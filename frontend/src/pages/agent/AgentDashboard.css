@@ -1,0 +1,41 @@
+.dashboard-container {
+    display: flex;
+  }
+  
+  .main-content {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+  }
+  
+  .content-wrapper {
+    padding: 20px;
+  }
+  
+  .welcome-message h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .statistics-panel,
+  .visits-panel,
+  .calendar,
+  .promos-panel {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  
+  .stat-box {
+    background-color: #fff;
+    text-align: center;
+  }
+  
+  .list-group-item {
+    margin-bottom: 10px;
+  }
+  
+  .btn-primary {
+    background-color: #3f3d56;
+    border: none;
+  }
+  
