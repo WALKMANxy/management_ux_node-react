@@ -79,4 +79,4 @@ const AgentDashboard: React.FC = () => {
   );
 };
 
-export default AgentDashboard;
+export default React.memo(AgentDashboard);

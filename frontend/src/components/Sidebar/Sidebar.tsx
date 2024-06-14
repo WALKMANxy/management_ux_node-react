@@ -1,23 +1,70 @@
-import React from 'react';
-
+import React, { useState, useEffect, useCallback } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBars, faTimes, faUser, faEnvelope, faChartBar, faTags, faExclamationTriangle, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import './Sidebar.css';
 
 const Sidebar: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(true);
+
+  const toggleSidebar = useCallback(() => {
+    setIsOpen(!isOpen);
+  }, [isOpen]);
+
+  const handleResize = useCallback(() => {
+    if (window.innerWidth < 768) {
+      setIsOpen(false);
+    } else {
+      setIsOpen(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Call it initially to set the correct state based on initial window size
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, [handleResize]);
+
   return (
-    <div className="sidebar d-flex flex-column">
-      <div className="logo p-3">
-        <h2>Logo</h2>
+    <>
+      <div className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
+        <div className="logo">Logo</div>
+        <nav>
+          <ul>
+            <li>
+              <FontAwesomeIcon icon={faUser} className="sidebar-icon" />
+              <a href="#clients">Clients</a>
+            </li>
+            <li>
+              <FontAwesomeIcon icon={faEnvelope} className="sidebar-icon" />
+              <a href="#visits">Visits</a>
+            </li>
+            <li>
+              <FontAwesomeIcon icon={faChartBar} className="sidebar-icon" />
+              <a href="#statistics">Statistics</a>
+            </li>
+            <li>
+              <FontAwesomeIcon icon={faTags} className="sidebar-icon" />
+              <a href="#promos">Promos</a>
+            </li>
+            <li>
+              <FontAwesomeIcon icon={faExclamationTriangle} className="sidebar-icon" />
+              <a href="#alerts">Alerts</a>
+            </li>
+          </ul>
+          <ul className="logout">
+            <li>
+              <FontAwesomeIcon icon={faSignOutAlt} className="sidebar-icon" />
+              <a href="#logout">Logout</a>
+            </li>
+          </ul>
+        </nav>
       </div>
-      <nav className="nav flex-column">
-        <a className="nav-link" href="#clients">Clients</a>
-        <a className="nav-link" href="#visits">Visits</a>
-        <a className="nav-link" href="#statistics">Statistics</a>
-        <a className="nav-link" href="#promos">Promos</a>
-        <a className="nav-link" href="#alerts">Alerts</a>
-        <a className="nav-link" href="#logout">Logout</a>
-      </nav>
-    </div>
+      <button className="toggle-button" onClick={toggleSidebar}>
+        <FontAwesomeIcon icon={isOpen ? faTimes : faBars} />
+      </button>
+    </>
   );
 };
 
-export default Sidebar;
+export default React.memo(Sidebar);
