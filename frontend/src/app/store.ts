@@ -3,12 +3,14 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 import { exampleAPI } from '../features/example/exampleAPI';
 import debugReducer from '../features/debug/debugSlice';
 import authReducer from '../features/auth/authSlice';
+import searchReducer from '../features/search/searchSlice';
 
 const store = configureStore({
   reducer: {
     [exampleAPI.reducerPath]: exampleAPI.reducer,
     debug: debugReducer,
-    auth: authReducer,  // Add auth reducer
+    auth: authReducer,
+    search: searchReducer,  // Add auth reducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(exampleAPI.middleware),

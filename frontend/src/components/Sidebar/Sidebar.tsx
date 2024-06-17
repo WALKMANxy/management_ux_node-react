@@ -1,36 +1,30 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTimes, faUser, faEnvelope, faChartBar, faTags, faExclamationTriangle, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTimes, faUser, faEnvelope, faChartBar, faTags, faExclamationTriangle, faSignOutAlt, faHome } from '@fortawesome/free-solid-svg-icons';
+import { useSidebar } from '../../hooks/useSidebar'; // Adjust the path as needed
 import './Sidebar.css';
 
-const Sidebar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(true);
+interface SidebarProps {
+  onToggle: (isOpen: boolean) => void;
+}
 
-  const toggleSidebar = useCallback(() => {
-    setIsOpen(!isOpen);
-  }, [isOpen]);
-
-  const handleResize = useCallback(() => {
-    if (window.innerWidth < 768) {
-      setIsOpen(false);
-    } else {
-      setIsOpen(true);
-    }
-  }, []);
+const Sidebar: React.FC<SidebarProps> = ({ onToggle }) => {
+  const { isSidebarOpen, toggleSidebar } = useSidebar();
 
   useEffect(() => {
-    window.addEventListener('resize', handleResize);
-    handleResize(); // Call it initially to set the correct state based on initial window size
-
-    return () => window.removeEventListener('resize', handleResize);
-  }, [handleResize]);
+    onToggle(isSidebarOpen);
+  }, [isSidebarOpen, onToggle]);
 
   return (
     <>
-      <div className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
+      <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
         <div className="logo">Logo</div>
         <nav>
           <ul>
+          <li>
+              <FontAwesomeIcon icon={faHome} className="sidebar-icon" />
+              <a href="#dashboard">Dashboard</a>
+            </li>
             <li>
               <FontAwesomeIcon icon={faUser} className="sidebar-icon" />
               <a href="#clients">Clients</a>
@@ -61,7 +55,7 @@ const Sidebar: React.FC = () => {
         </nav>
       </div>
       <button className="toggle-button" onClick={toggleSidebar}>
-        <FontAwesomeIcon icon={isOpen ? faTimes : faBars} />
+        <FontAwesomeIcon icon={isSidebarOpen ? faTimes : faBars} />
       </button>
     </>
   );

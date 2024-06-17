@@ -1,6 +1,8 @@
+// Header.tsx
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faBell } from '@fortawesome/free-solid-svg-icons';
+import GlobalSearch from '../common/GlobalSearch';
 import styles from './Header.module.css';
 
 const Header: React.FC = () => {
@@ -29,11 +31,14 @@ const Header: React.FC = () => {
     };
   }, [showNotifications, handleClickOutside]);
 
+  const handleSearchSelect = (result: string) => {
+    console.log(`Selected result: ${result}`);
+  };
+
   return (
     <header className={`${styles.header} d-flex justify-content-between align-items-center p-3`}>
       <div className={styles['search-container']}>
-        <FontAwesomeIcon icon={faSearch} className={styles['search-icon']} />
-        <input type="text" className="form-control search-bar" placeholder="Search..." />
+        <GlobalSearch filter="all" onSelect={handleSearchSelect} placeholder="Global search..." />
       </div>
       <div className={`${styles['user-info-container']} d-flex align-items-center`}>
         <FontAwesomeIcon icon={faBell} className={styles['bell-icon']} onClick={handleBellClick} />

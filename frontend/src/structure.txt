@@ -1,0 +1,32 @@
+
+src/
+|-- components/
+|   |-- common/
+|   |   |-- DetailComponent.tsx
+|   |   |-- GlobalSearch.tsx
+|   |   |-- HistoryComponent.tsx
+|   |-- Header/
+|   |   |-- Header.tsx
+|   |   |-- Header.css
+|   |-- Sidebar/
+|   |   |-- Sidebar.tsx
+|   |   |-- Sidebar.css
+|-- features/
+|   |-- auth/
+|   |   |-- authSlice.ts
+|   |-- debug/
+|   |-- example/
+|-- hooks/
+|   |-- useSidebar.ts
+|-- pages/
+|   |-- admin/
+|   |   |-- AdminDashboard.tsx
+|   |-- agent/
+|   |   |-- AgentDashboard.tsx
+|   |   |-- AgentDashboard.css
+|   |-- client/
+|   |   |-- ClientDashboard.tsx
+|   |-- common/
+|   |   |-- ClientsPage.tsx
+|-- App.tsx
+|-- index.tsx

@@ -1,0 +1,21 @@
+.search-results-container {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 5px;
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  width: 100%;
+  z-index: 1000;
+}
+
+.search-result-item {
+  cursor: pointer;
+  padding: 10px;
+}
+
+.search-result-item:hover {
+  background-color: #f1f1f1;
+}
