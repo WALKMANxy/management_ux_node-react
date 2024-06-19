@@ -1,16 +1,20 @@
 // src/components/common/DetailComponent.tsx
-import React from 'react';
-import { DetailProps } from '../../models/models';
+import React from "react";
+import { Box, Typography } from "@mui/material";
+
+interface DetailProps {
+  detail: { [key: string]: any };
+}
 
 const DetailComponent: React.FC<DetailProps> = ({ detail }) => {
   return (
-    <div>
+    <Box>
       {Object.keys(detail).map((key) => (
-        <p key={key}>
+        <Typography key={key} variant="body1">
           <strong>{key}:</strong> {detail[key]}
-        </p>
+        </Typography>
       ))}
-    </div>
+    </Box>
   );
 };
 

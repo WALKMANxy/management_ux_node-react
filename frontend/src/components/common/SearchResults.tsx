@@ -1,12 +1,9 @@
 // src/components/common/SearchResults.tsx
 import React, { useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../app/store';
 import { SearchResultsProps } from '../../models/models';
 import './SearchResults.module.css';
 
-const SearchResults: React.FC<SearchResultsProps> = ({ onSelect, selectedIndex }) => {
-  const { results, status, error } = useSelector((state: RootState) => state.search);
+const SearchResults: React.FC<SearchResultsProps> = ({ onSelect, selectedIndex, results }) => {
   const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -18,14 +15,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({ onSelect, selectedIndex }
     }
   }, [selectedIndex]);
 
-  if (status === 'loading') {
-    return <div className="search-results">Loading...</div>;
-  }
-
-  if (status === 'failed') {
-    return <div className="search-results">Error: {error}</div>;
-  }
-
   return (
     <div className="search-results" ref={resultsRef}>
       {results.length > 0 ? (
@@ -33,7 +22,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ onSelect, selectedIndex }
           <div
             key={result.id}
             className={`search-result-item ${index === selectedIndex ? 'selected' : ''}`}
-            onClick={() => onSelect && onSelect(result.name)}
+            onClick={() => onSelect(result.name)}
           >
             <p>{result.name}</p>
             <small>Type: {result.type}</small>

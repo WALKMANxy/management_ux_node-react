@@ -1,4 +1,4 @@
-/* src/components/Sidebar/sidebar.css */
+/* /* /* src/components/Sidebar/sidebar.css 
 .sidebar {
   position: fixed;
   left: 0;
@@ -10,8 +10,8 @@
   padding: 20px;
   transition: transform 0.3s ease-in-out;
   transform: translateX(0);
-  z-index: 2000; /* Ensure it stays on top */
-  border-radius: 0 20px 20px 0; /* Add rounded corners to the sidebar */
+  z-index: 2000;  Ensure it stays on top 
+  border-radius: 0 20px 20px 0;  Add rounded corners to the sidebar 
 }
 
 .sidebar.closed {
@@ -36,20 +36,20 @@
 }
 
 .sidebar nav ul li {
-  margin: 20px 0; /* Increase spacing between list items */
+  margin: 20px 0;  Increase spacing between list items 
   display: flex;
   align-items: center;
-  font-size: 1.1rem; /* Increase font size */
+  font-size: 1.1rem; /* Increase font size 
 }
 
 .sidebar nav ul.logout {
-  margin-top: auto; /* Push the logout link to the bottom */
+  margin-top: auto; /* Push the logout link to the bottom 
 }
 
 .sidebar nav ul li a {
   color: #fff;
   text-decoration: none;
-  margin-left: 10px; /* Add margin to the left of the text */
+  margin-left: 10px; /* Add margin to the left of the text 
 }
 
 .sidebar-icon {
@@ -59,14 +59,14 @@
 .toggle-button {
   position: fixed;
   left: 20px;
-  top: 10px; /* Adjust this to align vertically with the header */
+  top: 10px; /* Adjust this to align vertically with the header 
   background-color: transparent;
   border: none;
   color: #000;
   font-size: 1.5rem;
   cursor: pointer;
-  z-index: 3000; /* Ensure it stays on top */
-  padding: 5px 0; /* Adjust padding to align vertically */
+  z-index: 3000; /* Ensure it stays on top 
+  padding: 5px 0; /* Adjust padding to align vertically 
 }
 
 @media (min-width: 768px) {
@@ -74,17 +74,18 @@
     display: none;
   }
 }
-
+/*  
 @media (max-width: 767px) {
   .sidebar {
     transform: translateX(-100%);
   }
 
   .sidebar.open {
-    transform: translateX(0);
+    transform: translateX(0);/*  
   }
 
   .main-content {
     margin-left: 0;
   }
 }
+ */ 

@@ -5,6 +5,7 @@ export type UserRole = 'admin' | 'agent' | 'client' | 'guest';
 export type AuthState = {
   isLoggedIn: boolean;
   userRole: UserRole;
+  id: string | null;
 };
 
 export type SearchResult = {
@@ -16,6 +17,7 @@ export type SearchResult = {
 export type SearchParams = {
   query: string;
   filter: string;
+  results?: SearchResult[];
 };
 
 export type SearchState = {
@@ -40,6 +42,74 @@ export type HistoryProps = {
 };
 
 export type SearchResultsProps = {
-  onSelect?: (item: string) => void;
+  onSelect: (item: string) => void;
   selectedIndex: number;
+  results: SearchResult[];
+};
+
+export type SidebarProps = {
+  onToggle: (isOpen: boolean) => void;
+};
+
+export type Visit = {
+  date: string;
+  note: string;
+};
+
+export type Movement = {
+  id: string;
+  type: string;
+  name: string;
+  category: string;
+  price: string;
+  amountPaid: string;
+  unpaidAmount: string;
+  paymentDueDate: string;
+  dateOfOrder: string;
+};
+
+export type Promo = {
+  id: string;
+  name: string;
+  discount: string;
+  startDate: string;
+  endDate: string;
+};
+
+export type Client = {
+  id: string;
+  name: string;
+  province: string;
+  phone: string;
+  totalOrders: number;
+  totalRevenue: string;
+  unpaidRevenue: string;
+  address: string;
+  email: string;
+  visits: Visit[];
+  agent: string;
+  movements: Movement[];
+  promos: Promo[];
+};
+
+export type Agent = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  clients: Client[];
+};
+
+export type Alert = {
+  id: string;
+  message: string;
+  date: string;
+  severity: 'low' | 'medium' | 'high';
+};
+
+export type MockData = {
+  clients: Client[];
+  agents: Agent[];
+  promos: Promo[];
+  alerts: Alert[];
 };

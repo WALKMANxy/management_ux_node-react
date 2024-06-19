@@ -2,6 +2,8 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import { Provider, useSelector } from 'react-redux';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import store, { RootState } from './app/store';
 import Layout from './layout/Layout';
 import LandingPage from './pages/landing/LandingPage';
@@ -32,10 +34,22 @@ const router = createBrowserRouter([
   },
 ]);
 
+const theme = createTheme({
+  palette: {
+    background: {
+      default: '#f4f6f8',
+      paper: '#ffffff',
+    },
+  },
+});
+
 function App() {
   return (
     <Provider store={store}>
-      <RouterProvider router={router} />
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <RouterProvider router={router} />
+      </ThemeProvider>
     </Provider>
   );
 }

@@ -1,17 +1,75 @@
-// src/components/Sidebar/Sidebar.tsx
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTimes, faUser, faEnvelope, faChartBar, faTags, faExclamationTriangle, faSignOutAlt, faHome } from '@fortawesome/free-solid-svg-icons';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../app/store';
-import { logout } from '../../features/auth/authSlice';
-import { useSidebar } from '../../hooks/useSidebar';
-import './Sidebar.css';
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBars,
+  faTimes,
+  faEnvelope,
+  faChartBar,
+  faTags,
+  faExclamationTriangle,
+  faSignOutAlt,
+  faHome,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../app/store";
+import { logout } from "../../features/auth/authSlice";
+import { useSidebar } from "../../hooks/useSidebar";
+import {
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  IconButton,
+  Typography,
+  Box,
+} from "@mui/material";
+import { styled } from "@mui/system";
+import { SidebarProps } from "../../models/models"; // Adjust the path if necessary
 
-interface SidebarProps {
-  onToggle: (isOpen: boolean) => void;
-}
+const SidebarContainer = styled(Box)(({ theme }) => ({
+  position: "fixed",
+  left: 0,
+  top: 0,
+  width: 200, // Adjusted to make sidebar thinner
+  height: "100vh",
+  backgroundColor: "#2E3B4E",
+  color: "#fff",
+  padding: 20,
+  transition: "transform 0.3s ease-in-out",
+  transform: "translateX(0)",
+  zIndex: 2000,
+  borderRadius: "0 20px 20px 0",
+  "&.closed": {
+    transform: "translateX(-100%)",
+  },
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "space-between",
+  "& .MuiListItemIcon-root": {
+    fontSize: "1.32rem", // Increased icon size by 10%
+  },
+  "& .MuiListItemText-primary": {
+    fontSize: "1.1rem", // Increased text size by 10%
+  },
+}));
+
+const ToggleButton = styled(IconButton)(({ theme }) => ({
+  position: "fixed",
+  left: 20,
+  top: 10,
+  backgroundColor: "transparent",
+  border: "none",
+  color: "#000",
+  fontSize: "1.5rem",
+  cursor: "pointer",
+  zIndex: 3000,
+  padding: "5px 0",
+  [theme.breakpoints.up("md")]: {
+    display: "none",
+  },
+}));
 
 const Sidebar: React.FC<SidebarProps> = ({ onToggle }) => {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
@@ -27,84 +85,88 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggle }) => {
   };
 
   const renderLinks = () => {
+    let dashboardLink = "/";
     switch (userRole) {
-      case 'admin':
-        return (
-          <>
-            <li>
-              <FontAwesomeIcon icon={faHome} className="sidebar-icon" />
-              <Link to="/admin-dashboard">Dashboard</Link>
-            </li>
-            <li>
-              <FontAwesomeIcon icon={faUser} className="sidebar-icon" />
-              <Link to="/clients">Clients</Link>
-            </li>
-            {/* Add other admin links here */}
-          </>
-        );
-      case 'agent':
-        return (
-          <>
-            <li>
-              <FontAwesomeIcon icon={faHome} className="sidebar-icon" />
-              <Link to="/agent-dashboard">Dashboard</Link>
-            </li>
-            <li>
-              <FontAwesomeIcon icon={faUser} className="sidebar-icon" />
-              <Link to="/clients">Clients</Link>
-            </li>
-            <li>
-              <FontAwesomeIcon icon={faEnvelope} className="sidebar-icon" />
-              <Link to="/visits">Visits</Link>
-            </li>
-            <li>
-              <FontAwesomeIcon icon={faChartBar} className="sidebar-icon" />
-              <Link to="/statistics">Statistics</Link>
-            </li>
-            <li>
-              <FontAwesomeIcon icon={faTags} className="sidebar-icon" />
-              <Link to="/promos">Promos</Link>
-            </li>
-            <li>
-              <FontAwesomeIcon icon={faExclamationTriangle} className="sidebar-icon" />
-              <Link to="/alerts">Alerts</Link>
-            </li>
-          </>
-        );
-      case 'client':
-        return (
-          <>
-            <li>
-              <FontAwesomeIcon icon={faHome} className="sidebar-icon" />
-              <Link to="/client-dashboard">Dashboard</Link>
-            </li>
-            {/* Add other client links here */}
-          </>
-        );
+      case "admin":
+        dashboardLink = "/admin-dashboard";
+        break;
+      case "agent":
+        dashboardLink = "/agent-dashboard";
+        break;
+      case "client":
+        dashboardLink = "/client-dashboard";
+        break;
       default:
-        return null;
+        dashboardLink = "/";
     }
+
+    return (
+      <>
+        <ListItem button component={Link} to={dashboardLink}>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faHome} />
+          </ListItemIcon>
+          <ListItemText primary="Dashboard" />
+        </ListItem>
+        <ListItem button component={Link} to="/clients">
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faUser} />
+          </ListItemIcon>
+          <ListItemText primary="Clients" />
+        </ListItem>
+        <ListItem button component={Link} to="/visits">
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faEnvelope} />
+          </ListItemIcon>
+          <ListItemText primary="Visits" />
+        </ListItem>
+        <ListItem button component={Link} to="/statistics">
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faChartBar} />
+          </ListItemIcon>
+          <ListItemText primary="Statistics" />
+        </ListItem>
+        <ListItem button component={Link} to="/promos">
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faTags} />
+          </ListItemIcon>
+          <ListItemText primary="Promos" />
+        </ListItem>
+        <ListItem button component={Link} to="/alerts">
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faExclamationTriangle} />
+          </ListItemIcon>
+          <ListItemText primary="Alerts" />
+        </ListItem>
+      </>
+    );
   };
 
   return (
     <>
-      <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
-        <div className="logo">Logo</div>
-        <nav>
-          <ul>
-            {renderLinks()}
-          </ul>
-          <ul className="logout">
-            <li>
-              <FontAwesomeIcon icon={faSignOutAlt} className="sidebar-icon" />
-              <Link to="/" onClick={handleLogout}>Logout</Link>
-            </li>
-          </ul>
-        </nav>
-      </div>
-      <button className="toggle-button" onClick={toggleSidebar}>
+      <SidebarContainer className={isSidebarOpen ? "" : "closed"}>
+        <Box>
+          <Typography variant="h6" component="div" className="logo">
+            Logo
+          </Typography>
+          <nav>
+            <List>{renderLinks()}</List>
+          </nav>
+        </Box>
+        <Box>
+          <List className="logout">
+            <ListItem button component={Link} to="/" onClick={handleLogout}>
+              <ListItemIcon>
+                <FontAwesomeIcon icon={faSignOutAlt} />
+              </ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItem>
+          </List>
+        </Box>
+      </SidebarContainer>
+      <ToggleButton onClick={toggleSidebar}>
         <FontAwesomeIcon icon={isSidebarOpen ? faTimes : faBars} />
-      </button>
+      </ToggleButton>
     </>
   );
 };

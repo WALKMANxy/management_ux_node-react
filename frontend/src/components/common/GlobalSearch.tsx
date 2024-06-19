@@ -6,11 +6,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import DOMPurify from 'dompurify';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { setQuery, searchItems } from '../../features/search/searchSlice';
-import {  GlobalSearchProps } from '../../models/models';
+import { GlobalSearchProps } from '../../models/models';
 import './GlobalSearch.css';
 import SearchResults from './SearchResults';
-
-
 
 const GlobalSearch: React.FC<GlobalSearchProps> = ({ filter = 'all', onSelect, placeholder = "Search..." }) => {
   const [input, setInput] = useState('');
@@ -110,7 +108,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ filter = 'all', onSelect, p
       </div>
       {showResults && (
         <div className="search-results-container">
-          <SearchResults onSelect={handleSelect} selectedIndex={selectedIndex} />
+          <SearchResults onSelect={handleSelect} selectedIndex={selectedIndex} results={results} />
         </div>
       )}
     </div>

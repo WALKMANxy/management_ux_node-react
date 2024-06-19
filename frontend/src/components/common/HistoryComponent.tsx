@@ -1,20 +1,22 @@
 // src/components/common/HistoryComponent.tsx
-import React from 'react';
-import { HistoryProps } from '../../models/models';
+import React from "react";
+import { List, ListItem, ListItemText } from "@mui/material";
+
+interface HistoryProps {
+  history: { [key: string]: any }[];
+}
 
 const HistoryComponent: React.FC<HistoryProps> = ({ history }) => {
   return (
-    <ul>
+    <List>
       {history.map((item, index) => (
-        <li key={index}>
+        <ListItem key={index}>
           {Object.keys(item).map((key) => (
-            <p key={key}>
-              <strong>{key}:</strong> {item[key]}
-            </p>
+            <ListItemText key={key} primary={`${key}: ${item[key]}`} />
           ))}
-        </li>
+        </ListItem>
       ))}
-    </ul>
+    </List>
   );
 };
 
