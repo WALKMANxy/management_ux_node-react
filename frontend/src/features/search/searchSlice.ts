@@ -1,18 +1,6 @@
-// searchSlice.ts
+// src/features/search/searchSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
-interface SearchResult {
-  id: string;
-  name: string;
-  type: string;
-}
-
-interface SearchState {
-  query: string;
-  results: SearchResult[];
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
-  error: string | null;
-}
+import { SearchResult, SearchParams, SearchState } from '../../models/models';
 
 const initialState: SearchState = {
   query: '',
@@ -21,16 +9,10 @@ const initialState: SearchState = {
   error: null,
 };
 
-interface SearchParams {
-  query: string;
-  filter?: string;
-}
-
 export const searchItems = createAsyncThunk<SearchResult[], SearchParams>(
   'search/searchItems',
   async ({ query, filter }) => {
-    console.log('searchItems called with query:', query, 'and filter:', filter);
-    const mockData = [
+    const mockData: SearchResult[] = [
       { id: '1', name: 'Client 1', type: 'client' },
       { id: '2', name: 'Client 2', type: 'client' },
       { id: '3', name: 'Client 3', type: 'client' },
@@ -42,22 +24,17 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams>(
       { id: '9', name: 'Visit 2', type: 'visit' },
       { id: '10', name: 'Alert 1', type: 'alert' },
       { id: '11', name: 'Alert 2', type: 'alert' },
-      { id: '12', name: 'Alert 3', type: 'alert' }
     ];
-    const lowerCaseQuery = query.toLowerCase();
-    let filteredData;
-
-    if (filter && filter !== 'all') {
-      filteredData = mockData.filter(item => item.type === filter);
+    if (filter === 'all') {
+      return mockData.filter((item) =>
+        item.name.toLowerCase().includes(query.toLowerCase())
+      );
     } else {
-      filteredData = mockData;
+      return mockData.filter(
+        (item) =>
+          item.type === filter && item.name.toLowerCase().includes(query.toLowerCase())
+      );
     }
-
-    const results = filteredData.filter(item =>
-      item.name.toLowerCase().includes(lowerCaseQuery)
-    );
-    console.log('Filtered results:', results);
-    return results;
   }
 );
 
@@ -67,6 +44,11 @@ const searchSlice = createSlice({
   reducers: {
     setQuery(state, action) {
       state.query = action.payload;
+    },
+    clearResults(state) {
+      state.results = [];
+      state.query = '';
+      state.status = 'idle';
     },
   },
   extraReducers: (builder) => {
@@ -85,6 +67,6 @@ const searchSlice = createSlice({
   },
 });
 
-export const { setQuery } = searchSlice.actions;
+export const { setQuery, clearResults } = searchSlice.actions;
 
 export default searchSlice.reducer;

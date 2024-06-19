@@ -1,0 +1,23 @@
+/* src/pages/common/ClientsPage.module.css */
+.clients-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.content-wrapper {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+}
+
+.client-details {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.client-details h2,
+.client-details h3 {
+  margin-bottom: 20px;
+}

@@ -1,3 +1,4 @@
+//src/app/store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { exampleAPI } from '../features/example/exampleAPI';
@@ -10,7 +11,7 @@ const store = configureStore({
     [exampleAPI.reducerPath]: exampleAPI.reducer,
     debug: debugReducer,
     auth: authReducer,
-    search: searchReducer,  // Add auth reducer
+    search: searchReducer, 
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(exampleAPI.middleware),

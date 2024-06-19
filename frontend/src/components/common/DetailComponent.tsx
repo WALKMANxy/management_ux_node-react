@@ -1,8 +1,6 @@
+// src/components/common/DetailComponent.tsx
 import React from 'react';
-
-interface DetailProps {
-  detail: { [key: string]: any };
-}
+import { DetailProps } from '../../models/models';
 
 const DetailComponent: React.FC<DetailProps> = ({ detail }) => {
   return (

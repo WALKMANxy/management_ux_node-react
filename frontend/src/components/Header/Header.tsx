@@ -1,4 +1,4 @@
-// Header.tsx
+// src/components/Header/Header.tsx
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
@@ -36,9 +36,9 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className={`${styles.header} d-flex justify-content-between align-items-center p-3`}>
+    <header className={`${styles.header} d-flex justify-content-between align-items-center p-3`} style={{ zIndex: 1100 }}>
       <div className={styles['search-container']}>
-        <GlobalSearch filter="all" onSelect={handleSearchSelect} placeholder="Global search..." />
+        <GlobalSearch filter="all" placeholder="Global search..." onSelect={handleSearchSelect} />
       </div>
       <div className={`${styles['user-info-container']} d-flex align-items-center`}>
         <FontAwesomeIcon icon={faBell} className={styles['bell-icon']} onClick={handleBellClick} />

@@ -1,26 +1,23 @@
+// src/features/auth/authSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-interface AuthState {
-  isLoggedIn: boolean;
-  userRole: 'admin' | 'agent' | 'client' | null;
-}
+import { AuthState, UserRole } from '../../models/models';
 
 const initialState: AuthState = {
   isLoggedIn: false,
-  userRole: null,
+  userRole: 'guest', // default to guest
 };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    login: (state, action: PayloadAction<'admin' | 'agent' | 'client'>) => {
+    login(state, action: PayloadAction<UserRole>) {
       state.isLoggedIn = true;
       state.userRole = action.payload;
     },
-    logout: (state) => {
+    logout(state) {
       state.isLoggedIn = false;
-      state.userRole = null;
+      state.userRole = 'guest'; // default to guest
     },
   },
 });

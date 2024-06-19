@@ -1,8 +1,6 @@
+// src/components/common/HistoryComponent.tsx
 import React from 'react';
-
-interface HistoryProps {
-  history: { [key: string]: any }[];
-}
+import { HistoryProps } from '../../models/models';
 
 const HistoryComponent: React.FC<HistoryProps> = ({ history }) => {
   return (
