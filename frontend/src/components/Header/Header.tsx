@@ -2,7 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import GlobalSearch from "../common/GlobalSearch";
-import useNotifications from "../../hooks/useNotifications";
+import useNotifications from "../../features/hooks/useNotifications";
 import styles from "./Header.module.css";
 
 const Header: React.FC = () => {

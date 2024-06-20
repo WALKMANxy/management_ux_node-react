@@ -15,7 +15,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import { logout } from "../../features/auth/authSlice";
-import { useSidebar } from "../../hooks/useSidebar";
+import { useSidebar } from "../../features/hooks/useSidebar";
 import {
   List,
   ListItem,

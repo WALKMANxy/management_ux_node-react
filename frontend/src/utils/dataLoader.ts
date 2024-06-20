@@ -1,9 +1,10 @@
+// utils/dataLoader.ts
 import axios from 'axios';
-import { Client, Agent } from '../models/models';
+import { Client, Agent, MovementDetail } from '../models/models';
 
 const jsonFilePath = '/datasetsfrom01JANto12JUN.json';
 
-// Web worker script
+// Web worker script for clients
 const workerScript = `
 self.onmessage = function(event) {
   const { data, chunkSize } = event.data;
@@ -111,6 +112,49 @@ export const mapDataToModels = (data: any[]): Promise<Client[]> => {
   });
 };
 
+export const mapDataToClients = (data: any[]): Promise<Client[]> => {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(workerUrl);
+    const chunkSize = 1000;
+
+    worker.postMessage({ data, chunkSize });
+
+    worker.onmessage = function(event) {
+      resolve(event.data);
+      worker.terminate();
+    };
+
+    worker.onerror = function(error) {
+      reject(error);
+      worker.terminate();
+    };
+  });
+};
+
+export const mapDataToMinimalClients = (data: any[]): Client[] => {
+  const clientsMap = data.reduce<Map<string, any>>((acc, item) => {
+    const clientId = item["Codice Cliente"].toString();
+    if (!acc.has(clientId)) {
+      acc.set(clientId, { id: clientId, name: item["Ragione Sociale Cliente"] });
+    }
+    return acc;
+  }, new Map<string, any>());
+
+  return Array.from(clientsMap.values());
+};
+
+export const mapDataToMinimalAgents = (data: any[]): Agent[] => {
+  const agentsMap = data.reduce<Map<string, any>>((acc, item) => {
+    const agentId = item["Codice Agente"].toString();
+    if (!acc.has(agentId)) {
+      acc.set(agentId, { id: agentId, name: `Agent ${agentId}`, clients: [] });
+    }
+    return acc;
+  }, new Map<string, any>());
+
+  return Array.from(agentsMap.values());
+};
+
 export const mapDataToAgents = (data: any[]): Agent[] => {
   const agentsMap = data.reduce<Map<string, any[]>>((acc, item) => {
     const agentId = item["Codice Agente"].toString();
@@ -139,4 +183,14 @@ export const mapDataToAgents = (data: any[]): Agent[] => {
   }));
 
   return agents;
+}
+
+export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
+  return data.map(item => ({
+    articleId: item["Codice Articolo"].toString(),
+    name: item["Descrizione Articolo"],
+    brand: item["Marca Articolo"],
+    priceSold: parseFloat(item["Valore"]).toFixed(2),
+    priceBought: parseFloat(item["Costo"]).toFixed(2)
+  }));
 };

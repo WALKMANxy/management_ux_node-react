@@ -16,6 +16,8 @@ export const useSidebar = () => {
     }
   }, []);
 
+
+
   useEffect(() => {
     window.addEventListener("resize", handleResize);
     handleResize(); // Call it initially to set the correct state based on initial window size

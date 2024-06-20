@@ -26,7 +26,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       {results.length > 0 ? (
         results.map((result, index) => (
           <div
-            key={`${result.id}-${index}`} // Ensure unique keys
+            key={result.id}
             className={`search-result-item ${
               index === selectedIndex ? "selected" : ""
             }`}

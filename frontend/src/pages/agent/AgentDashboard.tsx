@@ -3,7 +3,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import GlobalSearch from "../../components/common/GlobalSearch";
-import useAgentStats from "../../hooks/useAgentStats";
+import useAgentStats from "../../features/hooks/useAgentStats";
 import "./AgentDashboard.css";
 
 const AgentDashboard: React.FC = () => {

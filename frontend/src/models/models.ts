@@ -8,6 +8,14 @@ export type AuthState = {
   id: string | null;
 };
 
+export type AuthHandlersProps = {
+  selectedRole: "admin" | "agent" | "client";
+  selectedAgent: string;
+  selectedClient: string;
+  agents: Agent[];
+}
+
+
 export type SearchResult = {
   id: string;
   name: string;
@@ -112,12 +120,7 @@ export type Alert = {
   severity: "low" | "medium" | "high";
 };
 
-export type MockData = {
-  clients: Client[];
-  agents: Agent[];
-  promos: Promo[];
-  alerts: Alert[];
-};
+
 
 export type DataState = {
   clients: Client[];

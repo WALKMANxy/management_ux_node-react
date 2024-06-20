@@ -2,11 +2,11 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar/Sidebar";
 import Header from "../components/Header/Header";
-import { useSidebar } from "../hooks/useSidebar";
+import { useSidebar } from "../features/hooks/useSidebar";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
 import "./Layout.css";
-import useClearSearchOnNavigate from "../hooks/useClearSearchOnNavigate";
+import useClearSearchOnNavigate from "../features/hooks/useClearSearchOnNavigate";
 
 const Layout: React.FC = () => {
   const { isSidebarOpen, toggleSidebar } = useSidebar();

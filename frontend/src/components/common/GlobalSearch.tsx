@@ -3,7 +3,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import SearchResults from "./SearchResults";
-import useGlobalSearch from "../../hooks/useGlobalSearch";
+import useGlobalSearch from "../../features/hooks/useGlobalSearch";
 import { GlobalSearchProps } from "../../models/models";
 import "./GlobalSearch.css";
 

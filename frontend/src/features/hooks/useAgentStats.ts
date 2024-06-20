@@ -1,7 +1,7 @@
 // src/hooks/useAgentStats.ts
 import { useEffect, useState, useCallback } from "react";
-import { Client, Agent, Movement } from "../models/models";
-import { useGetClientsQuery } from "../services/api";
+import { Client, Agent, Movement } from "../../models/models";
+import { useGetClientsQuery } from "../../services/api";
 
 const useAgentStats = (agentId: string | null) => {
   const { data: clientsData, isLoading, error } = useGetClientsQuery();

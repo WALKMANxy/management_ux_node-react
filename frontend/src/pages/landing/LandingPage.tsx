@@ -1,8 +1,4 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { login } from "../../features/auth/authSlice";
-import { RootState } from "../../app/store";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -18,8 +14,10 @@ import {
   Grid,
   Paper,
 } from "@mui/material";
-import { useGetAgentsQuery } from "../../services/api";
-import { setAgentClients } from "../../features/data/dataSlice";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
+import { useGetAgentsQuery, useGetMinimalClientsQuery } from "../../services/api";
+import useAuthHandlers from "../../features/hooks/useAuthHandlers";
 
 const LandingPage: React.FC = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -27,49 +25,39 @@ const LandingPage: React.FC = () => {
   const [selectedAgent, setSelectedAgent] = useState<string>(""); // State for selected agent
   const [selectedClient, setSelectedClient] = useState<string>(""); // State for selected client
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
-  const userRole = useSelector((state: RootState) => state.auth.userRole);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const { data: agents = [] } = useGetAgentsQuery();
-  const clients = useSelector((state: RootState) => state.data.clients);
+  const { data: minimalClients = [], refetch: refetchMinimalClients } = useGetMinimalClientsQuery();
 
-  const handleLogin = () => {
-    if (selectedRole === "agent" && selectedAgent) {
-      const agent = agents.find(agent => agent.id === selectedAgent);
-      if (agent) {
-        dispatch(setAgentClients(agent.clients)); // Save the clients of the agent to state
-      }
-      dispatch(login({ role: selectedRole, id: selectedAgent }));
-    } else if (selectedRole === "client" && selectedClient) {
-      const client = clients.find(client => client.id === selectedClient);
-      if (client) {
-        dispatch(setAgentClients([client])); // Save the client details to state
-      }
-      dispatch(login({ role: selectedRole, id: selectedClient }));
-    } else if (selectedRole === "admin") {
-      dispatch(login({ role: selectedRole, id: "" })); // Admin can see all data
-    } else {
-      dispatch(login({ role: "guest", id: "" })); // Default to guest
-    }
-    setShowLogin(false);
-  };
+  const { handleLogin, handleEnterDashboard } = useAuthHandlers({
+    selectedRole,
+    selectedAgent,
+    selectedClient,
+    agents
+  });
 
-  const handleEnterDashboard = () => {
-    switch (userRole) {
-      case "admin":
-        navigate("/admin-dashboard");
-        break;
-      case "agent":
-        navigate("/agent-dashboard");
-        break;
-      case "client":
-        navigate("/client-dashboard");
-        break;
-      default:
-        navigate("/");
+  const agentOptions = useMemo(() => (
+    agents.map((agent, index) => (
+      <MenuItem key={`${agent.id}-${index}`} value={agent.id}>
+        {agent.name}
+      </MenuItem>
+    ))
+  ), [agents]);
+
+  const clientOptions = useMemo(() => (
+    minimalClients.map((client, index) => (
+      <MenuItem key={`${client.id}-${index}`} value={client.id}>
+        {client.name}
+      </MenuItem>
+    ))
+  ), [minimalClients]);
+
+  useEffect(() => {
+    if (!showLogin) {
+      setSelectedAgent("");
+      setSelectedClient("");
     }
-  };
+  }, [showLogin]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -94,11 +82,12 @@ const LandingPage: React.FC = () => {
               <InputLabel>User Role</InputLabel>
               <Select
                 value={selectedRole}
-                onChange={(e) =>
-                  setSelectedRole(
-                    e.target.value as "admin" | "agent" | "client"
-                  )
-                }
+                onChange={(e) => {
+                  setSelectedRole(e.target.value as "admin" | "agent" | "client");
+                  if (e.target.value === "client") {
+                    refetchMinimalClients();
+                  }
+                }}
               >
                 <MenuItem value="admin">Admin</MenuItem>
                 <MenuItem value="agent">Agent</MenuItem>
@@ -114,11 +103,7 @@ const LandingPage: React.FC = () => {
                   value={selectedAgent}
                   onChange={(e) => setSelectedAgent(e.target.value)}
                 >
-                  {agents.map((agent) => (
-                    <MenuItem key={agent.id} value={agent.id}>
-                      {agent.name}
-                    </MenuItem>
-                  ))}
+                  {agentOptions}
                 </Select>
               </FormControl>
             </MenuItem>
@@ -131,11 +116,7 @@ const LandingPage: React.FC = () => {
                   value={selectedClient}
                   onChange={(e) => setSelectedClient(e.target.value)}
                 >
-                  {clients.map((client) => (
-                    <MenuItem key={client.id} value={client.id}>
-                      {client.name}
-                    </MenuItem>
-                  ))}
+                  {clientOptions}
                 </Select>
               </FormControl>
             </MenuItem>
