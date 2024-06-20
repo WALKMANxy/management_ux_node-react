@@ -1,4 +1,3 @@
-// src/pages/landing/LandingPage.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,24 +18,39 @@ import {
   Grid,
   Paper,
 } from "@mui/material";
-import mockData from "../../mockData/mockData";
+import { useGetAgentsQuery } from "../../services/api";
+import { setAgentClients } from "../../features/data/dataSlice";
 
 const LandingPage: React.FC = () => {
   const [showLogin, setShowLogin] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<
-    "admin" | "agent" | "client"
-  >("client");
+  const [selectedRole, setSelectedRole] = useState<"admin" | "agent" | "client">("client");
   const [selectedAgent, setSelectedAgent] = useState<string>(""); // State for selected agent
+  const [selectedClient, setSelectedClient] = useState<string>(""); // State for selected client
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
   const userRole = useSelector((state: RootState) => state.auth.userRole);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const { data: agents = [] } = useGetAgentsQuery();
+  const clients = useSelector((state: RootState) => state.data.clients);
+
   const handleLogin = () => {
     if (selectedRole === "agent" && selectedAgent) {
+      const agent = agents.find(agent => agent.id === selectedAgent);
+      if (agent) {
+        dispatch(setAgentClients(agent.clients)); // Save the clients of the agent to state
+      }
       dispatch(login({ role: selectedRole, id: selectedAgent }));
+    } else if (selectedRole === "client" && selectedClient) {
+      const client = clients.find(client => client.id === selectedClient);
+      if (client) {
+        dispatch(setAgentClients([client])); // Save the client details to state
+      }
+      dispatch(login({ role: selectedRole, id: selectedClient }));
+    } else if (selectedRole === "admin") {
+      dispatch(login({ role: selectedRole, id: "" })); // Admin can see all data
     } else {
-      dispatch(login({ role: selectedRole, id: "" }));
+      dispatch(login({ role: "guest", id: "" })); // Default to guest
     }
     setShowLogin(false);
   };
@@ -100,9 +114,26 @@ const LandingPage: React.FC = () => {
                   value={selectedAgent}
                   onChange={(e) => setSelectedAgent(e.target.value)}
                 >
-                  {mockData.agents.map((agent) => (
+                  {agents.map((agent) => (
                     <MenuItem key={agent.id} value={agent.id}>
                       {agent.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </MenuItem>
+          )}
+          {selectedRole === "client" && (
+            <MenuItem>
+              <FormControl fullWidth>
+                <InputLabel>Select Client</InputLabel>
+                <Select
+                  value={selectedClient}
+                  onChange={(e) => setSelectedClient(e.target.value)}
+                >
+                  {clients.map((client) => (
+                    <MenuItem key={client.id} value={client.id}>
+                      {client.name}
                     </MenuItem>
                   ))}
                 </Select>
@@ -192,7 +223,7 @@ const LandingPage: React.FC = () => {
       >
         <Container>
           <Box display="flex" justifyContent="space-between">
-            <Typography>&copy; 2024 Developed By ****</Typography>
+            <Typography>© 2024 Developed By ****</Typography>
             <Typography>Business Contact: example@example.com</Typography>
           </Box>
         </Container>

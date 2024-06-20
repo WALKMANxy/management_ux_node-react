@@ -1,0 +1,90 @@
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../app/store";
+import DOMPurify from "dompurify";
+import { setQuery, searchItems } from "../features/search/searchSlice";
+import useDebounce from "./useDebounce";
+
+const useGlobalSearch = (filter: string) => {
+  const [input, setInput] = useState("");
+  const dispatch = useDispatch<AppDispatch>();
+  const searchRef = useRef<HTMLDivElement>(null);
+  const [showResults, setShowResults] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const debouncedInput = useDebounce(input, 300);
+  const results = useSelector((state: RootState) => state.search.results);
+
+  const handleSearch = useCallback(() => {
+    const sanitizedInput = DOMPurify.sanitize(debouncedInput.trim());
+    console.log("Sanitized Input:", sanitizedInput);
+    if (sanitizedInput === "") {
+      setShowResults(false);
+      return;
+    }
+    dispatch(setQuery(sanitizedInput));
+    dispatch(searchItems({ query: sanitizedInput, filter }));
+    setShowResults(true);
+  }, [dispatch, debouncedInput, filter]);
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter") {
+      if (selectedIndex >= 0 && selectedIndex < results.length) {
+        setShowResults(false);
+        setSelectedIndex(-1);
+      } else {
+        handleSearch();
+      }
+    } else if (event.key === "ArrowDown") {
+      setSelectedIndex((prevIndex) => (prevIndex + 1) % results.length);
+    } else if (event.key === "ArrowUp") {
+      setSelectedIndex(
+        (prevIndex) => (prevIndex - 1 + results.length) % results.length
+      );
+    }
+  };
+
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      setShowResults(false);
+      setSelectedIndex(-1);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [handleClickOutside]);
+
+  useEffect(() => {
+    if (debouncedInput) {
+      handleSearch();
+    }
+  }, [debouncedInput, handleSearch]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+    setSelectedIndex(-1);
+  };
+
+  const handleFocus = () => {
+    setShowResults(true);
+    setSelectedIndex(-1);
+  };
+
+  return {
+    input,
+    handleChange,
+    handleKeyDown,
+    handleFocus,
+    showResults,
+    searchRef,
+    results,
+    selectedIndex,
+    setShowResults,
+    setSelectedIndex,
+  };
+};
+
+export default useGlobalSearch;

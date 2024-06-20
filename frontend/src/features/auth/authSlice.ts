@@ -1,6 +1,6 @@
 // src/features/auth/authSlice.ts
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AuthState, UserRole } from '../../models/models';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AuthState, UserRole } from "../../models/models";
 
 interface LoginPayload {
   role: UserRole;
@@ -9,12 +9,12 @@ interface LoginPayload {
 
 const initialState: AuthState = {
   isLoggedIn: false,
-  userRole: 'guest', // default to guest
+  userRole: "guest", // default to guest
   id: null, // add userId field
 };
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
     login(state, action: PayloadAction<LoginPayload>) {
@@ -24,7 +24,7 @@ const authSlice = createSlice({
     },
     logout(state) {
       state.isLoggedIn = false;
-      state.userRole = 'guest'; // default to guest
+      state.userRole = "guest"; // default to guest
       state.id = null;
     },
   },

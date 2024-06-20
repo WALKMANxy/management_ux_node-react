@@ -1,64 +1,61 @@
 // src/hooks/useAgentStats.ts
-import { useEffect, useState } from 'react';
-import { Client, Agent, Movement } from '../models/models';
-import mockData from '../mockData/mockData';
+import { useEffect, useState, useCallback } from "react";
+import { Client, Agent, Movement } from "../models/models";
+import { useGetClientsQuery } from "../services/api";
 
 const useAgentStats = (agentId: string | null) => {
+  const { data: clientsData, isLoading, error } = useGetClientsQuery();
   const [agentDetails, setAgentDetails] = useState<Agent | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
   useEffect(() => {
-    console.log('Fetching agent details for:', agentId);
-    const agent = mockData.agents.find(agent => agent.id === agentId);
-    if (agent) {
+    if (!isLoading && clientsData && agentId) {
+      const agentClients = clientsData.filter(client => client.agent === agentId);
+      const agent = { id: agentId, name: `Agent ${agentId}`, clients: agentClients };
       setAgentDetails(agent);
-    } else {
-      console.error('Agent not found');
     }
-  }, [agentId]);
+  }, [isLoading, clientsData, agentId]);
 
-  const calculateTotalSpentThisMonth = (movements: Movement[]) => {
+  const calculateTotalSpentThisMonth = useCallback((movements: Movement[]) => {
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
     return movements
       .filter(movement => {
         const movementDate = new Date(movement.dateOfOrder);
-        return (
-          movementDate.getMonth() + 1 === currentMonth &&
-          movementDate.getFullYear() === currentYear
-        );
+        return movementDate.getMonth() + 1 === currentMonth && movementDate.getFullYear() === currentYear;
       })
-      .reduce((total, movement) => total + parseFloat(movement.price), 0);
-  };
+      .reduce((total, movement) => total + movement.details.reduce((sum, detail) => sum + parseFloat(detail.priceSold), 0), 0)
+      .toFixed(2);
+  }, []);
 
-  const calculateTotalSpentThisYear = (movements: Movement[]) => {
+  const calculateTotalSpentThisYear = useCallback((movements: Movement[]) => {
     const currentYear = new Date().getFullYear();
     return movements
       .filter(movement => new Date(movement.dateOfOrder).getFullYear() === currentYear)
-      .reduce((total, movement) => total + parseFloat(movement.price), 0);
-  };
+      .reduce((total, movement) => total + movement.details.reduce((sum, detail) => sum + parseFloat(detail.priceSold), 0), 0)
+      .toFixed(2);
+  }, []);
 
-  const calculateTopArticleType = (movements: Movement[]) => {
+  const calculateTopArticleType = useCallback((movements: Movement[]) => {
     const typeCount: { [key: string]: number } = {};
     movements.forEach(movement => {
-      if (typeCount[movement.type]) {
-        typeCount[movement.type]++;
-      } else {
-        typeCount[movement.type] = 1;
-      }
+      movement.details.forEach(detail => {
+        typeCount[detail.name] = (typeCount[detail.name] || 0) + 1;
+      });
     });
-    return Object.keys(typeCount).reduce((a, b) => (typeCount[a] > typeCount[b] ? a : b), '');
-  };
+    return Object.keys(typeCount).reduce((a, b) => (typeCount[a] > typeCount[b] ? a : b), "");
+  }, []);
 
-  const selectClient = (clientId: string) => {
-    console.log('Selecting client:', clientId);
-    const client = agentDetails?.clients.find(client => client.id === clientId);
-    if (client) {
-      setSelectedClient(client);
-    } else {
-      console.error('Client not found for this agent');
+  const selectClient = useCallback((clientName: string) => {
+    if (agentDetails) {
+      const client = agentDetails.clients.find(client => client.name === clientName);
+      if (client) {
+        setSelectedClient(client);
+      } else {
+        console.error("Client not found for this agent");
+      }
     }
-  };
+  }, [agentDetails]);
 
   return {
     agentDetails,
@@ -67,6 +64,8 @@ const useAgentStats = (agentId: string | null) => {
     calculateTotalSpentThisMonth,
     calculateTotalSpentThisYear,
     calculateTopArticleType,
+    isLoading,
+    error,
   };
 };
 

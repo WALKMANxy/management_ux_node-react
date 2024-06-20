@@ -1,6 +1,6 @@
 // src/models/models.ts
 
-export type UserRole = 'admin' | 'agent' | 'client' | 'guest';
+export type UserRole = "admin" | "agent" | "client" | "guest";
 
 export type AuthState = {
   isLoggedIn: boolean;
@@ -23,7 +23,7 @@ export type SearchParams = {
 export type SearchState = {
   query: string;
   results: SearchResult[];
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 };
 
@@ -56,13 +56,18 @@ export type Visit = {
   note: string;
 };
 
+export type MovementDetail = {
+  articleId: string;
+  name: string;
+  brand: string;
+  priceSold: string;
+  priceBought: string;
+};
+
 export type Movement = {
   id: string;
-  type: string;
-  name: string;
-  category: string;
-  price: string;
-  amountPaid: string;
+  discountCategory: string;
+  details: MovementDetail[];
   unpaidAmount: string;
   paymentDueDate: string;
   dateOfOrder: string;
@@ -95,8 +100,8 @@ export type Client = {
 export type Agent = {
   id: string;
   name: string;
-  email: string;
-  phone: string;
+  email?: string;
+  phone?: string;
   clients: Client[];
 };
 
@@ -104,7 +109,7 @@ export type Alert = {
   id: string;
   message: string;
   date: string;
-  severity: 'low' | 'medium' | 'high';
+  severity: "low" | "medium" | "high";
 };
 
 export type MockData = {
@@ -113,3 +118,16 @@ export type MockData = {
   promos: Promo[];
   alerts: Alert[];
 };
+
+export type DataState = {
+  clients: Client[];
+  clientIndex: Map<string, Client>;
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error: string | null;
+}
+
+export type FetchDataPayload = {
+  clients: Client[];
+  clientIndex: Map<string, Client>;
+}
+

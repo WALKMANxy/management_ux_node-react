@@ -1,38 +1,13 @@
-// src/components/Header/Header.tsx
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import GlobalSearch from "../common/GlobalSearch";
+import useNotifications from "../../hooks/useNotifications";
 import styles from "./Header.module.css";
 
 const Header: React.FC = () => {
-  const [showNotifications, setShowNotifications] = useState(false);
-  const notificationRef = useRef<HTMLDivElement>(null);
-
-  const handleBellClick = useCallback(() => {
-    setShowNotifications(!showNotifications);
-  }, [showNotifications]);
-
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (
-      notificationRef.current &&
-      !notificationRef.current.contains(event.target as Node)
-    ) {
-      setShowNotifications(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (showNotifications) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showNotifications, handleClickOutside]);
+  const { showNotifications, handleBellClick, notificationRef } =
+    useNotifications();
 
   const handleSearchSelect = (result: string) => {
     console.log(`Selected result: ${result}`);

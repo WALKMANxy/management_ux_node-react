@@ -1,16 +1,22 @@
 // src/components/common/SearchResults.tsx
-import React, { useEffect, useRef } from 'react';
-import { SearchResultsProps } from '../../models/models';
-import './SearchResults.module.css';
+import React, { useEffect, useRef } from "react";
+import { SearchResultsProps } from "../../models/models";
+import "./SearchResults.module.css";
 
-const SearchResults: React.FC<SearchResultsProps> = ({ onSelect, selectedIndex, results }) => {
+const SearchResults: React.FC<SearchResultsProps> = ({
+  onSelect,
+  selectedIndex,
+  results,
+}) => {
   const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (resultsRef.current) {
-      const selectedElement = resultsRef.current.children[selectedIndex] as HTMLElement;
+      const selectedElement = resultsRef.current.children[
+        selectedIndex
+      ] as HTMLElement;
       if (selectedElement) {
-        selectedElement.scrollIntoView({ block: 'nearest' });
+        selectedElement.scrollIntoView({ block: "nearest" });
       }
     }
   }, [selectedIndex]);
@@ -20,8 +26,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({ onSelect, selectedIndex, 
       {results.length > 0 ? (
         results.map((result, index) => (
           <div
-            key={result.id}
-            className={`search-result-item ${index === selectedIndex ? 'selected' : ''}`}
+            key={`${result.id}-${index}`} // Ensure unique keys
+            className={`search-result-item ${
+              index === selectedIndex ? "selected" : ""
+            }`}
             onClick={() => onSelect(result.name)}
           >
             <p>{result.name}</p>

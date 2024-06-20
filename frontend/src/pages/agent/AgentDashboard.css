@@ -36,7 +36,7 @@
   .sidebar {
     transform: translateX(0); /* Ensure sidebar is visible in desktop view */
   }
-  
+
   .sidebar.open ~ .main-content {
     margin-left: 180px; /* Adjust this based on your sidebar width */
   }

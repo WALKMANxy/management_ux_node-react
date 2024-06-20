@@ -1,10 +1,10 @@
-// src/pages/agent/AgentDashboard.tsx
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../app/store';
-import GlobalSearch from '../../components/common/GlobalSearch';
-import useAgentStats from '../../hooks/useAgentStats';
-import './AgentDashboard.css';
+//src/pages/agent/AgentDashboard.tsx
+import React from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
+import GlobalSearch from "../../components/common/GlobalSearch";
+import useAgentStats from "../../hooks/useAgentStats";
+import "./AgentDashboard.css";
 
 const AgentDashboard: React.FC = () => {
   const loggedInAgentId = useSelector((state: RootState) => state.auth.id);
@@ -17,9 +17,8 @@ const AgentDashboard: React.FC = () => {
     calculateTopArticleType,
   } = useAgentStats(loggedInAgentId);
 
-  const handleClientSelect = (clientId: string) => {
-    console.log('Client selected:', clientId);
-    selectClient(clientId);
+   const handleClientSelect = (clientName: string) => {
+    selectClient(clientName);
   };
 
   if (!agentDetails) {
@@ -27,9 +26,13 @@ const AgentDashboard: React.FC = () => {
   }
 
   const totalRevenue = agentDetails.clients.reduce(
-    (total, client) => total + parseFloat(client.totalRevenue), 0);
+    (total, client) => total + parseFloat(client.totalRevenue),
+    0
+  );
   const totalOrders = agentDetails.clients.reduce(
-    (total, client) => total + client.totalOrders, 0);
+    (total, client) => total + client.totalOrders,
+    0
+  );
 
   return (
     <div className="agent-dashboard">
@@ -47,13 +50,18 @@ const AgentDashboard: React.FC = () => {
                   <div className="col-md-4">
                     <div className="stat-box p-3 rounded">
                       <h4>Spent This Month</h4>
-                      <p>€{calculateTotalSpentThisMonth(selectedClient.movements)}</p>
+                      <p>
+                        €
+                        {calculateTotalSpentThisMonth(selectedClient.movements)}
+                      </p>
                     </div>
                   </div>
                   <div className="col-md-4">
                     <div className="stat-box p-3 rounded">
                       <h4>Spent This Year</h4>
-                      <p>€{calculateTotalSpentThisYear(selectedClient.movements)}</p>
+                      <p>
+                        €{calculateTotalSpentThisYear(selectedClient.movements)}
+                      </p>
                     </div>
                   </div>
                   <div className="col-md-4">
@@ -103,11 +111,19 @@ const AgentDashboard: React.FC = () => {
               </div>
             )}
             <div className="visits-panel mb-4">
-              <h3>{selectedClient ? `Upcoming Visits for ${selectedClient.name}` : 'Your Upcoming Visits'}</h3>
+              <h3>
+                {selectedClient
+                  ? `Upcoming Visits for ${selectedClient.name}`
+                  : "Your Upcoming Visits"}
+              </h3>
               <ul className="list-group">
-                {selectedClient ? selectedClient.visits.map((visit, index) => (
-                  <li key={index} className="list-group-item">{visit.note} on {visit.date}</li>
-                )) : (
+                {selectedClient ? (
+                  selectedClient.visits.map((visit, index) => (
+                    <li key={index} className="list-group-item">
+                      {visit.note} on {visit.date}
+                    </li>
+                  ))
+                ) : (
                   <>
                     <li className="list-group-item">Visit 1</li>
                     <li className="list-group-item">Visit 2</li>
@@ -126,11 +142,19 @@ const AgentDashboard: React.FC = () => {
               </div>
             </div>
             <div className="promos-panel">
-              <h3>{selectedClient ? `Active Promotions for ${selectedClient.name}` : 'Active Promotions with Your Clients'}</h3>
+              <h3>
+                {selectedClient
+                  ? `Active Promotions for ${selectedClient.name}`
+                  : "Active Promotions with Your Clients"}
+              </h3>
               <ul className="list-group">
-                {selectedClient ? selectedClient.promos.map(promo => (
-                  <li key={promo.id} className="list-group-item">{promo.name}</li>
-                )) : (
+                {selectedClient ? (
+                  selectedClient.promos.map((promo) => (
+                    <li key={promo.id} className="list-group-item">
+                      {promo.name}
+                    </li>
+                  ))
+                ) : (
                   <>
                     <li className="list-group-item">Promo 1</li>
                     <li className="list-group-item">Promo 2</li>
