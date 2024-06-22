@@ -46,7 +46,7 @@ const useAuthHandlers = ({ selectedRole, selectedAgent, selectedClient, agents }
     navigate('/'); // Navigate to home page
   }, [dispatch, refetchMinimalClients, refetchMinimalAgents, refetchAgents, navigate]);
 
-  const handleEnterDashboard = useCallback(() => {
+  const handleEnter = useCallback(() => {
     switch (userRole) {
       case 'admin':
         navigate('/admin-dashboard');
@@ -62,7 +62,7 @@ const useAuthHandlers = ({ selectedRole, selectedAgent, selectedClient, agents }
     }
   }, [userRole, navigate]);
 
-  return { handleLogin, handleLogout, handleEnterDashboard };
+  return { handleLogin, handleLogout, handleEnter };
 };
 
 export default useAuthHandlers;

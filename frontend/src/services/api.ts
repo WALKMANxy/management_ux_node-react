@@ -18,6 +18,7 @@ export const api = createApi({
           return { error: { status: "CUSTOM_ERROR", error: errorMessage } };
         }
       },
+      keepUnusedDataFor:60*2,
     }),
     getClients: builder.query<Client[], void>({
       queryFn: async () => {
@@ -30,6 +31,7 @@ export const api = createApi({
           return { error: { status: "CUSTOM_ERROR", error: errorMessage } };
         }
       },
+      keepUnusedDataFor:60*2,
     }),
     getClientById: builder.query<Client, string>({
       queryFn: async (clientId) => {
@@ -46,6 +48,7 @@ export const api = createApi({
           return { error: { status: "CUSTOM_ERROR", error: errorMessage } };
         }
       },
+      keepUnusedDataFor:60*2,
     }),
     getMinimalAgents: builder.query<Agent[], void>({
       queryFn: async () => {
@@ -58,6 +61,7 @@ export const api = createApi({
           return { error: { status: "CUSTOM_ERROR", error: errorMessage } };
         }
       },
+      keepUnusedDataFor:60*2,
     }),
     getAgents: builder.query<Agent[], void>({
       queryFn: async () => {
@@ -70,6 +74,7 @@ export const api = createApi({
           return { error: { status: "CUSTOM_ERROR", error: errorMessage } };
         }
       },
+      keepUnusedDataFor:60*2,
     }),
     getMovementDetails: builder.query<MovementDetail[], void>({
       queryFn: async () => {
@@ -82,6 +87,7 @@ export const api = createApi({
           return { error: { status: "CUSTOM_ERROR", error: errorMessage } };
         }
       },
+      keepUnusedDataFor:60*2,
     }),
   }),
 });
