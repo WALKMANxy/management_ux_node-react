@@ -1,3 +1,4 @@
+//src/pages/landing/LandingPage.tsx
 import React, { useState, useMemo, useEffect } from "react";
 import {
   AppBar,
@@ -29,8 +30,10 @@ import {
   useGetMinimalClientsQuery,
 } from "../../services/api";
 import useAuthHandlers from "../../features/hooks/useAuthHandlers";
+import Loader from "../../components/common/Loader";
 
 const LandingPage: React.FC = () => {
+  const [showLoader, setShowLoader] = useState(true);
   const [showLogin, setShowLogin] = useState(false);
   const [selectedRole, setSelectedRole] = useState<
     "admin" | "agent" | "client"
@@ -77,7 +80,15 @@ const LandingPage: React.FC = () => {
       setSelectedAgent("");
       setSelectedClient("");
     }
+
+    const timer = setTimeout(() => setShowLoader(false), 2000);
+    return () => clearTimeout(timer);
+
   }, [showLogin]);
+
+  if (showLoader) {
+    return <Loader />;
+  }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
