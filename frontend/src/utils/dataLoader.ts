@@ -1,6 +1,7 @@
 // utils/dataLoader.ts
 import axios from 'axios';
 import { Client, Agent, MovementDetail } from '../models/models';
+import { format, parseISO } from "date-fns"; // Import date-fns for date formatting
 
 const jsonFilePath = '/datasetsfrom01JANto12JUN.json';
 
@@ -82,6 +83,12 @@ self.onmessage = function(event) {
 // Create a Blob URL for the worker script
 const blob = new Blob([workerScript], { type: 'application/javascript' });
 const workerUrl = URL.createObjectURL(blob);
+
+const getMonthYear = (dateString: string) => {
+  const date = parseISO(dateString);
+  return format(date, "yyyy-MM");
+};
+
 
 export const loadJsonData = async (url: string = jsonFilePath): Promise<any[]> => {
   try {
@@ -185,6 +192,8 @@ export const mapDataToAgents = (data: any[]): Agent[] => {
   return agents;
 }
 
+
+
 export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
   return data.map(item => ({
     articleId: item["Codice Articolo"].toString(),
@@ -193,4 +202,24 @@ export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
     priceSold: parseFloat(item["Valore"]).toFixed(2),
     priceBought: parseFloat(item["Costo"]).toFixed(2)
   }));
+};
+
+export const calculateMonthlyRevenue = (clients: Client[]) => {
+  const monthlyRevenue = clients.reduce((acc, client) => {
+    client.movements.forEach((movement) => {
+      const monthYear = getMonthYear(movement.dateOfOrder);
+      const movementRevenue = movement.details.reduce(
+        (sum, detail) => sum + parseFloat(detail.priceSold),
+        0
+      );
+      acc[monthYear] = (acc[monthYear] || 0) + movementRevenue;
+    });
+    return acc;
+  }, {} as { [key: string]: number });
+
+  const months = Object.keys(monthlyRevenue).sort();
+  const revenueData = months.map((month) => monthlyRevenue[month]);
+  console.log("revenueData", revenueData);
+
+  return { months, revenueData };
 };

@@ -5,6 +5,7 @@ import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import SearchResults from "./SearchResults";
 import useGlobalSearch from "../../features/hooks/useGlobalSearch";
 import { GlobalSearchProps } from "../../models/models";
+import Spinner from "./Spinner"; // Import the Spinner component
 import "./GlobalSearch.css";
 
 const GlobalSearch: React.FC<GlobalSearchProps> = ({
@@ -23,6 +24,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
     selectedIndex,
     setShowResults,
     setSelectedIndex,
+    status, // Add status to the destructured properties
   } = useGlobalSearch(filter);
 
   const handleSelect = (item: string) => {
@@ -51,11 +53,15 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
       </div>
       {showResults && (
         <div className="search-results-container">
-          <SearchResults
-            onSelect={handleSelect}
-            selectedIndex={selectedIndex}
-            results={results}
-          />
+          {status === "loading" ? (
+            <Spinner /> // Show the spinner when the search is loading
+          ) : (
+            <SearchResults
+              onSelect={handleSelect}
+              selectedIndex={selectedIndex}
+              results={results}
+            />
+          )}
         </div>
       )}
     </div>

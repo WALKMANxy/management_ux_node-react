@@ -16,11 +16,30 @@ export type AuthHandlersProps = {
 }
 
 
+// src/models/models.ts
 export type SearchResult = {
   id: string;
   name: string;
   type: string;
+  // Article-specific properties
+  articleId?: string;
+  brand?: string;
+  lastSoldDate?: string;
+  // Client-specific properties
+  province?: string;
+  phone?: string;
+  paymentMethod?: string;
+  // Promo-specific properties
+  discountAmount?: string;
+  isEligible?: boolean;
+  startDate?: string;
+  endDate?: string;
+  // Alert-specific properties
+  dateIssued?: string;
+  reason?: string;
+  severity?: string;
 };
+
 
 export type SearchParams = {
   query: string;

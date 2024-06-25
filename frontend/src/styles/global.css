@@ -1,0 +1,17 @@
+/* src/styles/global.css */
+
+.agent-dashboard {
+    padding: 0 !important;
+  }
+  
+  /* Remove padding from the body when the drawer menu is opened */
+  body.drawer-open {
+    padding-right: 0 !important;
+  }
+  
+  @media (max-width: 600px) {
+    .MuiChartsLegend-root {
+      visibility: hidden;
+    }
+  }
+  

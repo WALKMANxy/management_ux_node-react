@@ -2,8 +2,17 @@
 import React, { useEffect, useState } from 'react';
 import { CircularProgress, Box } from '@mui/material';
 import styled from '@emotion/styled';
+import { keyframes, css } from '@emotion/react';
 
 // Keyframes for the fade-out effect
+const fadeOut = keyframes`
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+`;
 
 // Styled Box component with Emotion
 const FullScreenBox = styled(Box)<{ fadeout: string }>`
@@ -18,29 +27,31 @@ const FullScreenBox = styled(Box)<{ fadeout: string }>`
   top: 0;
   left: 0;
   z-index: 1300;
-  animation: ${({ fadeout }) => (fadeout ? fadeout : 'none')};
-  opacity: ${({ fadeout }) => (fadeout ? 0 : 1)};
+  ${({ fadeout }) => fadeout === 'true' && css`
+    animation: ${fadeOut} 0.5s forwards;
+    opacity: 0;
+  `}
   transition: opacity 0.5s;
 `;
 
 const Loader: React.FC = () => {
-  const [fadeOutEffect, setFadeOutEffect] = useState(false);
+  const [fadeOutEffect, setFadeOutEffect] = useState('false');
 
   useEffect(() => {
-    console.log("Loader mounted");
+    //console.log("Loader mounted");
     const timer = setTimeout(() => {
-      console.log("Fade out triggered");
-      setFadeOutEffect(true);
+      //console.log("Fade out triggered");
+      setFadeOutEffect('true');
     }, 1500);
 
     return () => {
-      console.log("Cleanup timer");
+      //console.log("Cleanup timer");
       clearTimeout(timer);
     };
   }, []);
 
   return (
-    <FullScreenBox fadeout={fadeOutEffect ? 'fadeOut' : ''}>
+    <FullScreenBox fadeout={fadeOutEffect}>
       <Box
         sx={{
           height: '12%', // 10% bigger than previous value

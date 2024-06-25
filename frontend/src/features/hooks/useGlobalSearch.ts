@@ -3,7 +3,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../app/store";
 import DOMPurify from "dompurify";
-import { setQuery, searchItems } from "../search/searchSlice";
+import { setQuery, searchItems, clearResults } from "../search/searchSlice";
 import useDebounce from "./useDebounce";
 
 const useGlobalSearch = (filter: string) => {
@@ -14,11 +14,12 @@ const useGlobalSearch = (filter: string) => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const debouncedInput = useDebounce(input, 300);
   const results = useSelector((state: RootState) => state.search.results);
+  const status = useSelector((state: RootState) => state.search.status);
 
   const handleSearch = useCallback(() => {
     const sanitizedInput = DOMPurify.sanitize(debouncedInput.trim());
-    console.log("Sanitized Input:", sanitizedInput);
-    if (sanitizedInput === "") {
+    if (sanitizedInput === "" || sanitizedInput.length < 3) {
+      dispatch(clearResults());
       setShowResults(false);
       return;
     }
@@ -59,9 +60,7 @@ const useGlobalSearch = (filter: string) => {
   }, [handleClickOutside]);
 
   useEffect(() => {
-    if (debouncedInput) {
-      handleSearch();
-    }
+    handleSearch();
   }, [debouncedInput, handleSearch]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,7 +69,12 @@ const useGlobalSearch = (filter: string) => {
   };
 
   const handleFocus = () => {
-    setShowResults(true);
+    setShowResults(false);
+    if (input.length >= 3) {
+      handleSearch();
+    } else {
+      dispatch(clearResults());
+    }
     setSelectedIndex(-1);
   };
 
@@ -85,6 +89,7 @@ const useGlobalSearch = (filter: string) => {
     selectedIndex,
     setShowResults,
     setSelectedIndex,
+    status,
   };
 };
 

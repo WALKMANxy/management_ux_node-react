@@ -3,7 +3,6 @@ import React, { useState, useMemo, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
-  Typography,
   Button,
   Menu,
   MenuItem,
@@ -13,6 +12,7 @@ import {
   FormControl,
   InputLabel,
   Divider,
+  Typography,
 } from "@mui/material";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
@@ -53,7 +53,7 @@ const LandingPage: React.FC = () => {
     agents,
   });
 
-  const VATIcon = () => <span>Partita IVA</span>; 
+  const VATIcon = () => <span>Partita IVA</span>;
 
   const agentOptions = useMemo(
     () =>
@@ -83,7 +83,6 @@ const LandingPage: React.FC = () => {
 
     const timer = setTimeout(() => setShowLoader(false), 2000);
     return () => clearTimeout(timer);
-
   }, [showLogin]);
 
   if (showLoader) {
@@ -197,19 +196,18 @@ const LandingPage: React.FC = () => {
             textAlign: "center",
           }}
         >
-          <Typography
-            variant="h1"
+          <Box
             sx={{
-              fontFamily: "Roboto, sans-serif",
-              background: "linear-gradient(90deg, #77dd77, #ffffff, #ff6961)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
               padding: "1rem",
-              fontSize: "9rem",
+              flex: { xs: "0 1 auto", md: "0 1 50%" },
             }}
           >
-            Welcome
-          </Typography>
+            <img
+              src="/logobig.png"
+              alt="Welcome Logo"
+              style={{ width: "100%", height: "auto" }}
+            />
+          </Box>
           <Divider
             orientation="vertical"
             flexItem
@@ -225,6 +223,7 @@ const LandingPage: React.FC = () => {
               display: "grid",
               gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)" },
               gap: 2,
+              flex: { xs: "0 1 auto", md: "0 1 50%" },
             }}
           >
             <Button
@@ -260,50 +259,141 @@ const LandingPage: React.FC = () => {
       </Container>
 
       <Box
-  component="footer"
-  sx={{
-    backgroundColor: "#f0f0f0",
-    color: "#333",
-    padding: "1rem",
-    textAlign: "center",
-    position: "relative",
-    mt: 'auto',
-    "&:before": {
-      content: '""',
-      display: 'block',
-      height: '8px',
-      background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0), #f0f0f0)'
-    }
-  }}
->
-  <Container>
-    <Box display="flex" justifyContent="space-between" flexDirection={{ xs: 'column', sm: 'row' }}>
-      <Box sx={{ textAlign: 'left', padding: '0.5rem 1rem', flex: 1, fontSize: '90%' }}>
-        <Typography sx={{ marginBottom: '0.5rem' }}>
-          <AccessTimeIcon /> Lun - Ven, 8:30 - 13:00 e 14:30 - 18:30
-        </Typography>
-        <Typography>
-          <LocationOnIcon /> Via Alessandro Volta 17, Catania
-        </Typography>
+        component="footer"
+        sx={{
+          backgroundColor: "#f0f0f0",
+          color: "#333",
+          padding: "0.64rem", // Reduced by 20% from 0.8rem
+          textAlign: "center",
+          position: "relative",
+          mt: "auto",
+          "&:before": {
+            content: '""',
+            display: "block",
+            height: "6.4px", // Reduced by 20% from 8px
+            background:
+              "linear-gradient(to bottom, rgba(255, 255, 255, 0), #f0f0f0)",
+          },
+          "@media (max-width: 600px)": {
+            padding: "0.4rem", // 50% smaller for mobile
+            "&:before": {
+              height: "4px", // 50% smaller for mobile
+            },
+          },
+        }}
+      >
+        <Container>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            flexDirection={{ xs: "column", sm: "row" }}
+            alignItems={{ xs: "center", sm: "flex-start" }}
+            sx={{
+              "@media (max-width: 600px)": {
+                flexDirection: "column", // Stack items for mobile
+                alignItems: "center",
+              },
+            }}
+          >
+            <Box
+              sx={{
+                textAlign: { xs: "center", sm: "left" },
+                padding: "0.32rem 0.64rem",
+                flex: 1,
+                fontSize: "64%",
+                "@media (max-width: 600px)": {
+                  padding: "0.16rem 0.32rem", // 50% smaller for mobile
+                  fontSize: "32%", // 50% smaller for mobile
+                },
+              }}
+            >
+              <Typography
+                sx={{
+                  marginBottom: "0.32rem",
+                  "@media (max-width: 600px)": { marginBottom: "0.16rem", fontSize: "250%" },
+                }}
+              >
+                <AccessTimeIcon /> Lun - Ven, 8:30 - 13:00 e 14:30 - 18:30
+              </Typography>
+              <Typography
+                sx={{
+                  marginBottom: "0.32rem",
+                  "@media (max-width: 600px)": { marginBottom: "0.16rem", fontSize: "250%" },
+                }}
+              >
+                <LocationOnIcon /> Via Alessandro Volta 17, Catania
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                textAlign: { xs: "center", sm: "right" },
+                padding: "0.32rem 0.64rem",
+                flex: 1,
+                fontSize: "64%",
+                "@media (max-width: 600px)": {
+                  padding: "0.16rem 0.32rem", // 50% smaller for mobile
+                  fontSize: "32%", // 50% smaller for mobile
+                },
+              }}
+            >
+              <Typography
+                sx={{
+                  marginBottom: "0.32rem",
+                  "@media (max-width: 600px)": { marginBottom: "0.16rem", fontSize: "250%" },
+                }}
+              >
+                <PhoneIcon />{" "}
+                <a
+                  href="tel:+390954190006"
+                  style={{ color: "blue", textDecoration: "none" }}
+                >
+                  (+39) 095 419 0006
+                </a>
+              </Typography>
+              <Typography
+                sx={{
+                  marginBottom: "0.32rem",
+                  "@media (max-width: 600px)": { marginBottom: "0.16rem", fontSize: "250%" },
+                }}
+              >
+                <EmailIcon />{" "}
+                <a
+                  href="mailto:info@ricambicentrosud.com"
+                  style={{ color: "blue", textDecoration: "none" }}
+                >
+                  info@ricambicentrosud.com
+                </a>
+              </Typography>
+              <Typography
+                sx={{
+                  marginBottom: "0.32rem",
+                  "@media (max-width: 600px)": { marginBottom: "0.16rem", fontSize: "250%" },
+                }}
+              >
+                <VATIcon /> 03176280877
+              </Typography>
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              textAlign: "center",
+              padding: "0.32rem 0.64rem",
+              fontSize: "64%",
+              "@media (max-width: 600px)": {
+                padding: "0.16rem 0.32rem", // 50% smaller for mobile
+                fontSize: "32%", // 50% smaller for mobile
+              },
+            }}
+          >
+            <Typography
+                sx={{
+                  marginBottom: "0.32rem",
+                  "@media (max-width: 600px)": { marginBottom: "0.16rem", fontSize: "250%" },
+                }}
+              >credits: @2024</Typography>
+          </Box>
+        </Container>
       </Box>
-      <Box sx={{ textAlign: 'right', padding: '0.5rem 1rem', flex: 1, fontSize: '90%' }}>
-        <Typography sx={{ marginBottom: '0.5rem' }}>
-          <PhoneIcon /> (+39) 095 419 0006
-        </Typography>
-        <Typography sx={{ marginBottom: '0.5rem' }}>
-          <EmailIcon /> info@ricambicentrosud.com
-        </Typography>
-        <Typography>
-          <VATIcon /> 03176280877  {/* Replace VATIcon with appropriate icon component */}
-        </Typography>
-      </Box>
-    </Box>
-    <Box sx={{ textAlign: 'center', padding: '0.5rem 1rem', fontSize: '90%' }}>
-      <Typography>credits: @2024</Typography>
-    </Box>
-  </Container>
-</Box>
-
     </Box>
   );
 };
