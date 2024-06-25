@@ -1,6 +1,5 @@
-// src/pages/agent/AgentDashboard.tsx
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../app/store";
 import GlobalSearch from "../../components/common/GlobalSearch";
 import useAgentStats from "../../features/hooks/useAgentStats";
@@ -13,16 +12,29 @@ import {
   List,
   ListItem,
   ListItemText,
-  CircularProgress,
   Fab,
   useMediaQuery,
   useTheme,
+  Skeleton,
+  Stack,
+  Divider,
 } from "@mui/material";
-import { PieChart } from "@mui/x-charts/PieChart";
-import { BarChart } from "@mui/x-charts/BarChart";
 import CloseIcon from "@mui/icons-material/Close";
+import CalendarComponent from "../../components/common/CalendarComponent";
+import { setVisits } from "../../features/calendar/calendarSlice";
+import TopBrandsSold from "../../components/charts/TopBrandSold";
+import SalesDistribution from "../../components/charts/SalesDistribution";
+import MonthOverMonthSpendingTrend from "../../components/charts/MonthOverMonthSpendingTrend";
+import {
+  calculateTotalRevenue,
+  calculateTotalOrders,
+  calculateTopBrandsData,
+  calculateSalesDistributionData,
+} from "../../utils/dataUtils";
+import { calculateMonthlyRevenue } from "../../utils/dataLoader";
 
 const AgentDashboard: React.FC = () => {
+  const dispatch = useDispatch();
   const loggedInAgentId = useSelector((state: RootState) => state.auth.id);
   const {
     agentDetails,
@@ -40,49 +52,49 @@ const AgentDashboard: React.FC = () => {
     selectClient(clientName);
   };
 
+  useEffect(() => {
+    if (agentDetails) {
+      dispatch(
+        setVisits(agentDetails.clients.flatMap((client) => client.visits))
+      );
+    }
+  }, [agentDetails, dispatch]);
+
   if (!agentDetails) {
-    return <CircularProgress />;
+    return (
+      <Box className="agent-dashboard" sx={{ p: isMobile ? 0 : 4 }}>
+        <Stack spacing={2}>
+          <Skeleton
+            variant="text"
+            sx={{ fontSize: "2rem", borderRadius: "8px" }}
+            width="60%"
+          />
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={300}
+            sx={{ borderRadius: "8px" }}
+          />
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={300}
+            sx={{ borderRadius: "8px" }}
+          />
+        </Stack>
+      </Box>
+    );
   }
 
-  const totalRevenue = agentDetails.clients
-    .reduce((total, client) => total + parseFloat(client.totalRevenue), 0)
-    .toFixed(2);
-
-  const totalOrders = agentDetails.clients.reduce(
-    (total, client) => total + client.totalOrders,
-    0
+  const totalRevenue = calculateTotalRevenue(agentDetails.clients);
+  const totalOrders = calculateTotalOrders(agentDetails.clients);
+  const topBrandsData = calculateTopBrandsData(agentDetails.clients);
+  const salesDistributionData = calculateSalesDistributionData(
+    agentDetails.clients,
+    isMobile
   );
 
-  // Calculate top brands data
-  const brandCount: { [key: string]: number } = {};
-  agentDetails.clients.forEach((client) => {
-    client.movements.forEach((movement) => {
-      movement.details.forEach((detail) => {
-        if (detail.brand) {
-          if (!brandCount[detail.brand]) {
-            brandCount[detail.brand] = 0;
-          }
-          brandCount[detail.brand] += 1;
-        }
-      });
-    });
-  });
-  const topBrandsData = Object.keys(brandCount)
-    .map((brand) => ({
-      label: brand,
-      value: brandCount[brand],
-    }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 10);
-
-  // Calculate sales distribution data
-  const topClients = [...agentDetails.clients]
-    .sort((a, b) => parseFloat(b.totalRevenue) - parseFloat(a.totalRevenue))
-    .slice(0, isMobile ? 5 : 25);
-  const salesDistributionData = topClients.map((client) => ({
-    label: client.name,
-    value: parseFloat(client.totalRevenue),
-  }));
+  const { months, revenueData } = calculateMonthlyRevenue(agentDetails.clients);
 
   const brandColors = [
     "#FF6384",
@@ -104,16 +116,29 @@ const AgentDashboard: React.FC = () => {
     "#9966FF",
     "#FF9F40",
     "#FF6384",
-    "#36A2EB",
-    "#FFCE56",
-    "#4BC0C0",
-    "#9966FF",
-    "#FF9F40",
-    "#FF6384",
   ];
 
+  const gradients = [
+    "linear-gradient(135deg, #fffde7 30%, #fff9c4 100%)",
+    "linear-gradient(135deg, #ffe0b2 30%, #ffcc80 100%)",
+    "linear-gradient(135deg, #e8f5e9 30%, #c8e6c9 100%)",
+    "linear-gradient(135deg, #f3e5f5 30%, #e1bee7 100%)",
+  ];
+
+  const titleBoxStyle = {
+    display: "inline-block",
+    backgroundColor: "rgba(0, 0, 0, 3%)",
+    borderRadius: "24px",
+    px: 2,
+    py: 0.5,
+    mb: 2.5,
+  };
+
   return (
-    <Box className="agent-dashboard" sx={{ p: isMobile ? 0 : 4 }}>
+    <Box
+      className="agent-dashboard"
+      sx={{ p: isMobile ? 0 : 4, bgcolor: "#f4f5f7" }}
+    >
       <Typography variant="h4" gutterBottom>
         Welcome back, {agentDetails.name}
       </Typography>
@@ -122,44 +147,75 @@ const AgentDashboard: React.FC = () => {
         <Grid item xs={12} md={8}>
           {selectedClient ? (
             <Box mb={4}>
-              <Typography variant="h5" gutterBottom>
-                Statistics for {selectedClient.name}
-              </Typography>
+              <Box sx={titleBoxStyle}>
+                <Typography variant="h5" gutterBottom>
+                  Statistics for {selectedClient.name}
+                </Typography>
+              </Box>
               <Grid container spacing={2}>
                 <Grid item xs={12} md={4}>
-                  <Paper elevation={3} sx={{ p: 3 }}>
-                    <Typography variant="h6">Spent This Month</Typography>
+                  <Paper
+                    elevation={3}
+                    sx={{
+                      p: 3,
+                      borderRadius: "12px",
+                      background: gradients[0],
+                    }}
+                  >
+                    <Box sx={titleBoxStyle}>
+                      <Typography variant="h6">Spent This Month</Typography>
+                    </Box>
                     <Typography variant="body1">
                       €{calculateTotalSpentThisMonth(selectedClient.movements)}
                     </Typography>
                   </Paper>
                 </Grid>
                 <Grid item xs={12} md={4}>
-                  <Paper elevation={3} sx={{ p: 3 }}>
-                    <Typography variant="h6">Spent This Year</Typography>
+                  <Paper
+                    elevation={3}
+                    sx={{
+                      p: 3,
+                      borderRadius: "12px",
+                      background: gradients[1],
+                    }}
+                  >
+                    <Box sx={titleBoxStyle}>
+                      <Typography variant="h6">Spent This Year</Typography>
+                    </Box>
                     <Typography variant="body1">
                       €{calculateTotalSpentThisYear(selectedClient.movements)}
                     </Typography>
                   </Paper>
                 </Grid>
                 <Grid item xs={12} md={4}>
-                  <Paper elevation={3} sx={{ p: 3 }}>
-                    <Typography variant="h6">Top Article Type</Typography>
+                  <Paper
+                    elevation={3}
+                    sx={{
+                      p: 3,
+                      borderRadius: "12px",
+                      background: gradients[2],
+                    }}
+                  >
+                    <Box sx={titleBoxStyle}>
+                      <Typography variant="h6">Top Article Type</Typography>
+                    </Box>
                     <Typography variant="body1">
                       {calculateTopArticleType(selectedClient.movements)}
                     </Typography>
                   </Paper>
                 </Grid>
                 <Grid item xs={12}>
-                  <Paper elevation={3} sx={{ p: 3 }}>
-                    <Typography variant="h6">
-                      Month Over Month Spending Trend
-                    </Typography>
-                    <Typography variant="body1">Chart here</Typography>
-                  </Paper>
+                  <MonthOverMonthSpendingTrend
+                    months={months}
+                    revenueData={revenueData}
+                  />
                 </Grid>
               </Grid>
-              <Button variant="contained" color="primary" sx={{ mt: 3 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ mt: 3, borderRadius: "8px" }}
+              >
                 View More
               </Button>
               <Fab
@@ -176,111 +232,53 @@ const AgentDashboard: React.FC = () => {
               <Typography variant="h5" gutterBottom>
                 Your Statistics
               </Typography>
+              <Divider sx={{ my: 2, borderRadius: "12px" }} />
               <Grid container spacing={2}>
                 <Grid item xs={12} md={4}>
-                  <Paper elevation={3} sx={{ p: 3 }}>
-                    <Typography variant="h6">Total Revenue</Typography>
+                  <Paper
+                    elevation={3}
+                    sx={{
+                      p: 3,
+                      borderRadius: "12px",
+                      background: gradients[3],
+                    }}
+                  >
+                    <Box sx={titleBoxStyle}>
+                      <Typography variant="h6">Total Revenue</Typography>
+                    </Box>
                     <Typography variant="body1" sx={{ paddingBottom: "10px" }}>
                       Revenue: €{totalRevenue}
                     </Typography>
                   </Paper>
                 </Grid>
                 <Grid item xs={12} md={4}>
-                  <Paper elevation={3} sx={{ p: 3 }}>
-                    <Typography variant="h6">Total Orders</Typography>
+                  <Paper
+                    elevation={3}
+                    sx={{
+                      p: 3,
+                      borderRadius: "12px",
+                      background: gradients[0],
+                    }}
+                  >
+                    <Box sx={titleBoxStyle}>
+                      <Typography variant="h6">Total Orders</Typography>
+                    </Box>
                     <Typography variant="body1">
                       Orders: {totalOrders}
                     </Typography>
                   </Paper>
                 </Grid>
                 <Grid item xs={12} md={8}>
-                  <Paper
-                    elevation={3}
-                    sx={{
-                      p: 3,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Typography variant="h6">Top Brands Sold</Typography>
-                    <PieChart
-                      colors={brandColors}
-                      series={[
-                        {
-                          data: topBrandsData,
-                          outerRadius: 80,
-                          highlightScope: {
-                            faded: "global",
-                            highlighted: "item",
-                          },
-                          faded: {
-                            innerRadius: 30,
-                            additionalRadius: -30,
-                            color: "gray",
-                          },
-                        },
-                      ]}
-                      height={200}
-                      slotProps={{
-                        legend: {
-                          hidden: isMobile,
-                        },
-                      }}
-                      sx={{
-                        position: "absolute",
-                        left: isMobile ? "50px" : "auto",
-                        right: isMobile ? "auto" : "50px",
-                      }}
-                    />
-                    {isMobile && (
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        alignItems="center"
-                        mt={2}
-                      >
-                        {topBrandsData.map((brand, index) => (
-                          <Box
-                            key={brand.label}
-                            display="flex"
-                            alignItems="center"
-                            mb={1}
-                          >
-                            <Box
-                              sx={{
-                                width: 16,
-                                height: 16,
-                                backgroundColor: brandColors[index],
-                                marginRight: 1,
-                              }}
-                            />
-                            <Typography variant="body2">
-                              {brand.label}
-                            </Typography>
-                          </Box>
-                        ))}
-                      </Box>
-                    )}
-                  </Paper>
+                  <TopBrandsSold
+                    topBrandsData={topBrandsData}
+                    brandColors={brandColors}
+                    isMobile={isMobile}
+                  />
                 </Grid>
                 <Grid item xs={12}>
-                  <Paper elevation={3} sx={{ p: 0 }}>
-                    <Typography variant="h6" sx={{ padding: "12px" }}>
-                      Sales Distribution Through Clients
-                    </Typography>
-                    <Box
-                      sx={{ width: "100%", height: "300px", padding: "10px" }}
-                    >
-                      <BarChart
-                        xAxis={[{ scaleType: "band", dataKey: "label" }]}
-                        yAxis={[{ scaleType: "linear" }]}
-                        series={[{ dataKey: "value", label: "Revenue" }]}
-                        dataset={salesDistributionData}
-                        layout="vertical"
-                      />
-                    </Box>
-                  </Paper>
+                  <SalesDistribution
+                    salesDistributionData={salesDistributionData}
+                  />
                 </Grid>
               </Grid>
             </Box>
@@ -291,6 +289,7 @@ const AgentDashboard: React.FC = () => {
                 ? `Upcoming Visits for ${selectedClient.name}`
                 : "Your Upcoming Visits"}
             </Typography>
+            <Divider sx={{ my: 2, borderRadius: "12px" }} />
             <List>
               {selectedClient ? (
                 selectedClient.visits.map((visit, index) => (
@@ -312,7 +311,11 @@ const AgentDashboard: React.FC = () => {
                 </>
               )}
             </List>
-            <Button variant="contained" color="primary" sx={{ mt: 3 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ mt: 3, borderRadius: "8px" }}
+            >
               Plan Visit
             </Button>
           </Box>
@@ -322,10 +325,17 @@ const AgentDashboard: React.FC = () => {
             <Typography variant="h5" gutterBottom>
               Calendar
             </Typography>
-            <Paper elevation={3} sx={{ p: 3 }}>
-              <Typography variant="body1">
-                Calendar integration goes here.
-              </Typography>
+            <Divider sx={{ my: 2, borderRadius: "12px" }} />
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                borderRadius: "12px",
+                background:
+                  "linear-gradient(135deg, #fff8e6 10%, #fff7ec 100%)",
+              }}
+            >
+              <CalendarComponent />
             </Paper>
           </Box>
           <Box>
@@ -334,6 +344,7 @@ const AgentDashboard: React.FC = () => {
                 ? `Active Promotions for ${selectedClient.name}`
                 : "Active Promotions with Your Clients"}
             </Typography>
+            <Divider sx={{ my: 2, borderRadius: "12px" }} />
             <List>
               {selectedClient ? (
                 selectedClient.promos.map((promo) => (
@@ -355,7 +366,11 @@ const AgentDashboard: React.FC = () => {
                 </>
               )}
             </List>
-            <Button variant="contained" color="primary" sx={{ mt: 3 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ mt: 3, borderRadius: "8px" }}
+            >
               View More
             </Button>
           </Box>

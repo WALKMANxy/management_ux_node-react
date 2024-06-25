@@ -4,6 +4,8 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 import authReducer from "../features/auth/authSlice";
 import searchReducer from "../features/search/searchSlice";
 import dataReducer, { fetchData } from "../features/data/dataSlice";
+import calendarReducer from '../features/calendar/calendarSlice';
+
 import { api } from "../services/api";
 
 
@@ -12,6 +14,7 @@ const store = configureStore({
     auth: authReducer,
     search: searchReducer,
     data: dataReducer,
+    calendar: calendarReducer,
     [api.reducerPath]: api.reducer,
   },
   middleware: (getDefaultMiddleware) =>

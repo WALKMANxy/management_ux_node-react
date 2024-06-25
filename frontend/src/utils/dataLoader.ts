@@ -219,7 +219,7 @@ export const calculateMonthlyRevenue = (clients: Client[]) => {
 
   const months = Object.keys(monthlyRevenue).sort();
   const revenueData = months.map((month) => monthlyRevenue[month]);
-  console.log("revenueData", revenueData);
+  //console.log("revenueData", revenueData);
 
   return { months, revenueData };
 };
