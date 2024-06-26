@@ -17,17 +17,31 @@ const TopBrandsSold: React.FC<{
         flexDirection: "column",
         alignItems: "center",
         position: "relative",
+        overflow: "hidden", // Ensure the pseudo-element is clipped by the border radius
         background: "linear-gradient(135deg, #E6F1F4 30%, #AEC6CF 100%)",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          backgroundImage: `url('/checkerboard-cross.png')`,
+          backgroundSize: "cover",
+          opacity: 0.1, // Adjust this value to make the pattern more or less transparent
+          zIndex: 0,
+        },
       }}
     >
       <Box
         sx={{
           display: "inline-block",
-          backgroundColor: "rgba(0, 0, 0, 0.7)",
-          borderRadius: "8px",
-          px: 1,
+          backgroundColor: "rgba(0, 0, 0, 4%)",
+          borderRadius: "24px",
+          px: 2,
           py: 0.5,
           mb: 2,
+          zIndex: 1, // Ensure the box is above the pseudo-element
         }}
       >
         <Typography variant="h6" gutterBottom>
@@ -35,7 +49,7 @@ const TopBrandsSold: React.FC<{
         </Typography>
       </Box>
 
-      <Divider sx={{ width: "100%", mb: 2 }} />
+      <Divider sx={{ width: "100%", mb: 2, zIndex: 1 }} />
 
       <Box
         sx={{
@@ -43,6 +57,7 @@ const TopBrandsSold: React.FC<{
           flexDirection: isMobile ? "column" : "row",
           alignItems: "center",
           width: "100%",
+          zIndex: 1, // Ensure the chart and legend are above the pseudo-element
         }}
       >
         <PieChart
@@ -71,8 +86,8 @@ const TopBrandsSold: React.FC<{
           sx={{
             flex: 1,
             position: "absolute",
-          left: isMobile ? "50px" : "auto",
-          right: isMobile ? "auto" : "-20px",
+            left: isMobile ? "50px" : "auto",
+            right: isMobile ? "auto" : "-20px",
           }}
         />
 

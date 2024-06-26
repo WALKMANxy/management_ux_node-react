@@ -229,12 +229,14 @@ const AgentDashboard: React.FC = () => {
             </Box>
           ) : (
             <Box mb={4}>
-              <Typography variant="h5" gutterBottom>
-                Your Statistics
-              </Typography>
+              <Box sx={titleBoxStyle}>
+                <Typography variant="h5" gutterBottom>
+                  Your Statistics
+                </Typography>
+              </Box>
               <Divider sx={{ my: 2, borderRadius: "12px" }} />
               <Grid container spacing={2}>
-                <Grid item xs={12} md={4}>
+                <Grid item xs={12} md={3}>
                   <Paper
                     elevation={3}
                     sx={{
@@ -251,7 +253,7 @@ const AgentDashboard: React.FC = () => {
                     </Typography>
                   </Paper>
                 </Grid>
-                <Grid item xs={12} md={4}>
+                <Grid item xs={12} md={3}>
                   <Paper
                     elevation={3}
                     sx={{
@@ -268,7 +270,7 @@ const AgentDashboard: React.FC = () => {
                     </Typography>
                   </Paper>
                 </Grid>
-                <Grid item xs={12} md={8}>
+                <Grid item xs={12} md={6}>
                   <TopBrandsSold
                     topBrandsData={topBrandsData}
                     brandColors={brandColors}
@@ -284,11 +286,13 @@ const AgentDashboard: React.FC = () => {
             </Box>
           )}
           <Box mb={4}>
-            <Typography variant="h5" gutterBottom>
-              {selectedClient
-                ? `Upcoming Visits for ${selectedClient.name}`
-                : "Your Upcoming Visits"}
-            </Typography>
+            <Box sx={titleBoxStyle}>
+              <Typography variant="h5" gutterBottom>
+                {selectedClient
+                  ? `Upcoming Visits for ${selectedClient.name}`
+                  : "Your Upcoming Visits"}
+              </Typography>
+            </Box>
             <Divider sx={{ my: 2, borderRadius: "12px" }} />
             <List>
               {selectedClient ? (
@@ -322,28 +326,22 @@ const AgentDashboard: React.FC = () => {
         </Grid>
         <Grid item xs={12} md={4}>
           <Box mb={4}>
-            <Typography variant="h5" gutterBottom>
-              Calendar
-            </Typography>
+            <Box sx={titleBoxStyle}>
+              <Typography variant="h5" gutterBottom>
+                Calendar
+              </Typography>
+            </Box>
             <Divider sx={{ my: 2, borderRadius: "12px" }} />
-            <Paper
-              elevation={3}
-              sx={{
-                p: 3,
-                borderRadius: "12px",
-                background:
-                  "linear-gradient(135deg, #fff8e6 10%, #fff7ec 100%)",
-              }}
-            >
-              <CalendarComponent />
-            </Paper>
+            <CalendarComponent />
           </Box>
           <Box>
-            <Typography variant="h5" gutterBottom>
-              {selectedClient
-                ? `Active Promotions for ${selectedClient.name}`
-                : "Active Promotions with Your Clients"}
-            </Typography>
+            <Box sx={titleBoxStyle}>
+              <Typography variant="h5" gutterBottom>
+                {selectedClient
+                  ? `Active Promotions for ${selectedClient.name}`
+                  : "Active Promotions with Your Clients"}
+              </Typography>
+            </Box>
             <Divider sx={{ my: 2, borderRadius: "12px" }} />
             <List>
               {selectedClient ? (

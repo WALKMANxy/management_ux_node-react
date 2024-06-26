@@ -8,6 +8,7 @@ import { DayCalendarSkeleton } from "@mui/x-date-pickers/DayCalendarSkeleton";
 import { useSelector } from "react-redux";
 import { selectVisits } from "../../features/calendar/calendarSlice";
 import dayjs from "dayjs";
+import { Paper } from "@mui/material";
 
 function ServerDay(
   props: PickersDayProps<dayjs.Dayjs> & { highlightedDays?: number[] }
@@ -51,21 +52,46 @@ const CalendarComponent: React.FC = () => {
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DateCalendar
-        loading={isLoading}
-        onMonthChange={handleMonthChange}
-        renderLoading={() => <DayCalendarSkeleton />}
-        slots={{
-          day: ServerDay,
-        }}
-        slotProps={{
-          day: {
-            highlightedDays,
-          } as any,
-        }}
-      />
-    </LocalizationProvider>
+    <Paper
+      elevation={3}
+      sx={{
+        p: 3,
+        borderRadius: '12px',
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'linear-gradient(135deg, #f3e5f5 30%, #e1bee7 100%)',
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          backgroundImage: `url('/funky-lines.png')`,
+          backgroundSize: "cover",
+          opacity: 0.1, // Adjust this value to make the pattern more or less transparent
+          zIndex: 0,
+        },
+      }}
+    >
+      
+      
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DateCalendar
+          loading={isLoading}
+          onMonthChange={handleMonthChange}
+          renderLoading={() => <DayCalendarSkeleton />}
+          slots={{
+            day: ServerDay,
+          }}
+          slotProps={{
+            day: {
+              highlightedDays,
+            } as any,
+          }}
+        />
+      </LocalizationProvider>
+    </Paper>
   );
 };
 
