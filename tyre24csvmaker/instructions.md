@@ -1,5 +1,3 @@
-Absolutely, here's the markdown file you requested:
-
 ## Tyre24 Stock Updater
 
 Tyre24 Stock Updater is a Python application designed to process and transform CSV files containing stock information. The application uses PyQt6 for its graphical user interface and includes features such as file browsing, progress tracking, and more.
@@ -83,7 +81,11 @@ pip install pyinstaller openpyxl
 Use the following command to build the executable:
 
 ```bash
-pyinstaller --onefile --noconsole --noupx --icon=icons/icon256.ico --add-data "icons;icons" --name "Tyre24StockUpdater" main.py
+pyinstaller --clean --onefile --noconsole --noupx --icon=icons/icon256.ico --add-data "icons;icons" --name "Tyre24StockUpdater" main.py
+```
+
+```bash
+pyinstaller --clean --onefile --noupx --icon=icons/icon256.ico --add-data "icons;icons" --name "Tyre24StockUpdater" main.py
 ```
 
 * `--onefile`: Creates a single executable file.

@@ -1,8 +1,8 @@
 import os
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QLabel, QLineEdit, QPushButton, QFileDialog, QProgressBar, QMessageBox, QWidget
-from PyQt6.QtGui import QIcon, QFont
-from PyQt6.QtCore import QTimer
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QLabel, QLineEdit, QPushButton, QFileDialog, QProgressBar, QMessageBox, QWidget # type: ignore
+from PyQt6.QtGui import QIcon, QFont # type: ignore
+from PyQt6.QtCore import QTimer # type: ignore
 from worker import Worker
 from styles import app_stylesheet
 
@@ -115,7 +115,7 @@ class MainWindow(QMainWindow):
 
     def browse_articles(self):
         self.articles_file, _ = QFileDialog.getOpenFileName(
-            self, "Select Articles File", "", "Excel files (*.xlsx)"
+            self, "Select Articles File", "", "Excel files (*.xls;*.xlsx)"
         )
         self.articles_entry.setText(self.articles_file)
         self.check_ready_to_process()
