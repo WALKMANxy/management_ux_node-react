@@ -1,8 +1,10 @@
 import React from "react";
-import { Box, Paper, Typography, Divider } from "@mui/material";
+import { Box, Paper, Typography, Divider, Skeleton } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 
 const SalesDistribution: React.FC<{ salesDistributionData: any[] }> = ({ salesDistributionData }) => {
+  const loading = salesDistributionData.length === 0;
+
   return (
     <Paper
       elevation={3}
@@ -21,7 +23,7 @@ const SalesDistribution: React.FC<{ salesDistributionData: any[] }> = ({ salesDi
           left: 0,
           backgroundImage: `url('/struckaxiom.png')`,
           backgroundSize: "cover",
-          opacity: 0.1, // Adjust this value to make the pattern more or less transparent
+          opacity: 0.1,
           zIndex: 0,
         },
       }}
@@ -34,20 +36,24 @@ const SalesDistribution: React.FC<{ salesDistributionData: any[] }> = ({ salesDi
           px: 2,
           py: 0.5,
           mb: 2,
-          zIndex: 1, // Ensure the box is above the pseudo-element
+          zIndex: 1,
         }}
       >
         <Typography variant="h6" gutterBottom>Sales Distribution Through Clients</Typography>
       </Box>
       <Divider sx={{ my: 2, borderRadius: '12px', zIndex: 1 }} />
       <Box sx={{ width: "100%", height: "300px", zIndex: 1 }}>
-        <BarChart
-          xAxis={[{ scaleType: "band", dataKey: "label" }]}
-          yAxis={[{ scaleType: "linear" }]}
-          series={[{ dataKey: "value", label: "Revenue" }]}
-          dataset={salesDistributionData}
-          layout="vertical"
-        />
+        {loading ? (
+          <Skeleton variant="rectangular" width="100%" height={300} sx={{ borderRadius: "12px" }} />
+        ) : (
+          <BarChart
+            xAxis={[{ scaleType: "band", dataKey: "label" }]}
+            yAxis={[{ scaleType: "linear" }]}
+            series={[{ dataKey: "value", label: "Revenue" }]}
+            dataset={salesDistributionData}
+            layout="vertical"
+          />
+        )}
       </Box>
     </Paper>
   );
