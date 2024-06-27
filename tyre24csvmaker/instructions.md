@@ -72,8 +72,14 @@ To build a standalone executable for the application without UPX compression, fo
 
 **Ensure all Dependencies are Installed**
 
+**Activating the Virtual Environment**
+   On Windows:
+
+
+   myenv\Scripts\activate
+
 ```bash
-pip install pyinstaller openpyxl
+pip install pyinstaller openpyxl PyQt6 pandas xlrd 
 ```
 
 **Create the Executable**
