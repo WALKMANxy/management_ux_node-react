@@ -1,10 +1,27 @@
+"""tyre24csvmaker/main.py"""
+
 import os
 import sys
+import json
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QLabel, QLineEdit, QPushButton, QFileDialog, QProgressBar, QMessageBox, QWidget # type: ignore
 from PyQt6.QtGui import QIcon, QFont # type: ignore
 from PyQt6.QtCore import QTimer # type: ignore
 from worker import Worker
 from styles import app_stylesheet
+
+CONFIG_FILE = 'config.json'
+DATA_FOLDER = 'Data'
+OUTPUT_FOLDER = 'Output'
+
+def load_config():
+    if os.path.exists(CONFIG_FILE):
+        with open(CONFIG_FILE, 'r') as file:
+            return json.load(file)
+    return {}
+
+def save_config(config):
+    with open(CONFIG_FILE, 'w') as file:
+        json.dump(config, file)
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -28,16 +45,17 @@ class MainWindow(QMainWindow):
         self.processing = False
 
         self.initUI()
+        self.check_and_load_files()
 
     def initUI(self):
         self.setStyleSheet(app_stylesheet)
 
-         # Determine the base path for the icons
+        # Determine the base path for the icons
         if hasattr(sys, '_MEIPASS'):
             base_path = sys._MEIPASS
         else:
             base_path = os.path.abspath(".")
-        
+
         layout = QVBoxLayout()
 
         welcome_label = QLabel("Welcome, user!")
@@ -106,26 +124,57 @@ class MainWindow(QMainWindow):
         self.fake_progress_timer.timeout.connect(self.update_fake_progress)
         self.progress_value = 0
 
+    def check_and_load_files(self):
+        config = load_config()
+
+        data_folder = os.path.join(os.path.dirname(__file__), DATA_FOLDER)
+        tecdoc_file = config.get('tecdoc_file', os.path.join(data_folder, 'tecdoc.csv'))
+        articles_file = config.get('articles_file', os.path.join(data_folder, 'articles.xls'))
+        output_folder = config.get('output_folder', os.path.join(os.path.dirname(__file__), OUTPUT_FOLDER))
+
+        if os.path.exists(tecdoc_file):
+            self.tecdoc_file = tecdoc_file
+            self.tecdoc_entry.setText(tecdoc_file)
+            self.tecdoc_button.setStyleSheet("background-color: green; color: white;")
+        if os.path.exists(articles_file):
+            self.articles_file = articles_file
+            self.articles_entry.setText(articles_file)
+            self.articles_button.setStyleSheet("background-color: green; color: white;")
+        if os.path.exists(output_folder):
+            self.output_folder = output_folder
+            self.output_entry.setText(output_folder)
+            self.output_button.setStyleSheet("background-color: green; color: white;")
+        else:
+            os.makedirs(output_folder)
+
+        self.check_ready_to_process()
+
     def browse_tecdoc(self):
         self.tecdoc_file, _ = QFileDialog.getOpenFileName(
             self, "Select TecDoc Brand ID File", "", "CSV files (*.csv)"
         )
         self.tecdoc_entry.setText(self.tecdoc_file)
+        self.tecdoc_button.setStyleSheet("background-color: green; color: white;")
         self.check_ready_to_process()
+        self.save_config()
 
     def browse_articles(self):
         self.articles_file, _ = QFileDialog.getOpenFileName(
             self, "Select Articles File", "", "Excel files (*.xls;*.xlsx)"
         )
         self.articles_entry.setText(self.articles_file)
+        self.articles_button.setStyleSheet("background-color: green; color: white;")
         self.check_ready_to_process()
+        self.save_config()
 
     def browse_output(self):
         self.output_folder = QFileDialog.getExistingDirectory(
             self, "Select Output Location"
         )
         self.output_entry.setText(self.output_folder)
+        self.output_button.setStyleSheet("background-color: green; color: white;")
         self.check_ready_to_process()
+        self.save_config()
 
     def check_ready_to_process(self):
         if self.tecdoc_file and self.articles_file and self.output_folder:
@@ -194,6 +243,14 @@ class MainWindow(QMainWindow):
         exit_button = msg_box.addButton("Exit", QMessageBox.ButtonRole.ActionRole)
         exit_button.clicked.connect(self.close)
         msg_box.exec()
+
+    def save_config(self):
+        config = {
+            'tecdoc_file': self.tecdoc_file,
+            'articles_file': self.articles_file,
+            'output_folder': self.output_folder
+        }
+        save_config(config)
 
 
 if __name__ == "__main__":

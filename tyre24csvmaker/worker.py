@@ -1,3 +1,5 @@
+"""tyre24csvmaker/worker.py"""
+
 from PyQt6.QtCore import QThread, pyqtSignal
 from data_processing import process_files
 

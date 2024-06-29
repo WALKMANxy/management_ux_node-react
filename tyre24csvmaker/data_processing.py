@@ -221,7 +221,14 @@ def process_files(
         "TecDoc Brand ID",
     ] = "MISSING / OFFICIAL SUPPLIER"
 
-    # Reorder columns and save
+    # Fill in the Price_Italia and Price_Germany columns by adding 25% to PRZ. ULT. ACQ.
+    df_combined["Price_Italia"] = df_combined["PRZ. ULT. ACQ."] * 1.25
+    df_combined["Price_Germany"] = df_combined["PRZ. ULT. ACQ."] * 1.25
+
+    # Drop the column PRZ. ULT. ACQ.
+    df_combined = df_combined.drop(columns=["PRZ. ULT. ACQ."])
+
+    # Reorder columns
     df_combined = df_combined[
         [
             "TecDoc-ID",
@@ -231,7 +238,6 @@ def process_files(
             "Quantity",
             "Price_Italia",
             "Price_Germany",
-            "PRZ. ULT. ACQ.",
             "Brand Type",
         ]
     ]
