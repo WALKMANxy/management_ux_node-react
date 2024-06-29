@@ -23,6 +23,7 @@ import CalendarComponent from "../../components/common/CalendarComponent";
 import TopBrandsSold from "../../components/charts/TopBrandSold";
 import SalesDistribution from "../../components/charts/SalesDistribution";
 import MonthOverMonthSpendingTrend from "../../components/charts/MonthOverMonthSpendingTrend";
+
 import { setVisits } from "../../features/calendar/calendarSlice";
 import {
   calculateTotalRevenue,
@@ -60,11 +61,11 @@ const AgentDashboard: React.FC = () => {
   }, [agentDetails, dispatch]);
 
   const totalRevenue = agentDetails
-    ? calculateTotalRevenue(agentDetails.clients)
-    : [];
+    ? parseFloat(calculateTotalRevenue(agentDetails.clients))
+    : 0;
   const totalOrders = agentDetails
     ? calculateTotalOrders(agentDetails.clients)
-    : [];
+    : 0;
   const topBrandsData = agentDetails
     ? calculateTopBrandsData(agentDetails.clients)
     : [];
@@ -104,15 +105,6 @@ const AgentDashboard: React.FC = () => {
     "linear-gradient(135deg, #e8f5e9 30%, #c8e6c9 100%)",
     "linear-gradient(135deg, #f3e5f5 30%, #e1bee7 100%)",
   ];
-
-  const titleBoxStyle = {
-    display: "inline-block",
-    backgroundColor: "rgba(0, 0, 0, 1%)",
-    borderRadius: "24px",
-    px: 2,
-    py: 0.5,
-    mb: 2.5,
-  };
 
   return (
     <Box
@@ -155,7 +147,16 @@ const AgentDashboard: React.FC = () => {
                         background: gradients[0],
                       }}
                     >
-                      <Box sx={titleBoxStyle}>
+                      <Box
+                        sx={{
+                          display: "inline-block",
+                          backgroundColor: "rgba(0, 0, 0, 1%)",
+                          borderRadius: "24px",
+                          px: 2,
+                          py: 0.5,
+                          mb: 2.5,
+                        }}
+                      >
                         <Typography variant="h6">Spent This Month</Typography>
                       </Box>
                       <Typography variant="body1">
@@ -182,7 +183,16 @@ const AgentDashboard: React.FC = () => {
                         background: gradients[1],
                       }}
                     >
-                      <Box sx={titleBoxStyle}>
+                      <Box
+                        sx={{
+                          display: "inline-block",
+                          backgroundColor: "rgba(0, 0, 0, 1%)",
+                          borderRadius: "24px",
+                          px: 2,
+                          py: 0.5,
+                          mb: 2.5,
+                        }}
+                      >
                         <Typography variant="h6">Spent This Year</Typography>
                       </Box>
                       <Typography variant="body1">
@@ -208,7 +218,16 @@ const AgentDashboard: React.FC = () => {
                         background: gradients[2],
                       }}
                     >
-                      <Box sx={titleBoxStyle}>
+                      <Box
+                        sx={{
+                          display: "inline-block",
+                          backgroundColor: "rgba(0, 0, 0, 1%)",
+                          borderRadius: "24px",
+                          px: 2,
+                          py: 0.5,
+                          mb: 2.5,
+                        }}
+                      >
                         <Typography variant="h6">Top Article Type</Typography>
                       </Box>
                       <Typography variant="body1">
@@ -274,7 +293,16 @@ const AgentDashboard: React.FC = () => {
                         background: gradients[3],
                       }}
                     >
-                      <Box sx={titleBoxStyle}>
+                      <Box
+                        sx={{
+                          display: "inline-block",
+                          backgroundColor: "rgba(0, 0, 0, 1%)",
+                          borderRadius: "24px",
+                          px: 2,
+                          py: 0.5,
+                          mb: 2.5,
+                        }}
+                      >
                         <Typography variant="h6">Total Revenue</Typography>
                       </Box>
                       <Typography
@@ -303,7 +331,16 @@ const AgentDashboard: React.FC = () => {
                         background: gradients[0],
                       }}
                     >
-                      <Box sx={titleBoxStyle}>
+                      <Box
+                        sx={{
+                          display: "inline-block",
+                          backgroundColor: "rgba(0, 0, 0, 1%)",
+                          borderRadius: "24px",
+                          px: 2,
+                          py: 0.5,
+                          mb: 2.5,
+                        }}
+                      >
                         <Typography variant="h6">Total Orders</Typography>
                       </Box>
                       <Typography variant="body1">
@@ -338,8 +375,8 @@ const AgentDashboard: React.FC = () => {
                   {agentDetails ? (
                     <TopBrandsSold
                       topBrandsData={topBrandsData}
-                      brandColors={brandColors}
                       isMobile={isMobile}
+                      brandColors={brandColors}
                     />
                   ) : (
                     <Skeleton

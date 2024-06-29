@@ -208,6 +208,10 @@ export const calculateMonthlyRevenue = (clients: Client[]) => {
   const monthlyRevenue = clients.reduce((acc, client) => {
     client.movements.forEach((movement) => {
       const monthYear = getMonthYear(movement.dateOfOrder);
+      if (monthYear === 'Invalid Date') {
+        console.error('Skipping movement with invalid date:', movement);
+        return;
+      }
       const movementRevenue = movement.details.reduce(
         (sum, detail) => sum + parseFloat(detail.priceSold),
         0
@@ -219,7 +223,9 @@ export const calculateMonthlyRevenue = (clients: Client[]) => {
 
   const months = Object.keys(monthlyRevenue).sort();
   const revenueData = months.map((month) => monthlyRevenue[month]);
-  //console.log("revenueData", revenueData);
+
+  console.log("Months:", months);
+  console.log("Revenue Data:", revenueData);
 
   return { months, revenueData };
 };
