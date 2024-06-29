@@ -1,3 +1,5 @@
+"""tyre24csvmaker/styles.py"""
+
 app_stylesheet = """
     QMainWindow {
         background: rgba(10, 10, 10, 0.8);
