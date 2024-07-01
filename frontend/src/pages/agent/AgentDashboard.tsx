@@ -117,8 +117,8 @@ const AgentDashboard: React.FC = () => {
           sx={{ borderRadius: "12px" }}
         />
       )}
-      <Grid container spacing={4} mt={2 }>
-        <Grid item xs={12} md={8}>
+      <Grid container spacing={6} mt={2 }>
+        <Grid item xs={12} md={10}>
           {selectedClient ? (
             <Box mb={4}>
               <Typography variant="h5" gutterBottom>
@@ -359,7 +359,7 @@ const AgentDashboard: React.FC = () => {
             agentDetails={agentDetails}
           />
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={2}>
           <Box mb={4}>
             <Typography variant="h5" gutterBottom>
               {agentDetails ? "Calendar" : <Skeleton width="30%" />}

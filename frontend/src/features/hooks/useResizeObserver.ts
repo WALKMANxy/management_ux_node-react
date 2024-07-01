@@ -1,20 +1,23 @@
-// src/hooks/useResizeObserver.ts
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 const useResizeObserver = () => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const observer = new ResizeObserver((entries) => {
-      if (entries[0].contentRect) {
-        setDimensions({
-          width: entries[0].contentRect.width,
-          height: entries[0].contentRect.height,
-        });
-      }
-    });
+  const handleResize = useCallback((entries: ResizeObserverEntry[]) => {
+    if (entries[0].contentRect) {
+      const { width, height } = entries[0].contentRect;
+      setDimensions((prevDimensions) => {
+        if (prevDimensions.width !== width || prevDimensions.height !== height) {
+          return { width, height };
+        }
+        return prevDimensions;
+      });
+    }
+  }, []);
 
+  useEffect(() => {
+    const observer = new ResizeObserver(handleResize);
     const currentContainer = containerRef.current;
 
     if (currentContainer) {
@@ -25,7 +28,7 @@ const useResizeObserver = () => {
         observer.unobserve(currentContainer);
       }
     };
-  }, []);
+  }, [handleResize]);
 
   return { containerRef, dimensions };
 };
