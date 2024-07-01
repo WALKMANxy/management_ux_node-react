@@ -1,33 +1,18 @@
-// src/components/charts/MonthOverMonthSpendingTrend.tsx
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, Paper, Typography, Divider, Skeleton } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
+import { monthMap } from "../../utils/constants";
 
-const monthMap: { [key: string]: string } = {
-  "01": "January",
-  "02": "February",
-  "03": "March",
-  "04": "April",
-  "05": "May",
-  "06": "June",
-  "07": "July",
-  "08": "August",
-  "09": "September",
-  "10": "October",
-  "11": "November",
-  "12": "December",
-};
 
 const MonthOverMonthSpendingTrend: React.FC<{ months: string[], revenueData: number[] }> = ({ months, revenueData }) => {
   const loading = revenueData.length === 0;
 
-  const data = months.map((month, index) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const data = useMemo(() => months.map((month, index) => {
     const [year, monthNum] = month.split("-");
     const monthName = monthMap[monthNum];
     const revenue = revenueData[index];
-    return { month: monthName, revenue };
-  });
+    return { month: `${monthName} ${year}`, revenue };
+  }), [months, revenueData]);
 
   return (
     <Paper elevation={3} sx={{ p: 3, borderRadius: '12px', background: 'linear-gradient(135deg, #fffde7 30%, #fff9c4 100%)' }}>
@@ -63,4 +48,4 @@ const MonthOverMonthSpendingTrend: React.FC<{ months: string[], revenueData: num
   );
 };
 
-export default MonthOverMonthSpendingTrend;
+export default React.memo(MonthOverMonthSpendingTrend);

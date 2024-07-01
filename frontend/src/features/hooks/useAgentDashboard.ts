@@ -1,47 +1,71 @@
-// src/hooks/useAgentDashboard.ts
-import { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../app/store";
-import { setVisits } from "../../features/calendar/calendarSlice";
-import {
-  calculateTotalRevenue,
-  calculateTotalOrders,
-  calculateTopBrandsData,
-  calculateSalesDistributionData,
-} from "../../utils/dataUtils";
-import { useMediaQuery, useTheme } from "@mui/material";
-import { Client } from "../../models/models";
-import useAgentStats from "./useAgentStats";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { Client, Agent, Movement } from "../../models/models";
+import { useGetClientsQuery } from "../../services/api";
 
-const useAgentDashboard = () => {
-  const dispatch = useDispatch();
-  const loggedInAgentId = useSelector((state: RootState) => state.auth.id);
-  const {
-    agentDetails,
-    selectedClient,
-    selectClient,
-    calculateTotalSpentThisMonth,
-    calculateTotalSpentThisYear,
-    calculateTopArticleType,
-  } = useAgentStats(loggedInAgentId);
+const useAgentStats = (agentId: string | null) => {
+  const { data: clientsData, isLoading, error } = useGetClientsQuery();
+  const [agentDetails, setAgentDetails] = useState<Agent | null>(null);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const clientIndex = useMemo(() => {
+    if (clientsData) {
+      return clientsData.reduce((acc, client) => {
+        acc.set(client.id, client);
+        return acc;
+      }, new Map<string, Client>());
+    }
+    return new Map<string, Client>();
+  }, [clientsData]);
 
   useEffect(() => {
-    if (agentDetails) {
-      dispatch(
-        setVisits(
-          agentDetails.clients.flatMap((client: Client) => client.visits)
-        )
-      );
+    if (!isLoading && clientsData && agentId) {
+      const agentClients = clientsData.filter(client => client.agent === agentId);
+      const agent = { id: agentId, name: `Agent ${agentId}`, clients: agentClients };
+      setAgentDetails(agent);
     }
-  }, [agentDetails, dispatch]);
+  }, [isLoading, clientsData, agentId]);
 
-  const totalRevenue = agentDetails ? calculateTotalRevenue(agentDetails.clients) : 0;
-  const totalOrders = agentDetails ? calculateTotalOrders(agentDetails.clients) : 0;
-  const topBrandsData = agentDetails ? calculateTopBrandsData(agentDetails.clients) : [];
-  const salesDistributionData = agentDetails ? calculateSalesDistributionData(agentDetails.clients, isMobile) : [];
+  const calculateTotalSpentThisMonth = useCallback((movements: Movement[]) => {
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+    return movements
+      .filter(movement => {
+        const movementDate = new Date(movement.dateOfOrder);
+        return movementDate.getMonth() + 1 === currentMonth && movementDate.getFullYear() === currentYear;
+      })
+      .reduce((total, movement) => total + movement.details.reduce((sum, detail) => sum + parseFloat(detail.priceSold), 0), 0)
+      .toFixed(2);
+  }, []);
+
+  const calculateTotalSpentThisYear = useCallback((movements: Movement[]) => {
+    const currentYear = new Date().getFullYear();
+    return movements
+      .filter(movement => new Date(movement.dateOfOrder).getFullYear() === currentYear)
+      .reduce((total, movement) => total + movement.details.reduce((sum, detail) => sum + parseFloat(detail.priceSold), 0), 0)
+      .toFixed(2);
+  }, []);
+
+  const calculateTopArticleType = useCallback((movements: Movement[]) => {
+    const typeCount: { [key: string]: number } = {};
+    movements.forEach(movement => {
+      movement.details.forEach(detail => {
+        typeCount[detail.name] = (typeCount[detail.name] || 0) + 1;
+      });
+    });
+    return Object.keys(typeCount).reduce((a, b) => (typeCount[a] > typeCount[b] ? a : b), "");
+  }, []);
+
+  const selectClient = useCallback((clientName: string) => {
+    if (agentDetails) {
+      const client = agentDetails.clients.find(client => client.name === clientName);
+      if (client) {
+        setSelectedClient(client);
+      } else {
+        console.error("Client not found for this agent");
+      }
+    }
+  }, [agentDetails]);
 
   return {
     agentDetails,
@@ -50,12 +74,9 @@ const useAgentDashboard = () => {
     calculateTotalSpentThisMonth,
     calculateTotalSpentThisYear,
     calculateTopArticleType,
-    totalRevenue,
-    totalOrders,
-    topBrandsData,
-    salesDistributionData,
-    isMobile,
+    isLoading,
+    error,
   };
 };
 
-export default useAgentDashboard;
+export default useAgentStats;

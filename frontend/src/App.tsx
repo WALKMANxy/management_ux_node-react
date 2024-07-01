@@ -16,6 +16,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import ClientDashboard from "./pages/client/ClientDashboard";
 import ClientsPage from "./pages/common/ClientsPage";
 
+
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
   return isLoggedIn ? children : <Navigate to="/" />;

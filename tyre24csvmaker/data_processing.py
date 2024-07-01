@@ -219,11 +219,11 @@ def process_files(
         (df_combined["Brand Type"] == "ORIGINAL")
         & (df_combined["TecDoc Brand ID"] == "MISSING TECDOC ID"),
         "TecDoc Brand ID",
-    ] = "MISSING / OFFICIAL SUPPLIER"
+    ] = ""
 
     # Fill in the Price_Italia and Price_Germany columns by adding 25% to PRZ. ULT. ACQ.
     df_combined["Price_Italia"] = df_combined["PRZ. ULT. ACQ."] * 1.25
-    df_combined["Price_Germany"] = df_combined["PRZ. ULT. ACQ."] * 1.25
+    df_combined["Price_Germany"] = df_combined["PRZ. ULT. ACQ."] * 1.32
 
     # Drop the column PRZ. ULT. ACQ.
     df_combined = df_combined.drop(columns=["PRZ. ULT. ACQ."])

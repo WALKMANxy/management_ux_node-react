@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useEffect, useMemo, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../app/store";
 import GlobalSearch from "../../components/common/GlobalSearch";
@@ -6,17 +7,14 @@ import useAgentStats from "../../features/hooks/useAgentStats";
 import {
   Box,
   Typography,
-  Paper,
   Grid,
   Button,
-  List,
-  ListItem,
-  ListItemText,
-  Fab,
   useMediaQuery,
   useTheme,
   Skeleton,
   Divider,
+  Paper,
+  Fab,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import CalendarComponent from "../../components/common/CalendarComponent";
@@ -31,7 +29,12 @@ import {
   calculateTopBrandsData,
   calculateSalesDistributionData,
 } from "../../utils/dataUtils";
-import { calculateMonthlyRevenue } from "../../utils/dataLoader";
+import { calculateMonthlyData } from "../../utils/dataLoader";
+import TotalEarning from "../../components/common/TotalRevenue";
+import TotalOrder from "../../components/common/TotalOrders";
+import { gradients, brandColors } from "../../utils/constants";
+import UpcomingVisits from "../../components/common/UpcomingVisits";
+import ActivePromotions from "../../components/common/ActivePromotions";
 
 const AgentDashboard: React.FC = () => {
   const dispatch = useDispatch();
@@ -48,9 +51,9 @@ const AgentDashboard: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const handleClientSelect = (clientName: string) => {
+  const handleClientSelect = useCallback((clientName: string) => {
     selectClient(clientName);
-  };
+  }, [selectClient]);
 
   useEffect(() => {
     if (agentDetails) {
@@ -60,51 +63,37 @@ const AgentDashboard: React.FC = () => {
     }
   }, [agentDetails, dispatch]);
 
-  const totalRevenue = agentDetails
+  const totalRevenue = useMemo(() => agentDetails
     ? parseFloat(calculateTotalRevenue(agentDetails.clients))
-    : 0;
-  const totalOrders = agentDetails
+    : 0, [agentDetails]);
+  
+  const totalOrders = useMemo(() => agentDetails
     ? calculateTotalOrders(agentDetails.clients)
-    : 0;
-  const topBrandsData = agentDetails
+    : 0, [agentDetails]);
+  
+  const topBrandsData = useMemo(() => agentDetails
     ? calculateTopBrandsData(agentDetails.clients)
-    : [];
-  const salesDistributionData = agentDetails
+    : [], [agentDetails]);
+  
+  const salesDistributionData = useMemo(() => agentDetails
     ? calculateSalesDistributionData(agentDetails.clients, isMobile)
-    : [];
+    : [], [agentDetails, isMobile]);
 
-  const { months, revenueData } = agentDetails
-    ? calculateMonthlyRevenue(agentDetails.clients)
-    : { months: [], revenueData: [] };
+  const { months, revenueData, ordersData } = useMemo(() => agentDetails
+    ? calculateMonthlyData(agentDetails.clients)
+    : { months: [], revenueData: [], ordersData: [] }, [agentDetails]);
 
-  const brandColors = [
-    "#FF6384",
-    "#36A2EB",
-    "#FFCE56",
-    "#4BC0C0",
-    "#9966FF",
-    "#FF9F40",
-    "#FF6384",
-    "#36A2EB",
-    "#FFCE56",
-    "#4BC0C0",
-    "#9966FF",
-    "#FF9F40",
-    "#FF6384",
-    "#36A2EB",
-    "#FFCE56",
-    "#4BC0C0",
-    "#9966FF",
-    "#FF9F40",
-    "#FF6384",
-  ];
-
-  const gradients = [
-    "linear-gradient(135deg, #fffde7 30%, #fff9c4 100%)",
-    "linear-gradient(135deg, #ffe0b2 30%, #ffcc80 100%)",
-    "linear-gradient(135deg, #e8f5e9 30%, #c8e6c9 100%)",
-    "linear-gradient(135deg, #f3e5f5 30%, #e1bee7 100%)",
-  ];
+  const yearlyOrders = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    return ordersData.reduce((acc, orders, index) => {
+      const year = parseInt(months[index].split('-')[0]);
+      acc[year] = (acc[year] || 0) + orders;
+      return acc;
+    }, {} as { [key: number]: number });
+  }, [ordersData, months]);
+  
+  const yearlyCategories = useMemo(() => Object.keys(yearlyOrders).map(String), [yearlyOrders]);
+  const yearlyOrdersData = useMemo(() => yearlyCategories.map(year => yearlyOrders[parseInt(year)]), [yearlyCategories, yearlyOrders]);
 
   return (
     <Box
@@ -128,7 +117,7 @@ const AgentDashboard: React.FC = () => {
           sx={{ borderRadius: "12px" }}
         />
       )}
-      <Grid container spacing={4} mt={2}>
+      <Grid container spacing={4} mt={2 }>
         <Grid item xs={12} md={8}>
           {selectedClient ? (
             <Box mb={4}>
@@ -283,35 +272,12 @@ const AgentDashboard: React.FC = () => {
 
               <Divider sx={{ my: 2, borderRadius: "12px" }} />
               <Grid container spacing={2}>
-                <Grid item xs={12} md={4}>
+                <Grid item xs={12} md={6}>
                   {agentDetails ? (
-                    <Paper
-                      elevation={3}
-                      sx={{
-                        p: 3,
-                        borderRadius: "12px",
-                        background: gradients[3],
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          display: "inline-block",
-                          backgroundColor: "rgba(0, 0, 0, 1%)",
-                          borderRadius: "24px",
-                          px: 2,
-                          py: 0.5,
-                          mb: 2.5,
-                        }}
-                      >
-                        <Typography variant="h6">Total Revenue</Typography>
-                      </Box>
-                      <Typography
-                        variant="body1"
-                        sx={{ paddingBottom: "10px" }}
-                      >
-                        Revenue: €{totalRevenue}
-                      </Typography>
-                    </Paper>
+                    <TotalEarning
+                      totalEarning={totalRevenue}
+                      isLoading={!agentDetails}
+                    />
                   ) : (
                     <Skeleton
                       variant="rectangular"
@@ -321,32 +287,16 @@ const AgentDashboard: React.FC = () => {
                     />
                   )}
                 </Grid>
-                <Grid item xs={12} md={4}>
+                <Grid item xs={12} md={6}>
                   {agentDetails ? (
-                    <Paper
-                      elevation={3}
-                      sx={{
-                        p: 3,
-                        borderRadius: "12px",
-                        background: gradients[0],
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          display: "inline-block",
-                          backgroundColor: "rgba(0, 0, 0, 1%)",
-                          borderRadius: "24px",
-                          px: 2,
-                          py: 0.5,
-                          mb: 2.5,
-                        }}
-                      >
-                        <Typography variant="h6">Total Orders</Typography>
-                      </Box>
-                      <Typography variant="body1">
-                        Orders: {totalOrders}
-                      </Typography>
-                    </Paper>
+                    <TotalOrder
+                      totalOrder={totalOrders}
+                      isLoading={!agentDetails}
+                      monthlyOrders={ordersData}
+                      yearlyOrders={yearlyOrdersData}
+                      monthlyCategories={months}
+                      yearlyCategories={yearlyCategories}
+                    />
                   ) : (
                     <Skeleton
                       variant="rectangular"
@@ -356,7 +306,7 @@ const AgentDashboard: React.FC = () => {
                     />
                   )}
                 </Grid>
-                <Grid item xs={12} md={8}>
+                <Grid item xs={12} md={6}>
                   {agentDetails ? (
                     <MonthOverMonthSpendingTrend
                       months={months}
@@ -371,7 +321,7 @@ const AgentDashboard: React.FC = () => {
                     />
                   )}
                 </Grid>
-                <Grid item xs={12} md={4}>
+                <Grid item xs={12} md={6}>
                   {agentDetails ? (
                     <TopBrandsSold
                       topBrandsData={topBrandsData}
@@ -404,60 +354,12 @@ const AgentDashboard: React.FC = () => {
               </Grid>
             </Box>
           )}
-          <Box mb={4}>
-            <Typography variant="h5" gutterBottom>
-              {selectedClient ? (
-                `Upcoming Visits for ${selectedClient.name}`
-              ) : agentDetails ? (
-                "Your Upcoming Visits"
-              ) : (
-                <Skeleton width="50%" />
-              )}
-            </Typography>
-
-            <Divider sx={{ my: 2, borderRadius: "12px" }} />
-            {agentDetails ? (
-              <List>
-                {selectedClient ? (
-                  selectedClient.visits.map((visit, index) => (
-                    <ListItem key={index}>
-                      <ListItemText
-                        primary={`${visit.note} on ${visit.date}`}
-                      />
-                    </ListItem>
-                  ))
-                ) : (
-                  <>
-                    <ListItem>
-                      <ListItemText primary="Visit 1" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Visit 2" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Visit 3" />
-                    </ListItem>
-                  </>
-                )}
-              </List>
-            ) : (
-              <Skeleton
-                variant="rectangular"
-                width="100%"
-                height={200}
-                sx={{ borderRadius: "12px" }}
-              />
-            )}
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{ mt: 3, borderRadius: "8px" }}
-            >
-              Plan Visit
-            </Button>
-          </Box>
+          <UpcomingVisits
+            selectedClient={selectedClient}
+            agentDetails={agentDetails}
+          />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={3}>
           <Box mb={4}>
             <Typography variant="h5" gutterBottom>
               {agentDetails ? "Calendar" : <Skeleton width="30%" />}
@@ -465,7 +367,9 @@ const AgentDashboard: React.FC = () => {
 
             <Divider sx={{ my: 2, borderRadius: "12px" }} />
             {agentDetails ? (
-              <CalendarComponent />
+              <Box sx={{ maxWidth: "400px", margin: "0 auto" }}>
+                <CalendarComponent />
+              </Box>
             ) : (
               <Skeleton
                 variant="rectangular"
@@ -475,56 +379,10 @@ const AgentDashboard: React.FC = () => {
               />
             )}
           </Box>
-          <Box>
-            <Typography variant="h5" gutterBottom>
-              {selectedClient ? (
-                `Active Promotions for ${selectedClient.name}`
-              ) : agentDetails ? (
-                "Active Promotions with Your Clients"
-              ) : (
-                <Skeleton width="50%" />
-              )}
-            </Typography>
-
-            <Divider sx={{ my: 2, borderRadius: "12px" }} />
-            {agentDetails ? (
-              <List>
-                {selectedClient ? (
-                  selectedClient.promos.map((promo) => (
-                    <ListItem key={promo.id}>
-                      <ListItemText primary={promo.name} />
-                    </ListItem>
-                  ))
-                ) : (
-                  <>
-                    <ListItem>
-                      <ListItemText primary="Promo 1" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Promo 2" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Promo 3" />
-                    </ListItem>
-                  </>
-                )}
-              </List>
-            ) : (
-              <Skeleton
-                variant="rectangular"
-                width="100%"
-                height={200}
-                sx={{ borderRadius: "12px" }}
-              />
-            )}
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{ mt: 3, borderRadius: "8px" }}
-            >
-              View More
-            </Button>
-          </Box>
+          <ActivePromotions
+            selectedClient={selectedClient}
+            agentDetails={agentDetails}
+          />
         </Grid>
       </Grid>
     </Box>

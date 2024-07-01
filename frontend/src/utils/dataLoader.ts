@@ -1,4 +1,3 @@
-// utils/dataLoader.ts
 import axios from 'axios';
 import { Client, Agent, MovementDetail } from '../models/models';
 import { format, parseISO } from "date-fns"; // Import date-fns for date formatting
@@ -8,33 +7,29 @@ const jsonFilePath = '/datasetsfrom01JANto12JUN.json';
 // Web worker script for clients
 const workerScript = `
 self.onmessage = function(event) {
-  const { data, chunkSize } = event.data;
-  
-  // Create a clientsMap using reduce
-  const clientsMap = data.reduce((map, item) => {
-    const clientId = item["Codice Cliente"].toString();
-    if (!map.has(clientId)) {
-      map.set(clientId, []);
-    }
-    map.get(clientId).push(item);
-    return map;
-  }, new Map());
+  const { data } = event.data;
 
-  // Map the clients data
+  const clientsMap = new Map();
+  data.forEach(item => {
+    const clientId = item["Codice Cliente"].toString();
+    if (!clientsMap.has(clientId)) {
+      clientsMap.set(clientId, []);
+    }
+    clientsMap.get(clientId).push(item);
+  });
+
   const clients = Array.from(clientsMap.values()).map(clientData => {
     const clientInfo = clientData[0];
 
-    // Create a movementsMap using reduce
-    const movementsMap = clientData.reduce((map, item) => {
+    const movementsMap = new Map();
+    clientData.forEach(item => {
       const movementId = item["Numero Lista"].toString();
-      if (!map.has(movementId)) {
-        map.set(movementId, []);
+      if (!movementsMap.has(movementId)) {
+        movementsMap.set(movementId, []);
       }
-      map.get(movementId).push(item);
-      return map;
-    }, new Map());
+      movementsMap.get(movementId).push(item);
+    });
 
-    // Map the movements data
     const movements = Array.from(movementsMap.values()).map(movementData => {
       const movementInfo = movementData[0];
       return {
@@ -53,12 +48,10 @@ self.onmessage = function(event) {
       };
     });
 
-    // Calculate the total revenue using reduce
     const totalRevenue = movements.reduce((acc, movement) => {
       return acc + movement.details.reduce((sum, detail) => sum + parseFloat(detail.priceSold), 0);
     }, 0).toFixed(2);
 
-    // Return the mapped client object
     return {
       id: clientInfo["Codice Cliente"].toString(),
       name: clientInfo["Ragione Sociale Cliente"],
@@ -89,7 +82,6 @@ const getMonthYear = (dateString: string) => {
   return format(date, "yyyy-MM");
 };
 
-
 export const loadJsonData = async (url: string = jsonFilePath): Promise<any[]> => {
   try {
     const response = await axios.get(url);
@@ -103,28 +95,8 @@ export const loadJsonData = async (url: string = jsonFilePath): Promise<any[]> =
 export const mapDataToModels = (data: any[]): Promise<Client[]> => {
   return new Promise((resolve, reject) => {
     const worker = new Worker(workerUrl);
-    const chunkSize = 1000;
 
-    worker.postMessage({ data, chunkSize });
-
-    worker.onmessage = function(event) {
-      resolve(event.data);
-      worker.terminate();
-    };
-
-    worker.onerror = function(error) {
-      reject(error);
-      worker.terminate();
-    };
-  });
-};
-
-export const mapDataToClients = (data: any[]): Promise<Client[]> => {
-  return new Promise((resolve, reject) => {
-    const worker = new Worker(workerUrl);
-    const chunkSize = 1000;
-
-    worker.postMessage({ data, chunkSize });
+    worker.postMessage({ data });
 
     worker.onmessage = function(event) {
       resolve(event.data);
@@ -139,25 +111,25 @@ export const mapDataToClients = (data: any[]): Promise<Client[]> => {
 };
 
 export const mapDataToMinimalClients = (data: any[]): Client[] => {
-  const clientsMap = data.reduce<Map<string, any>>((acc, item) => {
+  const clientsMap = new Map<string, any>();
+  data.forEach(item => {
     const clientId = item["Codice Cliente"].toString();
-    if (!acc.has(clientId)) {
-      acc.set(clientId, { id: clientId, name: item["Ragione Sociale Cliente"] });
+    if (!clientsMap.has(clientId)) {
+      clientsMap.set(clientId, { id: clientId, name: item["Ragione Sociale Cliente"] });
     }
-    return acc;
-  }, new Map<string, any>());
+  });
 
   return Array.from(clientsMap.values());
 };
 
 export const mapDataToMinimalAgents = (data: any[]): Agent[] => {
-  const agentsMap = data.reduce<Map<string, any>>((acc, item) => {
+  const agentsMap = new Map<string, any>();
+  data.forEach(item => {
     const agentId = item["Codice Agente"].toString();
-    if (!acc.has(agentId)) {
-      acc.set(agentId, { id: agentId, name: `Agent ${agentId}`, clients: [] });
+    if (!agentsMap.has(agentId)) {
+      agentsMap.set(agentId, { id: agentId, name: `Agent ${agentId}`, clients: [] });
     }
-    return acc;
-  }, new Map<string, any>());
+  });
 
   return Array.from(agentsMap.values());
 };
@@ -204,8 +176,8 @@ export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
   }));
 };
 
-export const calculateMonthlyRevenue = (clients: Client[]) => {
-  const monthlyRevenue = clients.reduce((acc, client) => {
+export const calculateMonthlyData = (clients: Client[]) => {
+  const monthlyData = clients.reduce((acc, client) => {
     client.movements.forEach((movement) => {
       const monthYear = getMonthYear(movement.dateOfOrder);
       if (monthYear === 'Invalid Date') {
@@ -216,16 +188,20 @@ export const calculateMonthlyRevenue = (clients: Client[]) => {
         (sum, detail) => sum + parseFloat(detail.priceSold),
         0
       );
-      acc[monthYear] = (acc[monthYear] || 0) + movementRevenue;
+      const movementOrders = movement.details.length;
+      if (!acc[monthYear]) {
+        acc[monthYear] = { revenue: 0, orders: 0 };
+      }
+      acc[monthYear].revenue += movementRevenue;
+      acc[monthYear].orders += movementOrders;
     });
     return acc;
-  }, {} as { [key: string]: number });
+  }, {} as { [key: string]: { revenue: number; orders: number } });
 
-  const months = Object.keys(monthlyRevenue).sort();
-  const revenueData = months.map((month) => monthlyRevenue[month]);
+  const months = Object.keys(monthlyData).sort();
+  const revenueData = months.map((month) => monthlyData[month].revenue);
+  const ordersData = months.map((month) => monthlyData[month].orders);
 
-  console.log("Months:", months);
-  console.log("Revenue Data:", revenueData);
-
-  return { months, revenueData };
+  return { months, revenueData, ordersData };
 };
+
