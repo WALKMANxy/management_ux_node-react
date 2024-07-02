@@ -3,11 +3,12 @@ import { Client, Agent, MovementDetail } from '../models/models';
 import { format, parseISO } from "date-fns"; // Import date-fns for date formatting
 
 const jsonFilePath = '/datasetsfrom01JANto12JUN.json';
+const clientDetailsFilePath = '/clientdetailsdataset02072024.json';
 
 // Web worker script for clients
 const workerScript = `
 self.onmessage = function(event) {
-  const { data } = event.data;
+  const { data, clientDetails } = event.data;
 
   const clientsMap = new Map();
   data.forEach(item => {
@@ -20,6 +21,14 @@ self.onmessage = function(event) {
 
   const clients = Array.from(clientsMap.values()).map(clientData => {
     const clientInfo = clientData[0];
+
+    const clientDetail = clientDetails.find(detail => detail["CODICE"] === clientInfo["Codice Cliente"].toString());
+
+    if (clientDetail) {
+      //console.log('Client Detail found:', clientDetail);
+    } else {
+      console.warn('Client Detail not found for:', clientInfo["Codice Cliente"]);
+    }
 
     const movementsMap = new Map();
     clientData.forEach(item => {
@@ -52,21 +61,30 @@ self.onmessage = function(event) {
       return acc + movement.details.reduce((sum, detail) => sum + parseFloat(detail.priceSold), 0);
     }, 0).toFixed(2);
 
-    return {
+    const client = {
       id: clientInfo["Codice Cliente"].toString(),
       name: clientInfo["Ragione Sociale Cliente"],
-      province: "",
-      phone: "",
+      province: clientDetail ? clientDetail["C.A.P. - COMUNE (PROV.)"] : "",
+      phone: clientDetail ? clientDetail["TELEFONO"] : "",
       totalOrders: movementsMap.size,
       totalRevenue,
       unpaidRevenue: "",
-      address: "",
-      email: "",
+      address: clientDetail ? clientDetail["INDIRIZZO"] : "",
+      email: clientDetail ? clientDetail["EMAIL"] : "",
+      pec: clientDetail ? clientDetail["EMAIL PEC"] : "",
+      taxCode: clientDetail ? clientDetail["PARTITA IVA"] : "",
+      extendedTaxCode: clientDetail ? clientDetail["CODICE FISCALE"] : "",
+      paymentMethodID: clientDetail ? clientDetail["MP"] : "",
+      paymentMethod: clientDetail ? clientDetail["Descizione metodo pagamento"] : "",
       visits: [],
       agent: clientInfo["Codice Agente"].toString(),
       movements,
       promos: []
     };
+
+    //console.log('Processed client:', client);
+
+    return client;
   });
 
   self.postMessage(clients);
@@ -92,18 +110,32 @@ export const loadJsonData = async (url: string = jsonFilePath): Promise<any[]> =
   }
 };
 
-export const mapDataToModels = (data: any[]): Promise<Client[]> => {
+export const loadClientDetailsData = async (url: string = clientDetailsFilePath): Promise<any[]> => {
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Error loading client details data:', error);
+    throw new Error(`Failed to load data from ${url}`);
+  }
+};
+
+export const mapDataToModels = async (data: any[], clientDetails: any[]): Promise<Client[]> => {
   return new Promise((resolve, reject) => {
     const worker = new Worker(workerUrl);
 
-    worker.postMessage({ data });
+    //console.log('Sending data to worker:', { data, clientDetails });
+
+    worker.postMessage({ data, clientDetails });
 
     worker.onmessage = function(event) {
+      //console.log('Received data from worker:', event.data);
       resolve(event.data);
       worker.terminate();
     };
 
     worker.onerror = function(error) {
+      console.error('Worker error:', error);
       reject(error);
       worker.terminate();
     };
@@ -162,9 +194,7 @@ export const mapDataToAgents = (data: any[]): Agent[] => {
   }));
 
   return agents;
-}
-
-
+};
 
 export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
   return data.map(item => ({

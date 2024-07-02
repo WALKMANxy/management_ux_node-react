@@ -13,10 +13,8 @@ export type AuthHandlersProps = {
   selectedAgent: string;
   selectedClient: string;
   agents: Agent[];
-}
+};
 
-
-// src/models/models.ts
 export type SearchResult = {
   id: string;
   name: string;
@@ -29,6 +27,9 @@ export type SearchResult = {
   province?: string;
   phone?: string;
   paymentMethod?: string;
+  address?: string;
+  email?: string;
+  agent?: string;
   // Promo-specific properties
   discountAmount?: string;
   isEligible?: boolean;
@@ -39,7 +40,6 @@ export type SearchResult = {
   reason?: string;
   severity?: string;
 };
-
 
 export type SearchParams = {
   query: string;
@@ -111,13 +111,19 @@ export type Promo = {
 export type Client = {
   id: string;
   name: string;
-  province: string;
-  phone: string;
+  extendedName?: string; // New property
+  province?: string;
+  phone?: string;
   totalOrders: number;
   totalRevenue: string;
   unpaidRevenue: string;
-  address: string;
-  email: string;
+  address?: string;
+  email?: string;
+  pec?: string; // New property
+  taxCode?: string; // New property
+  extendedTaxCode?: string; // New property
+  paymentMethodID?: string; // New property
+  paymentMethod?: string; // New property
   visits: Visit[];
   agent: string;
   movements: Movement[];
@@ -139,17 +145,14 @@ export type Alert = {
   severity: "low" | "medium" | "high";
 };
 
-
-
 export type DataState = {
   clients: Client[];
   clientIndex: Map<string, Client>;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
-}
+};
 
 export type FetchDataPayload = {
   clients: Client[];
   clientIndex: Map<string, Client>;
-}
-
+};

@@ -1,4 +1,4 @@
-//src/pages/landing/LandingPage.tsx
+// src/pages/landing/LandingPage.tsx
 import React, { useState, useMemo, useEffect } from "react";
 import {
   AppBar,
@@ -42,9 +42,13 @@ const LandingPage: React.FC = () => {
   const [selectedClient, setSelectedClient] = useState<string>(""); // State for selected client
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
 
-  const { data: agents = [] } = useGetAgentsQuery();
-  const { data: minimalClients = [], refetch: refetchMinimalClients } =
-    useGetMinimalClientsQuery();
+  const {
+    data: agents = [],
+  } = useGetAgentsQuery();
+  const {
+    data: minimalClients = [],
+    refetch: refetchMinimalClients,
+  } = useGetMinimalClientsQuery();
 
   const { handleLogin, handleEnter } = useAuthHandlers({
     selectedRole,
@@ -88,7 +92,6 @@ const LandingPage: React.FC = () => {
   if (showLoader) {
     return <Loader />;
   }
-
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <AppBar position="static" sx={{ backgroundColor: "black" }}>
@@ -310,7 +313,10 @@ const LandingPage: React.FC = () => {
               <Typography
                 sx={{
                   marginBottom: "0.32rem",
-                  "@media (max-width: 600px)": { marginBottom: "0.16rem", fontSize: "250%" },
+                  "@media (max-width: 600px)": {
+                    marginBottom: "0.16rem",
+                    fontSize: "250%",
+                  },
                 }}
               >
                 <AccessTimeIcon /> Lun - Ven, 8:30 - 13:00 e 14:30 - 18:30
@@ -318,7 +324,10 @@ const LandingPage: React.FC = () => {
               <Typography
                 sx={{
                   marginBottom: "0.32rem",
-                  "@media (max-width: 600px)": { marginBottom: "0.16rem", fontSize: "250%" },
+                  "@media (max-width: 600px)": {
+                    marginBottom: "0.16rem",
+                    fontSize: "250%",
+                  },
                 }}
               >
                 <LocationOnIcon /> Via Alessandro Volta 17, Catania
@@ -339,7 +348,10 @@ const LandingPage: React.FC = () => {
               <Typography
                 sx={{
                   marginBottom: "0.32rem",
-                  "@media (max-width: 600px)": { marginBottom: "0.16rem", fontSize: "250%" },
+                  "@media (max-width: 600px)": {
+                    marginBottom: "0.16rem",
+                    fontSize: "250%",
+                  },
                 }}
               >
                 <PhoneIcon />{" "}
@@ -353,7 +365,10 @@ const LandingPage: React.FC = () => {
               <Typography
                 sx={{
                   marginBottom: "0.32rem",
-                  "@media (max-width: 600px)": { marginBottom: "0.16rem", fontSize: "250%" },
+                  "@media (max-width: 600px)": {
+                    marginBottom: "0.16rem",
+                    fontSize: "250%",
+                  },
                 }}
               >
                 <EmailIcon />{" "}
@@ -367,7 +382,10 @@ const LandingPage: React.FC = () => {
               <Typography
                 sx={{
                   marginBottom: "0.32rem",
-                  "@media (max-width: 600px)": { marginBottom: "0.16rem", fontSize: "250%" },
+                  "@media (max-width: 600px)": {
+                    marginBottom: "0.16rem",
+                    fontSize: "250%",
+                  },
                 }}
               >
                 <VATIcon /> 03176280877
@@ -386,11 +404,16 @@ const LandingPage: React.FC = () => {
             }}
           >
             <Typography
-                sx={{
-                  marginBottom: "0.32rem",
-                  "@media (max-width: 600px)": { marginBottom: "0.16rem", fontSize: "250%" },
-                }}
-              >credits: @2024</Typography>
+              sx={{
+                marginBottom: "0.32rem",
+                "@media (max-width: 600px)": {
+                  marginBottom: "0.16rem",
+                  fontSize: "250%",
+                },
+              }}
+            >
+              credits: @2024
+            </Typography>
           </Box>
         </Container>
       </Box>

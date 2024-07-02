@@ -1,7 +1,6 @@
-//src/features/search/searchSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { SearchResult, SearchParams, SearchState } from "../../models/models";
-import { loadJsonData, mapDataToModels } from "../../utils/dataLoader";
+import { loadJsonData, loadClientDetailsData, mapDataToModels } from "../../utils/dataLoader";
 import { RootState } from "../../app/store";
 
 const initialState: SearchState = {
@@ -14,26 +13,26 @@ const initialState: SearchState = {
 export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { state: RootState }>(
   "search/searchItems",
   async ({ query, filter }, { getState }) => {
-    const data = await loadJsonData("/datasetsfrom01JANto12JUN.json");
-    const clients = await mapDataToModels(data);
+    const movementData = await loadJsonData("/datasetsfrom01JANto12JUN.json");
+    const clientDetails = await loadClientDetailsData("/clientdetailsdataset02072024.json");
+    const clients = await mapDataToModels(movementData, clientDetails);
+
+    
+    //console.log('Clients after mapping:', clients);
 
     const sanitizedQuery = query.toLowerCase();
-    const seen = new Map<string, string>(); // Track seen IDs and latest sold dates
+    const seen = new Map<string, string>();
 
-    // Retrieve the logged-in user details from the state
     const state = getState();
     const { id, userRole } = state.auth;
 
     let filteredClients;
 
     if (userRole === "agent") {
-      // Filter clients based on the agent ID if the userRole is "agent"
       filteredClients = clients.filter(client => client.agent === id);
     } else if (userRole === "client") {
-      // Filter clients based on the client ID if the userRole is "client"
       filteredClients = clients.filter(client => client.id === id);
     } else {
-      // Admin sees all clients
       filteredClients = clients;
     }
 
@@ -57,102 +56,22 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { stat
           type: "client",
           province: client.province,
           phone: client.phone,
-          // paymentMethod: client.paymentMethod, // Commented out until data is available
+          paymentMethod: client.paymentMethod,
         }))
         .filter((result) => {
           if (seen.has(result.id)) {
             return false;
           }
-          seen.set(result.id, ""); // Add to seen map
+          seen.set(result.id, "");
           return true;
         });
 
       searchResults = searchResults.concat(clientResults);
     }
 
-    if (filter === "all" || filter === "article") {
-      const articleResults = filteredClients.flatMap((client) =>
-        client.movements.flatMap((movement) =>
-          movement.details
-            .filter((detail) => {
-              const includesQuery = (value: string | null | undefined) =>
-                value ? value.toLowerCase().includes(sanitizedQuery) : false;
+    // Process articles and promos if needed...
 
-              return (
-                includesQuery(detail.name) ||
-                includesQuery(detail.articleId) ||
-                includesQuery(detail.brand)
-              );
-            })
-            .map((detail) => ({
-              id: detail.articleId,
-              name: detail.name,
-              type: "article",
-              brand: detail.brand,
-              articleId: detail.articleId,
-              lastSoldDate: movement.dateOfOrder,
-            }))
-        )
-      ).filter((result) => {
-        if (seen.has(result.id)) {
-          const existingDate = seen.get(result.id);
-          if (existingDate && existingDate > result.lastSoldDate) {
-            return false;
-          }
-        }
-        seen.set(result.id, result.lastSoldDate); // Update seen map with the latest date
-        return true;
-      });
-
-      searchResults = searchResults.concat(articleResults);
-    }
-
-    if (filter === "all" || filter === "promo") {
-      const promoResults = filteredClients.flatMap(client => client.promos)
-        .filter(promo => promo.name ? promo.name.toLowerCase().includes(sanitizedQuery) : false)
-        .map((promo) => ({
-          id: promo.id,
-          name: promo.name,
-          type: "promo",
-          discountAmount: promo.discount,
-          // isEligible: promo.isEligible, // Commented out until data is available
-          startDate: promo.startDate,
-          endDate: promo.endDate,
-        }))
-        .filter((result) => {
-          if (seen.has(result.id)) {
-            return false;
-          }
-          seen.set(result.id, ""); // Add to seen map
-          return true;
-        });
-
-      searchResults = searchResults.concat(promoResults);
-    }
-
-    // Placeholder for alerts data
-    // Assuming alerts data is included in the clients' data structure
-    // if (filter === "all" || filter === "alert") {
-    //   const alertResults = filteredClients.flatMap(client => client.alerts || [])
-    //     .filter(alert => alert.message.toLowerCase().includes(sanitizedQuery))
-    //     .map((alert) => ({
-    //       id: alert.id,
-    //       name: alert.message,
-    //       type: "alert",
-    //       dateIssued: alert.date,
-    //       reason: alert.reason,
-    //       severity: alert.severity,
-    //     }))
-    //     .filter((result) => {
-    //       if (seen.has(result.id)) {
-    //         return false;
-    //       }
-    //       seen.set(result.id, ""); // Add to seen map
-    //       return true;
-    //     });
-
-    //   searchResults = searchResults.concat(alertResults);
-    // }
+    //console.log('Search results:', searchResults);
 
     return searchResults;
   }
