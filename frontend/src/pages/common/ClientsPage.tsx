@@ -1,83 +1,164 @@
-// src/pages/common/ClientsPage.tsx
-import React, { useState } from "react";
+import React, { useState, useRef, useCallback, useMemo } from "react";
 import {
   Box,
   Typography,
   Paper,
   Collapse,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   IconButton,
   Card,
   CardContent,
   Grid,
+  TextField,
+  Button,
+  Menu,
+  MenuItem,
+  useMediaQuery,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import GlobalSearch from "../../components/common/GlobalSearch";
+import { useSelector } from "react-redux";
+import { useGetClientsQuery } from "../../services/api";
+import { RootState } from "../../app/store";
 import DetailComponent from "../../components/common/DetailComponent";
 import HistoryComponent from "../../components/common/HistoryComponent";
-
-const mockClientDetails = {
-  name: "Client 1",
-  address: "123 Main St",
-  email: "client1@example.com",
-  phone: "123-456-7890",
-  ordersThisMonth: 5,
-  revenueThisMonth: "$5000",
-  unpaidRevenue: "$1000",
-};
-
-const mockVisitsHistory = [
-  { date: "2023-01-01", note: "Initial consultation" },
-  { date: "2023-02-15", note: "Follow-up visit" },
-  { date: "2023-03-10", note: "Routine check" },
-];
-
-const mockClientsList = [
-  {
-    id: "1",
-    name: "Client 1",
-    province: "CT",
-    phone: "123-456-7890",
-    ordersThisMonth: 5,
-    revenueThisMonth: "$5000",
-    unpaidRevenue: "$1000",
-  },
-  {
-    id: "2",
-    name: "Client 2",
-    province: "PA",
-    phone: "123-456-7891",
-    ordersThisMonth: 3,
-    revenueThisMonth: "$3000",
-    unpaidRevenue: "$500",
-  },
-  {
-    id: "3",
-    name: "Client 3",
-    province: "NY",
-    phone: "123-456-7892",
-    ordersThisMonth: 4,
-    revenueThisMonth: "$4000",
-    unpaidRevenue: "$1500",
-  },
-  // Add more mock data to make the list scrollable
-];
+import AGGridTable from "../../components/common/AGGridTable";
+import { Client } from "../../models/models";
+import {
+  calculateMonthlyOrders,
+  calculateMonthlyRevenue,
+} from "../../utils/dataUtils";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import '../styles/AGGrid.css'
 
 const ClientsPage: React.FC = () => {
-  const [selectedClient, setSelectedClient] = useState<string | null>(null);
+  const { data: clients = [] } = useGetClientsQuery();
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isClientListCollapsed, setClientListCollapsed] = useState(false);
   const [isClientDetailsCollapsed, setClientDetailsCollapsed] = useState(false);
+  const userRole = useSelector((state: RootState) => state.auth.userRole);
+  const userId = useSelector((state: RootState) => state.auth.id);
+  const [quickFilterText, setQuickFilterText] = useState("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+  const detailsRef = useRef<HTMLDivElement | null>(null);
+  const gridRef = useRef<any>(null);
+  const isMobile = useMediaQuery("(max-width:600px)");
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const handleClientSelect = (client: string) => {
-    setSelectedClient(client);
-    setClientDetailsCollapsed(false);
+  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
   };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleClientSelect = useCallback(
+    (clientId: string) => {
+      const client = clients.find((client) => client.id === clientId) || null;
+      setSelectedClient(client);
+      setClientDetailsCollapsed(false);
+
+      if (detailsRef.current) {
+        detailsRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    },
+    [clients]
+  );
+
+  const filteredClients = useCallback(() => {
+    let filtered = clients;
+    if (userRole === "agent") {
+      filtered = filtered.filter((client) => client.agent === userId);
+    } else if (userRole === "client") {
+      filtered = filtered.filter((client) => client.id === userId);
+    }
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      filtered = filtered.filter((client) => {
+        return client.movements.some((movement) => {
+          const movementDate = new Date(movement.dateOfOrder);
+          return movementDate >= start && movementDate <= end;
+        });
+      });
+    }
+    return filtered;
+  }, [clients, userRole, userId, startDate, endDate]);
+
+  const onFilterTextBoxChanged = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setQuickFilterText(event.target.value);
+    },
+    []
+  );
+
+  const handleDateFilter = useCallback(() => {
+    setStartDate(startDate);
+    setEndDate(endDate);
+  }, [startDate, endDate]);
+
+  const exportDataAsCsv = useCallback(() => {
+    if (gridRef.current) {
+      gridRef.current.api.exportDataAsCsv();
+    }
+  }, []);
+
+  const columnDefs = useMemo(
+    () => [
+      { headerName: "Name", field: "name", filter: "agTextColumnFilter" },
+      {
+        headerName: "Province",
+        field: "province",
+        filter: "agTextColumnFilter",
+      },
+      { headerName: "Phone", field: "phone", filter: "agTextColumnFilter" },
+      {
+        headerName: "Total Orders",
+        field: "totalOrders",
+        filter: "agNumberColumnFilter",
+      },
+      {
+        headerName: "Orders This Month",
+        valueGetter: (params: any) =>
+          calculateMonthlyOrders(params.data.movements),
+        filter: "agNumberColumnFilter",
+      },
+      {
+        headerName: "Total Revenue",
+        field: "totalRevenue",
+        filter: "agNumberColumnFilter",
+      },
+      {
+        headerName: "Revenue This Month",
+        valueGetter: (params: any) =>
+          calculateMonthlyRevenue(params.data.movements),
+        filter: "agNumberColumnFilter",
+      },
+      {
+        headerName: "Unpaid Revenue",
+        field: "unpaidRevenue",
+        filter: "agNumberColumnFilter",
+      },
+      {
+        headerName: "Payment Method",
+        field: "paymentMethod",
+        filter: "agTextColumnFilter",
+      },
+      {
+        headerName: "Actions",
+        field: "id",
+        cellRenderer: (params: any) => {
+          return (
+            <button onClick={() => handleClientSelect(params.value)}>
+              View
+            </button>
+          );
+        },
+      },
+    ],
+    [handleClientSelect]
+  );
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", p: 2 }}>
@@ -99,48 +180,75 @@ const ClientsPage: React.FC = () => {
         </Box>
         <Collapse in={!isClientListCollapsed}>
           <Box sx={{ p: 2 }}>
-            <GlobalSearch filter="client" onSelect={handleClientSelect} />
-            <TableContainer component={Paper} sx={{ mt: 2 }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Province</TableCell>
-                    <TableCell>Phone</TableCell>
-                    <TableCell>Orders This Month</TableCell>
-                    <TableCell>Revenue This Month</TableCell>
-                    <TableCell>Unpaid Revenue</TableCell>
-                    <TableCell>Visit History</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {mockClientsList.map((client) => (
-                    <TableRow
-                      key={client.id}
-                      onClick={() => handleClientSelect(client.name)}
-                      hover
-                    >
-                      <TableCell>{client.name}</TableCell>
-                      <TableCell>{client.province}</TableCell>
-                      <TableCell>{client.phone}</TableCell>
-                      <TableCell>{client.ordersThisMonth}</TableCell>
-                      <TableCell>{client.revenueThisMonth}</TableCell>
-                      <TableCell>{client.unpaidRevenue}</TableCell>
-                      <TableCell>
-                        <button onClick={() => handleClientSelect(client.name)}>
-                          View
-                        </button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: isMobile ? "column" : "row",
+                gap: 2,
+                mb: 2,
+              }}
+            >
+              <TextField
+                id="filter-text-box"
+                placeholder="Quick Filter..."
+                variant="outlined"
+                size="small"
+                fullWidth
+                onChange={onFilterTextBoxChanged}
+              />
+              <TextField
+                type="date"
+                label="Start Date"
+                InputLabelProps={{ shrink: true }}
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                fullWidth={isMobile}
+              />
+              <TextField
+                type="date"
+                label="End Date"
+                InputLabelProps={{ shrink: true }}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                fullWidth={isMobile}
+              />
+              {isMobile ? (
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                  <IconButton onClick={handleMenuOpen}>
+                    <MoreVertIcon />
+                  </IconButton>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                  >
+                    <MenuItem onClick={handleDateFilter}>Filter</MenuItem>
+                    <MenuItem onClick={exportDataAsCsv}>Export CSV</MenuItem>
+                  </Menu>
+                </Box>
+              ) : (
+                <>
+                  <Button variant="contained" onClick={handleDateFilter}>
+                    Filter
+                  </Button>
+                  <Button variant="contained" onClick={exportDataAsCsv}>
+                    Export CSV
+                  </Button>
+                </>
+              )}
+            </Box>
+            <AGGridTable
+              ref={gridRef}
+              columnDefs={columnDefs}
+              rowData={filteredClients()}
+              paginationPageSize={500}
+              quickFilterText={quickFilterText}
+            />
           </Box>
         </Collapse>
       </Paper>
 
-      <Paper elevation={3}>
+      <Paper elevation={3} ref={detailsRef}>
         <Box
           sx={{
             display: "flex",
@@ -163,13 +271,13 @@ const ClientsPage: React.FC = () => {
                 <CardContent>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
-                      <DetailComponent detail={mockClientDetails} />
+                      <DetailComponent detail={selectedClient} />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <Typography variant="h6" gutterBottom>
                         Visits History
                       </Typography>
-                      <HistoryComponent history={mockVisitsHistory} />
+                      <HistoryComponent history={selectedClient.visits} />
                     </Grid>
                   </Grid>
                 </CardContent>

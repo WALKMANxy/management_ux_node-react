@@ -20,7 +20,6 @@ import CalendarComponent from "../../components/common/CalendarComponent";
 import TopBrandsSold from "../../components/charts/TopBrandSold";
 import SalesDistribution from "../../components/charts/SalesDistribution";
 import MonthOverMonthSpendingTrend from "../../components/charts/MonthOverMonthSpendingTrend";
-
 import { setVisits } from "../../features/calendar/calendarSlice";
 import TotalEarning from "../../components/common/TotalRevenue";
 import TotalOrder from "../../components/common/TotalOrders";

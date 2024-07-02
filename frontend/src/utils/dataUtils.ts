@@ -1,5 +1,6 @@
 // src/utils/dataUtils.ts
 import { Client } from "../models/models";
+import { Movement } from "../models/models";
 
 export const calculateTotalRevenue = (clients: Client[]): string => {
   return clients
@@ -11,7 +12,9 @@ export const calculateTotalOrders = (clients: Client[]): number => {
   return clients.reduce((total, client) => total + client.totalOrders, 0);
 };
 
-export const calculateTopBrandsData = (clients: Client[]): { label: string; value: number }[] => {
+export const calculateTopBrandsData = (
+  clients: Client[]
+): { label: string; value: number }[] => {
   const brandCount: { [key: string]: number } = {};
   clients.forEach((client) => {
     client.movements.forEach((movement) => {
@@ -34,7 +37,10 @@ export const calculateTopBrandsData = (clients: Client[]): { label: string; valu
     .slice(0, 10);
 };
 
-export const calculateSalesDistributionData = (clients: Client[], isMobile: boolean): { label: string; value: number }[] => {
+export const calculateSalesDistributionData = (
+  clients: Client[],
+  isMobile: boolean
+): { label: string; value: number }[] => {
   const topClients = [...clients]
     .sort((a, b) => parseFloat(b.totalRevenue) - parseFloat(a.totalRevenue))
     .slice(0, isMobile ? 8 : 25);
@@ -61,7 +67,9 @@ export const calculateAgentTotalOrders = (clients: Client[]): number => {
 };
 
 // Calculate top brands data for a specific agent
-export const calculateAgentTopBrandsData = (clients: Client[]): { label: string; value: number }[] => {
+export const calculateAgentTopBrandsData = (
+  clients: Client[]
+): { label: string; value: number }[] => {
   const brandCount: { [key: string]: number } = {};
   clients.forEach((client) => {
     client.movements.forEach((movement) => {
@@ -85,7 +93,10 @@ export const calculateAgentTopBrandsData = (clients: Client[]): { label: string;
 };
 
 // Calculate sales distribution data for a specific agent
-export const calculateAgentSalesDistributionData = (clients: Client[], isMobile: boolean): { label: string; value: number }[] => {
+export const calculateAgentSalesDistributionData = (
+  clients: Client[],
+  isMobile: boolean
+): { label: string; value: number }[] => {
   const topClients = [...clients]
     .sort((a, b) => parseFloat(b.totalRevenue) - parseFloat(a.totalRevenue))
     .slice(0, isMobile ? 8 : 25);
@@ -93,4 +104,40 @@ export const calculateAgentSalesDistributionData = (clients: Client[], isMobile:
     label: client.name,
     value: parseFloat(client.totalRevenue),
   }));
+};
+
+export const calculateMonthlyOrders = (movements: Movement[]): number => {
+  const currentMonth = new Date().getMonth() + 1;
+  const currentYear = new Date().getFullYear();
+  return movements.filter((movement) => {
+    const movementDate = new Date(movement.dateOfOrder);
+    return (
+      movementDate.getMonth() + 1 === currentMonth &&
+      movementDate.getFullYear() === currentYear
+    );
+  }).length;
+};
+
+export const calculateMonthlyRevenue = (movements: Movement[]): string => {
+  const currentMonth = new Date().getMonth() + 1;
+  const currentYear = new Date().getFullYear();
+  const totalRevenue = movements
+    .filter((movement) => {
+      const movementDate = new Date(movement.dateOfOrder);
+      return (
+        movementDate.getMonth() + 1 === currentMonth &&
+        movementDate.getFullYear() === currentYear
+      );
+    })
+    .reduce((total, movement) => {
+      return (
+        total +
+        movement.details.reduce(
+          (sum, detail) => sum + parseFloat(detail.priceSold),
+          0
+        )
+      );
+    }, 0)
+    .toFixed(2);
+  return totalRevenue;
 };

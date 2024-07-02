@@ -5,6 +5,7 @@ import authReducer from "../features/auth/authSlice";
 import searchReducer from "../features/search/searchSlice";
 import dataReducer, { fetchData } from "../features/data/dataSlice";
 import calendarReducer from '../features/calendar/calendarSlice';
+import clientsReducer from '../features/clients/clientsSlice';
 
 import { api } from "../services/api";
 
@@ -15,6 +16,7 @@ const store = configureStore({
     search: searchReducer,
     data: dataReducer,
     calendar: calendarReducer,
+    clients: clientsReducer,
     [api.reducerPath]: api.reducer,
   },
   middleware: (getDefaultMiddleware) =>
