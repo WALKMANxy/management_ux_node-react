@@ -110,7 +110,7 @@ const TopBrandsSold: React.FC<{
             }}
           >
             {topBrandsData.map((brand, index) => (
-              <Box key={brand.label} display="flex" alignItems="center" mb={1}>
+              <Box key={`${brand.label}-${index}`} display="flex" alignItems="center" mb={1}>
                 <Box
                   sx={{
                     width: 16,

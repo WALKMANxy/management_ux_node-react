@@ -205,3 +205,32 @@ export const calculateMonthlyData = (clients: Client[]) => {
   return { months, revenueData, ordersData };
 };
 
+// Calculate monthly data for a specific agent
+export const calculateAgentMonthlyData = (clients: Client[]) => {
+  const monthlyData = clients.reduce((acc, client) => {
+    client.movements.forEach((movement) => {
+      const monthYear = getMonthYear(movement.dateOfOrder);
+      if (monthYear === 'Invalid Date') {
+        console.error('Skipping movement with invalid date:', movement);
+        return;
+      }
+      const movementRevenue = movement.details.reduce(
+        (sum, detail) => sum + parseFloat(detail.priceSold),
+        0
+      );
+      const movementOrders = 1; // Each movement is an order
+      if (!acc[monthYear]) {
+        acc[monthYear] = { revenue: 0, orders: 0 };
+      }
+      acc[monthYear].revenue += movementRevenue;
+      acc[monthYear].orders += movementOrders;
+    });
+    return acc;
+  }, {} as { [key: string]: { revenue: number; orders: number } });
+
+  const months = Object.keys(monthlyData).sort();
+  const revenueData = months.map((month) => monthlyData[month].revenue);
+  const ordersData = months.map((month) => monthlyData[month].orders);
+
+  return { months, revenueData, ordersData };
+};

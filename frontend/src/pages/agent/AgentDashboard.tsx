@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useMemo, useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../app/store";
 import GlobalSearch from "../../components/common/GlobalSearch";
@@ -13,7 +13,6 @@ import {
   useTheme,
   Skeleton,
   Divider,
-  Paper,
   Fab,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -23,22 +22,22 @@ import SalesDistribution from "../../components/charts/SalesDistribution";
 import MonthOverMonthSpendingTrend from "../../components/charts/MonthOverMonthSpendingTrend";
 
 import { setVisits } from "../../features/calendar/calendarSlice";
-import {
-  calculateTotalRevenue,
-  calculateTotalOrders,
-  calculateTopBrandsData,
-  calculateSalesDistributionData,
-} from "../../utils/dataUtils";
-import { calculateMonthlyData } from "../../utils/dataLoader";
 import TotalEarning from "../../components/common/TotalRevenue";
 import TotalOrder from "../../components/common/TotalOrders";
-import { gradients, brandColors } from "../../utils/constants";
+import { brandColors } from "../../utils/constants";
 import UpcomingVisits from "../../components/common/UpcomingVisits";
 import ActivePromotions from "../../components/common/ActivePromotions";
+import SpentThisMonth from "../../components/common/SpentThisMonth";
+import SpentThisYear from "../../components/common/SpentThisYear";
+import TopArticleType from "../../components/common/TopArticleType";
+import { calculateAgentMonthlyData } from "../../utils/dataLoader";
 
 const AgentDashboard: React.FC = () => {
   const dispatch = useDispatch();
   const loggedInAgentId = useSelector((state: RootState) => state.auth.id);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const {
     agentDetails,
     selectedClient,
@@ -46,14 +45,23 @@ const AgentDashboard: React.FC = () => {
     calculateTotalSpentThisMonth,
     calculateTotalSpentThisYear,
     calculateTopArticleType,
-  } = useAgentStats(loggedInAgentId);
+    totalRevenue,
+    totalOrders,
+    topBrandsData,
+    salesDistributionData,
+    months,
+    revenueData,
+    ordersData,
+    yearlyCategories,
+    yearlyOrdersData,
+  } = useAgentStats(loggedInAgentId, isMobile);
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
-  const handleClientSelect = useCallback((clientName: string) => {
-    selectClient(clientName);
-  }, [selectClient]);
+  const handleClientSelect = useCallback(
+    (clientName: string) => {
+      selectClient(clientName);
+    },
+    [selectClient]
+  );
 
   useEffect(() => {
     if (agentDetails) {
@@ -62,38 +70,6 @@ const AgentDashboard: React.FC = () => {
       );
     }
   }, [agentDetails, dispatch]);
-
-  const totalRevenue = useMemo(() => agentDetails
-    ? parseFloat(calculateTotalRevenue(agentDetails.clients))
-    : 0, [agentDetails]);
-  
-  const totalOrders = useMemo(() => agentDetails
-    ? calculateTotalOrders(agentDetails.clients)
-    : 0, [agentDetails]);
-  
-  const topBrandsData = useMemo(() => agentDetails
-    ? calculateTopBrandsData(agentDetails.clients)
-    : [], [agentDetails]);
-  
-  const salesDistributionData = useMemo(() => agentDetails
-    ? calculateSalesDistributionData(agentDetails.clients, isMobile)
-    : [], [agentDetails, isMobile]);
-
-  const { months, revenueData, ordersData } = useMemo(() => agentDetails
-    ? calculateMonthlyData(agentDetails.clients)
-    : { months: [], revenueData: [], ordersData: [] }, [agentDetails]);
-
-  const yearlyOrders = useMemo(() => {
-    const currentYear = new Date().getFullYear();
-    return ordersData.reduce((acc, orders, index) => {
-      const year = parseInt(months[index].split('-')[0]);
-      acc[year] = (acc[year] || 0) + orders;
-      return acc;
-    }, {} as { [key: number]: number });
-  }, [ordersData, months]);
-  
-  const yearlyCategories = useMemo(() => Object.keys(yearlyOrders).map(String), [yearlyOrders]);
-  const yearlyOrdersData = useMemo(() => yearlyCategories.map(year => yearlyOrders[parseInt(year)]), [yearlyCategories, yearlyOrders]);
 
   return (
     <Box
@@ -117,7 +93,7 @@ const AgentDashboard: React.FC = () => {
           sx={{ borderRadius: "12px" }}
         />
       )}
-      <Grid container spacing={6} mt={2 }>
+      <Grid container spacing={6} mt={2}>
         <Grid item xs={12} md={10}>
           {selectedClient ? (
             <Box mb={4}>
@@ -127,125 +103,38 @@ const AgentDashboard: React.FC = () => {
 
               <Grid container spacing={2}>
                 <Grid item xs={12} md={4}>
-                  {agentDetails ? (
-                    <Paper
-                      elevation={3}
-                      sx={{
-                        p: 3,
-                        borderRadius: "12px",
-                        background: gradients[0],
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          display: "inline-block",
-                          backgroundColor: "rgba(0, 0, 0, 1%)",
-                          borderRadius: "24px",
-                          px: 2,
-                          py: 0.5,
-                          mb: 2.5,
-                        }}
-                      >
-                        <Typography variant="h6">Spent This Month</Typography>
-                      </Box>
-                      <Typography variant="body1">
-                        €
-                        {calculateTotalSpentThisMonth(selectedClient.movements)}
-                      </Typography>
-                    </Paper>
-                  ) : (
-                    <Skeleton
-                      variant="rectangular"
-                      width="100%"
-                      height={200}
-                      sx={{ borderRadius: "12px" }}
-                    />
-                  )}
+                  <SpentThisMonth
+                    amount={calculateTotalSpentThisMonth(
+                      selectedClient.movements
+                    )}
+                  />
                 </Grid>
                 <Grid item xs={12} md={4}>
-                  {agentDetails ? (
-                    <Paper
-                      elevation={3}
-                      sx={{
-                        p: 3,
-                        borderRadius: "12px",
-                        background: gradients[1],
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          display: "inline-block",
-                          backgroundColor: "rgba(0, 0, 0, 1%)",
-                          borderRadius: "24px",
-                          px: 2,
-                          py: 0.5,
-                          mb: 2.5,
-                        }}
-                      >
-                        <Typography variant="h6">Spent This Year</Typography>
-                      </Box>
-                      <Typography variant="body1">
-                        €{calculateTotalSpentThisYear(selectedClient.movements)}
-                      </Typography>
-                    </Paper>
-                  ) : (
-                    <Skeleton
-                      variant="rectangular"
-                      width="100%"
-                      height={200}
-                      sx={{ borderRadius: "12px" }}
-                    />
-                  )}
+                  <SpentThisYear
+                    amount={calculateTotalSpentThisYear(
+                      selectedClient.movements
+                    )}
+                  />
                 </Grid>
                 <Grid item xs={12} md={4}>
-                  {agentDetails ? (
-                    <Paper
-                      elevation={3}
-                      sx={{
-                        p: 3,
-                        borderRadius: "12px",
-                        background: gradients[2],
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          display: "inline-block",
-                          backgroundColor: "rgba(0, 0, 0, 1%)",
-                          borderRadius: "24px",
-                          px: 2,
-                          py: 0.5,
-                          mb: 2.5,
-                        }}
-                      >
-                        <Typography variant="h6">Top Article Type</Typography>
-                      </Box>
-                      <Typography variant="body1">
-                        {calculateTopArticleType(selectedClient.movements)}
-                      </Typography>
-                    </Paper>
-                  ) : (
-                    <Skeleton
-                      variant="rectangular"
-                      width="100%"
-                      height={200}
-                      sx={{ borderRadius: "12px" }}
-                    />
-                  )}
+                  <TopArticleType
+                    articles={calculateTopArticleType(selectedClient.movements)}
+                  />
                 </Grid>
-                <Grid item xs={12}>
-                  {agentDetails ? (
-                    <MonthOverMonthSpendingTrend
-                      months={months}
-                      revenueData={revenueData}
-                    />
-                  ) : (
-                    <Skeleton
-                      variant="rectangular"
-                      width="100%"
-                      height={300}
-                      sx={{ borderRadius: "12px" }}
-                    />
-                  )}
+                <Grid item xs={12} md={6}>
+                  <MonthOverMonthSpendingTrend
+                    months={calculateAgentMonthlyData([selectedClient]).months}
+                    revenueData={
+                      calculateAgentMonthlyData([selectedClient]).revenueData
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TopBrandsSold
+                    topBrandsData={topBrandsData}
+                    brandColors={brandColors}
+                    isMobile={isMobile}
+                  />
                 </Grid>
               </Grid>
               <Button

@@ -133,7 +133,7 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <AppBar position="static" sx={{ backgroundColor: "black", color: "black" }}>
+      <AppBar position="fixed" sx={{ backgroundColor: "black", color: "black" }}>
         <Toolbar>
           <Fade in={!iconChange} timeout={500}>
             <IconButton
@@ -166,6 +166,7 @@ const Header: React.FC = () => {
           </IconButton>
         </Toolbar>
       </AppBar>
+      <Toolbar /> {/* This Toolbar component is added to push the content down */}
       <Drawer
         anchor="left"
         open={drawerOpen}
