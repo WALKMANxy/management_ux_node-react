@@ -4,6 +4,7 @@ import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import { monthMap } from "../../utils/constants";
 import useResizeObserver from "../../features/hooks/useResizeObserver";
+import { currencyFormatter } from "../../utils/dataUtils"; // Import the currency formatter
 
 const MonthOverMonthSpendingTrend: React.FC<{
   months: string[];
@@ -31,12 +32,12 @@ const MonthOverMonthSpendingTrend: React.FC<{
         toolbar: { show: false },
       },
       xaxis: {
-        categories: data.map(d => d.month.split(' ')[0]),
+        categories: data.map((d) => d.month.split(" ")[0]),
         labels: { rotate: 0 },
       },
       yaxis: {
         labels: {
-          formatter: (value: number) => `€${value.toFixed(2)}`,
+          formatter: (value: number) => currencyFormatter(value), // Use currency formatter
         },
         axisTicks: {
           show: false, // Disable tick marks on the y-axis
@@ -45,7 +46,7 @@ const MonthOverMonthSpendingTrend: React.FC<{
       dataLabels: { enabled: false },
       tooltip: {
         y: {
-          formatter: (val: number) => `€${val.toFixed(2)}`,
+          formatter: (val: number) => currencyFormatter(val), // Use currency formatter
         },
       },
       fill: {

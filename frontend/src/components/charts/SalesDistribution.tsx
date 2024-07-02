@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { Box, Paper, Typography, Divider, Skeleton } from "@mui/material";
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
+import { currencyFormatter } from "../../utils/dataUtils"; // Import the currency formatter
 
 interface SalesDistributionProps {
   salesDistributionData: { label: string; value: number }[];
@@ -46,7 +47,8 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
       tooltip: {
         custom: ({ series, seriesIndex, dataPointIndex, w }) => {
           const fullLabel = dataset[dataPointIndex].label;
-          const value = series[seriesIndex][dataPointIndex].toFixed(2);
+          const value = series[seriesIndex][dataPointIndex];
+          const formattedValue = currencyFormatter(value);
           const x = w.globals.dom.baseEl.getBoundingClientRect().left;
           const tooltipWidth = 150; // estimated tooltip width
 
@@ -56,7 +58,7 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
           return `<div class="tooltip-custom" style="font-size: 14px; padding: 8px; white-space: nowrap; background: #fff; border: 1px solid #ccc; border-radius: 4px; ${
             positionLeft ? "right: 0;" : "left: 0;"
           }">
-            <span>${fullLabel}</span>: <strong>€${value}</strong>
+            <span>${fullLabel}</span>: <strong>${formattedValue}</strong>
           </div>`;
         },
         fixed: {

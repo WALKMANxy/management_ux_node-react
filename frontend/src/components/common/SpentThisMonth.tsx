@@ -1,9 +1,9 @@
-
-//src/components/common/SpentThisMonth.tsx
+// src/components/common/SpentThisMonth.tsx
 import React from 'react';
 import { Typography, Paper, Box, Avatar, Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import { currencyFormatter } from '../../utils/dataUtils'; // Import the currency formatter
 
 interface SpentThisMonthProps {
   amount: string;
@@ -11,6 +11,8 @@ interface SpentThisMonthProps {
 
 const SpentThisMonth: React.FC<SpentThisMonthProps> = ({ amount }) => {
   const theme = useTheme();
+
+  const formattedAmount = currencyFormatter(parseFloat(amount));
 
   return (
     <Paper
@@ -68,7 +70,7 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({ amount }) => {
             <Grid container alignItems="center">
               <Grid item>
                 <Typography sx={{ fontSize: '2.7rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>
-                  €{amount}
+                  {formattedAmount}
                 </Typography>
               </Grid>
               <Grid item>

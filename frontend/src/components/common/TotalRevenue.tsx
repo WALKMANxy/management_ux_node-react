@@ -3,6 +3,8 @@ import React from 'react';
 import { Typography, Paper, Box, Avatar, Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import { currencyFormatter } from '../../utils/dataUtils';
+
 
 interface TotalEarningProps {
   totalEarning: number;
@@ -11,6 +13,7 @@ interface TotalEarningProps {
 
 const TotalEarning: React.FC<TotalEarningProps> = ({ totalEarning }) => {
   const theme = useTheme();
+  const formattedEarning = currencyFormatter(totalEarning);
 
   return (
     <Paper
@@ -68,7 +71,7 @@ const TotalEarning: React.FC<TotalEarningProps> = ({ totalEarning }) => {
             <Grid container alignItems="center">
               <Grid item>
                 <Typography sx={{ fontSize: '2.7rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>
-                  €{totalEarning}
+                  {formattedEarning}
                 </Typography>
               </Grid>
               <Grid item>

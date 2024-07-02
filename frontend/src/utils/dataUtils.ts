@@ -141,3 +141,12 @@ export const calculateMonthlyRevenue = (movements: Movement[]): string => {
     .toFixed(2);
   return totalRevenue;
 };
+
+// src/utils/dataUtils.ts
+export const currencyFormatter = (value: any): string => {
+  const numberValue = parseFloat(value);
+  if (isNaN(numberValue)) {
+    return "";
+  }
+  return `€${numberValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,")}`;
+};

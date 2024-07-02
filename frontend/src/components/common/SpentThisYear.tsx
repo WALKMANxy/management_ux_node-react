@@ -1,12 +1,16 @@
+// src/components/common/SpentThisYear.tsx
 import React from "react";
 import { Typography, Paper, Box, Avatar, Grid } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import { currencyFormatter } from "../../utils/dataUtils"; // Import the currency formatter
 
 interface SpentThisYearProps {
   amount: string;
 }
 
 const SpentThisYear: React.FC<SpentThisYearProps> = ({ amount }) => {
+  const formattedAmount = currencyFormatter(parseFloat(amount));
+
   return (
     <Paper
       elevation={3}
@@ -75,7 +79,7 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({ amount }) => {
                     mb: 0.75,
                   }}
                 >
-                  €{amount}
+                  {formattedAmount}
                 </Typography>
               </Grid>
               <Grid item>
