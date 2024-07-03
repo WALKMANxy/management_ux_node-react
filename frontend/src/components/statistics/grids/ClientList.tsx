@@ -1,30 +1,20 @@
-
 //Src/components/common/ClientList.tsx
 import React from "react";
-import { Paper, Box, TextField, IconButton, Menu, MenuItem, Typography,Collapse } from "@mui/material";
+import {
+  Paper,
+  Box,
+  TextField,
+  IconButton,
+  Menu,
+  MenuItem,
+  Typography,
+  Collapse,
+} from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import AGGridTable from "../../components/common/AGGridTable";
-
-interface ClientListProps {
-  quickFilterText: string;
-  setQuickFilterText: (value: string) => void;
-  startDate: string;
-  setStartDate: (value: string) => void;
-  endDate: string;
-  setEndDate: (value: string) => void;
-  filteredClients: () => any[];
-  columnDefs: any[];
-  gridRef: any;
-  handleMenuOpen: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  handleMenuClose: () => void;
-  anchorEl: HTMLElement | null;
-  exportDataAsCsv: () => void;
-  isClientListCollapsed: boolean;
-  setClientListCollapsed: (value: boolean) => void;
-  isMobile: boolean;
-}
+import AGGridTable from "./AGGridTable";
+import { ClientListProps } from "../../../models/models";
 
 const ClientList: React.FC<ClientListProps> = ({
   quickFilterText,
@@ -44,7 +34,9 @@ const ClientList: React.FC<ClientListProps> = ({
   setClientListCollapsed,
   isMobile,
 }) => {
-  const onFilterTextBoxChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onFilterTextBoxChanged = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setQuickFilterText(event.target.value);
   };
 
@@ -59,7 +51,9 @@ const ClientList: React.FC<ClientListProps> = ({
         }}
       >
         <Typography variant="h6">Clients</Typography>
-        <IconButton onClick={() => setClientListCollapsed(!isClientListCollapsed)}>
+        <IconButton
+          onClick={() => setClientListCollapsed(!isClientListCollapsed)}
+        >
           {isClientListCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
         </IconButton>
       </Box>

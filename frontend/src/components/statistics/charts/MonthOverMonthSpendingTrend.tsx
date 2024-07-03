@@ -2,9 +2,9 @@ import React, { useMemo } from "react";
 import { Box, Paper, Typography, Divider, Skeleton } from "@mui/material";
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
-import { monthMap } from "../../utils/constants";
-import useResizeObserver from "../../features/hooks/useResizeObserver";
-import { currencyFormatter } from "../../utils/dataUtils"; // Import the currency formatter
+import useResizeObserver from "../../../hooks/useResizeObserver";
+import { monthMap } from "../../../utils/constants";
+import { currencyFormatter } from "../../../utils/dataUtils";
 
 const MonthOverMonthSpendingTrend: React.FC<{
   months: string[];

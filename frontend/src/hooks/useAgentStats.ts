@@ -1,9 +1,14 @@
 // src/hooks/useAgentStats.ts
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { Client, Agent, Movement } from "../../models/models";
-import { useGetClientsQuery } from "../../services/api";
-import { calculateAgentMonthlyData } from "../../utils/dataLoader";
-import { calculateAgentTotalRevenue, calculateAgentTotalOrders, calculateAgentTopBrandsData, calculateAgentSalesDistributionData } from "../../utils/dataUtils";
+import { Client, Agent, Movement } from "../models/models";
+import { useGetClientsQuery } from "../services/api";
+import { calculateAgentMonthlyData } from "../utils/dataLoader";
+import {
+  calculateAgentTotalRevenue,
+  calculateAgentTotalOrders,
+  calculateAgentTopBrandsData,
+  calculateAgentSalesDistributionData,
+} from "../utils/dataUtils";
 
 const useAgentStats = (agentId: string | null, isMobile: boolean) => {
   const { data: clientsData, isLoading, error } = useGetClientsQuery();
@@ -164,10 +169,7 @@ const useAgentStats = (agentId: string | null, isMobile: boolean) => {
   );
 
   const selectedClientTopBrandsData = useMemo(
-    () =>
-      selectedClient
-        ? calculateAgentTopBrandsData([selectedClient])
-        : [],
+    () => (selectedClient ? calculateAgentTopBrandsData([selectedClient]) : []),
     [selectedClient]
   );
 

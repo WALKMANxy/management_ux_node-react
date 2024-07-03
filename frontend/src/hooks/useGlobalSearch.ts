@@ -1,9 +1,9 @@
 // src/hooks/useGlobalSearch.ts
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../app/store";
+import { RootState, AppDispatch } from "../app/store";
 import DOMPurify from "dompurify";
-import { setQuery, searchItems, clearResults } from "../search/searchSlice";
+import { setQuery, searchItems, clearResults } from "../features/search/searchSlice";
 import useDebounce from "./useDebounce";
 
 const useGlobalSearch = (filter: string) => {
@@ -46,7 +46,10 @@ const useGlobalSearch = (filter: string) => {
   };
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+    if (
+      searchRef.current &&
+      !searchRef.current.contains(event.target as Node)
+    ) {
       setShowResults(false);
       setSelectedIndex(-1);
     }

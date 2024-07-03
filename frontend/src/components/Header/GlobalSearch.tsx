@@ -3,10 +3,10 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import SearchResults from "./SearchResults";
-import useGlobalSearch from "../../features/hooks/useGlobalSearch";
+import useGlobalSearch from "../../hooks/useGlobalSearch";
 import { GlobalSearchProps } from "../../models/models";
-import Spinner from "./Spinner"; // Import the Spinner component
 import "./GlobalSearch.css";
+import Spinner from "../common/Spinner";
 
 const GlobalSearch: React.FC<GlobalSearchProps> = ({
   filter = "all",

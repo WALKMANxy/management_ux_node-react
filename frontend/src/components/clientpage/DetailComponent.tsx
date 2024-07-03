@@ -1,5 +1,6 @@
 import React from "react";
-import { Typography, Grid, Link, Box, Skeleton, useTheme } from "@mui/material";
+import { Typography, Grid, Link, Box, Skeleton } from "@mui/material";
+import PersonIcon from '@mui/icons-material/Person';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
 import HomeIcon from '@mui/icons-material/Home';
@@ -8,15 +9,12 @@ import PaymentIcon from '@mui/icons-material/Payment';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { currencyFormatter } from "../../utils/dataUtils"; // Import the currency formatter
+import { DetailProps } from "../../models/models";
 
-interface DetailProps {
-  detail: { [key: string]: any };
-  isLoading: boolean;
-}
+
 
 const DetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {
-  const theme = useTheme();
-  const excludedKeys = ["id", "agent", "movements", "promos", "visits"];
+  const excludedKeys = ["id","movements", "promos", "visits"];
   const keyMap: { [key: string]: string } = {
     name: "Name",
     phone: "Phone Number",
@@ -30,10 +28,12 @@ const DetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {
     email: "E-mail",
     taxCode: "Tax Code",
     paymentMethodID: "PMID",
-    address: "Address"
+    address: "Address",
+    agent: "Agent"
   };
 
   const icons: { [key: string]: JSX.Element } = {
+    name: <PersonIcon />,
     phone: <PhoneIcon />,
     email: <EmailIcon />,
     pec: <EmailIcon />,
@@ -46,6 +46,7 @@ const DetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {
     extendedTaxCode: <AccountBalanceIcon />,
     taxCode: <AccountBalanceIcon />,
     paymentMethodID: <PaymentIcon />,
+    agent: <PersonIcon />
   };
 
   const formatPhoneNumber = (phone: string) => {
@@ -62,7 +63,7 @@ const DetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {
   };
 
   return (
-    <Box sx={{ p: 3, borderRadius: '30px', background: theme.palette.background.paper }}>
+    <Box sx={{ p: 3, borderRadius: '30px', background: "transparent" }}>
       <Grid container spacing={2}>
         {Object.keys(detail).map((key) => {
           if (excludedKeys.includes(key)) return null;
@@ -95,7 +96,7 @@ const DetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {
                 </Link>
               );
             } else if (["totalRevenue", "unpaidRevenue"].includes(key)) {
-              displayValue = currencyFormatter(value); // Apply currency formatter
+              displayValue = currencyFormatter(Number(value)); // Apply currency formatter
             } else {
               displayValue = value;
             }

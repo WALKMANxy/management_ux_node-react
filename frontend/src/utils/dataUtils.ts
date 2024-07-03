@@ -150,3 +150,7 @@ export const currencyFormatter = (value: any): string => {
   }
   return `€${numberValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,")}`;
 };
+
+export const numberComparator = (valueA: number, valueB: number) => {
+  return valueA - valueB;
+};

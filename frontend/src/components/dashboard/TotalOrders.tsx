@@ -12,35 +12,8 @@ import { useTheme } from "@mui/material/styles";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined";
 import Chart from "react-apexcharts";
+import { ChartData } from "../../utils/constants";
 
-const ChartData = (categories: string[], data: number[]) => ({
-  options: {
-    chart: {
-      id: "basic-bar",
-    },
-    xaxis: {
-      categories,
-      labels: {
-        style: {
-          colors: "#000",
-        },
-      },
-    },
-    yaxis: {
-      labels: {
-        style: {
-          colors: "#000",
-        },
-      },
-    },
-  },
-  series: [
-    {
-      name: "Total Orders",
-      data,
-    },
-  ],
-});
 
 interface TotalOrderProps {
   totalOrder: number;

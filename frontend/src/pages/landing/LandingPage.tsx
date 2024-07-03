@@ -29,7 +29,7 @@ import {
   useGetAgentsQuery,
   useGetMinimalClientsQuery,
 } from "../../services/api";
-import useAuthHandlers from "../../features/hooks/useAuthHandlers";
+import useAuthHandlers from "../../hooks/useAuthHandlers";
 import Loader from "../../components/common/Loader";
 
 const LandingPage: React.FC = () => {
@@ -42,13 +42,9 @@ const LandingPage: React.FC = () => {
   const [selectedClient, setSelectedClient] = useState<string>(""); // State for selected client
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
 
-  const {
-    data: agents = [],
-  } = useGetAgentsQuery();
-  const {
-    data: minimalClients = [],
-    refetch: refetchMinimalClients,
-  } = useGetMinimalClientsQuery();
+  const { data: agents = [] } = useGetAgentsQuery();
+  const { data: minimalClients = [], refetch: refetchMinimalClients } =
+    useGetMinimalClientsQuery();
 
   const { handleLogin, handleEnter } = useAuthHandlers({
     selectedRole,

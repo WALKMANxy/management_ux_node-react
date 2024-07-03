@@ -2,11 +2,8 @@ import React, { useMemo } from "react";
 import { Box, Paper, Typography, Divider, Skeleton } from "@mui/material";
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
-import { currencyFormatter } from "../../utils/dataUtils"; // Import the currency formatter
-
-interface SalesDistributionProps {
-  salesDistributionData: { label: string; value: number }[];
-}
+import { currencyFormatter } from "../../../utils/dataUtils";
+import { SalesDistributionProps } from "../../../models/models";
 
 const SalesDistribution: React.FC<SalesDistributionProps> = ({
   salesDistributionData,

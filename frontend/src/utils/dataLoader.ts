@@ -1,9 +1,9 @@
-import axios from 'axios';
-import { Client, Agent, MovementDetail } from '../models/models';
+import axios from "axios";
+import { Client, Agent, MovementDetail } from "../models/models";
 import { format, parseISO } from "date-fns"; // Import date-fns for date formatting
 
-const jsonFilePath = '/datasetsfrom01JANto12JUN.json';
-const clientDetailsFilePath = '/clientdetailsdataset02072024.json';
+const jsonFilePath = "/datasetsfrom01JANto12JUN.json";
+const clientDetailsFilePath = "/clientdetailsdataset02072024.json";
 
 // Web worker script for clients
 const workerScript = `
@@ -92,7 +92,7 @@ self.onmessage = function(event) {
 `;
 
 // Create a Blob URL for the worker script
-const blob = new Blob([workerScript], { type: 'application/javascript' });
+const blob = new Blob([workerScript], { type: "application/javascript" });
 const workerUrl = URL.createObjectURL(blob);
 
 const getMonthYear = (dateString: string) => {
@@ -100,27 +100,34 @@ const getMonthYear = (dateString: string) => {
   return format(date, "yyyy-MM");
 };
 
-export const loadJsonData = async (url: string = jsonFilePath): Promise<any[]> => {
+export const loadJsonData = async (
+  url: string = jsonFilePath
+): Promise<any[]> => {
   try {
     const response = await axios.get(url);
     return response.data;
   } catch (error) {
-    console.error('Error loading JSON data:', error);
+    console.error("Error loading JSON data:", error);
     throw new Error(`Failed to load data from ${url}`);
   }
 };
 
-export const loadClientDetailsData = async (url: string = clientDetailsFilePath): Promise<any[]> => {
+export const loadClientDetailsData = async (
+  url: string = clientDetailsFilePath
+): Promise<any[]> => {
   try {
     const response = await axios.get(url);
     return response.data;
   } catch (error) {
-    console.error('Error loading client details data:', error);
+    console.error("Error loading client details data:", error);
     throw new Error(`Failed to load data from ${url}`);
   }
 };
 
-export const mapDataToModels = async (data: any[], clientDetails: any[]): Promise<Client[]> => {
+export const mapDataToModels = async (
+  data: any[],
+  clientDetails: any[]
+): Promise<Client[]> => {
   return new Promise((resolve, reject) => {
     const worker = new Worker(workerUrl);
 
@@ -128,14 +135,14 @@ export const mapDataToModels = async (data: any[], clientDetails: any[]): Promis
 
     worker.postMessage({ data, clientDetails });
 
-    worker.onmessage = function(event) {
+    worker.onmessage = function (event) {
       //console.log('Received data from worker:', event.data);
       resolve(event.data);
       worker.terminate();
     };
 
-    worker.onerror = function(error) {
-      console.error('Worker error:', error);
+    worker.onerror = function (error) {
+      console.error("Worker error:", error);
       reject(error);
       worker.terminate();
     };
@@ -144,10 +151,13 @@ export const mapDataToModels = async (data: any[], clientDetails: any[]): Promis
 
 export const mapDataToMinimalClients = (data: any[]): Client[] => {
   const clientsMap = new Map<string, any>();
-  data.forEach(item => {
+  data.forEach((item) => {
     const clientId = item["Codice Cliente"].toString();
     if (!clientsMap.has(clientId)) {
-      clientsMap.set(clientId, { id: clientId, name: item["Ragione Sociale Cliente"] });
+      clientsMap.set(clientId, {
+        id: clientId,
+        name: item["Ragione Sociale Cliente"],
+      });
     }
   });
 
@@ -156,10 +166,14 @@ export const mapDataToMinimalClients = (data: any[]): Client[] => {
 
 export const mapDataToMinimalAgents = (data: any[]): Agent[] => {
   const agentsMap = new Map<string, any>();
-  data.forEach(item => {
+  data.forEach((item) => {
     const agentId = item["Codice Agente"].toString();
     if (!agentsMap.has(agentId)) {
-      agentsMap.set(agentId, { id: agentId, name: `Agent ${agentId}`, clients: [] });
+      agentsMap.set(agentId, {
+        id: agentId,
+        name: `Agent ${agentId}`,
+        clients: [],
+      });
     }
   });
 
@@ -176,7 +190,7 @@ export const mapDataToAgents = (data: any[]): Agent[] => {
   const agents = Array.from(agentsMap.entries()).map(([id, clientData]) => ({
     id,
     name: `Agent ${id}`,
-    clients: clientData.map(item => ({
+    clients: clientData.map((item) => ({
       id: item["Codice Cliente"].toString(),
       name: item["Ragione Sociale Cliente"],
       province: "",
@@ -189,20 +203,20 @@ export const mapDataToAgents = (data: any[]): Agent[] => {
       visits: [],
       agent: id,
       movements: [],
-      promos: []
-    }))
+      promos: [],
+    })),
   }));
 
   return agents;
 };
 
 export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
-  return data.map(item => ({
+  return data.map((item) => ({
     articleId: item["Codice Articolo"].toString(),
     name: item["Descrizione Articolo"],
     brand: item["Marca Articolo"],
     priceSold: parseFloat(item["Valore"]).toFixed(2),
-    priceBought: parseFloat(item["Costo"]).toFixed(2)
+    priceBought: parseFloat(item["Costo"]).toFixed(2),
   }));
 };
 
@@ -210,8 +224,8 @@ export const calculateMonthlyData = (clients: Client[]) => {
   const monthlyData = clients.reduce((acc, client) => {
     client.movements.forEach((movement) => {
       const monthYear = getMonthYear(movement.dateOfOrder);
-      if (monthYear === 'Invalid Date') {
-        console.error('Skipping movement with invalid date:', movement);
+      if (monthYear === "Invalid Date") {
+        console.error("Skipping movement with invalid date:", movement);
         return;
       }
       const movementRevenue = movement.details.reduce(
@@ -240,8 +254,8 @@ export const calculateAgentMonthlyData = (clients: Client[]) => {
   const monthlyData = clients.reduce((acc, client) => {
     client.movements.forEach((movement) => {
       const monthYear = getMonthYear(movement.dateOfOrder);
-      if (monthYear === 'Invalid Date') {
-        console.error('Skipping movement with invalid date:', movement);
+      if (monthYear === "Invalid Date") {
+        console.error("Skipping movement with invalid date:", movement);
         return;
       }
       const movementRevenue = movement.details.reduce(

@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { clearResults } from "../search/searchSlice";
+import { clearResults } from "../features/search/searchSlice";
 
 const useClearSearchOnNavigate = () => {
   const location = useLocation();

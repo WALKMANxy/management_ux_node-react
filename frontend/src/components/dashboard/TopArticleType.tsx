@@ -1,9 +1,7 @@
 import React from "react";
 import { Typography, Paper, Box, Avatar, Grid, Divider } from "@mui/material";
+import { TopArticleTypeProps } from "../../models/models";
 
-interface TopArticleTypeProps {
-  articles: { id: string; name: string; amount: number }[];
-}
 
 const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {
   return (

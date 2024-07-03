@@ -1,9 +1,12 @@
 // src/hooks/useClientDetails.ts
 import { useEffect, useState, useMemo } from "react";
-import { Client } from "../../models/models";
+import { Client } from "../models/models";
 import { useSelector } from "react-redux";
-import { RootState } from "../../app/store";
-import { calculateTopBrandsData, calculateSalesDistributionData } from "../../utils/dataUtils";
+import { RootState } from "../app/store";
+import {
+  calculateTopBrandsData,
+  calculateSalesDistributionData,
+} from "../utils/dataUtils";
 
 const useClientDetails = (clientName: string | null) => {
   const clients = useSelector((state: RootState) => state.clients.clients);
@@ -22,7 +25,10 @@ const useClientDetails = (clientName: string | null) => {
   );
 
   const salesDistributionData = useMemo(
-    () => (selectedClient ? calculateSalesDistributionData([selectedClient], false) : []),
+    () =>
+      selectedClient
+        ? calculateSalesDistributionData([selectedClient], false)
+        : [],
     [selectedClient]
   );
 

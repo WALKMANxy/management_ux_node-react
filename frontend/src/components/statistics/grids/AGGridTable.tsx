@@ -2,21 +2,13 @@
 import { forwardRef } from "react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import "../common/AGGridTable.css";
-
-interface AGGridTableProps {
-  columnDefs: ColDef[];
-  rowData: any[];
-  paginationPageSize: number;
-  quickFilterText: string; // Added quickFilterText prop
-}
-
-const paginationPageSizeSelector = [20, 50, 100, 200, 500];
+import "../grids/AGGridTable.css";
+import { AGGridTableProps } from "../../../models/models";
+import { paginationPageSizeSelector } from "../../../utils/constants";
 
 const AGGridTable = forwardRef<AgGridReact, AGGridTableProps>(
-  ({ columnDefs, rowData,  quickFilterText }, ref) => {
+  ({ columnDefs, rowData, quickFilterText }, ref) => {
     return (
       <div className="ag-theme-quartz" style={{ height: 600, width: "100%" }}>
         <AgGridReact

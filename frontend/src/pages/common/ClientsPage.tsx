@@ -1,13 +1,14 @@
 import React, { useMemo } from "react";
 import { Box, useMediaQuery } from "@mui/material";
-import ClientList from "../../components/common/ClientList";
-import ClientDetails from "../../components/common/ClientDetails";
-import { useClientsGrid } from "../../features/hooks/useClientGrid";
+import ClientDetails from "../../components/clientpage/ClientDetails";
+import { useClientsGrid } from "../../hooks/useClientGrid";
 import {
   calculateMonthlyOrders,
   calculateMonthlyRevenue,
   currencyFormatter,
+  numberComparator,
 } from "../../utils/dataUtils";
+import ClientList from "../../components/statistics/grids/ClientList";
 
 const ClientsPage: React.FC = () => {
   const isMobile = useMediaQuery("(max-width:600px)");
@@ -29,12 +30,9 @@ const ClientsPage: React.FC = () => {
     handleMenuOpen,
     handleMenuClose,
     anchorEl,
+    clientDetailsRef,
     exportDataAsCsv,
   } = useClientsGrid();
-
-  const numberComparator = (valueA: number, valueB: number) => {
-    return valueA - valueB;
-  };
 
   const columnDefinitions = useMemo(
     () => [
@@ -139,6 +137,7 @@ const ClientsPage: React.FC = () => {
         isMobile={isMobile}
       />
       <ClientDetails
+        ref={clientDetailsRef}
         isLoading={false}
         selectedClient={selectedClient}
         isClientDetailsCollapsed={isClientDetailsCollapsed}

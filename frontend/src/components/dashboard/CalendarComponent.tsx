@@ -1,37 +1,14 @@
+// src/components/common/CalendarComponent.tsx
 import React from "react";
-import Badge from "@mui/material/Badge";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { PickersDay, PickersDayProps } from "@mui/x-date-pickers/PickersDay";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { DayCalendarSkeleton } from "@mui/x-date-pickers/DayCalendarSkeleton";
 import { useSelector } from "react-redux";
 import { selectVisits } from "../../features/calendar/calendarSlice";
 import dayjs from "dayjs";
 import { Paper } from "@mui/material";
-
-function ServerDay(
-  props: PickersDayProps<dayjs.Dayjs> & { highlightedDays?: number[] }
-) {
-  const { highlightedDays = [], day, outsideCurrentMonth, ...other } = props;
-  const isSelected =
-    !props.outsideCurrentMonth && highlightedDays.indexOf(day.date()) >= 0;
-
-  return (
-    <Badge
-      key={day.toString()}
-      overlap="circular"
-      badgeContent={isSelected ? "📅" : undefined}
-      color="secondary"
-    >
-      <PickersDay
-        {...other}
-        outsideCurrentMonth={outsideCurrentMonth}
-        day={day}
-      />
-    </Badge>
-  );
-}
+import ServerDay from "./ServerDay";
 
 const CalendarComponent: React.FC = () => {
   const visits = useSelector(selectVisits);
@@ -56,10 +33,10 @@ const CalendarComponent: React.FC = () => {
       elevation={3}
       sx={{
         p: 3,
-        borderRadius: '12px',
-        position: 'relative',
-        overflow: 'hidden',
-        background: 'linear-gradient(135deg, #f3e5f5 30%, #e1bee7 100%)',
+        borderRadius: "12px",
+        position: "relative",
+        overflow: "hidden",
+        background: "linear-gradient(135deg, #f3e5f5 30%, #e1bee7 100%)",
         "&::before": {
           content: '""',
           position: "absolute",
@@ -74,8 +51,6 @@ const CalendarComponent: React.FC = () => {
         },
       }}
     >
-      
-      
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DateCalendar
           loading={isLoading}

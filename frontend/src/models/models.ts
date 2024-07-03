@@ -1,11 +1,24 @@
 // src/models/models.ts
 
+import { ColDef } from "ag-grid-community";
+import { ReactNode } from "react";
+
 export type UserRole = "admin" | "agent" | "client" | "guest";
 
 export type AuthState = {
   isLoggedIn: boolean;
   userRole: UserRole;
   id: string | null;
+};
+
+export type ClientsState = {
+  clients: Client[];
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error: string | null;
+};
+
+export type CalendarState = {
+  visits: Visit[];
 };
 
 export type AuthHandlersProps = {
@@ -62,6 +75,7 @@ export type GlobalSearchProps = {
 
 export type DetailProps = {
   detail: { [key: string]: any };
+  isLoading: boolean;
 };
 
 export type HistoryProps = {
@@ -76,6 +90,83 @@ export type SearchResultsProps = {
 
 export type SidebarProps = {
   onToggle: (isOpen: boolean) => void;
+};
+
+export type SalesDistributionProps = {
+  salesDistributionData: { label: string; value: number }[];
+};
+
+export type ActivePromotionsProps = {
+  selectedClient?: Client | null;
+  agentDetails?: { clients: Client[] } | null;
+};
+
+export type SpentThisMonthProps = {
+  amount: string;
+};
+
+export type SpentThisYearProps = {
+  amount: string;
+};
+
+export type Props = {
+  children: ReactNode;
+};
+
+export type State = {
+  hasError: boolean;
+};
+
+export type ClientListProps = {
+  quickFilterText: string;
+  setQuickFilterText: (value: string) => void;
+  startDate: string;
+  setStartDate: (value: string) => void;
+  endDate: string;
+  setEndDate: (value: string) => void;
+  filteredClients: () => any[];
+  columnDefs: any[];
+  gridRef: any;
+  handleMenuOpen: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  handleMenuClose: () => void;
+  anchorEl: HTMLElement | null;
+  exportDataAsCsv: () => void;
+  isClientListCollapsed: boolean;
+  setClientListCollapsed: (value: boolean) => void;
+  isMobile: boolean;
+};
+
+export type TopArticleTypeProps = {
+  articles: { id: string; name: string; amount: number }[];
+};
+
+export type TotalEarningProps = {
+  totalEarning: number;
+  isLoading: boolean;
+};
+
+export type UpcomingVisitsProps = {
+  selectedClient?: Client | null;
+  agentDetails?: { clients: Client[] } | null;
+};
+
+export type AGGridTableProps = {
+  columnDefs: ColDef[];
+  rowData: any[];
+  paginationPageSize: number;
+  quickFilterText: string; // Added quickFilterText prop
+};
+
+export type MovementsHistoryProps = {
+  movements: Movement[];
+};
+
+export type ClientDetailsProps = {
+  selectedClient: Client | null;
+  isClientDetailsCollapsed: boolean;
+  setClientDetailsCollapsed: (value: boolean) => void;
+  isLoading: boolean;
+  ref: React.Ref<HTMLDivElement>; // Add ref prop
 };
 
 export type Visit = {

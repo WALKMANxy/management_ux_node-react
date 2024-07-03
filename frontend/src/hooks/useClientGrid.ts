@@ -1,8 +1,8 @@
 import { useState, useCallback, useRef } from "react";
 import { useSelector } from "react-redux";
-import { useGetClientsQuery } from "../../services/api";
-import { RootState } from "../../app/store";
-import { Client } from "../../models/models";
+import { useGetClientsQuery } from "../services/api";
+import { RootState } from "../app/store";
+import { Client } from "../models/models";
 
 export const useClientsGrid = () => {
   const { data: clients = [] } = useGetClientsQuery();
@@ -15,6 +15,7 @@ export const useClientsGrid = () => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const gridRef = useRef<any>(null);
+  const clientDetailsRef = useRef<HTMLDivElement>(null); // Add ref for client details
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -35,6 +36,9 @@ export const useClientsGrid = () => {
     (clientId: string) => {
       const client = clients.find((client) => client.id === clientId) || null;
       setSelectedClient(client);
+      if (clientDetailsRef.current) {
+        clientDetailsRef.current.scrollIntoView({ behavior: "smooth" });
+      }
     },
     [clients]
   );
@@ -72,6 +76,7 @@ export const useClientsGrid = () => {
     handleClientSelect,
     filteredClients,
     gridRef,
+    clientDetailsRef, // Export the client details ref
     isClientListCollapsed,
     setClientListCollapsed,
     isClientDetailsCollapsed,

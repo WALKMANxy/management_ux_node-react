@@ -1,18 +1,14 @@
 // src/features/calendar/calendarSlice.ts
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../../app/store';
-import { Visit } from '../../models/models';
-
-interface CalendarState {
-  visits: Visit[];
-}
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "../../app/store";
+import { CalendarState, Visit } from "../../models/models";
 
 const initialState: CalendarState = {
   visits: [],
 };
 
 const calendarSlice = createSlice({
-  name: 'calendar',
+  name: "calendar",
   initialState,
   reducers: {
     setVisits(state, action: PayloadAction<Visit[]>) {

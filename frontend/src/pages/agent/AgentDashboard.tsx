@@ -2,8 +2,7 @@
 import React, { useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../app/store";
-import GlobalSearch from "../../components/common/GlobalSearch";
-import useAgentStats from "../../features/hooks/useAgentStats";
+import useAgentStats from "../../hooks/useAgentStats";
 import {
   Box,
   Typography,
@@ -16,20 +15,21 @@ import {
   Fab,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import CalendarComponent from "../../components/common/CalendarComponent";
-import TopBrandsSold from "../../components/charts/TopBrandSold";
-import SalesDistribution from "../../components/charts/SalesDistribution";
-import MonthOverMonthSpendingTrend from "../../components/charts/MonthOverMonthSpendingTrend";
+import CalendarComponent from "../../components/dashboard/CalendarComponent";
 import { setVisits } from "../../features/calendar/calendarSlice";
-import TotalEarning from "../../components/common/TotalRevenue";
-import TotalOrder from "../../components/common/TotalOrders";
+import TotalEarning from "../../components/dashboard/TotalRevenue";
+import TotalOrder from "../../components/dashboard/TotalOrders";
 import { brandColors } from "../../utils/constants";
-import UpcomingVisits from "../../components/common/UpcomingVisits";
-import ActivePromotions from "../../components/common/ActivePromotions";
-import SpentThisMonth from "../../components/common/SpentThisMonth";
-import SpentThisYear from "../../components/common/SpentThisYear";
-import TopArticleType from "../../components/common/TopArticleType";
+import UpcomingVisits from "../../components/dashboard/UpcomingVisits";
+import ActivePromotions from "../../components/dashboard/ActivePromotions";
+import SpentThisMonth from "../../components/dashboard/SpentThisMonth";
+import SpentThisYear from "../../components/dashboard/SpentThisYear";
+import TopArticleType from "../../components/dashboard/TopArticleType";
 import { calculateAgentMonthlyData } from "../../utils/dataLoader";
+import GlobalSearch from "../../components/Header/GlobalSearch";
+import MonthOverMonthSpendingTrend from "../../components/statistics/charts/MonthOverMonthSpendingTrend";
+import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
+import SalesDistribution from "../../components/statistics/charts/SalesDistribution";
 
 const AgentDashboard: React.FC = () => {
   const dispatch = useDispatch();
@@ -93,7 +93,7 @@ const AgentDashboard: React.FC = () => {
         />
       )}
       <Grid container spacing={6} mt={2}>
-        <Grid item xs={12} md={10}>
+        <Grid item xs={12} md={9}>
           {selectedClient ? (
             <Box mb={4}>
               <Typography variant="h5" gutterBottom>
@@ -247,7 +247,7 @@ const AgentDashboard: React.FC = () => {
             agentDetails={agentDetails}
           />
         </Grid>
-        <Grid item xs={12} md={2}>
+        <Grid item xs={12} md={3}>
           <Box mb={4}>
             <Typography variant="h5" gutterBottom>
               {agentDetails ? "Calendar" : <Skeleton width="30%" />}

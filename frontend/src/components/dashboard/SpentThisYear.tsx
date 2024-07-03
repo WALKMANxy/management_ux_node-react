@@ -3,10 +3,9 @@ import React from "react";
 import { Typography, Paper, Box, Avatar, Grid } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { currencyFormatter } from "../../utils/dataUtils"; // Import the currency formatter
+import { SpentThisYearProps } from "../../models/models";
 
-interface SpentThisYearProps {
-  amount: string;
-}
+
 
 const SpentThisYear: React.FC<SpentThisYearProps> = ({ amount }) => {
   const formattedAmount = currencyFormatter(parseFloat(amount));

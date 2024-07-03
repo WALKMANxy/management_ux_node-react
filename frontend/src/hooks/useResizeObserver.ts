@@ -8,7 +8,10 @@ const useResizeObserver = () => {
     if (entries[0].contentRect) {
       const { width, height } = entries[0].contentRect;
       setDimensions((prevDimensions) => {
-        if (prevDimensions.width !== width || prevDimensions.height !== height) {
+        if (
+          prevDimensions.width !== width ||
+          prevDimensions.height !== height
+        ) {
           return { width, height };
         }
         return prevDimensions;

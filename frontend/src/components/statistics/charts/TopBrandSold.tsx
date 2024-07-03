@@ -98,7 +98,12 @@ const TopBrandsSold: React.FC<{
         )}
 
         {loading ? (
-          <Skeleton variant="rectangular" width="60%" height={30} sx={{ borderRadius: "12px", mt: 2 }} />
+          <Skeleton
+            variant="rectangular"
+            width="60%"
+            height={30}
+            sx={{ borderRadius: "12px", mt: 2 }}
+          />
         ) : (
           <Box
             sx={{
@@ -110,7 +115,12 @@ const TopBrandsSold: React.FC<{
             }}
           >
             {topBrandsData.map((brand, index) => (
-              <Box key={`${brand.label}-${index}`} display="flex" alignItems="center" mb={1}>
+              <Box
+                key={`${brand.label}-${index}`}
+                display="flex"
+                alignItems="center"
+                mb={1}
+              >
                 <Box
                   sx={{
                     width: 16,

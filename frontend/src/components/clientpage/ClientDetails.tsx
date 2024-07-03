@@ -1,4 +1,3 @@
-//src/components/common/ClientDetails.tsx
 import React from "react";
 import {
   Paper,
@@ -8,18 +7,13 @@ import {
   Typography,
   IconButton,
   useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import DetailComponent from "../../components/common/DetailComponent";
-import { Client } from "../../models/models";
-
-interface ClientDetailsProps {
-  selectedClient: Client | null;
-  isClientDetailsCollapsed: boolean;
-  setClientDetailsCollapsed: (value: boolean) => void;
-  isLoading: boolean;
-}
+import DetailComponent from "./DetailComponent";
+import { ClientDetailsProps } from "../../models/models";
+import MovementsHistory from "../statistics/grids/MovementsHistory";
 
 const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
   (
@@ -32,6 +26,7 @@ const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
     ref
   ) => {
     const theme = useTheme();
+    const isMobile = useMediaQuery("(max-width:600px)");
 
     return (
       <Paper
@@ -71,7 +66,11 @@ const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
         <Box sx={{ p: 2.25 }}>
           <Grid container direction="column">
             <Grid item>
-              <Grid container justifyContent="space-between">
+              <Grid
+                container
+                justifyContent="space-between"
+                alignItems="center"
+              >
                 <Grid item>
                   <Typography variant="h2">Client Details</Typography>
                 </Grid>
@@ -95,7 +94,21 @@ const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
         <Collapse in={!isClientDetailsCollapsed}>
           {selectedClient ? (
             <Box sx={{ p: 2 }}>
-              <DetailComponent detail={selectedClient} isLoading={isLoading} />
+              <Grid
+                container
+                spacing={2}
+                direction={isMobile ? "column" : "row"}
+              >
+                <Grid item xs={12} md={6}>
+                  <DetailComponent
+                    detail={selectedClient}
+                    isLoading={isLoading}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <MovementsHistory movements={selectedClient.movements} />
+                </Grid>
+              </Grid>
             </Box>
           ) : (
             <Box sx={{ p: 2 }}></Box>

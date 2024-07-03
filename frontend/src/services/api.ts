@@ -1,21 +1,29 @@
 // services/api.ts
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Client, Agent, MovementDetail } from '../models/models';
-import { loadJsonData, loadClientDetailsData, mapDataToModels, mapDataToMinimalClients, mapDataToMinimalAgents, mapDataToAgents, mapDataToMovementDetails } from '../utils/dataLoader';
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { Client, Agent, MovementDetail } from "../models/models";
+import {
+  loadJsonData,
+  loadClientDetailsData,
+  mapDataToModels,
+  mapDataToMinimalClients,
+  mapDataToMinimalAgents,
+  mapDataToAgents,
+  mapDataToMovementDetails,
+} from "../utils/dataLoader";
 
 export const api = createApi({
-  reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: '/' }),
+  reducerPath: "api",
+  baseQuery: fetchBaseQuery({ baseUrl: "/" }),
   endpoints: (builder) => ({
     getMinimalClients: builder.query<Client[], void>({
       queryFn: async () => {
         try {
-          const data = await loadJsonData('/datasetsfrom01JANto12JUN.json');
+          const data = await loadJsonData("/datasetsfrom01JANto12JUN.json");
           const minimalClients = mapDataToMinimalClients(data);
           return { data: minimalClients };
         } catch (error) {
           const errorMessage = (error as Error).message;
-          return { error: { status: 'CUSTOM_ERROR', error: errorMessage } };
+          return { error: { status: "CUSTOM_ERROR", error: errorMessage } };
         }
       },
       keepUnusedDataFor: 60 * 2,
@@ -24,14 +32,14 @@ export const api = createApi({
       queryFn: async () => {
         try {
           const [data, clientDetails] = await Promise.all([
-            loadJsonData('/datasetsfrom01JANto12JUN.json'),
-            loadClientDetailsData('/clientdetailsdataset02072024.json'),
+            loadJsonData("/datasetsfrom01JANto12JUN.json"),
+            loadClientDetailsData("/clientdetailsdataset02072024.json"),
           ]);
           const clients = await mapDataToModels(data, clientDetails);
           return { data: clients };
         } catch (error) {
           const errorMessage = (error as Error).message;
-          return { error: { status: 'CUSTOM_ERROR', error: errorMessage } };
+          return { error: { status: "CUSTOM_ERROR", error: errorMessage } };
         }
       },
       keepUnusedDataFor: 60 * 2,
@@ -40,18 +48,18 @@ export const api = createApi({
       queryFn: async (clientId) => {
         try {
           const [data, clientDetails] = await Promise.all([
-            loadJsonData('/datasetsfrom01JANto12JUN.json'),
-            loadClientDetailsData('/clientdetailsdataset02072024.json'),
+            loadJsonData("/datasetsfrom01JANto12JUN.json"),
+            loadClientDetailsData("/clientdetailsdataset02072024.json"),
           ]);
           const clients = await mapDataToModels(data, clientDetails);
           const client = clients.find((client) => client.id === clientId);
           if (!client) {
-            throw new Error('Client not found');
+            throw new Error("Client not found");
           }
           return { data: client };
         } catch (error) {
           const errorMessage = (error as Error).message;
-          return { error: { status: 'CUSTOM_ERROR', error: errorMessage } };
+          return { error: { status: "CUSTOM_ERROR", error: errorMessage } };
         }
       },
       keepUnusedDataFor: 60 * 2,
@@ -59,12 +67,12 @@ export const api = createApi({
     getMinimalAgents: builder.query<Agent[], void>({
       queryFn: async () => {
         try {
-          const data = await loadJsonData('/datasetsfrom01JANto12JUN.json');
+          const data = await loadJsonData("/datasetsfrom01JANto12JUN.json");
           const minimalAgents = mapDataToMinimalAgents(data);
           return { data: minimalAgents };
         } catch (error) {
           const errorMessage = (error as Error).message;
-          return { error: { status: 'CUSTOM_ERROR', error: errorMessage } };
+          return { error: { status: "CUSTOM_ERROR", error: errorMessage } };
         }
       },
       keepUnusedDataFor: 60 * 2,
@@ -72,12 +80,12 @@ export const api = createApi({
     getAgents: builder.query<Agent[], void>({
       queryFn: async () => {
         try {
-          const data = await loadJsonData('/datasetsfrom01JANto12JUN.json');
+          const data = await loadJsonData("/datasetsfrom01JANto12JUN.json");
           const agents = mapDataToAgents(data);
           return { data: agents };
         } catch (error) {
           const errorMessage = (error as Error).message;
-          return { error: { status: 'CUSTOM_ERROR', error: errorMessage } };
+          return { error: { status: "CUSTOM_ERROR", error: errorMessage } };
         }
       },
       keepUnusedDataFor: 60 * 2,
@@ -85,12 +93,12 @@ export const api = createApi({
     getMovementDetails: builder.query<MovementDetail[], void>({
       queryFn: async () => {
         try {
-          const data = await loadJsonData('/datasetsfrom01JANto12JUN.json');
+          const data = await loadJsonData("/datasetsfrom01JANto12JUN.json");
           const movementDetails = mapDataToMovementDetails(data);
           return { data: movementDetails };
         } catch (error) {
           const errorMessage = (error as Error).message;
-          return { error: { status: 'CUSTOM_ERROR', error: errorMessage } };
+          return { error: { status: "CUSTOM_ERROR", error: errorMessage } };
         }
       },
       keepUnusedDataFor: 60 * 2,
