@@ -1,11 +1,9 @@
 // src/components/common/SearchResults.tsx
-
 import React, { useEffect, useRef } from "react";
 import { SearchResultsProps } from "../../models/models";
 import { Card, CardContent, Typography } from "@mui/material";
 import "./SearchResults.module.css";
 import { generateRandomString } from "../../utils/constants";
-
 
 const SearchResults: React.FC<SearchResultsProps> = ({
   onSelect,
@@ -24,6 +22,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       }
     }
   }, [selectedIndex]);
+
+  console.log("SearchResults render - Results:", results);
+  console.log("SearchResults render - Selected Index:", selectedIndex);
 
   return (
     <div className="search-results" ref={resultsRef}>
@@ -46,6 +47,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                   </Typography>
                   <Typography variant="body2">Brand: {result.brand}</Typography>
                   <Typography variant="body2">
+                    {" "}
                     Last Sold: {result.lastSoldDate}
                   </Typography>
                 </>

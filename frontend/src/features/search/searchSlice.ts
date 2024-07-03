@@ -1,9 +1,17 @@
 // src/features/search/searchSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { SearchResult, SearchParams, SearchState, Movement, MovementDetail } from "../../models/models";
-import { loadJsonData, loadClientDetailsData, mapDataToModels } from "../../utils/dataLoader";
+import {
+  SearchResult,
+  SearchParams,
+  SearchState,
+  Movement,
+} from "../../models/models";
+import {
+  loadJsonData,
+  loadClientDetailsData,
+  mapDataToModels,
+} from "../../utils/dataLoader";
 import { RootState } from "../../app/store";
-import dayjs from "dayjs";
 
 const initialState: SearchState = {
   query: "",
@@ -12,143 +20,152 @@ const initialState: SearchState = {
   error: null,
 };
 
-export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { state: RootState }>(
+export const searchItems = createAsyncThunk<
+  SearchResult[],
+  SearchParams,
+  { state: RootState }
+>(
   "search/searchItems",
-  async ({ query, filter }, { getState }) => {
-    console.log(`Searching for query: ${query} with filter: ${filter}`);
+  async ({ query, filter }, { getState, rejectWithValue }) => {
+    try {
+      console.log(`Searching for query: ${query} with filter: ${filter}`);
 
-    const movementData: Movement[] = await loadJsonData("/datasetsfrom01JANto12JUN.json");
-    const clientDetails = await loadClientDetailsData("/clientdetailsdataset02072024.json");
-    const clients = await mapDataToModels(movementData, clientDetails);
+      const movementData: Movement[] = await loadJsonData(
+        "/datasetsfrom01JANto12JUN.json"
+      );
+      const clientDetails = await loadClientDetailsData(
+        "/clientdetailsdataset02072024.json"
+      );
+      const clients = await mapDataToModels(movementData, clientDetails);
 
-    const sanitizedQuery = query.toLowerCase();
-    const seen = new Map<string, string>(); // Track seen IDs and latest sold dates
+      const sanitizedQuery = query.toLowerCase();
+      const seen = new Map<string, string>(); // Track seen IDs
 
-    // Retrieve the logged-in user details from the state
-    const state = getState();
-    const { id, userRole } = state.auth;
+      // Retrieve the logged-in user details from the state
+      const state = getState();
+      const { id, userRole } = state.auth;
 
-    let filteredClients;
+      let filteredClients;
 
-    if (userRole === "agent") {
-      // Filter clients based on the agent ID if the userRole is "agent"
-      filteredClients = clients.filter(client => client.agent === id);
-    } else if (userRole === "client") {
-      // Filter clients based on the client ID if the userRole is "client"
-      filteredClients = clients.filter(client => client.id === id);
-    } else {
-      // Admin sees all clients
-      filteredClients = clients;
-    }
+      if (userRole === "agent") {
+        // Filter clients based on the agent ID if the userRole is "agent"
+        filteredClients = clients.filter((client) => client.agent === id);
+      } else if (userRole === "client") {
+        // Filter clients based on the client ID if the userRole is "client"
+        filteredClients = clients.filter((client) => client.id === id);
+      } else {
+        // Admin sees all clients
+        filteredClients = clients;
+      }
 
-    let searchResults: SearchResult[] = [];
+      let searchResults: SearchResult[] = [];
 
-    if (filter === "all" || filter === "client") {
-      const clientResults = filteredClients
-        .filter(client => {
-          const includesQuery = (value: string | null | undefined) =>
-            value ? value.toLowerCase().includes(sanitizedQuery) : false;
+      if (filter === "all" || filter === "client") {
+        const clientResults = filteredClients
+          .filter((client) => {
+            const includesQuery = (value: string | null | undefined) =>
+              value ? value.toLowerCase().includes(sanitizedQuery) : false;
 
-          return (
-            includesQuery(client.name) ||
-            includesQuery(client.email) ||
-            includesQuery(client.phone)
-          );
-        })
-        .map((client) => ({
-          id: client.id,
-          name: client.name,
-          type: "client",
-          province: client.province,
-          phone: client.phone,
-          paymentMethod: client.paymentMethod,
-        }))
-        .filter((result) => {
-          if (seen.has(result.id)) {
-            return false;
-          }
-          seen.set(result.id, ""); // Add to seen map
-          return true;
-        });
-
-      searchResults = searchResults.concat(clientResults);
-      console.log("Client results:", clientResults);
-    }
-
-    if (filter === "all" || filter === "article") {
-      const articleMap = new Map<string, SearchResult>();
-
-      movementData.forEach((movement) => {
-        movement.details.forEach((detail: MovementDetail) => {
-          const articleKey = `${detail.articleId}-${detail.brand}-${detail.name}`;
-          const includesQuery = (value: string | null | undefined) =>
-            value ? value.toLowerCase().includes(sanitizedQuery) : false;
-
-          if (
-            includesQuery(detail.name) ||
-            includesQuery(detail.articleId) ||
-            includesQuery(detail.brand)
-          ) {
-            const lastSoldDate = movement.dateOfOrder;
-
-            if (articleMap.has(articleKey)) {
-              const existingArticle = articleMap.get(articleKey);
-              if (existingArticle && dayjs(existingArticle.lastSoldDate).isBefore(dayjs(lastSoldDate))) {
-                existingArticle.lastSoldDate = lastSoldDate;
-              }
-            } else {
-              articleMap.set(articleKey, {
-                id: detail.articleId,
-                name: detail.name,
-                type: "article",
-                brand: detail.brand,
-                lastSoldDate,
-              });
+            return (
+              includesQuery(client.name) ||
+              includesQuery(client.email) ||
+              includesQuery(client.phone)
+            );
+          })
+          .map((client) => ({
+            id: client.id,
+            name: client.name,
+            type: "client",
+            province: client.province,
+            phone: client.phone,
+            paymentMethod: client.paymentMethod,
+          }))
+          .filter((result) => {
+            if (seen.has(result.id)) {
+              return false;
             }
-          }
-        });
-      });
+            seen.set(result.id, ""); // Add to seen map
+            return true;
+          });
 
-      const articleResults = Array.from(articleMap.values()).filter((result) => {
-        if (seen.has(result.id)) {
-          const existingDate = seen.get(result.id);
-          if (existingDate && dayjs(existingDate).isAfter(dayjs(result.lastSoldDate))) {
-            return false;
-          }
-        }
-        seen.set(result.id, result.lastSoldDate); // Update seen map with the latest date
-        return true;
-      });
+        searchResults = searchResults.concat(clientResults);
+        console.log("Client results:", clientResults);
+      }
 
-      searchResults = searchResults.concat(articleResults);
-      console.log("Article results:", articleResults);
+      if (filter === "all" || filter === "article") {
+        const articleResults = filteredClients
+          .flatMap((client) =>
+            client.movements.flatMap((movement) =>
+              movement.details
+                .filter((detail) => {
+                  const includesQuery = (value: string | null | undefined) =>
+                    value
+                      ? value.toLowerCase().includes(sanitizedQuery)
+                      : false;
+
+                  return (
+                    includesQuery(detail.name) ||
+                    includesQuery(detail.articleId) ||
+                    includesQuery(detail.brand)
+                  );
+                })
+                .map((detail) => ({
+                  id: detail.articleId,
+                  name: detail.name,
+                  type: "article",
+                  brand: detail.brand,
+                  articleId: detail.articleId,
+                  lastSoldDate: movement.dateOfOrder,
+                }))
+            )
+          )
+          .filter((result) => {
+            if (seen.has(result.id)) {
+              const existingDate = seen.get(result.id);
+              if (existingDate && existingDate > result.lastSoldDate) {
+                return false;
+              }
+            }
+            seen.set(result.id, result.lastSoldDate); // Update seen map with the latest date
+            return true;
+          });
+
+        searchResults = searchResults.concat(articleResults);
+      }
+
+      if (filter === "all" || filter === "promo") {
+        const promoResults = filteredClients
+          .flatMap((client) => client.promos)
+          .filter((promo) =>
+            promo.name
+              ? promo.name.toLowerCase().includes(sanitizedQuery)
+              : false
+          )
+          .map((promo) => ({
+            id: promo.id,
+            name: promo.name,
+            type: "promo",
+            discountAmount: promo.discount,
+            // isEligible: promo.isEligible, // Commented out until data is available
+            startDate: promo.startDate,
+            endDate: promo.endDate,
+          }))
+          .filter((result) => {
+            if (seen.has(result.id)) {
+              return false;
+            }
+            seen.set(result.id, ""); // Add to seen map
+            return true;
+          });
+
+        searchResults = searchResults.concat(promoResults);
+      }
+      console.log("Final search results:", searchResults);
+      return searchResults;
+    } catch (error: any) {
+      console.error("Error searching items:", error);
+      return rejectWithValue(error.message || "An unknown error occurred.");
     }
-
-    if (filter === "all" || filter === "promo") {
-      const promoResults = filteredClients.flatMap(client => client.promos)
-        .filter(promo => promo.name ? promo.name.toLowerCase().includes(sanitizedQuery) : false)
-        .map((promo) => ({
-          id: promo.id,
-          name: promo.name,
-          type: "promo",
-          discountAmount: promo.discount,
-          startDate: promo.startDate,
-          endDate: promo.endDate,
-        }))
-        .filter((result) => {
-          if (seen.has(result.id)) {
-            return false;
-          }
-          seen.set(result.id, ""); // Add to seen map
-          return true;
-        });
-
-      searchResults = searchResults.concat(promoResults);
-      console.log("Promo results:", promoResults);
-    }
-
-    console.log("Final search results:", searchResults);
-    return searchResults;
   }
 );
 
@@ -176,7 +193,7 @@ const searchSlice = createSlice({
       })
       .addCase(searchItems.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message || null;
+        state.error = action.payload as string; // Properly type the error
       });
   },
 });

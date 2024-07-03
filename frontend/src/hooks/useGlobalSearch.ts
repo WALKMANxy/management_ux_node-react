@@ -18,11 +18,13 @@ const useGlobalSearch = (filter: string) => {
 
   const handleSearch = useCallback(() => {
     const sanitizedInput = DOMPurify.sanitize(debouncedInput.trim());
+    console.log("handleSearch - Sanitized input:", sanitizedInput);
     if (sanitizedInput === "" || sanitizedInput.length < 3) {
       dispatch(clearResults());
       setShowResults(false);
       return;
     }
+    console.log("handleSearch - Dispatching searchItems with query:", sanitizedInput);
     dispatch(setQuery(sanitizedInput));
     dispatch(searchItems({ query: sanitizedInput, filter }));
     setShowResults(true);
@@ -52,6 +54,7 @@ const useGlobalSearch = (filter: string) => {
     ) {
       setShowResults(false);
       setSelectedIndex(-1);
+      console.log("handleClickOutside - Click outside detected, hiding results");
     }
   }, []);
 
@@ -79,7 +82,18 @@ const useGlobalSearch = (filter: string) => {
       dispatch(clearResults());
     }
     setSelectedIndex(-1);
+    console.log("handleFocus - Input focused");
   };
+
+  useEffect(() => {
+    console.log("useGlobalSearch - Current state:", {
+      input,
+      results,
+      status,
+      selectedIndex,
+      showResults,
+    });
+  });
 
   return {
     input,
