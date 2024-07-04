@@ -3,7 +3,11 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../app/store";
 import DOMPurify from "dompurify";
-import { setQuery, searchItems, clearResults } from "../features/search/searchSlice";
+import {
+  setQuery,
+  searchItems,
+  clearResults,
+} from "../features/search/searchSlice";
 import useDebounce from "./useDebounce";
 
 const useGlobalSearch = (filter: string) => {
@@ -18,13 +22,13 @@ const useGlobalSearch = (filter: string) => {
 
   const handleSearch = useCallback(() => {
     const sanitizedInput = DOMPurify.sanitize(debouncedInput.trim());
-    console.log("handleSearch - Sanitized input:", sanitizedInput);
+    //console.log("handleSearch - Sanitized input:", sanitizedInput);
     if (sanitizedInput === "" || sanitizedInput.length < 3) {
       dispatch(clearResults());
       setShowResults(false);
       return;
     }
-    console.log("handleSearch - Dispatching searchItems with query:", sanitizedInput);
+    //console.log("handleSearch - Dispatching searchItems with query:", sanitizedInput);
     dispatch(setQuery(sanitizedInput));
     dispatch(searchItems({ query: sanitizedInput, filter }));
     setShowResults(true);
@@ -54,7 +58,7 @@ const useGlobalSearch = (filter: string) => {
     ) {
       setShowResults(false);
       setSelectedIndex(-1);
-      console.log("handleClickOutside - Click outside detected, hiding results");
+      //console.log("handleClickOutside - Click outside detected, hiding results");
     }
   }, []);
 
@@ -82,10 +86,10 @@ const useGlobalSearch = (filter: string) => {
       dispatch(clearResults());
     }
     setSelectedIndex(-1);
-    console.log("handleFocus - Input focused");
+    //console.log("handleFocus - Input focused");
   };
 
-  useEffect(() => {
+  /* useEffect(() => {
     console.log("useGlobalSearch - Current state:", {
       input,
       results,
@@ -93,7 +97,7 @@ const useGlobalSearch = (filter: string) => {
       selectedIndex,
       showResults,
     });
-  });
+  }); */
 
   return {
     input,

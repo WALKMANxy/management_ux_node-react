@@ -23,8 +23,8 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     }
   }, [selectedIndex]);
 
-  console.log("SearchResults render - Results:", results);
-  console.log("SearchResults render - Selected Index:", selectedIndex);
+  /* console.log("SearchResults render - Results:", results);
+  console.log("SearchResults render - Selected Index:", selectedIndex); */
 
   return (
     <div className="search-results" ref={resultsRef}>

@@ -28,7 +28,7 @@ export const searchItems = createAsyncThunk<
   "search/searchItems",
   async ({ query, filter }, { getState, rejectWithValue }) => {
     try {
-      console.log(`Searching for query: ${query} with filter: ${filter}`);
+      //console.log(`Searching for query: ${query} with filter: ${filter}`);
 
       const movementData: Movement[] = await loadJsonData(
         "/datasetsfrom01JANto12JUN.json"
@@ -89,7 +89,7 @@ export const searchItems = createAsyncThunk<
           });
 
         searchResults = searchResults.concat(clientResults);
-        console.log("Client results:", clientResults);
+        //console.log("Client results:", clientResults);
       }
 
       if (filter === "all" || filter === "article") {
@@ -160,7 +160,7 @@ export const searchItems = createAsyncThunk<
 
         searchResults = searchResults.concat(promoResults);
       }
-      console.log("Final search results:", searchResults);
+      //console.log("Final search results:", searchResults);
       return searchResults;
     } catch (error: any) {
       console.error("Error searching items:", error);

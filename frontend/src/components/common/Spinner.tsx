@@ -19,6 +19,7 @@ const Spinner: React.FC = () => (
       size={40}
       thickness={4}
       value={100}
+      aria-label="indeterminate-spinner"
     />
   </Box>
 );

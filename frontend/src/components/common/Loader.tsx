@@ -61,6 +61,7 @@ const Loader: React.FC = () => {
         />
         <CircularProgress
           style={{ color: "white", height: "9%", width: "9%" }}
+          aria-label="loading"
         />{" "}
         {/* 10% smaller */}
       </Box>

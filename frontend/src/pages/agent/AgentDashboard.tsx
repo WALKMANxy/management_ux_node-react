@@ -90,6 +90,7 @@ const AgentDashboard: React.FC = () => {
           width="100%"
           height={50}
           sx={{ borderRadius: "12px" }}
+          aria-label="skeleton"
         />
       )}
       <Grid container spacing={6} mt={2}>
@@ -172,6 +173,7 @@ const AgentDashboard: React.FC = () => {
                       width="100%"
                       height={200}
                       sx={{ borderRadius: "12px" }}
+                      aria-label="skeleton"
                     />
                   )}
                 </Grid>
@@ -191,6 +193,7 @@ const AgentDashboard: React.FC = () => {
                       width="100%"
                       height={200}
                       sx={{ borderRadius: "12px" }}
+                      aria-label="skeleton"
                     />
                   )}
                 </Grid>
@@ -206,6 +209,7 @@ const AgentDashboard: React.FC = () => {
                       width="100%"
                       height={300}
                       sx={{ borderRadius: "12px" }}
+                      aria-label="skeleton"
                     />
                   )}
                 </Grid>
@@ -222,6 +226,7 @@ const AgentDashboard: React.FC = () => {
                       width="100%"
                       height={300}
                       sx={{ borderRadius: "12px" }}
+                      aria-label="skeleton"
                     />
                   )}
                 </Grid>
@@ -236,6 +241,7 @@ const AgentDashboard: React.FC = () => {
                       width="100%"
                       height={300}
                       sx={{ borderRadius: "12px" }}
+                      aria-label="skeleton"
                     />
                   )}
                 </Grid>
@@ -264,6 +270,7 @@ const AgentDashboard: React.FC = () => {
                 width="100%"
                 height={300}
                 sx={{ borderRadius: "12px" }}
+                aria-label="skeleton"
               />
             )}
           </Box>

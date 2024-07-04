@@ -35,10 +35,10 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
     setSelectedIndex(-1);
   };
 
-  console.log("GlobalSearch render - Input value:", input);
+  /* console.log("GlobalSearch render - Input value:", input);
   console.log("GlobalSearch render - Results:", results);
   console.log("GlobalSearch render - Status:", status);
-
+ */
   return (
     <div ref={searchRef} className="global-search-container">
       <div className="global-search d-flex align-items-center">
