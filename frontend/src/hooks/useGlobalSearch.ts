@@ -1,12 +1,12 @@
 // src/hooks/useGlobalSearch.ts
-import { useState, useRef, useEffect, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../app/store";
 import DOMPurify from "dompurify";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../app/store";
 import {
-  setQuery,
-  searchItems,
   clearResults,
+  searchItems,
+  setQuery,
 } from "../features/search/searchSlice";
 import useDebounce from "./useDebounce";
 

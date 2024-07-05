@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const useResizeObserver = () => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });

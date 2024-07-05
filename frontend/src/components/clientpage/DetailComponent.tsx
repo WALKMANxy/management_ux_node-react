@@ -1,35 +1,37 @@
+// src/components/clientpage/DetailComponent.tsx
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import EmailIcon from "@mui/icons-material/Email";
+import HomeIcon from "@mui/icons-material/Home";
+import PaymentIcon from "@mui/icons-material/Payment";
+import PersonIcon from "@mui/icons-material/Person";
+import PhoneIcon from "@mui/icons-material/Phone";
+import { Box, Grid, Link, Skeleton, Typography } from "@mui/material";
 import React from "react";
-import { Typography, Grid, Link, Box, Skeleton } from "@mui/material";
-import PersonIcon from '@mui/icons-material/Person';
-import PhoneIcon from '@mui/icons-material/Phone';
-import EmailIcon from '@mui/icons-material/Email';
-import HomeIcon from '@mui/icons-material/Home';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import PaymentIcon from '@mui/icons-material/Payment';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import { currencyFormatter } from "../../utils/dataUtils"; // Import the currency formatter
+import { useTranslation } from "react-i18next";
 import { DetailProps } from "../../models/models";
-
-
+import { currencyFormatter } from "../../utils/dataUtils";
 
 const DetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {
-  const excludedKeys = ["id","movements", "promos", "visits"];
+  const { t } = useTranslation();
+
+  const excludedKeys = ["id", "movements", "promos", "visits"];
   const keyMap: { [key: string]: string } = {
-    name: "Name",
-    phone: "Phone Number",
-    totalRevenue: "Total Revenue",
-    pec: "E-mail PEC",
-    extendedTaxCode: "Additional Tax Code",
-    paymentMethod: "Payment Method",
-    province: "Location",
-    totalOrders: "Total Orders",
-    unpaidRevenue: "Unpaid Revenue",
-    email: "E-mail",
-    taxCode: "Tax Code",
-    paymentMethodID: "PMID",
-    address: "Address",
-    agent: "Agent"
+    name: t("details.name"),
+    phone: t("details.phone"),
+    totalRevenue: t("details.totalRevenue"),
+    pec: t("details.pec"),
+    extendedTaxCode: t("details.extendedTaxCode"),
+    paymentMethod: t("details.paymentMethod"),
+    province: t("details.province"),
+    totalOrders: t("details.totalOrders"),
+    unpaidRevenue: t("details.unpaidRevenue"),
+    email: t("details.email"),
+    taxCode: t("details.taxCode"),
+    paymentMethodID: t("details.paymentMethodID"),
+    address: t("details.address"),
+    agent: t("details.agent"),
   };
 
   const icons: { [key: string]: JSX.Element } = {
@@ -46,7 +48,7 @@ const DetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {
     extendedTaxCode: <AccountBalanceIcon />,
     taxCode: <AccountBalanceIcon />,
     paymentMethodID: <PaymentIcon />,
-    agent: <PersonIcon />
+    agent: <PersonIcon />,
   };
 
   const formatPhoneNumber = (phone: string) => {
@@ -54,7 +56,9 @@ const DetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {
   };
 
   const getGoogleMapsLink = (address: string) => {
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+      address
+    )}`;
   };
 
   const formatAddress = (address: string, province: string) => {
@@ -63,7 +67,7 @@ const DetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {
   };
 
   return (
-    <Box sx={{ p: 3, borderRadius: '30px', background: "transparent" }}>
+    <Box sx={{ p: 3, borderRadius: "30px", background: "transparent" }}>
       <Grid container spacing={2}>
         {Object.keys(detail).map((key) => {
           if (excludedKeys.includes(key)) return null;
@@ -84,19 +88,28 @@ const DetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {
               );
             } else if (key === "email" || key === "pec") {
               displayValue = (
-                <Link href={`mailto:${value}`} color="secondary" underline="none">
+                <Link
+                  href={`mailto:${value}`}
+                  color="secondary"
+                  underline="none"
+                >
                   {value}
                 </Link>
               );
             } else if (key === "address") {
               const formattedAddress = formatAddress(value, detail.province);
               displayValue = (
-                <Link href={getGoogleMapsLink(formattedAddress)} target="_blank" color="secondary" underline="none">
+                <Link
+                  href={getGoogleMapsLink(formattedAddress)}
+                  target="_blank"
+                  color="secondary"
+                  underline="none"
+                >
                   {formattedAddress}
                 </Link>
               );
             } else if (["totalRevenue", "unpaidRevenue"].includes(key)) {
-              displayValue = currencyFormatter(Number(value)); // Apply currency formatter
+              displayValue = currencyFormatter(Number(value));
             } else {
               displayValue = value;
             }
@@ -104,7 +117,7 @@ const DetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {
 
           return (
             <Grid item xs={12} sm={6} key={key} p={1}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
                 {icons[key] && <Box sx={{ mr: 1 }}>{icons[key]}</Box>}
                 <Typography variant="body1">
                   <strong>{displayKey}:</strong> {displayValue}

@@ -1,17 +1,17 @@
 // features/hooks/useAuthHandlers.ts
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { RootState } from "../app/store";
 import { login, logout } from "../features/auth/authSlice";
-import { useNavigate } from "react-router-dom";
 import { setAgentClients } from "../features/data/dataSlice";
-import {
-  useGetMinimalClientsQuery,
-  useGetMinimalAgentsQuery,
-  useGetClientByIdQuery,
-  useGetAgentsQuery,
-} from "../services/api";
 import { AuthHandlersProps } from "../models/models";
+import {
+  useGetAgentsQuery,
+  useGetClientByIdQuery,
+  useGetMinimalAgentsQuery,
+  useGetMinimalClientsQuery,
+} from "../services/api";
 
 const useAuthHandlers = ({
   selectedRole,

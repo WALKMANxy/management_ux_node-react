@@ -1,5 +1,4 @@
 // src/components/common/ServerDay.tsx
-import React from "react";
 import Badge from "@mui/material/Badge";
 import { PickersDay, PickersDayProps } from "@mui/x-date-pickers/PickersDay";
 import dayjs from "dayjs";

@@ -1,20 +1,20 @@
-//Src/components/common/ClientList.tsx
-import React from "react";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
-  Paper,
   Box,
-  TextField,
+  Collapse,
   IconButton,
   Menu,
   MenuItem,
+  Paper,
+  TextField,
   Typography,
-  Collapse,
 } from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import AGGridTable from "./AGGridTable";
+import React from "react";
+import { useTranslation } from "react-i18next";
 import { ClientListProps } from "../../../models/models";
+import AGGridTable from "./AGGridTable";
 
 const ClientList: React.FC<ClientListProps> = ({
   quickFilterText,
@@ -34,6 +34,8 @@ const ClientList: React.FC<ClientListProps> = ({
   setClientListCollapsed,
   isMobile,
 }) => {
+  const { t } = useTranslation();
+
   const onFilterTextBoxChanged = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -50,7 +52,7 @@ const ClientList: React.FC<ClientListProps> = ({
           p: 2,
         }}
       >
-        <Typography variant="h6">Clients</Typography>
+        <Typography variant="h6">{t("clientList.title")}</Typography>
         <IconButton
           onClick={() => setClientListCollapsed(!isClientListCollapsed)}
         >
@@ -72,7 +74,7 @@ const ClientList: React.FC<ClientListProps> = ({
             >
               <TextField
                 id="filter-text-box"
-                placeholder="Quick Filter..."
+                placeholder={t("clientList.quickFilterPlaceholder")}
                 variant="outlined"
                 size="small"
                 fullWidth
@@ -84,7 +86,7 @@ const ClientList: React.FC<ClientListProps> = ({
             </Box>
             <TextField
               type="date"
-              label="Start Date"
+              label={t("clientList.startDate")}
               InputLabelProps={{ shrink: true }}
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
@@ -92,7 +94,7 @@ const ClientList: React.FC<ClientListProps> = ({
             />
             <TextField
               type="date"
-              label="End Date"
+              label={t("clientList.endDate")}
               InputLabelProps={{ shrink: true }}
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
@@ -104,7 +106,9 @@ const ClientList: React.FC<ClientListProps> = ({
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
           >
-            <MenuItem onClick={exportDataAsCsv}>Export CSV</MenuItem>
+            <MenuItem onClick={exportDataAsCsv}>
+              {t("clientList.exportCSV")}
+            </MenuItem>
           </Menu>
           <AGGridTable
             ref={gridRef}

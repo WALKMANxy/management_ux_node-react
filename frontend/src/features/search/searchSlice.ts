@@ -1,17 +1,17 @@
 // src/features/search/searchSlice.ts
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { RootState } from "../../app/store";
 import {
-  SearchResult,
-  SearchParams,
-  SearchState,
   Movement,
+  SearchParams,
+  SearchResult,
+  SearchState,
 } from "../../models/models";
 import {
-  loadJsonData,
   loadClientDetailsData,
+  loadJsonData,
   mapDataToModels,
 } from "../../utils/dataLoader";
-import { RootState } from "../../app/store";
 
 const initialState: SearchState = {
   query: "",
@@ -31,10 +31,10 @@ export const searchItems = createAsyncThunk<
       //console.log(`Searching for query: ${query} with filter: ${filter}`);
 
       const movementData: Movement[] = await loadJsonData(
-        "/datasetsfrom01JANto12JUN.json"
+        "/datasetsfrom01JANto12JUN.min.json"
       );
       const clientDetails = await loadClientDetailsData(
-        "/clientdetailsdataset02072024.json"
+        "/clientdetailsdataset02072024.min.json"
       );
       const clients = await mapDataToModels(movementData, clientDetails);
 

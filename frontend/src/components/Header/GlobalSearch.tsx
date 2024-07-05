@@ -1,18 +1,19 @@
-// src/components/common/GlobalSearch.tsx
-import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
-import SearchResults from "./SearchResults";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from "react";
+import { useTranslation } from "react-i18next";
 import useGlobalSearch from "../../hooks/useGlobalSearch";
 import { GlobalSearchProps } from "../../models/models";
-import "./GlobalSearch.css";
 import Spinner from "../common/Spinner";
+import "./GlobalSearch.css";
+import SearchResults from "./SearchResults";
 
 const GlobalSearch: React.FC<GlobalSearchProps> = ({
   filter = "all",
   onSelect,
-  placeholder = "Search...",
+  placeholder,
 }) => {
+  const { t } = useTranslation();
   const {
     input,
     handleChange,
@@ -35,10 +36,6 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
     setSelectedIndex(-1);
   };
 
-  /* console.log("GlobalSearch render - Input value:", input);
-  console.log("GlobalSearch render - Results:", results);
-  console.log("GlobalSearch render - Status:", status);
- */
   return (
     <div ref={searchRef} className="global-search-container">
       <div className="global-search d-flex align-items-center">
@@ -48,7 +45,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
         <input
           type="text"
           className="form-control search-bar"
-          placeholder={placeholder}
+          placeholder={placeholder || t("globalSearch.placeholder")}
           value={input}
           onChange={handleChange}
           onKeyDown={handleKeyDown}

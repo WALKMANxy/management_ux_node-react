@@ -1,13 +1,15 @@
-import React, { useMemo } from "react";
-import { Box, Paper, Typography, Divider, Skeleton } from "@mui/material";
-import Chart from "react-apexcharts";
+import { Box, Divider, Paper, Skeleton, Typography } from "@mui/material";
 import { ApexOptions } from "apexcharts";
-import { currencyFormatter } from "../../../utils/dataUtils";
+import React, { useMemo } from "react";
+import Chart from "react-apexcharts";
 import { SalesDistributionProps } from "../../../models/models";
+import { currencyFormatter } from "../../../utils/dataUtils";
+import { useTranslation } from "react-i18next";
 
 const SalesDistribution: React.FC<SalesDistributionProps> = ({
   salesDistributionData,
 }) => {
+  const { t } = useTranslation();
   const loading = salesDistributionData.length === 0;
 
   // Memoize the chart dataset to prevent unnecessary re-renders
@@ -76,11 +78,11 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
   const series = useMemo(
     () => [
       {
-        name: "Revenue",
+        name: t("salesDistribution.revenue"),
         data: dataset.map((data) => data.value),
       },
     ],
-    [dataset]
+    [dataset, t]
   );
 
   return (
@@ -118,7 +120,7 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
         }}
       >
         <Typography variant="h6" gutterBottom>
-          Sales Distribution Through Clients
+          {t("salesDistribution.title")}
         </Typography>
       </Box>
       <Divider sx={{ my: 2, borderRadius: "12px", zIndex: 1 }} />

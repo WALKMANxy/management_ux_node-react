@@ -1,8 +1,8 @@
-import { useState, useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { useGetClientsQuery } from "../services/api";
 import { RootState } from "../app/store";
 import { Client } from "../models/models";
+import { useGetClientsQuery } from "../services/api";
 
 export const useClientsGrid = () => {
   const { data: clients = [] } = useGetClientsQuery();

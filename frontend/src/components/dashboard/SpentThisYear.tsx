@@ -1,13 +1,14 @@
 // src/components/common/SpentThisYear.tsx
-import React from "react";
-import { Typography, Paper, Box, Avatar, Grid } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import { currencyFormatter } from "../../utils/dataUtils"; // Import the currency formatter
+import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
+import React from "react";
+import { useTranslation } from "react-i18next";
 import { SpentThisYearProps } from "../../models/models";
-
-
+import { currencyFormatter } from "../../utils/dataUtils"; // Import the currency formatter
 
 const SpentThisYear: React.FC<SpentThisYearProps> = ({ amount }) => {
+  const { t } = useTranslation();
+
   const formattedAmount = currencyFormatter(parseFloat(amount));
 
   return (
@@ -59,7 +60,7 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({ amount }) => {
                 >
                   <img
                     src="/moneybag.svg"
-                    alt="Spent Icon"
+                    alt={t('spentThisYear.iconAlt')}
                     style={{ width: "100%", height: "100%" }}
                   />
                 </Avatar>
@@ -105,7 +106,7 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({ amount }) => {
                 color: "#000",
               }}
             >
-              Spent This Year
+              {t('spentThisYear.title')}
             </Typography>
           </Grid>
         </Grid>

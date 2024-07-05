@@ -27,17 +27,20 @@ import {
   Logout as LogoutIcon,
   Close as CloseIcon,
 } from "@mui/icons-material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import { logout } from "../../features/auth/authSlice";
 import GlobalSearch from "./GlobalSearch";
+import { useTranslation } from "react-i18next";
 
 const Header: React.FC = () => {
+  const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [iconChange, setIconChange] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const userRole = useSelector((state: RootState) => state.auth.userRole);
 
   const handleLogout = () => {
@@ -53,6 +56,24 @@ const Header: React.FC = () => {
 
   const handleSearchSelect = (result: string) => {
     console.log(`Selected result: ${result}`);
+  };
+
+  const handleLogoClick = () => {
+    let dashboardLink = "/";
+    switch (userRole) {
+      case "admin":
+        dashboardLink = "/admin-dashboard";
+        break;
+      case "agent":
+        dashboardLink = "/agent-dashboard";
+        break;
+      case "client":
+        dashboardLink = "/client-dashboard";
+        break;
+      default:
+        dashboardLink = "/";
+    }
+    navigate(dashboardLink);
   };
 
   const renderLinks = () => {
@@ -73,41 +94,41 @@ const Header: React.FC = () => {
 
     return (
       <>
-        <ListItem button component={Link} to={dashboardLink}>
+        <ListItem button component={Link} to={dashboardLink} onClick={toggleDrawer}>
           <ListItemIcon sx={{ color: "white" }}>
             <HomeIcon />
           </ListItemIcon>
-          <ListItemText primary="Dashboard" />
+          <ListItemText primary={t("headerDashboard")} />
         </ListItem>
-        <ListItem button component={Link} to="/clients">
+        <ListItem button component={Link} to="/clients" onClick={toggleDrawer}>
           <ListItemIcon sx={{ color: "white" }}>
             <PeopleIcon />
           </ListItemIcon>
-          <ListItemText primary="Clients" />
+          <ListItemText primary={t("clients")} />
         </ListItem>
-        <ListItem button component={Link} to="/visits">
+        <ListItem button component={Link} to="/visits" onClick={toggleDrawer}>
           <ListItemIcon sx={{ color: "white" }}>
             <EventNoteIcon />
           </ListItemIcon>
-          <ListItemText primary="Visits" />
+          <ListItemText primary={t("visits")} />
         </ListItem>
-        <ListItem button component={Link} to="/statistics">
+        <ListItem button component={Link} to="/statistics" onClick={toggleDrawer}>
           <ListItemIcon sx={{ color: "white" }}>
             <BarChartIcon />
           </ListItemIcon>
-          <ListItemText primary="Statistics" />
+          <ListItemText primary={t("statistics")} />
         </ListItem>
-        <ListItem button component={Link} to="/promos">
+        <ListItem button component={Link} to="/promos" onClick={toggleDrawer}>
           <ListItemIcon sx={{ color: "white" }}>
             <LocalOfferIcon />
           </ListItemIcon>
-          <ListItemText primary="Promos" />
+          <ListItemText primary={t("promos")} />
         </ListItem>
-        <ListItem button component={Link} to="/alerts">
+        <ListItem button component={Link} to="/alerts" onClick={toggleDrawer}>
           <ListItemIcon sx={{ color: "white" }}>
             <WarningIcon />
           </ListItemIcon>
-          <ListItemText primary="Alerts" />
+          <ListItemText primary={t("alerts")} />
         </ListItem>
       </>
     );
@@ -120,14 +141,14 @@ const Header: React.FC = () => {
       to="/"
       onClick={() => {
         handleLogout();
-        dispatch(logout());
+        toggleDrawer(); // Close the drawer on logout
       }}
       sx={{ color: "white", paddingBottom: "20px" }}
     >
       <ListItemIcon sx={{ color: "white" }}>
         <LogoutIcon />
       </ListItemIcon>
-      <ListItemText primary="Logout" />
+      <ListItemText primary={t("logout")} />
     </ListItem>
   );
 
@@ -152,11 +173,12 @@ const Header: React.FC = () => {
           <img
             src="/logo-appbar.png"
             alt="Logo"
-            style={{ height: "40px", marginRight: "16px" }}
+            style={{ height: "40px", marginRight: "16px", cursor: "pointer" }}
+            onClick={handleLogoClick}
           />
           <GlobalSearch
             filter="all"
-            placeholder="Search..."
+            placeholder={t("search")}
             onSelect={handleSearchSelect}
           />
           <IconButton
@@ -201,7 +223,8 @@ const Header: React.FC = () => {
             <img
               src="/logo-appbar.png"
               alt="Logo"
-              style={{ height: "40px", marginLeft: "8px" }}
+              style={{ height: "40px", marginLeft: "8px", cursor: "pointer" }}
+              onClick={handleLogoClick}
             />
           </Box>
           <List sx={{ flexGrow: 1 }}>{renderLinks()}</List>
@@ -227,10 +250,10 @@ const Header: React.FC = () => {
           }}
         >
           <Typography id="notification-modal-title" variant="h6" component="h2">
-            Notifications
+            {t("notifications")}
           </Typography>
           <Typography id="notification-modal-description" sx={{ mt: 2 }}>
-            No new notifications
+            {t("no_notifications")}
           </Typography>
         </Box>
       </Modal>

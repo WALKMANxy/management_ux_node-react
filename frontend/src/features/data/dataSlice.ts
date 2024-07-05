@@ -1,9 +1,9 @@
 // src/features/data/dataSlice.ts
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { Client, FetchDataPayload, DataState } from "../../models/models";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Client, DataState, FetchDataPayload } from "../../models/models";
 import {
-  loadJsonData,
   loadClientDetailsData,
+  loadJsonData,
   mapDataToModels,
 } from "../../utils/dataLoader";
 
@@ -18,8 +18,8 @@ export const fetchData = createAsyncThunk<FetchDataPayload>(
   "data/fetchData",
   async () => {
     const [data, clientDetails] = await Promise.all([
-      loadJsonData("/datasetsfrom01JANto12JUN.json"),
-      loadClientDetailsData("/clientdetailsdataset02072024.json"),
+      loadJsonData("/datasetsfrom01JANto12JUN.min.json"),
+      loadClientDetailsData("/clientdetailsdataset02072024.min.json"),
     ]);
     const clients = await mapDataToModels(data, clientDetails);
 

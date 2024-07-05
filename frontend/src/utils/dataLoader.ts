@@ -1,9 +1,9 @@
 import axios from "axios";
-import { Client, Agent, MovementDetail } from "../models/models";
 import { format, parseISO } from "date-fns";
+import { Agent, Client, MovementDetail } from "../models/models";
 
-const jsonFilePath = "/datasetsfrom01JANto12JUN.json";
-const clientDetailsFilePath = "/clientdetailsdataset02072024.json";
+const jsonFilePath = "/datasetsfrom01JANto12JUN.min.json";
+const clientDetailsFilePath = "/clientdetailsdataset02072024.min.json";
 
 const workerScriptPath = new URL("./worker.js", import.meta.url);
 
@@ -62,11 +62,13 @@ export const mapDataToModels = async (
   data: any[],
   clientDetails: any[]
 ): Promise<Client[]> => {
-  const numWorkers = navigator.hardwareConcurrency || 4;
+  const numWorkers = Math.min(navigator.hardwareConcurrency || 4, 4); // Limit to a maximum of 4 workers
   const chunks = chunkArray(data, Math.ceil(data.length / numWorkers));
 
   return new Promise<Client[]>((resolve, reject) => {
-    const workers: Worker[] = chunks.map((chunk) => new Worker(workerScriptPath));
+    const workers: Worker[] = chunks.map(
+      (chunk) => new Worker(workerScriptPath)
+    );
     const results: Client[] = [];
     let completed = 0;
 

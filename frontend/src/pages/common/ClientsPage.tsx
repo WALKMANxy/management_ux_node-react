@@ -1,7 +1,8 @@
-//src/pages/common/ClientsPage.tsx
-import React, { useMemo } from "react";
 import { Box, useMediaQuery } from "@mui/material";
+import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import ClientDetails from "../../components/clientpage/ClientDetails";
+import ClientList from "../../components/statistics/grids/ClientList";
 import { useClientsGrid } from "../../hooks/useClientGrid";
 import {
   calculateMonthlyOrders,
@@ -9,9 +10,9 @@ import {
   currencyFormatter,
   numberComparator,
 } from "../../utils/dataUtils";
-import ClientList from "../../components/statistics/grids/ClientList";
 
 const ClientsPage: React.FC = () => {
+  const { t } = useTranslation();
   const isMobile = useMediaQuery("(max-width:600px)");
   const {
     selectedClient,
@@ -38,7 +39,7 @@ const ClientsPage: React.FC = () => {
   const columnDefinitions = useMemo(
     () => [
       {
-        headerName: "Name",
+        headerName: t("clientsPage.name"),
         field: "name",
         filter: "agTextColumnFilter",
         sortable: true,
@@ -56,26 +57,26 @@ const ClientsPage: React.FC = () => {
         },
       },
       {
-        headerName: "Province",
+        headerName: t("clientsPage.province"),
         field: "province",
         filter: "agTextColumnFilter",
         sortable: true,
       },
       {
-        headerName: "Phone",
+        headerName: t("clientsPage.phone"),
         field: "phone",
         filter: "agTextColumnFilter",
         sortable: true,
       },
       {
-        headerName: "Total Orders",
+        headerName: t("clientsPage.totalOrders"),
         field: "totalOrders",
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
         sortable: true,
       },
       {
-        headerName: "Orders This Month",
+        headerName: t("clientsPage.ordersThisMonth"),
         valueGetter: (params: any) =>
           calculateMonthlyOrders(params.data.movements),
         filter: "agNumberColumnFilter",
@@ -83,7 +84,7 @@ const ClientsPage: React.FC = () => {
         sortable: true,
       },
       {
-        headerName: "Total Revenue",
+        headerName: t("clientsPage.totalRevenue"),
         field: "totalRevenue",
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
@@ -91,7 +92,7 @@ const ClientsPage: React.FC = () => {
         sortable: true,
       },
       {
-        headerName: "Revenue This Month",
+        headerName: t("clientsPage.revenueThisMonth"),
         valueGetter: (params: any) =>
           calculateMonthlyRevenue(params.data.movements),
         filter: "agNumberColumnFilter",
@@ -100,7 +101,7 @@ const ClientsPage: React.FC = () => {
         sortable: true,
       },
       {
-        headerName: "Unpaid Revenue",
+        headerName: t("clientsPage.unpaidRevenue"),
         field: "unpaidRevenue",
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
@@ -108,13 +109,13 @@ const ClientsPage: React.FC = () => {
         sortable: true,
       },
       {
-        headerName: "Payment Method",
+        headerName: t("clientsPage.paymentMethod"),
         field: "paymentMethod",
         filter: "agTextColumnFilter",
         sortable: true,
       },
     ],
-    [handleClientSelect]
+    [handleClientSelect, t]
   );
 
   return (

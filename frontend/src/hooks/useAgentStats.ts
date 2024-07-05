@@ -1,13 +1,13 @@
 // src/hooks/useAgentStats.ts
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { Client, Agent, Movement } from "../models/models";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Agent, Client, Movement } from "../models/models";
 import { useGetClientsQuery } from "../services/api";
 import { calculateAgentMonthlyData } from "../utils/dataLoader";
 import {
-  calculateAgentTotalRevenue,
-  calculateAgentTotalOrders,
-  calculateAgentTopBrandsData,
   calculateAgentSalesDistributionData,
+  calculateAgentTopBrandsData,
+  calculateAgentTotalOrders,
+  calculateAgentTotalRevenue,
 } from "../utils/dataUtils";
 
 const useAgentStats = (agentId: string | null, isMobile: boolean) => {

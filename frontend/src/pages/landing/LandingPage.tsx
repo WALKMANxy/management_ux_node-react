@@ -1,38 +1,38 @@
-// src/pages/landing/LandingPage.tsx
-import React, { useState, useMemo, useEffect } from "react";
-import {
-  AppBar,
-  Toolbar,
-  Button,
-  Menu,
-  MenuItem,
-  Container,
-  Box,
-  Select,
-  FormControl,
-  InputLabel,
-  Divider,
-  Typography,
-} from "@mui/material";
-import PhoneIcon from "@mui/icons-material/Phone";
-import EmailIcon from "@mui/icons-material/Email";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
+import EmailIcon from "@mui/icons-material/Email";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
-import GoogleMapsIcon from "@mui/icons-material/Map";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
-
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import GoogleMapsIcon from "@mui/icons-material/Map";
+import PhoneIcon from "@mui/icons-material/Phone";
+import {
+  AppBar,
+  Box,
+  Button,
+  Container,
+  Divider,
+  FormControl,
+  InputLabel,
+  Menu,
+  MenuItem,
+  Select,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
+import Loader from "../../components/common/Loader";
+import useAuthHandlers from "../../hooks/useAuthHandlers";
 import {
   useGetAgentsQuery,
   useGetMinimalClientsQuery,
 } from "../../services/api";
-import useAuthHandlers from "../../hooks/useAuthHandlers";
-import Loader from "../../components/common/Loader";
 
 const LandingPage: React.FC = () => {
+  const { t } = useTranslation();
   const [showLoader, setShowLoader] = useState(true);
   const [showLogin, setShowLogin] = useState(false);
   const [selectedRole, setSelectedRole] = useState<
@@ -53,7 +53,7 @@ const LandingPage: React.FC = () => {
     agents,
   });
 
-  const VATIcon = () => <span>Partita IVA</span>;
+  const VATIcon = () => <span>{t("landingPage.vat")}</span>;
 
   const agentOptions = useMemo(
     () =>
@@ -94,7 +94,7 @@ const LandingPage: React.FC = () => {
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <img src="/logo-appbar.png" alt="Logo" style={{ height: "40px" }} />
           <Button color="inherit" onClick={() => setShowLogin(!showLogin)}>
-            {isLoggedIn ? "Enter" : "Login"}
+            {isLoggedIn ? t("landingPage.enter") : t("landingPage.login")}
           </Button>
         </Toolbar>
       </AppBar>
@@ -113,7 +113,7 @@ const LandingPage: React.FC = () => {
               sx={{ marginBottom: 2, paddingTop: "8px", margintop: "10px" }}
             >
               <InputLabel sx={{ fontSize: "110%", top: "-8px" }}>
-                User Role
+                {t("landingPage.userRole")}
               </InputLabel>
               <Select
                 value={selectedRole}
@@ -126,9 +126,9 @@ const LandingPage: React.FC = () => {
                   }
                 }}
               >
-                <MenuItem value="admin">Admin</MenuItem>
-                <MenuItem value="agent">Agent</MenuItem>
-                <MenuItem value="client">Client</MenuItem>
+                <MenuItem value="admin">{t("landingPage.admin")}</MenuItem>
+                <MenuItem value="agent">{t("landingPage.agent")}</MenuItem>
+                <MenuItem value="client">{t("landingPage.client")}</MenuItem>
               </Select>
             </FormControl>
           </MenuItem>
@@ -136,7 +136,7 @@ const LandingPage: React.FC = () => {
             <MenuItem>
               <FormControl fullWidth sx={{ marginBottom: 2 }}>
                 <InputLabel sx={{ fontSize: "110%", top: "-8px" }}>
-                  Select Agent
+                  {t("landingPage.selectAgent")}
                 </InputLabel>
                 <Select
                   value={selectedAgent}
@@ -151,7 +151,7 @@ const LandingPage: React.FC = () => {
             <MenuItem>
               <FormControl fullWidth sx={{ marginBottom: 2 }}>
                 <InputLabel sx={{ fontSize: "110%", top: "-8px" }}>
-                  Select Client
+                  {t("landingPage.selectClient")}
                 </InputLabel>
                 <Select
                   value={selectedClient}
@@ -169,7 +169,7 @@ const LandingPage: React.FC = () => {
               onClick={isLoggedIn ? handleEnter : handleLogin}
               fullWidth
             >
-              {isLoggedIn ? "Enter" : "Login"}
+              {isLoggedIn ? t("landingPage.enter") : t("landingPage.login")}
             </Button>
           </MenuItem>
         </Menu>
@@ -230,28 +230,28 @@ const LandingPage: React.FC = () => {
               startIcon={<FacebookIcon />}
               sx={{ color: "#3b5998" }}
             >
-              Facebook
+              {t("landingPage.facebook")}
             </Button>
             <Button
               href="https://www.instagram.com/ricambicentrosud/"
               startIcon={<InstagramIcon />}
               sx={{ color: "#E1306C" }}
             >
-              Instagram
+              {t("landingPage.instagram")}
             </Button>
             <Button
               href="https://goo.gl/maps/MFy1cqdn3BbQNmtW6"
               startIcon={<GoogleMapsIcon />}
               sx={{ color: "#4285F4" }}
             >
-              Google Maps
+              {t("landingPage.googleMaps")}
             </Button>
             <Button
               href="https://www.linkedin.com/company/7007068/"
               startIcon={<LinkedInIcon />}
               sx={{ color: "#0077B5" }}
             >
-              LinkedIn
+              {t("landingPage.linkedIn")}
             </Button>
           </Box>
         </Box>
@@ -315,7 +315,7 @@ const LandingPage: React.FC = () => {
                   },
                 }}
               >
-                <AccessTimeIcon /> Lun - Ven, 8:30 - 13:00 e 14:30 - 18:30
+                <AccessTimeIcon /> {t("landingPage.workingHours")}
               </Typography>
               <Typography
                 sx={{
@@ -326,7 +326,7 @@ const LandingPage: React.FC = () => {
                   },
                 }}
               >
-                <LocationOnIcon /> Via Alessandro Volta 17, Catania
+                <LocationOnIcon /> {t("landingPage.address")}
               </Typography>
             </Box>
             <Box
@@ -408,7 +408,7 @@ const LandingPage: React.FC = () => {
                 },
               }}
             >
-              credits: @2024
+              {t("landingPage.credits")}
             </Typography>
           </Box>
         </Container>

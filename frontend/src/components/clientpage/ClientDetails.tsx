@@ -1,19 +1,21 @@
-import React from "react";
+// src/components/clientpage/ClientDetails.tsx
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
-  Paper,
   Box,
   Collapse,
   Grid,
-  Typography,
   IconButton,
-  useTheme,
+  Paper,
+  Typography,
   useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import DetailComponent from "./DetailComponent";
+import React from "react";
+import { useTranslation } from "react-i18next";
 import { ClientDetailsProps } from "../../models/models";
 import MovementsHistory from "../statistics/grids/MovementsHistory";
+import DetailComponent from "./DetailComponent";
 
 const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
   (
@@ -25,6 +27,7 @@ const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
     },
     ref
   ) => {
+    const { t } = useTranslation();
     const theme = useTheme();
     const isMobile = useMediaQuery("(max-width:600px)");
 
@@ -72,7 +75,9 @@ const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
                 alignItems="center"
               >
                 <Grid item>
-                  <Typography variant="h2">Client Details</Typography>
+                  <Typography variant="h2">
+                    {t('clientDetails.title')}
+                  </Typography>
                 </Grid>
                 <Grid item>
                   <IconButton

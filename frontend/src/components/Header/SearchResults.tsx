@@ -1,15 +1,16 @@
-// src/components/common/SearchResults.tsx
-import React, { useEffect, useRef } from "react";
-import { SearchResultsProps } from "../../models/models";
 import { Card, CardContent, Typography } from "@mui/material";
-import "./SearchResults.module.css";
+import React, { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { SearchResultsProps } from "../../models/models";
 import { generateRandomString } from "../../utils/constants";
+import "./SearchResults.module.css";
 
 const SearchResults: React.FC<SearchResultsProps> = ({
   onSelect,
   selectedIndex,
   results,
 }) => {
+  const { t } = useTranslation();
   const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,9 +23,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       }
     }
   }, [selectedIndex]);
-
-  /* console.log("SearchResults render - Results:", results);
-  console.log("SearchResults render - Selected Index:", selectedIndex); */
 
   return (
     <div className="search-results" ref={resultsRef}>
@@ -43,47 +41,52 @@ const SearchResults: React.FC<SearchResultsProps> = ({
               {result.type === "article" && (
                 <>
                   <Typography variant="body2">
-                    Article ID: {result.articleId}
+                    {t("searchResults.articleId", { articleId: result.articleId })}
                   </Typography>
-                  <Typography variant="body2">Brand: {result.brand}</Typography>
                   <Typography variant="body2">
-                    {" "}
-                    Last Sold: {result.lastSoldDate}
+                    {t("searchResults.brand", { brand: result.brand })}
+                  </Typography>
+                  <Typography variant="body2">
+                    {t("searchResults.lastSoldDate", { lastSoldDate: result.lastSoldDate })}
                   </Typography>
                 </>
               )}
               {result.type === "client" && (
                 <>
                   <Typography variant="body2">
-                    Province: {result.province}
+                    {t("searchResults.province", { province: result.province })}
                   </Typography>
-                  <Typography variant="body2">Phone: {result.phone}</Typography>
                   <Typography variant="body2">
-                    Payment Method: {result.paymentMethod}
+                    {t("searchResults.phone", { phone: result.phone })}
+                  </Typography>
+                  <Typography variant="body2">
+                    {t("searchResults.paymentMethod", { paymentMethod: result.paymentMethod })}
                   </Typography>
                 </>
               )}
               {result.type === "promo" && (
                 <>
                   <Typography variant="body2">
-                    Discount Amount: {result.discountAmount}
+                    {t("searchResults.discountAmount", { discountAmount: result.discountAmount })}
                   </Typography>
                   <Typography variant="body2">
-                    Start Date: {result.startDate}
+                    {t("searchResults.startDate", { startDate: result.startDate })}
                   </Typography>
                   <Typography variant="body2">
-                    End Date: {result.endDate}
+                    {t("searchResults.endDate", { endDate: result.endDate })}
                   </Typography>
                 </>
               )}
-              <Typography variant="body2">Type: {result.type}</Typography>
+              <Typography variant="body2">
+                {t("searchResults.type", { type: result.type })}
+              </Typography>
             </CardContent>
           </Card>
         ))
       ) : (
         <Card className="search-result-item" sx={{ marginBottom: 2 }}>
           <CardContent>
-            <Typography variant="body2">No results found</Typography>
+            <Typography variant="body2">{t("searchResults.noResults")}</Typography>
           </CardContent>
         </Card>
       )}

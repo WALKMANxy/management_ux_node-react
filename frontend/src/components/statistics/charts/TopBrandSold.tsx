@@ -1,12 +1,14 @@
-import React from "react";
-import { Box, Paper, Typography, Divider, Skeleton } from "@mui/material";
+import { Box, Divider, Paper, Skeleton, Typography } from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
+import React from "react";
+import { useTranslation } from "react-i18next";
 
 const TopBrandsSold: React.FC<{
   topBrandsData: any[];
   brandColors: string[];
   isMobile: boolean;
 }> = ({ topBrandsData, brandColors, isMobile }) => {
+  const { t } = useTranslation();
   const loading = topBrandsData.length === 0;
 
   return (
@@ -47,7 +49,7 @@ const TopBrandsSold: React.FC<{
         }}
       >
         <Typography variant="h6" gutterBottom>
-          Top Brands Sold
+          {t("topBrandsSold.title")}
         </Typography>
       </Box>
 

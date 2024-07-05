@@ -1,20 +1,22 @@
-import React from "react";
 import {
+  Box,
+  Button,
   List,
   ListItem,
   ListItemText,
-  Typography,
-  Box,
-  Button,
   Skeleton,
+  Typography,
 } from "@mui/material";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Client, UpcomingVisitsProps, Visit } from "../../models/models";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { UpcomingVisitsProps } from "../../models/models";
 
 const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({
   selectedClient,
   agentDetails,
 }) => {
+  const { t } = useTranslation();
+
   const visits = selectedClient
     ? selectedClient.visits
     : agentDetails?.clients.flatMap((client) => client.visits);
@@ -23,9 +25,9 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({
     <Box mb={4}>
       <Typography variant="h5" gutterBottom>
         {selectedClient ? (
-          `Upcoming Visits for ${selectedClient.name}`
+          t("upcomingVisits.titleForClient", { clientName: selectedClient.name })
         ) : agentDetails ? (
-          "Your Upcoming Visits"
+          t("upcomingVisits.titleForAgent")
         ) : (
           <Skeleton width="50%" />
         )}
@@ -42,13 +44,13 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({
             ) : (
               <>
                 <ListItem>
-                  <ListItemText primary="Visit 1" />
+                  <ListItemText primary={t("upcomingVisits.visitPlaceholder1")} />
                 </ListItem>
                 <ListItem>
-                  <ListItemText primary="Visit 2" />
+                  <ListItemText primary={t("upcomingVisits.visitPlaceholder2")} />
                 </ListItem>
                 <ListItem>
-                  <ListItemText primary="Visit 3" />
+                  <ListItemText primary={t("upcomingVisits.visitPlaceholder3")} />
                 </ListItem>
               </>
             )}
@@ -67,7 +69,7 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({
         color="primary"
         sx={{ mt: 3, borderRadius: "8px" }}
       >
-        Plan Visit
+        {t("upcomingVisits.planVisit")}
       </Button>
     </Box>
   );

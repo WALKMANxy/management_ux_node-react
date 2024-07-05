@@ -1,24 +1,25 @@
-// src/index.tsx
+import "bootstrap/dist/css/bootstrap.min.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { I18nextProvider } from 'react-i18next';
 import { Provider } from "react-redux";
-import store from "./app/store";
 import App from "./App";
-import "bootstrap/dist/css/bootstrap.min.css";
+import store from "./app/store";
 import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
-import "./index.css"
+import i18n from './i18n';
+import "./index.css";
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-
 
 const container = document.getElementById("root");
 const root = ReactDOM.createRoot(container!);
-
 
 root.render(
   <React.StrictMode>
     <ErrorBoundary>
       <Provider store={store}>
-        <App />
+        <I18nextProvider i18n={i18n}>
+          <App />
+        </I18nextProvider>
       </Provider>
     </ErrorBoundary>
   </React.StrictMode>

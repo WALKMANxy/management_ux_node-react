@@ -1,7 +1,7 @@
 // src/hooks/useClearSearchOnNavigate.ts
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { useLocation } from "react-router-dom";
 import { clearResults } from "../features/search/searchSlice";
 
 const useClearSearchOnNavigate = () => {

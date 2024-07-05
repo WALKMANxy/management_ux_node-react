@@ -1,20 +1,20 @@
 // src/App.tsx
+import CssBaseline from "@mui/material/CssBaseline";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import React from "react";
+import { Provider, useSelector } from "react-redux";
 import {
   createBrowserRouter,
-  RouterProvider,
   Navigate,
+  RouterProvider,
 } from "react-router-dom";
-import { Provider, useSelector } from "react-redux";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
 import store, { RootState } from "./app/store";
 import Layout from "./layout/Layout";
-import LandingPage from "./pages/landing/LandingPage";
-import AgentDashboard from "./pages/agent/AgentDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AgentDashboard from "./pages/agent/AgentDashboard";
 import ClientDashboard from "./pages/client/ClientDashboard";
 import ClientsPage from "./pages/common/ClientsPage";
+import LandingPage from "./pages/landing/LandingPage";
 
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);

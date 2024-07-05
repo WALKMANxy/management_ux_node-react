@@ -1,9 +1,7 @@
 // src/components/common/HistoryComponent.tsx
-import React from "react";
 import { List, ListItem, ListItemText } from "@mui/material";
+import React from "react";
 import { HistoryProps } from "../../models/models";
-
-
 
 const HistoryComponent: React.FC<HistoryProps> = ({ history }) => {
   return (

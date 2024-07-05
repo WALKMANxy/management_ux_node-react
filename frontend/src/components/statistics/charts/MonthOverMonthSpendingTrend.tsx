@@ -1,7 +1,8 @@
-import React, { useMemo } from "react";
-import { Box, Paper, Typography, Divider, Skeleton } from "@mui/material";
-import Chart from "react-apexcharts";
+import { Box, Divider, Paper, Skeleton, Typography } from "@mui/material";
 import { ApexOptions } from "apexcharts";
+import React, { useMemo } from "react";
+import Chart from "react-apexcharts";
+import { useTranslation } from "react-i18next";
 import useResizeObserver from "../../../hooks/useResizeObserver";
 import { monthMap } from "../../../utils/constants";
 import { currencyFormatter } from "../../../utils/dataUtils";
@@ -10,6 +11,7 @@ const MonthOverMonthSpendingTrend: React.FC<{
   months: string[];
   revenueData: number[];
 }> = ({ months, revenueData }) => {
+  const { t } = useTranslation();
   const loading = revenueData.length === 0;
   const { containerRef, dimensions } = useResizeObserver();
 
@@ -88,11 +90,11 @@ const MonthOverMonthSpendingTrend: React.FC<{
   const series = useMemo(
     () => [
       {
-        name: "Revenue",
+        name: t("monthOverMonthSpendingTrend.revenue"),
         data: data.map((d) => d.revenue),
       },
     ],
-    [data]
+    [data, t]
   );
 
   return (
@@ -115,7 +117,7 @@ const MonthOverMonthSpendingTrend: React.FC<{
         }}
       >
         <Typography variant="h6" gutterBottom>
-          Month Over Month Spending Trend
+          {t("monthOverMonthSpendingTrend.title")}
         </Typography>
       </Box>
       <Divider sx={{ my: 1, borderRadius: "8px" }} />

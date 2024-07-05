@@ -1,8 +1,8 @@
 // src/layout/Layout.tsx
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Header from "../components/Header/Header";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
 
 const Layout: React.FC = () => {
   const location = useLocation();

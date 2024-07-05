@@ -1,11 +1,11 @@
 // src/hooks/useClientDetails.ts
-import { useEffect, useState, useMemo } from "react";
-import { Client } from "../models/models";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
+import { Client } from "../models/models";
 import {
-  calculateTopBrandsData,
   calculateSalesDistributionData,
+  calculateTopBrandsData,
 } from "../utils/dataUtils";
 
 const useClientDetails = (clientName: string | null) => {

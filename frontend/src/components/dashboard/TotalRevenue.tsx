@@ -1,12 +1,15 @@
 // src/components/TotalEarning.tsx
-import React from "react";
-import { Typography, Paper, Box, Avatar, Grid } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import { currencyFormatter } from "../../utils/dataUtils";
+import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import React from "react";
 import { TotalEarningProps } from "../../models/models";
+import { currencyFormatter } from "../../utils/dataUtils";
+import { useTranslation } from "react-i18next";
 
 const TotalEarning: React.FC<TotalEarningProps> = ({ totalEarning }) => {
+  const { t } = useTranslation();
+
   const theme = useTheme();
   const formattedEarning = currencyFormatter(totalEarning);
 
@@ -105,7 +108,7 @@ const TotalEarning: React.FC<TotalEarningProps> = ({ totalEarning }) => {
                 color: "#000",
               }}
             >
-              Total Earning
+              {t("dashboard.totalEarning")}
             </Typography>
           </Grid>
         </Grid>

@@ -1,13 +1,15 @@
 // src/components/common/SpentThisMonth.tsx
-import React from "react";
-import { Typography, Paper, Box, Avatar, Grid } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import { currencyFormatter } from "../../utils/dataUtils"; // Import the currency formatter
+import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import React from "react";
+import { useTranslation } from "react-i18next";
 import { SpentThisMonthProps } from "../../models/models";
+import { currencyFormatter } from "../../utils/dataUtils"; // Import the currency formatter
 
 const SpentThisMonth: React.FC<SpentThisMonthProps> = ({ amount }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   const formattedAmount = currencyFormatter(parseFloat(amount));
 
@@ -60,7 +62,7 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({ amount }) => {
                 >
                   <img
                     src="/money.svg"
-                    alt="Spent Icon"
+                    alt={t('spentThisMonth.iconAlt')}
                     style={{ width: "100%", height: "100%" }}
                   />
                 </Avatar>
@@ -106,7 +108,7 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({ amount }) => {
                 color: "#000",
               }}
             >
-              Spent This Month
+              {t('spentThisMonth.title')}
             </Typography>
           </Grid>
         </Grid>

@@ -1,8 +1,8 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Client, ClientsState } from "../../models/models";
 import {
-  loadJsonData,
   loadClientDetailsData,
+  loadJsonData,
   mapDataToModels,
 } from "../../utils/dataLoader";
 

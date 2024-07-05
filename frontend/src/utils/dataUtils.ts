@@ -1,6 +1,5 @@
 // src/utils/dataUtils.ts
-import { Client } from "../models/models";
-import { Movement } from "../models/models";
+import { Client, Movement } from "../models/models";
 
 export const calculateTotalRevenue = (clients: Client[]): string => {
   return clients

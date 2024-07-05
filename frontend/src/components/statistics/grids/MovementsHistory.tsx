@@ -1,26 +1,28 @@
-// src/components/common/MovementsHistory.tsx
+import { Box, Paper } from "@mui/material";
 import React, { useMemo } from "react";
-import { Paper, Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { MovementsHistoryProps } from "../../../models/models";
 import { currencyFormatter, numberComparator } from "../../../utils/dataUtils";
 import AGGridTable from "./AGGridTable";
 
 const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
+  const { t } = useTranslation();
+
   const columnDefinitions = useMemo(
     () => [
       {
-        headerName: "Date",
+        headerName: t("movementsHistory.date"),
         field: "dateOfOrder",
         sortable: true,
       },
       {
-        headerName: "Brand",
+        headerName: t("movementsHistory.brand"),
         valueGetter: (params: any) =>
           params.data.details.length > 0 ? params.data.details[0].brand : "",
         sortable: true,
       },
       {
-        headerName: "OEM ID",
+        headerName: t("movementsHistory.oemId"),
         valueGetter: (params: any) =>
           params.data.details.length > 0
             ? params.data.details[0].articleId
@@ -28,13 +30,13 @@ const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
         sortable: true,
       },
       {
-        headerName: "Name",
+        headerName: t("movementsHistory.name"),
         valueGetter: (params: any) =>
           params.data.details.length > 0 ? params.data.details[0].name : "",
         sortable: true,
       },
       {
-        headerName: "Revenue",
+        headerName: t("movementsHistory.revenue"),
         valueGetter: (params: any) =>
           params.data.details.length > 0
             ? parseFloat(params.data.details[0].priceSold)
@@ -44,7 +46,7 @@ const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
         sortable: true,
       },
       {
-        headerName: "Cost",
+        headerName: t("movementsHistory.cost"),
         valueGetter: (params: any) =>
           params.data.details.length > 0
             ? parseFloat(params.data.details[0].priceBought)
@@ -54,7 +56,7 @@ const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
         sortable: true,
       },
     ],
-    []
+    [t]
   );
 
   return (

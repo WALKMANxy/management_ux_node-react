@@ -1,19 +1,22 @@
-import React from "react";
+// src/components/ActivePromotions.tsx
 import {
+  Box,
+  Button,
   List,
   ListItem,
   ListItemText,
-  Typography,
-  Box,
-  Button,
   Skeleton,
+  Typography,
 } from "@mui/material";
+import React from "react";
+import { useTranslation } from "react-i18next";
 import { ActivePromotionsProps } from "../../models/models";
 
 const ActivePromotions: React.FC<ActivePromotionsProps> = ({
   selectedClient,
   agentDetails,
 }) => {
+  const { t } = useTranslation();
   const promos = selectedClient
     ? selectedClient.promos
     : agentDetails?.clients.flatMap((client) => client.promos);
@@ -22,9 +25,9 @@ const ActivePromotions: React.FC<ActivePromotionsProps> = ({
     <Box>
       <Typography variant="h5" gutterBottom>
         {selectedClient ? (
-          `Active Promotions for ${selectedClient.name}`
+          `${t('promotions.activePromotionsFor')} ${selectedClient.name}`
         ) : agentDetails ? (
-          "Active Promotions with Your Clients"
+          t('promotions.activePromotionsWithClients')
         ) : (
           <Skeleton width="50%" />
         )}
@@ -41,13 +44,13 @@ const ActivePromotions: React.FC<ActivePromotionsProps> = ({
             ) : (
               <>
                 <ListItem>
-                  <ListItemText primary="Promo 1" />
+                  <ListItemText primary={t('promotions.promo1')} />
                 </ListItem>
                 <ListItem>
-                  <ListItemText primary="Promo 2" />
+                  <ListItemText primary={t('promotions.promo2')} />
                 </ListItem>
                 <ListItem>
-                  <ListItemText primary="Promo 3" />
+                  <ListItemText primary={t('promotions.promo3')} />
                 </ListItem>
               </>
             )}
@@ -66,7 +69,7 @@ const ActivePromotions: React.FC<ActivePromotionsProps> = ({
         color="primary"
         sx={{ mt: 3, borderRadius: "8px" }}
       >
-        View More
+        {t('promotions.viewMore')}
       </Button>
     </Box>
   );

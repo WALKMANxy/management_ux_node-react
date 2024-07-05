@@ -1,38 +1,38 @@
-//src/pages/agent/AgentDashboard.tsx
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useCallback } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../app/store";
-import useAgentStats from "../../hooks/useAgentStats";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
-  Typography,
-  Grid,
   Button,
-  useMediaQuery,
-  useTheme,
-  Skeleton,
   Divider,
   Fab,
+  Grid,
+  Skeleton,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import CalendarComponent from "../../components/dashboard/CalendarComponent";
-import { setVisits } from "../../features/calendar/calendarSlice";
-import TotalEarning from "../../components/dashboard/TotalRevenue";
-import TotalOrder from "../../components/dashboard/TotalOrders";
-import { brandColors } from "../../utils/constants";
-import UpcomingVisits from "../../components/dashboard/UpcomingVisits";
+import React, { useCallback, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
+import { RootState } from "../../app/store";
 import ActivePromotions from "../../components/dashboard/ActivePromotions";
+import CalendarComponent from "../../components/dashboard/CalendarComponent";
 import SpentThisMonth from "../../components/dashboard/SpentThisMonth";
 import SpentThisYear from "../../components/dashboard/SpentThisYear";
 import TopArticleType from "../../components/dashboard/TopArticleType";
-import { calculateAgentMonthlyData } from "../../utils/dataLoader";
+import TotalOrder from "../../components/dashboard/TotalOrders";
+import TotalEarning from "../../components/dashboard/TotalRevenue";
+import UpcomingVisits from "../../components/dashboard/UpcomingVisits";
 import GlobalSearch from "../../components/Header/GlobalSearch";
 import MonthOverMonthSpendingTrend from "../../components/statistics/charts/MonthOverMonthSpendingTrend";
-import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
 import SalesDistribution from "../../components/statistics/charts/SalesDistribution";
+import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
+import { setVisits } from "../../features/calendar/calendarSlice";
+import useAgentStats from "../../hooks/useAgentStats";
+import { brandColors } from "../../utils/constants";
+import { calculateAgentMonthlyData } from "../../utils/dataLoader";
 
 const AgentDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const loggedInAgentId = useSelector((state: RootState) => state.auth.id);
   const theme = useTheme();
@@ -78,7 +78,7 @@ const AgentDashboard: React.FC = () => {
     >
       <Typography variant="h4" gutterBottom>
         {agentDetails ? (
-          <>Welcome back, {agentDetails.name}</>
+          <>{t("agentDashboard.welcomeBack", { name: agentDetails.name })}</>
         ) : (
           <Skeleton width="30%" />
         )}
@@ -99,7 +99,7 @@ const AgentDashboard: React.FC = () => {
           {selectedClient ? (
             <Box mb={4}>
               <Typography variant="h5" gutterBottom>
-                Statistics for {selectedClient.name}
+                {t("agentDashboard.statisticsFor", { name: selectedClient.name })}
               </Typography>
 
               <Grid container spacing={2}>
@@ -143,7 +143,7 @@ const AgentDashboard: React.FC = () => {
                 color="primary"
                 sx={{ mt: 3, borderRadius: "8px" }}
               >
-                View More
+                {t("agentDashboard.viewMore")}
               </Button>
               <Fab
                 color="secondary"
@@ -157,7 +157,7 @@ const AgentDashboard: React.FC = () => {
           ) : (
             <Box mb={4}>
               <Typography variant="h5" gutterBottom>
-                {agentDetails ? "Your Statistics" : <Skeleton width="40%" />}
+                {agentDetails ? t("agentDashboard.yourStatistics") : <Skeleton width="40%" />}
               </Typography>
 
               <Divider sx={{ my: 2, borderRadius: "12px" }} />
@@ -257,7 +257,7 @@ const AgentDashboard: React.FC = () => {
         <Grid item xs={12} md={3}>
           <Box mb={4}>
             <Typography variant="h5" gutterBottom>
-              {agentDetails ? "Calendar" : <Skeleton width="30%" />}
+              {agentDetails ? t("agentDashboard.calendar") : <Skeleton width="30%" />}
             </Typography>
 
             <Divider sx={{ my: 2, borderRadius: "12px" }} />

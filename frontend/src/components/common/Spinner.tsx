@@ -1,6 +1,6 @@
 // src/components/common/Spinner.tsx
+import { Box, CircularProgress } from "@mui/material";
 import React from "react";
-import { CircularProgress, Box } from "@mui/material";
 
 const Spinner: React.FC = () => (
   <Box

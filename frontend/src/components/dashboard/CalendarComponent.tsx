@@ -1,13 +1,13 @@
 // src/components/common/CalendarComponent.tsx
-import React from "react";
+import { Paper } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { DayCalendarSkeleton } from "@mui/x-date-pickers/DayCalendarSkeleton";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import dayjs from "dayjs";
+import React from "react";
 import { useSelector } from "react-redux";
 import { selectVisits } from "../../features/calendar/calendarSlice";
-import dayjs from "dayjs";
-import { Paper } from "@mui/material";
 import ServerDay from "./ServerDay";
 
 const CalendarComponent: React.FC = () => {

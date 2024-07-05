@@ -1,19 +1,19 @@
-import React from "react";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined";
 import {
-  Typography,
-  Paper,
-  Box,
   Avatar,
-  Grid,
+  Box,
   Button,
+  Grid,
+  Paper,
+  Typography,
   useMediaQuery,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined";
+import React from "react";
+import { useTranslation } from "react-i18next";
 import Chart from "react-apexcharts";
 import { ChartData } from "../../utils/constants";
-
 
 interface TotalOrderProps {
   totalOrder: number;
@@ -32,6 +32,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
   monthlyCategories,
   yearlyCategories,
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [timeValue, setTimeValue] = React.useState(true); // Initialize with "month" chart
@@ -110,7 +111,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
                   }}
                   onClick={(e) => handleChangeTime(e, true)}
                 >
-                  Month
+                  {t('totalOrder.month')}
                 </Button>
                 <Button
                   disableElevation
@@ -127,7 +128,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
                   }}
                   onClick={(e) => handleChangeTime(e, false)}
                 >
-                  Year
+                  {t('totalOrder.year')}
                 </Button>
               </Grid>
             </Grid>
@@ -184,7 +185,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
                         color: "#000",
                       }}
                     >
-                      Total Orders
+                      {t('totalOrder.totalOrders')}
                     </Typography>
                   </Grid>
                 </Grid>

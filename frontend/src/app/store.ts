@@ -2,13 +2,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import authReducer from "../features/auth/authSlice";
-import searchReducer from "../features/search/searchSlice";
+import calendarReducer from "../features/calendar/calendarSlice";
+import clientsReducer from "../features/clients/clientsSlice";
 import dataReducer, { fetchData } from "../features/data/dataSlice";
-import calendarReducer from '../features/calendar/calendarSlice';
-import clientsReducer from '../features/clients/clientsSlice';
-
+import searchReducer from "../features/search/searchSlice";
 import { api } from "../services/api";
-
 
 const store = configureStore({
   reducer: {

@@ -1,8 +1,8 @@
 //src/components/common/Loader.tsx
-import React, { useEffect, useState } from "react";
-import { CircularProgress, Box } from "@mui/material";
-import styled from "@emotion/styled";
 import { css } from "@emotion/react";
+import styled from "@emotion/styled";
+import { Box, CircularProgress } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { fadeOut } from "../../utils/constants";
 
 // Styled Box component with Emotion

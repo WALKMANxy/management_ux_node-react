@@ -1,11 +1,11 @@
 // src/components/common/AGGridTable.tsx
-import { forwardRef } from "react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { AgGridReact } from "ag-grid-react";
-import "../grids/AGGridTable.css";
+import { forwardRef } from "react";
 import { AGGridTableProps } from "../../../models/models";
 import { paginationPageSizeSelector } from "../../../utils/constants";
+import "../grids/AGGridTable.css";
 
 const AGGridTable = forwardRef<AgGridReact, AGGridTableProps>(
   ({ columnDefs, rowData, quickFilterText }, ref) => {
