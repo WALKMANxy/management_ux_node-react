@@ -1,3 +1,4 @@
+//src/pages/common/ClientsPage.tsx
 import React, { useMemo } from "react";
 import { Box, useMediaQuery } from "@mui/material";
 import ClientDetails from "../../components/clientpage/ClientDetails";

@@ -1,99 +1,11 @@
 import axios from "axios";
 import { Client, Agent, MovementDetail } from "../models/models";
-import { format, parseISO } from "date-fns"; // Import date-fns for date formatting
+import { format, parseISO } from "date-fns";
 
 const jsonFilePath = "/datasetsfrom01JANto12JUN.json";
 const clientDetailsFilePath = "/clientdetailsdataset02072024.json";
 
-// Web worker script for clients
-const workerScript = `
-self.onmessage = function(event) {
-  const { data, clientDetails } = event.data;
-
-  const clientsMap = new Map();
-  data.forEach(item => {
-    const clientId = item["Codice Cliente"].toString();
-    if (!clientsMap.has(clientId)) {
-      clientsMap.set(clientId, []);
-    }
-    clientsMap.get(clientId).push(item);
-  });
-
-  const clients = Array.from(clientsMap.values()).map(clientData => {
-    const clientInfo = clientData[0];
-
-    const clientDetail = clientDetails.find(detail => detail["CODICE"] === clientInfo["Codice Cliente"].toString());
-
-    if (clientDetail) {
-      //console.log('Client Detail found:', clientDetail);
-    } else {
-      console.warn('Client Detail not found for:', clientInfo["Codice Cliente"]);
-    }
-
-    const movementsMap = new Map();
-    clientData.forEach(item => {
-      const movementId = item["Numero Lista"].toString();
-      if (!movementsMap.has(movementId)) {
-        movementsMap.set(movementId, []);
-      }
-      movementsMap.get(movementId).push(item);
-    });
-
-    const movements = Array.from(movementsMap.values()).map(movementData => {
-      const movementInfo = movementData[0];
-      return {
-        id: movementInfo["Numero Lista"].toString(),
-        discountCategory: movementInfo["Categoria Sconto Vendita"],
-        details: movementData.map(item => ({
-          articleId: item["Codice Articolo"].toString(),
-          name: item["Descrizione Articolo"],
-          brand: item["Marca Articolo"],
-          priceSold: parseFloat(item["Valore"]).toFixed(2),
-          priceBought: parseFloat(item["Costo"]).toFixed(2)
-        })),
-        unpaidAmount: "",
-        paymentDueDate: "",
-        dateOfOrder: movementInfo["Data Documento Precedente"].split('T')[0]
-      };
-    });
-
-    const totalRevenue = movements.reduce((acc, movement) => {
-      return acc + movement.details.reduce((sum, detail) => sum + parseFloat(detail.priceSold), 0);
-    }, 0).toFixed(2);
-
-    const client = {
-      id: clientInfo["Codice Cliente"].toString(),
-      name: clientInfo["Ragione Sociale Cliente"],
-      province: clientDetail ? clientDetail["C.A.P. - COMUNE (PROV.)"] : "",
-      phone: clientDetail ? clientDetail["TELEFONO"] : "",
-      totalOrders: movementsMap.size,
-      totalRevenue,
-      unpaidRevenue: "",
-      address: clientDetail ? clientDetail["INDIRIZZO"] : "",
-      email: clientDetail ? clientDetail["EMAIL"] : "",
-      pec: clientDetail ? clientDetail["EMAIL PEC"] : "",
-      taxCode: clientDetail ? clientDetail["PARTITA IVA"] : "",
-      extendedTaxCode: clientDetail ? clientDetail["CODICE FISCALE"] : "",
-      paymentMethodID: clientDetail ? clientDetail["MP"] : "",
-      paymentMethod: clientDetail ? clientDetail["Descizione metodo pagamento"] : "",
-      visits: [],
-      agent: clientInfo["Codice Agente"].toString(),
-      movements,
-      promos: []
-    };
-
-    //console.log('Processed client:', client);
-
-    return client;
-  });
-
-  self.postMessage(clients);
-};
-`;
-
-// Create a Blob URL for the worker script
-const blob = new Blob([workerScript], { type: "application/javascript" });
-const workerUrl = URL.createObjectURL(blob);
+const workerScriptPath = new URL("./worker.js", import.meta.url);
 
 const getMonthYear = (dateString: string) => {
   const date = parseISO(dateString);
@@ -124,28 +36,59 @@ export const loadClientDetailsData = async (
   }
 };
 
+/**
+ * Chunks an array into smaller arrays of a specified size.
+ * @param {Array<T>} array - The array to be chunked.
+ * @param {number} chunkSize - The size of each chunk.
+ * @returns {Array<Array<T>>} - An array of arrays, where each inner array
+ * contains `chunkSize` elements from the original array.
+ */
+const chunkArray = <T>(array: T[], chunkSize: number): T[][] => {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
+};
+
+/**
+ * Maps the given data and client details to a list of Client models.
+ *
+ * @param data - The data to map, typed as an array of any.
+ * @param clientDetails - The client details to map, typed as an array of any.
+ * @returns A Promise that resolves to an array of Client models.
+ */
 export const mapDataToModels = async (
   data: any[],
   clientDetails: any[]
 ): Promise<Client[]> => {
-  return new Promise((resolve, reject) => {
-    const worker = new Worker(workerUrl);
+  const numWorkers = navigator.hardwareConcurrency || 4;
+  const chunks = chunkArray(data, Math.ceil(data.length / numWorkers));
 
-    //console.log('Sending data to worker:', { data, clientDetails });
+  return new Promise<Client[]>((resolve, reject) => {
+    const workers: Worker[] = chunks.map((chunk) => new Worker(workerScriptPath));
+    const results: Client[] = [];
+    let completed = 0;
 
-    worker.postMessage({ data, clientDetails });
+    workers.forEach((worker, index) => {
+      worker.postMessage({ data: chunks[index], clientDetails });
 
-    worker.onmessage = function (event) {
-      //console.log('Received data from worker:', event.data);
-      resolve(event.data);
-      worker.terminate();
-    };
+      worker.onmessage = (event: MessageEvent<Client[]>) => {
+        results.push(...event.data);
+        completed += 1;
+        worker.terminate();
 
-    worker.onerror = function (error) {
-      console.error("Worker error:", error);
-      reject(error);
-      worker.terminate();
-    };
+        if (completed === workers.length) {
+          resolve(results);
+        }
+      };
+
+      worker.onerror = (error: ErrorEvent) => {
+        console.error("Worker error:", error);
+        reject(error);
+        worker.terminate();
+      };
+    });
   });
 };
 
@@ -249,7 +192,6 @@ export const calculateMonthlyData = (clients: Client[]) => {
   return { months, revenueData, ordersData };
 };
 
-// Calculate monthly data for a specific agent
 export const calculateAgentMonthlyData = (clients: Client[]) => {
   const monthlyData = clients.reduce((acc, client) => {
     client.movements.forEach((movement) => {
