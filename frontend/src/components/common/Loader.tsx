@@ -55,7 +55,7 @@ const Loader: React.FC = () => {
         }}
       >
         <img
-          src="/logo-appbar.png"
+          src="/images/logo-appbar.png"
           alt="RCS Logo"
           style={{ height: "60%", marginBottom: "10%" }}
         />

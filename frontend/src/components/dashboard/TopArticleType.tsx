@@ -67,7 +67,7 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {
                     }}
                   >
                     <img
-                      src="/garage.svg"
+                      src="/icons/garage.svg"
                       alt={t('topArticleType.iconAlt')}
                       style={{ width: "100%", height: "100%" }}
                     />

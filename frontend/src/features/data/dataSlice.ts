@@ -18,8 +18,8 @@ export const fetchData = createAsyncThunk<FetchDataPayload>(
   "data/fetchData",
   async () => {
     const [data, clientDetails] = await Promise.all([
-      loadJsonData("/datasetsfrom01JANto12JUN.min.json"),
-      loadClientDetailsData("/clientdetailsdataset02072024.min.json"),
+      loadJsonData("/data/datasetsfrom01JANto12JUN.min.json"),
+      loadClientDetailsData("/data/clientdetailsdataset02072024.min.json"),
     ]);
     const clients = await mapDataToModels(data, clientDetails);
 

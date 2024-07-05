@@ -92,7 +92,7 @@ const LandingPage: React.FC = () => {
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <AppBar position="static" sx={{ backgroundColor: "black" }}>
         <Toolbar sx={{ justifyContent: "space-between" }}>
-          <img src="/logo-appbar.png" alt="Logo" style={{ height: "40px" }} />
+          <img src="/images/logo-appbar.png" alt="Logo" style={{ height: "40px" }} />
           <Button color="inherit" onClick={() => setShowLogin(!showLogin)}>
             {isLoggedIn ? t("landingPage.enter") : t("landingPage.login")}
           </Button>
@@ -202,7 +202,7 @@ const LandingPage: React.FC = () => {
             }}
           >
             <img
-              src="/logobig.png"
+              src="/images/logobig.png"
               alt="Welcome Logo"
               style={{ width: "100%", height: "auto" }}
             />

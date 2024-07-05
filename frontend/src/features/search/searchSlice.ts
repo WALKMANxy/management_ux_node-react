@@ -31,10 +31,10 @@ export const searchItems = createAsyncThunk<
       //console.log(`Searching for query: ${query} with filter: ${filter}`);
 
       const movementData: Movement[] = await loadJsonData(
-        "/datasetsfrom01JANto12JUN.min.json"
+        "/data/datasetsfrom01JANto12JUN.min.json"
       );
       const clientDetails = await loadClientDetailsData(
-        "/clientdetailsdataset02072024.min.json"
+        "/data/clientdetailsdataset02072024.min.json"
       );
       const clients = await mapDataToModels(movementData, clientDetails);
 

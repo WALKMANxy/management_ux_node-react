@@ -61,7 +61,7 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({ amount }) => {
                   }}
                 >
                   <img
-                    src="/money.svg"
+                    src="/icons/money.svg"
                     alt={t('spentThisMonth.iconAlt')}
                     style={{ width: "100%", height: "100%" }}
                   />

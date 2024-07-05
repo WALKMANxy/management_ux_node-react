@@ -59,7 +59,7 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({ amount }) => {
                   }}
                 >
                   <img
-                    src="/moneybag.svg"
+                    src="/icons/moneybag.svg"
                     alt={t('spentThisYear.iconAlt')}
                     style={{ width: "100%", height: "100%" }}
                   />

@@ -171,7 +171,7 @@ const Header: React.FC = () => {
             </IconButton>
           </Fade>
           <img
-            src="/logo-appbar.png"
+            src="/images/logo-appbar.png"
             alt="Logo"
             style={{ height: "40px", marginRight: "16px", cursor: "pointer" }}
             onClick={handleLogoClick}
@@ -221,7 +221,7 @@ const Header: React.FC = () => {
               <CloseIcon />
             </IconButton>
             <img
-              src="/logo-appbar.png"
+              src="/images/logo-appbar.png"
               alt="Logo"
               style={{ height: "40px", marginLeft: "8px", cursor: "pointer" }}
               onClick={handleLogoClick}

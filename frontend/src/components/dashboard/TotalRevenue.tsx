@@ -61,7 +61,7 @@ const TotalEarning: React.FC<TotalEarningProps> = ({ totalEarning }) => {
                   }}
                 >
                   <img
-                    src="/earning.svg"
+                    src="/icons/earning.svg"
                     alt="Earning Icon"
                     style={{ width: "100%", height: "100%" }}
                   />

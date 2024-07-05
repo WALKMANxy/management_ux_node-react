@@ -2,8 +2,8 @@ import axios from "axios";
 import { format, parseISO } from "date-fns";
 import { Agent, Client, MovementDetail } from "../models/models";
 
-const jsonFilePath = "/datasetsfrom01JANto12JUN.min.json";
-const clientDetailsFilePath = "/clientdetailsdataset02072024.min.json";
+const jsonFilePath = "/data/datasetsfrom01JANto12JUN.min.json";
+const clientDetailsFilePath = "/data/clientdetailsdataset02072024.min.json";
 
 const workerScriptPath = new URL("./worker.js", import.meta.url);
 
