@@ -91,7 +91,8 @@
     "revenue": "Entrate"
   },
   "topBrandsSold": {
-    "title": "Marche Più Vendute",
+    "titleAgent": "Marche più vendute",
+    "titleClient": "Marche più acquistate",
     "brandLabel": "Marca"
   },
   "clientList": {
@@ -120,7 +121,11 @@
     "spentThisMonth": "Speso Questo Mese",
     "spentThisYear": "Speso Quest'Anno",
     "topArticleType": "Articoli più Acquistati",
-    "monthOverMonthSpendingTrend": "Trend Spesa Mensile",
+    "monthOverMonthSpendingTrend": {
+      "title": "Andamento delle spese mensili",
+      "revenue": "Entrate",
+      "expense": "Spese"
+    },
     "topBrandsSold": "Marche Più Vendute",
     "salesDistribution": "Distribuzione delle Vendite tra i Clienti",
     "upcomingVisits": "Visite in Arrivo per {{name}}"

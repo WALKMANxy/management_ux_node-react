@@ -1,161 +1,165 @@
 {
-    "welcome": "Willkommen",
-    "login": "Anmelden",
-    "logout": "Abmelden",
-    "headerDashboard": "Instrumententafel",
-    "clients": "Kunden",
-    "visits": "Besuche",
-    "statistics": "Statistiken",
-    "promos": "Werbeaktionen",
-    "alerts": "Warnungen",
-    "notifications": "Benachrichtigungen",
-    "no_notifications": "Keine neuen Benachrichtigungen",
-    "clientDetails": {
-      "title": "Kundendetails"
-    },
-    "details": {
-      "name": "Name",
-      "phone": "Telefonnummer",
-      "totalRevenue": "Gesamteinnahmen",
-      "pec": "E-Mail PEC",
-      "extendedTaxCode": "Zusätzliche Steuerkennziffer",
-      "paymentMethod": "Zahlungsmethode",
-      "province": "Standort",
-      "totalOrders": "Gesamtaufträge",
-      "unpaidRevenue": "Unbezahlte Einnahmen",
-      "email": "E-Mail",
-      "taxCode": "Steuerkennziffer",
-      "paymentMethodID": "PMID",
-      "address": "Adresse",
-      "agent": "Agent"
-    },
-    "promotions": {
-      "activePromotionsFor": "Aktive Werbeaktionen für",
-      "activePromotionsWithClients": "Aktive Werbeaktionen mit Ihren Kunden",
-      "promo1": "Promo 1",
-      "promo2": "Promo 2",
-      "promo3": "Promo 3",
-      "viewMore": "Mehr anzeigen"
-    },
-    "spentThisMonth": {
-      "title": "In diesem Monat ausgegeben",
-      "iconAlt": "Ausgaben-Symbol"
-    },
-    "spentThisYear": {
-      "title": "In diesem Jahr ausgegeben",
-      "iconAlt": "Ausgaben-Symbol"
-    },
-    "topArticleType": {
-      "title": "Am häufigsten gekaufte Artikel",
-      "iconAlt": "Artikel-Symbol",
-      "amountPurchased": "Gekaufte Menge"
-    },
-    "totalOrder": {
-      "month": "Monat",
-      "year": "Jahr",
-      "totalOrders": "Gesamtaufträge"
-    },
-    "dashboard": {
-      "totalEarning": "Gesamteinnahmen"
-    },
-    "upcomingVisits": {
-      "titleForClient": "Bevorstehende Besuche für {{clientName}}",
-      "titleForAgent": "Ihre bevorstehenden Besuche",
-      "visitPlaceholder1": "Besuch 1",
-      "visitPlaceholder2": "Besuch 2",
-      "visitPlaceholder3": "Besuch 3",
-      "planVisit": "Besuch planen"
-    },
-    "globalSearch": {
-      "placeholder": "Suchen..."
-    },
-    "searchResults": {
-      "articleId": "Artikel OEM: {{articleId}}",
-      "brand": "Marke: {{brand}}",
-      "lastSoldDate": "Zuletzt verkauft: {{lastSoldDate}}",
-      "province": "Provinz: {{province}}",
-      "phone": "Telefon: {{phone}}",
-      "paymentMethod": "Zahlungsmethode: {{paymentMethod}}",
-      "discountAmount": "Rabattbetrag: {{discountAmount}}",
-      "startDate": "Startdatum: {{startDate}}",
-      "endDate": "Enddatum: {{endDate}}",
-      "type": "Typ: {{type}}",
-      "noResults": "Keine Ergebnisse gefunden"
-    },
+  "welcome": "Willkommen",
+  "login": "Anmelden",
+  "logout": "Abmelden",
+  "headerDashboard": "Instrumententafel",
+  "clients": "Kunden",
+  "visits": "Besuche",
+  "statistics": "Statistiken",
+  "promos": "Werbeaktionen",
+  "alerts": "Warnungen",
+  "notifications": "Benachrichtigungen",
+  "no_notifications": "Keine neuen Benachrichtigungen",
+  "clientDetails": {
+    "title": "Kundendetails"
+  },
+  "details": {
+    "name": "Name",
+    "phone": "Telefonnummer",
+    "totalRevenue": "Gesamteinnahmen",
+    "pec": "E-Mail PEC",
+    "extendedTaxCode": "Zusätzliche Steuerkennziffer",
+    "paymentMethod": "Zahlungsmethode",
+    "province": "Standort",
+    "totalOrders": "Gesamtaufträge",
+    "unpaidRevenue": "Unbezahlte Einnahmen",
+    "email": "E-Mail",
+    "taxCode": "Steuerkennziffer",
+    "paymentMethodID": "PMID",
+    "address": "Adresse",
+    "agent": "Agent"
+  },
+  "promotions": {
+    "activePromotionsFor": "Aktive Werbeaktionen für",
+    "activePromotionsWithClients": "Aktive Werbeaktionen mit Ihren Kunden",
+    "promo1": "Promo 1",
+    "promo2": "Promo 2",
+    "promo3": "Promo 3",
+    "viewMore": "Mehr anzeigen"
+  },
+  "spentThisMonth": {
+    "title": "In diesem Monat ausgegeben",
+    "iconAlt": "Ausgaben-Symbol"
+  },
+  "spentThisYear": {
+    "title": "In diesem Jahr ausgegeben",
+    "iconAlt": "Ausgaben-Symbol"
+  },
+  "topArticleType": {
+    "title": "Am häufigsten gekaufte Artikel",
+    "iconAlt": "Artikel-Symbol",
+    "amountPurchased": "Gekaufte Menge"
+  },
+  "totalOrder": {
+    "month": "Monat",
+    "year": "Jahr",
+    "totalOrders": "Gesamtaufträge"
+  },
+  "dashboard": {
+    "totalEarning": "Gesamteinnahmen"
+  },
+  "upcomingVisits": {
+    "titleForClient": "Bevorstehende Besuche für {{clientName}}",
+    "titleForAgent": "Ihre bevorstehenden Besuche",
+    "visitPlaceholder1": "Besuch 1",
+    "visitPlaceholder2": "Besuch 2",
+    "visitPlaceholder3": "Besuch 3",
+    "planVisit": "Besuch planen"
+  },
+  "globalSearch": {
+    "placeholder": "Suchen..."
+  },
+  "searchResults": {
+    "articleId": "Artikel OEM: {{articleId}}",
+    "brand": "Marke: {{brand}}",
+    "lastSoldDate": "Zuletzt verkauft: {{lastSoldDate}}",
+    "province": "Provinz: {{province}}",
+    "phone": "Telefon: {{phone}}",
+    "paymentMethod": "Zahlungsmethode: {{paymentMethod}}",
+    "discountAmount": "Rabattbetrag: {{discountAmount}}",
+    "startDate": "Startdatum: {{startDate}}",
+    "endDate": "Enddatum: {{endDate}}",
+    "type": "Typ: {{type}}",
+    "noResults": "Keine Ergebnisse gefunden"
+  },
+  "monthOverMonthSpendingTrend": {
+    "title": "Monatliche Ausgabenentwicklung",
+    "revenue": "Einnahmen"
+  },
+  "salesDistribution": {
+    "title": "Vertriebsverteilung durch Kunden",
+    "revenue": "Einnahmen"
+  },
+  "topBrandsSold": {
+    "titleAgent": "Top-Marken verkauft",
+    "titleClient": "Top-Marken gekauft",
+    "brandLabel": "Marke"
+  },
+  "clientList": {
+    "title": "Kunden",
+    "quickFilterPlaceholder": "Schnellfilter...",
+    "startDate": "Anfangsdatum",
+    "endDate": "Enddatum",
+    "exportCSV": "CSV exportieren"
+  },
+  "movementsHistory": {
+    "date": "Datum",
+    "brand": "Marke",
+    "oemId": "OEM-ID",
+    "name": "Name",
+    "revenue": "Einnahmen",
+    "cost": "Kosten"
+  },
+  "agentDashboard": {
+    "welcomeBack": "Willkommen zurück, {{name}}",
+    "statisticsFor": "Statistiken für {{name}}",
+    "yourStatistics": "Ihre Statistiken",
+    "calendar": "Kalender",
+    "viewMore": "Mehr anzeigen",
+    "totalEarning": "Gesamteinnahmen",
+    "totalOrder": "Gesamtaufträge",
+    "spentThisMonth": "In diesem Monat ausgegeben",
+    "spentThisYear": "In diesem Jahr ausgegeben",
+    "topArticleType": "Am häufigsten gekaufte Artikel",
     "monthOverMonthSpendingTrend": {
-      "title": "Monatliche Ausgabenentwicklung",
-      "revenue": "Einnahmen"
-    },
-    "salesDistribution": {
-      "title": "Vertriebsverteilung durch Kunden",
-      "revenue": "Einnahmen"
-    },
-    "topBrandsSold": {
-      "title": "Top-Verkaufte Marken",
-      "brandLabel": "Marke"
-    },
-    "clientList": {
-      "title": "Kunden",
-      "quickFilterPlaceholder": "Schnellfilter...",
-      "startDate": "Anfangsdatum",
-      "endDate": "Enddatum",
-      "exportCSV": "CSV exportieren"
-    },
-    "movementsHistory": {
-      "date": "Datum",
-      "brand": "Marke",
-      "oemId": "OEM-ID",
-      "name": "Name",
+      "title": "Monatlicher Ausgabenverlauf",
       "revenue": "Einnahmen",
-      "cost": "Kosten"
+      "expense": "Ausgaben"
     },
-    "agentDashboard": {
-      "welcomeBack": "Willkommen zurück, {{name}}",
-      "statisticsFor": "Statistiken für {{name}}",
-      "yourStatistics": "Ihre Statistiken",
-      "calendar": "Kalender",
-      "viewMore": "Mehr anzeigen",
-      "totalEarning": "Gesamteinnahmen",
-      "totalOrder": "Gesamtaufträge",
-      "spentThisMonth": "In diesem Monat ausgegeben",
-      "spentThisYear": "In diesem Jahr ausgegeben",
-      "topArticleType": "Am häufigsten gekaufte Artikel",
-      "monthOverMonthSpendingTrend": "Monatliche Ausgabenentwicklung",
-      "topBrandsSold": "Top-Verkaufte Marken",
-      "salesDistribution": "Vertriebsverteilung durch Kunden",
-      "upcomingVisits": "Bevorstehende Besuche für {{name}}"
-    },
-    "clientsPage": {
-      "name": "Name",
-      "province": "Provinz",
-      "phone": "Telefonnummer",
-      "totalOrders": "Gesamtaufträge",
-      "ordersThisMonth": "Aufträge diesen Monat",
-      "totalRevenue": "Gesamteinnahmen",
-      "revenueThisMonth": "Einnahmen diesen Monat",
-      "unpaidRevenue": "Unbezahlte Einnahmen",
-      "paymentMethod": "Zahlungsmethode"
-    },
-    "landingPage": {
-      "welcome": "Willkommen zurück, {name}",
-      "login": "Anmelden",
-      "enter": "Eintreten",
-      "userRole": "Benutzerrolle",
-      "admin": "Administrator",
-      "agent": "Agent",
-      "client": "Kunde",
-      "selectAgent": "Agent auswählen",
-      "selectClient": "Kunde auswählen",
-      "facebook": "Facebook",
-      "instagram": "Instagram",
-      "googleMaps": "Google Maps",
-      "linkedIn": "LinkedIn",
-      "workingHours": "Mo - Fr, 8:30 - 13:00 und 14:30 - 18:30",
-      "address": "Via Alessandro Volta 17, Catania",
-      "phone": "Telefon",
-      "email": "E-Mail",
-      "vat": "Umsatzsteuer-Identifikationsnummer",
-      "credits": "Credits: @2024"
-    }
+    "topBrandsSold": "Top-Verkaufte Marken",
+    "salesDistribution": "Vertriebsverteilung durch Kunden",
+    "upcomingVisits": "Bevorstehende Besuche für {{name}}"
+  },
+  "clientsPage": {
+    "name": "Name",
+    "province": "Provinz",
+    "phone": "Telefonnummer",
+    "totalOrders": "Gesamtaufträge",
+    "ordersThisMonth": "Aufträge diesen Monat",
+    "totalRevenue": "Gesamteinnahmen",
+    "revenueThisMonth": "Einnahmen diesen Monat",
+    "unpaidRevenue": "Unbezahlte Einnahmen",
+    "paymentMethod": "Zahlungsmethode"
+  },
+  "landingPage": {
+    "welcome": "Willkommen zurück, {name}",
+    "login": "Anmelden",
+    "enter": "Eintreten",
+    "userRole": "Benutzerrolle",
+    "admin": "Administrator",
+    "agent": "Agent",
+    "client": "Kunde",
+    "selectAgent": "Agent auswählen",
+    "selectClient": "Kunde auswählen",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "googleMaps": "Google Maps",
+    "linkedIn": "LinkedIn",
+    "workingHours": "Mo - Fr, 8:30 - 13:00 und 14:30 - 18:30",
+    "address": "Via Alessandro Volta 17, Catania",
+    "phone": "Telefon",
+    "email": "E-Mail",
+    "vat": "Umsatzsteuer-Identifikationsnummer",
+    "credits": "Credits: @2024"
   }
-  
+}

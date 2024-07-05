@@ -106,6 +106,8 @@ const ClientDashboard: React.FC = () => {
                     revenueData={
                       calculateAgentMonthlyData([clientDetails]).revenueData
                     }
+                    userRole="client" // Pass the user role
+
                   />
                 ) : (
                   <Skeleton
@@ -122,6 +124,8 @@ const ClientDashboard: React.FC = () => {
                     topBrandsData={topBrandsData}
                     brandColors={brandColors}
                     isMobile={isMobile}
+                    userRole="client" // Pass the user role
+
                   />
                 ) : (
                   <Skeleton

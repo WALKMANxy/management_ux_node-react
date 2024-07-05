@@ -84,14 +84,16 @@
   },
   "monthOverMonthSpendingTrend": {
     "title": "Monthly Spending Trend",
-    "revenue": "Revenue"
+    "revenue": "Revenue",
+    "expense": "Expense"
   },
   "salesDistribution": {
     "title": "Sales Distribution Through Clients",
     "revenue": "Revenue"
   },
   "topBrandsSold": {
-    "title": "Top Brands Sold",
+    "titleAgent": "Top Brands Sold",
+    "titleClient": "Top Brands Bought",
     "brandLabel": "Brand"
   },
   "clientList": {

@@ -128,6 +128,8 @@ const AgentDashboard: React.FC = () => {
                     revenueData={
                       calculateAgentMonthlyData([selectedClient]).revenueData
                     }
+                    userRole="agent" // Pass the user role
+
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -135,6 +137,8 @@ const AgentDashboard: React.FC = () => {
                     topBrandsData={topBrandsData}
                     brandColors={brandColors}
                     isMobile={isMobile}
+                    userRole="agent" // Pass the user role
+
                   />
                 </Grid>
               </Grid>
@@ -203,6 +207,8 @@ const AgentDashboard: React.FC = () => {
                     <MonthOverMonthSpendingTrend
                       months={months}
                       revenueData={revenueData}
+                      userRole="agent" // Pass the user role
+
                     />
                   ) : (
                     <Skeleton
@@ -220,6 +226,8 @@ const AgentDashboard: React.FC = () => {
                       topBrandsData={topBrandsData}
                       isMobile={isMobile}
                       brandColors={brandColors}
+                      userRole="agent" // Pass the user role
+
                     />
                   ) : (
                     <Skeleton

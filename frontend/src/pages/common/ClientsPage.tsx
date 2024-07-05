@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import ClientDetails from "../../components/clientpage/ClientDetails";
 import ClientList from "../../components/statistics/grids/ClientList";
 import { useClientsGrid } from "../../hooks/useClientGrid";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
 import {
   calculateMonthlyOrders,
   calculateMonthlyRevenue,
@@ -14,8 +16,10 @@ import {
 const ClientsPage: React.FC = () => {
   const { t } = useTranslation();
   const isMobile = useMediaQuery("(max-width:600px)");
+  const userRole = useSelector((state: RootState) => state.auth.userRole);
+  const loggedInClientId = useSelector((state: RootState) => state.auth.id);
+
   const {
-    selectedClient,
     quickFilterText,
     setQuickFilterText,
     startDate,
@@ -118,33 +122,43 @@ const ClientsPage: React.FC = () => {
     [handleClientSelect, t]
   );
 
+  // Extract the logged-in client details from filteredClients
+  const loggedInClientDetails = filteredClients().find(
+    (client) => client.id === loggedInClientId
+  );
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
-      <ClientList
-        quickFilterText={quickFilterText}
-        setQuickFilterText={setQuickFilterText}
-        startDate={startDate}
-        setStartDate={setStartDate}
-        endDate={endDate}
-        setEndDate={setEndDate}
-        filteredClients={filteredClients}
-        columnDefs={columnDefinitions}
-        gridRef={gridRef}
-        handleMenuOpen={handleMenuOpen}
-        handleMenuClose={handleMenuClose}
-        anchorEl={anchorEl}
-        exportDataAsCsv={exportDataAsCsv}
-        isClientListCollapsed={isClientListCollapsed}
-        setClientListCollapsed={setClientListCollapsed}
-        isMobile={isMobile}
-      />
-      <ClientDetails
-        ref={clientDetailsRef}
-        isLoading={false}
-        selectedClient={selectedClient}
-        isClientDetailsCollapsed={isClientDetailsCollapsed}
-        setClientDetailsCollapsed={setClientDetailsCollapsed}
-      />
+      {userRole === "agent" ? (
+        <ClientList
+          quickFilterText={quickFilterText}
+          setQuickFilterText={setQuickFilterText}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+          filteredClients={filteredClients}
+          columnDefs={columnDefinitions}
+          gridRef={gridRef}
+          handleMenuOpen={handleMenuOpen}
+          handleMenuClose={handleMenuClose}
+          anchorEl={anchorEl}
+          exportDataAsCsv={exportDataAsCsv}
+          isClientListCollapsed={isClientListCollapsed}
+          setClientListCollapsed={setClientListCollapsed}
+          isMobile={isMobile}
+        />
+      ) : (
+        loggedInClientDetails && (
+          <ClientDetails
+            ref={clientDetailsRef}
+            isLoading={false}
+            selectedClient={loggedInClientDetails}
+            isClientDetailsCollapsed={isClientDetailsCollapsed}
+            setClientDetailsCollapsed={setClientDetailsCollapsed}
+          />
+        )
+      )}
     </Box>
   );
 };

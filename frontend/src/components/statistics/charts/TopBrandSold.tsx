@@ -7,7 +7,8 @@ const TopBrandsSold: React.FC<{
   topBrandsData: any[];
   brandColors: string[];
   isMobile: boolean;
-}> = ({ topBrandsData, brandColors, isMobile }) => {
+  userRole: "agent" | "client"; // New prop to determine user role
+}> = ({ topBrandsData, brandColors, isMobile, userRole }) => {
   const { t } = useTranslation();
   const loading = topBrandsData.length === 0;
 
@@ -49,7 +50,7 @@ const TopBrandsSold: React.FC<{
         }}
       >
         <Typography variant="h6" gutterBottom>
-          {t("topBrandsSold.title")}
+          {userRole === "agent" ? t("topBrandsSold.titleAgent") : t("topBrandsSold.titleClient")}
         </Typography>
       </Box>
 

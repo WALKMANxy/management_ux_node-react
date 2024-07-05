@@ -3,17 +3,16 @@ import { ApexOptions } from "apexcharts";
 import React, { useMemo } from "react";
 import Chart from "react-apexcharts";
 import { useTranslation } from "react-i18next";
-import useResizeObserver from "../../../hooks/useResizeObserver";
 import { monthMap } from "../../../utils/constants";
 import { currencyFormatter } from "../../../utils/dataUtils";
 
 const MonthOverMonthSpendingTrend: React.FC<{
   months: string[];
   revenueData: number[];
-}> = ({ months, revenueData }) => {
+  userRole: "agent" | "client"; // New prop to determine user role
+}> = ({ months, revenueData, userRole }) => {
   const { t } = useTranslation();
   const loading = revenueData.length === 0;
-  const { containerRef, dimensions } = useResizeObserver();
 
   const data = useMemo(
     () =>
@@ -39,16 +38,19 @@ const MonthOverMonthSpendingTrend: React.FC<{
       },
       yaxis: {
         labels: {
-          formatter: (value: number) => currencyFormatter(value), // Use currency formatter
+          formatter: (value: number) => currencyFormatter(value),
         },
         axisTicks: {
-          show: false, // Disable tick marks on the y-axis
+          show: false,
         },
       },
       dataLabels: { enabled: false },
       tooltip: {
         y: {
-          formatter: (val: number) => currencyFormatter(val), // Use currency formatter
+          formatter: (val: number) => currencyFormatter(val),
+          title: {
+            formatter: () => userRole === "agent" ? t("monthOverMonthSpendingTrend.revenue") : t("monthOverMonthSpendingTrend.expense")
+          }
         },
       },
       fill: {
@@ -63,10 +65,10 @@ const MonthOverMonthSpendingTrend: React.FC<{
         curve: "smooth",
       },
       markers: {
-        size: 3, // Add markers for each data point
+        size: 3,
       },
       grid: {
-        show: true, // Show grid
+        show: true,
         borderColor: "#e0e0e0",
         strokeDashArray: 1,
         xaxis: {
@@ -84,17 +86,17 @@ const MonthOverMonthSpendingTrend: React.FC<{
         palette: "palette2",
       },
     }),
-    [data]
+    [data, t, userRole]
   );
 
   const series = useMemo(
     () => [
       {
-        name: t("monthOverMonthSpendingTrend.revenue"),
+        name: userRole === "agent" ? t("monthOverMonthSpendingTrend.revenue") : t("monthOverMonthSpendingTrend.expense"),
         data: data.map((d) => d.revenue),
       },
     ],
-    [data, t]
+    [data, t, userRole]
   );
 
   return (
@@ -121,7 +123,7 @@ const MonthOverMonthSpendingTrend: React.FC<{
         </Typography>
       </Box>
       <Divider sx={{ my: 1, borderRadius: "8px" }} />
-      <Box ref={containerRef} sx={{ width: "100%", height: "300px" }}>
+      <Box sx={{ width: "100%", height: "300px" }}>
         {loading ? (
           <Skeleton
             variant="rectangular"
@@ -130,13 +132,7 @@ const MonthOverMonthSpendingTrend: React.FC<{
             sx={{ borderRadius: "12px" }}
           />
         ) : (
-          <Chart
-            options={options}
-            series={series}
-            type="area"
-            height={300}
-            width={dimensions.width} // Use the detected width
-          />
+          <Chart options={options} series={series} type="area" height={300} />
         )}
       </Box>
     </Paper>
