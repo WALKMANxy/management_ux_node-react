@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import useGlobalSearch from "../../hooks/useGlobalSearch";
-import { GlobalSearchProps } from "../../models/models";
+import { GlobalSearchProps, SearchResult } from "../../models/models";
 import Spinner from "../common/Spinner";
 import "./GlobalSearch.css";
 import SearchResults from "./SearchResults";
@@ -28,14 +28,13 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
     status, // Add status to the destructured properties
   } = useGlobalSearch(filter);
 
-  const handleSelect = (item: string) => {
+  const handleSelect = (item: SearchResult) => {
     if (onSelect) {
-      onSelect(item);
+      onSelect(item); // Pass the entire item to the callback
     }
     setShowResults(false);
     setSelectedIndex(-1);
   };
-
   return (
     <div ref={searchRef} className="global-search-container">
       <div className="global-search d-flex align-items-center">

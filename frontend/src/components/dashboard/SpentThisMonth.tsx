@@ -1,15 +1,18 @@
-// src/components/common/SpentThisMonth.tsx
+//src/components/dashboard/SpentThisMonth.tsx
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
 import { SpentThisMonthProps } from "../../models/models";
 import { currencyFormatter } from "../../utils/dataUtils"; // Import the currency formatter
 
-const SpentThisMonth: React.FC<SpentThisMonthProps> = ({ amount }) => {
+const SpentThisMonth: React.FC<SpentThisMonthProps> = ({ amount, comparison }) => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const userRole = useSelector((state: RootState) => state.auth.userRole);
 
   const formattedAmount = currencyFormatter(parseFloat(amount));
 
@@ -84,20 +87,22 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({ amount }) => {
                   {formattedAmount}
                 </Typography>
               </Grid>
-              <Grid item>
-                <Avatar
-                  sx={{
-                    cursor: "pointer",
-                    bgcolor: theme.palette.secondary.light,
-                    color: "#000",
-                  }}
-                >
-                  <ArrowUpwardIcon
-                    fontSize="inherit"
-                    sx={{ transform: "rotate3d(1, 1, 1, 45deg)" }}
-                  />
-                </Avatar>
-              </Grid>
+              {userRole === "admin" && comparison && (
+                <Grid item>
+                  <Avatar
+                    sx={{
+                      cursor: "pointer",
+                      bgcolor: comparison.trend === "up" ? theme.palette.success.light : theme.palette.error.light,
+                      color: "#000",
+                    }}
+                  >
+                    <ArrowUpwardIcon
+                      fontSize="inherit"
+                      sx={{ transform: "rotate3d(1, 1, 1, 45deg)" }}
+                    />
+                  </Avatar>
+                </Grid>
+              )}
             </Grid>
           </Grid>
           <Grid item sx={{ mb: 1.25 }}>
@@ -110,6 +115,17 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({ amount }) => {
             >
               {t('spentThisMonth.title')}
             </Typography>
+            {userRole === "admin" && comparison && (
+              <Typography
+                sx={{
+                  fontSize: "1rem",
+                  fontWeight: 400,
+                  color: comparison.trend === "up" ? theme.palette.success.main : theme.palette.error.main,
+                }}
+              >
+                {comparison.value}% {t('comparedToOtherAgents')}
+              </Typography>
+            )}
           </Grid>
         </Grid>
       </Box>

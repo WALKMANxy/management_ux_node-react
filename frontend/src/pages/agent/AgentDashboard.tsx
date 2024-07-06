@@ -30,6 +30,7 @@ import { setVisits } from "../../features/calendar/calendarSlice";
 import useAgentStats from "../../hooks/useAgentStats";
 import { brandColors } from "../../utils/constants";
 import { calculateAgentMonthlyData } from "../../utils/dataLoader";
+import { SearchResult } from "../../models/models";
 
 const AgentDashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -57,8 +58,12 @@ const AgentDashboard: React.FC = () => {
   } = useAgentStats(loggedInAgentId, isMobile);
 
   const handleClientSelect = useCallback(
-    (clientName: string) => {
-      selectClient(clientName);
+    (result: SearchResult) => {
+      if (result.type === "client") {
+        selectClient(result.name);
+      } else {
+        console.error("Selected item is not a client");
+      }
     },
     [selectClient]
   );
@@ -99,7 +104,9 @@ const AgentDashboard: React.FC = () => {
           {selectedClient ? (
             <Box mb={4}>
               <Typography variant="h5" gutterBottom>
-                {t("agentDashboard.statisticsFor", { name: selectedClient.name })}
+                {t("agentDashboard.statisticsFor", {
+                  name: selectedClient.name,
+                })}
               </Typography>
 
               <Grid container spacing={2}>
@@ -129,7 +136,6 @@ const AgentDashboard: React.FC = () => {
                       calculateAgentMonthlyData([selectedClient]).revenueData
                     }
                     userRole="agent" // Pass the user role
-
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -138,7 +144,6 @@ const AgentDashboard: React.FC = () => {
                     brandColors={brandColors}
                     isMobile={isMobile}
                     userRole="agent" // Pass the user role
-
                   />
                 </Grid>
               </Grid>
@@ -161,7 +166,11 @@ const AgentDashboard: React.FC = () => {
           ) : (
             <Box mb={4}>
               <Typography variant="h5" gutterBottom>
-                {agentDetails ? t("agentDashboard.yourStatistics") : <Skeleton width="40%" />}
+                {agentDetails ? (
+                  t("agentDashboard.yourStatistics")
+                ) : (
+                  <Skeleton width="40%" />
+                )}
               </Typography>
 
               <Divider sx={{ my: 2, borderRadius: "12px" }} />
@@ -208,7 +217,6 @@ const AgentDashboard: React.FC = () => {
                       months={months}
                       revenueData={revenueData}
                       userRole="agent" // Pass the user role
-
                     />
                   ) : (
                     <Skeleton
@@ -227,7 +235,6 @@ const AgentDashboard: React.FC = () => {
                       isMobile={isMobile}
                       brandColors={brandColors}
                       userRole="agent" // Pass the user role
-
                     />
                   ) : (
                     <Skeleton
@@ -242,7 +249,7 @@ const AgentDashboard: React.FC = () => {
                 <Grid item xs={12}>
                   {agentDetails ? (
                     <SalesDistribution
-                      salesDistributionData={salesDistributionData}
+                      salesDistributionDataClients={salesDistributionData}
                     />
                   ) : (
                     <Skeleton
@@ -265,7 +272,11 @@ const AgentDashboard: React.FC = () => {
         <Grid item xs={12} md={3}>
           <Box mb={4}>
             <Typography variant="h5" gutterBottom>
-              {agentDetails ? t("agentDashboard.calendar") : <Skeleton width="30%" />}
+              {agentDetails ? (
+                t("agentDashboard.calendar")
+              ) : (
+                <Skeleton width="30%" />
+              )}
             </Typography>
 
             <Divider sx={{ my: 2, borderRadius: "12px" }} />

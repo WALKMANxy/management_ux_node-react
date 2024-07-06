@@ -68,11 +68,10 @@ export type SearchState = {
 };
 
 export type GlobalSearchProps = {
-  filter?: string;
-  onSelect?: (item: string) => void;
+  filter: string;
+  onSelect: (item: SearchResult) => void; // Change the callback to accept SearchResult
   placeholder?: string;
 };
-
 export type DetailProps = {
   detail: { [key: string]: any };
   isLoading: boolean;
@@ -83,17 +82,19 @@ export type HistoryProps = {
 };
 
 export type SearchResultsProps = {
-  onSelect: (item: string) => void;
+  onSelect: (item: SearchResult) => void; // Change this to accept SearchResult
   selectedIndex: number;
   results: SearchResult[];
 };
+
 
 export type SidebarProps = {
   onToggle: (isOpen: boolean) => void;
 };
 
 export type SalesDistributionProps = {
-  salesDistributionData: { label: string; value: number }[];
+  salesDistributionDataClients: { label: string; value: number }[];
+  salesDistributionDataAgents?: { label: string; value: number }[];
 };
 
 export type ActivePromotionsProps = {
@@ -101,12 +102,19 @@ export type ActivePromotionsProps = {
   agentDetails?: { clients: Client[] } | null;
 };
 
+export type Comparison = {
+  value: number;
+  trend: "up" | "down";
+};
+
 export type SpentThisMonthProps = {
   amount: string;
+  comparison?: Comparison;
 };
 
 export type SpentThisYearProps = {
   amount: string;
+  comparison?: Comparison;
 };
 
 export type Props = {

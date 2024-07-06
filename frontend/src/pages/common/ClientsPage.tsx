@@ -20,6 +20,7 @@ const ClientsPage: React.FC = () => {
   const loggedInClientId = useSelector((state: RootState) => state.auth.id);
 
   const {
+    selectedClient,
     quickFilterText,
     setQuickFilterText,
     startDate,
@@ -129,26 +130,7 @@ const ClientsPage: React.FC = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
-      {userRole === "agent" ? (
-        <ClientList
-          quickFilterText={quickFilterText}
-          setQuickFilterText={setQuickFilterText}
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
-          filteredClients={filteredClients}
-          columnDefs={columnDefinitions}
-          gridRef={gridRef}
-          handleMenuOpen={handleMenuOpen}
-          handleMenuClose={handleMenuClose}
-          anchorEl={anchorEl}
-          exportDataAsCsv={exportDataAsCsv}
-          isClientListCollapsed={isClientListCollapsed}
-          setClientListCollapsed={setClientListCollapsed}
-          isMobile={isMobile}
-        />
-      ) : (
+      {userRole === "client" ? (
         loggedInClientDetails && (
           <ClientDetails
             ref={clientDetailsRef}
@@ -158,6 +140,34 @@ const ClientsPage: React.FC = () => {
             setClientDetailsCollapsed={setClientDetailsCollapsed}
           />
         )
+      ) : (
+        <>
+          <ClientList
+            quickFilterText={quickFilterText}
+            setQuickFilterText={setQuickFilterText}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
+            filteredClients={filteredClients}
+            columnDefs={columnDefinitions}
+            gridRef={gridRef}
+            handleMenuOpen={handleMenuOpen}
+            handleMenuClose={handleMenuClose}
+            anchorEl={anchorEl}
+            exportDataAsCsv={exportDataAsCsv}
+            isClientListCollapsed={isClientListCollapsed}
+            setClientListCollapsed={setClientListCollapsed}
+            isMobile={isMobile}
+          />
+          <ClientDetails
+            ref={clientDetailsRef}
+            isLoading={false}
+            selectedClient={selectedClient}
+            isClientDetailsCollapsed={isClientDetailsCollapsed}
+            setClientDetailsCollapsed={setClientDetailsCollapsed}
+          />
+        </>
       )}
     </Box>
   );

@@ -9,7 +9,7 @@ import { currencyFormatter } from "../../../utils/dataUtils";
 const MonthOverMonthSpendingTrend: React.FC<{
   months: string[];
   revenueData: number[];
-  userRole: "agent" | "client"; // New prop to determine user role
+  userRole: "agent" | "client" | "admin"; // New prop to determine user role
 }> = ({ months, revenueData, userRole }) => {
   const { t } = useTranslation();
   const loading = revenueData.length === 0;

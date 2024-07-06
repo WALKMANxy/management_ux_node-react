@@ -1,4 +1,3 @@
-// src/features/search/searchSlice.ts
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import {
@@ -11,6 +10,7 @@ import {
   loadClientDetailsData,
   loadJsonData,
   mapDataToModels,
+  mapDataToAgents,
 } from "../../utils/dataLoader";
 
 const initialState: SearchState = {
@@ -28,8 +28,6 @@ export const searchItems = createAsyncThunk<
   "search/searchItems",
   async ({ query, filter }, { getState, rejectWithValue }) => {
     try {
-      //console.log(`Searching for query: ${query} with filter: ${filter}`);
-
       const movementData: Movement[] = await loadJsonData(
         "/data/datasetsfrom01JANto12JUN.min.json"
       );
@@ -89,7 +87,6 @@ export const searchItems = createAsyncThunk<
           });
 
         searchResults = searchResults.concat(clientResults);
-        //console.log("Client results:", clientResults);
       }
 
       if (filter === "all" || filter === "article") {
@@ -160,7 +157,32 @@ export const searchItems = createAsyncThunk<
 
         searchResults = searchResults.concat(promoResults);
       }
-      //console.log("Final search results:", searchResults);
+
+      if (userRole === "admin" && (filter === "all" || filter === "admin")) {
+        const agents = await mapDataToAgents(movementData);
+        const agentResults = agents
+          .filter((agent) => {
+            const includesQuery = (value: string | null | undefined) =>
+              value ? value.toLowerCase().includes(sanitizedQuery) : false;
+
+            return includesQuery(agent.name);
+          })
+          .map((agent) => ({
+            id: agent.id,
+            name: agent.name,
+            type: "agent",
+          }))
+          .filter((result) => {
+            if (seen.has(result.id)) {
+              return false;
+            }
+            seen.set(result.id, ""); // Add to seen map
+            return true;
+          });
+
+        searchResults = searchResults.concat(agentResults);
+      }
+
       return searchResults;
     } catch (error: any) {
       console.error("Error searching items:", error);

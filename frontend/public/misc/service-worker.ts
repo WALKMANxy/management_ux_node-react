@@ -8,7 +8,7 @@ const urlsToCache = [
   '/static/js/bundle.js',
   '/static/js/main.chunk.js',
   '/static/js/0.chunk.js',
-  'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap',
+  'https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800;900&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css',
 ];
 

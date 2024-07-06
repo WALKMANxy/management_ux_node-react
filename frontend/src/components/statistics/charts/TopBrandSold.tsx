@@ -7,7 +7,7 @@ const TopBrandsSold: React.FC<{
   topBrandsData: any[];
   brandColors: string[];
   isMobile: boolean;
-  userRole: "agent" | "client"; // New prop to determine user role
+  userRole: "agent" | "client" | "admin"; // New prop to determine user role
 }> = ({ topBrandsData, brandColors, isMobile, userRole }) => {
   const { t } = useTranslation();
   const loading = topBrandsData.length === 0;

@@ -33,7 +33,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             className={`search-result-item ${
               index === selectedIndex ? "selected" : ""
             }`}
-            onClick={() => onSelect(result.name)}
+            onClick={() => onSelect(result)} // Pass the entire result object
             sx={{ marginBottom: 2 }}
           >
             <CardContent>

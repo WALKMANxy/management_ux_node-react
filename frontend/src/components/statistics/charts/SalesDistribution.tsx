@@ -1,21 +1,32 @@
-import { Box, Divider, Paper, Skeleton, Typography } from "@mui/material";
+import { Box, Button, Divider, Paper, Skeleton, Typography } from "@mui/material";
 import { ApexOptions } from "apexcharts";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import { SalesDistributionProps } from "../../../models/models";
 import { currencyFormatter } from "../../../utils/dataUtils";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../app/store";
 
 const SalesDistribution: React.FC<SalesDistributionProps> = ({
-  salesDistributionData,
+  salesDistributionDataClients,
+  salesDistributionDataAgents,
 }) => {
   const { t } = useTranslation();
-  const loading = salesDistributionData.length === 0;
+  const [viewMode, setViewMode] = useState<"clients" | "agents">("clients");
 
-  // Memoize the chart dataset to prevent unnecessary re-renders
-  const dataset = useMemo(() => salesDistributionData, [salesDistributionData]);
+  const userRole = useSelector((state: RootState) => state.auth.userRole);
 
-  // Define the options and series for ApexCharts
+  const loading = salesDistributionDataClients.length === 0;
+
+  const dataset = useMemo(() => {
+    if (viewMode === "clients") {
+      return salesDistributionDataClients;
+    } else {
+      return salesDistributionDataAgents || [];
+    }
+  }, [viewMode, salesDistributionDataClients, salesDistributionDataAgents]);
+
   const options: ApexOptions = useMemo(
     () => ({
       chart: {
@@ -23,18 +34,18 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
         toolbar: {
           show: false,
         },
-        background: "transparent", // Set the background to transparent
+        background: "transparent",
       },
       plotOptions: {
         bar: {
-          horizontal: false, // Change to false for vertical bars
+          horizontal: false,
           borderRadius: 4,
         },
       },
       xaxis: {
-        categories: dataset.map((data) => data.label.split(" ")[0]), // Use only the first word of each label
+        categories: dataset.map((data) => data.label.split(" ")[0]),
         labels: {
-          rotate: -45, // Set rotation to 0 for horizontal labels
+          rotate: -45,
           style: {
             fontSize: "12px",
           },
@@ -49,9 +60,8 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
           const value = series[seriesIndex][dataPointIndex];
           const formattedValue = currencyFormatter(value);
           const x = w.globals.dom.baseEl.getBoundingClientRect().left;
-          const tooltipWidth = 150; // estimated tooltip width
+          const tooltipWidth = 150;
 
-          // Calculate the tooltip position
           const positionLeft = x + tooltipWidth > window.innerWidth;
 
           return `<div class="tooltip-custom" style="font-size: 14px; padding: 8px; white-space: nowrap; background: #fff; border: 1px solid #ccc; border-radius: 4px; ${
@@ -123,7 +133,34 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
           {t("salesDistribution.title")}
         </Typography>
       </Box>
+
+      {userRole === "admin" && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 1,
+            mb: 2,
+            zIndex: 1,
+          }}
+        >
+          <Button
+            variant={viewMode === "clients" ? "contained" : "outlined"}
+            onClick={() => setViewMode("clients")}
+          >
+            {t("salesDistribution.clients")}
+          </Button>
+          <Button
+            variant={viewMode === "agents" ? "contained" : "outlined"}
+            onClick={() => setViewMode("agents")}
+          >
+            {t("salesDistribution.agents")}
+          </Button>
+        </Box>
+      )}
+
       <Divider sx={{ my: 2, borderRadius: "12px", zIndex: 1 }} />
+
       <Box sx={{ width: "100%", height: "300px", zIndex: 1 }}>
         {loading ? (
           <Skeleton
