@@ -8,6 +8,8 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../app/store";
 
+// SalesDistribution.tsx
+
 const SalesDistribution: React.FC<SalesDistributionProps> = ({
   salesDistributionDataClients,
   salesDistributionDataAgents,
@@ -17,7 +19,9 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
 
   const userRole = useSelector((state: RootState) => state.auth.userRole);
 
-  const loading = salesDistributionDataClients.length === 0;
+  const loading =
+    (viewMode === "clients" && salesDistributionDataClients.length === 0) ||
+    (viewMode === "agents" && salesDistributionDataAgents?.length === 0);
 
   const dataset = useMemo(() => {
     if (viewMode === "clients") {

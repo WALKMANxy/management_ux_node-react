@@ -5,6 +5,11 @@ import { ReactNode } from "react";
 
 export type UserRole = "admin" | "agent" | "client" | "guest";
 
+export type AdminDetails ={
+  agents: Agent[];
+  clients: Client[];
+}
+
 export type AuthState = {
   isLoggedIn: boolean;
   userRole: UserRole;
@@ -96,6 +101,7 @@ export type SalesDistributionProps = {
   salesDistributionDataClients: { label: string; value: number }[];
   salesDistributionDataAgents?: { label: string; value: number }[];
 };
+
 
 export type ActivePromotionsProps = {
   selectedClient?: Client | null;

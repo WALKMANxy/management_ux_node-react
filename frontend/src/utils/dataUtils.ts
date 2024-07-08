@@ -1,5 +1,11 @@
-// src/utils/dataUtils.ts
-import { Client, Movement } from "../models/models";
+import { format, parseISO } from "date-fns";
+import { Agent, Client, Movement } from "../models/models";
+
+// Helper function to get month and year from a date string
+export const getMonthYear = (dateString: string) => {
+  const date = parseISO(dateString);
+  return format(date, "yyyy-MM");
+};
 
 // Calculate total revenue for a list of clients
 export const calculateTotalRevenue = (clients: Client[]): string => {
@@ -8,9 +14,39 @@ export const calculateTotalRevenue = (clients: Client[]): string => {
     .toFixed(2);
 };
 
+// Calculate sales distribution data for agents
+// dataUtils.ts
+
+export const calculateSalesDistributionDataForAgents = (
+  agents: Agent[],
+  isMobile: boolean
+): { label: string; value: number }[] => {
+  const agentSalesData = agents.map(agent => {
+    const totalRevenue = agent.clients.reduce((sum, client) => {
+      const revenue = parseFloat(client.totalRevenue);
+      console.log(`Agent: ${agent.name}, Client: ${client.name}, Revenue: ${revenue}`);
+      return sum + revenue;
+    }, 0);
+    console.log(`Agent: ${agent.name}, Total Revenue: ${totalRevenue}`);
+    return { label: agent.name, value: totalRevenue };
+  });
+
+  // Sort and slice based on the isMobile parameter
+  const sortedData = agentSalesData.sort((a, b) => b.value - a.value);
+  console.log("Sorted data: ", sortedData);
+  return isMobile ? sortedData.slice(0, 8) : sortedData.slice(0, 25);
+};
+
 // Calculate total orders for a list of clients
 export const calculateTotalOrders = (clients: Client[]): number => {
-  return clients.reduce((total, client) => total + client.totalOrders, 0);
+  //console.log("Calculating total orders...");
+  //console.log("Number of clients:", clients.length);
+  const totalOrders = clients.reduce((total, client) => {
+    //console.log("Client:", client.name, "Orders:", client.totalOrders);
+    return total + client.totalOrders;
+  }, 0);
+  //console.log("Total orders:", totalOrders);
+  return totalOrders;
 };
 
 // Calculate top brands data for a list of clients
@@ -53,71 +89,25 @@ export const calculateSalesDistributionData = (
   }));
 };
 
-// Calculate total revenue for a specific agent's clients
-export const calculateAgentTotalRevenue = (clients: Client[]): string => {
-  return calculateTotalRevenue(clients);
-};
-
-// Calculate total orders for a specific agent's clients
-export const calculateAgentTotalOrders = (clients: Client[]): number => {
-  return clients.reduce((total, client) => {
-    const clientOrders = client.movements.length; // Each movement is an order
-    return total + clientOrders;
-  }, 0);
-};
-
-// Calculate top brands data for a specific agent's clients
-export const calculateAgentTopBrandsData = (
-  clients: Client[]
-): { label: string; value: number }[] => {
-  return calculateTopBrandsData(clients);
-};
-
-// Calculate sales distribution data for a specific agent's clients
-export const calculateAgentSalesDistributionData = (
-  clients: Client[],
-  isMobile: boolean
-): { label: string; value: number }[] => {
-  return calculateSalesDistributionData(clients, isMobile);
-};
-
-// Calculate total revenue for a specific client
-export const calculateClientTotalRevenue = (clients: Client[]): string => {
-  return calculateTotalRevenue(clients);
-};
-
-// Calculate total orders for a specific client
-export const calculateClientTotalOrders = (clients: Client[]): number => {
-  return calculateTotalOrders(clients);
-};
-
-// Calculate top brands data for a specific client
-export const calculateClientTopBrandsData = (
-  clients: Client[]
-): { label: string; value: number }[] => {
-  return calculateTopBrandsData(clients);
-};
-
-// Calculate sales distribution data for a specific client
-export const calculateClientSalesDistributionData = (
-  clients: Client[],
-  isMobile: boolean
-): { label: string; value: number }[] => {
-  return calculateSalesDistributionData(clients, isMobile);
-};
-
+// Calculate monthly orders from movements
 export const calculateMonthlyOrders = (movements: Movement[]): number => {
   const currentMonth = new Date().getMonth() + 1;
   const currentYear = new Date().getFullYear();
-  return movements.filter((movement) => {
+  //console.log("Calculating monthly orders...");
+  //console.log("Current month:", currentMonth);
+  //console.log("Current year:", currentYear);
+  const filteredMovements = movements.filter((movement) => {
     const movementDate = new Date(movement.dateOfOrder);
     return (
       movementDate.getMonth() + 1 === currentMonth &&
       movementDate.getFullYear() === currentYear
     );
-  }).length;
+  });
+  //console.log("Number of filtered movements:", filteredMovements.length);
+  return filteredMovements.length;
 };
 
+// Calculate monthly revenue from movements
 export const calculateMonthlyRevenue = (movements: Movement[]): string => {
   const currentMonth = new Date().getMonth() + 1;
   const currentYear = new Date().getFullYear();
@@ -140,6 +130,36 @@ export const calculateMonthlyRevenue = (movements: Movement[]): string => {
     }, 0)
     .toFixed(2);
   return totalRevenue;
+};
+
+// Calculate monthly data (revenue and orders) from clients
+export const calculateMonthlyData = (clients: Client[]) => {
+  const monthlyData = clients.reduce((acc, client) => {
+    client.movements.forEach((movement) => {
+      const monthYear = getMonthYear(movement.dateOfOrder);
+      if (monthYear === "Invalid Date") {
+        console.error("Skipping movement with invalid date:", movement);
+        return;
+      }
+      const movementRevenue = movement.details.reduce(
+        (sum, detail) => sum + parseFloat(detail.priceSold),
+        0
+      );
+      const movementOrders = movement.details.length;
+      if (!acc[monthYear]) {
+        acc[monthYear] = { revenue: 0, orders: 0 };
+      }
+      acc[monthYear].revenue += movementRevenue;
+      acc[monthYear].orders += movementOrders;
+    });
+    return acc;
+  }, {} as { [key: string]: { revenue: number; orders: number } });
+
+  const months = Object.keys(monthlyData).sort();
+  const revenueData = months.map((month) => monthlyData[month].revenue);
+  const ordersData = months.map((month) => monthlyData[month].orders);
+
+  return { months, revenueData, ordersData };
 };
 
 export const currencyFormatter = (value: any): string => {

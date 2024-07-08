@@ -1,16 +1,10 @@
 import axios from "axios";
-import { format, parseISO } from "date-fns";
 import { Agent, Client, MovementDetail } from "../models/models";
 
 const jsonFilePath = "/data/datasetsfrom01JANto12JUN.min.json";
 const clientDetailsFilePath = "/data/clientdetailsdataset02072024.min.json";
 
 const workerScriptPath = new URL("./worker.js", import.meta.url);
-
-const getMonthYear = (dateString: string) => {
-  const date = parseISO(dateString);
-  return format(date, "yyyy-MM");
-};
 
 export const loadJsonData = async (
   url: string = jsonFilePath
@@ -165,60 +159,50 @@ export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
   }));
 };
 
-export const calculateMonthlyData = (clients: Client[]) => {
-  const monthlyData = clients.reduce((acc, client) => {
-    client.movements.forEach((movement) => {
-      const monthYear = getMonthYear(movement.dateOfOrder);
-      if (monthYear === "Invalid Date") {
-        console.error("Skipping movement with invalid date:", movement);
-        return;
-      }
-      const movementRevenue = movement.details.reduce(
-        (sum, detail) => sum + parseFloat(detail.priceSold),
-        0
-      );
-      const movementOrders = movement.details.length;
-      if (!acc[monthYear]) {
-        acc[monthYear] = { revenue: 0, orders: 0 };
-      }
-      acc[monthYear].revenue += movementRevenue;
-      acc[monthYear].orders += movementOrders;
-    });
-    return acc;
-  }, {} as { [key: string]: { revenue: number; orders: number } });
+export const mapDataToAdmin = (data: any[]): { agents: Agent[], clients: Client[] } => {
+  const agentsMap = new Map<string, Agent>();
+  const clientsMap = new Map<string, Client>();
 
-  const months = Object.keys(monthlyData).sort();
-  const revenueData = months.map((month) => monthlyData[month].revenue);
-  const ordersData = months.map((month) => monthlyData[month].orders);
+  data.forEach((item) => {
+    const agentId = item["Codice Agente"].toString();
+    const clientId = item["Codice Cliente"].toString();
 
-  return { months, revenueData, ordersData };
-};
+    if (!agentsMap.has(agentId)) {
+      agentsMap.set(agentId, {
+        id: agentId,
+        name: `Agent ${agentId}`,
+        clients: []
+      });
+    }
 
-export const calculateAgentMonthlyData = (clients: Client[]) => {
-  const monthlyData = clients.reduce((acc, client) => {
-    client.movements.forEach((movement) => {
-      const monthYear = getMonthYear(movement.dateOfOrder);
-      if (monthYear === "Invalid Date") {
-        console.error("Skipping movement with invalid date:", movement);
-        return;
-      }
-      const movementRevenue = movement.details.reduce(
-        (sum, detail) => sum + parseFloat(detail.priceSold),
-        0
-      );
-      const movementOrders = 1; // Each movement is an order
-      if (!acc[monthYear]) {
-        acc[monthYear] = { revenue: 0, orders: 0 };
-      }
-      acc[monthYear].revenue += movementRevenue;
-      acc[monthYear].orders += movementOrders;
-    });
-    return acc;
-  }, {} as { [key: string]: { revenue: number; orders: number } });
+    if (!clientsMap.has(clientId)) {
+      clientsMap.set(clientId, {
+        id: clientId,
+        name: item["Ragione Sociale Cliente"],
+        province: "",
+        phone: "",
+        totalOrders: 0, // Placeholder
+        totalRevenue: "0", // Placeholder
+        unpaidRevenue: "0", // Placeholder
+        address: "",
+        email: "",
+        visits: [],
+        agent: agentId,
+        movements: [],
+        promos: [],
+      });
+    }
 
-  const months = Object.keys(monthlyData).sort();
-  const revenueData = months.map((month) => monthlyData[month].revenue);
-  const ordersData = months.map((month) => monthlyData[month].orders);
+    const agent = agentsMap.get(agentId)!;
+    const client = clientsMap.get(clientId)!;
 
-  return { months, revenueData, ordersData };
+    if (!agent.clients.find(c => c.id === client.id)) {
+      agent.clients.push(client);
+    }
+  });
+
+  return {
+    agents: Array.from(agentsMap.values()),
+    clients: Array.from(clientsMap.values())
+  };
 };

@@ -27,11 +27,10 @@ import MonthOverMonthSpendingTrend from "../../components/statistics/charts/Mont
 import SalesDistribution from "../../components/statistics/charts/SalesDistribution";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
 import { setVisits } from "../../features/calendar/calendarSlice";
-import useAgentStats from "../../hooks/useAgentStats";
+import useStats from "../../hooks/useStats";
 import { brandColors } from "../../utils/constants";
-import { calculateAgentMonthlyData } from "../../utils/dataLoader";
 import { SearchResult } from "../../models/models";
-import { getTrend } from "../../utils/dataUtils";
+import { calculateMonthlyData, getTrend } from "../../utils/dataUtils";
 
 const AgentDashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -41,7 +40,7 @@ const AgentDashboard: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const {
-    agentDetails,
+    details,
     selectedClient,
     selectClient,
     calculateTotalSpentThisMonth,
@@ -50,7 +49,7 @@ const AgentDashboard: React.FC = () => {
     totalRevenue,
     totalOrders,
     topBrandsData,
-    salesDistributionData,
+    salesDistributionDataClients,
     months,
     revenueData,
     ordersData,
@@ -58,8 +57,7 @@ const AgentDashboard: React.FC = () => {
     yearlyOrdersData,
     clientComparativeStatistics,
     clientComparativeStatisticsMonthly,
-    isLoading  
-  } = useAgentStats(loggedInAgentId, isMobile);
+  } = useStats("agent", loggedInAgentId, isMobile);
 
   const handleClientSelect = useCallback(
     (result: SearchResult) => {
@@ -73,12 +71,10 @@ const AgentDashboard: React.FC = () => {
   );
 
   useEffect(() => {
-    if (agentDetails) {
-      dispatch(
-        setVisits(agentDetails.clients.flatMap((client) => client.visits))
-      );
+    if (details && 'clients' in details) {
+      dispatch(setVisits(details.clients.flatMap((client) => client.visits)));
     }
-  }, [agentDetails, dispatch]);
+  }, [details, dispatch]);
 
   return (
     <Box
@@ -86,13 +82,13 @@ const AgentDashboard: React.FC = () => {
       sx={{ p: isMobile ? 0 : 4, bgcolor: "#f4f5f7" }}
     >
       <Typography variant="h4" gutterBottom>
-        {agentDetails ? (
-          <>{t("agentDashboard.welcomeBack", { name: agentDetails.name })}</>
+        {details && 'name' in details ? (
+          <>{t("agentDashboard.welcomeBack", { name: details.name })}</>
         ) : (
           <Skeleton width="30%" />
         )}
       </Typography>
-      {agentDetails ? (
+      {details && 'clients' in details ? (
         <GlobalSearch filter="client" onSelect={handleClientSelect} />
       ) : (
         <Skeleton
@@ -122,11 +118,13 @@ const AgentDashboard: React.FC = () => {
                     comparison={{
                       value: parseFloat(
                         `${
-                          clientComparativeStatisticsMonthly?.revenuePercentage || "0"
+                          clientComparativeStatisticsMonthly?.revenuePercentage ||
+                          "0"
                         }`
                       ), // Ensure string type
                       trend: getTrend(
-                        clientComparativeStatisticsMonthly?.revenuePercentage || "0"
+                        clientComparativeStatisticsMonthly?.revenuePercentage ||
+                          "0"
                       ), // Ensure string type
                     }}
                   />
@@ -155,9 +153,9 @@ const AgentDashboard: React.FC = () => {
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <MonthOverMonthSpendingTrend
-                    months={calculateAgentMonthlyData([selectedClient]).months}
+                    months={calculateMonthlyData([selectedClient]).months}
                     revenueData={
-                      calculateAgentMonthlyData([selectedClient]).revenueData
+                      calculateMonthlyData([selectedClient]).revenueData
                     }
                     userRole="agent" // Pass the user role
                   />
@@ -190,7 +188,7 @@ const AgentDashboard: React.FC = () => {
           ) : (
             <Box mb={4}>
               <Typography variant="h5" gutterBottom>
-                {agentDetails ? (
+                {details && 'name' in details ? (
                   t("agentDashboard.yourStatistics")
                 ) : (
                   <Skeleton width="40%" />
@@ -200,10 +198,10 @@ const AgentDashboard: React.FC = () => {
               <Divider sx={{ my: 2, borderRadius: "12px" }} />
               <Grid container spacing={2}>
                 <Grid item xs={12} md={6}>
-                  {agentDetails ? (
+                  {details && 'clients' in details ? (
                     <TotalEarning
                       totalEarning={totalRevenue}
-                      isLoading={!agentDetails}
+                      isLoading={!details}
                     />
                   ) : (
                     <Skeleton
@@ -216,10 +214,10 @@ const AgentDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  {agentDetails ? (
+                  {details && 'clients' in details ? (
                     <TotalOrder
                       totalOrder={totalOrders}
-                      isLoading={!agentDetails}
+                      isLoading={!details}
                       monthlyOrders={ordersData}
                       yearlyOrders={yearlyOrdersData}
                       monthlyCategories={months}
@@ -236,7 +234,7 @@ const AgentDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  {agentDetails ? (
+                  {details && 'clients' in details ? (
                     <MonthOverMonthSpendingTrend
                       months={months}
                       revenueData={revenueData}
@@ -253,7 +251,7 @@ const AgentDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  {agentDetails ? (
+                  {details && 'clients' in details ? (
                     <TopBrandsSold
                       topBrandsData={topBrandsData}
                       isMobile={isMobile}
@@ -271,9 +269,9 @@ const AgentDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12}>
-                  {agentDetails ? (
+                  {details && 'clients' in details ? (
                     <SalesDistribution
-                      salesDistributionDataClients={salesDistributionData}
+                      salesDistributionDataClients={salesDistributionDataClients}
                     />
                   ) : (
                     <Skeleton
@@ -290,13 +288,13 @@ const AgentDashboard: React.FC = () => {
           )}
           <UpcomingVisits
             selectedClient={selectedClient}
-            agentDetails={agentDetails}
+            agentDetails={details && 'clients' in details ? details : undefined}
           />
         </Grid>
         <Grid item xs={12} md={3}>
           <Box mb={4}>
             <Typography variant="h5" gutterBottom>
-              {agentDetails ? (
+              {details && 'name' in details ? (
                 t("agentDashboard.calendar")
               ) : (
                 <Skeleton width="30%" />
@@ -304,7 +302,7 @@ const AgentDashboard: React.FC = () => {
             </Typography>
 
             <Divider sx={{ my: 2, borderRadius: "12px" }} />
-            {agentDetails ? (
+            {details && 'clients' in details ? (
               <Box sx={{ maxWidth: "400px", margin: "0 auto" }}>
                 <CalendarComponent />
               </Box>
@@ -320,7 +318,7 @@ const AgentDashboard: React.FC = () => {
           </Box>
           <ActivePromotions
             selectedClient={selectedClient}
-            agentDetails={agentDetails}
+            agentDetails={details && 'clients' in details ? details : undefined}
           />
         </Grid>
       </Grid>

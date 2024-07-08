@@ -1,4 +1,11 @@
-import { Box, Grid, Skeleton, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Skeleton,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
@@ -11,10 +18,9 @@ import TopArticleType from "../../components/dashboard/TopArticleType";
 import UpcomingVisits from "../../components/dashboard/UpcomingVisits";
 import MonthOverMonthSpendingTrend from "../../components/statistics/charts/MonthOverMonthSpendingTrend";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
-import useClientStats from "../../hooks/useClientStats";
+import useStats from "../../hooks/useStats"; // Use the new unified hook
 import { brandColors } from "../../utils/constants";
 import { setVisits } from "../../features/calendar/calendarSlice";
-import { calculateAgentMonthlyData } from "../../utils/dataLoader";
 
 const ClientDashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -24,15 +30,17 @@ const ClientDashboard: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const {
-    clientDetails,
+    details: clientDetails,
     calculateTotalSpentThisMonth,
     calculateTotalSpentThisYear,
     calculateTopArticleType,
     topBrandsData,
-  } = useClientStats(loggedInClientId, isMobile);
+    months,
+    revenueData,
+  } = useStats("client", loggedInClientId, isMobile);
 
   useEffect(() => {
-    if (clientDetails) {
+    if (clientDetails && "visits" in clientDetails) {
       dispatch(setVisits(clientDetails.visits));
     }
   }, [clientDetails, dispatch]);
@@ -43,7 +51,7 @@ const ClientDashboard: React.FC = () => {
       sx={{ p: isMobile ? 0 : 4, bgcolor: "#f4f5f7" }}
     >
       <Typography variant="h4" gutterBottom>
-        {clientDetails ? (
+        {clientDetails && "name" in clientDetails ? (
           <>{t("clientDashboard.welcomeBack", { name: clientDetails.name })}</>
         ) : (
           <Skeleton width="30%" />
@@ -58,9 +66,11 @@ const ClientDashboard: React.FC = () => {
 
             <Grid container spacing={2}>
               <Grid item xs={12} md={4}>
-                {clientDetails ? (
+                {clientDetails && "movements" in clientDetails ? (
                   <SpentThisMonth
-                    amount={calculateTotalSpentThisMonth(clientDetails.movements)}
+                    amount={calculateTotalSpentThisMonth(
+                      clientDetails.movements
+                    )}
                   />
                 ) : (
                   <Skeleton
@@ -72,9 +82,11 @@ const ClientDashboard: React.FC = () => {
                 )}
               </Grid>
               <Grid item xs={12} md={4}>
-                {clientDetails ? (
+                {clientDetails && "movements" in clientDetails ? (
                   <SpentThisYear
-                    amount={calculateTotalSpentThisYear(clientDetails.movements)}
+                    amount={calculateTotalSpentThisYear(
+                      clientDetails.movements
+                    )}
                   />
                 ) : (
                   <Skeleton
@@ -86,7 +98,7 @@ const ClientDashboard: React.FC = () => {
                 )}
               </Grid>
               <Grid item xs={12} md={4}>
-                {clientDetails ? (
+                {clientDetails && "movements" in clientDetails ? (
                   <TopArticleType
                     articles={calculateTopArticleType(clientDetails.movements)}
                   />
@@ -102,12 +114,9 @@ const ClientDashboard: React.FC = () => {
               <Grid item xs={12} md={6}>
                 {clientDetails ? (
                   <MonthOverMonthSpendingTrend
-                    months={calculateAgentMonthlyData([clientDetails]).months}
-                    revenueData={
-                      calculateAgentMonthlyData([clientDetails]).revenueData
-                    }
+                    months={months}
+                    revenueData={revenueData}
                     userRole="client" // Pass the user role
-
                   />
                 ) : (
                   <Skeleton
@@ -125,7 +134,6 @@ const ClientDashboard: React.FC = () => {
                     brandColors={brandColors}
                     isMobile={isMobile}
                     userRole="client" // Pass the user role
-
                   />
                 ) : (
                   <Skeleton
@@ -137,7 +145,9 @@ const ClientDashboard: React.FC = () => {
                 )}
               </Grid>
             </Grid>
-            {clientDetails && <UpcomingVisits selectedClient={clientDetails} />}
+            {clientDetails && "visits" in clientDetails && (
+              <UpcomingVisits selectedClient={clientDetails} />
+            )}
           </Box>
         </Grid>
         <Grid item xs={12} md={3}>
@@ -159,7 +169,9 @@ const ClientDashboard: React.FC = () => {
               )}
             </Box>
           </Box>
-          {clientDetails && <ActivePromotions selectedClient={clientDetails} />}
+          {clientDetails && "promos" in clientDetails && (
+            <ActivePromotions selectedClient={clientDetails} />
+          )}
         </Grid>
       </Grid>
     </Box>

@@ -26,12 +26,11 @@ import MonthOverMonthSpendingTrend from "../../components/statistics/charts/Mont
 import SalesDistribution from "../../components/statistics/charts/SalesDistribution";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
 import { setVisits } from "../../features/calendar/calendarSlice";
-import useAdminStats from "../../hooks/useAdminStats";
+import useStats from "../../hooks/useStats";
 import { brandColors } from "../../utils/constants";
 import AgentActivityOverview from "../../components/dashboard/AgentActivityOverview";
-import { calculateMonthlyData } from "../../utils/dataLoader";
 import { SearchResult } from "../../models/models";
-import { getTrend } from "../../utils/dataUtils";
+import { calculateMonthlyData, getTrend } from "../../utils/dataUtils";
 
 const AdminDashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -40,13 +39,14 @@ const AdminDashboard: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const {
-    agentsData,
+    details,
     selectedClient,
     selectedAgent,
     selectClient,
     selectAgent,
     calculateTotalSpentThisMonth,
     calculateTotalSpentThisYear,
+    calculateTotalSpentThisYearForAgents,
     calculateTopArticleType,
     totalRevenue,
     totalOrders,
@@ -58,13 +58,12 @@ const AdminDashboard: React.FC = () => {
     ordersData,
     yearlyCategories,
     yearlyOrdersData,
-    agentComparativeStatistics,
-    agentComparativeStatisticsMonthly,
     clientComparativeStatistics,
     clientComparativeStatisticsMonthly,
-    isLoading
-  } = useAdminStats(isMobile);
-  
+    agentComparativeStatistics,
+    agentComparativeStatisticsMonthly,
+    isLoading,
+  } = useStats("admin", null, isMobile);
 
   const handleSelect = useCallback(
     (item: SearchResult) => {
@@ -81,16 +80,16 @@ const AdminDashboard: React.FC = () => {
   );
 
   useEffect(() => {
-    if (agentsData) {
+    if (details && "agents" in details) {
       dispatch(
         setVisits(
-          agentsData.flatMap((agent) =>
+          details.agents.flatMap((agent) =>
             agent.clients.flatMap((client) => client.visits)
           )
         )
       );
     }
-  }, [agentsData, dispatch]);
+  }, [details, dispatch]);
 
   return (
     <Box
@@ -135,30 +134,49 @@ const AdminDashboard: React.FC = () => {
                     comparison={{
                       value: parseFloat(
                         `${
-                          agentComparativeStatisticsMonthly?.revenuePercentage || "0"
+                          clientComparativeStatisticsMonthly?.revenuePercentage ||
+                          "0"
                         }`
                       ), // Ensure string type
                       trend: getTrend(
-                        agentComparativeStatisticsMonthly?.revenuePercentage || "0"
+                        clientComparativeStatisticsMonthly?.revenuePercentage ||
+                          "0"
                       ), // Ensure string type
                     }}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
                   <SpentThisYear
-                    amount={calculateTotalSpentThisYear(
-                      selectedAgent.clients.flatMap(
-                        (client) => client.movements
-                      )
-                    )}
+                    amount={
+                      selectedAgent
+                        ? (() => {
+                            console.log(
+                              "Selected agent clients:",
+                              selectedAgent.clients
+                            );
+                            return calculateTotalSpentThisYearForAgents(
+                              selectedAgent.clients
+                            );
+                          })()
+                        : calculateTotalSpentThisYear(
+                            selectedClient?.movements || []
+                          )
+                    }
                     comparison={{
                       value: parseFloat(
                         `${
-                          agentComparativeStatistics?.revenuePercentage || "0"
+                          selectedAgent
+                            ? agentComparativeStatistics?.revenuePercentage ||
+                              "0"
+                            : clientComparativeStatistics?.revenuePercentage ||
+                              "0"
                         }`
                       ), // Ensure string type
                       trend: getTrend(
-                        agentComparativeStatistics?.revenuePercentage || "0"
+                        selectedAgent
+                          ? agentComparativeStatistics?.revenuePercentage || "0"
+                          : clientComparativeStatistics?.revenuePercentage ||
+                              "0"
                       ), // Ensure string type
                     }}
                   />
@@ -247,11 +265,13 @@ const AdminDashboard: React.FC = () => {
                     comparison={{
                       value: parseFloat(
                         `${
-                          clientComparativeStatisticsMonthly?.revenuePercentage || "0"
+                          clientComparativeStatisticsMonthly?.revenuePercentage ||
+                          "0"
                         }`
                       ), // Ensure string type
                       trend: getTrend(
-                        clientComparativeStatisticsMonthly?.revenuePercentage || "0"
+                        clientComparativeStatisticsMonthly?.revenuePercentage ||
+                          "0"
                       ), // Ensure string type
                     }}
                   />
