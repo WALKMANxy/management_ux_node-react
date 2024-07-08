@@ -1,13 +1,13 @@
-// src/hooks/useAgentStats.ts
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Agent, Client, Movement } from "../models/models";
 import { useGetClientsQuery } from "../services/api";
-import { calculateAgentMonthlyData } from "../utils/dataLoader";
+import { calculateMonthlyData } from "../utils/dataLoader";
 import {
-  calculateAgentSalesDistributionData,
-  calculateAgentTopBrandsData,
-  calculateAgentTotalOrders,
-  calculateAgentTotalRevenue,
+  calculateMonthlyRevenue,
+  calculateSalesDistributionData,
+  calculateTopBrandsData,
+  calculateTotalOrders,
+  calculateTotalRevenue,
 } from "../utils/dataUtils";
 
 const useAgentStats = (agentId: string | null, isMobile: boolean) => {
@@ -26,36 +26,19 @@ const useAgentStats = (agentId: string | null, isMobile: boolean) => {
         clients: agentClients,
       };
       setAgentDetails(agent);
+      console.log("Agent details set:", agent); // Debug statement
     }
   }, [isLoading, clientsData, agentId]);
 
   const calculateTotalSpentThisMonth = useCallback((movements: Movement[]) => {
-    const currentMonth = new Date().getMonth() + 1;
-    const currentYear = new Date().getFullYear();
-    const totalSpent = movements
-      .filter((movement) => {
-        const movementDate = new Date(movement.dateOfOrder);
-        return (
-          movementDate.getMonth() + 1 === currentMonth &&
-          movementDate.getFullYear() === currentYear
-        );
-      })
-      .reduce(
-        (total, movement) =>
-          total +
-          movement.details.reduce(
-            (sum, detail) => sum + parseFloat(detail.priceSold),
-            0
-          ),
-        0
-      )
-      .toFixed(2);
+    const totalSpent = calculateMonthlyRevenue(movements);
+    console.log("Total spent this month:", totalSpent); // Debug statement
     return totalSpent;
   }, []);
 
   const calculateTotalSpentThisYear = useCallback((movements: Movement[]) => {
     const currentYear = new Date().getFullYear();
-    return movements
+    const totalSpent = movements
       .filter(
         (movement) =>
           new Date(movement.dateOfOrder).getFullYear() === currentYear
@@ -70,6 +53,8 @@ const useAgentStats = (agentId: string | null, isMobile: boolean) => {
         0
       )
       .toFixed(2);
+    console.log("Total spent this year:", totalSpent); // Debug statement
+    return totalSpent;
   }, []);
 
   const calculateTopArticleType = useCallback((movements: Movement[]) => {
@@ -91,6 +76,7 @@ const useAgentStats = (agentId: string | null, isMobile: boolean) => {
     const sortedArticles = Object.values(typeCount).sort(
       (a, b) => b.amount - a.amount
     );
+    console.log("Top article types:", sortedArticles.slice(0, 5)); // Debug statement
     return sortedArticles.slice(0, 5); // Return top 5 articles
   }, []);
 
@@ -106,6 +92,7 @@ const useAgentStats = (agentId: string | null, isMobile: boolean) => {
         );
         if (client) {
           setSelectedClient(client);
+          console.log("Selected client set:", client); // Debug statement
         } else {
           console.error("Client not found for this agent");
         }
@@ -117,26 +104,26 @@ const useAgentStats = (agentId: string | null, isMobile: boolean) => {
   const totalRevenue = useMemo(
     () =>
       agentDetails
-        ? parseFloat(calculateAgentTotalRevenue(agentDetails.clients))
+        ? parseFloat(calculateTotalRevenue(agentDetails.clients))
         : 0,
     [agentDetails]
   );
 
   const totalOrders = useMemo(
-    () => (agentDetails ? calculateAgentTotalOrders(agentDetails.clients) : 0),
+    () => (agentDetails ? calculateTotalOrders(agentDetails.clients) : 0),
     [agentDetails]
   );
 
   const topBrandsData = useMemo(
     () =>
-      agentDetails ? calculateAgentTopBrandsData(agentDetails.clients) : [],
+      agentDetails ? calculateTopBrandsData(agentDetails.clients) : [],
     [agentDetails]
   );
 
   const salesDistributionData = useMemo(
     () =>
       agentDetails
-        ? calculateAgentSalesDistributionData(agentDetails.clients, isMobile)
+        ? calculateSalesDistributionData(agentDetails.clients, isMobile)
         : [],
     [agentDetails, isMobile]
   );
@@ -144,10 +131,16 @@ const useAgentStats = (agentId: string | null, isMobile: boolean) => {
   const { months, revenueData, ordersData } = useMemo(
     () =>
       agentDetails
-        ? calculateAgentMonthlyData(agentDetails.clients)
+        ? calculateMonthlyData(agentDetails.clients)
         : { months: [], revenueData: [], ordersData: [] },
     [agentDetails]
   );
+
+  useEffect(() => {
+    console.log("Months data:", months); // Debug statement
+    console.log("Revenue data:", revenueData); // Debug statement
+    console.log("Orders data:", ordersData); // Debug statement
+  }, [months, revenueData, ordersData]);
 
   const yearlyOrders = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -163,15 +156,85 @@ const useAgentStats = (agentId: string | null, isMobile: boolean) => {
     () => Object.keys(yearlyOrders).map(String),
     [yearlyOrders]
   );
+
   const yearlyOrdersData = useMemo(
     () => yearlyCategories.map((year) => yearlyOrders[parseInt(year)]),
     [yearlyCategories, yearlyOrders]
   );
 
   const selectedClientTopBrandsData = useMemo(
-    () => (selectedClient ? calculateAgentTopBrandsData([selectedClient]) : []),
+    () => (selectedClient ? calculateTopBrandsData([selectedClient]) : []),
     [selectedClient]
   );
+
+  const calculateMonthlyComparativeStats = useCallback((selectedMovements: Movement[], allMovements: Movement[], currentMonth: number, currentYear: number) => {
+    const selectedMonthlyTotal = selectedMovements
+      .filter((movement) => {
+        const movementDate = new Date(movement.dateOfOrder);
+        return movementDate.getMonth() + 1 === currentMonth && movementDate.getFullYear() === currentYear;
+      })
+      .reduce((movementSum, movement) => movementSum + movement.details.reduce((detailSum, detail) => detailSum + parseFloat(detail.priceSold), 0), 0);
+
+    const allMonthlyTotal = allMovements
+      .filter((movement) => {
+        const movementDate = new Date(movement.dateOfOrder);
+        return movementDate.getMonth() + 1 === currentMonth && movementDate.getFullYear() === currentYear;
+      })
+      .reduce((movementSum, movement) => movementSum + movement.details.reduce((detailSum, detail) => detailSum + parseFloat(detail.priceSold), 0), 0);
+
+    return {
+      selectedMonthlyTotal,
+      allMonthlyTotal,
+    };
+  }, []);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const totalRevenueAllClients = useMemo(
+    () =>
+      clientsData
+        ? clientsData.reduce((sum, client) => sum + parseFloat(client.totalRevenue), 0)
+        : 0,
+    [clientsData]
+  );
+
+  const totalOrdersAllClients = useMemo(
+    () =>
+      clientsData
+        ? clientsData.reduce((sum, client) => sum + client.movements.length, 0)
+        : 0,
+    [clientsData]
+  );
+
+  const clientComparativeStatistics = useMemo(() => {
+    if (!selectedClient || !clientsData) return { revenuePercentage: 0, ordersPercentage: 0 };
+
+    const clientRevenue = parseFloat(selectedClient.totalRevenue);
+    const totalRevenueAllClients = clientsData.reduce((sum, client) => sum + parseFloat(client.totalRevenue), 0);
+
+    return {
+      revenuePercentage: ((clientRevenue / totalRevenueAllClients) * 100).toFixed(2),
+      ordersPercentage: ((selectedClient.movements.length / totalOrdersAllClients) * 100).toFixed(2),
+    };
+  }, [selectedClient, clientsData, totalOrdersAllClients]);
+
+  const clientComparativeStatisticsMonthly = useMemo(() => {
+    if (!selectedClient || !clientsData) return { revenuePercentage: 0, ordersPercentage: 0 };
+
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+
+    const { selectedMonthlyTotal: clientMonthlyRevenue, allMonthlyTotal: totalRevenueAllClientsMonthly } = calculateMonthlyComparativeStats(
+      selectedClient.movements,
+      clientsData.flatMap((client) => client.movements),
+      currentMonth,
+      currentYear
+    );
+
+    return {
+      revenuePercentage: ((clientMonthlyRevenue / totalRevenueAllClientsMonthly) * 100).toFixed(2),
+      ordersPercentage: ((selectedClient.movements.length / totalOrdersAllClients) * 100).toFixed(2),
+    };
+  }, [selectedClient, clientsData, calculateMonthlyComparativeStats, totalOrdersAllClients]);
 
   return {
     agentDetails,
@@ -183,13 +246,15 @@ const useAgentStats = (agentId: string | null, isMobile: boolean) => {
     totalRevenue,
     totalOrders,
     topBrandsData,
-    selectedClientTopBrandsData, // Return top brands data for the selected client
+    selectedClientTopBrandsData,
     salesDistributionData,
     months,
     revenueData,
     ordersData,
     yearlyCategories,
     yearlyOrdersData,
+    clientComparativeStatistics,
+    clientComparativeStatisticsMonthly,
     isLoading,
     error,
   };

@@ -15,6 +15,27 @@ const useAdminStats = (isMobile: boolean) => {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
 
+  const calculateMonthlyComparativeStats = useCallback((selectedMovements: Movement[], allMovements: Movement[], currentMonth: number, currentYear: number) => {
+    const selectedMonthlyTotal = selectedMovements
+      .filter((movement) => {
+        const movementDate = new Date(movement.dateOfOrder);
+        return movementDate.getMonth() + 1 === currentMonth && movementDate.getFullYear() === currentYear;
+      })
+      .reduce((movementSum, movement) => movementSum + movement.details.reduce((detailSum, detail) => detailSum + parseFloat(detail.priceSold), 0), 0);
+
+    const allMonthlyTotal = allMovements
+      .filter((movement) => {
+        const movementDate = new Date(movement.dateOfOrder);
+        return movementDate.getMonth() + 1 === currentMonth && movementDate.getFullYear() === currentYear;
+      })
+      .reduce((movementSum, movement) => movementSum + movement.details.reduce((detailSum, detail) => detailSum + parseFloat(detail.priceSold), 0), 0);
+
+    return {
+      selectedMonthlyTotal,
+      allMonthlyTotal,
+    };
+  }, []);
+
   const calculateTotalSpentThisMonth = useCallback((movements: Movement[]) => {
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
@@ -186,7 +207,7 @@ const useAdminStats = (isMobile: boolean) => {
     [selectedClient]
   );
 
-  // Calculate comparative statistics
+  // Calculate comparative statistics for Agents
   const totalRevenueAllAgents = useMemo(
     () => (agentsData ? agentsData.reduce((sum, agent) => sum + agent.clients.reduce((clientSum, client) => clientSum + parseFloat(client.totalRevenue), 0), 0) : 0),
     [agentsData]
@@ -198,7 +219,7 @@ const useAdminStats = (isMobile: boolean) => {
   );
 
   const agentComparativeStatistics = useMemo(() => {
-    if (!selectedAgent || !agentsData) return null;
+    if (!selectedAgent || !agentsData) return { revenuePercentage: 0, ordersPercentage: 0 };
 
     const agentRevenue = selectedAgent.clients.reduce((sum, client) => sum + parseFloat(client.totalRevenue), 0);
     const agentOrders = selectedAgent.clients.reduce((sum, client) => sum + client.movements.length, 0);
@@ -208,6 +229,68 @@ const useAdminStats = (isMobile: boolean) => {
       ordersPercentage: ((agentOrders / totalOrdersAllAgents) * 100).toFixed(2),
     };
   }, [selectedAgent, agentsData, totalRevenueAllAgents, totalOrdersAllAgents]);
+
+  const agentComparativeStatisticsMonthly = useMemo(() => {
+    if (!selectedAgent || !agentsData) return { revenuePercentage: 0, ordersPercentage: 0 };
+
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+
+    const { selectedMonthlyTotal: agentMonthlyRevenue, allMonthlyTotal: totalRevenueAllAgentsMonthly } = calculateMonthlyComparativeStats(
+      selectedAgent.clients.flatMap((client) => client.movements),
+      agentsData.flatMap((agent) => agent.clients.flatMap((client) => client.movements)),
+      currentMonth,
+      currentYear
+    );
+
+    return {
+      revenuePercentage: ((agentMonthlyRevenue / totalRevenueAllAgentsMonthly) * 100).toFixed(2),
+      ordersPercentage: ((selectedAgent.clients.reduce((sum, client) => sum + client.movements.length, 0) / totalOrdersAllAgents) * 100).toFixed(2),
+    };
+  }, [selectedAgent, agentsData, calculateMonthlyComparativeStats, totalOrdersAllAgents]);
+
+  // Calculate comparative statistics for Clients
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const totalRevenueAllClients = useMemo(
+    () => (clientsData ? clientsData.reduce((sum, client) => sum + parseFloat(client.totalRevenue), 0) : 0),
+    [clientsData]
+  );
+
+  const totalOrdersAllClients = useMemo(
+    () => (clientsData ? clientsData.reduce((sum, client) => sum + client.movements.length, 0) : 0),
+    [clientsData]
+  );
+
+  const clientComparativeStatistics = useMemo(() => {
+    if (!selectedClient || !clientsData) return { revenuePercentage: 0, ordersPercentage: 0 };
+
+    const clientRevenue = parseFloat(selectedClient.totalRevenue);
+    const totalRevenueAllClients = clientsData.reduce((sum, client) => sum + parseFloat(client.totalRevenue), 0);
+
+    return {
+      revenuePercentage: ((clientRevenue / totalRevenueAllClients) * 100).toFixed(2),
+      ordersPercentage: 0, // Add logic if needed
+    };
+  }, [selectedClient, clientsData]);
+
+  const clientComparativeStatisticsMonthly = useMemo(() => {
+    if (!selectedClient || !clientsData) return { revenuePercentage: 0, ordersPercentage: 0 };
+
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+
+    const { selectedMonthlyTotal: clientMonthlyRevenue, allMonthlyTotal: totalRevenueAllClientsMonthly } = calculateMonthlyComparativeStats(
+      selectedClient.movements,
+      clientsData.flatMap((client) => client.movements),
+      currentMonth,
+      currentYear
+    );
+
+    return {
+      revenuePercentage: ((clientMonthlyRevenue / totalRevenueAllClientsMonthly) * 100).toFixed(2),
+      ordersPercentage: ((selectedClient.movements.length / totalOrdersAllClients) * 100).toFixed(2),
+    };
+  }, [selectedClient, clientsData, calculateMonthlyComparativeStats, totalOrdersAllClients]);
 
   // Placeholder data for agent activity overview
   const agentActivityOverview = useMemo(() => {
@@ -258,6 +341,9 @@ const useAdminStats = (isMobile: boolean) => {
     yearlyCategories,
     yearlyOrdersData,
     agentComparativeStatistics,
+    agentComparativeStatisticsMonthly,
+    clientComparativeStatistics,
+    clientComparativeStatisticsMonthly,
     agentActivityOverview,
     isLoading: clientsLoading || agentsLoading,
     error: clientsError || agentsError,

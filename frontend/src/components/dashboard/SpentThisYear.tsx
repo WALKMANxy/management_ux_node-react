@@ -1,4 +1,5 @@
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
@@ -6,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import { SpentThisYearProps } from "../../models/models";
-import { currencyFormatter } from "../../utils/dataUtils"; // Import the currency formatter
+import { currencyFormatter } from "../../utils/dataUtils";
 
 const SpentThisYear: React.FC<SpentThisYearProps> = ({ amount, comparison }) => {
   const theme = useTheme();
@@ -14,6 +15,26 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({ amount, comparison }) => 
   const userRole = useSelector((state: RootState) => state.auth.userRole);
 
   const formattedAmount = currencyFormatter(parseFloat(amount));
+
+  let comparisonColor;
+  let comparisonIcon;
+  let comparisonText;
+
+  if (comparison) {
+    if (comparison.value > 1) {
+      comparisonColor = theme.palette.success.main;
+      comparisonIcon = <ArrowUpwardIcon fontSize="inherit" />;
+      comparisonText = t('more');
+    } else if (comparison.value < -1) {
+      comparisonColor = theme.palette.error.main;
+      comparisonIcon = <ArrowDownwardIcon fontSize="inherit" />;
+      comparisonText = t('less');
+    } else {
+      comparisonColor = theme.palette.grey[500];
+      comparisonIcon = null;
+      comparisonText = '';
+    }
+  }
 
   return (
     <Paper
@@ -86,19 +107,16 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({ amount, comparison }) => 
                   {formattedAmount}
                 </Typography>
               </Grid>
-              {userRole === "admin" && comparison && (
+              {userRole !== "client" && comparison && comparisonIcon && (
                 <Grid item>
                   <Avatar
                     sx={{
                       cursor: "pointer",
-                      bgcolor: comparison.trend === "up" ? theme.palette.success.light : theme.palette.error.light,
+                      bgcolor: comparisonColor,
                       color: "#000",
                     }}
                   >
-                    <ArrowUpwardIcon
-                      fontSize="inherit"
-                      sx={{ transform: "rotate3d(1, 1, 1, 45deg)" }}
-                    />
+                    {comparisonIcon}
                   </Avatar>
                 </Grid>
               )}
@@ -114,15 +132,16 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({ amount, comparison }) => 
             >
               {t('spentThisYear.title')}
             </Typography>
-            {userRole === "admin" && comparison && (
+            {userRole !== "client" && comparison && (
               <Typography
                 sx={{
-                  fontSize: "1rem",
-                  fontWeight: 400,
-                  color: comparison.trend === "up" ? theme.palette.success.main : theme.palette.error.main,
+                  fontSize: "1.65rem", // 10% larger than the original 1.5rem
+                  fontWeight: 500,
+                  color: comparisonColor,
+                  paddingTop: 1, // Added padding for spacing
                 }}
               >
-                {comparison.value}% {t('comparedToOtherAgents')}
+                {Math.abs(comparison.value)}% {comparisonText} {userRole === 'admin' ? t('comparedToOtherAgents') : t('comparedToOtherClients')}
               </Typography>
             )}
           </Grid>

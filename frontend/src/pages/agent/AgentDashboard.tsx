@@ -31,6 +31,7 @@ import useAgentStats from "../../hooks/useAgentStats";
 import { brandColors } from "../../utils/constants";
 import { calculateAgentMonthlyData } from "../../utils/dataLoader";
 import { SearchResult } from "../../models/models";
+import { getTrend } from "../../utils/dataUtils";
 
 const AgentDashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -55,6 +56,9 @@ const AgentDashboard: React.FC = () => {
     ordersData,
     yearlyCategories,
     yearlyOrdersData,
+    clientComparativeStatistics,
+    clientComparativeStatisticsMonthly,
+    isLoading  
   } = useAgentStats(loggedInAgentId, isMobile);
 
   const handleClientSelect = useCallback(
@@ -115,6 +119,16 @@ const AgentDashboard: React.FC = () => {
                     amount={calculateTotalSpentThisMonth(
                       selectedClient.movements
                     )}
+                    comparison={{
+                      value: parseFloat(
+                        `${
+                          clientComparativeStatisticsMonthly?.revenuePercentage || "0"
+                        }`
+                      ), // Ensure string type
+                      trend: getTrend(
+                        clientComparativeStatisticsMonthly?.revenuePercentage || "0"
+                      ), // Ensure string type
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -122,6 +136,16 @@ const AgentDashboard: React.FC = () => {
                     amount={calculateTotalSpentThisYear(
                       selectedClient.movements
                     )}
+                    comparison={{
+                      value: parseFloat(
+                        `${
+                          clientComparativeStatistics?.revenuePercentage || "0"
+                        }`
+                      ), // Ensure string type
+                      trend: getTrend(
+                        clientComparativeStatistics?.revenuePercentage || "0"
+                      ), // Ensure string type
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>

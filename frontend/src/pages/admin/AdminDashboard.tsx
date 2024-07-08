@@ -11,7 +11,7 @@ import {
   useTheme,
 } from "@mui/material";
 import React, { useCallback, useEffect } from "react";
-import { useDispatch} from "react-redux";
+import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 import ActivePromotions from "../../components/dashboard/ActivePromotions";
 import CalendarComponent from "../../components/dashboard/CalendarComponent";
@@ -31,6 +31,7 @@ import { brandColors } from "../../utils/constants";
 import AgentActivityOverview from "../../components/dashboard/AgentActivityOverview";
 import { calculateMonthlyData } from "../../utils/dataLoader";
 import { SearchResult } from "../../models/models";
+import { getTrend } from "../../utils/dataUtils";
 
 const AdminDashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -57,8 +58,13 @@ const AdminDashboard: React.FC = () => {
     ordersData,
     yearlyCategories,
     yearlyOrdersData,
-    isLoading,
+    agentComparativeStatistics,
+    agentComparativeStatisticsMonthly,
+    clientComparativeStatistics,
+    clientComparativeStatisticsMonthly,
+    isLoading
   } = useAdminStats(isMobile);
+  
 
   const handleSelect = useCallback(
     (item: SearchResult) => {
@@ -126,7 +132,16 @@ const AdminDashboard: React.FC = () => {
                         (client) => client.movements
                       )
                     )}
-                    comparison={{ value: 30, trend: "up" }} // Placeholder for comparison
+                    comparison={{
+                      value: parseFloat(
+                        `${
+                          agentComparativeStatisticsMonthly?.revenuePercentage || "0"
+                        }`
+                      ), // Ensure string type
+                      trend: getTrend(
+                        agentComparativeStatisticsMonthly?.revenuePercentage || "0"
+                      ), // Ensure string type
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -136,7 +151,16 @@ const AdminDashboard: React.FC = () => {
                         (client) => client.movements
                       )
                     )}
-                    comparison={{ value: 20, trend: "down" }} // Placeholder for comparison
+                    comparison={{
+                      value: parseFloat(
+                        `${
+                          agentComparativeStatistics?.revenuePercentage || "0"
+                        }`
+                      ), // Ensure string type
+                      trend: getTrend(
+                        agentComparativeStatistics?.revenuePercentage || "0"
+                      ), // Ensure string type
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -220,6 +244,16 @@ const AdminDashboard: React.FC = () => {
                     amount={calculateTotalSpentThisMonth(
                       selectedClient.movements
                     )}
+                    comparison={{
+                      value: parseFloat(
+                        `${
+                          clientComparativeStatisticsMonthly?.revenuePercentage || "0"
+                        }`
+                      ), // Ensure string type
+                      trend: getTrend(
+                        clientComparativeStatisticsMonthly?.revenuePercentage || "0"
+                      ), // Ensure string type
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -227,6 +261,16 @@ const AdminDashboard: React.FC = () => {
                     amount={calculateTotalSpentThisYear(
                       selectedClient.movements
                     )}
+                    comparison={{
+                      value: parseFloat(
+                        `${
+                          clientComparativeStatistics?.revenuePercentage || "0"
+                        }`
+                      ), // Ensure string type
+                      trend: getTrend(
+                        clientComparativeStatistics?.revenuePercentage || "0"
+                      ), // Ensure string type
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>

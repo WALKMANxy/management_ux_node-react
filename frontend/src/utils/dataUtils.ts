@@ -153,3 +153,6 @@ export const currencyFormatter = (value: any): string => {
 export const numberComparator = (valueA: number, valueB: number) => {
   return valueA - valueB;
 };
+
+export const getTrend = (percentage: string | number) =>
+  parseFloat(`${percentage}`) > 50 ? "up" : "down";
