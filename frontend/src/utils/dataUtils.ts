@@ -24,16 +24,16 @@ export const calculateSalesDistributionDataForAgents = (
   const agentSalesData = agents.map(agent => {
     const totalRevenue = agent.clients.reduce((sum, client) => {
       const revenue = parseFloat(client.totalRevenue);
-      console.log(`Agent: ${agent.name}, Client: ${client.name}, Revenue: ${revenue}`);
+      //console.log(`Agent: ${agent.name}, Client: ${client.name}, Revenue: ${revenue}`);
       return sum + revenue;
     }, 0);
-    console.log(`Agent: ${agent.name}, Total Revenue: ${totalRevenue}`);
+    //console.log(`Agent: ${agent.name}, Total Revenue: ${totalRevenue}`);
     return { label: agent.name, value: totalRevenue };
   });
 
   // Sort and slice based on the isMobile parameter
   const sortedData = agentSalesData.sort((a, b) => b.value - a.value);
-  console.log("Sorted data: ", sortedData);
+  //console.log("Sorted data: ", sortedData);
   return isMobile ? sortedData.slice(0, 8) : sortedData.slice(0, 25);
 };
 
@@ -54,6 +54,7 @@ export const calculateTopBrandsData = (
   clients: Client[]
 ): { label: string; value: number }[] => {
   const brandCount: { [key: string]: number } = {};
+  
   clients.forEach((client) => {
     client.movements.forEach((movement) => {
       movement.details.forEach((detail) => {
@@ -67,13 +68,17 @@ export const calculateTopBrandsData = (
     });
   });
   return Object.keys(brandCount)
-    .map((brand) => ({
+    .map((brand, index) => ({
       label: brand,
       value: brandCount[brand],
+      key: `${brand}-${index}`, // Ensure unique keys by adding an index
     }))
     .sort((a, b) => b.value - a.value)
     .slice(0, 10);
 };
+
+
+
 
 // Calculate sales distribution data for a list of clients
 export const calculateSalesDistributionData = (
