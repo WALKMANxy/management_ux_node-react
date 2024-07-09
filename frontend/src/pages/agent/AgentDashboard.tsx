@@ -29,7 +29,7 @@ import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
 import { setVisits } from "../../features/calendar/calendarSlice";
 import useStats from "../../hooks/useStats";
 import { brandColors } from "../../utils/constants";
-import { SearchResult } from "../../models/models";
+import { Agent, SearchResult } from "../../models/models";
 import { calculateMonthlyData, getTrend } from "../../utils/dataUtils";
 
 const AgentDashboard: React.FC = () => {
@@ -71,8 +71,8 @@ const AgentDashboard: React.FC = () => {
   );
 
   useEffect(() => {
-    if (details && 'clients' in details) {
-      dispatch(setVisits(details.clients.flatMap((client) => client.visits)));
+    if (details && "AgentVisits" in details) {
+      dispatch(setVisits(details.AgentVisits));
     }
   }, [details, dispatch]);
 
@@ -82,13 +82,13 @@ const AgentDashboard: React.FC = () => {
       sx={{ p: isMobile ? 0 : 4, bgcolor: "#f4f5f7" }}
     >
       <Typography variant="h4" gutterBottom>
-        {details && 'name' in details ? (
+        {details && "name" in details ? (
           <>{t("agentDashboard.welcomeBack", { name: details.name })}</>
         ) : (
           <Skeleton width="30%" />
         )}
       </Typography>
-      {details && 'clients' in details ? (
+      {details && "clients" in details ? (
         <GlobalSearch filter="client" onSelect={handleClientSelect} />
       ) : (
         <Skeleton
@@ -188,7 +188,7 @@ const AgentDashboard: React.FC = () => {
           ) : (
             <Box mb={4}>
               <Typography variant="h5" gutterBottom>
-                {details && 'name' in details ? (
+                {details && "name" in details ? (
                   t("agentDashboard.yourStatistics")
                 ) : (
                   <Skeleton width="40%" />
@@ -198,7 +198,7 @@ const AgentDashboard: React.FC = () => {
               <Divider sx={{ my: 2, borderRadius: "12px" }} />
               <Grid container spacing={2}>
                 <Grid item xs={12} md={6}>
-                  {details && 'clients' in details ? (
+                  {details && "clients" in details ? (
                     <TotalEarning
                       totalEarning={totalRevenue}
                       isLoading={!details}
@@ -214,7 +214,7 @@ const AgentDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  {details && 'clients' in details ? (
+                  {details && "clients" in details ? (
                     <TotalOrder
                       totalOrder={totalOrders}
                       isLoading={!details}
@@ -234,7 +234,7 @@ const AgentDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  {details && 'clients' in details ? (
+                  {details && "clients" in details ? (
                     <MonthOverMonthSpendingTrend
                       months={months}
                       revenueData={revenueData}
@@ -251,7 +251,7 @@ const AgentDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  {details && 'clients' in details ? (
+                  {details && "clients" in details ? (
                     <TopBrandsSold
                       topBrandsData={topBrandsData}
                       isMobile={isMobile}
@@ -269,9 +269,11 @@ const AgentDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12}>
-                  {details && 'clients' in details ? (
+                  {details && "clients" in details ? (
                     <SalesDistribution
-                      salesDistributionDataClients={salesDistributionDataClients}
+                      salesDistributionDataClients={
+                        salesDistributionDataClients
+                      }
                     />
                   ) : (
                     <Skeleton
@@ -288,13 +290,17 @@ const AgentDashboard: React.FC = () => {
           )}
           <UpcomingVisits
             selectedClient={selectedClient}
-            agentDetails={details && 'clients' in details ? details : undefined}
+            agentDetails={
+              details && "AgentVisits" in details
+                ? (details as Agent)
+                : undefined
+            }
           />
         </Grid>
         <Grid item xs={12} md={3}>
           <Box mb={4}>
             <Typography variant="h5" gutterBottom>
-              {details && 'name' in details ? (
+              {details && "name" in details ? (
                 t("agentDashboard.calendar")
               ) : (
                 <Skeleton width="30%" />
@@ -302,7 +308,7 @@ const AgentDashboard: React.FC = () => {
             </Typography>
 
             <Divider sx={{ my: 2, borderRadius: "12px" }} />
-            {details && 'clients' in details ? (
+            {details && "clients" in details ? (
               <Box sx={{ maxWidth: "400px", margin: "0 auto" }}>
                 <CalendarComponent />
               </Box>
@@ -318,7 +324,11 @@ const AgentDashboard: React.FC = () => {
           </Box>
           <ActivePromotions
             selectedClient={selectedClient}
-            agentDetails={details && 'clients' in details ? details : undefined}
+            agentDetails={
+              details && "AgentPromos" in details
+                ? (details as Agent)
+                : undefined
+            }
           />
         </Grid>
       </Grid>

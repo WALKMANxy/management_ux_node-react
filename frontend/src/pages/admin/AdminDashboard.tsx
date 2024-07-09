@@ -27,7 +27,7 @@ import MonthOverMonthSpendingTrend from "../../components/statistics/charts/Mont
 import SalesDistribution from "../../components/statistics/charts/SalesDistribution";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
 import AgentActivityOverview from "../../components/dashboard/AgentActivityOverview";
-import { SearchResult } from "../../models/models";
+import { AdminDetails, SearchResult } from "../../models/models";
 import {
   calculateMonthlyData,
   getTrend,
@@ -52,6 +52,8 @@ const AdminDashboard: React.FC = () => {
     calculateTotalSpentThisYear,
     calculateTotalSpentThisYearForAgents,
     calculateTopArticleType,
+    getPromos,
+    getVisits,
     totalRevenue,
     totalOrders,
     topBrandsData,
@@ -81,16 +83,13 @@ const AdminDashboard: React.FC = () => {
     [selectClient, selectAgent]
   );
 
-  useEffect(() => {
-    if (details && "agents" in details) {
-      const allVisits = details.agents.flatMap((agent) =>
-        agent.clients.flatMap((client) => client.visits || [])
-      );
+  
 
-      console.log("Dispatching visits:", allVisits);
-      dispatch(setVisits(allVisits));
-    }
-  }, [details, dispatch]);
+  useEffect(() => {
+    const visits = getVisits();
+    console.log("Dispatching visits:", visits);
+    dispatch(setVisits(visits));
+  }, [getVisits, dispatch]);
 
   const selectedAgentData = useMemo(() => {
     if (selectedAgent && salesDistributionDataAgents.agents.length > 0) {
@@ -435,6 +434,17 @@ const AdminDashboard: React.FC = () => {
           <UpcomingVisits
             selectedClient={selectedClient}
             agentDetails={selectedAgent}
+            adminDetails={
+              details && "clients" in details
+                ? (details as AdminDetails)
+                : {
+                    agents: [],
+                    clients: [],
+                    GlobalVisits: {},
+                    GlobalPromos: {},
+                  }
+            }
+            getVisits={getVisits}
           />
         </Grid>
         <Grid item xs={12} md={3}>
@@ -461,6 +471,17 @@ const AdminDashboard: React.FC = () => {
           <ActivePromotions
             selectedClient={selectedClient}
             agentDetails={selectedAgent}
+            adminDetails={
+              details && "clients" in details
+                ? (details as AdminDetails)
+                : {
+                    agents: [],
+                    clients: [],
+                    GlobalVisits: {},
+                    GlobalPromos: {},
+                  }
+            }
+            getPromos={getPromos}
           />
         </Grid>
       </Grid>

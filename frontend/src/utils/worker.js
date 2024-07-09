@@ -15,7 +15,7 @@ onmessage = function (event) {
     const clientDetail = clientDetails.find(
       (detail) => detail["CODICE"] === clientInfo["Codice Cliente"].toString()
     );
-
+  
     const movementsMap = clientData.reduce((acc, item) => {
       const movementId = item["Numero Lista"].toString();
       if (!acc.has(movementId)) {
@@ -24,7 +24,7 @@ onmessage = function (event) {
       acc.get(movementId).push(item);
       return acc;
     }, new Map());
-
+  
     const movements = Array.from(movementsMap.values()).map((movementData) => {
       const movementInfo = movementData[0];
       return {
@@ -42,7 +42,7 @@ onmessage = function (event) {
         dateOfOrder: movementInfo["Data Documento Precedente"].split("T")[0],
       };
     });
-
+  
     const totalRevenue = movements
       .reduce((acc, movement) => {
         return (
@@ -55,6 +55,9 @@ onmessage = function (event) {
       }, 0)
       .toFixed(2);
 
+    const visits = []; // Initialize visits
+    const promos = []; // Initialize promos
+  
     return {
       id: clientInfo["Codice Cliente"].toString(),
       name: clientInfo["Ragione Sociale Cliente"],
@@ -72,12 +75,12 @@ onmessage = function (event) {
       paymentMethod: clientDetail
         ? clientDetail["Descizione metodo pagamento"]
         : "",
-      visits: [], // Initialize visits
+      visits,
       agent: clientInfo["Codice Agente"].toString(),
       movements,
-      promos: [], // Initialize promos
+      promos,
     };
   });
-
+  
   postMessage(clients);
 };

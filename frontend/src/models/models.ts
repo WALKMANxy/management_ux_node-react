@@ -113,8 +113,7 @@ export type SalesDistributionProps = {
 };
 
 export type ActivePromotionsProps = {
-  selectedClient?: Client | null;
-  agentDetails?: { clients: Client[] } | null;
+  getPromos: () => Promo[];
 };
 
 export type Comparison = {
@@ -169,8 +168,7 @@ export type TotalEarningProps = {
 };
 
 export type UpcomingVisitsProps = {
-  selectedClient?: Client | null;
-  agentDetails?: { clients: Client[] } | null;
+  getVisits: () => Visit[];
 };
 
 export type AGGridTableProps = {

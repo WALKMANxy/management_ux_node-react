@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AdminDetails, Agent, Client, Movement } from "../models/models";
-import { useGetClientsQuery, useGetAgentsQuery, useGetAgentDetailsQuery } from "../services/api";
+import {
+  useGetClientsQuery,
+  useGetAgentsQuery,
+  useGetAgentDetailsQuery,
+} from "../services/api";
 import {
   calculateMonthlyData,
   calculateTotalOrders,
@@ -30,37 +34,69 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     error: agentDetailsError,
   } = useGetAgentDetailsQuery();
 
-  const [details, setDetails] = useState<Agent | Client | AdminDetails | null>(null);
+  const [details, setDetails] = useState<Agent | Client | AdminDetails | null>(
+    null
+  );
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
 
   useEffect(() => {
-  if (role === "agent" && !clientsLoading && !agentDetailsLoading && clientsData && agentDetailsData && id) {
-    const agent = agentDetailsData.find((agent) => agent.id === id);
-    if (agent) {
-      const updatedAgent = {
-        ...agent,
-        clients: clientsData.filter((client) => client.agent === id),
+    if (
+      role === "agent" &&
+      !clientsLoading &&
+      !agentDetailsLoading &&
+      clientsData &&
+      agentDetailsData &&
+      id
+    ) {
+      const agent = agentDetailsData.find((agent) => agent.id === id);
+      if (agent) {
+        const updatedAgent = {
+          ...agent,
+          clients: clientsData.filter((client) => client.agent === id),
+          AgentVisits: clientsData.flatMap((client) => client.visits || []),
+          AgentPromos: clientsData.flatMap((client) => client.promos || []),
+        };
+        setDetails(updatedAgent);
+      }
+    } else if (role === "client" && !clientsLoading && clientsData && id) {
+      const client = clientsData.find((client) => client.id === id);
+      setDetails(client || null);
+    } else if (
+      role === "admin" &&
+      !clientsLoading &&
+      !agentsLoading &&
+      !agentDetailsLoading &&
+      clientsData &&
+      agentsData &&
+      agentDetailsData
+    ) {
+      const adminDetails: AdminDetails = {
+        agents: agentDetailsData,
+        clients: clientsData,
+        GlobalVisits: {},
+        GlobalPromos: {},
       };
-      setDetails(updatedAgent);
+      agentDetailsData.forEach((agent) => {
+        adminDetails.GlobalVisits[agent.id] = {
+          Visits: agent.AgentVisits || [],
+        };
+        adminDetails.GlobalPromos[agent.id] = {
+          Promos: agent.AgentPromos || [],
+        };
+      });
+      setDetails(adminDetails);
     }
-  } else if (role === "client" && !clientsLoading && clientsData && id) {
-    const client = clientsData.find((client) => client.id === id);
-    setDetails(client || null);
-  } else if (
-    role === "admin" &&
-    !clientsLoading &&
-    !agentsLoading &&
-    !agentDetailsLoading &&
-    clientsData &&
-    agentsData &&
-    agentDetailsData
-  ) {
-    const adminDetails = { agents: agentDetailsData, clients: clientsData };
-    setDetails(adminDetails);
-  }
-}, [role, id, clientsLoading, agentsLoading, agentDetailsLoading, clientsData, agentsData, agentDetailsData]);
-
+  }, [
+    role,
+    id,
+    clientsLoading,
+    agentsLoading,
+    agentDetailsLoading,
+    clientsData,
+    agentsData,
+    agentDetailsData,
+  ]);
 
   const selectClient = useCallback(
     (clientName: string) => {
@@ -83,12 +119,36 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
           setSelectedAgent(null);
           return;
         }
-        const agent = agentDetailsData.find((agent) => agent.name === agentName);
+        const agent = agentDetailsData.find(
+          (agent) => agent.name === agentName
+        );
         setSelectedAgent(agent || null);
       }
     },
     [agentDetailsData]
   );
+
+  const getVisits = useCallback(() => {
+    if (selectedClient) {
+      return selectedClient.visits || [];
+    } else if (selectedAgent) {
+      return selectedAgent.AgentVisits || [];
+    } else if (details && "GlobalVisits" in details) {
+      return Object.values(details.GlobalVisits).flatMap((visitObj) => visitObj.Visits) || [];
+    }
+    return [];
+  }, [selectedClient, selectedAgent, details]);
+
+  const getPromos = useCallback(() => {
+    if (selectedClient) {
+      return selectedClient.promos || [];
+    } else if (selectedAgent) {
+      return selectedAgent.AgentPromos || [];
+    } else if (details && "GlobalPromos" in details) {
+      return Object.values(details.GlobalPromos).flatMap((promoObj) => promoObj.Promos) || [];
+    }
+    return [];
+  }, [selectedClient, selectedAgent, details]);
 
   const calculateTotalSpentThisMonth = useCallback((movements: Movement[]) => {
     const totalSpent = calculateMonthlyRevenue(movements);
@@ -147,7 +207,7 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
       "TRASPORTO ",
       "TRASPORTO URGENTE",
     ]);
-  
+
     const typeCount: {
       [key: string]: { id: string; name: string; amount: number };
     } = {};
@@ -170,7 +230,6 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     );
     return sortedArticles.slice(0, 5); // Return top 5 articles
   }, []);
-  
 
   const totalRevenue = useMemo(() => {
     if (role === "agent" && details) {
@@ -214,9 +273,20 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
       const agentsMap = clients.reduce((acc, client) => {
         const agentId = client.agent;
         if (!acc[agentId]) {
-          acc[agentId] = { id: agentId, name: `Agent ${agentId}`, clients: [] };
+          acc[agentId] = {
+            id: agentId,
+            name: `Agent ${agentId}`,
+            clients: [],
+            AgentVisits: [],
+            AgentPromos: [],
+          };
         }
         acc[agentId].clients.push(client);
+
+        // Collect visits and promos from the client and add to the agent
+        acc[agentId].AgentVisits.push(...client.visits);
+        acc[agentId].AgentPromos.push(...client.promos);
+
         return acc;
       }, {} as { [key: string]: Agent });
 
@@ -356,7 +426,7 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     if (!selectedAgent || !clientsData) {
       return { revenuePercentage: 0, ordersPercentage: 0 };
     }
-  
+
     const agentClients = selectedAgent.clients || [];
     const agentRevenue = agentClients.reduce((sum, client) => {
       return sum + (parseFloat(client.totalRevenue) || 0);
@@ -364,32 +434,34 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     const totalRevenueAllClients = clientsData.reduce((sum, client) => {
       return sum + (parseFloat(client.totalRevenue) || 0);
     }, 0);
-  
+
     return {
-      revenuePercentage: totalRevenueAllClients === 0 ? 0 : (
-        (agentRevenue / totalRevenueAllClients) *
-        100
-      ).toFixed(2),
-      ordersPercentage: totalOrders === 0 ? 0 : (
-        (agentClients.reduce(
-          (sum, client) => sum + (client.movements?.length || 0),
-          0
-        ) /
-          totalOrders) *
-        100
-      ).toFixed(2),
+      revenuePercentage:
+        totalRevenueAllClients === 0
+          ? 0
+          : ((agentRevenue / totalRevenueAllClients) * 100).toFixed(2),
+      ordersPercentage:
+        totalOrders === 0
+          ? 0
+          : (
+              (agentClients.reduce(
+                (sum, client) => sum + (client.movements?.length || 0),
+                0
+              ) /
+                totalOrders) *
+              100
+            ).toFixed(2),
     };
   }, [selectedAgent, clientsData, totalOrders]);
-  
 
   const agentComparativeStatisticsMonthly = useMemo(() => {
     if (!selectedAgent || !clientsData) {
       return { revenuePercentage: 0, ordersPercentage: 0 };
     }
-  
+
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
-  
+
     const selectedMovements = (selectedAgent.clients || []).flatMap((client) =>
       (client.movements || []).filter((movement) => {
         const movementDate = new Date(movement.dateOfOrder);
@@ -399,7 +471,7 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
         );
       })
     );
-  
+
     const allMovements = clientsData.flatMap((client) =>
       (client.movements || []).filter((movement) => {
         const movementDate = new Date(movement.dateOfOrder);
@@ -409,39 +481,40 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
         );
       })
     );
-  
+
     const selectedMonthlyTotal = selectedMovements.reduce(
       (movementSum, movement) =>
         movementSum +
         movement.details.reduce(
-          (detailSum, detail) => detailSum + (parseFloat(detail.priceSold) || 0),
+          (detailSum, detail) =>
+            detailSum + (parseFloat(detail.priceSold) || 0),
           0
         ),
       0
     );
-  
+
     const allMonthlyTotal = allMovements.reduce(
       (movementSum, movement) =>
         movementSum +
         movement.details.reduce(
-          (detailSum, detail) => detailSum + (parseFloat(detail.priceSold) || 0),
+          (detailSum, detail) =>
+            detailSum + (parseFloat(detail.priceSold) || 0),
           0
         ),
       0
     );
-  
+
     return {
-      revenuePercentage: allMonthlyTotal === 0 ? 0 : (
-        (selectedMonthlyTotal / allMonthlyTotal) *
-        100
-      ).toFixed(2),
-      ordersPercentage: allMovements.length === 0 ? 0 : (
-        (selectedMovements.length / allMovements.length) *
-        100
-      ).toFixed(2),
+      revenuePercentage:
+        allMonthlyTotal === 0
+          ? 0
+          : ((selectedMonthlyTotal / allMonthlyTotal) * 100).toFixed(2),
+      ordersPercentage:
+        allMovements.length === 0
+          ? 0
+          : ((selectedMovements.length / allMovements.length) * 100).toFixed(2),
     };
   }, [selectedAgent, clientsData]);
-  
 
   return {
     details,
@@ -449,6 +522,8 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     selectedAgent,
     selectClient,
     selectAgent,
+    getVisits,
+    getPromos,
     calculateTotalSpentThisMonth,
     calculateTotalSpentThisYear,
     calculateTotalSpentThisYearForAgents,
@@ -467,8 +542,11 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     clientComparativeStatisticsMonthly,
     agentComparativeStatistics,
     agentComparativeStatisticsMonthly,
-    isLoading: clientsLoading || (role === "admin" && (agentsLoading || agentDetailsLoading)),
-    error: clientsError || (role === "admin" && (agentsError || agentDetailsError)),
+    isLoading:
+      clientsLoading ||
+      (role === "admin" && (agentsLoading || agentDetailsLoading)),
+    error:
+      clientsError || (role === "admin" && (agentsError || agentDetailsError)),
   };
 };
 

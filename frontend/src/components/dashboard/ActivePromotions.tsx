@@ -11,53 +11,30 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { ActivePromotionsProps } from "../../models/models";
 
-const ActivePromotions: React.FC<ActivePromotionsProps> = ({
-  selectedClient,
-  agentDetails,
-}) => {
+const ActivePromotions: React.FC<ActivePromotionsProps> = ({ getPromos }) => {
   const { t } = useTranslation();
-  const promos = selectedClient
-    ? selectedClient.promos || []
-    : agentDetails?.clients.flatMap((client) => client.promos || []) || [];
+  const promos = getPromos();
 
-    
   // Debugging output
-  console.log("Selected Client Promos: ", selectedClient?.promos);
-  console.log("Agent Details Promos: ", agentDetails?.clients.flatMap((client) => client.promos));
+  console.log("Promos: ", promos);
 
   return (
     <Box>
       <Typography variant="h5" gutterBottom>
-        {selectedClient ? (
-          `${t('promotions.activePromotionsFor')} ${selectedClient.name}`
-        ) : agentDetails ? (
-          t('promotions.activePromotionsWithClients')
+        {promos.length > 0 ? (
+          t('promotions.activePromotions')
         ) : (
           <Skeleton width="50%" />
         )}
       </Typography>
       <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
-        {agentDetails ? (
+        {promos.length > 0 ? (
           <List>
-            {promos ? (
-              promos.map((promo, index) => (
-                <ListItem key={promo.id}>
-                  <ListItemText primary={promo.name} />
-                </ListItem>
-              ))
-            ) : (
-              <>
-                <ListItem>
-                  <ListItemText primary={t('promotions.promo1')} />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary={t('promotions.promo2')} />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary={t('promotions.promo3')} />
-                </ListItem>
-              </>
-            )}
+            {promos.map((promo) => (
+              <ListItem key={promo.id}>
+                <ListItemText primary={promo.name} />
+              </ListItem>
+            ))}
           </List>
         ) : (
           <Skeleton

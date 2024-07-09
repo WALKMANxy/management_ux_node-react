@@ -11,53 +11,30 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { UpcomingVisitsProps } from "../../models/models";
 
-const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({
-  selectedClient,
-  agentDetails,
-}) => {
+const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ getVisits }) => {
   const { t } = useTranslation();
-
-  const visits = selectedClient
-    ? selectedClient.visits || []
-    : agentDetails?.clients.flatMap((client) => client.visits || []) || [];
+  const visits = getVisits();
 
   // Debugging output
-  console.log("Selected Client Visits: ", selectedClient?.visits);
-  console.log("Agent Details Visits: ", agentDetails?.clients.flatMap((client) => client.visits));
+  console.log("Visits: ", visits);
 
   return (
     <Box mb={4}>
       <Typography variant="h5" gutterBottom>
-        {selectedClient ? (
-          t("upcomingVisits.titleForClient", { clientName: selectedClient.name })
-        ) : agentDetails ? (
-          t("upcomingVisits.titleForAgent")
+        {visits.length > 0 ? (
+          t("upcomingVisits.title")
         ) : (
           <Skeleton width="50%" />
         )}
       </Typography>
       <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
-        {agentDetails ? (
+        {visits.length > 0 ? (
           <List>
-            {visits ? (
-              visits.map((visit, index) => (
-                <ListItem key={index}>
-                  <ListItemText primary={`${visit.note} on ${visit.date}`} />
-                </ListItem>
-              ))
-            ) : (
-              <>
-                <ListItem>
-                  <ListItemText primary={t("upcomingVisits.visitPlaceholder1")} />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary={t("upcomingVisits.visitPlaceholder2")} />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary={t("upcomingVisits.visitPlaceholder3")} />
-                </ListItem>
-              </>
-            )}
+            {visits.map((visit) => (
+              <ListItem key={visit.id}>
+                <ListItemText primary={`${visit.note} on ${visit.date}`} />
+              </ListItem>
+            ))}
           </List>
         ) : (
           <Skeleton

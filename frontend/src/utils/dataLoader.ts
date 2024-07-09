@@ -152,10 +152,12 @@ export const mapDataToAgents = async (
     agentsMap.set(agent.id, {
       ...agent,
       clients: [],
+      AgentVisits: [], // Initialize AgentVisits
+      AgentPromos: [], // Initialize AgentPromos
     });
   });
 
-  // Map clients to their respective agents
+  // Map clients and their visits/promos to their respective agents
   data.forEach((item) => {
     const agentId = item["Codice Agente"].toString();
     const clientId = item["Codice Cliente"].toString();
@@ -166,21 +168,24 @@ export const mapDataToAgents = async (
         (client) => client.id === clientId
       );
       if (!existingClient) {
-        agent.clients.push({
+        const newClient: Client = {
           id: clientId,
           name: item["Ragione Sociale Cliente"],
           province: "",
           phone: "",
-          totalOrders: 0, // Placeholder
-          totalRevenue: "0", // Placeholder
-          unpaidRevenue: "0", // Placeholder
+          totalOrders: 0,
+          totalRevenue: "0",
+          unpaidRevenue: "0",
           address: "",
           email: "",
-          visits: [], // Ensure visits is initialized as an empty array
+          visits: [],
           agent: agentId,
           movements: [],
-          promos: [], // Ensure promos is initialized as an empty array
-        });
+          promos: [],
+        };
+        agent.clients.push(newClient);
+        agent.AgentVisits.push(...newClient.visits);
+        agent.AgentPromos.push(...newClient.promos);
       }
     }
   });
@@ -210,7 +215,9 @@ export const mapDataToAdmin = (
     agentsMap.set(agent.id, {
       ...agent,
       clients: [],
-      alerts: [], // Initialize alerts
+      alerts: [],
+      AgentVisits: [], // Initialize AgentVisits
+      AgentPromos: [], // Initialize AgentPromos
     });
   });
 
@@ -221,9 +228,11 @@ export const mapDataToAdmin = (
     if (!agentsMap.has(agentId)) {
       agentsMap.set(agentId, {
         id: agentId,
-        name: `Agent ${agentId}`, // This will be overwritten by the next loop if agentDetails has the correct name
+        name: `Agent ${agentId}`,
         clients: [],
         alerts: [],
+        AgentVisits: [],
+        AgentPromos: [],
       });
     }
 
@@ -235,15 +244,15 @@ export const mapDataToAdmin = (
         name: item["Ragione Sociale Cliente"],
         province: clientDetail ? clientDetail["C.A.P. - COMUNE (PROV.)"] : "",
         phone: clientDetail ? clientDetail["TELEFONO"] : "",
-        totalOrders: 0, // Placeholder
-        totalRevenue: "0", // Placeholder
-        unpaidRevenue: "0", // Placeholder
+        totalOrders: 0,
+        totalRevenue: "0",
+        unpaidRevenue: "0",
         address: clientDetail ? clientDetail["INDIRIZZO"] : "",
         email: clientDetail ? clientDetail["EMAIL"] : "",
-        visits: [], // Ensure visits is initialized as an empty array
+        visits: [],
         agent: agentId,
         movements: [],
-        promos: [], // Ensure promos is initialized as an empty array
+        promos: [],
       });
     }
 
@@ -252,6 +261,8 @@ export const mapDataToAdmin = (
 
     if (!agent.clients.find((c) => c.id === client.id)) {
       agent.clients.push(client);
+      agent.AgentVisits.push(...client.visits);
+      agent.AgentPromos.push(...client.promos);
     }
   });
 
@@ -259,9 +270,9 @@ export const mapDataToAdmin = (
   agentDetails.forEach((agentDetail) => {
     const agent = agentsMap.get(agentDetail.id);
     if (agent) {
-      agent.name = agentDetail.name; // Update the name to the correct one from agentDetails
-      agent.email = agentDetail.email; // Update email if needed
-      agent.phone = agentDetail.phone; // Update phone if needed
+      agent.name = agentDetail.name;
+      agent.email = agentDetail.email;
+      agent.phone = agentDetail.phone;
     }
   });
 
