@@ -3,6 +3,7 @@ import { Agent, Client, MovementDetail } from "../models/models";
 
 const jsonFilePath = "/data/datasetsfrom01JANto12JUN.min.json";
 const clientDetailsFilePath = "/data/clientdetailsdataset02072024.min.json";
+const agentDetailsFilePath = "/data/agentdetailsdataset02072024.min.json";
 
 const workerScriptPath = new URL("./worker.js", import.meta.url);
 
@@ -26,6 +27,18 @@ export const loadClientDetailsData = async (
     return response.data;
   } catch (error) {
     console.error("Error loading client details data:", error);
+    throw new Error(`Failed to load data from ${url}`);
+  }
+};
+
+export const loadAgentDetailsData = async (
+  url: string = agentDetailsFilePath
+): Promise<Agent[]> => {
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error loading agent details data:", error);
     throw new Error(`Failed to load data from ${url}`);
   }
 };
@@ -54,9 +67,10 @@ const chunkArray = <T>(array: T[], chunkSize: number): T[][] => {
  */
 export const mapDataToModels = async (
   data: any[],
-  clientDetails: any[]
+  clientDetails: any[],
+  agentDetails: any[]
 ): Promise<Client[]> => {
-  const numWorkers = Math.min(navigator.hardwareConcurrency || 4, 4); // Limit to a maximum of 4 workers
+  const numWorkers = Math.min(navigator.hardwareConcurrency || 4, 4);
   const chunks = chunkArray(data, Math.ceil(data.length / numWorkers));
 
   return new Promise<Client[]>((resolve, reject) => {
@@ -67,7 +81,8 @@ export const mapDataToModels = async (
     let completed = 0;
 
     workers.forEach((worker, index) => {
-      worker.postMessage({ data: chunks[index], clientDetails });
+      console.log("Sending data to worker:", { data: chunks[index], clientDetails, agentDetails });
+      worker.postMessage({ data: chunks[index], clientDetails, agentDetails });
 
       worker.onmessage = (event: MessageEvent<Client[]>) => {
         results.push(...event.data);
@@ -119,34 +134,58 @@ export const mapDataToMinimalAgents = (data: any[]): Agent[] => {
   return Array.from(agentsMap.values());
 };
 
-export const mapDataToAgents = (data: any[]): Agent[] => {
-  const agentsMap = data.reduce<Map<string, any[]>>((acc, item) => {
+/**
+ * Maps the given data to a list of Agent models.
+ *
+ * @param data - The data to map, typed as an array of any.
+ * @param agentDetails - The agent details to map, typed as an array of any.
+ * @returns A Promise that resolves to an array of Agent models.
+ */
+export const mapDataToAgents = async (
+  data: any[],
+  agentDetails: Agent[]
+): Promise<Agent[]> => {
+  const agentsMap = new Map<string, Agent>();
+
+  // Populate agents map from agentDetails
+  agentDetails.forEach((agent) => {
+    agentsMap.set(agent.id, {
+      ...agent,
+      clients: [],
+    });
+  });
+
+  // Map clients to their respective agents
+  data.forEach((item) => {
     const agentId = item["Codice Agente"].toString();
-    acc.set(agentId, (acc.get(agentId) || []).concat(item));
-    return acc;
-  }, new Map<string, any[]>());
+    const clientId = item["Codice Cliente"].toString();
+    const agent = agentsMap.get(agentId);
 
-  const agents = Array.from(agentsMap.entries()).map(([id, clientData]) => ({
-    id,
-    name: `Agent ${id}`,
-    clients: clientData.map((item) => ({
-      id: item["Codice Cliente"].toString(),
-      name: item["Ragione Sociale Cliente"],
-      province: "",
-      phone: "",
-      totalOrders: 0, // Placeholder
-      totalRevenue: "0", // Placeholder
-      unpaidRevenue: "0", // Placeholder
-      address: "",
-      email: "",
-      visits: [],
-      agent: id,
-      movements: [],
-      promos: [],
-    })),
-  }));
+    if (agent) {
+      const existingClient = agent.clients.find(
+        (client) => client.id === clientId
+      );
+      if (!existingClient) {
+        agent.clients.push({
+          id: clientId,
+          name: item["Ragione Sociale Cliente"],
+          province: "",
+          phone: "",
+          totalOrders: 0, // Placeholder
+          totalRevenue: "0", // Placeholder
+          unpaidRevenue: "0", // Placeholder
+          address: "",
+          email: "",
+          visits: [],
+          agent: agentId,
+          movements: [],
+          promos: [],
+        });
+      }
+    }
+  });
 
-  return agents;
+  return Array.from(agentsMap.values());
 };
 
 export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
@@ -159,9 +198,19 @@ export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
   }));
 };
 
-export const mapDataToAdmin = (data: any[]): { agents: Agent[], clients: Client[] } => {
+export const mapDataToAdmin = (
+  data: any[],
+  agentDetails: Agent[]
+): { agents: Agent[]; clients: Client[] } => {
   const agentsMap = new Map<string, Agent>();
   const clientsMap = new Map<string, Client>();
+
+  agentDetails.forEach((agent) => {
+    agentsMap.set(agent.id, {
+      ...agent,
+      clients: [],
+    });
+  });
 
   data.forEach((item) => {
     const agentId = item["Codice Agente"].toString();
@@ -171,7 +220,7 @@ export const mapDataToAdmin = (data: any[]): { agents: Agent[], clients: Client[
       agentsMap.set(agentId, {
         id: agentId,
         name: `Agent ${agentId}`,
-        clients: []
+        clients: [],
       });
     }
 
@@ -196,13 +245,13 @@ export const mapDataToAdmin = (data: any[]): { agents: Agent[], clients: Client[
     const agent = agentsMap.get(agentId)!;
     const client = clientsMap.get(clientId)!;
 
-    if (!agent.clients.find(c => c.id === client.id)) {
+    if (!agent.clients.find((c) => c.id === client.id)) {
       agent.clients.push(client);
     }
   });
 
   return {
     agents: Array.from(agentsMap.values()),
-    clients: Array.from(clientsMap.values())
+    clients: Array.from(clientsMap.values()),
   };
 };

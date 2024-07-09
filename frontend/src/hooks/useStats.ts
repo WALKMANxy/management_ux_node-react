@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AdminDetails, Agent, Client, Movement } from "../models/models";
-import { useGetClientsQuery, useGetAgentsQuery } from "../services/api";
+import { useGetClientsQuery, useGetAgentsQuery, useGetAgentDetailsQuery } from "../services/api";
 import {
   calculateMonthlyData,
   calculateTotalOrders,
@@ -24,35 +24,39 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     isLoading: agentsLoading,
     error: agentsError,
   } = useGetAgentsQuery();
+  const {
+    data: agentDetailsData,
+    isLoading: agentDetailsLoading,
+    error: agentDetailsError,
+  } = useGetAgentDetailsQuery();
 
-  const [details, setDetails] = useState<Agent | Client | AdminDetails | null>(
-    null
-  );
+  const [details, setDetails] = useState<Agent | Client | AdminDetails | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
 
   useEffect(() => {
-    if (role === "agent" && !clientsLoading && clientsData && id) {
-      const agentClients = clientsData.filter((client) => client.agent === id);
-      const agent = { id, name: `Agent ${id}`, clients: agentClients };
-      //console.log("Setting agent details: ", agent);
-      setDetails(agent);
+    if (role === "agent" && !clientsLoading && !agentDetailsLoading && clientsData && agentDetailsData && id) {
+      const agent = agentDetailsData.find((agent) => agent.id === id);
+      if (agent) {
+        agent.clients = clientsData.filter((client) => client.agent === id);
+        setDetails(agent);
+      }
     } else if (role === "client" && !clientsLoading && clientsData && id) {
       const client = clientsData.find((client) => client.id === id);
-      //console.log("Setting client details: ", client);
       setDetails(client || null);
     } else if (
       role === "admin" &&
       !clientsLoading &&
       !agentsLoading &&
+      !agentDetailsLoading &&
       clientsData &&
-      agentsData
+      agentsData &&
+      agentDetailsData
     ) {
-      const adminDetails = { agents: agentsData, clients: clientsData };
-      //console.log("Setting admin details: ", adminDetails);
+      const adminDetails = { agents: agentDetailsData, clients: clientsData };
       setDetails(adminDetails);
     }
-  }, [role, id, clientsLoading, agentsLoading, clientsData, agentsData]);
+  }, [role, id, clientsLoading, agentsLoading, agentDetailsLoading, clientsData, agentsData, agentDetailsData]);
 
   const selectClient = useCallback(
     (clientName: string) => {
@@ -70,18 +74,16 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
 
   const selectAgent = useCallback(
     (agentName: string) => {
-      if (agentsData) {
-        //console.log(`Selecting agent: ${agentName}`);
+      if (agentDetailsData) {
         if (agentName === "") {
           setSelectedAgent(null);
           return;
         }
-        const agent = agentsData.find((agent) => agent.name === agentName);
-        //console.log("Selected Agent: ", agent);
+        const agent = agentDetailsData.find((agent) => agent.name === agentName);
         setSelectedAgent(agent || null);
       }
     },
-    [agentsData]
+    [agentDetailsData]
   );
 
   const calculateTotalSpentThisMonth = useCallback((movements: Movement[]) => {
@@ -111,41 +113,25 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
 
   const calculateTotalSpentThisYearForAgents = useCallback(
     (clients: Client[]) => {
-      /* console.log(
-        "Calculating total spent this year for agents. Clients:",
-        clients
-      ); */
       const currentYear = new Date().getFullYear();
       const totalSpent = clients
         .reduce((total, client) => {
-          /* console.log(
-            `Processing client: ${client.name}, Movements: ${JSON.stringify(
-              client.movements
-            )}`
-          ); */
           const clientTotal = client.movements
             .filter((movement) => {
               const isCurrentYear =
                 new Date(movement.dateOfOrder).getFullYear() === currentYear;
-             /*  console.log(
-                `Movement date: ${movement.dateOfOrder}, Is current year: ${isCurrentYear}`
-              ); */
               return isCurrentYear;
             })
             .reduce((movementTotal, movement) => {
               const movementSum = movement.details.reduce((sum, detail) => {
                 const priceSold = parseFloat(detail.priceSold);
-                //console.log(`Detail price sold: ${priceSold}`);
                 return sum + priceSold;
               }, 0);
-              //console.log(`Movement total: ${movementSum}`);
               return movementTotal + movementSum;
             }, 0);
-          //console.log(`Client total: ${clientTotal}`);
           return total + clientTotal;
         }, 0)
         .toFixed(2);
-      //console.log(`Total spent this year: ${totalSpent}`);
       return totalSpent;
     },
     []
@@ -232,12 +218,10 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
 
       const agents = Object.values(agentsMap);
       const data = calculateSalesDistributionDataForAgents(agents, isMobile);
-      //console.log("Sales Distribution Data for Agents: ", data);
       return { agents, data };
     } else if (role === "agent" && details) {
       const agent = details as Agent;
       const data = calculateSalesDistributionData(agent.clients, isMobile);
-      //console.log("Sales Distribution Data for Agent Clients: ", data);
       return { agents: [agent], data };
     }
     return { agents: [], data: [] };
@@ -477,8 +461,8 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     clientComparativeStatisticsMonthly,
     agentComparativeStatistics,
     agentComparativeStatisticsMonthly,
-    isLoading: clientsLoading || (role === "admin" && agentsLoading),
-    error: clientsError || (role === "admin" && agentsError),
+    isLoading: clientsLoading || (role === "admin" && (agentsLoading || agentDetailsLoading)),
+    error: clientsError || (role === "admin" && (agentsError || agentDetailsError)),
   };
 };
 

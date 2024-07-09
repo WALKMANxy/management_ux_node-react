@@ -1,11 +1,12 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
 import { Client } from "../models/models";
-import { useGetClientsQuery } from "../services/api";
+import { useGetClientsQuery, useGetAgentDetailsQuery } from "../services/api";
 
 export const useClientsGrid = () => {
   const { data: clients = [] } = useGetClientsQuery();
+  const { data: agentDetails = [] } = useGetAgentDetailsQuery();
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isClientListCollapsed, setClientListCollapsed] = useState(false);
   const [isClientDetailsCollapsed, setClientDetailsCollapsed] = useState(false);
@@ -63,8 +64,23 @@ export const useClientsGrid = () => {
     return filtered;
   }, [clients, userRole, userId, startDate, endDate]);
 
+  // Integrate agent details for admin role
+  const combinedClients = useMemo(() => {
+    if (userRole === "admin") {
+      const agentsMap = new Map(agentDetails.map(agent => [agent.id, agent]));
+      return clients.map(client => {
+        const agent = agentsMap.get(client.agent);
+        if (agent) {
+          return { ...client, agentName: agent.name };
+        }
+        return client;
+      });
+    }
+    return clients;
+  }, [clients, agentDetails, userRole]);
+
   return {
-    clients,
+    clients: combinedClients, // Return combined clients
     selectedClient,
     setSelectedClient,
     quickFilterText,

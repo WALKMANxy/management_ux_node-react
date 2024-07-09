@@ -1,7 +1,7 @@
-// services/api.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Agent, Client, MovementDetail } from "../models/models";
 import {
+  loadAgentDetailsData,
   loadClientDetailsData,
   loadJsonData,
   mapDataToAgents,
@@ -9,6 +9,7 @@ import {
   mapDataToMinimalClients,
   mapDataToModels,
   mapDataToMovementDetails,
+  mapDataToAdmin,
 } from "../utils/dataLoader";
 
 export const api = createApi({
@@ -31,11 +32,12 @@ export const api = createApi({
     getClients: builder.query<Client[], void>({
       queryFn: async () => {
         try {
-          const [data, clientDetails] = await Promise.all([
+          const [data, clientDetails, agentDetails] = await Promise.all([
             loadJsonData("/data/datasetsfrom01JANto12JUN.min.json"),
             loadClientDetailsData("/data/clientdetailsdataset02072024.min.json"),
+            loadAgentDetailsData("/data/agentdetailsdataset02072024.min.json"),
           ]);
-          const clients = await mapDataToModels(data, clientDetails);
+          const clients = await mapDataToModels(data, clientDetails, agentDetails);
           return { data: clients };
         } catch (error) {
           const errorMessage = (error as Error).message;
@@ -47,11 +49,12 @@ export const api = createApi({
     getClientById: builder.query<Client, string>({
       queryFn: async (clientId) => {
         try {
-          const [data, clientDetails] = await Promise.all([
+          const [data, clientDetails, agentDetails] = await Promise.all([
             loadJsonData("/data/datasetsfrom01JANto12JUN.min.json"),
             loadClientDetailsData("/data/clientdetailsdataset02072024.min.json"),
+            loadAgentDetailsData("/data/agentdetailsdataset02072024.min.json"),
           ]);
-          const clients = await mapDataToModels(data, clientDetails);
+          const clients = await mapDataToModels(data, clientDetails, agentDetails);
           const client = clients.find((client) => client.id === clientId);
           if (!client) {
             throw new Error("Client not found");
@@ -80,9 +83,41 @@ export const api = createApi({
     getAgents: builder.query<Agent[], void>({
       queryFn: async () => {
         try {
-          const data = await loadJsonData("/data/datasetsfrom01JANto12JUN.min.json");
-          const agents = mapDataToAgents(data);
+          const [data, agentDetails] = await Promise.all([
+            loadJsonData("/data/datasetsfrom01JANto12JUN.min.json"),
+            loadAgentDetailsData("/data/agentdetailsdataset02072024.min.json"),
+          ]);
+          const agents = await mapDataToAgents(data, agentDetails);
           return { data: agents };
+        } catch (error) {
+          const errorMessage = (error as Error).message;
+          return { error: { status: "CUSTOM_ERROR", error: errorMessage } };
+        }
+      },
+      keepUnusedDataFor: 60 * 2,
+    }),
+    getAgentDetails: builder.query<Agent[], void>({
+      queryFn: async () => {
+        try {
+          const agentDetails = await loadAgentDetailsData("/data/agentdetailsdataset02072024.min.json");
+          return { data: agentDetails };
+        } catch (error) {
+          const errorMessage = (error as Error).message;
+          return { error: { status: "CUSTOM_ERROR", error: errorMessage } };
+        }
+      },
+      keepUnusedDataFor: 60 * 2,
+    }),
+    getAdminData: builder.query<{ agents: Agent[], clients: Client[] }, void>({
+      queryFn: async () => {
+        try {
+          const [data, clientDetails, agentDetails] = await Promise.all([
+            loadJsonData("/data/datasetsfrom01JANto12JUN.min.json"),
+            loadClientDetailsData("/data/clientdetailsdataset02072024.min.json"),
+            loadAgentDetailsData("/data/agentdetailsdataset02072024.min.json"),
+          ]);
+          const { agents, clients } = mapDataToAdmin(data, agentDetails);
+          return { data: { agents, clients } };
         } catch (error) {
           const errorMessage = (error as Error).message;
           return { error: { status: "CUSTOM_ERROR", error: errorMessage } };
@@ -112,5 +147,7 @@ export const {
   useGetAgentsQuery,
   useGetMinimalClientsQuery,
   useGetMinimalAgentsQuery,
+  useGetAgentDetailsQuery,
+  useGetAdminDataQuery,
   useGetMovementDetailsQuery,
 } = api;

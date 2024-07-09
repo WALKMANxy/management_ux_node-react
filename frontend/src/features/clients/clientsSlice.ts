@@ -1,10 +1,6 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Client, ClientsState } from "../../models/models";
-import {
-  loadClientDetailsData,
-  loadJsonData,
-  mapDataToModels,
-} from "../../utils/dataLoader";
+import { api } from "../../services/api"; // Import the API slice
 
 const initialState: ClientsState = {
   clients: [],
@@ -12,37 +8,32 @@ const initialState: ClientsState = {
   error: null,
 };
 
-export const fetchClients = createAsyncThunk(
-  "clients/fetchClients",
-  async () => {
-    const clientData = await loadJsonData();
-    const clientDetails = await loadClientDetailsData();
-    const clients = await mapDataToModels(clientData, clientDetails);
-    //console.log("Loaded clients data: ", clients); // Add console log
-    return clients;
-  }
-);
-
 const clientsSlice = createSlice({
   name: "clients",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchClients.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(
-        fetchClients.fulfilled,
+      .addMatcher(
+        api.endpoints.getClients.matchPending,
+        (state) => {
+          state.status = "loading";
+        }
+      )
+      .addMatcher(
+        api.endpoints.getClients.matchFulfilled,
         (state, action: PayloadAction<Client[]>) => {
           state.status = "succeeded";
           state.clients = action.payload;
         }
       )
-      .addCase(fetchClients.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message || "Something went wrong";
-      });
+      .addMatcher(
+        api.endpoints.getClients.matchRejected,
+        (state, action) => {
+          state.status = "failed";
+          state.error = action.error?.message || "Something went wrong";
+        }
+      );
   },
 });
 

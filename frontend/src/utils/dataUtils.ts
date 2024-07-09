@@ -15,8 +15,6 @@ export const calculateTotalRevenue = (clients: Client[]): string => {
 };
 
 // Calculate sales distribution data for agents
-// dataUtils.ts
-
 export const calculateSalesDistributionDataForAgents = (
   agents: Agent[],
   isMobile: boolean
@@ -24,29 +22,19 @@ export const calculateSalesDistributionDataForAgents = (
   const agentSalesData = agents.map(agent => {
     const totalRevenue = agent.clients.reduce((sum, client) => {
       const revenue = parseFloat(client.totalRevenue);
-      //console.log(`Agent: ${agent.name}, Client: ${client.name}, Revenue: ${revenue}`);
       return sum + revenue;
     }, 0);
-    //console.log(`Agent: ${agent.name}, Total Revenue: ${totalRevenue}`);
     return { label: agent.name, value: totalRevenue };
   });
 
   // Sort and slice based on the isMobile parameter
   const sortedData = agentSalesData.sort((a, b) => b.value - a.value);
-  //console.log("Sorted data: ", sortedData);
   return isMobile ? sortedData.slice(0, 8) : sortedData.slice(0, 25);
 };
 
 // Calculate total orders for a list of clients
 export const calculateTotalOrders = (clients: Client[]): number => {
-  //console.log("Calculating total orders...");
-  //console.log("Number of clients:", clients.length);
-  const totalOrders = clients.reduce((total, client) => {
-    //console.log("Client:", client.name, "Orders:", client.totalOrders);
-    return total + client.totalOrders;
-  }, 0);
-  //console.log("Total orders:", totalOrders);
-  return totalOrders;
+  return clients.reduce((total, client) => total + client.totalOrders, 0);
 };
 
 // Calculate top brands data for a list of clients
@@ -67,6 +55,7 @@ export const calculateTopBrandsData = (
       });
     });
   });
+  
   return Object.keys(brandCount)
     .map((brand, index) => ({
       label: brand,
@@ -76,9 +65,6 @@ export const calculateTopBrandsData = (
     .sort((a, b) => b.value - a.value)
     .slice(0, 10);
 };
-
-
-
 
 // Calculate sales distribution data for a list of clients
 export const calculateSalesDistributionData = (
@@ -98,9 +84,6 @@ export const calculateSalesDistributionData = (
 export const calculateMonthlyOrders = (movements: Movement[]): number => {
   const currentMonth = new Date().getMonth() + 1;
   const currentYear = new Date().getFullYear();
-  //console.log("Calculating monthly orders...");
-  //console.log("Current month:", currentMonth);
-  //console.log("Current year:", currentYear);
   const filteredMovements = movements.filter((movement) => {
     const movementDate = new Date(movement.dateOfOrder);
     return (
@@ -108,7 +91,6 @@ export const calculateMonthlyOrders = (movements: Movement[]): number => {
       movementDate.getFullYear() === currentYear
     );
   });
-  //console.log("Number of filtered movements:", filteredMovements.length);
   return filteredMovements.length;
 };
 

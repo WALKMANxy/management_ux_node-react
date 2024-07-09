@@ -1,7 +1,7 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { Agent } from "../../models/models";
-import { loadAgentDetailsData } from "../../utils/dataLoader";
+import { api } from "../../services/api"; // Import the API slice
 
 // Define the initial state
 const initialState: {
@@ -14,19 +14,6 @@ const initialState: {
   error: null,
 };
 
-// Async thunk to load agent details
-export const fetchAgents = createAsyncThunk<Agent[], void, { state: RootState }>(
-  'agents/fetchAgents',
-  async (_, { rejectWithValue }) => {
-    try {
-      const agentDetails = await loadAgentDetailsData('/data/agentdetailsdataset02072024.min.json');
-      return agentDetails;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to load agent details');
-    }
-  }
-);
-
 // Create the agents slice
 const agentsSlice = createSlice({
   name: 'agents',
@@ -34,17 +21,26 @@ const agentsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchAgents.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchAgents.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.agents = action.payload;
-      })
-      .addCase(fetchAgents.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload as string;
-      });
+      .addMatcher(
+        api.endpoints.getAgentDetails.matchPending,
+        (state) => {
+          state.status = 'loading';
+        }
+      )
+      .addMatcher(
+        api.endpoints.getAgentDetails.matchFulfilled,
+        (state, action: PayloadAction<Agent[]>) => {
+          state.status = 'succeeded';
+          state.agents = action.payload;
+        }
+      )
+      .addMatcher(
+        api.endpoints.getAgentDetails.matchRejected,
+        (state, action) => {
+          state.status = 'failed';
+          state.error = action.error?.message || 'Something went wrong';
+        }
+      );
   },
 });
 

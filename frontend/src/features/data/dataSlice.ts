@@ -1,11 +1,6 @@
-// src/features/data/dataSlice.ts
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Client, DataState, FetchDataPayload } from "../../models/models";
-import {
-  loadClientDetailsData,
-  loadJsonData,
-  mapDataToModels,
-} from "../../utils/dataLoader";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Client, DataState } from "../../models/models";
+import { api } from "../../services/api"; // Import the API slice
 
 const initialState: DataState = {
   clients: [],
@@ -13,24 +8,6 @@ const initialState: DataState = {
   status: "idle",
   error: null,
 };
-
-export const fetchData = createAsyncThunk<FetchDataPayload>(
-  "data/fetchData",
-  async () => {
-    const [data, clientDetails] = await Promise.all([
-      loadJsonData("/data/datasetsfrom01JANto12JUN.min.json"),
-      loadClientDetailsData("/data/clientdetailsdataset02072024.min.json"),
-    ]);
-    const clients = await mapDataToModels(data, clientDetails);
-
-    const clientIndex = new Map<string, Client>();
-    clients.forEach((client) => {
-      clientIndex.set(client.id, client);
-    });
-
-    return { clients, clientIndex };
-  }
-);
 
 const dataSlice = createSlice({
   name: "data",
@@ -44,19 +21,56 @@ const dataSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    // Integrate RTK Query's getClients and getAgentDetails query lifecycle actions
     builder
-      .addCase(fetchData.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchData.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.clients = action.payload.clients;
-        state.clientIndex = action.payload.clientIndex;
-      })
-      .addCase(fetchData.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message || null;
-      });
+      .addMatcher(
+        api.endpoints.getClients.matchPending,
+        (state) => {
+          state.status = "loading";
+        }
+      )
+      .addMatcher(
+        api.endpoints.getClients.matchFulfilled,
+        (state, action) => {
+          state.status = "succeeded";
+          state.clients = action.payload;
+          state.clientIndex = new Map<string, Client>(
+            action.payload.map((client) => [client.id, client])
+          );
+        }
+      )
+      .addMatcher(
+        api.endpoints.getClients.matchRejected,
+        (state, action) => {
+          state.status = "failed";
+          state.error = action.error?.message || null;
+        }
+      )
+      .addMatcher(
+        api.endpoints.getAgentDetails.matchPending,
+        (state) => {
+          state.status = "loading";
+        }
+      )
+      .addMatcher(
+        api.endpoints.getAgentDetails.matchFulfilled,
+        (state, action) => {
+          state.status = "succeeded";
+          // Assuming action.payload is an array of agents with nested clients
+          const clients = action.payload.flatMap(agent => agent.clients);
+          state.clients = clients;
+          state.clientIndex = new Map<string, Client>(
+            clients.map((client) => [client.id, client])
+          );
+        }
+      )
+      .addMatcher(
+        api.endpoints.getAgentDetails.matchRejected,
+        (state, action) => {
+          state.status = "failed";
+          state.error = action.error?.message || null;
+        }
+      );
   },
 });
 

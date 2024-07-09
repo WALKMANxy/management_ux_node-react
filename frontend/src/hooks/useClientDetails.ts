@@ -1,4 +1,3 @@
-// src/hooks/useClientDetails.ts
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
@@ -7,9 +6,11 @@ import {
   calculateSalesDistributionData,
   calculateTopBrandsData,
 } from "../utils/dataUtils";
+import { useGetClientsQuery } from "../services/api";
 
 const useClientDetails = (clientName: string | null) => {
-  const clients = useSelector((state: RootState) => state.clients.clients);
+  const { data: clients = [] } = useGetClientsQuery();
+  const userRole = useSelector((state: RootState) => state.auth.userRole); // Example of using useSelector for other state
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
   useEffect(() => {
@@ -36,6 +37,7 @@ const useClientDetails = (clientName: string | null) => {
     selectedClient,
     topBrandsData,
     salesDistributionData,
+    userRole, // Return userRole if needed in the component
   };
 };
 

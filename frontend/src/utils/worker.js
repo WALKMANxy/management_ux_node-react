@@ -1,5 +1,5 @@
 onmessage = function (event) {
-  const { data, clientDetails } = event.data;
+  const { data, clientDetails, agentDetails } = event.data;
 
   const clientsMap = new Map();
   data.forEach((item) => {

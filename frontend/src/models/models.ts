@@ -65,6 +65,7 @@ export type SearchParams = {
   results?: SearchResult[];
 };
 
+
 export type SearchState = {
   query: string;
   results: SearchResult[];
