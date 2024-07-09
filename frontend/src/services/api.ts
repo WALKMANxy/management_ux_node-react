@@ -108,7 +108,7 @@ export const api = createApi({
       },
       keepUnusedDataFor: 60 * 2,
     }),
-    getAdminData: builder.query<{ agents: Agent[], clients: Client[] }, void>({
+    getAdminData: builder.query<{ agents: Agent[]; clients: Client[] }, void>({
       queryFn: async () => {
         try {
           const [data, clientDetails, agentDetails] = await Promise.all([
@@ -116,7 +116,7 @@ export const api = createApi({
             loadClientDetailsData("/data/clientdetailsdataset02072024.min.json"),
             loadAgentDetailsData("/data/agentdetailsdataset02072024.min.json"),
           ]);
-          const { agents, clients } = mapDataToAdmin(data, agentDetails);
+          const { agents, clients } = mapDataToAdmin(data, agentDetails, clientDetails);
           return { data: { agents, clients } };
         } catch (error) {
           const errorMessage = (error as Error).message;

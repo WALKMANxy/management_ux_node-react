@@ -35,28 +35,32 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
 
   useEffect(() => {
-    if (role === "agent" && !clientsLoading && !agentDetailsLoading && clientsData && agentDetailsData && id) {
-      const agent = agentDetailsData.find((agent) => agent.id === id);
-      if (agent) {
-        agent.clients = clientsData.filter((client) => client.agent === id);
-        setDetails(agent);
-      }
-    } else if (role === "client" && !clientsLoading && clientsData && id) {
-      const client = clientsData.find((client) => client.id === id);
-      setDetails(client || null);
-    } else if (
-      role === "admin" &&
-      !clientsLoading &&
-      !agentsLoading &&
-      !agentDetailsLoading &&
-      clientsData &&
-      agentsData &&
-      agentDetailsData
-    ) {
-      const adminDetails = { agents: agentDetailsData, clients: clientsData };
-      setDetails(adminDetails);
+  if (role === "agent" && !clientsLoading && !agentDetailsLoading && clientsData && agentDetailsData && id) {
+    const agent = agentDetailsData.find((agent) => agent.id === id);
+    if (agent) {
+      const updatedAgent = {
+        ...agent,
+        clients: clientsData.filter((client) => client.agent === id),
+      };
+      setDetails(updatedAgent);
     }
-  }, [role, id, clientsLoading, agentsLoading, agentDetailsLoading, clientsData, agentsData, agentDetailsData]);
+  } else if (role === "client" && !clientsLoading && clientsData && id) {
+    const client = clientsData.find((client) => client.id === id);
+    setDetails(client || null);
+  } else if (
+    role === "admin" &&
+    !clientsLoading &&
+    !agentsLoading &&
+    !agentDetailsLoading &&
+    clientsData &&
+    agentsData &&
+    agentDetailsData
+  ) {
+    const adminDetails = { agents: agentDetailsData, clients: clientsData };
+    setDetails(adminDetails);
+  }
+}, [role, id, clientsLoading, agentsLoading, agentDetailsLoading, clientsData, agentsData, agentDetailsData]);
+
 
   const selectClient = useCallback(
     (clientName: string) => {
@@ -349,27 +353,26 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
   }, [selectedClient, clientsData]);
 
   const agentComparativeStatistics = useMemo(() => {
-    if (!selectedAgent || !clientsData)
+    if (!selectedAgent || !clientsData) {
       return { revenuePercentage: 0, ordersPercentage: 0 };
-
-    const agentClients = selectedAgent.clients;
-    const agentRevenue = agentClients.reduce(
-      (sum, client) => sum + parseFloat(client.totalRevenue),
-      0
-    );
-    const totalRevenueAllClients = clientsData.reduce(
-      (sum, client) => sum + parseFloat(client.totalRevenue),
-      0
-    );
-
+    }
+  
+    const agentClients = selectedAgent.clients || [];
+    const agentRevenue = agentClients.reduce((sum, client) => {
+      return sum + (parseFloat(client.totalRevenue) || 0);
+    }, 0);
+    const totalRevenueAllClients = clientsData.reduce((sum, client) => {
+      return sum + (parseFloat(client.totalRevenue) || 0);
+    }, 0);
+  
     return {
-      revenuePercentage: (
+      revenuePercentage: totalRevenueAllClients === 0 ? 0 : (
         (agentRevenue / totalRevenueAllClients) *
         100
       ).toFixed(2),
-      ordersPercentage: (
+      ordersPercentage: totalOrders === 0 ? 0 : (
         (agentClients.reduce(
-          (sum, client) => sum + client.movements.length,
+          (sum, client) => sum + (client.movements?.length || 0),
           0
         ) /
           totalOrders) *
@@ -377,16 +380,18 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
       ).toFixed(2),
     };
   }, [selectedAgent, clientsData, totalOrders]);
+  
 
   const agentComparativeStatisticsMonthly = useMemo(() => {
-    if (!selectedAgent || !clientsData)
+    if (!selectedAgent || !clientsData) {
       return { revenuePercentage: 0, ordersPercentage: 0 };
-
+    }
+  
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
-
-    const selectedMovements = selectedAgent.clients.flatMap((client) =>
-      client.movements.filter((movement) => {
+  
+    const selectedMovements = (selectedAgent.clients || []).flatMap((client) =>
+      (client.movements || []).filter((movement) => {
         const movementDate = new Date(movement.dateOfOrder);
         return (
           movementDate.getMonth() + 1 === currentMonth &&
@@ -394,9 +399,9 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
         );
       })
     );
-
+  
     const allMovements = clientsData.flatMap((client) =>
-      client.movements.filter((movement) => {
+      (client.movements || []).filter((movement) => {
         const movementDate = new Date(movement.dateOfOrder);
         return (
           movementDate.getMonth() + 1 === currentMonth &&
@@ -404,38 +409,39 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
         );
       })
     );
-
+  
     const selectedMonthlyTotal = selectedMovements.reduce(
       (movementSum, movement) =>
         movementSum +
         movement.details.reduce(
-          (detailSum, detail) => detailSum + parseFloat(detail.priceSold),
+          (detailSum, detail) => detailSum + (parseFloat(detail.priceSold) || 0),
           0
         ),
       0
     );
-
+  
     const allMonthlyTotal = allMovements.reduce(
       (movementSum, movement) =>
         movementSum +
         movement.details.reduce(
-          (detailSum, detail) => detailSum + parseFloat(detail.priceSold),
+          (detailSum, detail) => detailSum + (parseFloat(detail.priceSold) || 0),
           0
         ),
       0
     );
-
+  
     return {
-      revenuePercentage: (
+      revenuePercentage: allMonthlyTotal === 0 ? 0 : (
         (selectedMonthlyTotal / allMonthlyTotal) *
         100
       ).toFixed(2),
-      ordersPercentage: (
+      ordersPercentage: allMovements.length === 0 ? 0 : (
         (selectedMovements.length / allMovements.length) *
         100
       ).toFixed(2),
     };
   }, [selectedAgent, clientsData]);
+  
 
   return {
     details,

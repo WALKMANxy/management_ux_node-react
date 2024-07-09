@@ -24,21 +24,26 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { stat
       // Load data based on user role and search context
       let clients: Client[] = [];
       let agents: Agent[] = [];
-      
+
       if (userRole === "admin") {
         const adminData = await dispatch(api.endpoints.getAdminData.initiate()).unwrap();
         clients = adminData.clients;
         agents = adminData.agents;
+        console.log("Admin Data Loaded: ", { clients, agents });
       } else if (userRole === "agent") {
         clients = (await dispatch(api.endpoints.getClients.initiate()).unwrap()).filter(client => client.agent === id);
+        console.log("Agent Data Loaded: ", clients);
       } else if (userRole === "client" && id) {  // Ensure id is not null
         clients = [(await dispatch(api.endpoints.getClientById.initiate(id)).unwrap())];
+        console.log("Client Data Loaded: ", clients);
       }
 
       // Filter and map clients
-      if (filter === "all" || filter === "client") {
+      if (filter === "all" || filter === "client" || (filter === "admin" && userRole === "admin")) {
         const clientResults = clients
-          .filter(client => client.name.toLowerCase().includes(sanitizedQuery) || client.id.toLowerCase().includes(sanitizedQuery))
+          .filter(client => 
+            (client.name?.toLowerCase().includes(sanitizedQuery) || client.id?.toLowerCase().includes(sanitizedQuery))
+          )
           .map(client => ({
             id: client.id,
             name: client.name,
@@ -50,6 +55,22 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { stat
           .filter(result => !seen.has(result.id) && seen.set(result.id, ""));
         
         searchResults = searchResults.concat(clientResults);
+        console.log("Client Search Results: ", clientResults);
+      }
+
+      // Filter and map agents
+      if (filter === "all" || filter === "agent" || (filter === "admin" && userRole === "admin")) {
+        const agentResults = agents
+          .filter(agent => agent.name?.toLowerCase().includes(sanitizedQuery) || agent.id?.toLowerCase().includes(sanitizedQuery))
+          .map(agent => ({
+            id: agent.id,
+            name: agent.name,
+            type: "agent",
+          }))
+          .filter(result => !seen.has(result.id) && seen.set(result.id, ""));
+        
+        searchResults = searchResults.concat(agentResults);
+        console.log("Agent Search Results: ", agentResults);
       }
 
       // Filter and map articles
@@ -57,7 +78,11 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { stat
         const articleResults = clients
           .flatMap(client => client.movements.flatMap(movement => 
             movement.details
-              .filter(detail => detail.name.toLowerCase().includes(sanitizedQuery) || detail.articleId.toLowerCase().includes(sanitizedQuery) || detail.brand.toLowerCase().includes(sanitizedQuery))
+              .filter(detail => 
+                (detail.name?.toLowerCase().includes(sanitizedQuery) || 
+                detail.articleId?.toLowerCase().includes(sanitizedQuery) || 
+                detail.brand?.toLowerCase().includes(sanitizedQuery))
+              )
               .map(detail => ({
                 id: detail.articleId,
                 name: detail.name,
@@ -70,6 +95,7 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { stat
           .filter(result => !seen.has(result.id) && seen.set(result.id, result.lastSoldDate));
         
         searchResults = searchResults.concat(articleResults);
+        console.log("Article Search Results: ", articleResults);
       }
 
       // Filter and map promos
@@ -88,20 +114,7 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { stat
           .filter(result => !seen.has(result.id) && seen.set(result.id, ""));
         
         searchResults = searchResults.concat(promoResults);
-      }
-
-      // Filter and map agents
-      if (userRole === "admin" && (filter === "all" || filter === "agent")) {
-        const agentResults = agents
-          .filter(agent => agent.name.toLowerCase().includes(sanitizedQuery) || agent.id.toLowerCase().includes(sanitizedQuery))
-          .map(agent => ({
-            id: agent.id,
-            name: agent.name,
-            type: "agent",
-          }))
-          .filter(result => !seen.has(result.id) && seen.set(result.id, ""));
-        
-        searchResults = searchResults.concat(agentResults);
+        console.log("Promo Search Results: ", promoResults);
       }
 
       return searchResults;

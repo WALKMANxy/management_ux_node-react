@@ -5,10 +5,21 @@ import { ReactNode } from "react";
 
 export type UserRole = "admin" | "agent" | "client" | "guest";
 
-export type AdminDetails ={
+export type AdminDetails = {
   agents: Agent[];
   clients: Client[];
-}
+  GlobalVisits: { 
+    [agentId: string]: {
+      Visits: Visit[];
+    };
+  };
+  GlobalPromos: {
+    [agentId: string]: {
+      Promos: Promo[];
+    };
+  };
+};
+
 
 export type AuthState = {
   isLoggedIn: boolean;
@@ -65,7 +76,6 @@ export type SearchParams = {
   results?: SearchResult[];
 };
 
-
 export type SearchState = {
   query: string;
   results: SearchResult[];
@@ -93,7 +103,6 @@ export type SearchResultsProps = {
   results: SearchResult[];
 };
 
-
 export type SidebarProps = {
   onToggle: (isOpen: boolean) => void;
 };
@@ -102,7 +111,6 @@ export type SalesDistributionProps = {
   salesDistributionDataClients: { label: string; value: number }[];
   salesDistributionDataAgents?: { label: string; value: number }[];
 };
-
 
 export type ActivePromotionsProps = {
   selectedClient?: Client | null;
@@ -185,9 +193,13 @@ export type ClientDetailsProps = {
 };
 
 export type Visit = {
+  id: string;
+  clientId: string;
+  agentId: string;
   date: string;
   note: string;
 };
+
 
 export type MovementDetail = {
   articleId: string;
@@ -208,11 +220,14 @@ export type Movement = {
 
 export type Promo = {
   id: string;
+  clientsId: string[]; // Array of client IDs this promo applies to
+  agentsId: string[];  // Array of agent IDs this promo applies to
   name: string;
   discount: string;
   startDate: string;
   endDate: string;
 };
+
 
 export type Client = {
   id: string;
@@ -242,6 +257,9 @@ export type Agent = {
   email?: string;
   phone?: string;
   clients: Client[];
+  alerts?: Alert[];
+  AgentVisits: Visit[]; // New property
+  AgentPromos: Promo[]; // New property
 };
 
 export type Alert = {

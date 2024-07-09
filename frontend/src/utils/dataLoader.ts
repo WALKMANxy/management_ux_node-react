@@ -176,10 +176,10 @@ export const mapDataToAgents = async (
           unpaidRevenue: "0", // Placeholder
           address: "",
           email: "",
-          visits: [],
+          visits: [], // Ensure visits is initialized as an empty array
           agent: agentId,
           movements: [],
-          promos: [],
+          promos: [], // Ensure promos is initialized as an empty array
         });
       }
     }
@@ -200,7 +200,8 @@ export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
 
 export const mapDataToAdmin = (
   data: any[],
-  agentDetails: Agent[]
+  agentDetails: Agent[],
+  clientDetails: any[]
 ): { agents: Agent[]; clients: Client[] } => {
   const agentsMap = new Map<string, Agent>();
   const clientsMap = new Map<string, Client>();
@@ -209,6 +210,7 @@ export const mapDataToAdmin = (
     agentsMap.set(agent.id, {
       ...agent,
       clients: [],
+      alerts: [], // Initialize alerts
     });
   });
 
@@ -219,26 +221,29 @@ export const mapDataToAdmin = (
     if (!agentsMap.has(agentId)) {
       agentsMap.set(agentId, {
         id: agentId,
-        name: `Agent ${agentId}`,
+        name: `Agent ${agentId}`, // This will be overwritten by the next loop if agentDetails has the correct name
         clients: [],
+        alerts: [],
       });
     }
+
+    const clientDetail = clientDetails.find(detail => detail.CODICE === clientId);
 
     if (!clientsMap.has(clientId)) {
       clientsMap.set(clientId, {
         id: clientId,
         name: item["Ragione Sociale Cliente"],
-        province: "",
-        phone: "",
+        province: clientDetail ? clientDetail["C.A.P. - COMUNE (PROV.)"] : "",
+        phone: clientDetail ? clientDetail["TELEFONO"] : "",
         totalOrders: 0, // Placeholder
         totalRevenue: "0", // Placeholder
         unpaidRevenue: "0", // Placeholder
-        address: "",
-        email: "",
-        visits: [],
+        address: clientDetail ? clientDetail["INDIRIZZO"] : "",
+        email: clientDetail ? clientDetail["EMAIL"] : "",
+        visits: [], // Ensure visits is initialized as an empty array
         agent: agentId,
         movements: [],
-        promos: [],
+        promos: [], // Ensure promos is initialized as an empty array
       });
     }
 
@@ -250,8 +255,24 @@ export const mapDataToAdmin = (
     }
   });
 
+  // Merge agent details to ensure the correct names are assigned
+  agentDetails.forEach((agentDetail) => {
+    const agent = agentsMap.get(agentDetail.id);
+    if (agent) {
+      agent.name = agentDetail.name; // Update the name to the correct one from agentDetails
+      agent.email = agentDetail.email; // Update email if needed
+      agent.phone = agentDetail.phone; // Update phone if needed
+    }
+  });
+
+  const mappedAgents = Array.from(agentsMap.values());
+  const mappedClients = Array.from(clientsMap.values());
+
+  console.log("Mapped agents:", mappedAgents);
+  console.log("Mapped clients:", mappedClients);
+
   return {
-    agents: Array.from(agentsMap.values()),
-    clients: Array.from(clientsMap.values()),
+    agents: mappedAgents,
+    clients: mappedClients,
   };
 };

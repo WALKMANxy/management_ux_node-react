@@ -18,8 +18,12 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({
   const { t } = useTranslation();
 
   const visits = selectedClient
-    ? selectedClient.visits
-    : agentDetails?.clients.flatMap((client) => client.visits);
+    ? selectedClient.visits || []
+    : agentDetails?.clients.flatMap((client) => client.visits || []) || [];
+
+  // Debugging output
+  console.log("Selected Client Visits: ", selectedClient?.visits);
+  console.log("Agent Details Visits: ", agentDetails?.clients.flatMap((client) => client.visits));
 
   return (
     <Box mb={4}>

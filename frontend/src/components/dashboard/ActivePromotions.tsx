@@ -1,4 +1,3 @@
-// src/components/ActivePromotions.tsx
 import {
   Box,
   Button,
@@ -18,8 +17,13 @@ const ActivePromotions: React.FC<ActivePromotionsProps> = ({
 }) => {
   const { t } = useTranslation();
   const promos = selectedClient
-    ? selectedClient.promos
-    : agentDetails?.clients.flatMap((client) => client.promos);
+    ? selectedClient.promos || []
+    : agentDetails?.clients.flatMap((client) => client.promos || []) || [];
+
+    
+  // Debugging output
+  console.log("Selected Client Promos: ", selectedClient?.promos);
+  console.log("Agent Details Promos: ", agentDetails?.clients.flatMap((client) => client.promos));
 
   return (
     <Box>

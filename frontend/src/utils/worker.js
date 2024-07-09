@@ -1,5 +1,5 @@
 onmessage = function (event) {
-  const { data, clientDetails, agentDetails } = event.data;
+  const { data, clientDetails } = event.data;
 
   const clientsMap = new Map();
   data.forEach((item) => {
@@ -12,7 +12,6 @@ onmessage = function (event) {
 
   const clients = Array.from(clientsMap.values()).map((clientData) => {
     const clientInfo = clientData[0];
-
     const clientDetail = clientDetails.find(
       (detail) => detail["CODICE"] === clientInfo["Codice Cliente"].toString()
     );
@@ -73,10 +72,10 @@ onmessage = function (event) {
       paymentMethod: clientDetail
         ? clientDetail["Descizione metodo pagamento"]
         : "",
-      visits: [],
+      visits: [], // Initialize visits
       agent: clientInfo["Codice Agente"].toString(),
       movements,
-      promos: [],
+      promos: [], // Initialize promos
     };
   });
 
