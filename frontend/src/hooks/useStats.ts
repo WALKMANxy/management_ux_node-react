@@ -289,29 +289,30 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
   }, [role, details]);
 
   const salesDistributionDataAgents = useMemo(() => {
-    if (role === "admin" && details) {
+    if (role === "admin" && details && agentDetailsData) {
       const clients = (details as { clients: Client[] }).clients;
-
+  
       const agentsMap = clients.reduce((acc, client) => {
         const agentId = client.agent;
         if (!acc[agentId]) {
+          const agentDetails = agentDetailsData.find(agent => agent.id === agentId);
           acc[agentId] = {
             id: agentId,
-            name: `Agent ${agentId}`,
+            name: agentDetails ? agentDetails.name : `Agent ${agentId}`,
             clients: [],
             AgentVisits: [],
             AgentPromos: [],
           };
         }
         acc[agentId].clients.push(client);
-
+  
         // Collect visits and promos from the client and add to the agent
         acc[agentId].AgentVisits.push(...client.visits);
         acc[agentId].AgentPromos.push(...client.promos);
-
+  
         return acc;
       }, {} as { [key: string]: Agent });
-
+  
       const agents = Object.values(agentsMap);
       const data = calculateSalesDistributionDataForAgents(agents, isMobile);
       return { agents, data };
@@ -321,7 +322,8 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
       return { agents: [agent], data };
     }
     return { agents: [], data: [] };
-  }, [role, details, isMobile]);
+  }, [role, details, agentDetailsData, isMobile]);
+  
 
   const salesDistributionDataClients = useMemo(() => {
     if ((role === "admin" || role === "agent") && details) {
