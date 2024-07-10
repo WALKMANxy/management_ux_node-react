@@ -16,7 +16,7 @@ import { currencyFormatter } from "../../utils/dataUtils";
 const DetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {
   const { t } = useTranslation();
 
-  const excludedKeys = ["id", "movements", "promos", "visits"];
+  const excludedKeys = ["id", "movements", "promos", "visits", "agent"];
   const keyMap: { [key: string]: string } = {
     name: t("details.name"),
     phone: t("details.phone"),
@@ -32,6 +32,7 @@ const DetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {
     paymentMethodID: t("details.paymentMethodID"),
     address: t("details.address"),
     agent: t("details.agent"),
+    agentName: t("details.agentName"),
   };
 
   const icons: { [key: string]: JSX.Element } = {
@@ -48,7 +49,7 @@ const DetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {
     extendedTaxCode: <AccountBalanceIcon />,
     taxCode: <AccountBalanceIcon />,
     paymentMethodID: <PaymentIcon />,
-    agent: <PersonIcon />,
+    agentName: <PersonIcon />,
   };
 
   const formatPhoneNumber = (phone: string) => {

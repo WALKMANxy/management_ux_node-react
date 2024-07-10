@@ -83,6 +83,8 @@ export type SearchState = {
   query: string;
   results: SearchResult[];
   status: "idle" | "loading" | "succeeded" | "failed";
+
+  
   error: string | null;
 };
 
@@ -250,6 +252,7 @@ export type Client = {
   paymentMethod?: string; // New property
   visits: Visit[];
   agent: string;
+  agentName?: string;
   movements: Movement[];
   promos: Promo[];
 };

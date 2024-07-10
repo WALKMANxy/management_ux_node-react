@@ -169,7 +169,7 @@ const ClientsPage: React.FC = () => {
             isClientListCollapsed={isClientListCollapsed}
             setClientListCollapsed={setClientListCollapsed}
             isMobile={isMobile}
-            clientDetailsRef={clientDetailsRef} // Pass the clientDetailsRef prop
+            clientDetailsRef={clientDetailsRef}
           />
           <ClientDetails
             ref={clientDetailsRef}

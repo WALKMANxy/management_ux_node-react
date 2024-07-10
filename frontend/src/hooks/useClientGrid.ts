@@ -1,7 +1,7 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback,  useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
-import { Client } from "../models/models";
+import { Agent, Client } from "../models/models";
 import { useGetClientsQuery, useGetAgentDetailsQuery } from "../services/api";
 
 export const useClientsGrid = () => {
@@ -16,7 +16,7 @@ export const useClientsGrid = () => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const gridRef = useRef<any>(null);
-  const clientDetailsRef = useRef<HTMLDivElement>(null); // Add ref for client details
+  const clientDetailsRef = useRef<HTMLDivElement>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -33,17 +33,14 @@ export const useClientsGrid = () => {
     }
   }, []);
 
-  const handleClientSelect = useCallback(
-    (clientId: string) => {
-      const client = clients.find((client) => client.id === clientId) || null;
-      setSelectedClient(client);
-      if (clientDetailsRef.current) {
-        clientDetailsRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    },
-    [clients]
-  );
-
+  const addAgentNameToClient = (client: Client, agentDetails: Agent[]) => {
+    const agent = agentDetails.find((agent) => agent.id === client.agent);
+    return {
+      ...client,
+      agentName: agent ? agent.name : "Unknown Agent",
+    };
+  };
+  
   const filteredClients = useCallback(() => {
     let filtered = clients;
     if (userRole === "agent") {
@@ -61,18 +58,28 @@ export const useClientsGrid = () => {
         });
       });
     }
-    if (userRole === "admin") {
-      const agentsMap = new Map(agentDetails.map((agent) => [agent.id, agent.name]));
-      filtered = filtered.map((client) => ({
-        ...client,
-        agentName: agentsMap.get(client.agent) || "Unknown Agent",
-      }));
-    }
-    return filtered;
+    return filtered.map((client) => addAgentNameToClient(client, agentDetails));
   }, [clients, userRole, userId, startDate, endDate, agentDetails]);
+  
+  const handleClientSelect = useCallback(
+    (clientId: string) => {
+      const client = clients.find((client) => client.id === clientId) || null;
+      if (client) {
+        const clientWithAgentName = addAgentNameToClient(client, agentDetails);
+        setSelectedClient(clientWithAgentName);
+        if (clientDetailsRef.current) {
+          clientDetailsRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+      } else {
+        setSelectedClient(null);
+      }
+    },
+    [clients, agentDetails]
+  );
+  
 
   return {
-    clients, // No need for combinedClients
+    clients, 
     selectedClient,
     setSelectedClient,
     quickFilterText,
@@ -84,7 +91,7 @@ export const useClientsGrid = () => {
     handleClientSelect,
     filteredClients,
     gridRef,
-    clientDetailsRef, // Export the client details ref
+    clientDetailsRef,
     isClientListCollapsed,
     setClientListCollapsed,
     isClientDetailsCollapsed,
