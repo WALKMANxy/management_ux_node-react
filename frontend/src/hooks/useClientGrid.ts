@@ -40,6 +40,26 @@ export const useClientsGrid = () => {
       agentName: agent ? agent.name : "Unknown Agent",
     };
   };
+
+  const handleClientSelect = useCallback(
+    (clientId: string) => {
+      const client = clients.find((client) => client.id === clientId) || null;
+      if (client) {
+        const clientWithAgentName = addAgentNameToClient(client, agentDetails);
+        setSelectedClient(clientWithAgentName);
+        setTimeout(() => {
+          if (clientDetailsRef.current) {
+            clientDetailsRef.current.scrollIntoView({ behavior: "smooth" });
+          }
+        }, 0);
+      } else {
+        setSelectedClient(null);
+      }
+    },
+    [clients, agentDetails]
+  );
+  
+  
   
   const filteredClients = useCallback(() => {
     let filtered = clients;
@@ -61,21 +81,7 @@ export const useClientsGrid = () => {
     return filtered.map((client) => addAgentNameToClient(client, agentDetails));
   }, [clients, userRole, userId, startDate, endDate, agentDetails]);
   
-  const handleClientSelect = useCallback(
-    (clientId: string) => {
-      const client = clients.find((client) => client.id === clientId) || null;
-      if (client) {
-        const clientWithAgentName = addAgentNameToClient(client, agentDetails);
-        setSelectedClient(clientWithAgentName);
-        if (clientDetailsRef.current) {
-          clientDetailsRef.current.scrollIntoView({ behavior: "smooth" });
-        }
-      } else {
-        setSelectedClient(null);
-      }
-    },
-    [clients, agentDetails]
-  );
+  
   
 
   return {
