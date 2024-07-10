@@ -7,8 +7,7 @@ import { useClientsGrid } from "../../hooks/useClientGrid";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import {
-  calculateMonthlyOrders,
-  calculateMonthlyRevenue,
+  calculateMonthlyData,
   currencyFormatter,
   numberComparator,
 } from "../../utils/dataUtils";
@@ -82,8 +81,10 @@ const ClientsPage: React.FC = () => {
       },
       {
         headerName: t("clientsPage.ordersThisMonth"),
-        valueGetter: (params: any) =>
-          calculateMonthlyOrders(params.data.movements),
+        valueGetter: (params: any) => {
+          const { months, ordersData } = calculateMonthlyData([params.data]);
+          return ordersData[months.length - 1] || 0; // Get the latest month's data
+        },
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
         sortable: true,
@@ -98,8 +99,10 @@ const ClientsPage: React.FC = () => {
       },
       {
         headerName: t("clientsPage.revenueThisMonth"),
-        valueGetter: (params: any) =>
-          calculateMonthlyRevenue(params.data.movements),
+        valueGetter: (params: any) => {
+          const { months, revenueData } = calculateMonthlyData([params.data]);
+          return revenueData[months.length - 1] || 0; // Get the latest month's data
+        },
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
         valueFormatter: (params: any) => currencyFormatter(params.value),

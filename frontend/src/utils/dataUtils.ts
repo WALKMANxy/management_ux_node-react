@@ -33,9 +33,28 @@ export const calculateSalesDistributionDataForAgents = (
 };
 
 // Calculate total orders for a list of clients
-export const calculateTotalOrders = (clients: Client[]): number => {
-  return clients.reduce((total, client) => total + client.totalOrders, 0);
+// Helper function to group movements by order ID
+const groupByOrderId = (movements: Movement[]): { [orderId: string]: Movement[] } => {
+  return movements.reduce((acc, movement) => {
+    const orderId = movement.id;
+    if (!acc[orderId]) {
+      acc[orderId] = [];
+    }
+    acc[orderId].push(movement);
+    return acc;
+  }, {} as { [orderId: string]: Movement[] });
 };
+
+// Calculate total orders for a list of clients based on unique order IDs
+export const calculateTotalOrders = (clients: Client[]): number => {
+  const allMovements = clients.flatMap(client => client.movements);
+  const groupedMovements = groupByOrderId(allMovements);
+  return Object.keys(groupedMovements).length;
+};
+
+
+
+
 
 // Calculate top brands data for a list of clients
 export const calculateTopBrandsData = (
@@ -80,19 +99,8 @@ export const calculateSalesDistributionData = (
   }));
 };
 
-// Calculate monthly orders from movements
-export const calculateMonthlyOrders = (movements: Movement[]): number => {
-  const currentMonth = new Date().getMonth() + 1;
-  const currentYear = new Date().getFullYear();
-  const filteredMovements = movements.filter((movement) => {
-    const movementDate = new Date(movement.dateOfOrder);
-    return (
-      movementDate.getMonth() + 1 === currentMonth &&
-      movementDate.getFullYear() === currentYear
-    );
-  });
-  return filteredMovements.length;
-};
+
+
 
 // Calculate monthly revenue from movements
 export const calculateMonthlyRevenue = (movements: Movement[]): string => {
@@ -121,24 +129,31 @@ export const calculateMonthlyRevenue = (movements: Movement[]): string => {
 
 // Calculate monthly data (revenue and orders) from clients
 export const calculateMonthlyData = (clients: Client[]) => {
-  const monthlyData = clients.reduce((acc, client) => {
-    client.movements.forEach((movement) => {
-      const monthYear = getMonthYear(movement.dateOfOrder);
-      if (monthYear === "Invalid Date") {
-        console.error("Skipping movement with invalid date:", movement);
-        return;
-      }
-      const movementRevenue = movement.details.reduce(
-        (sum, detail) => sum + parseFloat(detail.priceSold),
-        0
-      );
-      const movementOrders = movement.details.length;
-      if (!acc[monthYear]) {
-        acc[monthYear] = { revenue: 0, orders: 0 };
-      }
-      acc[monthYear].revenue += movementRevenue;
-      acc[monthYear].orders += movementOrders;
-    });
+  const allMovements = clients.flatMap(client => client.movements);
+
+  const groupedByOrderId = groupByOrderId(allMovements);
+
+  const monthlyData = Object.values(groupedByOrderId).reduce((acc, movements) => {
+    const uniqueMovement = movements[0]; // Use the first movement as a representative for the order
+    const monthYear = getMonthYear(uniqueMovement.dateOfOrder);
+
+    if (monthYear === "Invalid Date") {
+      console.error("Skipping movement with invalid date:", uniqueMovement);
+      return acc;
+    }
+
+    const movementRevenue = movements.reduce(
+      (sum, movement) => sum + movement.details.reduce((detailSum, detail) => detailSum + parseFloat(detail.priceSold), 0),
+      0
+    );
+
+    if (!acc[monthYear]) {
+      acc[monthYear] = { revenue: 0, orders: 0 };
+    }
+
+    acc[monthYear].revenue += movementRevenue;
+    acc[monthYear].orders += 1; // Each group of movements with the same orderId counts as one order
+
     return acc;
   }, {} as { [key: string]: { revenue: number; orders: number } });
 
