@@ -41,8 +41,8 @@ const ClientsPage: React.FC = () => {
     exportDataAsCsv,
   } = useClientsGrid();
 
-  const columnDefinitions = useMemo(
-    () => [
+  const columnDefinitions = useMemo(() => {
+    const baseColumns = [
       {
         headerName: t("clientsPage.name"),
         field: "name",
@@ -119,9 +119,19 @@ const ClientsPage: React.FC = () => {
         filter: "agTextColumnFilter",
         sortable: true,
       },
-    ],
-    [handleClientSelect, t]
-  );
+    ];
+
+    if (userRole === "admin") {
+      baseColumns.splice(1, 0, {
+        headerName: t("clientsPage.agent"),
+        field: "agentName",
+        filter: "agTextColumnFilter",
+        sortable: true,
+      });
+    }
+
+    return baseColumns;
+  }, [handleClientSelect, t, userRole]);
 
   // Extract the logged-in client details from filteredClients
   const loggedInClientDetails = filteredClients().find(
@@ -159,6 +169,7 @@ const ClientsPage: React.FC = () => {
             isClientListCollapsed={isClientListCollapsed}
             setClientListCollapsed={setClientListCollapsed}
             isMobile={isMobile}
+            clientDetailsRef={clientDetailsRef} // Pass the clientDetailsRef prop
           />
           <ClientDetails
             ref={clientDetailsRef}

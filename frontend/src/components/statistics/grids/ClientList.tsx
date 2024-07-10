@@ -33,6 +33,7 @@ const ClientList: React.FC<ClientListProps> = ({
   isClientListCollapsed,
   setClientListCollapsed,
   isMobile,
+  clientDetailsRef, // Add the clientDetailsRef prop
 }) => {
   const { t } = useTranslation();
 
@@ -119,6 +120,7 @@ const ClientList: React.FC<ClientListProps> = ({
           />
         </Box>
       </Collapse>
+      <div ref={clientDetailsRef} />
     </Paper>
   );
 };

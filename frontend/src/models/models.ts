@@ -159,7 +159,9 @@ export type ClientListProps = {
   isClientListCollapsed: boolean;
   setClientListCollapsed: (value: boolean) => void;
   isMobile: boolean;
+  clientDetailsRef: React.RefObject<HTMLDivElement>; // Added clientDetailsRef
 };
+
 
 export type TopArticleTypeProps = {
   articles: { id: string; name: string; amount: number }[];

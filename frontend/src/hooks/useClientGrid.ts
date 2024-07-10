@@ -61,26 +61,18 @@ export const useClientsGrid = () => {
         });
       });
     }
-    return filtered;
-  }, [clients, userRole, userId, startDate, endDate]);
-
-  // Integrate agent details for admin role
-  const combinedClients = useMemo(() => {
     if (userRole === "admin") {
-      const agentsMap = new Map(agentDetails.map(agent => [agent.id, agent]));
-      return clients.map(client => {
-        const agent = agentsMap.get(client.agent);
-        if (agent) {
-          return { ...client, agentName: agent.name };
-        }
-        return client;
-      });
+      const agentsMap = new Map(agentDetails.map((agent) => [agent.id, agent.name]));
+      filtered = filtered.map((client) => ({
+        ...client,
+        agentName: agentsMap.get(client.agent) || "Unknown Agent",
+      }));
     }
-    return clients;
-  }, [clients, agentDetails, userRole]);
+    return filtered;
+  }, [clients, userRole, userId, startDate, endDate, agentDetails]);
 
   return {
-    clients: combinedClients, // Return combined clients
+    clients, // No need for combinedClients
     selectedClient,
     setSelectedClient,
     quickFilterText,
