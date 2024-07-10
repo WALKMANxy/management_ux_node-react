@@ -15,7 +15,7 @@ const CalendarComponent: React.FC = () => {
   const [highlightedDays, setHighlightedDays] = React.useState<number[]>([]);
 
   React.useEffect(() => {
-    console.log("Visits in CalendarComponent:", visits);
+    //console.log("Visits in CalendarComponent:", visits);
     const days = visits
       .filter((visit) => visit && visit.date) // Filter out undefined visits
       .map((visit) => dayjs(visit.date).date());

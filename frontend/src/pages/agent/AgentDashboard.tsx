@@ -29,7 +29,7 @@ import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
 import { setVisits } from "../../features/calendar/calendarSlice";
 import useStats from "../../hooks/useStats";
 import { brandColors } from "../../utils/constants";
-import { Agent, SearchResult } from "../../models/models";
+import { SearchResult } from "../../models/models";
 import { calculateMonthlyData, getTrend } from "../../utils/dataUtils";
 
 const AgentDashboard: React.FC = () => {
@@ -57,6 +57,8 @@ const AgentDashboard: React.FC = () => {
     yearlyOrdersData,
     clientComparativeStatistics,
     clientComparativeStatisticsMonthly,
+
+    isLoading,
   } = useStats("agent", loggedInAgentId, isMobile);
 
   const handleClientSelect = useCallback(
@@ -289,12 +291,7 @@ const AgentDashboard: React.FC = () => {
             </Box>
           )}
           <UpcomingVisits
-            selectedClient={selectedClient}
-            agentDetails={
-              details && "AgentVisits" in details
-                ? (details as Agent)
-                : undefined
-            }
+            isLoading={isLoading} // Update this line
           />
         </Grid>
         <Grid item xs={12} md={3}>
@@ -323,12 +320,7 @@ const AgentDashboard: React.FC = () => {
             )}
           </Box>
           <ActivePromotions
-            selectedClient={selectedClient}
-            agentDetails={
-              details && "AgentPromos" in details
-                ? (details as Agent)
-                : undefined
-            }
+            isLoading={isLoading} // Update this line
           />
         </Grid>
       </Grid>

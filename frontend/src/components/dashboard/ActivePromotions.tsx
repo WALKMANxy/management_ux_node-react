@@ -10,25 +10,31 @@ import {
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { ActivePromotionsProps } from "../../models/models";
+import { useSelector } from "react-redux";
+import { selectPromos } from "../../features/promos/promosSlice";
 
-const ActivePromotions: React.FC<ActivePromotionsProps> = ({ getPromos }) => {
+
+const ActivePromotions: React.FC<ActivePromotionsProps> = ({  isLoading }) => {
   const { t } = useTranslation();
-  const promos = getPromos();
+  const promos = useSelector(selectPromos);
 
   // Debugging output
-  console.log("Promos: ", promos);
+  //console.log("Promos: ", promos);
 
   return (
     <Box>
       <Typography variant="h5" gutterBottom>
-        {promos.length > 0 ? (
-          t('promotions.activePromotions')
-        ) : (
-          <Skeleton width="50%" />
-        )}
+        {t('promotions.activePromotions')}
       </Typography>
       <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
-        {promos.length > 0 ? (
+        {isLoading ? (
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={200}
+            sx={{ borderRadius: "12px" }}
+          />
+        ) : promos.length > 0 ? (
           <List>
             {promos.map((promo) => (
               <ListItem key={promo.id}>
@@ -37,12 +43,9 @@ const ActivePromotions: React.FC<ActivePromotionsProps> = ({ getPromos }) => {
             ))}
           </List>
         ) : (
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height={200}
-            sx={{ borderRadius: "12px" }}
-          />
+          <Typography variant="body1">
+            {t('promotions.noActivePromotions')}
+          </Typography>
         )}
       </Box>
       <Button

@@ -37,6 +37,9 @@ export type CalendarState = {
   visits: Visit[];
 };
 
+
+
+
 export type AuthHandlersProps = {
   selectedRole: "admin" | "agent" | "client";
   selectedAgent: string;
@@ -113,7 +116,7 @@ export type SalesDistributionProps = {
 };
 
 export type ActivePromotionsProps = {
-  getPromos: () => Promo[];
+  isLoading: boolean;
 };
 
 export type Comparison = {
@@ -168,7 +171,7 @@ export type TotalEarningProps = {
 };
 
 export type UpcomingVisitsProps = {
-  getVisits: () => Visit[];
+  isLoading: boolean;
 };
 
 export type AGGridTableProps = {

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
 import { AdminDetails, Agent, Client, Movement } from "../models/models";
 import {
   useGetClientsQuery,
@@ -14,10 +15,13 @@ import {
   calculateMonthlyRevenue,
   calculateSalesDistributionDataForAgents,
 } from "../utils/dataUtils";
+import { setVisits } from "../features/calendar/calendarSlice";
+import { setPromos } from "../features/promos/promosSlice";
 
 type Role = "admin" | "agent" | "client";
 
 const useStats = (role: Role, id: string | null, isMobile: boolean) => {
+  const dispatch = useDispatch();
   const {
     data: clientsData,
     isLoading: clientsLoading,
@@ -134,7 +138,11 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     } else if (selectedAgent) {
       return selectedAgent.AgentVisits || [];
     } else if (details && "GlobalVisits" in details) {
-      return Object.values(details.GlobalVisits).flatMap((visitObj) => visitObj.Visits) || [];
+      return (
+        Object.values(details.GlobalVisits).flatMap(
+          (visitObj) => visitObj.Visits
+        ) || []
+      );
     }
     return [];
   }, [selectedClient, selectedAgent, details]);
@@ -145,10 +153,24 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     } else if (selectedAgent) {
       return selectedAgent.AgentPromos || [];
     } else if (details && "GlobalPromos" in details) {
-      return Object.values(details.GlobalPromos).flatMap((promoObj) => promoObj.Promos) || [];
+      return (
+        Object.values(details.GlobalPromos).flatMap(
+          (promoObj) => promoObj.Promos
+        ) || []
+      );
     }
     return [];
   }, [selectedClient, selectedAgent, details]);
+
+  useEffect(() => {
+    const visits = getVisits();
+    dispatch(setVisits(visits));
+  }, [getVisits, dispatch]);
+
+  useEffect(() => {
+    const promos = getPromos();
+    dispatch(setPromos(promos));
+  }, [getPromos, dispatch]);
 
   const calculateTotalSpentThisMonth = useCallback((movements: Movement[]) => {
     const totalSpent = calculateMonthlyRevenue(movements);

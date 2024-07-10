@@ -29,13 +29,13 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { stat
         const adminData = await dispatch(api.endpoints.getAdminData.initiate()).unwrap();
         clients = adminData.clients;
         agents = adminData.agents;
-        console.log("Admin Data Loaded: ", { clients, agents });
+        //console.log("Admin Data Loaded: ", { clients, agents });
       } else if (userRole === "agent") {
         clients = (await dispatch(api.endpoints.getClients.initiate()).unwrap()).filter(client => client.agent === id);
-        console.log("Agent Data Loaded: ", clients);
+        //console.log("Agent Data Loaded: ", clients);
       } else if (userRole === "client" && id) {  // Ensure id is not null
         clients = [(await dispatch(api.endpoints.getClientById.initiate(id)).unwrap())];
-        console.log("Client Data Loaded: ", clients);
+        //console.log("Client Data Loaded: ", clients);
       }
 
       // Filter and map clients
@@ -55,7 +55,7 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { stat
           .filter(result => !seen.has(result.id) && seen.set(result.id, ""));
         
         searchResults = searchResults.concat(clientResults);
-        console.log("Client Search Results: ", clientResults);
+        //console.log("Client Search Results: ", clientResults);
       }
 
       // Filter and map agents
@@ -70,7 +70,7 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { stat
           .filter(result => !seen.has(result.id) && seen.set(result.id, ""));
         
         searchResults = searchResults.concat(agentResults);
-        console.log("Agent Search Results: ", agentResults);
+        //console.log("Agent Search Results: ", agentResults);
       }
 
       // Filter and map articles
@@ -95,7 +95,7 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { stat
           .filter(result => !seen.has(result.id) && seen.set(result.id, result.lastSoldDate));
         
         searchResults = searchResults.concat(articleResults);
-        console.log("Article Search Results: ", articleResults);
+        //console.log("Article Search Results: ", articleResults);
       }
 
       // Filter and map promos
@@ -114,7 +114,7 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { stat
           .filter(result => !seen.has(result.id) && seen.set(result.id, ""));
         
         searchResults = searchResults.concat(promoResults);
-        console.log("Promo Search Results: ", promoResults);
+        //console.log("Promo Search Results: ", promoResults);
       }
 
       return searchResults;

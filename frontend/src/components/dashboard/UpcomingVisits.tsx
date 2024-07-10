@@ -10,25 +10,30 @@ import {
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { UpcomingVisitsProps } from "../../models/models";
+import { useSelector } from "react-redux";
+import { selectVisits } from "../../features/visits/visitsSlice";
 
-const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ getVisits }) => {
+const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
   const { t } = useTranslation();
-  const visits = getVisits();
+  const visits = useSelector(selectVisits);
 
   // Debugging output
-  console.log("Visits: ", visits);
+  //console.log("Visits: ", visits);
 
   return (
     <Box mb={4}>
       <Typography variant="h5" gutterBottom>
-        {visits.length > 0 ? (
-          t("upcomingVisits.title")
-        ) : (
-          <Skeleton width="50%" />
-        )}
+        {t("upcomingVisits.title")}
       </Typography>
       <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
-        {visits.length > 0 ? (
+        {isLoading ? (
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={200}
+            sx={{ borderRadius: "12px" }}
+          />
+        ) : visits.length > 0 ? (
           <List>
             {visits.map((visit) => (
               <ListItem key={visit.id}>
@@ -37,12 +42,9 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ getVisits }) => {
             ))}
           </List>
         ) : (
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height={200}
-            sx={{ borderRadius: "12px" }}
-          />
+          <Typography variant="body1">
+            {t('upcomingVisits.noProgrammedVisits')}
+          </Typography>
         )}
       </Box>
       <Button

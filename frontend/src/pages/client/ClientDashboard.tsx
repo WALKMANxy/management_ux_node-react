@@ -37,6 +37,7 @@ const ClientDashboard: React.FC = () => {
     topBrandsData,
     months,
     revenueData,
+    isLoading,
   } = useStats("client", loggedInClientId, isMobile);
 
   useEffect(() => {
@@ -146,7 +147,9 @@ const ClientDashboard: React.FC = () => {
               </Grid>
             </Grid>
             {clientDetails && "visits" in clientDetails && (
-              <UpcomingVisits selectedClient={clientDetails} />
+              <UpcomingVisits
+                isLoading={isLoading} // Update this line
+              />
             )}
           </Box>
         </Grid>
@@ -170,7 +173,9 @@ const ClientDashboard: React.FC = () => {
             </Box>
           </Box>
           {clientDetails && "promos" in clientDetails && (
-            <ActivePromotions selectedClient={clientDetails} />
+            <ActivePromotions
+              isLoading={isLoading} // Update this line
+            />
           )}
         </Grid>
       </Grid>

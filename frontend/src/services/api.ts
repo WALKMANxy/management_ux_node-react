@@ -9,7 +9,6 @@ import {
   mapDataToMinimalClients,
   mapDataToModels,
   mapDataToMovementDetails,
-  mapDataToAdmin,
 } from "../utils/dataLoader";
 
 export const api = createApi({
@@ -116,7 +115,8 @@ export const api = createApi({
             loadClientDetailsData("/data/clientdetailsdataset02072024.min.json"),
             loadAgentDetailsData("/data/agentdetailsdataset02072024.min.json"),
           ]);
-          const { agents, clients } = mapDataToAdmin(data, agentDetails, clientDetails);
+          const clients = await mapDataToModels(data, clientDetails, agentDetails);
+          const agents = await mapDataToAgents(data, agentDetails);
           return { data: { agents, clients } };
         } catch (error) {
           const errorMessage = (error as Error).message;

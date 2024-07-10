@@ -81,7 +81,7 @@ export const mapDataToModels = async (
     let completed = 0;
 
     workers.forEach((worker, index) => {
-      console.log("Sending data to worker:", { data: chunks[index], clientDetails, agentDetails });
+      //console.log("Sending data to worker:", { data: chunks[index], clientDetails, agentDetails });
       worker.postMessage({ data: chunks[index], clientDetails, agentDetails });
 
       worker.onmessage = (event: MessageEvent<Client[]>) => {
@@ -201,89 +201,4 @@ export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
     priceSold: parseFloat(item["Valore"]).toFixed(2),
     priceBought: parseFloat(item["Costo"]).toFixed(2),
   }));
-};
-
-export const mapDataToAdmin = (
-  data: any[],
-  agentDetails: Agent[],
-  clientDetails: any[]
-): { agents: Agent[]; clients: Client[] } => {
-  const agentsMap = new Map<string, Agent>();
-  const clientsMap = new Map<string, Client>();
-
-  agentDetails.forEach((agent) => {
-    agentsMap.set(agent.id, {
-      ...agent,
-      clients: [],
-      alerts: [],
-      AgentVisits: [], // Initialize AgentVisits
-      AgentPromos: [], // Initialize AgentPromos
-    });
-  });
-
-  data.forEach((item) => {
-    const agentId = item["Codice Agente"].toString();
-    const clientId = item["Codice Cliente"].toString();
-
-    if (!agentsMap.has(agentId)) {
-      agentsMap.set(agentId, {
-        id: agentId,
-        name: `Agent ${agentId}`,
-        clients: [],
-        alerts: [],
-        AgentVisits: [],
-        AgentPromos: [],
-      });
-    }
-
-    const clientDetail = clientDetails.find(detail => detail.CODICE === clientId);
-
-    if (!clientsMap.has(clientId)) {
-      clientsMap.set(clientId, {
-        id: clientId,
-        name: item["Ragione Sociale Cliente"],
-        province: clientDetail ? clientDetail["C.A.P. - COMUNE (PROV.)"] : "",
-        phone: clientDetail ? clientDetail["TELEFONO"] : "",
-        totalOrders: 0,
-        totalRevenue: "0",
-        unpaidRevenue: "0",
-        address: clientDetail ? clientDetail["INDIRIZZO"] : "",
-        email: clientDetail ? clientDetail["EMAIL"] : "",
-        visits: [],
-        agent: agentId,
-        movements: [],
-        promos: [],
-      });
-    }
-
-    const agent = agentsMap.get(agentId)!;
-    const client = clientsMap.get(clientId)!;
-
-    if (!agent.clients.find((c) => c.id === client.id)) {
-      agent.clients.push(client);
-      agent.AgentVisits.push(...client.visits);
-      agent.AgentPromos.push(...client.promos);
-    }
-  });
-
-  // Merge agent details to ensure the correct names are assigned
-  agentDetails.forEach((agentDetail) => {
-    const agent = agentsMap.get(agentDetail.id);
-    if (agent) {
-      agent.name = agentDetail.name;
-      agent.email = agentDetail.email;
-      agent.phone = agentDetail.phone;
-    }
-  });
-
-  const mappedAgents = Array.from(agentsMap.values());
-  const mappedClients = Array.from(clientsMap.values());
-
-  console.log("Mapped agents:", mappedAgents);
-  console.log("Mapped clients:", mappedClients);
-
-  return {
-    agents: mappedAgents,
-    clients: mappedClients,
-  };
 };

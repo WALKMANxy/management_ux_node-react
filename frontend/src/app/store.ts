@@ -6,7 +6,9 @@ import calendarReducer from "../features/calendar/calendarSlice";
 import clientsReducer from "../features/clients/clientsSlice";
 import dataReducer from "../features/data/dataSlice";
 import searchReducer from "../features/search/searchSlice";
-import agentsReducer from "../features/agents/agentsSlice"; // Import the agents reducer
+import agentsReducer from "../features/agents/agentsSlice";
+import visitsReducer from "../features/visits/visitsSlice";
+import promosReducer from "../features/promos/promosSlice"; // Import the agents reducer
 import { api } from "../services/api";
 
 const store = configureStore({
@@ -16,6 +18,8 @@ const store = configureStore({
     data: dataReducer,
     calendar: calendarReducer,
     clients: clientsReducer,
+    visits: visitsReducer,
+    promos: promosReducer,
     agents: agentsReducer, // Add the agents reducer
     [api.reducerPath]: api.reducer,
   },
