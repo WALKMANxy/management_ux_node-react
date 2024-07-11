@@ -205,6 +205,29 @@ export type Visit = {
   note: string;
 };
 
+export type ArticlesListProps = {
+  quickFilterText: string;
+  setQuickFilterText: (value: string) => void;
+  filteredArticles: () => MovementDetail[];
+  columnDefs: any[];
+  gridRef: any;
+  handleMenuOpen: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  handleMenuClose: () => void;
+  anchorEl: HTMLElement | null;
+  exportDataAsCsv: () => void;
+  isArticleListCollapsed: boolean;
+  setArticleListCollapsed: (value: boolean) => void;
+  isMobile: boolean;
+  articleDetailsRef: React.RefObject<HTMLDivElement>;
+};
+
+export type ArticleDetailsProps = {
+  selectedArticle: MovementDetail | null;
+  isArticleDetailsCollapsed: boolean;
+  setArticleDetailsCollapsed: (value: boolean) => void;
+  isLoading: boolean;
+};
+
 
 export type MovementDetail = {
   articleId: string;
