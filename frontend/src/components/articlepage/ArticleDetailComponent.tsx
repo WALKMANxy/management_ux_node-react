@@ -1,7 +1,7 @@
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import HomeIcon from "@mui/icons-material/Home";
 import PersonIcon from "@mui/icons-material/Person";
-import { Box, Grid, Link, Skeleton, Typography } from "@mui/material";
+import { Box, Grid,  Skeleton, Typography } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { DetailProps } from "../../models/models";

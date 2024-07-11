@@ -1,4 +1,4 @@
-import { Box, Paper } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Movement } from "../../../models/models";
@@ -8,13 +8,21 @@ import { useGetClientsQuery } from "../../../services/api";
 
 type ArticleHistoryProps = {
   articleId: string;
+  clientMovements?: Movement[]; // Ensure clientName is included
 };
 
-const ArticleHistory: React.FC<ArticleHistoryProps> = ({ articleId }) => {
+const ArticleHistory: React.FC<ArticleHistoryProps> = ({ articleId, clientMovements }) => {
   const { t } = useTranslation();
 
   const { data: clients = [] } = useGetClientsQuery();
-  const movements: Movement[] = clients.flatMap(client => client.movements)
+
+  // If clientMovements is provided, use it; otherwise, fetch all clients' movements
+  const movements: (Movement)[] = (clientMovements || clients.flatMap(client =>
+    client.movements.map(movement => ({
+      ...movement,
+      clientName: client.name,
+    }))
+  ))
     .filter(movement => movement.details.some(detail => detail.articleId === articleId));
 
   const columnDefinitions = useMemo(
@@ -26,8 +34,7 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({ articleId }) => {
       },
       {
         headerName: t("movementsHistory.client"),
-        valueGetter: (params: any) =>
-          params.data.client ? params.data.client.name : "",
+        field: "clientName",
         sortable: true,
       },
       {
@@ -54,6 +61,8 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({ articleId }) => {
     [t, articleId]
   );
 
+  console.log("ArticleHistory movements: ", movements);
+
   return (
     <Paper
       elevation={3}
@@ -68,12 +77,27 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({ articleId }) => {
       }}
     >
       <Box sx={{ height: 600, width: "100%" }}>
-        <AGGridTable
-          columnDefs={columnDefinitions}
-          rowData={movements}
-          paginationPageSize={20}
-          quickFilterText=""
-        />
+        {movements.length > 0 ? (
+          <AGGridTable
+            columnDefs={columnDefinitions}
+            rowData={movements}
+            paginationPageSize={20}
+            quickFilterText=""
+          />
+        ) : (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '100%',
+            }}
+          >
+            <Typography variant="h6" sx={{ textAlign: "center" }}>
+              {t('articleDetails.noHistory')}
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Paper>
   );

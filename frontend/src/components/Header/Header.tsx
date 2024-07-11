@@ -26,6 +26,7 @@ import {
   Warning as WarningIcon,
   Logout as LogoutIcon,
   Close as CloseIcon,
+  Category as CategoryIcon, // Import icon for Articles
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -64,6 +65,7 @@ const Header: React.FC = () => {
       // Handle other types if necessary
     }
   };
+
   const handleLogoClick = () => {
     let dashboardLink = "/";
     switch (userRole) {
@@ -100,7 +102,12 @@ const Header: React.FC = () => {
 
     return (
       <>
-        <ListItem button component={Link} to={dashboardLink} onClick={toggleDrawer}>
+        <ListItem
+          button
+          component={Link}
+          to={dashboardLink}
+          onClick={toggleDrawer}
+        >
           <ListItemIcon sx={{ color: "white" }}>
             <HomeIcon />
           </ListItemIcon>
@@ -112,13 +119,24 @@ const Header: React.FC = () => {
           </ListItemIcon>
           <ListItemText primary={t("clients")} />
         </ListItem>
+        <ListItem button component={Link} to="/articles" onClick={toggleDrawer}>
+          <ListItemIcon sx={{ color: "white" }}>
+            <CategoryIcon />
+          </ListItemIcon>
+          <ListItemText primary={t("articles")} />
+        </ListItem>
         <ListItem button component={Link} to="/visits" onClick={toggleDrawer}>
           <ListItemIcon sx={{ color: "white" }}>
             <EventNoteIcon />
           </ListItemIcon>
           <ListItemText primary={t("visits")} />
         </ListItem>
-        <ListItem button component={Link} to="/statistics" onClick={toggleDrawer}>
+        <ListItem
+          button
+          component={Link}
+          to="/statistics"
+          onClick={toggleDrawer}
+        >
           <ListItemIcon sx={{ color: "white" }}>
             <BarChartIcon />
           </ListItemIcon>

@@ -15,6 +15,7 @@ import AgentDashboard from "./pages/agent/AgentDashboard";
 import ClientDashboard from "./pages/client/ClientDashboard";
 import ClientsPage from "./pages/common/ClientsPage";
 import LandingPage from "./pages/landing/LandingPage";
+import ArticlesPage from "./pages/common/ArticlesPage";
 
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
@@ -59,6 +60,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <ClientsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "articles",
+        element: (
+          <ProtectedRoute>
+            <ArticlesPage />
           </ProtectedRoute>
         ),
       },

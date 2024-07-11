@@ -117,6 +117,17 @@ export type SalesDistributionProps = {
   salesDistributionDataAgents?: { label: string; value: number }[];
 };
 
+
+export type ArticleColumnDefinition = {
+  headerName: string;
+  field: string;
+  filter: string;
+  sortable: boolean;
+  cellRenderer?: (params: any) => JSX.Element;
+  valueFormatter?: (params: any) => string;
+};
+
+
 export type ActivePromotionsProps = {
   isLoading: boolean;
 };
@@ -225,6 +236,7 @@ export type ArticleDetailsProps = {
   selectedArticle: MovementDetail | null;
   isArticleDetailsCollapsed: boolean;
   setArticleDetailsCollapsed: (value: boolean) => void;
+  clientMovements?: Movement[]; // Optional prop for client movements
   isLoading: boolean;
 };
 

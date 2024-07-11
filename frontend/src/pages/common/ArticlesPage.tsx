@@ -1,15 +1,19 @@
 import { Box, useMediaQuery } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { currencyFormatter } from "../../utils/dataUtils";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
+import { currencyFormatter} from "../../utils/dataUtils";
 import ArticlesList from "../../components/statistics/grids/ArticlesList";
 import ArticleDetails from "../../components/articlepage/ArticleDetails";
 import { useArticlesGrid } from "../../hooks/useArticlesGrid";
-
+import { ArticleColumnDefinition } from "../../models/models";
 
 const ArticlesPage: React.FC = () => {
   const { t } = useTranslation();
   const isMobile = useMediaQuery("(max-width:600px)");
+  const userRole = useSelector((state: RootState) => state.auth.userRole);
+
   const {
     selectedArticle,
     quickFilterText,
@@ -26,54 +30,66 @@ const ArticlesPage: React.FC = () => {
     anchorEl,
     articleDetailsRef,
     exportDataAsCsv,
+    clientMovements, // Add clientMovements
   } = useArticlesGrid();
 
-  const columnDefinitions = useMemo(() => [
-    {
-      headerName: t("articlesPage.name"),
-      field: "name",
-      filter: "agTextColumnFilter",
-      sortable: true,
-      cellRenderer: (params: any) => {
-        return (
-          <span
-            onDoubleClick={() => handleArticleSelect(params.data.articleId)}
-            style={{
-              cursor: "pointer",
-            }}
-          >
-            {params.value}
-          </span>
-        );
+ 
+
+  const columnDefinitions: ArticleColumnDefinition[] = useMemo(() => {
+    const baseColumns: ArticleColumnDefinition[] = [
+      {
+        headerName: t("articlesPage.name"),
+        field: "name",
+        filter: "agTextColumnFilter",
+        sortable: true,
+        cellRenderer: (params: any) => {
+          return (
+            <span
+              onDoubleClick={() => handleArticleSelect(params.data.articleId)}
+              style={{
+                cursor: "pointer",
+              }}
+            >
+              {params.value}
+            </span>
+          );
+        },
       },
-    },
-    {
-      headerName: t("articlesPage.brand"),
-      field: "brand",
-      filter: "agTextColumnFilter",
-      sortable: true,
-    },
-    {
-      headerName: t("articlesPage.oemId"),
-      field: "articleId",
-      filter: "agTextColumnFilter",
-      sortable: true,
-    },
-    {
-      headerName: t("articlesPage.revenue"),
-      field: "priceSold",
-      filter: "agNumberColumnFilter",
-      valueFormatter: (params: any) => currencyFormatter(params.value),
-      sortable: true,
-    },
-    {
-      headerName: t("articlesPage.cost"),
-      field: "priceBought",
-      filter: "agNumberColumnFilter",
-      valueFormatter: (params: any) => currencyFormatter(params.value),
-      sortable: true,
-    },
-  ], [handleArticleSelect, t]);
+      {
+        headerName: t("articlesPage.brand"),
+        field: "brand",
+        filter: "agTextColumnFilter",
+        sortable: true,
+      },
+      {
+        headerName: t("articlesPage.oemId"),
+        field: "articleId",
+        filter: "agTextColumnFilter",
+        sortable: true,
+      },
+    ];
+
+    if (userRole !== "client") {
+      baseColumns.push(
+        {
+          headerName: t("articlesPage.revenue"),
+          field: "priceSold",
+          filter: "agNumberColumnFilter",
+          valueFormatter: (params: any) => currencyFormatter(params.value),
+          sortable: true,
+        },
+        {
+          headerName: t("articlesPage.cost"),
+          field: "priceBought",
+          filter: "agNumberColumnFilter",
+          valueFormatter: (params: any) => currencyFormatter(params.value),
+          sortable: true,
+        }
+      );
+    }
+
+    return baseColumns;
+  }, [handleArticleSelect, t, userRole]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -92,13 +108,16 @@ const ArticlesPage: React.FC = () => {
         isMobile={isMobile}
         articleDetailsRef={articleDetailsRef}
       />
-      <ArticleDetails
-        ref={articleDetailsRef}
-        isLoading={false}
-        selectedArticle={selectedArticle}
-        isArticleDetailsCollapsed={isArticleDetailsCollapsed}
-        setArticleDetailsCollapsed={setArticleDetailsCollapsed}
-      />
+      {selectedArticle && (
+        <ArticleDetails
+          ref={articleDetailsRef}
+          isLoading={false}
+          selectedArticle={selectedArticle}
+          isArticleDetailsCollapsed={isArticleDetailsCollapsed}
+          setArticleDetailsCollapsed={setArticleDetailsCollapsed}
+          clientMovements={clientMovements}
+        />
+      )}
     </Box>
   );
 };

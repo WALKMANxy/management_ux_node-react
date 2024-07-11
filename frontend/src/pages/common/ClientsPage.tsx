@@ -140,6 +140,7 @@ const ClientsPage: React.FC = () => {
   const loggedInClientDetails = filteredClients().find(
     (client) => client.id === loggedInClientId
   );
+  
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
