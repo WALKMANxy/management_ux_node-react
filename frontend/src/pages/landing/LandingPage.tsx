@@ -85,333 +85,354 @@ const LandingPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [showLogin]);
 
-  if (showLoader) {
-    return <Loader />;
-  }
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <AppBar position="static" sx={{ backgroundColor: "black" }}>
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          <img src="/images/logo-appbar.png" alt="Logo" style={{ height: "40px" }} />
-          <Button color="inherit" onClick={() => setShowLogin(!showLogin)}>
-            {isLoggedIn ? t("landingPage.enter") : t("landingPage.login")}
-          </Button>
-        </Toolbar>
-      </AppBar>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        position: "relative",
+      }}
+    >
+      {showLoader && <Loader fadeout={!showLoader} />}
 
-      {showLogin && (
-        <Menu
-          anchorEl={document.body}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-          open={showLogin}
-          onClose={() => setShowLogin(false)}
-          sx={{ marginTop: "48px" }}
-        >
-          <MenuItem>
-            <FormControl
-              fullWidth
-              sx={{ marginBottom: 2, paddingTop: "8px", margintop: "10px" }}
-            >
-              <InputLabel sx={{ fontSize: "110%", top: "-8px" }}>
-                {t("landingPage.userRole")}
-              </InputLabel>
-              <Select
-                value={selectedRole}
-                onChange={(e) => {
-                  setSelectedRole(
-                    e.target.value as "admin" | "agent" | "client"
-                  );
-                  if (e.target.value === "client") {
-                    refetchMinimalClients();
-                  }
-                }}
-              >
-                <MenuItem value="admin">{t("landingPage.admin")}</MenuItem>
-                <MenuItem value="agent">{t("landingPage.agent")}</MenuItem>
-                <MenuItem value="client">{t("landingPage.client")}</MenuItem>
-              </Select>
-            </FormControl>
-          </MenuItem>
-          {selectedRole === "agent" && (
-            <MenuItem>
-              <FormControl fullWidth sx={{ marginBottom: 2 }}>
-                <InputLabel sx={{ fontSize: "110%", top: "-8px" }}>
-                  {t("landingPage.selectAgent")}
-                </InputLabel>
-                <Select
-                  value={selectedAgent}
-                  onChange={(e) => setSelectedAgent(e.target.value)}
-                >
-                  {agentOptions}
-                </Select>
-              </FormControl>
-            </MenuItem>
-          )}
-          {selectedRole === "client" && (
-            <MenuItem>
-              <FormControl fullWidth sx={{ marginBottom: 2 }}>
-                <InputLabel sx={{ fontSize: "110%", top: "-8px" }}>
-                  {t("landingPage.selectClient")}
-                </InputLabel>
-                <Select
-                  value={selectedClient}
-                  onChange={(e) => setSelectedClient(e.target.value)}
-                >
-                  {clientOptions}
-                </Select>
-              </FormControl>
-            </MenuItem>
-          )}
-          <MenuItem>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={isLoggedIn ? handleEnter : handleLogin}
-              fullWidth
-            >
-              {isLoggedIn ? t("landingPage.enter") : t("landingPage.login")}
-            </Button>
-          </MenuItem>
-        </Menu>
-      )}
-      <Container
-        component="main"
+      <Box
         sx={{
-          flex: 1,
+          opacity: showLoader ? 0 : 1,
+          transition: "opacity 0.5s ease-in-out",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "2rem",
+          minHeight: "100vh",
         }}
       >
-        <Box
+        <AppBar position="static" sx={{ backgroundColor: "black" }}>
+          <Toolbar sx={{ justifyContent: "space-between" }}>
+            <img
+              src="/images/logo-appbar.png"
+              alt="Logo"
+              style={{ height: "40px" }}
+            />
+            <Button color="inherit" onClick={() => setShowLogin(!showLogin)}>
+              {isLoggedIn ? t("landingPage.enter") : t("landingPage.login")}
+            </Button>
+          </Toolbar>
+        </AppBar>
+
+        {showLogin && (
+          <Menu
+            anchorEl={document.body}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            open={showLogin}
+            onClose={() => setShowLogin(false)}
+            sx={{ marginTop: "48px" }}
+          >
+            <MenuItem>
+              <FormControl
+                fullWidth
+                sx={{ marginBottom: 2, paddingTop: "8px", margintop: "10px" }}
+              >
+                <InputLabel sx={{ fontSize: "110%", top: "-8px" }}>
+                  {t("landingPage.userRole")}
+                </InputLabel>
+                <Select
+                  value={selectedRole}
+                  onChange={(e) => {
+                    setSelectedRole(
+                      e.target.value as "admin" | "agent" | "client"
+                    );
+                    if (e.target.value === "client") {
+                      refetchMinimalClients();
+                    }
+                  }}
+                >
+                  <MenuItem value="admin">{t("landingPage.admin")}</MenuItem>
+                  <MenuItem value="agent">{t("landingPage.agent")}</MenuItem>
+                  <MenuItem value="client">{t("landingPage.client")}</MenuItem>
+                </Select>
+              </FormControl>
+            </MenuItem>
+            {selectedRole === "agent" && (
+              <MenuItem>
+                <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                  <InputLabel sx={{ fontSize: "110%", top: "-8px" }}>
+                    {t("landingPage.selectAgent")}
+                  </InputLabel>
+                  <Select
+                    value={selectedAgent}
+                    onChange={(e) => setSelectedAgent(e.target.value)}
+                  >
+                    {agentOptions}
+                  </Select>
+                </FormControl>
+              </MenuItem>
+            )}
+            {selectedRole === "client" && (
+              <MenuItem>
+                <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                  <InputLabel sx={{ fontSize: "110%", top: "-8px" }}>
+                    {t("landingPage.selectClient")}
+                  </InputLabel>
+                  <Select
+                    value={selectedClient}
+                    onChange={(e) => setSelectedClient(e.target.value)}
+                  >
+                    {clientOptions}
+                  </Select>
+                </FormControl>
+              </MenuItem>
+            )}
+            <MenuItem>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={isLoggedIn ? handleEnter : handleLogin}
+                fullWidth
+              >
+                {isLoggedIn ? t("landingPage.enter") : t("landingPage.login")}
+              </Button>
+            </MenuItem>
+          </Menu>
+        )}
+
+        <Container
+          component="main"
           sx={{
-            width: "100%",
+            flex: 1,
             display: "flex",
-            flexDirection: { xs: "column", md: "row" },
+            flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            textAlign: "center",
+            padding: "2rem",
           }}
         >
           <Box
             sx={{
-              padding: "1rem",
-              flex: { xs: "0 1 auto", md: "0 1 50%" },
-            }}
-          >
-            <img
-              src="/images/logobig.png"
-              alt="Welcome Logo"
-              style={{ width: "100%", height: "auto" }}
-            />
-          </Box>
-          <Divider
-            orientation="vertical"
-            flexItem
-            sx={{
-              bgcolor: "lightgray",
-              height: { xs: "0", md: "200px" },
-              width: { xs: "100%", md: "0" },
-              margin: "1rem",
-            }}
-          />
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)" },
-              gap: 2,
-              flex: { xs: "0 1 auto", md: "0 1 50%" },
-            }}
-          >
-            <Button
-              href="https://www.facebook.com/RicambiCentroSud/"
-              startIcon={<FacebookIcon />}
-              sx={{ color: "#3b5998" }}
-            >
-              {t("landingPage.facebook")}
-            </Button>
-            <Button
-              href="https://www.instagram.com/ricambicentrosud/"
-              startIcon={<InstagramIcon />}
-              sx={{ color: "#E1306C" }}
-            >
-              {t("landingPage.instagram")}
-            </Button>
-            <Button
-              href="https://goo.gl/maps/MFy1cqdn3BbQNmtW6"
-              startIcon={<GoogleMapsIcon />}
-              sx={{ color: "#4285F4" }}
-            >
-              {t("landingPage.googleMaps")}
-            </Button>
-            <Button
-              href="https://www.linkedin.com/company/7007068/"
-              startIcon={<LinkedInIcon />}
-              sx={{ color: "#0077B5" }}
-            >
-              {t("landingPage.linkedIn")}
-            </Button>
-          </Box>
-        </Box>
-      </Container>
-
-      <Box
-        component="footer"
-        sx={{
-          backgroundColor: "#f0f0f0",
-          color: "#333",
-          padding: "0.64rem", // Reduced by 20% from 0.8rem
-          textAlign: "center",
-          position: "relative",
-          mt: "auto",
-          "&:before": {
-            content: '""',
-            display: "block",
-            height: "6.4px", // Reduced by 20% from 8px
-            background:
-              "linear-gradient(to bottom, rgba(255, 255, 255, 0), #f0f0f0)",
-          },
-          "@media (max-width: 600px)": {
-            padding: "0.4rem", // 50% smaller for mobile
-            "&:before": {
-              height: "4px", // 50% smaller for mobile
-            },
-          },
-        }}
-      >
-        <Container>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            flexDirection={{ xs: "column", sm: "row" }}
-            alignItems={{ xs: "center", sm: "flex-start" }}
-            sx={{
-              "@media (max-width: 600px)": {
-                flexDirection: "column", // Stack items for mobile
-                alignItems: "center",
-              },
-            }}
-          >
-            <Box
-              sx={{
-                textAlign: { xs: "center", sm: "left" },
-                padding: "0.32rem 0.64rem",
-                flex: 1,
-                fontSize: "64%",
-                "@media (max-width: 600px)": {
-                  padding: "0.16rem 0.32rem", // 50% smaller for mobile
-                  fontSize: "32%", // 50% smaller for mobile
-                },
-              }}
-            >
-              <Typography
-                sx={{
-                  marginBottom: "0.32rem",
-                  "@media (max-width: 600px)": {
-                    marginBottom: "0.16rem",
-                    fontSize: "250%",
-                  },
-                }}
-              >
-                <AccessTimeIcon /> {t("landingPage.workingHours")}
-              </Typography>
-              <Typography
-                sx={{
-                  marginBottom: "0.32rem",
-                  "@media (max-width: 600px)": {
-                    marginBottom: "0.16rem",
-                    fontSize: "250%",
-                  },
-                }}
-              >
-                <LocationOnIcon /> {t("landingPage.address")}
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                textAlign: { xs: "center", sm: "right" },
-                padding: "0.32rem 0.64rem",
-                flex: 1,
-                fontSize: "64%",
-                "@media (max-width: 600px)": {
-                  padding: "0.16rem 0.32rem", // 50% smaller for mobile
-                  fontSize: "32%", // 50% smaller for mobile
-                },
-              }}
-            >
-              <Typography
-                sx={{
-                  marginBottom: "0.32rem",
-                  "@media (max-width: 600px)": {
-                    marginBottom: "0.16rem",
-                    fontSize: "250%",
-                  },
-                }}
-              >
-                <PhoneIcon />{" "}
-                <a
-                  href="tel:+390954190006"
-                  style={{ color: "blue", textDecoration: "none" }}
-                >
-                  (+39) 095 419 0006
-                </a>
-              </Typography>
-              <Typography
-                sx={{
-                  marginBottom: "0.32rem",
-                  "@media (max-width: 600px)": {
-                    marginBottom: "0.16rem",
-                    fontSize: "250%",
-                  },
-                }}
-              >
-                <EmailIcon />{" "}
-                <a
-                  href="mailto:info@ricambicentrosud.com"
-                  style={{ color: "blue", textDecoration: "none" }}
-                >
-                  info@ricambicentrosud.com
-                </a>
-              </Typography>
-              <Typography
-                sx={{
-                  marginBottom: "0.32rem",
-                  "@media (max-width: 600px)": {
-                    marginBottom: "0.16rem",
-                    fontSize: "250%",
-                  },
-                }}
-              >
-                <VATIcon /> 03176280877
-              </Typography>
-            </Box>
-          </Box>
-          <Box
-            sx={{
+              width: "100%",
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              justifyContent: "center",
+              alignItems: "center",
               textAlign: "center",
-              padding: "0.32rem 0.64rem",
-              fontSize: "64%",
-              "@media (max-width: 600px)": {
-                padding: "0.16rem 0.32rem", // 50% smaller for mobile
-                fontSize: "32%", // 50% smaller for mobile
-              },
             }}
           >
-            <Typography
+            <Box
               sx={{
-                marginBottom: "0.32rem",
-                "@media (max-width: 600px)": {
-                  marginBottom: "0.16rem",
-                  fontSize: "250%",
-                },
+                padding: "1rem",
+                flex: { xs: "0 1 auto", md: "0 1 50%" },
               }}
             >
-              {t("landingPage.credits")}
-            </Typography>
+              <img
+                src="/images/logobig.png"
+                alt="Welcome Logo"
+                style={{ width: "100%", height: "auto" }}
+              />
+            </Box>
+            <Divider
+              orientation="vertical"
+              flexItem
+              sx={{
+                bgcolor: "lightgray",
+                height: { xs: "0", md: "200px" },
+                width: { xs: "100%", md: "0" },
+                margin: "1rem",
+              }}
+            />
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)" },
+                gap: 2,
+                flex: { xs: "0 1 auto", md: "0 1 50%" },
+              }}
+            >
+              <Button
+                href="https://www.facebook.com/RicambiCentroSud/"
+                startIcon={<FacebookIcon />}
+                sx={{ color: "#3b5998" }}
+              >
+                {t("landingPage.facebook")}
+              </Button>
+              <Button
+                href="https://www.instagram.com/ricambicentrosud/"
+                startIcon={<InstagramIcon />}
+                sx={{ color: "#E1306C" }}
+              >
+                {t("landingPage.instagram")}
+              </Button>
+              <Button
+                href="https://goo.gl/maps/MFy1cqdn3BbQNmtW6"
+                startIcon={<GoogleMapsIcon />}
+                sx={{ color: "#4285F4" }}
+              >
+                {t("landingPage.googleMaps")}
+              </Button>
+              <Button
+                href="https://www.linkedin.com/company/7007068/"
+                startIcon={<LinkedInIcon />}
+                sx={{ color: "#0077B5" }}
+              >
+                {t("landingPage.linkedIn")}
+              </Button>
+            </Box>
           </Box>
         </Container>
+
+        <Box
+          component="footer"
+          sx={{
+            backgroundColor: "#f0f0f0",
+            color: "#333",
+            padding: "0.64rem", // Reduced by 20% from 0.8rem
+            textAlign: "center",
+            position: "relative",
+            mt: "auto",
+            "&:before": {
+              content: '""',
+              display: "block",
+              height: "6.4px", // Reduced by 20% from 8px
+              background:
+                "linear-gradient(to bottom, rgba(255, 255, 255, 0), #f0f0f0)",
+            },
+            "@media (max-width: 600px)": {
+              padding: "0.4rem", // 50% smaller for mobile
+              "&:before": {
+                height: "4px", // 50% smaller for mobile
+              },
+            },
+          }}
+        >
+          <Container>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              flexDirection={{ xs: "column", sm: "row" }}
+              alignItems={{ xs: "center", sm: "flex-start" }}
+              sx={{
+                "@media (max-width: 600px)": {
+                  flexDirection: "column", // Stack items for mobile
+                  alignItems: "center",
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  textAlign: { xs: "center", sm: "left" },
+                  padding: "0.32rem 0.64rem",
+                  flex: 1,
+                  fontSize: "64%",
+                  "@media (max-width: 600px)": {
+                    padding: "0.16rem 0.32rem", // 50% smaller for mobile
+                    fontSize: "32%", // 50% smaller for mobile
+                  },
+                }}
+              >
+                <Typography
+                  sx={{
+                    marginBottom: "0.32rem",
+                    "@media (max-width: 600px)": {
+                      marginBottom: "0.16rem",
+                      fontSize: "250%",
+                    },
+                  }}
+                >
+                  <AccessTimeIcon /> {t("landingPage.workingHours")}
+                </Typography>
+                <Typography
+                  sx={{
+                    marginBottom: "0.32rem",
+                    "@media (max-width: 600px)": {
+                      marginBottom: "0.16rem",
+                      fontSize: "250%",
+                    },
+                  }}
+                >
+                  <LocationOnIcon /> {t("landingPage.address")}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  textAlign: { xs: "center", sm: "right" },
+                  padding: "0.32rem 0.64rem",
+                  flex: 1,
+                  fontSize: "64%",
+                  "@media (max-width: 600px)": {
+                    padding: "0.16rem 0.32rem", // 50% smaller for mobile
+                    fontSize: "32%", // 50% smaller for mobile
+                  },
+                }}
+              >
+                <Typography
+                  sx={{
+                    marginBottom: "0.32rem",
+                    "@media (max-width: 600px)": {
+                      marginBottom: "0.16rem",
+                      fontSize: "250%",
+                    },
+                  }}
+                >
+                  <PhoneIcon />{" "}
+                  <a
+                    href="tel:+390954190006"
+                    style={{ color: "blue", textDecoration: "none" }}
+                  >
+                    (+39) 095 419 0006
+                  </a>
+                </Typography>
+                <Typography
+                  sx={{
+                    marginBottom: "0.32rem",
+                    "@media (max-width: 600px)": {
+                      marginBottom: "0.16rem",
+                      fontSize: "250%",
+                    },
+                  }}
+                >
+                  <EmailIcon />{" "}
+                  <a
+                    href="mailto:info@ricambicentrosud.com"
+                    style={{ color: "blue", textDecoration: "none" }}
+                  >
+                    info@ricambicentrosud.com
+                  </a>
+                </Typography>
+                <Typography
+                  sx={{
+                    marginBottom: "0.32rem",
+                    "@media (max-width: 600px)": {
+                      marginBottom: "0.16rem",
+                      fontSize: "250%",
+                    },
+                  }}
+                >
+                  <VATIcon /> 03176280877
+                </Typography>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                textAlign: "center",
+                padding: "0.32rem 0.64rem",
+                fontSize: "64%",
+                "@media (max-width: 600px)": {
+                  padding: "0.16rem 0.32rem", // 50% smaller for mobile
+                  fontSize: "32%", // 50% smaller for mobile
+                },
+              }}
+            >
+              <Typography
+                sx={{
+                  marginBottom: "0.32rem",
+                  "@media (max-width: 600px)": {
+                    marginBottom: "0.16rem",
+                    fontSize: "250%",
+                  },
+                }}
+              >
+                {t("landingPage.credits")}
+              </Typography>
+            </Box>
+          </Container>
+        </Box>
       </Box>
     </Box>
   );

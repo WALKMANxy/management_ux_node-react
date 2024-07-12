@@ -1,4 +1,3 @@
-//src/components/common/Loader.tsx
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Box, CircularProgress } from "@mui/material";
@@ -27,18 +26,15 @@ const FullScreenBox = styled(Box)<{ fadeout: string }>`
   transition: opacity 0.5s;
 `;
 
-const Loader: React.FC = () => {
+const Loader: React.FC<{ fadeout: boolean }> = ({ fadeout }) => {
   const [fadeOutEffect, setFadeOutEffect] = useState("false");
 
   useEffect(() => {
-    //console.log("Loader mounted");
     const timer = setTimeout(() => {
-      //console.log("Fade out triggered");
       setFadeOutEffect("true");
     }, 1500);
 
     return () => {
-      //console.log("Cleanup timer");
       clearTimeout(timer);
     };
   }, []);

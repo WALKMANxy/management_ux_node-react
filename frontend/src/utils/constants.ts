@@ -56,6 +56,15 @@ to {
 }
 `;
 
+export const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
 export const ChartData = (categories: string[], data: number[]) => ({
   options: {
     chart: {

@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useEffect, useState } from "react";
 import useStats from "../../hooks/useStats";
 import {
   Box,
@@ -64,6 +64,17 @@ const AdminDashboard: React.FC = () => {
     isLoading,
   } = useStats("admin", null, isMobile);
 
+  const [fakeLoading, setFakeLoading] = useState(true);
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFakeLoading(false);
+    }, 700); // Fake loading for 700ms
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleSelect = useCallback(
     (item: SearchResult) => {
       if (item.type === "client") {
@@ -93,6 +104,8 @@ const AdminDashboard: React.FC = () => {
     return [];
   }, [selectedAgentData]);
 
+  const loadingState = fakeLoading;
+
   return (
     <Box
       className="admin-dashboard"
@@ -101,7 +114,7 @@ const AdminDashboard: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         {t("adminDashboard.welcomeBack", { name: "Admin" })}
       </Typography>
-      {isLoading ? (
+      {loadingState ? (
         <Skeleton
           variant="rectangular"
           width="100%"
@@ -324,7 +337,7 @@ const AdminDashboard: React.FC = () => {
               <Divider sx={{ my: 2, borderRadius: "12px" }} />
               <Grid container spacing={2}>
                 <Grid item xs={12} md={6}>
-                  {isLoading ? (
+                  {loadingState ? (
                     <Skeleton
                       variant="rectangular"
                       width="100%"
@@ -340,7 +353,7 @@ const AdminDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  {isLoading ? (
+                  {loadingState ? (
                     <Skeleton
                       variant="rectangular"
                       width="100%"
@@ -360,7 +373,7 @@ const AdminDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  {isLoading ? (
+                  {loadingState ? (
                     <Skeleton
                       variant="rectangular"
                       width="100%"
@@ -377,7 +390,7 @@ const AdminDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  {isLoading ? (
+                  {loadingState ? (
                     <Skeleton
                       variant="rectangular"
                       width="100%"
@@ -395,7 +408,7 @@ const AdminDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12}>
-                  {isLoading ? (
+                  {loadingState ? (
                     <Skeleton
                       variant="rectangular"
                       width="100%"
@@ -426,7 +439,7 @@ const AdminDashboard: React.FC = () => {
             </Typography>
 
             <Divider sx={{ my: 2, borderRadius: "12px" }} />
-            {isLoading ? (
+            {loadingState ? (
               <Skeleton
                 variant="rectangular"
                 width="100%"

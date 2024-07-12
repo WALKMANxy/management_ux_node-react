@@ -1,5 +1,5 @@
 import { Box, Paper } from "@mui/material";
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { MovementsHistoryProps } from "../../../models/models";
 import { currencyFormatter, numberComparator } from "../../../utils/dataUtils";
@@ -7,6 +7,22 @@ import AGGridTable from "./AGGridTable";
 
 const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
   const { t } = useTranslation();
+
+  useEffect(() => {
+    console.log("Movements:", movements);
+  }, [movements]);
+
+  // Flatten the movements array and filter out invalid articles
+  const flattenedMovements = useMemo(() => {
+    return movements.flatMap(movement =>
+      movement.details
+        .filter(detail => detail.brand && detail.brand !== ".")
+        .map(detail => ({
+          ...detail,
+          dateOfOrder: movement.dateOfOrder,
+        }))
+    );
+  }, [movements]);
 
   const columnDefinitions = useMemo(
     () => [
@@ -17,41 +33,30 @@ const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
       },
       {
         headerName: t("movementsHistory.brand"),
-        valueGetter: (params: any) =>
-          params.data.details.length > 0 ? params.data.details[0].brand : "",
+        field: "brand",
         sortable: true,
       },
       {
         headerName: t("movementsHistory.oemId"),
-        valueGetter: (params: any) =>
-          params.data.details.length > 0
-            ? params.data.details[0].articleId
-            : "",
+        field: "articleId",
         sortable: true,
       },
       {
         headerName: t("movementsHistory.name"),
-        valueGetter: (params: any) =>
-          params.data.details.length > 0 ? params.data.details[0].name : "",
+        field: "name",
         sortable: true,
       },
       {
         headerName: t("movementsHistory.revenue"),
-        valueGetter: (params: any) =>
-          params.data.details.length > 0
-            ? parseFloat(params.data.details[0].priceSold)
-            : 0,
-        valueFormatter: (params: any) => currencyFormatter(params.value),
+        field: "priceSold",
+        valueFormatter: (params: any) => currencyFormatter(parseFloat(params.value)),
         comparator: numberComparator,
         sortable: true,
       },
       {
         headerName: t("movementsHistory.cost"),
-        valueGetter: (params: any) =>
-          params.data.details.length > 0
-            ? parseFloat(params.data.details[0].priceBought)
-            : 0,
-        valueFormatter: (params: any) => currencyFormatter(params.value),
+        field: "priceBought",
+        valueFormatter: (params: any) => currencyFormatter(parseFloat(params.value)),
         comparator: numberComparator,
         sortable: true,
       },
@@ -75,7 +80,7 @@ const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
       <Box sx={{ height: 600, width: "100%" }}>
         <AGGridTable
           columnDefs={columnDefinitions}
-          rowData={movements}
+          rowData={flattenedMovements}
           paginationPageSize={20}
           quickFilterText=""
         />

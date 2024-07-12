@@ -2,13 +2,17 @@
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { AgGridReact } from "ag-grid-react";
-import { forwardRef } from "react";
+import { forwardRef, useEffect } from "react";
 import { AGGridTableProps } from "../../../models/models";
 import { paginationPageSizeSelector } from "../../../utils/constants";
 import "../grids/AGGridTable.css";
 
 const AGGridTable = forwardRef<AgGridReact, AGGridTableProps>(
   ({ columnDefs, rowData, quickFilterText }, ref) => {
+    useEffect(() => {
+      console.log('AGGridTable rowData:', rowData);
+    }, [rowData]);
+
     return (
       <div className="ag-theme-quartz" style={{ height: 600, width: "100%" }}>
         <AgGridReact
