@@ -109,7 +109,7 @@ export const calculateSalesDistributionData = (
   clients: Client[],
   isMobile: boolean
 ): { label: string; value: number }[] => {
-  console.log("Calculating Sales Distribution Data for Clients:", clients);
+  //console.log("Calculating Sales Distribution Data for Clients:", clients);
 
   const aggregatedClients = clients.reduce((acc, client) => {
     if (!acc[client.id]) {
@@ -127,7 +127,7 @@ export const calculateSalesDistributionData = (
     .sort((a, b) => b.totalRevenue - a.totalRevenue)
     .slice(0, isMobile ? 8 : 25);
 
-  console.log("Top Clients:", topClients);
+  //console.log("Top Clients:", topClients);
 
   return topClients.map((client) => ({
     label: client.name,

@@ -81,11 +81,11 @@ export const mapDataToModels = async (
     let completed = 0;
 
     workers.forEach((worker, index) => {
-      console.log(`Sending data to worker ${index}:`, { data: chunks[index], clientDetails, agentDetails });
+      //console.log(`Sending data to worker ${index}:`, { data: chunks[index], clientDetails, agentDetails });
       worker.postMessage({ data: chunks[index], clientDetails, agentDetails });
 
       worker.onmessage = (event: MessageEvent<Client[]>) => {
-        console.log(`Worker ${index} finished processing.`);
+        //console.log(`Worker ${index} finished processing.`);
         const workerResults = event.data;
         
         workerResults.forEach((client) => {
@@ -107,7 +107,7 @@ export const mapDataToModels = async (
 
         if (completed === workers.length) {
           const results = Array.from(resultsMap.values());
-          console.log('All workers finished. Aggregated results:', results);
+          //console.log('All workers finished. Aggregated results:', results);
           resolve(results);
         }
       };

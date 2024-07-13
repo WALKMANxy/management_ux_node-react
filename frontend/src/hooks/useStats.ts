@@ -429,10 +429,10 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     ) {
       return { revenuePercentage: 0, ordersPercentage: 0 };
     }
-
+/* 
     console.log("Selected Agent:", selectedAgent);
     console.log("Selected Agent Clients:", selectedAgent.clients);
-
+ */
     // Filter clientsData to get the clients belonging to the selected agent
     const agentClients = clientsData.filter(
       (client) => client.agent === selectedAgent.id
@@ -483,7 +483,7 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
       (client) => client.agent === selectedAgent.id
     );
   
-    console.log("Agent Clients:", agentClients);
+    //console.log("Agent Clients:", agentClients);
   
     // Calculate the total revenue for the selected agent's clients for the current month and year
     const selectedMonthlyTotal = agentClients.reduce((total, client) => {
@@ -508,7 +508,7 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
       return total + monthlyRevenue;
     }, 0);
   
-    console.log("Selected Agent's Monthly Total Revenue:", selectedMonthlyTotal);
+    //console.log("Selected Agent's Monthly Total Revenue:", selectedMonthlyTotal);
   
     // Calculate the total revenue for all clients for the current month and year
     const allMonthlyTotal = clientsData.reduce((total, client) => {
@@ -533,7 +533,7 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
       return total + monthlyRevenue;
     }, 0);
   
-    console.log("All Clients' Monthly Total Revenue:", allMonthlyTotal);
+    //console.log("All Clients' Monthly Total Revenue:", allMonthlyTotal);
   
     // Calculate the percentage of total monthly revenue that this agent's clients contribute
     const revenuePercentage = (
@@ -541,7 +541,7 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
       100
     ).toFixed(2);
   
-    console.log("Revenue Percentage:", revenuePercentage);
+    //console.log("Revenue Percentage:", revenuePercentage);
   
     // Calculate the number of orders for the selected agent's clients for the current month and year
     const selectedOrdersTotal = agentClients.reduce((total, client) => {
@@ -555,7 +555,7 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
       return total + monthlyOrders;
     }, 0);
   
-    console.log("Selected Agent's Monthly Total Orders:", selectedOrdersTotal);
+    //console.log("Selected Agent's Monthly Total Orders:", selectedOrdersTotal);
   
     // Calculate the total number of orders for all clients for the current month and year
     const allOrdersTotal = clientsData.reduce((total, client) => {
@@ -569,7 +569,7 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
       return total + monthlyOrders;
     }, 0);
   
-    console.log("All Clients' Monthly Total Orders:", allOrdersTotal);
+    //console.log("All Clients' Monthly Total Orders:", allOrdersTotal);
   
     // Calculate the percentage of total monthly orders that this agent's clients contribute
     const ordersPercentage = (
@@ -577,7 +577,7 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
       100
     ).toFixed(2);
   
-    console.log("Orders Percentage:", ordersPercentage);
+    //console.log("Orders Percentage:", ordersPercentage);
   
     return {
       revenuePercentage,
