@@ -1,9 +1,9 @@
 onmessage = function (event) {
   const { data, clientDetails } = event.data;
 
-  console.log('Worker received data:', data);
+ /*  console.log('Worker received data:', data);
   console.log('Worker received client details:', clientDetails);
-
+ */
   const clientsMap = new Map();
   data.forEach((item) => {
     const clientId = item["Codice Cliente"].toString();
@@ -13,8 +13,8 @@ onmessage = function (event) {
     clientsMap.get(clientId).push(item);
   });
 
-  console.log('Clients map after aggregation:', clientsMap);
-
+  /* console.log('Clients map after aggregation:', clientsMap);
+ */
   const clients = Array.from(clientsMap.values()).map((clientData) => {
     const clientInfo = clientData[0];
     const clientDetail = clientDetails.find(
@@ -90,7 +90,7 @@ onmessage = function (event) {
     };
   });
 
-  console.log('Final clients array:', clients);
+  //console.log('Final clients array:', clients);
 
   postMessage(clients);
 };

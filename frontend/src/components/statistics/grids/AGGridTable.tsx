@@ -10,7 +10,7 @@ import "../grids/AGGridTable.css";
 const AGGridTable = forwardRef<AgGridReact, AGGridTableProps>(
   ({ columnDefs, rowData, quickFilterText }, ref) => {
     useEffect(() => {
-      console.log('AGGridTable rowData:', rowData);
+      //console.log('AGGridTable rowData:', rowData);
     }, [rowData]);
 
     return (
