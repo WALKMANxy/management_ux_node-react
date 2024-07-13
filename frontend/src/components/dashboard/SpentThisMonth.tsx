@@ -9,7 +9,11 @@ import { RootState } from "../../app/store";
 import { SpentThisMonthProps } from "../../models/models";
 import { currencyFormatter } from "../../utils/dataUtils";
 
-const SpentThisMonth: React.FC<SpentThisMonthProps> = ({ amount, comparison }) => {
+const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
+  amount,
+  comparison,
+  isAgentSelected,
+}) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const userRole = useSelector((state: RootState) => state.auth.userRole);
@@ -21,18 +25,38 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({ amount, comparison }) =
   let comparisonText;
 
   if (comparison) {
-    if (comparison.value > 1) {
-      comparisonColor = theme.palette.success.main;
-      comparisonIcon = <ArrowUpwardIcon fontSize="inherit" />;
-      comparisonText = t('more');
-    } else if (comparison.value < -1) {
-      comparisonColor = theme.palette.error.main;
-      comparisonIcon = <ArrowDownwardIcon fontSize="inherit" />;
-      comparisonText = t('less');
-    } else {
-      comparisonColor = theme.palette.grey[500];
-      comparisonIcon = null;
-      comparisonText = '';
+    const isAgentComparison = userRole === "admin" && isAgentSelected;
+    const isClientComparison =
+      (userRole === "admin" && !isAgentSelected) || userRole === "agent";
+
+    if (isAgentComparison) {
+      if (comparison.value >= 10) {
+        comparisonColor = theme.palette.success.main;
+        comparisonIcon = <ArrowUpwardIcon fontSize="inherit" />;
+        comparisonText = t("more");
+      } else if (comparison.value >= 5) {
+        comparisonColor = theme.palette.grey[500];
+        comparisonIcon = <ArrowUpwardIcon fontSize="inherit" />;
+        comparisonText = t("neutral");
+      } else {
+        comparisonColor = theme.palette.error.main;
+        comparisonIcon = <ArrowDownwardIcon fontSize="inherit" />;
+        comparisonText = t("less");
+      }
+    } else if (isClientComparison) {
+      if (comparison.value >= 1.25) {
+        comparisonColor = theme.palette.success.main;
+        comparisonIcon = <ArrowUpwardIcon fontSize="inherit" />;
+        comparisonText = t("more");
+      } else if (comparison.value > 0.75) {
+        comparisonColor = theme.palette.grey[500];
+        comparisonIcon = <ArrowUpwardIcon fontSize="inherit" />;
+        comparisonText = t("neutral");
+      } else {
+        comparisonColor = theme.palette.error.main;
+        comparisonIcon = <ArrowDownwardIcon fontSize="inherit" />;
+        comparisonText = t("less");
+      }
     }
   }
 
@@ -85,7 +109,7 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({ amount, comparison }) =
                 >
                   <img
                     src="/icons/money.svg"
-                    alt={t('spentThisMonth.iconAlt')}
+                    alt={t("spentThisMonth.iconAlt")}
                     style={{ width: "100%", height: "100%" }}
                   />
                 </Avatar>
@@ -130,7 +154,7 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({ amount, comparison }) =
                 color: "#000",
               }}
             >
-              {t('spentThisMonth.title')}
+              {t("spentThisMonth.title")}
             </Typography>
             {userRole !== "client" && comparison && (
               <Typography
@@ -141,7 +165,10 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({ amount, comparison }) =
                   paddingTop: 1, // Added padding for spacing
                 }}
               >
-                {Math.abs(comparison.value)}% {comparisonText} {userRole === 'admin' ? t('comparedToOtherAgents') : t('comparedToOtherClients')}
+                {Math.abs(comparison.value)}% {comparisonText}{" "}
+                {userRole === "admin" && isAgentSelected
+                  ? t("comparedToOtherAgents")
+                  : t("comparedToOtherClients")}
               </Typography>
             )}
           </Grid>

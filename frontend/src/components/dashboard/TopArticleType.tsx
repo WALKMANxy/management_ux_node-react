@@ -83,7 +83,7 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {
                   {article.name} (ID: {article.id})
                 </Typography>
                 <Typography sx={{ fontSize: "1rem", color: "#000" }}>
-                  {t('topArticleType.amountPurchased')}: {article.amount}
+                  {t('topArticleType.amountPurchased')}: {article.quantity}
                 </Typography>
               </Box>
             ))}

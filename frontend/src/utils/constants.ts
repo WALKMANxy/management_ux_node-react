@@ -99,3 +99,9 @@ export const generateRandomString = () => {
 };
 
 export const paginationPageSizeSelector = [20, 50, 100, 200, 500];
+
+export const ignoreArticleNames = new Set([
+  "RESO CARCASSA",
+  "TRASPORTO ",
+  "TRASPORTO URGENTE",
+]);

@@ -61,6 +61,7 @@ const AdminDashboard: React.FC = () => {
     clientComparativeStatistics,
     clientComparativeStatisticsMonthly,
     agentComparativeStatistics,
+    agentComparativeStatisticsMonthly,
     isLoading,
   } = useStats("admin", null, isMobile);
 
@@ -142,19 +143,20 @@ const AdminDashboard: React.FC = () => {
                       selectedAgentData.clients.flatMap(
                         (client) => client.movements
                       )
-                    )}
+                    ).totalRevenue}
                     comparison={{
                       value: parseFloat(
                         `${
-                          clientComparativeStatisticsMonthly?.revenuePercentage ||
+                          agentComparativeStatisticsMonthly?.revenuePercentage ||
                           "0"
                         }`
                       ),
                       trend: getTrend(
-                        clientComparativeStatisticsMonthly?.revenuePercentage ||
+                        agentComparativeStatisticsMonthly?.revenuePercentage ||
                           "0"
                       ),
                     }}
+                    isAgentSelected={true}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -171,7 +173,10 @@ const AdminDashboard: React.FC = () => {
                       trend: getTrend(
                         agentComparativeStatistics?.revenuePercentage || "0"
                       ),
+                      
                     }}
+                    isAgentSelected={true}
+
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -257,7 +262,7 @@ const AdminDashboard: React.FC = () => {
                   <SpentThisMonth
                     amount={calculateTotalSpentThisMonth(
                       selectedClient.movements
-                    )}
+                    ).totalRevenue}
                     comparison={{
                       value: parseFloat(
                         `${
@@ -270,6 +275,7 @@ const AdminDashboard: React.FC = () => {
                           "0"
                       ),
                     }}
+                    isAgentSelected={false}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -287,6 +293,8 @@ const AdminDashboard: React.FC = () => {
                         clientComparativeStatistics?.revenuePercentage || "0"
                       ),
                     }}
+                    isAgentSelected={false}
+
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>

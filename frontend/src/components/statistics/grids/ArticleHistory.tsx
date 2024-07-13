@@ -11,19 +11,26 @@ type ArticleHistoryProps = {
   clientMovements?: Movement[]; // Ensure clientName is included
 };
 
-const ArticleHistory: React.FC<ArticleHistoryProps> = ({ articleId, clientMovements }) => {
+const ArticleHistory: React.FC<ArticleHistoryProps> = ({
+  articleId,
+  clientMovements,
+}) => {
   const { t } = useTranslation();
 
   const { data: clients = [] } = useGetClientsQuery();
 
   // If clientMovements is provided, use it; otherwise, fetch all clients' movements
-  const movements: (Movement)[] = (clientMovements || clients.flatMap(client =>
-    client.movements.map(movement => ({
-      ...movement,
-      clientName: client.name,
-    }))
-  ))
-    .filter(movement => movement.details.some(detail => detail.articleId === articleId));
+  const movements: Movement[] = (
+    clientMovements ||
+    clients.flatMap((client) =>
+      client.movements.map((movement) => ({
+        ...movement,
+        clientName: client.name,
+      }))
+    )
+  ).filter((movement) =>
+    movement.details.some((detail) => detail.articleId === articleId)
+  );
 
   const columnDefinitions = useMemo(
     () => [
@@ -38,10 +45,27 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({ articleId, clientMoveme
         sortable: true,
       },
       {
+        headerName: t("movementsHistory.quantity"),
+        valueGetter: (params: any) =>
+          params.data.details.some(
+            (detail: any) => detail.articleId === articleId
+          )
+            ? params.data.details.find(
+                (detail: any) => detail.articleId === articleId
+              ).quantity
+            : 0,
+        comparator: numberComparator,
+        sortable: true,
+      },
+      {
         headerName: t("movementsHistory.revenue"),
         valueGetter: (params: any) =>
-          params.data.details.some((detail: any) => detail.articleId === articleId)
-            ? params.data.details.find((detail: any) => detail.articleId === articleId).priceSold
+          params.data.details.some(
+            (detail: any) => detail.articleId === articleId
+          )
+            ? params.data.details.find(
+                (detail: any) => detail.articleId === articleId
+              ).priceSold
             : 0,
         valueFormatter: (params: any) => currencyFormatter(params.value),
         comparator: numberComparator,
@@ -50,8 +74,12 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({ articleId, clientMoveme
       {
         headerName: t("movementsHistory.cost"),
         valueGetter: (params: any) =>
-          params.data.details.some((detail: any) => detail.articleId === articleId)
-            ? params.data.details.find((detail: any) => detail.articleId === articleId).priceBought
+          params.data.details.some(
+            (detail: any) => detail.articleId === articleId
+          )
+            ? params.data.details.find(
+                (detail: any) => detail.articleId === articleId
+              ).priceBought
             : 0,
         valueFormatter: (params: any) => currencyFormatter(params.value),
         comparator: numberComparator,
@@ -87,14 +115,14 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({ articleId, clientMoveme
         ) : (
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '100%',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "100%",
             }}
           >
             <Typography variant="h6" sx={{ textAlign: "center" }}>
-              {t('articleDetails.noHistory')}
+              {t("articleDetails.noHistory")}
             </Typography>
           </Box>
         )}

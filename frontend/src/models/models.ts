@@ -120,11 +120,12 @@ export type SalesDistributionProps = {
 
 export type ArticleColumnDefinition = {
   headerName: string;
-  field: string;
+  field?: string;
   filter: string;
   sortable: boolean;
   cellRenderer?: (params: any) => JSX.Element;
   valueFormatter?: (params: any) => string;
+  valueGetter?: (params: any) => number;
 };
 
 
@@ -140,12 +141,14 @@ export type Comparison = {
 export type SpentThisMonthProps = {
   amount: string;
   comparison?: Comparison;
+  isAgentSelected?: boolean;
 };
 
 export type SpentThisYearProps = {
   amount: string;
   comparison?: Comparison;
-};
+  isAgentSelected?: boolean;
+}
 
 export type Props = {
   children: ReactNode;
@@ -177,7 +180,7 @@ export type ClientListProps = {
 
 
 export type TopArticleTypeProps = {
-  articles: { id: string; name: string; amount: number }[];
+  articles: { id: string; name: string; quantity: number }[];
 };
 
 export type TotalEarningProps = {
@@ -245,10 +248,11 @@ export type MovementDetail = {
   articleId: string;
   name: string;
   brand: string;
+  quantity: number; // Added quantity
+  unitPrice: string; // Added unit price
   priceSold: string;
   priceBought: string;
 };
-
 export type Movement = {
   id: string;
   discountCategory: string;

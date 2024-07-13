@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
 import { Movement, MovementDetail } from "../models/models";
 import { useGetClientsQuery } from "../services/api";
+import { calculateTotalQuantitySold } from "../utils/dataUtils";
 
 export const useArticlesGrid = () => {
   const { data: clients = [] } = useGetClientsQuery();
@@ -143,6 +144,14 @@ export const useArticlesGrid = () => {
     return movements;
   }, [filteredClients, selectedArticle]);
 
+
+    // Calculate total quantity sold for each article
+    const totalQuantitySold = useMemo(() => {
+      const allMovements = clients.flatMap(client => client.movements);
+      return calculateTotalQuantitySold(allMovements);
+    }, [clients]);
+  
+
   return {
     clients,
     selectedArticle,
@@ -155,6 +164,7 @@ export const useArticlesGrid = () => {
     setEndDate,
     handleArticleSelect,
     filteredArticles,
+    totalQuantitySold,
     gridRef,
     articleDetailsRef,
     isArticleListCollapsed,

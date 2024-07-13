@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import {
   calculateMonthlyData,
+  calculateNetRevenue,
   currencyFormatter,
   numberComparator,
 } from "../../utils/dataUtils";
@@ -67,12 +68,6 @@ const ClientsPage: React.FC = () => {
         sortable: true,
       },
       {
-        headerName: t("clientsPage.phone"),
-        field: "phone",
-        filter: "agTextColumnFilter",
-        sortable: true,
-      },
-      {
         headerName: t("clientsPage.totalOrders"),
         field: "totalOrders",
         filter: "agNumberColumnFilter",
@@ -98,10 +93,31 @@ const ClientsPage: React.FC = () => {
         sortable: true,
       },
       {
+        headerName: t("clientsPage.totalNetRevenue"),
+        valueGetter: (params: any) => {
+          return calculateNetRevenue([params.data]);
+        },
+        filter: "agNumberColumnFilter",
+        comparator: numberComparator,
+        valueFormatter: (params: any) => currencyFormatter(params.value),
+        sortable: true,
+      },
+      {
         headerName: t("clientsPage.revenueThisMonth"),
         valueGetter: (params: any) => {
           const { months, revenueData } = calculateMonthlyData([params.data]);
           return revenueData[months.length - 1] || 0; // Get the latest month's data
+        },
+        filter: "agNumberColumnFilter",
+        comparator: numberComparator,
+        valueFormatter: (params: any) => currencyFormatter(params.value),
+        sortable: true,
+      },
+      {
+        headerName: t("clientsPage.netRevenueThisMonth"),
+        valueGetter: (params: any) => {
+          const { months, netRevenueData } = calculateMonthlyData([params.data]);
+          return netRevenueData[months.length - 1] || 0; // Get the latest month's data
         },
         filter: "agNumberColumnFilter",
         comparator: numberComparator,

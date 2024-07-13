@@ -1,4 +1,5 @@
 import { Box, Paper } from "@mui/material";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { MovementsHistoryProps } from "../../../models/models";
@@ -8,16 +9,16 @@ import AGGridTable from "./AGGridTable";
 const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
   const { t } = useTranslation();
 
-  useEffect(() => {
+   useEffect(() => {
     console.log("Movements:", movements);
-  }, [movements]);
+  }, [movements]); 
 
   // Flatten the movements array and filter out invalid articles
   const flattenedMovements = useMemo(() => {
-    return movements.flatMap(movement =>
+    return movements.flatMap((movement) =>
       movement.details
-        .filter(detail => detail.brand && detail.brand !== ".")
-        .map(detail => ({
+        .filter((detail) => detail.brand && detail.brand !== ".")
+        .map((detail) => ({
           ...detail,
           dateOfOrder: movement.dateOfOrder,
         }))
@@ -47,16 +48,24 @@ const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
         sortable: true,
       },
       {
+        headerName: t("movementsHistory.quantity"),
+        field: "quantity",
+        comparator: numberComparator,
+        sortable: true,
+      },
+      {
         headerName: t("movementsHistory.revenue"),
         field: "priceSold",
-        valueFormatter: (params: any) => currencyFormatter(parseFloat(params.value)),
+        valueFormatter: (params: any) =>
+          currencyFormatter(parseFloat(params.value)),
         comparator: numberComparator,
         sortable: true,
       },
       {
         headerName: t("movementsHistory.cost"),
         field: "priceBought",
-        valueFormatter: (params: any) => currencyFormatter(parseFloat(params.value)),
+        valueFormatter: (params: any) =>
+          currencyFormatter(parseFloat(params.value)),
         comparator: numberComparator,
         sortable: true,
       },
