@@ -14,6 +14,9 @@ import {
   calculateSalesDistributionData,
   calculateMonthlyRevenue,
   calculateSalesDistributionDataForAgents,
+  calculateTotalSpentForYear,
+  calculateTotalSpentForYearForClients,
+  calculateTopArticleTypeUtil,
 } from "../utils/dataUtils";
 import { setVisits } from "../features/calendar/calendarSlice";
 import { setPromos } from "../features/promos/promosSlice";
@@ -179,78 +182,19 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
 
   const calculateTotalSpentThisYear = useCallback((movements: Movement[]) => {
     const currentYear = new Date().getFullYear();
-    const totalSpent = movements
-      .filter(
-        (movement) =>
-          new Date(movement.dateOfOrder).getFullYear() === currentYear
-      )
-      .reduce(
-        (total, movement) =>
-          total +
-          movement.details.reduce(
-            (sum, detail) => sum + parseFloat(detail.priceSold),
-            0
-          ),
-        0
-      )
-      .toFixed(2);
-    return totalSpent;
+    return calculateTotalSpentForYear(movements, currentYear);
   }, []);
 
   const calculateTotalSpentThisYearForAgents = useCallback(
     (clients: Client[]) => {
       const currentYear = new Date().getFullYear();
-      const totalSpent = clients
-        .reduce((total, client) => {
-          const clientTotal = client.movements
-            .filter((movement) => {
-              const isCurrentYear =
-                new Date(movement.dateOfOrder).getFullYear() === currentYear;
-              return isCurrentYear;
-            })
-            .reduce((movementTotal, movement) => {
-              const movementSum = movement.details.reduce((sum, detail) => {
-                const priceSold = parseFloat(detail.priceSold);
-                return sum + priceSold;
-              }, 0);
-              return movementTotal + movementSum;
-            }, 0);
-          return total + clientTotal;
-        }, 0)
-        .toFixed(2);
-      return totalSpent;
+      return calculateTotalSpentForYearForClients(clients, currentYear);
     },
     []
   );
 
   const calculateTopArticleType = useCallback((movements: Movement[]) => {
-    const ignoreArticleNames = new Set([
-      "RESO CARCASSA",
-      "TRASPORTO ",
-      "TRASPORTO URGENTE",
-    ]);
-
-    const typeCount: {
-      [key: string]: { id: string; name: string; amount: number };
-    } = {};
-    movements.forEach((movement) => {
-      movement.details.forEach((detail) => {
-        if (!ignoreArticleNames.has(detail.name)) {
-          if (!typeCount[detail.name]) {
-            typeCount[detail.name] = {
-              id: detail.articleId,
-              name: detail.name,
-              amount: 0,
-            };
-          }
-          typeCount[detail.name].amount += 1;
-        }
-      });
-    });
-    const sortedArticles = Object.values(typeCount).sort(
-      (a, b) => b.amount - a.amount
-    );
-    return sortedArticles.slice(0, 5); // Return top 5 articles
+    return calculateTopArticleTypeUtil(movements);
   }, []);
 
   const totalRevenue = useMemo(() => {
@@ -291,11 +235,13 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
   const salesDistributionDataAgents = useMemo(() => {
     if (role === "admin" && details && agentDetailsData) {
       const clients = (details as { clients: Client[] }).clients;
-  
+
       const agentsMap = clients.reduce((acc, client) => {
         const agentId = client.agent;
         if (!acc[agentId]) {
-          const agentDetails = agentDetailsData.find(agent => agent.id === agentId);
+          const agentDetails = agentDetailsData.find(
+            (agent) => agent.id === agentId
+          );
           acc[agentId] = {
             id: agentId,
             name: agentDetails ? agentDetails.name : `Agent ${agentId}`,
@@ -305,14 +251,14 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
           };
         }
         acc[agentId].clients.push(client);
-  
+
         // Collect visits and promos from the client and add to the agent
         acc[agentId].AgentVisits.push(...client.visits);
         acc[agentId].AgentPromos.push(...client.promos);
-  
+
         return acc;
       }, {} as { [key: string]: Agent });
-  
+
       const agents = Object.values(agentsMap);
       const data = calculateSalesDistributionDataForAgents(agents, isMobile);
       return { agents, data };
@@ -323,7 +269,6 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     }
     return { agents: [], data: [] };
   }, [role, details, agentDetailsData, isMobile]);
-  
 
   const salesDistributionDataClients = useMemo(() => {
     if ((role === "admin" || role === "agent") && details) {
@@ -350,11 +295,14 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
   const yearlyOrders = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const currentYear = new Date().getFullYear();
-    return ordersData.reduce((acc, orders, index) => {
-      const year = parseInt(months[index].split("-")[0]);
-      acc[year] = (acc[year] || 0) + orders;
-      return acc;
-    }, {} as { [key: number]: number });
+    return (ordersData as number[]).reduce<{ [key: number]: number }>(
+      (acc, orders, index) => {
+        const year = parseInt(months[index].split("-")[0]);
+        acc[year] = (acc[year] || 0) + orders;
+        return acc;
+      },
+      {}
+    );
   }, [ordersData, months]);
 
   const yearlyCategories = useMemo(
@@ -374,16 +322,14 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
 
     const clientRevenue = parseFloat(selectedClient.totalRevenue);
 
-    // Calculate total revenue and average revenue per client
-    const totalRevenueAllClients = clientsData.reduce(
-      (sum, client) => sum + parseFloat(client.totalRevenue),
-      0
+    // Calculate total revenue for all clients
+    const totalRevenueAllClients = parseFloat(
+      calculateTotalRevenue(clientsData)
     );
-    const averageRevenue = totalRevenueAllClients / clientsData.length;
 
-    // Calculate the percentage difference in revenue
+    // Calculate the percentage of total revenue that this client contributes
     const revenuePercentage = (
-      ((clientRevenue - averageRevenue) / averageRevenue) *
+      (clientRevenue / totalRevenueAllClients) *
       100
     ).toFixed(2);
 
@@ -392,24 +338,12 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
       (sum, client) => sum + client.movements.length,
       0
     );
-    const averageOrders = totalOrdersAllClients / clientsData.length;
 
-    // Calculate the percentage difference in orders
+    // Calculate the percentage of total orders that this client contributes
     const ordersPercentage = (
-      ((selectedClient.movements.length - averageOrders) / averageOrders) *
+      (selectedClient.movements.length / totalOrdersAllClients) *
       100
     ).toFixed(2);
-
-    // Console logs to verify data
-    /* console.log("Selected Client Revenue:", clientRevenue);
-    console.log("Total Revenue All Clients:", totalRevenueAllClients);
-    console.log("Average Revenue per Client:", averageRevenue);
-    console.log("Revenue Percentage Difference:", revenuePercentage);
-  
-    console.log("Selected Client Orders:", selectedClient.movements.length);
-    console.log("Total Orders All Clients:", totalOrdersAllClients);
-    console.log("Average Orders per Client:", averageOrders);
-    console.log("Orders Percentage Difference:", ordersPercentage);  */
 
     return {
       revenuePercentage,
@@ -467,35 +401,18 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
       0
     );
 
-    // Calculate the average monthly total for all clients
-    const averageMonthlyTotal = allMonthlyTotal / clientsData.length;
-
-    // Calculate the percentage difference in revenue
+    // Calculate the percentage of total monthly revenue that this client contributes
     const revenuePercentage = (
-      ((selectedMonthlyTotal - averageMonthlyTotal) / averageMonthlyTotal) *
+      (selectedMonthlyTotal / allMonthlyTotal) *
       100
     ).toFixed(2);
 
-    // Calculate the average number of orders for all clients
-    const averageOrders = allMovements.length / clientsData.length;
-
-    // Calculate the percentage difference in orders
+    // Calculate the percentage of total monthly orders that this client contributes
     const ordersPercentage = (
-      ((selectedMovements.length - averageOrders) / averageOrders) *
+      (selectedMovements.length / allMovements.length) *
       100
     ).toFixed(2);
 
-    // Console logs to verify data
-    /* console.log("Selected Client Monthly Revenue:", selectedMonthlyTotal);
-    console.log("Total Monthly Revenue All Clients:", allMonthlyTotal);
-    console.log("Average Monthly Revenue per Client:", averageMonthlyTotal);
-    console.log("Monthly Revenue Percentage Difference:", revenuePercentage);
-  
-    console.log("Selected Client Monthly Orders:", selectedMovements.length);
-    console.log("Total Monthly Orders All Clients:", allMovements.length);
-    console.log("Average Monthly Orders per Client:", averageOrders);
-    console.log("Monthly Orders Percentage Difference:", ordersPercentage);
-   */
     return {
       revenuePercentage,
       ordersPercentage,
@@ -512,60 +429,46 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     ) {
       return { revenuePercentage: 0, ordersPercentage: 0 };
     }
-  
+
     console.log("Selected Agent:", selectedAgent);
     console.log("Selected Agent Clients:", selectedAgent.clients);
-  
+
     // Filter clientsData to get the clients belonging to the selected agent
-    const agentClients = clientsData.filter(client => client.agent === selectedAgent.id);
-  
+    const agentClients = clientsData.filter(
+      (client) => client.agent === selectedAgent.id
+    );
+
     // Calculate the total revenue for the selected agent's clients
     const agentRevenue = parseFloat(calculateTotalRevenue(agentClients));
-  
+
     // Calculate the total revenue for all clients
-    const totalRevenueAllClients = parseFloat(calculateTotalRevenue(clientsData));
-  
-    // Calculate the average revenue per agent
-    const averageRevenuePerAgent = totalRevenueAllClients / agentsData.length;
-  
-    // Calculate the percentage difference in revenue
+    const totalRevenueAllClients = parseFloat(
+      calculateTotalRevenue(clientsData)
+    );
+
+    // Calculate the percentage of total revenue that this agent's clients contribute
     const revenuePercentage = (
-      ((agentRevenue - averageRevenuePerAgent) / averageRevenuePerAgent) *
+      (agentRevenue / totalRevenueAllClients) *
       100
     ).toFixed(2);
-  
+
     // Calculate the total orders for the selected agent's clients
     const agentOrders = calculateTotalOrders(agentClients);
-  
+
     // Calculate the total orders for all clients
     const totalOrdersAllClients = calculateTotalOrders(clientsData);
-  
-    // Calculate the average number of orders per agent
-    const averageOrdersPerAgent = totalOrdersAllClients / agentsData.length;
-  
-    // Calculate the percentage difference in orders
+
+    // Calculate the percentage of total orders that this agent's clients contribute
     const ordersPercentage = (
-      ((agentOrders - averageOrdersPerAgent) / averageOrdersPerAgent) *
+      (agentOrders / totalOrdersAllClients) *
       100
     ).toFixed(2);
-  
-    // Console logs to verify data
-   /*  console.log("Selected Agent Revenue:", agentRevenue);
-    console.log("Total Revenue All Clients:", totalRevenueAllClients);
-    console.log("Average Revenue per Agent:", averageRevenuePerAgent);
-    console.log("Revenue Percentage Difference:", revenuePercentage);
-  
-    console.log("Selected Agent Orders:", agentOrders);
-    console.log("Total Orders All Clients:", totalOrdersAllClients);
-    console.log("Average Orders per Agent:", averageOrdersPerAgent);
-    console.log("Orders Percentage Difference:", ordersPercentage); */
-  
+
     return {
       revenuePercentage,
       ordersPercentage,
     };
   }, [selectedAgent, clientsData, agentsData]);
-  
 
   const agentComparativeStatisticsMonthly = useMemo(() => {
     if (!selectedAgent || !clientsData || clientsData.length === 0) {
@@ -576,80 +479,105 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     const currentYear = new Date().getFullYear();
   
     // Filter clientsData to get the clients belonging to the selected agent
-    const agentClients = clientsData.filter(client => client.agent === selectedAgent.id);
-  
-    // Filter movements for the selected agent's clients for the current month and year
-    const selectedMovements = agentClients.flatMap(client =>
-      client.movements.filter(movement => {
-        const movementDate = new Date(movement.dateOfOrder);
-        return (
-          movementDate.getMonth() + 1 === currentMonth &&
-          movementDate.getFullYear() === currentYear
-        );
-      })
+    const agentClients = clientsData.filter(
+      (client) => client.agent === selectedAgent.id
     );
   
-    // Filter movements for all clients for the current month and year
-    const allMovements = clientsData.flatMap(client =>
-      client.movements.filter(movement => {
-        const movementDate = new Date(movement.dateOfOrder);
-        return (
-          movementDate.getMonth() + 1 === currentMonth &&
-          movementDate.getFullYear() === currentYear
-        );
-      })
-    );
+    console.log("Agent Clients:", agentClients);
   
-    // Calculate the total revenue for the selected agent's movements
-    const selectedMonthlyTotal = selectedMovements.reduce(
-      (movementSum, movement) =>
-        movementSum +
-        movement.details.reduce(
-          (detailSum, detail) => detailSum + (parseFloat(detail.priceSold) || 0),
-          0
-        ),
-      0
-    );
+    // Calculate the total revenue for the selected agent's clients for the current month and year
+    const selectedMonthlyTotal = agentClients.reduce((total, client) => {
+      const monthlyRevenue = client.movements
+        .filter((movement) => {
+          const movementDate = new Date(movement.dateOfOrder);
+          return (
+            movementDate.getMonth() + 1 === currentMonth &&
+            movementDate.getFullYear() === currentYear
+          );
+        })
+        .reduce((movementSum, movement) => {
+          return (
+            movementSum +
+            movement.details.reduce(
+              (detailSum, detail) =>
+                detailSum + (parseFloat(detail.priceSold) || 0),
+              0
+            )
+          );
+        }, 0);
+      return total + monthlyRevenue;
+    }, 0);
   
-    // Calculate the total revenue for all clients' movements
-    const allMonthlyTotal = allMovements.reduce(
-      (movementSum, movement) =>
-        movementSum +
-        movement.details.reduce(
-          (detailSum, detail) => detailSum + (parseFloat(detail.priceSold) || 0),
-          0
-        ),
-      0
-    );
+    console.log("Selected Agent's Monthly Total Revenue:", selectedMonthlyTotal);
   
-    // Calculate the average monthly total for all clients
-    const averageMonthlyTotal = allMonthlyTotal / clientsData.length;
+    // Calculate the total revenue for all clients for the current month and year
+    const allMonthlyTotal = clientsData.reduce((total, client) => {
+      const monthlyRevenue = client.movements
+        .filter((movement) => {
+          const movementDate = new Date(movement.dateOfOrder);
+          return (
+            movementDate.getMonth() + 1 === currentMonth &&
+            movementDate.getFullYear() === currentYear
+          );
+        })
+        .reduce((movementSum, movement) => {
+          return (
+            movementSum +
+            movement.details.reduce(
+              (detailSum, detail) =>
+                detailSum + (parseFloat(detail.priceSold) || 0),
+              0
+            )
+          );
+        }, 0);
+      return total + monthlyRevenue;
+    }, 0);
   
-    // Calculate the percentage difference in revenue
+    console.log("All Clients' Monthly Total Revenue:", allMonthlyTotal);
+  
+    // Calculate the percentage of total monthly revenue that this agent's clients contribute
     const revenuePercentage = (
-      ((selectedMonthlyTotal - averageMonthlyTotal) / averageMonthlyTotal) *
+      (selectedMonthlyTotal / allMonthlyTotal) *
       100
     ).toFixed(2);
   
-    // Calculate the average number of orders for all clients
-    const averageOrders = allMovements.length / clientsData.length;
+    console.log("Revenue Percentage:", revenuePercentage);
   
-    // Calculate the percentage difference in orders
+    // Calculate the number of orders for the selected agent's clients for the current month and year
+    const selectedOrdersTotal = agentClients.reduce((total, client) => {
+      const monthlyOrders = client.movements.filter((movement) => {
+        const movementDate = new Date(movement.dateOfOrder);
+        return (
+          movementDate.getMonth() + 1 === currentMonth &&
+          movementDate.getFullYear() === currentYear
+        );
+      }).length;
+      return total + monthlyOrders;
+    }, 0);
+  
+    console.log("Selected Agent's Monthly Total Orders:", selectedOrdersTotal);
+  
+    // Calculate the total number of orders for all clients for the current month and year
+    const allOrdersTotal = clientsData.reduce((total, client) => {
+      const monthlyOrders = client.movements.filter((movement) => {
+        const movementDate = new Date(movement.dateOfOrder);
+        return (
+          movementDate.getMonth() + 1 === currentMonth &&
+          movementDate.getFullYear() === currentYear
+        );
+      }).length;
+      return total + monthlyOrders;
+    }, 0);
+  
+    console.log("All Clients' Monthly Total Orders:", allOrdersTotal);
+  
+    // Calculate the percentage of total monthly orders that this agent's clients contribute
     const ordersPercentage = (
-      ((selectedMovements.length - averageOrders) / averageOrders) *
+      (selectedOrdersTotal / allOrdersTotal) *
       100
     ).toFixed(2);
   
-    // Console logs to verify data
-    /* console.log("Selected Agent Monthly Revenue:", selectedMonthlyTotal);
-    console.log("Total Monthly Revenue All Clients:", allMonthlyTotal);
-    console.log("Average Monthly Revenue per Client:", averageMonthlyTotal);
-    console.log("Monthly Revenue Percentage Difference:", revenuePercentage);
-  
-    console.log("Selected Agent Monthly Orders:", selectedMovements.length);
-    console.log("Total Monthly Orders All Clients:", allMovements.length);
-    console.log("Average Monthly Orders per Client:", averageOrders);
-    console.log("Monthly Orders Percentage Difference:", ordersPercentage); */
+    console.log("Orders Percentage:", ordersPercentage);
   
     return {
       revenuePercentage,
@@ -657,7 +585,7 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     };
   }, [selectedAgent, clientsData]);
   
-
+  
   return {
     details,
     selectedClient,

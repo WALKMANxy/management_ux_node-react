@@ -1,6 +1,9 @@
 onmessage = function (event) {
   const { data, clientDetails } = event.data;
 
+  console.log('Worker received data:', data);
+  console.log('Worker received client details:', clientDetails);
+
   const clientsMap = new Map();
   data.forEach((item) => {
     const clientId = item["Codice Cliente"].toString();
@@ -9,6 +12,8 @@ onmessage = function (event) {
     }
     clientsMap.get(clientId).push(item);
   });
+
+  console.log('Clients map after aggregation:', clientsMap);
 
   const clients = Array.from(clientsMap.values()).map((clientData) => {
     const clientInfo = clientData[0];
@@ -34,6 +39,8 @@ onmessage = function (event) {
           articleId: item["Codice Articolo"].toString(),
           name: item["Descrizione Articolo"],
           brand: item["Marca Articolo"],
+          quantity: parseFloat(item["Quantita"]),
+          unitPrice: parseFloat(item["Prezzo Articolo"]).toFixed(2),
           priceSold: parseFloat(item["Valore"]).toFixed(2),
           priceBought: parseFloat(item["Costo"]).toFixed(2),
         })),
@@ -61,6 +68,7 @@ onmessage = function (event) {
     return {
       id: clientInfo["Codice Cliente"].toString(),
       name: clientInfo["Ragione Sociale Cliente"],
+      extendedName: clientDetail ? clientDetail["EXTENDED_NAME"] : "", // Assuming this is the source field
       province: clientDetail ? clientDetail["C.A.P. - COMUNE (PROV.)"] : "",
       phone: clientDetail ? clientDetail["TELEFONO"] : "",
       totalOrders: movementsMap.size,
@@ -81,6 +89,8 @@ onmessage = function (event) {
       promos,
     };
   });
-  
+
+  console.log('Final clients array:', clients);
+
   postMessage(clients);
 };

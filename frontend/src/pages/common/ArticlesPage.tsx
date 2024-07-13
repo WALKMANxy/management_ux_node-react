@@ -20,6 +20,7 @@ const ArticlesPage: React.FC = () => {
     setQuickFilterText,
     handleArticleSelect,
     filteredArticles,
+    totalQuantitySold,
     gridRef,
     isArticleListCollapsed,
     setArticleListCollapsed,
@@ -72,8 +73,8 @@ const ArticlesPage: React.FC = () => {
     if (userRole !== "client") {
       baseColumns.push(
         {
-          headerName: t("articlesPage.revenue"),
-          field: "priceSold",
+          headerName: t("articlesPage.unitPrice"),
+          field: "unitPrice",
           filter: "agNumberColumnFilter",
           valueFormatter: (params: any) => currencyFormatter(params.value),
           sortable: true,
@@ -84,12 +85,18 @@ const ArticlesPage: React.FC = () => {
           filter: "agNumberColumnFilter",
           valueFormatter: (params: any) => currencyFormatter(params.value),
           sortable: true,
+        },
+        {
+          headerName: t("articlesPage.quantitySold"),
+          valueGetter: (params: any) => totalQuantitySold[params.data.articleId] || 0,
+          filter: "agNumberColumnFilter",
+          sortable: true,
         }
       );
     }
 
     return baseColumns;
-  }, [handleArticleSelect, t, userRole]);
+  }, [handleArticleSelect, t, userRole, totalQuantitySold]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>

@@ -69,9 +69,10 @@ const ClientDashboard: React.FC = () => {
               <Grid item xs={12} md={4}>
                 {clientDetails && "movements" in clientDetails ? (
                   <SpentThisMonth
-                    amount={calculateTotalSpentThisMonth(
-                      clientDetails.movements
-                    )}
+                    amount={
+                      calculateTotalSpentThisMonth(clientDetails.movements)
+                        .totalRevenue
+                    }
                   />
                 ) : (
                   <Skeleton

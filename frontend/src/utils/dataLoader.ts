@@ -70,38 +70,59 @@ export const mapDataToModels = async (
   clientDetails: any[],
   agentDetails: any[]
 ): Promise<Client[]> => {
-  const numWorkers = Math.min(navigator.hardwareConcurrency || 4, 4);
+  const numWorkers = navigator.hardwareConcurrency || 4;
   const chunks = chunkArray(data, Math.ceil(data.length / numWorkers));
 
   return new Promise<Client[]>((resolve, reject) => {
     const workers: Worker[] = chunks.map(
       (chunk) => new Worker(workerScriptPath)
     );
-    const results: Client[] = [];
+    const resultsMap = new Map<string, Client>();
     let completed = 0;
 
     workers.forEach((worker, index) => {
-      //console.log("Sending data to worker:", { data: chunks[index], clientDetails, agentDetails });
+      console.log(`Sending data to worker ${index}:`, { data: chunks[index], clientDetails, agentDetails });
       worker.postMessage({ data: chunks[index], clientDetails, agentDetails });
 
       worker.onmessage = (event: MessageEvent<Client[]>) => {
-        results.push(...event.data);
+        console.log(`Worker ${index} finished processing.`);
+        const workerResults = event.data;
+        
+        workerResults.forEach((client) => {
+          if (resultsMap.has(client.id)) {
+            const existingClient = resultsMap.get(client.id)!; // Non-null assertion operator
+            // Merge movements
+            existingClient.movements.push(...client.movements);
+            // Update totalOrders
+            existingClient.totalOrders += client.totalOrders;
+            // Update totalRevenue
+            existingClient.totalRevenue = (parseFloat(existingClient.totalRevenue) + parseFloat(client.totalRevenue)).toFixed(2);
+          } else {
+            resultsMap.set(client.id, client);
+          }
+        });
+
         completed += 1;
         worker.terminate();
 
         if (completed === workers.length) {
+          const results = Array.from(resultsMap.values());
+          console.log('All workers finished. Aggregated results:', results);
           resolve(results);
         }
       };
 
       worker.onerror = (error: ErrorEvent) => {
-        console.error("Worker error:", error);
+        console.error(`Worker ${index} error:`, error);
         reject(error);
         worker.terminate();
       };
     });
   });
 };
+
+
+
 
 export const mapDataToMinimalClients = (data: any[]): Client[] => {
   const clientsMap = new Map<string, any>();
@@ -198,6 +219,8 @@ export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
     articleId: item["Codice Articolo"].toString(),
     name: item["Descrizione Articolo"],
     brand: item["Marca Articolo"],
+    quantity: parseFloat(item["Quantita"]),
+    unitPrice: parseFloat(item["Prezzo Articolo"]).toFixed(2),
     priceSold: parseFloat(item["Valore"]).toFixed(2),
     priceBought: parseFloat(item["Costo"]).toFixed(2),
   }));

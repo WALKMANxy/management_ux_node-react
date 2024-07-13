@@ -116,7 +116,7 @@ const AgentDashboard: React.FC = () => {
                   <SpentThisMonth
                     amount={calculateTotalSpentThisMonth(
                       selectedClient.movements
-                    )}
+                    ).totalRevenue}
                     comparison={{
                       value: parseFloat(
                         `${
@@ -129,6 +129,7 @@ const AgentDashboard: React.FC = () => {
                           "0"
                       ), // Ensure string type
                     }}
+                    isAgentSelected={false}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -146,6 +147,7 @@ const AgentDashboard: React.FC = () => {
                         clientComparativeStatistics?.revenuePercentage || "0"
                       ), // Ensure string type
                     }}
+                    isAgentSelected={false}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
