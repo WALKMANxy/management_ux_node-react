@@ -16,6 +16,7 @@ import ClientDashboard from "./pages/client/ClientDashboard";
 import ClientsPage from "./pages/common/ClientsPage";
 import LandingPage from "./pages/landing/LandingPage";
 import ArticlesPage from "./pages/common/ArticlesPage";
+import MovementsPage from "./pages/common/MovementsPage";
 
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
@@ -68,6 +69,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <ArticlesPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "movements",
+        element: (
+          <ProtectedRoute>
+            <MovementsPage />
           </ProtectedRoute>
         ),
       },

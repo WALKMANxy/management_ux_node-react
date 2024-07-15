@@ -26,7 +26,8 @@ import {
   Warning as WarningIcon,
   Logout as LogoutIcon,
   Close as CloseIcon,
-  Category as CategoryIcon, // Import icon for Articles
+  Category as CategoryIcon,
+  History as HistoryIcon, // Import icon for Articles
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -112,6 +113,12 @@ const Header: React.FC = () => {
             <HomeIcon />
           </ListItemIcon>
           <ListItemText primary={t("headerDashboard")} />
+        </ListItem>
+        <ListItem button component={Link} to="/movements" onClick={toggleDrawer}>
+          <ListItemIcon sx={{ color: "white" }}>
+            <HistoryIcon />
+          </ListItemIcon>
+          <ListItemText primary={t("movements")} />
         </ListItem>
         <ListItem button component={Link} to="/clients" onClick={toggleDrawer}>
           <ListItemIcon sx={{ color: "white" }}>

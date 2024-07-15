@@ -2,17 +2,19 @@
 import { Box, useMediaQuery } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import MovementDetails from "../../components/movementspage/MovementDetails";
-import MovementList from "../../components/statistics/grids/MovementList";
 import { useMovementsGrid } from "../../hooks/useMovementsGrid";
-import { useSelector } from "react-redux";
-import { RootState } from "../../app/store";
-import { currencyFormatter, numberComparator } from "../../utils/dataUtils";
+import {
+  calculateTotalQuantity,
+  calculateTotalPriceSold,
+  currencyFormatter,
+  numberComparator,
+} from "../../utils/dataUtils";
+import MovementList from "../../components/statistics/grids/MovementList";
+import MovementDetails from "../../components/movementsPage/movementsDetails";
 
 const MovementsPage: React.FC = () => {
   const { t } = useTranslation();
   const isMobile = useMediaQuery("(max-width:600px)");
-  const userRole = useSelector((state: RootState) => state.auth.userRole);
 
   const {
     selectedMovement,
@@ -34,50 +36,64 @@ const MovementsPage: React.FC = () => {
     anchorEl,
     movementDetailsRef,
     exportDataAsCsv,
+    userRole, // Added userRole to props
   } = useMovementsGrid();
 
-  const columnDefinitions = useMemo(() => [
-    {
-      headerName: t("movementsPage.date"),
-      field: "dateOfOrder",
-      sortable: true,
-    },
-    {
-      headerName: t("movementsPage.brand"),
-      field: "brand",
-      sortable: true,
-    },
-    {
-      headerName: t("movementsPage.oemId"),
-      field: "articleId",
-      sortable: true,
-    },
-    {
-      headerName: t("movementsPage.name"),
-      field: "name",
-      sortable: true,
-    },
-    {
-      headerName: t("movementsPage.quantity"),
-      field: "quantity",
-      comparator: numberComparator,
-      sortable: true,
-    },
-    {
-      headerName: t("movementsPage.revenue"),
-      field: "priceSold",
-      valueFormatter: (params: any) => currencyFormatter(parseFloat(params.value)),
-      comparator: numberComparator,
-      sortable: true,
-    },
-    {
-      headerName: t("movementsPage.cost"),
-      field: "priceBought",
-      valueFormatter: (params: any) => currencyFormatter(parseFloat(params.value)),
-      comparator: numberComparator,
-      sortable: true,
-    },
-  ], [t]);
+  const columnDefinitions = useMemo(
+    () =>
+      [
+        {
+          headerName: t("movementsPage.id"),
+          field: "id",
+          sortable: true,
+          cellRenderer: (params: any) => (
+            <span
+              onDoubleClick={() => handleMovementSelect(params.data.id)}
+              style={{ cursor: "pointer" }}
+            >
+              {params.value}
+            </span>
+          ),
+          comparator: numberComparator,
+        },
+        {
+          headerName: t("movementsPage.clientName"),
+          field: "clientName",
+          filter: "agTextColumnFilter",
+          sortable: true,
+        },
+        userRole === "admin"
+          ? {
+              headerName: t("movementsPage.agentName"),
+              field: "agentName",
+              filter: "agTextColumnFilter",
+              sortable: true,
+            }
+          : null,
+        {
+          headerName: t("movementsPage.dateOfOrder"),
+          field: "dateOfOrder",
+          filter: "agDateColumnFilter",
+          sortable: true,
+          valueFormatter: (params: any) =>
+            new Date(params.value).toLocaleDateString(),
+        },
+        {
+          headerName: t("movementsPage.totalQuantity"),
+          valueGetter: (params: any) => calculateTotalQuantity(params.data),
+          sortable: true,
+          comparator: numberComparator,
+        },
+        {
+          headerName: t("movementsPage.totalPriceSold"),
+          valueGetter: (params: any) => calculateTotalPriceSold(params.data),
+          valueFormatter: (params: any) => currencyFormatter(params.value),
+          comparator: numberComparator,
+          sortable: true,
+        },
+      ].filter(Boolean), // Remove null entries
+    [handleMovementSelect, t, userRole]
+  );
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>

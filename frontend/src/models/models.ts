@@ -8,7 +8,7 @@ export type UserRole = "admin" | "agent" | "client" | "guest";
 export type AdminDetails = {
   agents: Agent[];
   clients: Client[];
-  GlobalVisits: { 
+  GlobalVisits: {
     [agentId: string]: {
       Visits: Visit[];
     };
@@ -19,7 +19,6 @@ export type AdminDetails = {
     };
   };
 };
-
 
 export type AuthState = {
   isLoggedIn: boolean;
@@ -36,9 +35,6 @@ export type ClientsState = {
 export type CalendarState = {
   visits: Visit[];
 };
-
-
-
 
 export type AuthHandlersProps = {
   selectedRole: "admin" | "agent" | "client";
@@ -84,7 +80,6 @@ export type SearchState = {
   results: SearchResult[];
   status: "idle" | "loading" | "succeeded" | "failed";
 
-  
   error: string | null;
 };
 
@@ -117,7 +112,6 @@ export type SalesDistributionProps = {
   salesDistributionDataAgents?: { label: string; value: number }[];
 };
 
-
 export type ArticleColumnDefinition = {
   headerName: string;
   field?: string;
@@ -127,7 +121,6 @@ export type ArticleColumnDefinition = {
   valueFormatter?: (params: any) => string;
   valueGetter?: (params: any) => number;
 };
-
 
 export type ActivePromotionsProps = {
   isLoading: boolean;
@@ -148,7 +141,7 @@ export type SpentThisYearProps = {
   amount: string;
   comparison?: Comparison;
   isAgentSelected?: boolean;
-}
+};
 
 export type Props = {
   children: ReactNode;
@@ -205,7 +198,6 @@ export type MovementDetailsProps = {
   isLoading: boolean;
   ref: React.Ref<HTMLDivElement>;
 };
-
 
 export type TopArticleTypeProps = {
   articles: { id: string; name: string; quantity: number }[];
@@ -271,6 +263,9 @@ export type ArticleDetailsProps = {
   isLoading: boolean;
 };
 
+export type MovementDetailsHistoryProps = {
+  movementDetails: MovementDetail[];
+};
 
 export type MovementDetail = {
   articleId: string;
@@ -281,6 +276,7 @@ export type MovementDetail = {
   priceSold: string;
   priceBought: string;
 };
+
 export type Movement = {
   id: string;
   discountCategory: string;
@@ -293,13 +289,12 @@ export type Movement = {
 export type Promo = {
   id: string;
   clientsId: string[]; // Array of client IDs this promo applies to
-  agentsId: string[];  // Array of agent IDs this promo applies to
+  agentsId: string[]; // Array of agent IDs this promo applies to
   name: string;
   discount: string;
   startDate: string;
   endDate: string;
 };
-
 
 export type Client = {
   id: string;

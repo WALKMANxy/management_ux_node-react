@@ -324,6 +324,20 @@ export const calculateMonthlyData = (clients: Client[]) => {
   return { months, revenueData, netRevenueData, ordersData };
 };
 
+// Calculate total quantity for a movement
+export const calculateTotalQuantity = (movement: Movement): number => {
+  return movement.details.reduce((total, detail) => total + detail.quantity, 0);
+};
+
+// Calculate total price sold for a movement
+export const calculateTotalPriceSold = (movement: Movement): string => {
+  const total = movement.details.reduce(
+    (total, detail) => total + parseFloat(detail.priceSold),
+    0
+  );
+  return total.toFixed(2);
+};
+
 export const currencyFormatter = (value: any): string => {
   const numberValue = parseFloat(value);
   if (isNaN(numberValue)) {
