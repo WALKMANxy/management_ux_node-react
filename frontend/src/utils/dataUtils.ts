@@ -89,26 +89,72 @@ export const calculateTotalOrders = (clients: Client[]): number => {
   return Object.keys(groupedMovements).length;
 };
 
-// Calculate top brands data for a list of clients
+export const calculateTopBrandsData = (
+  movements: Movement[]
+): { label: string; value: number }[] => {
+  const brandCount: { [key: string]: { name: string; quantity: number } } = {};
+
+  // Iterate over each movement
+  movements.forEach((movement) => {
+    // Iterate over each detail in the movement
+    movement.details.forEach((detail) => {
+      if (detail.brand && !ignoreArticleNames.has(detail.name)) {
+        // Normalize the brand name
+        const normalizedBrand = detail.brand.trim().toLowerCase();
+        // Initialize the brandCount entry if it doesn't exist
+        if (!brandCount[normalizedBrand]) {
+          brandCount[normalizedBrand] = {
+            name: detail.brand, // Use the original brand name for display
+            quantity: 0,
+          };
+        }
+        // Accumulate the quantity sold
+        brandCount[normalizedBrand].quantity += detail.quantity;
+      }
+    });
+  });
+
+  // Sort the brands by quantity in descending order and return the top 10
+  return Object.values(brandCount)
+    .map((brand, index) => ({
+      label: brand.name,
+      value: brand.quantity,
+      key: `${brand.name}-${index}`, // Ensure unique keys by adding an index
+    }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 10);
+};
+
+
+/* // Calculate top brands data for a list of clients
 export const calculateTopBrandsData = (
   clients: Client[]
 ): { label: string; value: number }[] => {
   const brandCount: { [key: string]: number } = {};
 
+  console.log("Clients data:", clients);
+
   clients.forEach((client) => {
+    console.log("Processing client:", client.name, client.id);
     client.movements.forEach((movement) => {
+      console.log("Processing movement:", movement.id, movement.dateOfOrder);
       movement.details.forEach((detail) => {
-        if (detail.brand) {
-          if (!brandCount[detail.brand]) {
-            brandCount[detail.brand] = 0;
+        console.log("Processing detail:", detail);
+        // Normalize the brand name
+        const brand = detail.brand?.trim().toLowerCase();
+        if (brand) {
+          if (!brandCount[brand]) {
+            brandCount[brand] = 0;
           }
-          brandCount[detail.brand] += 1;
+          brandCount[brand] += 1;
         }
       });
     });
   });
 
-  return Object.keys(brandCount)
+  console.log("Brand counts:", brandCount);
+
+  const result = Object.keys(brandCount)
     .map((brand, index) => ({
       label: brand,
       value: brandCount[brand],
@@ -116,7 +162,12 @@ export const calculateTopBrandsData = (
     }))
     .sort((a, b) => b.value - a.value)
     .slice(0, 10);
-};
+
+  console.log("Top brands result:", result);
+
+  return result;
+}
+; */
 
 // Calculate sales distribution data for a list of clients
 export const calculateSalesDistributionData = (
