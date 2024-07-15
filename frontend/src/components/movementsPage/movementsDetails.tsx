@@ -1,21 +1,12 @@
-// src/components/movementspage/MovementDetails.tsx
+// src/components/movementsPage/MovementDetails.tsx
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {
-  Box,
-  Collapse,
-  Grid,
-  IconButton,
-  Paper,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Box, Collapse, Grid, IconButton, Paper, Typography, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { MovementDetailsProps } from "../../models/models";
-import MovementsHistory from "../statistics/grids/MovementsHistory";
-import DetailComponent from "../clientpage/DetailComponent";
+import MovementDetailComponent from "./MovementDetailComponent";
+import MovementDetailsHistory from "../statistics/grids/MovementDetailsHistory";
 
 const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
   (
@@ -76,7 +67,7 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
               >
                 <Grid item>
                   <Typography variant="h2">
-                    {t('movementDetails.title')}
+                    {t("movementDetails.title")}
                   </Typography>
                 </Grid>
                 <Grid item>
@@ -104,8 +95,14 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
                 spacing={2}
                 direction={isMobile ? "column" : "row"}
               >
-                <Grid item xs={12}>
-                  <MovementsHistory movements={[selectedMovement]} />
+                <Grid item xs={12} md={6}>
+                  <MovementDetailComponent
+                    detail={{ id: selectedMovement.id, dateOfOrder: selectedMovement.dateOfOrder }}
+                    isLoading={isLoading}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <MovementDetailsHistory movementDetails={selectedMovement.details} />
                 </Grid>
               </Grid>
             </Box>
@@ -119,4 +116,3 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
 );
 
 export default MovementDetails;
-
