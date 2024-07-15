@@ -104,7 +104,8 @@ const AdminDashboard: React.FC = () => {
 
   const topBrandsForSelectedAgent = useMemo(() => {
     if (selectedAgentData) {
-      return calculateTopBrandsData(selectedAgentData.clients);
+      const movements = selectedAgentData.clients.flatMap(client => client.movements);
+      return calculateTopBrandsData(movements);
     }
     return [];
   }, [selectedAgentData]);

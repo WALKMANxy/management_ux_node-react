@@ -230,14 +230,18 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
 
   const topBrandsData = useMemo(() => {
     if (role === "agent" && details) {
-      return calculateTopBrandsData((details as Agent).clients);
+      const movements = (details as Agent).clients.flatMap(client => client.movements);
+      return calculateTopBrandsData(movements);
     } else if (role === "client" && details) {
-      return calculateTopBrandsData([details as Client]);
+      const movements = (details as Client).movements;
+      return calculateTopBrandsData(movements);
     } else if (role === "admin" && details) {
-      return calculateTopBrandsData((details as { clients: Client[] }).clients);
+      const movements = (details as { clients: Client[] }).clients.flatMap(client => client.movements);
+      return calculateTopBrandsData(movements);
     }
     return [];
   }, [role, details]);
+  
 
   const salesDistributionDataAgents = useMemo(() => {
     if (role === "admin" && details && agentDetailsData) {

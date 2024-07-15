@@ -20,10 +20,14 @@ const useClientDetails = (clientName: string | null) => {
     }
   }, [clientName, clients]);
 
-  const topBrandsData = useMemo(
-    () => (selectedClient ? calculateTopBrandsData([selectedClient]) : []),
-    [selectedClient]
-  );
+  const topBrandsData = useMemo(() => {
+    if (selectedClient) {
+      const movements = selectedClient.movements;
+      return calculateTopBrandsData(movements);
+    }
+    return [];
+  }, [selectedClient]);
+  
 
   const salesDistributionData = useMemo(
     () =>
