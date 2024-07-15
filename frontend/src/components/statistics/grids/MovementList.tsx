@@ -1,4 +1,4 @@
-//src/components/statistics/grids/ClientList.tsx
+// src/components/statistics/grids/MovementList.tsx
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -14,27 +14,27 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ClientListProps } from "../../../models/models";
+import { MovementListProps } from "../../../models/models";
 import AGGridTable from "./AGGridTable";
 
-const ClientList: React.FC<ClientListProps> = ({
+const MovementList: React.FC<MovementListProps> = ({
   quickFilterText,
   setQuickFilterText,
   startDate,
   setStartDate,
   endDate,
   setEndDate,
-  filteredClients,
+  filteredMovements,
   columnDefs,
   gridRef,
   handleMenuOpen,
   handleMenuClose,
   anchorEl,
   exportDataAsCsv,
-  isClientListCollapsed,
-  setClientListCollapsed,
+  isMovementListCollapsed,
+  setMovementListCollapsed,
   isMobile,
-  clientDetailsRef, // Add the clientDetailsRef prop
+  movementDetailsRef,
 }) => {
   const { t } = useTranslation();
 
@@ -54,14 +54,14 @@ const ClientList: React.FC<ClientListProps> = ({
           p: 2,
         }}
       >
-        <Typography variant="h6">{t("clientList.title")}</Typography>
+        <Typography variant="h6">{t("movementList.title")}</Typography>
         <IconButton
-          onClick={() => setClientListCollapsed(!isClientListCollapsed)}
+          onClick={() => setMovementListCollapsed(!isMovementListCollapsed)}
         >
-          {isClientListCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+          {isMovementListCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
         </IconButton>
       </Box>
-      <Collapse in={!isClientListCollapsed}>
+      <Collapse in={!isMovementListCollapsed}>
         <Box sx={{ p: 2 }}>
           <Box
             sx={{
@@ -76,7 +76,7 @@ const ClientList: React.FC<ClientListProps> = ({
             >
               <TextField
                 id="filter-text-box"
-                placeholder={t("clientList.quickFilterPlaceholder")}
+                placeholder={t("movementList.quickFilterPlaceholder")}
                 variant="outlined"
                 size="small"
                 fullWidth
@@ -88,7 +88,7 @@ const ClientList: React.FC<ClientListProps> = ({
             </Box>
             <TextField
               type="date"
-              label={t("clientList.startDate")}
+              label={t("movementList.startDate")}
               InputLabelProps={{ shrink: true }}
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
@@ -96,7 +96,7 @@ const ClientList: React.FC<ClientListProps> = ({
             />
             <TextField
               type="date"
-              label={t("clientList.endDate")}
+              label={t("movementList.endDate")}
               InputLabelProps={{ shrink: true }}
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
@@ -109,21 +109,21 @@ const ClientList: React.FC<ClientListProps> = ({
             onClose={handleMenuClose}
           >
             <MenuItem onClick={exportDataAsCsv}>
-              {t("clientList.exportCSV")}
+              {t("movementList.exportCSV")}
             </MenuItem>
           </Menu>
           <AGGridTable
             ref={gridRef}
             columnDefs={columnDefs}
-            rowData={filteredClients()}
+            rowData={filteredMovements()}
             paginationPageSize={500}
             quickFilterText={quickFilterText}
           />
         </Box>
       </Collapse>
-      <div ref={clientDetailsRef} />
+      <div ref={movementDetailsRef} />
     </Paper>
   );
 };
 
-export default ClientList;
+export default MovementList;

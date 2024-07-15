@@ -43,86 +43,68 @@ export const loadAgentDetailsData = async (
   }
 };
 
-/**
- * Chunks an array into smaller arrays of a specified size.
- * @param {Array<T>} array - The array to be chunked.
- * @param {number} chunkSize - The size of each chunk.
- * @returns {Array<Array<T>>} - An array of arrays, where each inner array
- * contains `chunkSize` elements from the original array.
- */
-const chunkArray = <T>(array: T[], chunkSize: number): T[][] => {
-  const chunks: T[][] = [];
-  for (let i = 0; i < array.length; i += chunkSize) {
-    chunks.push(array.slice(i, i + chunkSize));
-  }
-  return chunks;
-};
-
-/**
- * Maps the given data and client details to a list of Client models.
- *
- * @param data - The data to map, typed as an array of any.
- * @param clientDetails - The client details to map, typed as an array of any.
- * @returns A Promise that resolves to an array of Client models.
- */
 export const mapDataToModels = async (
   data: any[],
   clientDetails: any[],
   agentDetails: any[]
 ): Promise<Client[]> => {
-  const numWorkers = navigator.hardwareConcurrency || 4;
-  const chunks = chunkArray(data, Math.ceil(data.length / numWorkers));
+  const numWorkers = Math.min(navigator.hardwareConcurrency || 4, data.length);
+  const chunkSize = Math.ceil(data.length / numWorkers);
+  const chunks = Array.from({ length: numWorkers }, (_, i) =>
+    data.slice(i * chunkSize, (i + 1) * chunkSize)
+  );
 
   return new Promise<Client[]>((resolve, reject) => {
-    const workers: Worker[] = chunks.map(
-      (chunk) => new Worker(workerScriptPath)
-    );
+    const workers: Worker[] = [];
     const resultsMap = new Map<string, Client>();
     let completed = 0;
 
-    workers.forEach((worker, index) => {
-      //console.log(`Sending data to worker ${index}:`, { data: chunks[index], clientDetails, agentDetails });
-      worker.postMessage({ data: chunks[index], clientDetails, agentDetails });
+    const handleWorkerMessage = (
+      index: number,
+      event: MessageEvent<Client[]>
+    ) => {
+      const workerResults = event.data;
 
-      worker.onmessage = (event: MessageEvent<Client[]>) => {
-        //console.log(`Worker ${index} finished processing.`);
-        const workerResults = event.data;
-        
-        workerResults.forEach((client) => {
-          if (resultsMap.has(client.id)) {
-            const existingClient = resultsMap.get(client.id)!; // Non-null assertion operator
-            // Merge movements
-            existingClient.movements.push(...client.movements);
-            // Update totalOrders
-            existingClient.totalOrders += client.totalOrders;
-            // Update totalRevenue
-            existingClient.totalRevenue = (parseFloat(existingClient.totalRevenue) + parseFloat(client.totalRevenue)).toFixed(2);
-          } else {
-            resultsMap.set(client.id, client);
-          }
-        });
-
-        completed += 1;
-        worker.terminate();
-
-        if (completed === workers.length) {
-          const results = Array.from(resultsMap.values());
-          //console.log('All workers finished. Aggregated results:', results);
-          resolve(results);
+      workerResults.forEach((client) => {
+        if (resultsMap.has(client.id)) {
+          const existingClient = resultsMap.get(client.id)!;
+          existingClient.movements.push(...client.movements);
+          existingClient.totalOrders += client.totalOrders;
+          existingClient.totalRevenue = (
+            parseFloat(existingClient.totalRevenue) +
+            parseFloat(client.totalRevenue)
+          ).toFixed(2);
+        } else {
+          resultsMap.set(client.id, client);
         }
-      };
+      });
 
-      worker.onerror = (error: ErrorEvent) => {
-        console.error(`Worker ${index} error:`, error);
-        reject(error);
-        worker.terminate();
-      };
+      completed += 1;
+      workers[index].terminate();
+
+      if (completed === workers.length) {
+        const results = Array.from(resultsMap.values());
+        resolve(results);
+      }
+    };
+
+    const handleWorkerError = (index: number, error: ErrorEvent) => {
+      console.error(`Worker ${index} error:`, error);
+      workers.forEach((worker) => worker.terminate());
+      reject(error);
+    };
+
+    chunks.forEach((chunk, index) => {
+      const worker = new Worker(workerScriptPath);
+      workers.push(worker);
+
+      worker.onmessage = (event) => handleWorkerMessage(index, event);
+      worker.onerror = (error) => handleWorkerError(index, error);
+
+      worker.postMessage({ data: chunk, clientDetails, agentDetails });
     });
   });
 };
-
-
-
 
 export const mapDataToMinimalClients = (data: any[]): Client[] => {
   const clientsMap = new Map<string, any>();

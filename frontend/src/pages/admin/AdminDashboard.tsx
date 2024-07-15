@@ -62,6 +62,7 @@ const AdminDashboard: React.FC = () => {
     clientComparativeStatisticsMonthly,
     agentComparativeStatistics,
     agentComparativeStatisticsMonthly,
+    clearSelection,
     isLoading,
   } = useStats("admin", null, isMobile);
 
@@ -78,6 +79,9 @@ const AdminDashboard: React.FC = () => {
 
   const handleSelect = useCallback(
     (item: SearchResult) => {
+      // Clear previous selections
+      clearSelection();
+  
       if (item.type === "client") {
         selectClient(item.name);
       } else if (item.type === "agent") {
@@ -86,7 +90,7 @@ const AdminDashboard: React.FC = () => {
         console.log(`Selected ${item.type}: ${item.name}`);
       }
     },
-    [selectClient, selectAgent]
+    [selectClient, selectAgent, clearSelection]
   );
 
   const selectedAgentData = useMemo(() => {
