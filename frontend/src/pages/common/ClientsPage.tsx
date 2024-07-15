@@ -1,3 +1,4 @@
+//src/pages/common/ClientsPage.tsx
 import { Box, useMediaQuery } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";

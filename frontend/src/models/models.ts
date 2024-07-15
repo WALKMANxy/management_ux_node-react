@@ -178,6 +178,34 @@ export type ClientListProps = {
   clientDetailsRef: React.RefObject<HTMLDivElement>; // Added clientDetailsRef
 };
 
+export type MovementListProps = {
+  quickFilterText: string;
+  setQuickFilterText: (value: string) => void;
+  startDate: string;
+  setStartDate: (value: string) => void;
+  endDate: string;
+  setEndDate: (value: string) => void;
+  filteredMovements: () => any[];
+  columnDefs: any[];
+  gridRef: any;
+  handleMenuOpen: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  handleMenuClose: () => void;
+  anchorEl: HTMLElement | null;
+  exportDataAsCsv: () => void;
+  isMovementListCollapsed: boolean;
+  setMovementListCollapsed: (value: boolean) => void;
+  isMobile: boolean;
+  movementDetailsRef: React.RefObject<HTMLDivElement>;
+};
+
+export type MovementDetailsProps = {
+  selectedMovement: Movement | null;
+  isMovementDetailsCollapsed: boolean;
+  setMovementDetailsCollapsed: (value: boolean) => void;
+  isLoading: boolean;
+  ref: React.Ref<HTMLDivElement>;
+};
+
 
 export type TopArticleTypeProps = {
   articles: { id: string; name: string; quantity: number }[];

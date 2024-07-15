@@ -104,9 +104,15 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     agentsData,
     agentDetailsData,
   ]);
+  
+  const clearSelection = useCallback(() => {
+    setSelectedClient(null);
+    setSelectedAgent(null);
+  }, []);
 
   const selectClient = useCallback(
     (clientName: string) => {
+      clearSelection();
       if (clientsData) {
         if (clientName === "") {
           setSelectedClient(null);
@@ -116,11 +122,12 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
         setSelectedClient(client || null);
       }
     },
-    [clientsData]
+    [clientsData, clearSelection]
   );
-
+  
   const selectAgent = useCallback(
     (agentName: string) => {
+      clearSelection();
       if (agentDetailsData) {
         if (agentName === "") {
           setSelectedAgent(null);
@@ -132,7 +139,7 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
         setSelectedAgent(agent || null);
       }
     },
-    [agentDetailsData]
+    [agentDetailsData, clearSelection]
   );
 
   const getVisits = useCallback(() => {
@@ -598,6 +605,7 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
     calculateTotalSpentThisYear,
     calculateTotalSpentThisYearForAgents,
     calculateTopArticleType,
+    clearSelection,
     totalRevenue,
     totalOrders,
     topBrandsData,
