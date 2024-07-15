@@ -22,13 +22,27 @@ export const calculateNetRevenue = (clients: Client[]): string => {
         const movementNetRevenue = movement.details.reduce(
           (detailSum, detail) => {
             const priceSold = parseFloat(detail.priceSold) || 0;
-            const priceBought = parseFloat(detail.priceBought) || 0;
+            const priceBought = Math.abs((parseFloat(detail.priceBought)) || 0) * (detail.quantity || 0);
+
+            /*  // Log details for debugging
+             console.log("Detail:", detail);
+             console.log("priceSold:", priceSold);
+             console.log("priceBought:", priceBought);
+             console.log("quantity:", Math.abs(detail.quantity || 0));
+             console.log("netRevenue for this detail:", detailSum + priceSold - priceBought);
+ 
+ */
             return detailSum + priceSold - priceBought;
           },
           0
         );
-        return sum + movementNetRevenue;
-      }, 0);
+       // Log movementNetRevenue for debugging
+       //console.log("movementNetRevenue:", movementNetRevenue);
+       return sum + movementNetRevenue;
+     }, 0);
+
+     // Log clientNetRevenue for debugging
+     //console.log("clientNetRevenue:", clientNetRevenue);
       return netTotal + clientNetRevenue;
     }, 0)
     .toFixed(2);
