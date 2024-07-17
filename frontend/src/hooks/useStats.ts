@@ -108,11 +108,11 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
   const clearSelection = useCallback(() => {
     setSelectedClient(null);
     setSelectedAgent(null);
+    sessionStorage.removeItem('selectedItem'); // Clear sessionStorage when clearing selection
   }, []);
 
   const selectClient = useCallback(
     (clientName: string) => {
-      clearSelection();
       if (clientsData) {
         if (clientName === "") {
           setSelectedClient(null);
@@ -122,12 +122,11 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
         setSelectedClient(client || null);
       }
     },
-    [clientsData, clearSelection]
+    [clientsData]
   );
   
   const selectAgent = useCallback(
     (agentName: string) => {
-      clearSelection();
       if (agentDetailsData) {
         if (agentName === "") {
           setSelectedAgent(null);
@@ -139,7 +138,7 @@ const useStats = (role: Role, id: string | null, isMobile: boolean) => {
         setSelectedAgent(agent || null);
       }
     },
-    [agentDetailsData, clearSelection]
+    [agentDetailsData]
   );
 
   const getVisits = useCallback(() => {

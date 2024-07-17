@@ -1,6 +1,6 @@
 //src/pages/common/ClientsPage.tsx
 import { Box, useMediaQuery } from "@mui/material";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import ClientDetails from "../../components/clientpage/ClientDetails";
 import ClientList from "../../components/statistics/grids/ClientList";
@@ -41,6 +41,17 @@ const ClientsPage: React.FC = () => {
     clientDetailsRef,
     exportDataAsCsv,
   } = useClientsGrid();
+
+  useEffect(() => {
+    const selectedItem = sessionStorage.getItem('searchedItem');
+    if (selectedItem) {
+      const item = JSON.parse(selectedItem);
+      if (item.type === 'client') {
+        handleClientSelect(item.id);
+      }
+      sessionStorage.removeItem('searchedItem'); // Clear the item from storage
+    }
+  }, [handleClientSelect]);
 
   const columnDefinitions = useMemo(() => {
     const baseColumns = [

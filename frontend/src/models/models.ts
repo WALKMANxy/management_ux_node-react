@@ -85,9 +85,11 @@ export type SearchState = {
 
 export type GlobalSearchProps = {
   filter: string;
-  onSelect: (item: SearchResult) => void; // Change the callback to accept SearchResult
+  onSelect?: (item: SearchResult) => void; // Change the callback to accept SearchResult
   placeholder?: string;
+  isHeaderSearch?: boolean;
 };
+
 export type DetailProps = {
   detail: { [key: string]: any };
   isLoading: boolean;

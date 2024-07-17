@@ -1,5 +1,5 @@
 import { Box, useMediaQuery } from "@mui/material";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
@@ -33,6 +33,15 @@ const ArticlesPage: React.FC = () => {
     exportDataAsCsv,
     clientMovements, // Add clientMovements
   } = useArticlesGrid();
+
+  useEffect(() => {
+    const selectedItem = sessionStorage.getItem('searchedItem');
+    if (selectedItem) {
+      const item = JSON.parse(selectedItem);
+      handleArticleSelect(item.articleId);
+      sessionStorage.removeItem('searchedItem'); // Clear the item from storage
+    }
+  }, [handleArticleSelect]);
 
  
 

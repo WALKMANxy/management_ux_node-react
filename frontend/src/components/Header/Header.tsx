@@ -35,7 +35,6 @@ import { RootState } from "../../app/store";
 import { logout } from "../../features/auth/authSlice";
 import GlobalSearch from "./GlobalSearch";
 import { useTranslation } from "react-i18next";
-import { SearchResult } from "../../models/models";
 
 const Header: React.FC = () => {
   const { t } = useTranslation();
@@ -57,15 +56,6 @@ const Header: React.FC = () => {
     }, 500); // 500ms delay for icon change
   };
 
-  const handleSearchSelect = (result: SearchResult) => {
-    if (result.type === "client" || result.type === "agent") {
-      console.log(`Selected ${result.type}: ${result.name}`);
-      // Handle the selection based on type
-    } else {
-      console.log(`Selected ${result.type}: ${result.name}`);
-      // Handle other types if necessary
-    }
-  };
 
   const handleLogoClick = () => {
     let dashboardLink = "/";
@@ -210,7 +200,7 @@ const Header: React.FC = () => {
           <GlobalSearch
             filter="all"
             placeholder={t("search")}
-            onSelect={handleSearchSelect}
+            isHeaderSearch={true}
           />
           <IconButton
             color="inherit"

@@ -7,13 +7,16 @@ import { GlobalSearchProps, SearchResult } from "../../models/models";
 import Spinner from "../common/Spinner";
 import "./GlobalSearch.css";
 import SearchResults from "./SearchResults";
+import { useNavigate } from "react-router-dom";
 
 const GlobalSearch: React.FC<GlobalSearchProps> = ({
   filter = "all",
   onSelect,
   placeholder,
+  isHeaderSearch = false,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const {
     input,
     handleChange,
@@ -29,12 +32,21 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
   } = useGlobalSearch(filter);
 
   const handleSelect = (item: SearchResult) => {
-    if (onSelect) {
-      onSelect(item); // Pass the entire item to the callback
+    if (isHeaderSearch) {
+      sessionStorage.setItem('searchedItem', JSON.stringify(item));
+      if (item.type === 'article') {
+        navigate('/articles');
+      } else if (item.type === 'client') {
+        navigate('/clients');
+      }
+    } else if (onSelect) {
+      onSelect(item); // Call the provided onSelect callback
     }
     setShowResults(false);
     setSelectedIndex(-1);
   };
+
+
   return (
     <div ref={searchRef} className="global-search-container">
       <div className="global-search d-flex align-items-center">
