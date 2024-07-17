@@ -1,4 +1,4 @@
-"""tyre24csvmaker/styles.py"""
+#tuleroCsvMaker\styles.py
 
 app_stylesheet = """
     QMainWindow {
