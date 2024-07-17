@@ -1,0 +1,1 @@
+pip install xlrdPyQt6 pandas openpyxl tqdm
