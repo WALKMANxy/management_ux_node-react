@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect, useState } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import useStats from "../../hooks/useStats";
 import {
   Box,
@@ -25,12 +25,12 @@ import MonthOverMonthSpendingTrend from "../../components/statistics/charts/Mont
 import SalesDistribution from "../../components/statistics/charts/SalesDistribution";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
 import AgentActivityOverview from "../../components/dashboard/AgentActivityOverview";
-import { SearchResult } from "../../models/models";
 import {
   calculateMonthlyData,
   getTrend,
   calculateTopBrandsData,
 } from "../../utils/dataUtils";
+import useSelectionState from "../../hooks/useSelectionState";
 import CloseIcon from "@mui/icons-material/Close";
 import { brandColors } from "../../utils/constants";
 
@@ -42,8 +42,15 @@ const AdminDashboard: React.FC = () => {
   const {
     selectedClient,
     selectedAgent,
-    selectClient,
-    selectAgent,
+    handleSelect,
+    clearSelection,
+    clientComparativeStatistics,
+    clientComparativeStatisticsMonthly,
+    agentComparativeStatistics,
+    agentComparativeStatisticsMonthly,
+  } = useSelectionState(isMobile);
+
+  const {
     calculateTotalSpentThisMonth,
     calculateTotalSpentThisYear,
     calculateTotalSpentThisYearForAgents,
@@ -58,16 +65,10 @@ const AdminDashboard: React.FC = () => {
     ordersData,
     yearlyCategories,
     yearlyOrdersData,
-    clientComparativeStatistics,
-    clientComparativeStatisticsMonthly,
-    agentComparativeStatistics,
-    agentComparativeStatisticsMonthly,
-    clearSelection,
     isLoading,
   } = useStats("admin", null, isMobile);
 
   const [fakeLoading, setFakeLoading] = useState(true);
-
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -76,22 +77,6 @@ const AdminDashboard: React.FC = () => {
 
     return () => clearTimeout(timer);
   }, []);
-
-  const handleSelect = useCallback(
-    (item: SearchResult) => {
-      // Clear previous selections
-      clearSelection();
-  
-      if (item.type === "client") {
-        selectClient(item.name);
-      } else if (item.type === "agent") {
-        selectAgent(item.name);
-      } else {
-        console.log(`Selected ${item.type}: ${item.name}`);
-      }
-    },
-    [selectClient, selectAgent, clearSelection]
-  );
 
   const selectedAgentData = useMemo(() => {
     if (selectedAgent && salesDistributionDataAgents.agents.length > 0) {
@@ -104,7 +89,9 @@ const AdminDashboard: React.FC = () => {
 
   const topBrandsForSelectedAgent = useMemo(() => {
     if (selectedAgentData) {
-      const movements = selectedAgentData.clients.flatMap(client => client.movements);
+      const movements = selectedAgentData.clients.flatMap(
+        (client) => client.movements
+      );
       return calculateTopBrandsData(movements);
     }
     return [];
@@ -144,11 +131,13 @@ const AdminDashboard: React.FC = () => {
               <Grid container spacing={2}>
                 <Grid item xs={12} md={4}>
                   <SpentThisMonth
-                    amount={calculateTotalSpentThisMonth(
-                      selectedAgentData.clients.flatMap(
-                        (client) => client.movements
-                      )
-                    ).totalRevenue}
+                    amount={
+                      calculateTotalSpentThisMonth(
+                        selectedAgentData.clients.flatMap(
+                          (client) => client.movements
+                        )
+                      ).totalRevenue
+                    }
                     comparison={{
                       value: parseFloat(
                         `${
@@ -178,10 +167,8 @@ const AdminDashboard: React.FC = () => {
                       trend: getTrend(
                         agentComparativeStatistics?.revenuePercentage || "0"
                       ),
-                      
                     }}
                     isAgentSelected={true}
-
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -249,7 +236,7 @@ const AdminDashboard: React.FC = () => {
                 color="secondary"
                 aria-label="close"
                 sx={{ position: "fixed", bottom: 16, right: 16 }}
-                onClick={() => selectAgent("")}
+                onClick={() => clearSelection()}
               >
                 <CloseIcon />
               </Fab>
@@ -265,9 +252,10 @@ const AdminDashboard: React.FC = () => {
               <Grid container spacing={2}>
                 <Grid item xs={12} md={4}>
                   <SpentThisMonth
-                    amount={calculateTotalSpentThisMonth(
-                      selectedClient.movements
-                    ).totalRevenue}
+                    amount={
+                      calculateTotalSpentThisMonth(selectedClient.movements)
+                        .totalRevenue
+                    }
                     comparison={{
                       value: parseFloat(
                         `${
@@ -299,7 +287,6 @@ const AdminDashboard: React.FC = () => {
                       ),
                     }}
                     isAgentSelected={false}
-
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -336,7 +323,7 @@ const AdminDashboard: React.FC = () => {
                 color="secondary"
                 aria-label="close"
                 sx={{ position: "fixed", bottom: 16, right: 16 }}
-                onClick={() => selectClient("")}
+                onClick={() => clearSelection()}
               >
                 <CloseIcon />
               </Fab>

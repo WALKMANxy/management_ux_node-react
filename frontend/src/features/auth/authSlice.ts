@@ -24,6 +24,7 @@ const authSlice = createSlice({
       state.isLoggedIn = false;
       state.userRole = "guest";
       state.id = "";
+      sessionStorage.clear();  // Clear session storage on logout
     },
   },
 });

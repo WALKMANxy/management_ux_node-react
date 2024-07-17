@@ -10,7 +10,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { RootState } from "../../app/store";
@@ -29,8 +29,8 @@ import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
 import { setVisits } from "../../features/calendar/calendarSlice";
 import useStats from "../../hooks/useStats";
 import { brandColors } from "../../utils/constants";
-import { SearchResult } from "../../models/models";
 import { calculateMonthlyData, getTrend } from "../../utils/dataUtils";
+import useSelectionState from "../../hooks/useSelectionState";
 
 const AgentDashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -40,9 +40,15 @@ const AgentDashboard: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const {
-    details,
     selectedClient,
-    selectClient,
+    handleSelect,
+    clearSelection,
+    clientComparativeStatistics,
+    clientComparativeStatisticsMonthly,
+  } = useSelectionState(isMobile);
+
+  const {
+    details,
     calculateTotalSpentThisMonth,
     calculateTotalSpentThisYear,
     calculateTopArticleType,
@@ -55,22 +61,8 @@ const AgentDashboard: React.FC = () => {
     ordersData,
     yearlyCategories,
     yearlyOrdersData,
-    clientComparativeStatistics,
-    clientComparativeStatisticsMonthly,
-
     isLoading,
   } = useStats("agent", loggedInAgentId, isMobile);
-
-  const handleClientSelect = useCallback(
-    (result: SearchResult) => {
-      if (result.type === "client") {
-        selectClient(result.name);
-      } else {
-        console.error("Selected item is not a client");
-      }
-    },
-    [selectClient]
-  );
 
   useEffect(() => {
     if (details && "AgentVisits" in details) {
@@ -91,7 +83,7 @@ const AgentDashboard: React.FC = () => {
         )}
       </Typography>
       {details && "clients" in details ? (
-        <GlobalSearch filter="client" onSelect={handleClientSelect} />
+        <GlobalSearch filter="client" onSelect={handleSelect} />
       ) : (
         <Skeleton
           variant="rectangular"
@@ -114,9 +106,10 @@ const AgentDashboard: React.FC = () => {
               <Grid container spacing={2}>
                 <Grid item xs={12} md={4}>
                   <SpentThisMonth
-                    amount={calculateTotalSpentThisMonth(
-                      selectedClient.movements
-                    ).totalRevenue}
+                    amount={
+                      calculateTotalSpentThisMonth(selectedClient.movements)
+                        .totalRevenue
+                    }
                     comparison={{
                       value: parseFloat(
                         `${
@@ -184,7 +177,7 @@ const AgentDashboard: React.FC = () => {
                 color="secondary"
                 aria-label="close"
                 sx={{ position: "fixed", bottom: 16, right: 16 }}
-                onClick={() => selectClient("")}
+                onClick={() => clearSelection()}
               >
                 <CloseIcon />
               </Fab>
