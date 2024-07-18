@@ -342,13 +342,14 @@ export const calculateMonthlyData = (clients: Client[]) => {
         0
       );
 
-      const movementCost = movements.reduce(
+      const movementNetRevenue = movements.reduce(
         (sum, movement) =>
           sum +
-          movement.details.reduce(
-            (detailSum, detail) => detailSum + parseFloat(detail.priceBought),
-            0
-          ),
+          movement.details.reduce((detailSum, detail) => {
+            const priceSold = parseFloat(detail.priceSold) || 0;
+            const priceBought = Math.abs(parseFloat(detail.priceBought) || 0) * (detail.quantity || 0);
+            return detailSum + priceSold - priceBought;
+          }, 0),
         0
       );
 
@@ -357,7 +358,7 @@ export const calculateMonthlyData = (clients: Client[]) => {
       }
 
       acc[monthYear].revenue += movementRevenue;
-      acc[monthYear].netRevenue += movementRevenue - movementCost;
+      acc[monthYear].netRevenue += movementNetRevenue;
       acc[monthYear].orders += 1; // Each group of movements with the same orderId counts as one order
 
       return acc;
@@ -374,6 +375,7 @@ export const calculateMonthlyData = (clients: Client[]) => {
 
   return { months, revenueData, netRevenueData, ordersData };
 };
+
 
 // Calculate total quantity for a movement
 export const calculateTotalQuantity = (movement: Movement): number => {

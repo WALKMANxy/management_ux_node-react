@@ -19,5 +19,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src"]
+  "include": ["src", "../backend/src/models/Agent.ts", "../backend/src/models/Client.ts", "../backend/src/models/Movement.ts"]
 }
