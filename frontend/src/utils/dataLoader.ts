@@ -1,46 +1,36 @@
 import axios from "axios";
 import { Agent, Client, MovementDetail } from "../models/models";
 
-const jsonFilePath = "/data/datasetsfrom01JANto12JUN.min.json";
-const clientDetailsFilePath = "/data/clientdetailsdataset02072024.min.json";
-const agentDetailsFilePath = "/data/agentdetailsdataset02072024.min.json";
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || "";
+
+
+
+if (!BASE_URL || BASE_URL=== "") {
+  throw new Error("One or more environment variables are not defined");
+}
 
 const workerScriptPath = new URL("./worker.js", import.meta.url);
 
-export const loadJsonData = async (
-  url: string = jsonFilePath
-): Promise<any[]> => {
+export const fetchData = async (endpoint: string): Promise<any[]> => {
   try {
-    const response = await axios.get(url);
+    const response = await axios.get(`${BASE_URL}/${endpoint}`);
     return response.data;
   } catch (error) {
-    console.error("Error loading JSON data:", error);
-    throw new Error(`Failed to load data from ${url}`);
+    console.error(`Error fetching data from ${endpoint}:`, error);
+    throw new Error(`Failed to fetch data from ${endpoint}`);
   }
 };
 
-export const loadClientDetailsData = async (
-  url: string = clientDetailsFilePath
-): Promise<any[]> => {
-  try {
-    const response = await axios.get(url);
-    return response.data;
-  } catch (error) {
-    console.error("Error loading client details data:", error);
-    throw new Error(`Failed to load data from ${url}`);
-  }
+export const loadJsonData = async (): Promise<any[]> => {
+  return fetchData('movements');
 };
 
-export const loadAgentDetailsData = async (
-  url: string = agentDetailsFilePath
-): Promise<Agent[]> => {
-  try {
-    const response = await axios.get(url);
-    return response.data;
-  } catch (error) {
-    console.error("Error loading agent details data:", error);
-    throw new Error(`Failed to load data from ${url}`);
-  }
+export const loadClientDetailsData = async (): Promise<any[]> => {
+  return fetchData('clients');
+};
+
+export const loadAgentDetailsData = async (): Promise<Agent[]> => {
+  return fetchData('agents');
 };
 
 export const mapDataToModels = async (

@@ -10,10 +10,10 @@ import AGGridTable from "./AGGridTable";
 const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
   const { t } = useTranslation();
 
-   useEffect(() => {
+   /* useEffect(() => {
     console.log("Movements:", movements);
   }, [movements]); 
-
+ */
   // Flatten the movements array and filter out invalid articles
   const flattenedMovements = useMemo(() => {
     return movements.flatMap((movement) =>
