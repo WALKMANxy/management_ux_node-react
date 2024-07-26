@@ -1,42 +1,94 @@
-//src/routes/agents.ts
+import express from "express";
+import fs from "fs";
+import path from "path";
+import { body } from "express-validator";
+import { authenticateUser } from "../utils/auth";
+import { Agent, AuthenticatedRequest } from "../models/types";
+import { checkValidation } from "../utils/validate";
+import { checkAdminRole } from "../utils/roleChecker";
 
-import express from 'express';
-import { Agent } from '../models/Agent';
-//Get files locally, instead of using MongoDB
-import fs from 'fs';
-import path from 'path';
 
 const router = express.Router();
 
-/* router.get('/', async (req, res) => {
+// Middleware to authenticate and authorize user
+router.use(authenticateUser);
+
+// Validation rules
+const agentValidationRules = [
+  body('name').notEmpty().withMessage('Name is required'),
+  body('email').isEmail().withMessage('Invalid email'),
+  body('phone').notEmpty().withMessage('Phone is required'),
+  body('clients').isArray().withMessage('Clients should be an array')
+];
+
+// GET method to retrieve all agents
+router.get("/", async (req: AuthenticatedRequest, res) => {
   try {
-    const agents = await Agent.find().populate('clients');
+    const filePath = path.resolve(process.env.AGENT_DETAILS_FILE_PATH || "");
+    const agents: Agent[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
     res.json(agents);
   } catch (err) {
-    // Type guard to check if err is an Error
     if (err instanceof Error) {
-      res.status(500).json({ status: "error", message: err.message });
+      res.status(500).json({ message: err.message });
     } else {
-      // Handle unexpected error type (optional)
       console.error("Unexpected error:", err);
-      res.status(500).json({ status: "error", message: "Internal Server Error" });
+      res.status(500).json({ message: "Internal Server Error" });
     }
   }
-}); */
+});
 
-router.get('/', async (req, res) => {
-    try {
-      const filePath = path.resolve(process.env.AGENT_DETAILS_FILE_PATH || '');
-      const agents = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-      res.json(agents);
-    } catch (err) {
-      if (err instanceof Error) {
-        res.status(500).json({ message: err.message });
-      } else {
-        console.error("Unexpected error:", err);
-        res.status(500).json({ message: "Internal Server Error" });
-      }
+// PUT method to replace an entire agent
+router.put("/:id", agentValidationRules, checkValidation, checkAdminRole, async (req: AuthenticatedRequest, res: express.Response) => {
+  try {
+    const filePath = path.resolve(process.env.AGENT_DETAILS_FILE_PATH || "");
+    const agents: Agent[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+
+    const agentIndex = agents.findIndex((agent) => agent.id === req.params.id);
+    if (agentIndex === -1) {
+      return res.status(404).json({ message: "Agent not found" });
     }
-  });
+
+    // Replace agent
+    agents[agentIndex] = { id: req.params.id, name: req.body.name, email: req.body.email, phone: req.body.phone, clients: req.body.clients };
+
+    fs.writeFileSync(filePath, JSON.stringify(agents, null, 2));
+    res.status(200).json({ message: "Agent updated successfully" });
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(500).json({ message: err.message });
+    } else {
+      console.error("Unexpected error:", err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+});
+
+// PATCH method to update part of an agent's information
+router.patch("/:id", agentValidationRules, checkValidation, checkAdminRole, async (req: AuthenticatedRequest, res: express.Response) => {
+  try {
+    const filePath = path.resolve(process.env.AGENT_DETAILS_FILE_PATH || "");
+    const agents: Agent[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+
+    const agentIndex = agents.findIndex((agent) => agent.id === req.params.id);
+    if (agentIndex === -1) {
+      return res.status(404).json({ message: "Agent not found" });
+    }
+
+    // Update only the fields provided in req.body
+    const updatedAgent = { ...agents[agentIndex], ...req.body };
+
+    agents[agentIndex] = updatedAgent;
+
+    fs.writeFileSync(filePath, JSON.stringify(agents, null, 2));
+    res.status(200).json({ message: "Agent updated successfully" });
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(500).json({ message: err.message });
+    } else {
+      console.error("Unexpected error:", err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+});
 
 export default router;

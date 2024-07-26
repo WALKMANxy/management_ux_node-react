@@ -5,7 +5,10 @@ import { ReactNode } from "react";
 
 export type UserRole = "admin" | "agent" | "client" | "guest";
 
-export type AdminDetails = {
+export type Admin = {
+  id: string;
+  name: string;
+  email: string;
   agents: Agent[];
   clients: Client[];
   GlobalVisits: {
@@ -18,7 +21,9 @@ export type AdminDetails = {
       Promos: Promo[];
     };
   };
+  avatar?: string; // Adding avatar field
 };
+
 
 export type AuthState = {
   isLoggedIn: boolean;
@@ -237,8 +242,14 @@ export type Visit = {
   id: string;
   clientId: string;
   agentId: string;
+  type: string;
+  reason: string;
+  createdAt: string;
   date: string;
-  note: string;
+  notePublic?: string;
+  notePrivate?: string;
+  pending: boolean;
+  completed: boolean;
 };
 
 export type ArticlesListProps = {
@@ -292,8 +303,10 @@ export type Promo = {
   id: string;
   clientsId: string[]; // Array of client IDs this promo applies to
   agentsId: string[]; // Array of agent IDs this promo applies to
+  type: string;
   name: string;
   discount: string;
+  createdAt: string;
   startDate: string;
   endDate: string;
 };
@@ -301,6 +314,7 @@ export type Promo = {
 export type Client = {
   id: string;
   name: string;
+  avatar?: string;
   extendedName?: string; // New property
   province?: string;
   phone?: string;
@@ -324,6 +338,7 @@ export type Client = {
 export type Agent = {
   id: string;
   name: string;
+  avatar?: string;
   email?: string;
   phone?: string;
   clients: Client[];

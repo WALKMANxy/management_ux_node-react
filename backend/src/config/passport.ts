@@ -1,4 +1,4 @@
-import passport from 'passport';
+/* import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { User, IUser } from '../models/User';
 
@@ -37,3 +37,4 @@ passport.deserializeUser(async (id, done) => {
 });
 
 export default passport;
+ */

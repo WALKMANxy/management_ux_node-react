@@ -1,43 +1,54 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import cors from 'cors';
-import rateLimit from 'express-rate-limit';
-import agentRoutes from './routes/agents';
-import clientRoutes from './routes/clients';
-import movementRoutes from './routes/movements';
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import cors from "cors";
+import rateLimit from "express-rate-limit";
+import compression from "compression";
+import cookieParser from "cookie-parser";
+import authRoutes from "./routes/OAuth";
+import agentRoutes from "./routes/agents";
+import adminRoutes from "./routes/admins";
+import clientRoutes from "./routes/clients";
+import logRequests from "./utils/logRequests";
+import { errorHandler } from "./utils/errorHandler";
 
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || "";
+const PORT = process.env.PORT || 5000;
 
-const corsOptions =  {
-  origin: 'http://localhost:3000',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
+mongoose
+  .connect(process.env.MONGO_URI!, {})
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
+
+const corsOptions: cors.CorsOptions = {
+  origin: "woodcock-prime-obviously.ngrok-free.app", // Your Ngrok URL
+  optionsSuccessStatus: 200,
+};
+
+app.use(errorHandler);
+app.use(cors(corsOptions));
+app.use(compression());
+app.use(cookieParser());
+app.use(express.json());
+app.use(logRequests); // Add the IP logging middleware here
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Too many requests from this IP, please try again later.",
 });
 
-// Enable CORS
-app.use(cors(corsOptions));
+app.use(limiter);
 
-/* mongoose.connect(process.env.MONGO_URI as string)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err)); */
+app.use("/auth", authRoutes);
+app.use("/agents", agentRoutes);
+app.use("/admins", adminRoutes);
+app.use("/clients", clientRoutes);
 
-app.use(express.json(), l);
-
-app.use('/api/agents', agentRoutes);
-app.use('/api/clients', clientRoutes);
-app.use('/api/movements', movementRoutes);
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
 export default app;
