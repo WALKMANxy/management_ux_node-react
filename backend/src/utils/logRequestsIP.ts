@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const logDirPath = path.resolve('data'); // Resolves to the root directory
-const logFilePath = path.join(logDirPath, 'log.json');
+const logFilePath = path.join(logDirPath, 'ipLog.json');
 
 interface IpInfo {
   ip: string;
@@ -27,7 +27,7 @@ if (!fs.existsSync(logFilePath)) {
   fs.writeFileSync(logFilePath, JSON.stringify([]));
 }
 
-const logRequests = async (req: Request, res: Response, next: NextFunction) => {
+const logRequestsIp = async (req: Request, res: Response, next: NextFunction) => {
   const clientIp = req.ip ? req.ip.replace('::ffff:', '') : 'unknown';
   if (clientIp === 'unknown') {
     console.error('Unable to determine client IP address');
@@ -65,4 +65,4 @@ const logRequests = async (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-export default logRequests;
+export default logRequestsIp;
