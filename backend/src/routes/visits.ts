@@ -1,6 +1,4 @@
 import express, { Request, Response } from "express";
-import fs from "fs";
-import path from "path";
 import { body } from "express-validator";
 import { authenticateUser } from "../utils/auth";
 import { checkValidation } from "../utils/validate";
@@ -27,8 +25,13 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     const visits = await Visit.find();
     res.json(visits);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      res.status(500).json({ message: err.message });
+    } else {
+      console.error("Unexpected error:", err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 });
 
@@ -47,8 +50,13 @@ router.post('/', visitValidationRules, checkValidation, checkAgentOrAdminRole, a
     });
     await visit.save();
     res.status(201).json({ message: 'Visit created successfully', visit });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      res.status(500).json({ message: err.message });
+    } else {
+      console.error("Unexpected error:", err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 });
 
@@ -60,8 +68,13 @@ router.put('/:id', visitValidationRules, checkValidation, checkAgentOrAdminRole,
       return res.status(404).json({ message: 'Visit not found' });
     }
     res.status(200).json({ message: 'Visit updated successfully', visit });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      res.status(500).json({ message: err.message });
+    } else {
+      console.error("Unexpected error:", err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 });
 
@@ -73,8 +86,13 @@ router.patch('/:id', visitValidationRules, checkValidation, checkAgentOrAdminRol
       return res.status(404).json({ message: 'Visit not found' });
     }
     res.status(200).json({ message: 'Visit updated successfully', visit });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      res.status(500).json({ message: err.message });
+    } else {
+      console.error("Unexpected error:", err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 });
 

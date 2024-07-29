@@ -1,6 +1,4 @@
 import express, { Request, Response } from "express";
-import fs from "fs";
-import path from "path";
 import { body } from "express-validator";
 import { authenticateUser } from "../utils/auth";
 import { checkValidation } from "../utils/validate";
@@ -29,8 +27,13 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     const promos = await Promo.find();
     res.json(promos);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      res.status(500).json({ message: err.message });
+    } else {
+      console.error("Unexpected error:", err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 });
 
@@ -49,8 +52,13 @@ router.post('/', promoValidationRules, checkValidation, checkAgentOrAdminRole, a
     });
     await promo.save();
     res.status(201).json({ message: 'Promo created successfully', promo });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      res.status(500).json({ message: err.message });
+    } else {
+      console.error("Unexpected error:", err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 });
 
@@ -62,8 +70,13 @@ router.put('/:id', promoValidationRules, checkValidation, checkAgentOrAdminRole,
       return res.status(404).json({ message: 'Promo not found' });
     }
     res.status(200).json({ message: 'Promo updated successfully', promo });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      res.status(500).json({ message: err.message });
+    } else {
+      console.error("Unexpected error:", err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 });
 
@@ -75,8 +88,13 @@ router.patch('/:id', promoValidationRules, checkValidation, checkAgentOrAdminRol
       return res.status(404).json({ message: 'Promo not found' });
     }
     res.status(200).json({ message: 'Promo updated successfully', promo });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      res.status(500).json({ message: err.message });
+    } else {
+      console.error("Unexpected error:", err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 });
 
