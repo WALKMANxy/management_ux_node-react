@@ -11,8 +11,11 @@ import authRoutes from "./routes/OAuth";
 import agentRoutes from "./routes/agents";
 import adminRoutes from "./routes/admins";
 import clientRoutes from "./routes/clients";
-import logRequests from "./utils/logRequests";
+import promosRoutes from "./routes/promos";
+import visitsRoutes from "./routes/visits";
 import { errorHandler } from "./utils/errorHandler";
+import logRequestsIp from "./utils/logRequestsIP";
+import logRequests from "./middlewares/logRequests";
 
 dotenv.config();
 
@@ -29,12 +32,13 @@ const corsOptions: cors.CorsOptions = {
   optionsSuccessStatus: 200,
 };
 
-app.use(errorHandler);
 app.use(cors(corsOptions));
 app.use(compression());
 app.use(cookieParser());
 app.use(express.json());
-app.use(logRequests); // Add the IP logging middleware here
+app.use(logRequestsIp); // Add the IP logging middleware here
+app.use(logRequests); // Add the logging middleware here
+
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -48,10 +52,16 @@ app.use("/auth", authRoutes);
 app.use("/agents", agentRoutes);
 app.use("/admins", adminRoutes);
 app.use("/clients", clientRoutes);
+app.use("/promos", promosRoutes);
+app.use("/visits", visitsRoutes);
+
+
+app.use(errorHandler);
+
 
 const httpsOptions = {
-  key: fs.readFileSync(process.env.SSL_KEY_PATH!),
-  cert: fs.readFileSync(process.env.SSL_CERT_PATH!),
+  key: fs.readFileSync(process.env.SSL_KEY_PATH!, 'utf8'),
+  cert: fs.readFileSync(process.env.SSL_CERT_PATH!, 'utf8'),
 };
 
 https.createServer(httpsOptions, app).listen(PORT, () => {
