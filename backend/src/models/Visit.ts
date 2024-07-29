@@ -1,8 +1,8 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document, Types } from 'mongoose';
 
 export interface IVisit extends Document {
-  clientId: string;
-  agentId: string;
+  clientId: Types.ObjectId;
+  agentId: Types.ObjectId;
   type: string;
   reason: string;
   createdAt: Date;

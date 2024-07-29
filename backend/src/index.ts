@@ -5,6 +5,8 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import compression from "compression";
 import cookieParser from "cookie-parser";
+import fs from "fs";
+import https from "https";
 import authRoutes from "./routes/OAuth";
 import agentRoutes from "./routes/agents";
 import adminRoutes from "./routes/admins";
@@ -23,7 +25,7 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 const corsOptions: cors.CorsOptions = {
-  origin: "woodcock-prime-obviously.ngrok-free.app", // Your Ngrok URL
+  origin: true,
   optionsSuccessStatus: 200,
 };
 
@@ -47,7 +49,12 @@ app.use("/agents", agentRoutes);
 app.use("/admins", adminRoutes);
 app.use("/clients", clientRoutes);
 
-app.listen(PORT, () => {
+const httpsOptions = {
+  key: fs.readFileSync(process.env.SSL_KEY_PATH!),
+  cert: fs.readFileSync(process.env.SSL_CERT_PATH!),
+};
+
+https.createServer(httpsOptions, app).listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
