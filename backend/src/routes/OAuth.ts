@@ -1,8 +1,8 @@
 import { Router, Request, Response } from 'express';
 import axios from 'axios';
 import { User, IUser } from '../models/User';
-import jwt from 'jsonwebtoken';
-import { generateToken } from '../utils/auth';
+import { authenticateUser, generateToken } from '../utils/auth';
+import { AuthenticatedRequest } from '../models/types';
 
 const router = Router();
 
@@ -66,6 +66,34 @@ router.get('/oauth2/callback', async (req: Request, res: Response) => {
       console.error('Axios error response:', error.response?.data);
     }
     res.status(500).send('Authentication failed');
+  }
+});
+
+router.use(authenticateUser);
+
+router.get('/link-google', async (req: AuthenticatedRequest, res: Response) => {
+  const { code } = req.query;
+  const user = req.user as IUser;
+
+  try {
+    const tokenResponse = await getToken(code as string);
+    const { access_token } = tokenResponse.data;
+
+    const userInfoResponse = await getUserInfo(access_token);
+    const { id, email, name, picture } = userInfoResponse.data;
+
+    if (email !== user.email) {
+      return res.status(400).json({ message: 'The email associated with this Google account does not match the email of the current user' });
+    }
+
+    user.googleId = id;
+    user.avatar = picture; // Optionally update avatar
+    await user.save();
+
+    res.status(200).json({ message: 'Google account linked successfully', user });
+  } catch (error) {
+    console.error('Error during Google account linking', error);
+    res.status(500).json({ message: 'Failed to link Google account', error });
   }
 });
 

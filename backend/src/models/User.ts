@@ -33,7 +33,7 @@ const userSchema = new Schema<IUser>(
     avatar: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
-    isEmailVerified: { type: Boolean, default: true },
+    isEmailVerified: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

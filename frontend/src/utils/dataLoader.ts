@@ -13,7 +13,7 @@ const workerScriptPath = new URL("./worker.js", import.meta.url);
 
 export const fetchData = async (endpoint: string): Promise<any[]> => {
   try {
-    const response = await axios.get(`${BASE_URL}/${endpoint}`);
+    const response = await axios.get(`${BASE_URL}${endpoint}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching data from ${endpoint}:`, error);

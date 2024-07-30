@@ -8,19 +8,22 @@ import cookieParser from "cookie-parser";
 import fs from "fs";
 import https from "https";
 import authRoutes from "./routes/OAuth";
+import oauthRoutes from "./routes/OAuth";
 import agentRoutes from "./routes/agents";
 import adminRoutes from "./routes/admins";
 import clientRoutes from "./routes/clients";
 import promosRoutes from "./routes/promos";
 import visitsRoutes from "./routes/visits";
+import movementsRoutes from "./routes/movements";
 import { errorHandler } from "./utils/errorHandler";
 import logRequestsIp from "./utils/logRequestsIP";
 import logRequests from "./middlewares/logRequests";
+import localtunnel from "localtunnel";
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT || "5000", 10);
 
 mongoose
   .connect(process.env.MONGO_URI!, {})
@@ -49,9 +52,11 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.use("/auth", authRoutes);
+app.use("/oauth", oauthRoutes);
 app.use("/agents", agentRoutes);
 app.use("/admins", adminRoutes);
 app.use("/clients", clientRoutes);
+app.use("/movements", movementsRoutes);
 app.use("/promos", promosRoutes);
 app.use("/visits", visitsRoutes);
 
@@ -64,8 +69,19 @@ const httpsOptions = {
   cert: fs.readFileSync(process.env.SSL_CERT_PATH!, 'utf8'),
 };
 
-https.createServer(httpsOptions, app).listen(PORT, () => {
+https.createServer(httpsOptions, app).listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
+
+  try {
+    const tunnel = await localtunnel({ port: PORT, subdomain: 'rcs-backend-test-september2024' });
+    console.log(`LocalTunnel running at ${tunnel.url}`);
+
+    tunnel.on('close', () => {
+      console.log('LocalTunnel closed');
+    });
+  } catch (error) {
+    console.error('Error setting up LocalTunnel:', error);
+  }
 });
 
 export default app;
