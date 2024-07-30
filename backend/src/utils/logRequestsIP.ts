@@ -3,21 +3,13 @@ import fs from 'fs';
 import path from 'path';
 import { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
+import { IpInfo } from '../models/types';
 
 dotenv.config();
 
 const logDirPath = path.resolve('data'); // Resolves to the root directory
 const logFilePath = path.join(logDirPath, 'ipLog.json');
 
-interface IpInfo {
-  ip: string;
-  country: string;
-  region: string;
-  city: string;
-  latitude: number;
-  longitude: number;
-  [key: string]: any;
-}
 
 // Ensure data directory and log.json file exist
 if (!fs.existsSync(logDirPath)) {

@@ -1,5 +1,5 @@
-import { Request } from 'express';
-import { IUser } from './User';
+import { Request } from "express";
+import { IUser } from "./User";
 
 export interface AuthenticatedRequest extends Request {
   user?: IUser;
@@ -33,8 +33,8 @@ export interface Client {
 export interface Movement {
   "Data Documento Precedente": string;
   "Numero Lista": number;
-  "Mese": number;
-  "Anno": number;
+  Mese: number;
+  Anno: number;
   "Ragione Sociale Cliente": string;
   "Codice Cliente": number;
   "Codice Agente": string;
@@ -46,3 +46,13 @@ export interface Movement {
   Costo: number;
   "Prezzo Articolo": number;
 }
+
+export type IpInfo = {
+  ip: string;
+  country: string;
+  region: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+  [key: string]: any;
+};
