@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import { authenticateUser } from "../utils/auth";
+import { authenticateUser } from "../utils/authentication";
 import { checkValidation } from "../utils/validate";
 import { checkAgentOrAdminRole } from "../utils/roleChecker";
 import { Visit } from "../models/Visit";

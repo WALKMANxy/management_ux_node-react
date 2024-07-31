@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 import { body } from "express-validator";
-import { authenticateUser } from "../utils/auth";
+import { authenticateUser } from "../utils/authentication";
 import { AuthenticatedRequest, Client } from "../models/types";
 import { checkValidation } from "../utils/validate";
 import { checkAdminRole } from "../utils/roleChecker";
