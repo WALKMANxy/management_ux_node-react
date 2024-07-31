@@ -7,7 +7,7 @@ import compression from "compression";
 import cookieParser from "cookie-parser";
 import fs from "fs";
 import https from "https";
-import authRoutes from "./routes/OAuth";
+import authRoutes from "./routes/auth";
 import oauthRoutes from "./routes/OAuth";
 import agentRoutes from "./routes/agents";
 import adminRoutes from "./routes/admins";
@@ -18,12 +18,17 @@ import movementsRoutes from "./routes/movements";
 import { errorHandler } from "./utils/errorHandler";
 import logRequestsIp from "./utils/logRequestsIP";
 import logRequests from "./middlewares/logRequests";
-import localtunnel from "localtunnel";
 
 dotenv.config();
 
+console.log(`JWT_SECRET inside process env inside the index: ${process.env.JWT_SECRET}`);  // Check if JWT_SECRET is loaded
+
+
 const app = express();
 const PORT = parseInt(process.env.PORT || "5000", 10);
+
+app.set('trust proxy', 1); // Trust first proxy
+
 
 mongoose
   .connect(process.env.MONGO_URI!, {})
@@ -41,6 +46,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(logRequestsIp); // Add the IP logging middleware here
 app.use(logRequests); // Add the logging middleware here
+
 
 
 const limiter = rateLimit({
@@ -71,17 +77,6 @@ const httpsOptions = {
 
 https.createServer(httpsOptions, app).listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
-
-  try {
-    const tunnel = await localtunnel({ port: PORT, subdomain: 'rcs-backend-test-september2024' });
-    console.log(`LocalTunnel running at ${tunnel.url}`);
-
-    tunnel.on('close', () => {
-      console.log('LocalTunnel closed');
-    });
-  } catch (error) {
-    console.error('Error setting up LocalTunnel:', error);
-  }
 });
-
+ 
 export default app;

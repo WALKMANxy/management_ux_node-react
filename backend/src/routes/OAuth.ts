@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import axios from 'axios';
 import { User, IUser } from '../models/User';
-import { authenticateUser, generateToken } from '../utils/auth';
+import { authenticateUser, generateToken } from '../utils/authentication';
 import { AuthenticatedRequest } from '../models/types';
 
 const router = Router();

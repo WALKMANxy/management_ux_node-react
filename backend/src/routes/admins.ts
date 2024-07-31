@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
-import { authenticateUser } from '../utils/auth';
+import { authenticateUser } from '../utils/authentication';
 import { checkAdminRole } from '../utils/roleChecker';
 import { AuthenticatedRequest } from '../models/types';
 

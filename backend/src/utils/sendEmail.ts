@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import logger from './logger'; // Assuming logger is in the same directory
 
 const transporter = nodemailer.createTransport({
   host: 'smtps.aruba.it',
@@ -32,6 +33,16 @@ export const sendVerificationEmail = async (email: string, token: string) => {
     text: `Please verify your email by clicking the following link: ${verificationUrl}`,
   };
 
-  const response = await transporter.sendMail(mailOptions);
-  return response;
+  try {
+    const response = await transporter.sendMail(mailOptions);
+    logger.info("Verification email sent", { email, verificationUrl, response });
+    return response;
+  } catch (error) {
+    if (error instanceof Error) {
+      logger.error("Failed to send verification email", { email, error: error.message, stack: error.stack });
+    } else {
+      logger.error("Failed to send verification email", { email, error: String(error) });
+    }
+    throw error;
+  }
 };
