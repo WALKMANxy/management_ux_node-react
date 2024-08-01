@@ -161,8 +161,22 @@ def process_files(
         .apply(list)
         .to_dict()
     )
+    
+    IGNORED_BRANDS = [
+    "AP", "AREXONS", "ASSO", "ATE", "ATECSO", "AUTOCLIMA", "BIRTH", "BOSCH", "BREMBO", 
+    "BUGATTI", "CASCO", "CASTROL", "CEI", "CORTECO", "COVIND", "DAF", "DAYCO", "DELPHI", 
+    "DENSO", "DOLZ", "ELRING", "EMMERRE", "ERA", "EXIDE", "FAG", "FEBI", "FERODO", 
+    "FIAT", "FORD", "FRAP", "FTE", "GATES", "HELLA", "HOFFER", "IMASAF", "INA", "ISUZU", 
+    "IVECO", "JAPANPARTS", "JAPKO", "KNECHT", "KRIOS", "LEMFORDER", "LUK", "MAHLE", 
+    "MAN", "METELLI", "MEYLE", "MOBIL", "MONROE", "MOOG", "MULLER FILTER", "NISSAN", 
+    "NISSENS", "NK", "NRF", "OLSA", "OMP", "PEUGEOT", "PIAGGIO", "PIERBURG", "RAICAM", 
+    "RENAULT", "SACHS", "SCANIA", "SELENIA", "SIDAT", "SKF", "TEXTAR", "TRW", "TUDOR", 
+    "UFI", "VALEO", "VEMA", "VITAL SUSPENSIONS", "VOLVO", "VOLKSWAGEN", "ZETA-ERRE", "ZF"
+]
 
     def get_oem_number(row):
+        if row["BRAND"] in IGNORED_BRANDS:
+            return ""  # Skip filling OE code for ignored brands
         key = (row["CODICE PRODOTTO"], row["BRAND"][:5])
         return " | ".join(oem_lookup[key]) if key in oem_lookup else "Unknown OE"
 
@@ -220,15 +234,16 @@ def process_files(
     cleaned_df["padded_oe"] = " " + cleaned_df["CODICE OE"].str.strip() + " "
 
     def find_additional_cross_codes(codice_prodotto, padded_oe):
-        matches = cleaned_df[cleaned_df["CODICE OE"] != "Unknown OE"]
+        matches = cleaned_df[(cleaned_df["CODICE OE"] != "Unknown OE") & 
+                         (~cleaned_df["BRAND"].isin(IGNORED_BRANDS))]
         exact_matches = matches[
             matches["padded_oe"].str.contains(f" {codice_prodotto} ", regex=False)
-        ]
+    ]
         if not exact_matches.empty:
             return " | ".join(exact_matches["CODICE PRODOTTO"].unique())
         return ""
 
-    unknown_oe_mask = cleaned_df["CODICE OE"] == "Unknown OE"
+    unknown_oe_mask = (cleaned_df["CODICE OE"] == "Unknown OE") & (~cleaned_df["BRAND"].isin(IGNORED_BRANDS))
     cleaned_df.loc[unknown_oe_mask, "CODICI CROSS"] = cleaned_df.loc[
         unknown_oe_mask, "CODICE PRODOTTO"
     ].progress_apply(
