@@ -1,13 +1,21 @@
-#/tuleroCsvMaker/data_processing.py
-
 import pandas as pd   
 import os
 from tqdm import tqdm
 
+IGNORED_BRANDS = [
+    "AP", "AREXONS", "ASSO", "ATE", "ATECSO", "AUTOCLIMA", "BIRTH", "BOSCH", "BREMBO", 
+    "BUGATTI", "CASCO", "CASTROL", "CEI", "CORTECO", "COVIND", "DAF", "DAYCO", "DELPHI", 
+    "DENSO", "DOLZ", "ELRING", "EMMERRE", "ERA", "EXIDE", "FAG", "FEBI", "FERODO", 
+    "FIAT", "FORD", "FRAP", "FTE", "GATES", "HELLA", "HOFFER", "IMASAF", "INA", "ISUZU", 
+    "IVECO", "JAPANPARTS", "JAPKO", "KNECHT", "KRIOS", "LEMFORDER", "LUK", "MAHLE", 
+    "MAN", "METELLI", "MEYLE", "MOBIL", "MONROE", "MOOG", "MULLER FILTER", "NISSAN", 
+    "NISSENS", "NK", "NRF", "OLSA", "OMP", "PEUGEOT", "PIAGGIO", "PIERBURG", "RAICAM", 
+    "RENAULT", "SACHS", "SCANIA", "SELENIA", "SIDAT", "SKF", "TEXTAR", "TRW", "TUDOR", 
+    "UFI", "VALEO", "VEMA", "VITAL SUSPENSIONS", "VOLVO", "VOLKSWAGEN", "ZETA-ERRE", "ZF"
+]
 
 def is_unnamed(header):
     return str(header).startswith("Unnamed")
-
 
 def validate_first_sheet(df):
     return (
@@ -20,7 +28,6 @@ def validate_first_sheet(df):
         and not pd.isna(df.columns[6])
     )
 
-
 def validate_other_sheet(df):
     return (
         df.shape[1] == 6
@@ -30,6 +37,60 @@ def validate_other_sheet(df):
         and not is_unnamed(df.columns[4])
         and is_unnamed(df.columns[0])
     )
+
+def get_oem_number(row, oem_lookup, IGNORED_BRANDS):
+    if row["BRAND"] in IGNORED_BRANDS:
+        return ""  # Skip filling OE code for ignored brands
+    key = (row["CODICE PRODOTTO"], row["BRAND"][:5])
+    return " | ".join(oem_lookup[key]) if key in oem_lookup else "Unknown OE"
+
+def find_additional_cross_codes(codice_prodotto, padded_oe, cleaned_df, IGNORED_BRANDS):
+    matches = cleaned_df[(cleaned_df["CODICE OE"] != "Unknown OE") & 
+                         (~cleaned_df["BRAND"].isin(IGNORED_BRANDS))]
+    exact_matches = matches[
+        matches["padded_oe"].str.contains(f" {codice_prodotto} ", regex=False)
+    ]
+    if not exact_matches.empty:
+        return " | ".join(exact_matches["CODICE PRODOTTO"].unique())
+    return ""
+
+def update_brands(df_output, brands_file_path):
+    # Load the brands file
+    brands_df = pd.read_csv(brands_file_path, dtype=str)
+    brands_df["Brand"] = brands_df["Brand"].astype(str).str.strip()
+    brands_df["Match"] = brands_df["Match"].astype(str).str.strip()
+
+    # Create a lookup dictionary from the brands file
+    brand_lookup = dict(zip(brands_df["Brand"], brands_df["Match"]))
+
+    # Update the BRANDS in the output dataframe
+    tqdm.pandas(desc="Updating brands")
+    df_output["BRAND"] = df_output["BRAND"].progress_apply(
+        lambda x: brand_lookup.get(x, x)
+    )
+    return df_output
+
+def optimized_cross_code_generation(cleaned_df, ignored_brands):
+    cross_references = {}
+    for _, row in tqdm(cleaned_df.iterrows(), total=len(cleaned_df), desc="Generating cross codes"):
+        codice_oe = row["CODICE OE"]
+        codice_prodotto = row["CODICE PRODOTTO"]
+        brand = row["BRAND"]
+
+        if codice_oe != "Unknown OE" and brand not in ignored_brands:
+            if codice_oe not in cross_references:
+                cross_references[codice_oe] = []
+            cross_references[codice_oe].append(codice_prodotto)
+
+    cross_codes_series = pd.Series(index=cleaned_df.index, dtype=str)
+    for codice_oe, prodotti in tqdm(cross_references.items(), desc="Updating CODICI CROSS"):
+        cross_codes = {
+            prodotto: " | ".join([code for code in prodotti if code != prodotto])
+            for prodotto in prodotti
+        }
+        cross_codes_series.update(pd.Series(cross_codes))
+
+    return cross_codes_series.fillna("")
 
 
 def process_files(
@@ -45,7 +106,7 @@ def process_files(
     first_sheet_validated = False
 
     for sheet_name in tqdm(xls.sheet_names, desc="Validating sheets"):
-        df = pd.read_excel(xls, sheet_name=sheet_name, header=0)
+        df = pd.read_excel(xls, sheet_name=sheet_name, header=0, dtype=str)  # Ensure all columns are read as strings
         if not first_sheet_validated:
             if validate_first_sheet(df):
                 relevant_sheets.append((sheet_name, df))
@@ -93,27 +154,13 @@ def process_files(
     ]:
         df_combined[col] = pd.NA
 
-    df_combined = df_combined[
-        [
-            "CODICE PRODOTTO",
-            "CODICE OE",
-            "CODICI CROSS",
-            "BRAND",
-            "DESCRIZIONE",
-            "LINK IMMAGINE",
-            "CATEGORIA",
-            "PRZ. ULT. ACQ.",
-            "GIACENZA",
-            "SCHEDA TECNICA",
-            "SCHEDA DI SICUREZZA",
-            "CONFEZIONE",
-            "QUANTITÀ MINIMA",
-            "META.LUNGHEZZA",
-            "META.LARGHEZZA",
-            "META.PROFONDITA'",
-            "META. ...",
-        ]
+    # Ensure specified columns are treated as strings
+    columns_to_ensure_as_strings = [
+        "CODICE PRODOTTO", "BRAND", "DESCRIZIONE", "CODICE OE", "CODICI CROSS", 
+        "LINK IMMAGINE", "CATEGORIA", "SCHEDA TECNICA", "SCHEDA DI SICUREZZA",
+        "CONFEZIONE", "META.LUNGHEZZA", "META.LARGHEZZA", "META.PROFONDITA'", "META. ..."
     ]
+    df_combined[columns_to_ensure_as_strings] = df_combined[columns_to_ensure_as_strings].astype(str)
 
     df_combined["GIACENZA"] = pd.to_numeric(
         df_combined["GIACENZA"].str.replace(",", "."), errors="coerce"
@@ -124,15 +171,12 @@ def process_files(
 
     df_combined = df_combined[df_combined["GIACENZA"] > 0]
     df_combined = df_combined[df_combined["PRZ. ULT. ACQ."].notna()]
-    df_combined.to_csv(output_file_path, index=False)
 
-    # Step 3: Do the thing
-    cleaned_df = pd.read_csv(output_file_path, dtype=str)
-    cleaned_df["CODICE PRODOTTO"] = (
-        cleaned_df["CODICE PRODOTTO"].astype(str).str.strip()
-    )
-    cleaned_df["CODICE OE"] = cleaned_df["CODICE OE"].astype(str).str.strip()
-    cleaned_df["BRAND"] = cleaned_df["BRAND"].astype(str).str.strip()
+    # No need to save and reload, continue with the DataFrame in memory
+    cleaned_df = df_combined.copy()
+    cleaned_df["CODICE PRODOTTO"] = cleaned_df["CODICE PRODOTTO"].str.strip()
+    cleaned_df["CODICE OE"] = cleaned_df["CODICE OE"].str.strip()
+    cleaned_df["BRAND"] = cleaned_df["BRAND"].str.strip()
 
     old_oems_files = [
         file
@@ -148,9 +192,7 @@ def process_files(
         oems_df["oem_number"] = (
             oems_df["oem_number"].astype(str).str.strip().str.replace(" ", "")
         )
-        oems_df["article_alt_brands"] = (
-            oems_df["article_alt_brands"].astype(str).str.strip()
-        )
+        oems_df["article_alt_brands"] = oems_df["article_alt_brands"].astype(str).str.strip()
         oems_df["brand_prefix"] = oems_df["article_alt_brands"].str[:5]
         all_oem_mappings = pd.concat(
             [all_oem_mappings, oems_df[["article_altc", "oem_number", "brand_prefix"]]]
@@ -162,27 +204,14 @@ def process_files(
         .to_dict()
     )
     
-    IGNORED_BRANDS = [
-    "AP", "AREXONS", "ASSO", "ATE", "ATECSO", "AUTOCLIMA", "BIRTH", "BOSCH", "BREMBO", 
-    "BUGATTI", "CASCO", "CASTROL", "CEI", "CORTECO", "COVIND", "DAF", "DAYCO", "DELPHI", 
-    "DENSO", "DOLZ", "ELRING", "EMMERRE", "ERA", "EXIDE", "FAG", "FEBI", "FERODO", 
-    "FIAT", "FORD", "FRAP", "FTE", "GATES", "HELLA", "HOFFER", "IMASAF", "INA", "ISUZU", 
-    "IVECO", "JAPANPARTS", "JAPKO", "KNECHT", "KRIOS", "LEMFORDER", "LUK", "MAHLE", 
-    "MAN", "METELLI", "MEYLE", "MOBIL", "MONROE", "MOOG", "MULLER FILTER", "NISSAN", 
-    "NISSENS", "NK", "NRF", "OLSA", "OMP", "PEUGEOT", "PIAGGIO", "PIERBURG", "RAICAM", 
-    "RENAULT", "SACHS", "SCANIA", "SELENIA", "SIDAT", "SKF", "TEXTAR", "TRW", "TUDOR", 
-    "UFI", "VALEO", "VEMA", "VITAL SUSPENSIONS", "VOLVO", "VOLKSWAGEN", "ZETA-ERRE", "ZF"
-]
-
-    def get_oem_number(row):
-        if row["BRAND"] in IGNORED_BRANDS:
-            return ""  # Skip filling OE code for ignored brands
-        key = (row["CODICE PRODOTTO"], row["BRAND"][:5])
-        return " | ".join(oem_lookup[key]) if key in oem_lookup else "Unknown OE"
-
+    
+    # Update CODICE OE using the get_oem_number function
     tqdm.pandas(desc="Updating CODICE OE with old OEMs")
-    cleaned_df["CODICE OE"] = cleaned_df.progress_apply(get_oem_number, axis=1)
+    cleaned_df["CODICE OE"] = cleaned_df.progress_apply(
+        lambda row: get_oem_number(row, oem_lookup, IGNORED_BRANDS), axis=1
+    )
 
+    # Update PREZZO based on PRZ. ULT. ACQ.
     cleaned_df["PRZ. ULT. ACQ."] = pd.to_numeric(
         cleaned_df["PRZ. ULT. ACQ."], errors="coerce"
     )
@@ -191,6 +220,10 @@ def process_files(
     )
     cleaned_df = cleaned_df.drop(columns=["PRZ. ULT. ACQ."])
 
+    # Ensure specified columns are treated as strings before reordering
+    cleaned_df[columns_to_ensure_as_strings] = cleaned_df[columns_to_ensure_as_strings].astype(str)
+
+    # Reorder columns
     columns_order = [
         "CODICE PRODOTTO",
         "CODICE OE",
@@ -213,81 +246,45 @@ def process_files(
     cleaned_df = cleaned_df[columns_order]
     cleaned_df["CODICI CROSS"] = ""
 
-    cross_references = (
-        cleaned_df[cleaned_df["CODICE OE"] != "Unknown OE"]
-        .groupby("CODICE OE")["CODICE PRODOTTO"]
-        .apply(list)
-        .to_dict()
-    )
-    cross_codes_series = pd.Series(index=cleaned_df.index, dtype=str)
+    # Apply optimized cross-code generation function
+    cleaned_df["CODICI CROSS"] = optimized_cross_code_generation(cleaned_df, IGNORED_BRANDS)
 
-    for codice_oe, prodotti in tqdm(
-        cross_references.items(), desc="Updating CODICI CROSS"
-    ):
-        cross_codes = {
-            prodotto: " | ".join([code for code in prodotti if code != prodotto])
-            for prodotto in prodotti
-        }
-        cross_codes_series.update(pd.Series(cross_codes))
-
-    cleaned_df["CODICI CROSS"] = cleaned_df.index.map(cross_codes_series).fillna("")
+    # Handle cases where CODICE OE is unknown and brand is not ignored
     cleaned_df["padded_oe"] = " " + cleaned_df["CODICE OE"].str.strip() + " "
-
-    def find_additional_cross_codes(codice_prodotto, padded_oe):
-        matches = cleaned_df[(cleaned_df["CODICE OE"] != "Unknown OE") & 
-                         (~cleaned_df["BRAND"].isin(IGNORED_BRANDS))]
-        exact_matches = matches[
-            matches["padded_oe"].str.contains(f" {codice_prodotto} ", regex=False)
-    ]
-        if not exact_matches.empty:
-            return " | ".join(exact_matches["CODICE PRODOTTO"].unique())
-        return ""
-
     unknown_oe_mask = (cleaned_df["CODICE OE"] == "Unknown OE") & (~cleaned_df["BRAND"].isin(IGNORED_BRANDS))
     cleaned_df.loc[unknown_oe_mask, "CODICI CROSS"] = cleaned_df.loc[
         unknown_oe_mask, "CODICE PRODOTTO"
     ].progress_apply(
         lambda codice_prodotto: find_additional_cross_codes(
-            codice_prodotto, cleaned_df["padded_oe"]
+            codice_prodotto, cleaned_df["padded_oe"], cleaned_df, IGNORED_BRANDS
         )
     )
-    
-    # Drop the 'padded_oe' column before saving the final file
+
+    # Drop the 'padded_oe' column
     cleaned_df = cleaned_df.drop(columns=["padded_oe"])
 
     # Fill the "CONFEZIONE" column with "1 pz" and the "QUANTITÀ MINIMA" column with "1"
     cleaned_df["CONFEZIONE"] = "1 pz"
     cleaned_df["QUANTITÀ MINIMA"] = "1"
 
-    cleaned_df.to_csv(output_file_path, index=False)
+    # Set CATEGORIA to "Ricambio"
+    cleaned_df["CATEGORIA"] = "Ricambio"
 
-    print(f"Updated CODICE OE and PREZZO in {output_file_path}")
+    # Ensure specified columns remain empty
+    columns_to_keep_empty = [
+        "LINK IMMAGINE", "SCHEDA TECNICA", "SCHEDA DI SICUREZZA",
+        "META.LUNGHEZZA", "META.LARGHEZZA", "META.PROFONDITA'", "META. ..."
+    ]
+    cleaned_df[columns_to_keep_empty] = ""
 
     # Step 4: Update brands
-    update_brands(output_file_path, brands_file_path, final_output_with_brands_path)
-    print(f"Brands updated in {final_output_with_brands_path}")
+    cleaned_df = update_brands(cleaned_df, brands_file_path)
 
+    # After updating brands, set CODICE OE and CODICI CROSS to empty for ignored brands
+    ignored_brands_mask = cleaned_df["BRAND"].isin(IGNORED_BRANDS)
+    cleaned_df.loc[ignored_brands_mask, ["CODICE OE", "CODICI CROSS"]] = ""
 
-def update_brands(output_file_path, brands_file_path, final_output_file_path):
-    # Load the output file
-    df_output = pd.read_csv(output_file_path, dtype=str)
+    # Save the final output directly
+    cleaned_df.to_csv(final_output_with_brands_path, index=False)
+    print(f"Brands updated and final file saved at {final_output_with_brands_path}")
 
-    # Load the brands file
-    brands_df = pd.read_csv(brands_file_path, dtype=str)
-
-    # Ensure all values in the relevant columns are strings and strip any leading/trailing spaces
-    df_output["BRAND"] = df_output["BRAND"].astype(str).str.strip()
-    brands_df["Brand"] = brands_df["Brand"].astype(str).str.strip()
-    brands_df["Match"] = brands_df["Match"].astype(str).str.strip()
-
-    # Create a lookup dictionary from the brands file
-    brand_lookup = dict(zip(brands_df["Brand"], brands_df["Match"]))
-
-    # Update the BRANDS in the output dataframe
-    tqdm.pandas(desc="Updating brands")
-    df_output["BRAND"] = df_output["BRAND"].progress_apply(
-        lambda x: brand_lookup.get(x, x)
-    )
-
-    # Save the updated dataframe to a new CSV file
-    df_output.to_csv(final_output_file_path, index=False)
