@@ -1,23 +1,11 @@
-#/tuleroCsvMaker/
-
 import os
 import sys
 import json
-from PyQt6.QtWidgets import (
-    QApplication,
-    QMainWindow,
-    QVBoxLayout,
-    QLabel,
-    QLineEdit,
-    QPushButton,
-    QFileDialog,
-    QProgressBar,
-    QMessageBox,
-    QWidget
-)
+from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget
 from PyQt6.QtGui import QIcon, QFont
+from PyQt6.QtCore import QTimer, QDateTime
 from worker import Worker
-from styles import app_stylesheet
+from utils import setup_ui, browse_articles, browse_oem, browse_brands, browse_output
 
 CONFIG_FILE = 'config.json'
 DATA_FOLDER = 'Data'
@@ -38,109 +26,48 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("CSV Transformer")
-        self.setGeometry(100, 100, 800, 600)  # Increased the height to fit more widgets
+        self.setGeometry(100, 100, 800, 600)
 
         # Determine the base path for the icons
-        if hasattr(sys, '_MEIPASS'):
-            base_path = sys._MEIPASS
-        else:
-            base_path = os.path.abspath(".")
-
-        # Set the window icon
+        base_path = sys._MEIPASS if hasattr(sys, '_MEIPASS') else os.path.abspath(".")
         self.setWindowIcon(QIcon(os.path.join(base_path, 'icons', 'icon256.ico')))
+
+        # Setup UI using utils
+        layout, widgets = setup_ui(self, base_path)
+        container = QWidget()
+        container.setLayout(layout)
+        self.setCentralWidget(container)
+
+        # Assign widget references to self for use in other methods
+        self.articles_entry = widgets["articles_entry"]
+        self.oem_entry = widgets["oem_entry"]
+        self.brands_entry = widgets["brands_entry"]
+        self.output_entry = widgets["output_entry"]
+        self.ftp_host_entry = widgets["ftp_host_entry"]
+        self.ftp_user_entry = widgets["ftp_user_entry"]
+        self.ftp_pass_entry = widgets["ftp_pass_entry"]
+        self.progress_bar = widgets["progress_bar"]
+        self.process_button = widgets["process_button"]
+
+        self.articles_button = widgets["articles_button"]
+        self.oem_button = widgets["oem_button"]
+        self.brands_button = widgets["brands_button"]
+        self.output_button = widgets["output_button"]
 
         self.articles_file = None
         self.output_folder = None
         self.oem_folder = None
         self.brands_file = None
+        self.ftp_host = None
+        self.ftp_user = None
+        self.ftp_pass = None
         self.processing = False
 
-        self.initUI()
+        self.timer = QTimer()
+        self.fake_progress = 0
+        self.timer.timeout.connect(self.update_fake_progress)
+
         self.check_and_load_files()
-
-    def initUI(self):
-        self.setStyleSheet(app_stylesheet)
-
-        # Determine the base path for the icons
-        if hasattr(sys, '_MEIPASS'):
-            base_path = sys._MEIPASS
-        else:
-            base_path = os.path.abspath(".")
-
-        layout = QVBoxLayout()
-
-        welcome_label = QLabel("Welcome, user!")
-        welcome_label.setFont(QFont("Roboto", 16, QFont.Weight.Bold))
-        welcome_label.setStyleSheet("color: white;")
-        layout.addWidget(welcome_label)
-
-        self.articles_label = QLabel("Select Articles File")
-        layout.addWidget(self.articles_label)
-
-        self.articles_entry = QLineEdit()
-        layout.addWidget(self.articles_entry)
-
-        self.articles_button = QPushButton("Browse")
-        icon_path = os.path.join(base_path, 'icons', 'icon32.png')
-        self.articles_button.setIcon(QIcon(icon_path))
-        self.articles_button.clicked.connect(self.browse_articles)
-        layout.addWidget(self.articles_button)
-
-        self.oem_label = QLabel("Select OEM Folder")
-        layout.addWidget(self.oem_label)
-
-        self.oem_entry = QLineEdit()
-        layout.addWidget(self.oem_entry)
-
-        self.oem_button = QPushButton("Browse")
-        self.oem_button.setIcon(QIcon(icon_path))
-        self.oem_button.clicked.connect(self.browse_oem)
-        layout.addWidget(self.oem_button)
-
-        self.brands_label = QLabel("Select Brands File")
-        layout.addWidget(self.brands_label)
-
-        self.brands_entry = QLineEdit()
-        layout.addWidget(self.brands_entry)
-
-        self.brands_button = QPushButton("Browse")
-        self.brands_button.setIcon(QIcon(icon_path))
-        self.brands_button.clicked.connect(self.browse_brands)
-        layout.addWidget(self.brands_button)
-
-        self.output_label = QLabel("Select Output Location")
-        layout.addWidget(self.output_label)
-
-        self.output_entry = QLineEdit()
-        layout.addWidget(self.output_entry)
-
-        self.output_button = QPushButton("Browse")
-        self.output_button.setIcon(QIcon(icon_path))
-        self.output_button.clicked.connect(self.browse_output)
-        layout.addWidget(self.output_button)
-
-        self.process_button = QPushButton("Process")
-        self.process_button.setIcon(QIcon(icon_path))
-        self.process_button.setEnabled(False)
-        self.process_button.clicked.connect(self.start_processing)
-        layout.addWidget(self.process_button)
-
-        self.progress_bar = QProgressBar()
-        self.progress_bar.setMinimum(0)
-        self.progress_bar.setMaximum(100)
-        layout.addWidget(self.progress_bar)
-
-        self.attribution_label = QLabel()
-        self.attribution_label.setText(
-            '<a href="https://www.flaticon.com/free-icons/programming-language" title="programming language icons">Programming language icons created by Bamicon - Flaticon</a>'
-        )
-        self.attribution_label.setOpenExternalLinks(True)
-        self.attribution_label.setStyleSheet("color: white;")
-        layout.addWidget(self.attribution_label)
-
-        container = QWidget()
-        container.setLayout(layout)
-        self.setCentralWidget(container)
 
     def check_and_load_files(self):
         config = load_config()
@@ -150,6 +77,9 @@ class MainWindow(QMainWindow):
         oem_folder = config.get('oem_folder', os.path.join(data_folder, 'oems'))
         brands_file = config.get('brands_file', os.path.join(data_folder, 'brands.csv'))
         output_folder = config.get('output_folder', os.path.join(os.path.dirname(__file__), OUTPUT_FOLDER))
+        self.ftp_host = config.get('ftp_host', '')
+        self.ftp_user = config.get('ftp_user', '')
+        self.ftp_pass = config.get('ftp_pass', '')
 
         if os.path.exists(articles_file):
             self.articles_file = articles_file
@@ -170,43 +100,11 @@ class MainWindow(QMainWindow):
         else:
             os.makedirs(output_folder)
 
-        self.check_ready_to_process()
+        self.ftp_host_entry.setText(self.ftp_host)
+        self.ftp_user_entry.setText(self.ftp_user)
+        self.ftp_pass_entry.setText(self.ftp_pass)
 
-    def browse_articles(self):
-        self.articles_file, _ = QFileDialog.getOpenFileName(
-            self, "Select Articles File", "", "Excel files (*.xls;*.xlsx)"
-        )
-        self.articles_entry.setText(self.articles_file)
-        self.articles_button.setStyleSheet("background-color: green; color: white;")
         self.check_ready_to_process()
-        self.save_config()
-
-    def browse_oem(self):
-        self.oem_folder = QFileDialog.getExistingDirectory(
-            self, "Select OEM Folder"
-        )
-        self.oem_entry.setText(self.oem_folder)
-        self.oem_button.setStyleSheet("background-color: green; color: white;")
-        self.check_ready_to_process()
-        self.save_config()
-
-    def browse_brands(self):
-        self.brands_file, _ = QFileDialog.getOpenFileName(
-            self, "Select Brands File", "", "CSV files (*.csv)"
-        )
-        self.brands_entry.setText(self.brands_file)
-        self.brands_button.setStyleSheet("background-color: green; color: white;")
-        self.check_ready_to_process()
-        self.save_config()
-
-    def browse_output(self):
-        self.output_folder = QFileDialog.getExistingDirectory(
-            self, "Select Output Location"
-        )
-        self.output_entry.setText(self.output_folder)
-        self.output_button.setStyleSheet("background-color: green; color: white;")
-        self.check_ready_to_process()
-        self.save_config()
 
     def check_ready_to_process(self):
         if self.articles_file and self.oem_folder and self.brands_file and self.output_folder:
@@ -220,21 +118,60 @@ class MainWindow(QMainWindow):
         )
         self.progress_bar.setValue(0)
 
+        # Generate the final output file name using the current date and time
+        current_time = QDateTime.currentDateTime().toString("yyyyMMdd_HHmmss")
+        final_output_file_name = f"rcs_stock_{current_time}.csv"
+        final_output_path = os.path.join(self.output_folder, final_output_file_name)
+
+        self.ftp_host = self.ftp_host_entry.text().strip()
+        self.ftp_user = self.ftp_user_entry.text().strip()
+        self.ftp_pass = self.ftp_pass_entry.text().strip()
+
         self.worker = Worker(
             self.articles_file,
             f"{self.output_folder}/cleaned_Articles.csv",
             self.oem_folder,
             self.brands_file,
-            f"{self.output_folder}/final_output_with_brands.csv"
+            final_output_path,
+            self.ftp_host,
+            self.ftp_user,
+            self.ftp_pass,
+            ftp_dir="/csv/"
         )
         self.worker.progress.connect(self.update_progress)
         self.worker.finished_processing.connect(self.processing_complete)
         self.worker.start()
 
+        # Start the fake progress after starting the worker
+        self.fake_progress = 0
+        self.timer.start(200)  # Update every 200ms
+
+    def update_fake_progress(self):
+        if self.fake_progress < 65:
+            # 65% in 2 minutes (120 seconds)
+            increment = 65 / (60 / 0.2)  # 0.2 seconds per update
+            self.fake_progress += increment
+        elif self.fake_progress < 100:
+            # Remaining 35% in 7 minutes (420 seconds)
+            increment = 35 / (210 / 0.2)  # 0.2 seconds per update
+            self.fake_progress += increment
+
+        # Cap the progress at 100%
+        self.fake_progress = min(self.fake_progress, 100)
+
+        # Update the progress bar with the new value
+        self.progress_bar.setValue(int(self.fake_progress))
+
+        # Stop the timer if it reaches 100%
+        if self.fake_progress >= 100:
+            self.timer.stop()
+
+
     def update_progress(self, value):
         self.progress_bar.setValue(value)
 
     def processing_complete(self):
+        self.timer.stop()
         self.progress_bar.setValue(100)
         self.process_button.setEnabled(True)
         self.process_button.setStyleSheet("""
@@ -266,15 +203,26 @@ class MainWindow(QMainWindow):
         exit_button.clicked.connect(self.close)
         msg_box.exec()
 
+        # Save the configuration including the FTP credentials
+        self.save_config()
+
     def save_config(self):
         config = {
             'articles_file': self.articles_file,
             'oem_folder': self.oem_folder,
             'brands_file': self.brands_file,
-            'output_folder': self.output_folder
+            'output_folder': self.output_folder,
+            'ftp_host': self.ftp_host,
+            'ftp_user': self.ftp_user,
+            'ftp_pass': self.ftp_pass,
         }
         save_config(config)
 
+    # Reuse functions from utils.py
+    browse_articles = browse_articles
+    browse_oem = browse_oem
+    browse_brands = browse_brands
+    browse_output = browse_output
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
