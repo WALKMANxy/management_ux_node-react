@@ -4,6 +4,7 @@ import path from 'path';
 import { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import { IpInfo } from '../models/types';
+import { config } from '../config/config';
 
 dotenv.config();
 
@@ -28,7 +29,7 @@ const logRequestsIp = async (req: Request, res: Response, next: NextFunction) =>
   }
   
   try {
-    const response = await axios.get(`https://ipinfo.io/${clientIp}?token=${process.env.IPINFO_TOKEN}`);
+    const response = await axios.get(`https://ipinfo.io/${clientIp}?token=${config.ipinfoToken}`);
     const ipInfo: IpInfo = response.data;
 
     const logEntry = {

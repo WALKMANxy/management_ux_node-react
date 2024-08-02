@@ -6,6 +6,7 @@ import { authenticateUser } from "../utils/authentication";
 import { Agent, AuthenticatedRequest } from "../models/types";
 import { checkValidation } from "../utils/validate";
 import { checkAdminRole } from "../utils/roleChecker";
+import {config} from "../config/config"
 
 
 const router = express.Router();
@@ -24,7 +25,7 @@ const agentValidationRules = [
 // GET method to retrieve all agents
 router.get("/", async (req: AuthenticatedRequest, res) => {
   try {
-    const filePath = path.resolve(process.env.AGENT_DETAILS_FILE_PATH || "");
+    const filePath = path.resolve(config.agentDetailsFilePath || "");
     const agents: Agent[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
     res.json(agents);
   } catch (err) {
@@ -40,7 +41,7 @@ router.get("/", async (req: AuthenticatedRequest, res) => {
 // PUT method to replace an entire agent
 router.put("/:id", agentValidationRules, checkValidation, checkAdminRole, async (req: AuthenticatedRequest, res: express.Response) => {
   try {
-    const filePath = path.resolve(process.env.AGENT_DETAILS_FILE_PATH || "");
+    const filePath = path.resolve(config.agentDetailsFilePath || "");
     const agents: Agent[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
 
     const agentIndex = agents.findIndex((agent) => agent.id === req.params.id);
@@ -66,7 +67,7 @@ router.put("/:id", agentValidationRules, checkValidation, checkAdminRole, async 
 // PATCH method to update part of an agent's information
 router.patch("/:id", agentValidationRules, checkValidation, checkAdminRole, async (req: AuthenticatedRequest, res: express.Response) => {
   try {
-    const filePath = path.resolve(process.env.AGENT_DETAILS_FILE_PATH || "");
+    const filePath = path.resolve(config.agentDetailsFilePath || "");
     const agents: Agent[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
 
     const agentIndex = agents.findIndex((agent) => agent.id === req.params.id);

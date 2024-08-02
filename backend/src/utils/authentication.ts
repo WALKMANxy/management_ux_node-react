@@ -2,8 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { User, IUser } from '../models/User';
 import { AuthenticatedRequest } from '../models/types';
+import {config} from '../config/config';
 
-const JWT_SECRET = process.env.JWT_SECRET || '';
+const JWT_SECRET = config.jwtSecret || '';
+
 
 export const generateToken = (user: IUser) => {
   return jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '7d' });
