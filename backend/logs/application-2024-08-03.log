@@ -1,0 +1,46 @@
+2024-08-02T22:00:59.917Z [info]: Incoming request: GET / from 82.53.43.223
+2024-08-02T22:00:59.922Z [info]: Response status: 404 for GET /
+2024-08-02T22:01:06.217Z [info]: Incoming request: POST /auth/register from 82.53.43.223
+2024-08-02T22:01:06.220Z [info]: Received registration request
+2024-08-02T22:01:06.374Z [info]: User saved successfully
+2024-08-02T22:01:06.376Z [info]: Verification token generated
+2024-08-02T22:01:06.851Z [info]: Verification email sent
+2024-08-02T22:01:06.851Z [info]: Verification email sent
+2024-08-02T22:01:06.853Z [info]: Response status: 201 for POST /register
+2024-08-02T22:01:06.854Z [info]: Log entry added to D:\coding\rcs_management_project-1\backend\data\registeredUsersLog.json
+2024-08-02T22:01:17.706Z [info]: Incoming request: GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1NzIyZjg2NDdjYzg0MWJhYmQyZiIsImlhdCI6MTcyMjYzNjA2NiwiZXhwIjoxNzIyNzIyNDY2fQ.gOPF2yum_KaSr65uy_-Tk82YoYNBhJ-8eJE43c3iXw0 from 82.53.43.223
+2024-08-02T22:01:17.807Z [info]: Response status: 302 for GET /verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1NzIyZjg2NDdjYzg0MWJhYmQyZiIsImlhdCI6MTcyMjYzNjA2NiwiZXhwIjoxNzIyNzIyNDY2fQ.gOPF2yum_KaSr65uy_-Tk82YoYNBhJ-8eJE43c3iXw0
+2024-08-02T22:01:30.025Z [info]: Incoming request: POST /auth/login from 82.53.43.223
+2024-08-02T22:01:30.115Z [info]: Response status: 200 for POST /login
+2024-08-02T22:01:38.538Z [info]: Incoming request: POST /auth/request-password-reset from 82.53.43.223
+2024-08-02T22:01:39.032Z [info]: Password reset email sent
+2024-08-02T22:01:39.032Z [info]: Password reset email sent to artorias555@gmail.com
+2024-08-02T22:01:39.033Z [info]: Response status: 200 for POST /request-password-reset
+2024-08-02T22:02:43.257Z [info]: Incoming request: POST /auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1NzIyZjg2NDdjYzg0MWJhYmQyZiIsImlhdCI6MTcyMjYzNjA5OCwiZXhwIjoxNzIyNjM5Njk4fQ.u2J2h7LZ0bGDUPokCUIA1SUrH1jys9cPFrkEBx1akrI from 82.53.43.223
+2024-08-02T22:02:43.257Z [info]: Response status: 404 for POST /auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1NzIyZjg2NDdjYzg0MWJhYmQyZiIsImlhdCI6MTcyMjYzNjA5OCwiZXhwIjoxNzIyNjM5Njk4fQ.u2J2h7LZ0bGDUPokCUIA1SUrH1jys9cPFrkEBx1akrI
+2024-08-02T22:02:58.743Z [info]: Incoming request: GET /auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1NzIyZjg2NDdjYzg0MWJhYmQyZiIsImlhdCI6MTcyMjYzNjA5OCwiZXhwIjoxNzIyNjM5Njk4fQ.u2J2h7LZ0bGDUPokCUIA1SUrH1jys9cPFrkEBx1akrI from 82.53.43.223
+2024-08-02T22:02:58.745Z [info]: Response status: 404 for GET /auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1NzIyZjg2NDdjYzg0MWJhYmQyZiIsImlhdCI6MTcyMjYzNjA5OCwiZXhwIjoxNzIyNjM5Njk4fQ.u2J2h7LZ0bGDUPokCUIA1SUrH1jys9cPFrkEBx1akrI
+2024-08-02T22:03:27.195Z [info]: Incoming request: POST /auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1NzIyZjg2NDdjYzg0MWJhYmQyZiIsImlhdCI6MTcyMjYzNjA5OCwiZXhwIjoxNzIyNjM5Njk4fQ.u2J2h7LZ0bGDUPokCUIA1SUrH1jys9cPFrkEBx1akrI from 82.53.43.223
+2024-08-02T22:03:27.196Z [info]: Response status: 404 for POST /auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1NzIyZjg2NDdjYzg0MWJhYmQyZiIsImlhdCI6MTcyMjYzNjA5OCwiZXhwIjoxNzIyNjM5Njk4fQ.u2J2h7LZ0bGDUPokCUIA1SUrH1jys9cPFrkEBx1akrI
+2024-08-02T22:03:47.633Z [info]: Incoming request: GET /auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1NzIyZjg2NDdjYzg0MWJhYmQyZiIsImlhdCI6MTcyMjYzNjA5OCwiZXhwIjoxNzIyNjM5Njk4fQ.u2J2h7LZ0bGDUPokCUIA1SUrH1jys9cPFrkEBx1akrI from 82.53.43.223
+2024-08-02T22:03:47.634Z [info]: Response status: 404 for GET /auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1NzIyZjg2NDdjYzg0MWJhYmQyZiIsImlhdCI6MTcyMjYzNjA5OCwiZXhwIjoxNzIyNjM5Njk4fQ.u2J2h7LZ0bGDUPokCUIA1SUrH1jys9cPFrkEBx1akrI
+2024-08-02T22:05:35.622Z [info]: Incoming request: POST /auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1NzIyZjg2NDdjYzg0MWJhYmQyZiIsImlhdCI6MTcyMjYzNjA5OCwiZXhwIjoxNzIyNjM5Njk4fQ.u2J2h7LZ0bGDUPokCUIA1SUrH1jys9cPFrkEBx1akrI from 82.53.43.223
+2024-08-02T22:05:35.626Z [error]: Password reset failed
+2024-08-02T22:05:35.628Z [info]: Response status: 500 for POST /reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1NzIyZjg2NDdjYzg0MWJhYmQyZiIsImlhdCI6MTcyMjYzNjA5OCwiZXhwIjoxNzIyNjM5Njk4fQ.u2J2h7LZ0bGDUPokCUIA1SUrH1jys9cPFrkEBx1akrI
+2024-08-02T22:07:17.440Z [info]: Incoming request: POST /auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1NzIyZjg2NDdjYzg0MWJhYmQyZiIsImlhdCI6MTcyMjYzNjA5OCwiZXhwIjoxNzIyNjM5Njk4fQ.u2J2h7LZ0bGDUPokCUIA1SUrH1jys9cPFrkEBx1akrI from 82.53.43.223
+2024-08-02T22:07:17.710Z [info]: Password reset successful for user: artorias555@gmail.com
+2024-08-02T22:07:17.712Z [info]: Response status: 302 for POST /reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1NzIyZjg2NDdjYzg0MWJhYmQyZiIsImlhdCI6MTcyMjYzNjA5OCwiZXhwIjoxNzIyNjM5Njk4fQ.u2J2h7LZ0bGDUPokCUIA1SUrH1jys9cPFrkEBx1akrI
+2024-08-02T22:12:37.353Z [info]: Incoming request: POST /auth/register from 82.53.43.223
+2024-08-02T22:12:37.355Z [info]: Received registration request
+2024-08-02T22:12:37.517Z [info]: User saved successfully
+2024-08-02T22:12:37.518Z [info]: Verification token generated
+2024-08-02T22:12:37.931Z [info]: Verification email sent
+2024-08-02T22:12:37.931Z [info]: Verification email sent
+2024-08-02T22:12:37.933Z [info]: Response status: 201 for POST /register
+2024-08-02T22:12:37.934Z [info]: Log entry added to D:\coding\rcs_management_project-1\backend\data\registeredUsersLog.json
+2024-08-02T22:12:47.777Z [info]: Incoming request: GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1OWQ1ZGEwOTcxMmU1NWUxYmZjNSIsImlhdCI6MTcyMjYzNjc1NywiZXhwIjoxNzIyNzIzMTU3fQ.urufdmJCDrTKgq3FUVaBV6rZRRsnAPWGC0xYW70epeI from 82.53.43.223
+2024-08-02T22:12:47.892Z [info]: Response status: 302 for GET /verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWQ1OWQ1ZGEwOTcxMmU1NWUxYmZjNSIsImlhdCI6MTcyMjYzNjc1NywiZXhwIjoxNzIyNzIzMTU3fQ.urufdmJCDrTKgq3FUVaBV6rZRRsnAPWGC0xYW70epeI
+2024-08-02T22:13:02.543Z [info]: Incoming request: POST /auth/login from 82.53.43.223
+2024-08-02T22:13:02.640Z [info]: Response status: 200 for POST /login
+2024-08-02T22:13:38.379Z [info]: Incoming request: GET /clients from 82.53.43.223
+2024-08-02T22:13:38.467Z [info]: Response status: 200 for GET /

@@ -16,3 +16,11 @@ export const checkAgentOrAdminRole = (req: AuthenticatedRequest, res: Response, 
     res.status(403).json({ message: 'Forbidden: Admin or Agent access only' });
   }
 };
+
+export const checkAgentOrAdminOrClientRole = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  if (req.user && (req.user.role === 'admin' || req.user.role === 'agent' || req.user.role === 'client')) {
+    next();
+  } else {
+    res.status(403).json({ message: 'Forbidden: Admin or Agent or Client access only' });
+  }
+};

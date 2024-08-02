@@ -15,7 +15,6 @@ export const config = {
   jsonFilePath: process.env.JSON_FILE_PATH || '',
   agentDetailsFilePath: process.env.AGENT_DETAILS_FILE_PATH || '',
   adminDetailsFilePath: process.env.ADMIN_DETAILS_FILE_PATH || '',
-  movementDetailsFilePath: process.env.MOVEMENT_DETAILS_FILE_PATH || '',
   ipinfoToken: process.env.IPINFO_TOKEN || '',
   googleClientId: process.env.GOOGLE_CLIENT_ID || '',
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || '',

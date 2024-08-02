@@ -5,7 +5,7 @@ import { body } from "express-validator";
 import { authenticateUser } from "../utils/authentication";
 import { Agent, AuthenticatedRequest } from "../models/types";
 import { checkValidation } from "../utils/validate";
-import { checkAdminRole } from "../utils/roleChecker";
+import { checkAdminRole, checkAgentOrAdminRole } from "../utils/roleChecker";
 import {config} from "../config/config"
 
 
@@ -23,7 +23,7 @@ const agentValidationRules = [
 ];
 
 // GET method to retrieve all agents
-router.get("/", async (req: AuthenticatedRequest, res) => {
+router.get("/", checkAgentOrAdminRole, async (req: AuthenticatedRequest, res) => {
   try {
     const filePath = path.resolve(config.agentDetailsFilePath || "");
     const agents: Agent[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));

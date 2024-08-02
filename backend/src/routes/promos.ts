@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import { authenticateUser } from "../utils/authentication";
 import { checkValidation } from "../utils/validate";
-import { checkAgentOrAdminRole } from "../utils/roleChecker";
+import { checkAgentOrAdminOrClientRole, checkAgentOrAdminRole } from "../utils/roleChecker";
 import { Promo } from "../models/Promo";
 import { AuthenticatedRequest } from "../models/types";
 
@@ -23,7 +23,7 @@ const promoValidationRules = [
 ];
 
 // GET method to retrieve all promos
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', checkAgentOrAdminOrClientRole, async (req: Request, res: Response) => {
   try {
     const promos = await Promo.find();
     res.json(promos);

@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import { authenticateUser } from "../utils/authentication";
 import { checkValidation } from "../utils/validate";
-import { checkAgentOrAdminRole } from "../utils/roleChecker";
+import { checkAgentOrAdminOrClientRole, checkAgentOrAdminRole } from "../utils/roleChecker";
 import { Visit } from "../models/Visit";
 import { AuthenticatedRequest } from "../models/types";
 
@@ -21,7 +21,7 @@ const visitValidationRules = [
 ];
 
 // GET method to retrieve all visits
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', checkAgentOrAdminOrClientRole, async (req: Request, res: Response) => {
   try {
     const visits = await Visit.find();
     res.json(visits);
