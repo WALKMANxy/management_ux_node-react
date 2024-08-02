@@ -1,18 +1,19 @@
 import nodemailer from 'nodemailer';
 import logger from './logger'; // Assuming logger is in the same directory
+import {config} from "../config/config";
 
 const transporter = nodemailer.createTransport({
   host: 'smtps.aruba.it',
   port: 465,
   secure: true, // Use SSL
   auth: {
-    user: process.env.SMTP_USER, // Your Aruba email username
-    pass: process.env.SMTP_PASS, // Your Aruba email password
+    user: config.smtpUser, // Your Aruba email username
+    pass: config.smtpPass, // Your Aruba email password
   },
 });
 
 export const sendVerificationEmail = async (email: string, token: string) => {
-  const verificationUrl = `${process.env.BASE_URL}/verify-email?token=${token}`;
+  const verificationUrl = `${config.baseUrl}/auth/verify-email?token=${token}`;
 
   const mailOptions = {
     from: '"Ricambi Centro Sud" <ordini.piattaforme@ricambicentrosud.com>', // Your email

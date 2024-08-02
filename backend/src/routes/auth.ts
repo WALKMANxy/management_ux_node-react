@@ -8,17 +8,20 @@ import path from "path";
 import { checkValidation } from "../utils/validate";
 import logger from "../utils/logger";
 import { body } from "express-validator";
+import { config } from "../config/config";
 
 const router = Router();
 
-const JWT_SECRET = process.env.JWT_SECRET || "";
+console.log("App url: ", config.appUrl);
+
+const appUrl= config.appUrl
+
+
+
+const JWT_SECRET = config.jwtSecret || "";
 console.log("This is the JWT_SECRET inside auth.ts:", JWT_SECRET);
 const LOG_FILE_PATH = path.join(__dirname, "../data/registeredUsersLog.json");
 
-console.log(
-  "JWT_SECRET inside process.env inside auth:",
-  process.env.JWT_SECRET
-);
 
 const logRegisteredUser = (user: IUser) => {
   const logEntry = {
@@ -64,8 +67,6 @@ router.post(
   async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
-    console.log("JWT_SECRET at start:", process.env.JWT_SECRET);
-    console.log("JWT_SECRET at check:", JWT_SECRET);
 
     logger.info("Received registration request", { email });
 
@@ -138,12 +139,15 @@ router.get("/verify-email", async (req: Request, res: Response) => {
     user.isEmailVerified = true;
     await user.save();
 
-    res.status(200).json({ message: "Email verified successfully" });
+    console.log("User verified, redirecting...");
+    res.redirect(appUrl);
   } catch (error) {
     logger.error("Email verification error:", { error });
     res.status(500).json({ message: "Email verification failed", error });
   }
 });
+
+
 
 router.post(
   "/login",
@@ -178,15 +182,27 @@ router.post(
       const token = generateToken(user);
       res.cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
       });
 
-      res.status(200).json({ message: "Login successful", user });
+      // Determine redirect URL based on user role
+      let redirectUrl = config.appUrl;
+      if (user.role === 'admin') {
+        redirectUrl = `${config.appUrl}/admin-dashboard`;
+      } else if (user.role === 'agent') {
+        redirectUrl = `${config.appUrl}/agent-dashboard`;
+      } else if (user.role === 'client') {
+        redirectUrl = `${config.appUrl}/client-dashboard`;
+      }
+
+      // Send the redirect URL to the client
+      res.status(200).json({ message: "Login successful", redirectUrl });
     } catch (error) {
       logger.error("Login error:", { error });
       res.status(500).json({ message: "Login failed", error });
     }
   }
 );
+
 
 export default router;

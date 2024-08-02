@@ -3,15 +3,16 @@ import axios from 'axios';
 import { User, IUser } from '../models/User';
 import { authenticateUser, generateToken } from '../utils/authentication';
 import { AuthenticatedRequest } from '../models/types';
+import {config} from '../config/config';
 
 const router = Router();
 
 const getToken = async (code: string) => {
   return axios.post('https://oauth2.googleapis.com/token', {
     code,
-    client_id: process.env.GOOGLE_CLIENT_ID,
-    client_secret: process.env.GOOGLE_CLIENT_SECRET,
-    redirect_uri: process.env.REDIRECT_URI,
+    client_id: config.googleClientId,
+    client_secret: config.googleClientSecret,
+    redirect_uri: config.redirectUri,
     grant_type: 'authorization_code',
   });
 };
@@ -57,9 +58,19 @@ router.get('/oauth2/callback', async (req: Request, res: Response) => {
     const user = await findOrCreateUser(id, email, name, picture);
 
     const token = generateToken(user);
-    res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+    res.cookie('token', token, { httpOnly: true, secure: true });
 
-    res.redirect(process.env.CLIENT_REDIRECT_URI || '/dashboard');
+    // Determine the redirection path based on the user role
+    let redirectUrl = '/';
+    if (user.role === 'admin') {
+      redirectUrl = '/admin-dashboard';
+    } else if (user.role === 'agent') {
+      redirectUrl = '/agent-dashboard';
+    } else if (user.role === 'client') {
+      redirectUrl = '/client-dashboard';
+    }
+
+    res.redirect(redirectUrl);
   } catch (error) {
     console.error('Error during OAuth callback', error);
     if (axios.isAxiosError(error)) {

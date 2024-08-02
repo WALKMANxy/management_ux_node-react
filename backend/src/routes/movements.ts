@@ -6,12 +6,15 @@ import { authenticateUser } from "../utils/authentication";
 import { AuthenticatedRequest, Movement } from "../models/types";
 import { checkValidation } from "../utils/validate";
 import { checkAdminRole } from "../utils/roleChecker";
+import {config} from "../config/config";
 
 
 const router = express.Router();
 
 // Middleware to authenticate and authorize user
 router.use(authenticateUser);
+
+console.log("Movements File Path:", config.movementDetailsFilePath);
 
 // Validation rules
 const movementValidationRules = [
@@ -34,7 +37,7 @@ const movementValidationRules = [
 // GET method to retrieve all movements
 router.get("/", async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const filePath = path.resolve(process.env.MOVEMENTS_FILE_PATH || "");
+    const filePath = path.resolve(config.movementDetailsFilePath || "");
     const movements: Movement[] = JSON.parse(
       fs.readFileSync(filePath, "utf-8")
     );
@@ -52,7 +55,7 @@ router.get("/", async (req: AuthenticatedRequest, res: Response) => {
 // PUT method to replace an entire movement
 router.put("/:id", movementValidationRules, checkValidation, checkAdminRole, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const filePath = path.resolve(process.env.MOVEMENTS_FILE_PATH || "");
+    const filePath = path.resolve(config.movementDetailsFilePath || "");
     const movements: Movement[] = JSON.parse(
       fs.readFileSync(filePath, "utf-8")
     );
@@ -82,7 +85,7 @@ router.put("/:id", movementValidationRules, checkValidation, checkAdminRole, asy
 // PATCH method to update part of a movement's information
 router.patch("/:id", movementValidationRules, checkValidation, checkAdminRole, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const filePath = path.resolve(process.env.MOVEMENTS_FILE_PATH || "");
+    const filePath = path.resolve(config.movementDetailsFilePath || "");
     const movements: Movement[] = JSON.parse(
       fs.readFileSync(filePath, "utf-8")
     );

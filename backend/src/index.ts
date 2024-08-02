@@ -18,20 +18,21 @@ import movementsRoutes from "./routes/movements";
 import { errorHandler } from "./utils/errorHandler";
 import logRequestsIp from "./utils/logRequestsIP";
 import logRequests from "./middlewares/logRequests";
+import { config } from "./config/config"; // Import the config
 
-dotenv.config();
+console.log(`JWT_SECRET inside config: ${config.jwtSecret}`);  // Check if JWT_SECRET is loaded
+console.log(`PORT inside config: ${config.port}`);  // Check if JWT_SECRET is loaded
 
-console.log(`JWT_SECRET inside process env inside the index: ${process.env.JWT_SECRET}`);  // Check if JWT_SECRET is loaded
 
 
 const app = express();
-const PORT = parseInt(process.env.PORT || "5000", 10);
+const PORT = (config.port || "");
 
 app.set('trust proxy', 1); // Trust first proxy
 
 
 mongoose
-  .connect(process.env.MONGO_URI!, {})
+  .connect(config.mongoUri!, {})
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
@@ -71,8 +72,8 @@ app.use(errorHandler);
 
 
 const httpsOptions = {
-  key: fs.readFileSync(process.env.SSL_KEY_PATH!, 'utf8'),
-  cert: fs.readFileSync(process.env.SSL_CERT_PATH!, 'utf8'),
+  key: fs.readFileSync(config.sslKeyPath!, 'utf8'),
+  cert: fs.readFileSync(config.sslCertPath!, 'utf8'),
 };
 
 https.createServer(httpsOptions, app).listen(PORT, async () => {
