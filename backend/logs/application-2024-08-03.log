@@ -44,3 +44,11 @@
 2024-08-02T22:13:02.640Z [info]: Response status: 200 for POST /login
 2024-08-02T22:13:38.379Z [info]: Incoming request: GET /clients from 82.53.43.223
 2024-08-02T22:13:38.467Z [info]: Response status: 200 for GET /
+2024-08-02T22:18:05.986Z [info]: Incoming request: GET /clients from 82.53.43.223
+2024-08-02T22:18:06.042Z [info]: Response status: 403 for GET /
+2024-08-02T22:18:21.307Z [info]: Incoming request: GET /clients from 82.53.43.223
+2024-08-02T22:18:21.386Z [info]: Response status: 200 for GET /
+2024-08-02T22:18:29.776Z [info]: Incoming request: GET /admins from 82.53.43.223
+2024-08-02T22:18:29.825Z [info]: Response status: 403 for GET /
+2024-08-02T22:18:40.982Z [info]: Incoming request: GET /admins from 82.53.43.223
+2024-08-02T22:18:41.041Z [info]: Response status: 200 for GET /
