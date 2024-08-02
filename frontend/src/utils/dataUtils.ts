@@ -1,11 +1,11 @@
-import { format, parseISO } from "date-fns";
+import dayjs from "dayjs";
 import { Agent, Client, Movement } from "../models/models";
 import { ignoreArticleNames } from "./constants";
 
 // Helper function to get month and year from a date string
 export const getMonthYear = (dateString: string) => {
-  const date = parseISO(dateString);
-  return format(date, "yyyy-MM");
+  const date = dayjs(dateString);
+  return date.format("YYYY-MM");
 };
 
 // Calculate total revenue for a list of clients
