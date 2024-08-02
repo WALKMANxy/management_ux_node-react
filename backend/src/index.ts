@@ -7,6 +7,7 @@ import compression from "compression";
 import cookieParser from "cookie-parser";
 import fs from "fs";
 import https from "https";
+import http from "http";
 import authRoutes from "./routes/auth";
 import oauthRoutes from "./routes/OAuth";
 import agentRoutes from "./routes/agents";
@@ -19,6 +20,8 @@ import { errorHandler } from "./utils/errorHandler";
 import logRequestsIp from "./utils/logRequestsIP";
 import logRequests from "./middlewares/logRequests";
 import { config } from "./config/config"; // Import the config
+import localtunnel from "localtunnel";
+
 
 console.log(`JWT_SECRET inside config: ${config.jwtSecret}`);  // Check if JWT_SECRET is loaded
 console.log(`PORT inside config: ${config.port}`);  // Check if JWT_SECRET is loaded
@@ -76,8 +79,30 @@ const httpsOptions = {
   cert: fs.readFileSync(config.sslCertPath!, 'utf8'),
 };
 
+/* https.createServer(httpsOptions, app).listen(PORT, async () => {
+  console.log(`Server is running on port ${PORT}`);
+}); */
+
 https.createServer(httpsOptions, app).listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
+
+  // Set up localtunnel with custom subdomain
+  try {
+    const tunnel = await localtunnel({
+      port: parseInt(PORT),
+      subdomain: 'rcs-test-server547915', // Set your desired subdomain
+      local_https: true,
+      allow_invalid_cert: true,
+    });
+    console.log(`LocalTunnel running at ${tunnel.url} with port: ${PORT}`);
+
+    tunnel.on('close', () => {
+      console.log('LocalTunnel closed');
+    });
+  } catch (error) {
+    console.error('Error setting up LocalTunnel:', error);
+  }
 });
+
  
 export default app;

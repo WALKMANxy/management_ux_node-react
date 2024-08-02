@@ -5,7 +5,7 @@ import { body } from "express-validator";
 import { authenticateUser } from "../utils/authentication";
 import { AuthenticatedRequest, Client } from "../models/types";
 import { checkValidation } from "../utils/validate";
-import { checkAdminRole } from "../utils/roleChecker";
+import { checkAdminRole, checkAgentOrAdminOrClientRole } from "../utils/roleChecker";
 import { config } from "../config/config";
 
 const router = express.Router();
@@ -25,7 +25,7 @@ const clientValidationRules = [
 ];
 
 // GET method to retrieve all clients
-router.get("/", async (req: AuthenticatedRequest, res: Response) => {
+router.get("/", checkAgentOrAdminOrClientRole, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const filePath = path.resolve(config.clientDetailsFilePath || "");
     const clients: Client[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
