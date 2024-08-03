@@ -22,7 +22,9 @@ export const calculateNetRevenue = (clients: Client[]): string => {
         const movementNetRevenue = movement.details.reduce(
           (detailSum, detail) => {
             const priceSold = parseFloat(detail.priceSold) || 0;
-            const priceBought = Math.abs((parseFloat(detail.priceBought)) || 0) * (detail.quantity || 0);
+            const priceBought =
+              Math.abs(parseFloat(detail.priceBought) || 0) *
+              (detail.quantity || 0);
 
             /*  // Log details for debugging
              console.log("Detail:", detail);
@@ -36,18 +38,17 @@ export const calculateNetRevenue = (clients: Client[]): string => {
           },
           0
         );
-       // Log movementNetRevenue for debugging
-       //console.log("movementNetRevenue:", movementNetRevenue);
-       return sum + movementNetRevenue;
-     }, 0);
+        // Log movementNetRevenue for debugging
+        //console.log("movementNetRevenue:", movementNetRevenue);
+        return sum + movementNetRevenue;
+      }, 0);
 
-     // Log clientNetRevenue for debugging
-     //console.log("clientNetRevenue:", clientNetRevenue);
+      // Log clientNetRevenue for debugging
+      //console.log("clientNetRevenue:", clientNetRevenue);
       return netTotal + clientNetRevenue;
     }, 0)
     .toFixed(2);
 };
-
 
 // Calculate sales distribution data for agents
 export const calculateSalesDistributionDataForAgents = (
@@ -124,50 +125,6 @@ export const calculateTopBrandsData = (
     .sort((a, b) => b.value - a.value)
     .slice(0, 10);
 };
-
-
-/* // Calculate top brands data for a list of clients
-export const calculateTopBrandsData = (
-  clients: Client[]
-): { label: string; value: number }[] => {
-  const brandCount: { [key: string]: number } = {};
-
-  console.log("Clients data:", clients);
-
-  clients.forEach((client) => {
-    console.log("Processing client:", client.name, client.id);
-    client.movements.forEach((movement) => {
-      console.log("Processing movement:", movement.id, movement.dateOfOrder);
-      movement.details.forEach((detail) => {
-        console.log("Processing detail:", detail);
-        // Normalize the brand name
-        const brand = detail.brand?.trim().toLowerCase();
-        if (brand) {
-          if (!brandCount[brand]) {
-            brandCount[brand] = 0;
-          }
-          brandCount[brand] += 1;
-        }
-      });
-    });
-  });
-
-  console.log("Brand counts:", brandCount);
-
-  const result = Object.keys(brandCount)
-    .map((brand, index) => ({
-      label: brand,
-      value: brandCount[brand],
-      key: `${brand}-${index}`, // Ensure unique keys by adding an index
-    }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 10);
-
-  console.log("Top brands result:", result);
-
-  return result;
-}
-; */
 
 // Calculate sales distribution data for a list of clients
 export const calculateSalesDistributionData = (
@@ -347,7 +304,9 @@ export const calculateMonthlyData = (clients: Client[]) => {
           sum +
           movement.details.reduce((detailSum, detail) => {
             const priceSold = parseFloat(detail.priceSold) || 0;
-            const priceBought = Math.abs(parseFloat(detail.priceBought) || 0) * (detail.quantity || 0);
+            const priceBought =
+              Math.abs(parseFloat(detail.priceBought) || 0) *
+              (detail.quantity || 0);
             return detailSum + priceSold - priceBought;
           }, 0),
         0
@@ -375,7 +334,6 @@ export const calculateMonthlyData = (clients: Client[]) => {
 
   return { months, revenueData, netRevenueData, ordersData };
 };
-
 
 // Calculate total quantity for a movement
 export const calculateTotalQuantity = (movement: Movement): number => {

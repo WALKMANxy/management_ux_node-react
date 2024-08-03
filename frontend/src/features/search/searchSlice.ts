@@ -1,6 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { Agent, Client, SearchParams, SearchResult, SearchState } from "../../models/models";
+import {
+  Agent,
+  Client,
+  SearchParams,
+  SearchResult,
+  SearchState,
+} from "../../models/models";
 import { api } from "../../services/api";
 
 const initialState: SearchState = {
@@ -10,7 +16,11 @@ const initialState: SearchState = {
   error: null,
 };
 
-export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { state: RootState }>(
+export const searchItems = createAsyncThunk<
+  SearchResult[],
+  SearchParams,
+  { state: RootState }
+>(
   "search/searchItems",
   async ({ query, filter }, { getState, dispatch, rejectWithValue }) => {
     try {
@@ -26,25 +36,38 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { stat
       let agents: Agent[] = [];
 
       if (userRole === "admin") {
-        const adminData = await dispatch(api.endpoints.getAdminData.initiate()).unwrap();
+        const adminData = await dispatch(
+          api.endpoints.getAdminData.initiate()
+        ).unwrap();
         clients = adminData.clients;
         agents = adminData.agents;
         //console.log("Admin Data Loaded: ", { clients, agents });
       } else if (userRole === "agent") {
-        clients = (await dispatch(api.endpoints.getClients.initiate()).unwrap()).filter(client => client.agent === id);
+        clients = (
+          await dispatch(api.endpoints.getClients.initiate()).unwrap()
+        ).filter((client) => client.agent === id);
         //console.log("Agent Data Loaded: ", clients);
-      } else if (userRole === "client" && id) {  // Ensure id is not null
-        clients = [(await dispatch(api.endpoints.getClientById.initiate(id)).unwrap())];
+      } else if (userRole === "client" && id) {
+        // Ensure id is not null
+        clients = [
+          await dispatch(api.endpoints.getClientById.initiate(id)).unwrap(),
+        ];
         //console.log("Client Data Loaded: ", clients);
       }
 
       // Filter and map clients
-      if (filter === "all" || filter === "client" || (filter === "admin" && userRole === "admin")) {
+      if (
+        filter === "all" ||
+        filter === "client" ||
+        (filter === "admin" && userRole === "admin")
+      ) {
         const clientResults = clients
-          .filter(client => 
-            (client.name?.toLowerCase().includes(sanitizedQuery) || client.id?.toLowerCase().includes(sanitizedQuery))
+          .filter(
+            (client) =>
+              client.name?.toLowerCase().includes(sanitizedQuery) ||
+              client.id?.toLowerCase().includes(sanitizedQuery)
           )
-          .map(client => ({
+          .map((client) => ({
             id: client.id,
             name: client.name,
             type: "client",
@@ -52,23 +75,31 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { stat
             phone: client.phone,
             paymentMethod: client.paymentMethod,
           }))
-          .filter(result => !seen.has(result.id) && seen.set(result.id, ""));
-        
+          .filter((result) => !seen.has(result.id) && seen.set(result.id, ""));
+
         searchResults = searchResults.concat(clientResults);
         //console.log("Client Search Results: ", clientResults);
       }
 
       // Filter and map agents
-      if (filter === "all" || filter === "agent" || (filter === "admin" && userRole === "admin")) {
+      if (
+        filter === "all" ||
+        filter === "agent" ||
+        (filter === "admin" && userRole === "admin")
+      ) {
         const agentResults = agents
-          .filter(agent => agent.name?.toLowerCase().includes(sanitizedQuery) || agent.id?.toLowerCase().includes(sanitizedQuery))
-          .map(agent => ({
+          .filter(
+            (agent) =>
+              agent.name?.toLowerCase().includes(sanitizedQuery) ||
+              agent.id?.toLowerCase().includes(sanitizedQuery)
+          )
+          .map((agent) => ({
             id: agent.id,
             name: agent.name,
             type: "agent",
           }))
-          .filter(result => !seen.has(result.id) && seen.set(result.id, ""));
-        
+          .filter((result) => !seen.has(result.id) && seen.set(result.id, ""));
+
         searchResults = searchResults.concat(agentResults);
         //console.log("Agent Search Results: ", agentResults);
       }
@@ -76,24 +107,30 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { stat
       // Filter and map articles
       if (filter === "all" || filter === "article") {
         const articleResults = clients
-          .flatMap(client => client.movements.flatMap(movement => 
-            movement.details
-              .filter(detail => 
-                (detail.name?.toLowerCase().includes(sanitizedQuery) || 
-                detail.articleId?.toLowerCase().includes(sanitizedQuery) || 
-                detail.brand?.toLowerCase().includes(sanitizedQuery))
-              )
-              .map(detail => ({
-                id: detail.articleId,
-                name: detail.name,
-                type: "article",
-                brand: detail.brand,
-                articleId: detail.articleId,
-                lastSoldDate: movement.dateOfOrder,
-              }))
-          ))
-          .filter(result => !seen.has(result.id) && seen.set(result.id, result.lastSoldDate));
-        
+          .flatMap((client) =>
+            client.movements.flatMap((movement) =>
+              movement.details
+                .filter(
+                  (detail) =>
+                    detail.name?.toLowerCase().includes(sanitizedQuery) ||
+                    detail.articleId?.toLowerCase().includes(sanitizedQuery) ||
+                    detail.brand?.toLowerCase().includes(sanitizedQuery)
+                )
+                .map((detail) => ({
+                  id: detail.articleId,
+                  name: detail.name,
+                  type: "article",
+                  brand: detail.brand,
+                  articleId: detail.articleId,
+                  lastSoldDate: movement.dateOfOrder,
+                }))
+            )
+          )
+          .filter(
+            (result) =>
+              !seen.has(result.id) && seen.set(result.id, result.lastSoldDate)
+          );
+
         searchResults = searchResults.concat(articleResults);
         //console.log("Article Search Results: ", articleResults);
       }
@@ -101,20 +138,49 @@ export const searchItems = createAsyncThunk<SearchResult[], SearchParams, { stat
       // Filter and map promos
       if (filter === "all" || filter === "promo") {
         const promoResults = clients
-          .flatMap(client => client.promos)
-          .filter(promo => promo.name && promo.name.toLowerCase().includes(sanitizedQuery))
-          .map(promo => ({
+          .flatMap((client) => client.promos)
+          .filter(
+            (promo) =>
+              promo.name && promo.name.toLowerCase().includes(sanitizedQuery)
+          )
+          .map((promo) => ({
             id: promo.id,
             name: promo.name,
-            type: "promo",
-            discountAmount: promo.discount,
-            startDate: promo.startDate,
-            endDate: promo.endDate,
+            promoType: promo.promoType,
+            type: "Promo",
+            startDate: new Date(promo.startDate),
+            endDate: new Date(promo.endDate),
+            issuedBy: promo.promoIssuedBy
           }))
-          .filter(result => !seen.has(result.id) && seen.set(result.id, ""));
-        
+          .filter((result) => !seen.has(result.id) && seen.set(result.id, ""));
+
         searchResults = searchResults.concat(promoResults);
         //console.log("Promo Search Results: ", promoResults);
+      }
+
+      // Filter and map visits
+      if (filter === "all" || filter === "visit") {
+        const visitResults = clients
+          .flatMap((client) => client.visits)
+          .filter(
+            (visit) =>
+              visit.reason.toLowerCase().includes(sanitizedQuery) ||
+              visit.notePublic?.toLowerCase().includes(sanitizedQuery) ||
+              visit.date.toISOString().slice(0, 10).includes(sanitizedQuery)
+          )
+          .map((visit) => ({
+            id: visit.id,
+            name: visit.reason,
+            type: "visit",
+            date: visit.date,
+            pending: visit.pending,
+            completed: visit.completed,
+            issuedBy: visit.visitIssuedBy
+          }))
+          .filter((result) => !seen.has(result.id) && seen.set(result.id, ""));
+
+        searchResults = searchResults.concat(visitResults);
+        //console.log("Visit Search Results: ", visitResults);
       }
 
       return searchResults;

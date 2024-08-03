@@ -5,6 +5,14 @@ export interface AuthenticatedRequest extends Request {
   user?: IUser;
 }
 
+// models/Admin.ts (Optional, just for structure)
+export interface Admin {
+  id: string;
+  name: string;
+  email: string;
+}
+
+
 export interface Agent {
   id: string;
   name: string;

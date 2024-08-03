@@ -16,7 +16,7 @@ const visitValidationRules = [
   body('clientId').notEmpty().withMessage('Client ID is required'),
   body('agentId').notEmpty().withMessage('Agent ID is required'),
   body('type').notEmpty().withMessage('Type is required'),
-  body('reason').notEmpty().withMessage('Reason is required'),
+  body('visitReason').notEmpty().withMessage('Reason is required'),
   body('date').isISO8601().withMessage('Date must be a valid ISO 8601 date')
 ];
 
@@ -38,12 +38,12 @@ router.get('/', checkAgentOrAdminOrClientRole, async (req: Request, res: Respons
 // POST method to create a new visit
 router.post('/', visitValidationRules, checkValidation, checkAgentOrAdminRole, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { clientId, agentId, type, reason, date, notePublic, notePrivate } = req.body;
+    const { clientId, agentId, type, visitReason, date, notePublic, notePrivate } = req.body;
     const visit = new Visit({
       clientId,
       agentId,
       type,
-      reason,
+      visitReason,
       date,
       notePublic,
       notePrivate

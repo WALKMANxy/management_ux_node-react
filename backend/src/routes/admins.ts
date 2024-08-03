@@ -5,6 +5,7 @@ import { authenticateUser } from '../utils/authentication';
 import { checkAdminRole } from '../utils/roleChecker';
 import { AuthenticatedRequest } from '../models/types';
 import { config } from '../config/config';
+import { Admin } from '../models/types';
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ console.log("Admin Details File Path:", config.adminDetailsFilePath);
 router.get('/', checkAdminRole, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const filePath = path.resolve(config.adminDetailsFilePath || '');
-    const admins = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const admins: Admin[] = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
     res.json(admins);
   } catch (err: unknown) {
     if (err instanceof Error) {

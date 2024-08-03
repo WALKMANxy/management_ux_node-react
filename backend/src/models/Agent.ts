@@ -1,4 +1,5 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document, Types } from 'mongoose';
+import { IAlert } from './Alert';
 
 interface IClient extends Document {
   codice: string;
@@ -17,12 +18,14 @@ interface IClient extends Document {
   ag: string;
 }
 
-interface IAgent extends Document {
-  id: string;
+export interface IAgent extends Document {
   name: string;
-  email: string;
-  phone: string;
-  clients: IClient[];
+  email?: string;
+  phone?: string;
+  clients: Types.ObjectId[]; // Reference to Client model
+  alerts?: IAlert[]; // Add alerts as an array of IAlert
+  AgentVisits: Types.ObjectId[]; // Reference to Visit model
+  AgentPromos: Types.ObjectId[]; // Reference to Promo model
 }
 
 const clientSchema = new Schema<IClient>({
@@ -43,11 +46,13 @@ const clientSchema = new Schema<IClient>({
 });
 
 const agentSchema = new Schema<IAgent>({
-  id: { type: String, required: true },
   name: { type: String, required: true },
-  email: { type: String, required: false },
-  phone: { type: String, required: false },
-  clients: { type: [clientSchema], required: true },
+  email: { type: String },
+  phone: { type: String },
+  clients: [{ type: Schema.Types.ObjectId, ref: 'Client' }],
+  alerts: [{ type: Schema.Types.ObjectId, ref: 'Alert' }], // Reference to Alert
+  AgentVisits: [{ type: Schema.Types.ObjectId, ref: 'Visit' }],
+  AgentPromos: [{ type: Schema.Types.ObjectId, ref: 'Promo' }],
 });
 
 export const Agent = model<IAgent>('Agent', agentSchema);

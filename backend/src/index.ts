@@ -15,6 +15,7 @@ import adminRoutes from "./routes/admins";
 import clientRoutes from "./routes/clients";
 import promosRoutes from "./routes/promos";
 import visitsRoutes from "./routes/visits";
+import alertsRoutes from "./routes/alerts";
 import movementsRoutes from "./routes/movements";
 import { errorHandler } from "./utils/errorHandler";
 import logRequestsIp from "./utils/logRequestsIP";
@@ -69,6 +70,7 @@ app.use("/clients", clientRoutes);
 app.use("/movements", movementsRoutes);
 app.use("/promos", promosRoutes);
 app.use("/visits", visitsRoutes);
+app.use("/alerts", alertsRoutes);
 
 
 app.use(errorHandler);

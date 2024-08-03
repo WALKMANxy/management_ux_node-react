@@ -5,6 +5,21 @@ import { ReactNode } from "react";
 
 export type UserRole = "admin" | "agent" | "client" | "guest";
 
+export type User = {
+  id: string; // Corresponds to MongoDB's _id
+  email: string;
+  googleId?: string;
+  password?: string; // Optional for OAuth users
+  passwordResetToken?: string; // Optional for password reset
+  passwordResetExpires?: Date; // Optional for password reset
+  role: UserRole;
+  entityCode?: string; // Code linking to admin, agent, or client
+  avatar?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isEmailVerified: boolean;
+};
+
 export type Admin = {
   id: string;
   name: string;
@@ -21,9 +36,8 @@ export type Admin = {
       Promos: Promo[];
     };
   };
-  avatar?: string; // Adding avatar field
+  adminAlerts: Alert[];
 };
-
 
 export type AuthState = {
   isLoggedIn: boolean;
@@ -65,13 +79,20 @@ export type SearchResult = {
   agent?: string;
   // Promo-specific properties
   discountAmount?: string;
-  isEligible?: boolean;
-  startDate?: string;
-  endDate?: string;
-  // Alert-specific properties
-  dateIssued?: string;
+  startDate?: Date; // Keep as Date
+  endDate?: Date; // Keep as Date
+  promoIssuedBy?: string;
+  // Visit-specific properties
   reason?: string;
+  date?: Date;
+  pending?: boolean;
+  completed?: boolean;
+  visitIssuedBy?: string;
+  // Alert-specific properties
+  createdAt?: string;
+  alertReason?: string;
   severity?: string;
+  alertIssuedBy?: string;
 };
 
 export type SearchParams = {
@@ -240,16 +261,16 @@ export type ClientDetailsProps = {
 
 export type Visit = {
   id: string;
-  clientId: string;
-  agentId: string;
+  clientId: string; // Unique association with a client
   type: string;
   reason: string;
-  createdAt: string;
-  date: string;
+  createdAt: Date;
+  date: Date;
   notePublic?: string;
   notePrivate?: string;
   pending: boolean;
   completed: boolean;
+  visitIssuedBy: string;
 };
 
 export type ArticlesListProps = {
@@ -302,19 +323,18 @@ export type Movement = {
 export type Promo = {
   id: string;
   clientsId: string[]; // Array of client IDs this promo applies to
-  agentsId: string[]; // Array of agent IDs this promo applies to
-  type: string;
+  promoType: string;
   name: string;
   discount: string;
-  createdAt: string;
-  startDate: string;
+  createdAt: Date;
+  startDate: Date;
   endDate: string;
+  promoIssuedBy: string;
 };
 
 export type Client = {
   id: string;
   name: string;
-  avatar?: string;
   extendedName?: string; // New property
   province?: string;
   phone?: string;
@@ -333,25 +353,29 @@ export type Client = {
   agentName?: string;
   movements: Movement[];
   promos: Promo[];
+  clientAlerts: Alert[];
 };
 
 export type Agent = {
   id: string;
   name: string;
-  avatar?: string;
   email?: string;
   phone?: string;
   clients: Client[];
-  alerts?: Alert[];
+  agentAlerts: Alert[];
   AgentVisits: Visit[]; // New property
   AgentPromos: Promo[]; // New property
 };
 
 export type Alert = {
   id: string;
+  alertReason: string;
   message: string;
-  date: string;
   severity: "low" | "medium" | "high";
+  createdAt: Date;
+  alertIssuedBy: string;
+  targetType: "admin" | "agent" | "client"; // New field
+  targetId: string; // New field
 };
 
 export type DataState = {

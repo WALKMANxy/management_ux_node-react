@@ -17,9 +17,6 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
   const { t } = useTranslation();
   const visits = useSelector(selectVisits);
 
-  // Debugging output
-  //console.log("Visits: ", visits);
-
   return (
     <Box mb={4}>
       <Typography variant="h5" gutterBottom>
@@ -37,7 +34,10 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
           <List>
             {visits.map((visit) => (
               <ListItem key={visit.id}>
-                <ListItemText primary={`${visit.note} on ${visit.date}`} />
+                <ListItemText
+                  primary={`Type: ${visit.type}, Reason: ${visit.reason}`}
+                  secondary={`Date: ${visit.date}, Pending: ${visit.pending ? "Yes" : "No"}`}
+                />
               </ListItem>
             ))}
           </List>
