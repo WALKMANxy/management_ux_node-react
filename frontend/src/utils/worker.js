@@ -1,5 +1,5 @@
 onmessage = function (event) {
-  const { data, clientDetails } = event.data;
+  const { data, clientDetails, visits, promos, alerts } = event.data;
 
   // Create a map for clientDetails for faster lookup
   const clientDetailsMap = new Map(
@@ -81,10 +81,11 @@ onmessage = function (event) {
       paymentMethod: clientDetail
         ? clientDetail["Descizione metodo pagamento"]
         : "",
-      visits: [], // Initialize visits
+      visits: visits.filter((visit) => visit.clientId === clientInfo["Codice Cliente"]), // Filter relevant visits
       agent: clientInfo["Codice Agente"].toString(),
       movements,
-      promos: [], // Initialize promos
+      promos: promos.filter((promo) => promo.clientsId.includes(clientInfo["Codice Cliente"])), // Filter relevant promos
+      clientAlerts: alerts.filter((alert) => alert.clientId === clientInfo["Codice Cliente"]), // Filter relevant alerts
     };
   });
 

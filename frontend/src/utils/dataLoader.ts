@@ -1,22 +1,28 @@
 import axios from "axios";
-import { Agent, Client, MovementDetail } from "../models/models";
+import {
+  Agent,
+  Client,
+  MovementDetail,
+  Visit,
+  Promo,
+  Alert,
+} from "../models/models"; // Import the new types
 
 const BASE_URL = process.env.REACT_APP_API_BASE_URL || "";
 
-
-
-if (!BASE_URL || BASE_URL=== "") {
+if (!BASE_URL || BASE_URL === "") {
   throw new Error("One or more environment variables are not defined");
 }
 
 const workerScriptPath = new URL("./worker.js", import.meta.url);
 
+// Generic function to fetch data from a given endpoint
 export const fetchData = async (endpoint: string): Promise<any[]> => {
   try {
-    const response = await axios.get(`${BASE_URL}${endpoint}`, {
+    const response = await axios.get(`${BASE_URL}/${endpoint}`, {
       headers: {
-        'ngrok-skip-browser-warning': 'true'
-      }
+        "bypass-tunnel-reminder": "true",
+      },
     });
     return response.data;
   } catch (error) {
@@ -25,22 +31,26 @@ export const fetchData = async (endpoint: string): Promise<any[]> => {
   }
 };
 
-export const loadJsonData = async (): Promise<any[]> => {
-  return fetchData('movements');
-};
+// Fetch functions for specific data types
+export const loadJsonData = async (): Promise<any[]> => fetchData("movements");
+export const loadClientDetailsData = async (): Promise<any[]> =>
+  fetchData("clients");
+export const loadAgentDetailsData = async (): Promise<Agent[]> =>
+  fetchData("agents");
+export const loadVisitsData = async (): Promise<Visit[]> => fetchData("visits"); // New function to load visits
+export const loadPromosData = async (): Promise<Promo[]> => fetchData("promos"); // New function to load promos
+export const loadAlertsData = async (): Promise<Alert[]> => fetchData("alerts"); // New function to load alerts
+export const loadAdminDetailsData = async (): Promise<any[]> =>
+  fetchData("admins"); // New function to load admin details
 
-export const loadClientDetailsData = async (): Promise<any[]> => {
-  return fetchData('clients');
-};
-
-export const loadAgentDetailsData = async (): Promise<Agent[]> => {
-  return fetchData('agents');
-};
-
+// Mapping data to models including the new data types (Visits, Promos, Alerts)
 export const mapDataToModels = async (
   data: any[],
   clientDetails: any[],
-  agentDetails: any[]
+  agentDetails: any[],
+  visits: Visit[], // New parameter for visits
+  promos: Promo[], // New parameter for promos
+  alerts: Alert[] // New parameter for alerts
 ): Promise<Client[]> => {
   const numWorkers = Math.min(navigator.hardwareConcurrency || 4, data.length);
   const chunkSize = Math.ceil(data.length / numWorkers);
@@ -95,52 +105,26 @@ export const mapDataToModels = async (
       worker.onmessage = (event) => handleWorkerMessage(index, event);
       worker.onerror = (error) => handleWorkerError(index, error);
 
-      worker.postMessage({ data: chunk, clientDetails, agentDetails });
+      worker.postMessage({
+        data: chunk,
+        clientDetails,
+        agentDetails,
+        visits,
+        promos,
+        alerts,
+      }); // Include new data in the worker
     });
   });
 };
 
-export const mapDataToMinimalClients = (data: any[]): Client[] => {
-  const clientsMap = new Map<string, any>();
-  data.forEach((item) => {
-    const clientId = item["Codice Cliente"].toString();
-    if (!clientsMap.has(clientId)) {
-      clientsMap.set(clientId, {
-        id: clientId,
-        name: item["Ragione Sociale Cliente"],
-      });
-    }
-  });
-
-  return Array.from(clientsMap.values());
-};
-
-export const mapDataToMinimalAgents = (data: any[]): Agent[] => {
-  const agentsMap = new Map<string, any>();
-  data.forEach((item) => {
-    const agentId = item["Codice Agente"].toString();
-    if (!agentsMap.has(agentId)) {
-      agentsMap.set(agentId, {
-        id: agentId,
-        name: `Agent ${agentId}`,
-        clients: [],
-      });
-    }
-  });
-
-  return Array.from(agentsMap.values());
-};
-
-/**
- * Maps the given data to a list of Agent models.
- *
- * @param data - The data to map, typed as an array of any.
- * @param agentDetails - The agent details to map, typed as an array of any.
- * @returns A Promise that resolves to an array of Agent models.
- */
+// Mapping function for full agent data
 export const mapDataToAgents = async (
   data: any[],
-  agentDetails: Agent[]
+  agentDetails: Agent[],
+  visits: Visit[], // New parameter for visits
+  promos: Promo[], // New parameter for promos
+  alerts: Alert[] // New parameter for alerts
+
 ): Promise<Agent[]> => {
   const agentsMap = new Map<string, Agent>();
 
@@ -151,6 +135,7 @@ export const mapDataToAgents = async (
       clients: [],
       AgentVisits: [], // Initialize AgentVisits
       AgentPromos: [], // Initialize AgentPromos
+      agentAlerts: [], // Initialize alerts
     });
   });
 
@@ -179,10 +164,12 @@ export const mapDataToAgents = async (
           agent: agentId,
           movements: [],
           promos: [],
+          clientAlerts: [],
         };
         agent.clients.push(newClient);
         agent.AgentVisits.push(...newClient.visits);
         agent.AgentPromos.push(...newClient.promos);
+        agent.agentAlerts.push(...newClient.clientAlerts); // Add alerts to the agent
       }
     }
   });
@@ -190,6 +177,7 @@ export const mapDataToAgents = async (
   return Array.from(agentsMap.values());
 };
 
+// Mapping function for movement details
 export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
   return data.map((item) => ({
     articleId: item["Codice Articolo"].toString(),
