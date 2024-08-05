@@ -1,7 +1,7 @@
 import os
 import platform
 from PyQt6.QtWidgets import (
-    QVBoxLayout, QLabel, QLineEdit, QPushButton, QProgressBar, QFileDialog
+    QVBoxLayout, QLabel, QLineEdit, QPushButton, QProgressBar, QFileDialog, QComboBox
 )
 from PyQt6.QtGui import QFont, QIcon
 from styles import app_stylesheet, light_stylesheet  # Import both stylesheets
@@ -54,6 +54,18 @@ def setup_ui(main_window, base_path):
     widgets["ftp_pass_entry"] = QLineEdit()
     widgets["ftp_pass_entry"].setEchoMode(QLineEdit.EchoMode.Password)
     layout.addWidget(widgets["ftp_pass_entry"])
+
+    # FTP Directory Combo Box
+    widgets["ftp_dir_label"] = QLabel("FTP Directory")
+    layout.addWidget(widgets["ftp_dir_label"])
+
+    widgets["ftp_dir_combo"] = QComboBox()
+    # Add directory options
+    widgets["ftp_dir_combo"].addItems(["/", "/csv/", "/test/"])
+    layout.addWidget(widgets["ftp_dir_combo"])
+
+    # Connect this widget in MainWindow to use its current value when needed
+    main_window.ftp_dir_combo = widgets["ftp_dir_combo"]  # This line makes the combo box accessible in MainWindow
 
     widgets["oem_label"] = QLabel("Select OEM Folder")
     layout.addWidget(widgets["oem_label"])

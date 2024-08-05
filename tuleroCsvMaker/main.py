@@ -48,6 +48,8 @@ class MainWindow(QMainWindow):
         self.ftp_pass_entry = widgets["ftp_pass_entry"]
         self.progress_bar = widgets["progress_bar"]
         self.process_button = widgets["process_button"]
+        self.ftp_dir_combo = widgets["ftp_dir_combo"]
+
 
         self.articles_button = widgets["articles_button"]
         self.oem_button = widgets["oem_button"]
@@ -61,6 +63,7 @@ class MainWindow(QMainWindow):
         self.ftp_host = None
         self.ftp_user = None
         self.ftp_pass = None
+
         self.processing = False
 
         self.timer = QTimer()
@@ -80,6 +83,13 @@ class MainWindow(QMainWindow):
         self.ftp_host = config.get('ftp_host', '')
         self.ftp_user = config.get('ftp_user', '')
         self.ftp_pass = config.get('ftp_pass', '')
+        # update UI elements
+        self.ftp_host_entry.setText(self.ftp_host)
+        self.ftp_user_entry.setText(self.ftp_user)
+        self.ftp_pass_entry.setText(self.ftp_pass)
+
+        if 'ftp_dir' in config:  # Ensure the ftp_dir is in the configuration
+            self.ftp_dir_combo.setCurrentText(config['ftp_dir'])
 
         if os.path.exists(articles_file):
             self.articles_file = articles_file
@@ -113,12 +123,9 @@ class MainWindow(QMainWindow):
     def start_processing(self):
         self.processing = True
         self.process_button.setEnabled(False)
-        self.process_button.setStyleSheet(
-            "background-color: lightgray; color: darkgray;"
-        )
+        self.process_button.setStyleSheet("background-color: lightgray; color: darkgray;")
         self.progress_bar.setValue(0)
 
-        # Generate the final output file name using the current date and time
         current_time = QDateTime.currentDateTime().toString("yyyyMMdd_HHmmss")
         final_output_file_name = f"rcs_stock_{current_time}.csv"
         final_output_path = os.path.join(self.output_folder, final_output_file_name)
@@ -126,6 +133,7 @@ class MainWindow(QMainWindow):
         self.ftp_host = self.ftp_host_entry.text().strip()
         self.ftp_user = self.ftp_user_entry.text().strip()
         self.ftp_pass = self.ftp_pass_entry.text().strip()
+        ftp_dir = self.ftp_dir_combo.currentText().strip()  # Get the selected FTP directory
 
         self.worker = Worker(
             self.articles_file,
@@ -136,15 +144,14 @@ class MainWindow(QMainWindow):
             self.ftp_host,
             self.ftp_user,
             self.ftp_pass,
-            ftp_dir="/csv/"
+            ftp_dir  # Pass the selected directory to the worker
         )
         self.worker.progress.connect(self.update_progress)
         self.worker.finished_processing.connect(self.processing_complete)
         self.worker.start()
 
-        # Start the fake progress after starting the worker
         self.fake_progress = 0
-        self.timer.start(200)  # Update every 200ms
+        self.timer.start(200)
 
     def update_fake_progress(self):
         if self.fake_progress < 65:
@@ -215,6 +222,8 @@ class MainWindow(QMainWindow):
             'ftp_host': self.ftp_host,
             'ftp_user': self.ftp_user,
             'ftp_pass': self.ftp_pass,
+            'ftp_dir': self.ftp_dir_combo.currentText()  # Save the current directory setting
+
         }
         save_config(config)
 

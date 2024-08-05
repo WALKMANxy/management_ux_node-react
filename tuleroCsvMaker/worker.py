@@ -17,7 +17,7 @@ class Worker(QThread):
         self.ftp_host = ftp_host
         self.ftp_user = ftp_user
         self.ftp_pass = ftp_pass
-        self.ftp_dir = "/test/"
+        self.ftp_dir = ftp_dir
         self.fake_progress = 0
         self.timer = None
 
@@ -69,7 +69,7 @@ class Worker(QThread):
             # Connect to the FTP server
             with FTP(self.ftp_host) as ftp:
                 ftp.login(user=self.ftp_user, passwd=self.ftp_pass)
-                ftp.cwd(self.ftp_dir)
+                ftp.cwd(self.ftp_dir)  # Navigate to the specified directory
 
                 # Open the file in binary mode
                 with open(file_path, 'rb') as file:
