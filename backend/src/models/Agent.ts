@@ -19,6 +19,7 @@ interface IClient extends Document {
 }
 
 export interface IAgent extends Document {
+  id: string;
   name: string;
   email?: string;
   phone?: string;
@@ -46,6 +47,7 @@ const clientSchema = new Schema<IClient>({
 });
 
 const agentSchema = new Schema<IAgent>({
+  id: { type: String, required: true },
   name: { type: String, required: true },
   email: { type: String },
   phone: { type: String },

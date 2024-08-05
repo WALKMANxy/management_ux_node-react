@@ -17,6 +17,7 @@ import promosRoutes from "./routes/promos";
 import visitsRoutes from "./routes/visits";
 import alertsRoutes from "./routes/alerts";
 import movementsRoutes from "./routes/movements";
+import usersRoutes from "./routes/users";
 import { errorHandler } from "./utils/errorHandler";
 import logRequestsIp from "./utils/logRequestsIP";
 import logRequests from "./middlewares/logRequests";
@@ -71,6 +72,7 @@ app.use("/movements", movementsRoutes);
 app.use("/promos", promosRoutes);
 app.use("/visits", visitsRoutes);
 app.use("/alerts", alertsRoutes);
+app.use("/users", usersRoutes);
 
 
 app.use(errorHandler);
@@ -106,5 +108,5 @@ https.createServer(httpsOptions, app).listen(PORT, async () => {
   }
 });
 
- 
+
 export default app;

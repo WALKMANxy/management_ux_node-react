@@ -6,8 +6,7 @@ import { authenticateUser } from "../utils/authentication";
 import { Agent, AuthenticatedRequest } from "../models/types";
 import { checkValidation } from "../utils/validate";
 import { checkAdminRole, checkAgentOrAdminRole } from "../utils/roleChecker";
-import {config} from "../config/config"
-
+import { config } from "../config/config";
 
 const router = express.Router();
 
@@ -28,6 +27,28 @@ router.get("/", checkAgentOrAdminRole, async (req: AuthenticatedRequest, res) =>
     const filePath = path.resolve(config.agentDetailsFilePath || "");
     const agents: Agent[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
     res.json(agents);
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(500).json({ message: err.message });
+    } else {
+      console.error("Unexpected error:", err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+});
+
+// GET method to retrieve an agent by ID
+router.get("/:id", checkAgentOrAdminRole, async (req: AuthenticatedRequest, res) => {
+  try {
+    const filePath = path.resolve(config.agentDetailsFilePath || "");
+    const agents: Agent[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+
+    const agent = agents.find(agent => agent.id === req.params.id);
+    if (!agent) {
+      return res.status(404).json({ message: "Agent not found" });
+    }
+
+    res.json(agent);
   } catch (err) {
     if (err instanceof Error) {
       res.status(500).json({ message: err.message });

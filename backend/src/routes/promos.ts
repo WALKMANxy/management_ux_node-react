@@ -14,12 +14,12 @@ router.use(authenticateUser);
 // Validation rules
 const promoValidationRules = [
   body('clientsId').isArray().withMessage('Clients ID must be an array'),
-  body('agentsId').isArray().withMessage('Agents ID must be an array'),
   body('type').notEmpty().withMessage('Type is required'),
   body('name').notEmpty().withMessage('Name is required'),
   body('discount').notEmpty().withMessage('Discount is required'),
   body('startDate').isISO8601().withMessage('Start date must be a valid ISO 8601 date'),
-  body('endDate').isISO8601().withMessage('End date must be a valid ISO 8601 date')
+  body('endDate').isISO8601().withMessage('End date must be a valid ISO 8601 date'),
+  body('promoIssuedBy').notEmpty().withMessage('Promo issued by is required')
 ];
 
 // GET method to retrieve all promos
@@ -40,15 +40,15 @@ router.get('/', checkAgentOrAdminOrClientRole, async (req: Request, res: Respons
 // POST method to create a new promo
 router.post('/', promoValidationRules, checkValidation, checkAgentOrAdminRole, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { clientsId, agentsId, type, name, discount, startDate, endDate } = req.body;
+    const { clientsId, type, name, discount, startDate, endDate, promoIssuedBy } = req.body;
     const promo = new Promo({
       clientsId,
-      agentsId,
       type,
       name,
       discount,
       startDate,
-      endDate
+      endDate,
+      promoIssuedBy
     });
     await promo.save();
     res.status(201).json({ message: 'Promo created successfully', promo });
