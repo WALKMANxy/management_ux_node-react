@@ -5,10 +5,9 @@
   "editor.autoClosingComments": "beforeWhitespace",
   "editor.codeActions.triggerOnFocusChange": true,
   "editor.codeActionsOnSave": {
-    "editor.formatOnSave": true,
-    "source.organizeImports": true,
-    "source.removeUnused": true,
-    "files.trimTrailingWhitespace": true
+    "editor.formatOnSave": "explicit",
+    "source.organizeImports": "explicit",
+    "files.trimTrailingWhitespace": "explicit"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.language.brackets": [],
