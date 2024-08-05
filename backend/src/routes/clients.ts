@@ -40,6 +40,28 @@ router.get("/", checkAgentOrAdminOrClientRole, async (req: AuthenticatedRequest,
   }
 });
 
+// GET method to retrieve a client by codice
+router.get("/codice/:codice", checkAgentOrAdminOrClientRole, async (req: Request, res: Response) => {
+  try {
+    const filePath = path.resolve(config.clientDetailsFilePath || "");
+    const clients: Client[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+
+    const client = clients.find((client) => client.CODICE === req.params.codice);
+    if (!client) {
+      return res.status(404).json({ message: "Client not found" });
+    }
+
+    res.json(client);
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(500).json({ message: err.message });
+    } else {
+      console.error("Unexpected error:", err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+});
+
 // PUT method to replace an entire client
 router.put("/:id", clientValidationRules, checkValidation, checkAdminRole, async (req: AuthenticatedRequest, res: Response) => {
   try {

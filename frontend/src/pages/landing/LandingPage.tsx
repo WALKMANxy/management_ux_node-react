@@ -1,89 +1,39 @@
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import EmailIcon from "@mui/icons-material/Email";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import GoogleMapsIcon from "@mui/icons-material/Map";
-import PhoneIcon from "@mui/icons-material/Phone";
 import {
   AppBar,
   Box,
   Button,
   Container,
   Divider,
-  FormControl,
-  InputLabel,
   Menu,
   MenuItem,
-  Select,
   Toolbar,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import Loader from "../../components/common/Loader";
-import useAuthHandlers from "../../hooks/useAuthHandlers";
-import {
-  useGetAgentsQuery,
-  useGetMinimalClientsQuery,
-} from "../../services/api";
 
 const LandingPage: React.FC = () => {
   const { t } = useTranslation();
   const [showLoader, setShowLoader] = useState(true);
   const [showLogin, setShowLogin] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<
-    "admin" | "agent" | "client"
-  >("client");
-  const [selectedAgent, setSelectedAgent] = useState<string>(""); // State for selected agent
-  const [selectedClient, setSelectedClient] = useState<string>(""); // State for selected client
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
 
-  const { data: agents = [] } = useGetAgentsQuery();
-  const { data: minimalClients = [], refetch: refetchMinimalClients } =
-    useGetMinimalClientsQuery();
+  // Temporary functions to handle login/logout
+  const handleLogin = () => {
+    console.log("Login button clicked");
+  };
 
-  const { handleLogin, handleEnter } = useAuthHandlers({
-    selectedRole,
-    selectedAgent,
-    selectedClient,
-    agents,
-  });
-
-  const VATIcon = () => <span>{t("landingPage.vat")}</span>;
-
-  const agentOptions = useMemo(
-    () =>
-      agents.map((agent, index) => (
-        <MenuItem key={`${agent.id}-${index}`} value={agent.id}>
-          {agent.name}
-        </MenuItem>
-      )),
-    [agents]
-  );
-
-  const clientOptions = useMemo(
-    () =>
-      minimalClients.map((client, index) => (
-        <MenuItem key={`${client.id}-${index}`} value={client.id}>
-          {client.name}
-        </MenuItem>
-      )),
-    [minimalClients]
-  );
+  const handleEnter = () => {
+    console.log("Enter button clicked");
+  };
 
   useEffect(() => {
-    if (!showLogin) {
-      setSelectedAgent("");
-      setSelectedClient("");
-    }
-
     const timer = setTimeout(() => setShowLoader(false), 2000);
     return () => clearTimeout(timer);
-  }, [showLogin]);
+  }, []);
 
   return (
     <Box
@@ -126,61 +76,7 @@ const LandingPage: React.FC = () => {
             onClose={() => setShowLogin(false)}
             sx={{ marginTop: "48px" }}
           >
-            <MenuItem>
-              <FormControl
-                fullWidth
-                sx={{ marginBottom: 2, paddingTop: "8px", margintop: "10px" }}
-              >
-                <InputLabel sx={{ fontSize: "110%", top: "-8px" }}>
-                  {t("landingPage.userRole")}
-                </InputLabel>
-                <Select
-                  value={selectedRole}
-                  onChange={(e) => {
-                    setSelectedRole(
-                      e.target.value as "admin" | "agent" | "client"
-                    );
-                    if (e.target.value === "client") {
-                      refetchMinimalClients();
-                    }
-                  }}
-                >
-                  <MenuItem value="admin">{t("landingPage.admin")}</MenuItem>
-                  <MenuItem value="agent">{t("landingPage.agent")}</MenuItem>
-                  <MenuItem value="client">{t("landingPage.client")}</MenuItem>
-                </Select>
-              </FormControl>
-            </MenuItem>
-            {selectedRole === "agent" && (
-              <MenuItem>
-                <FormControl fullWidth sx={{ marginBottom: 2 }}>
-                  <InputLabel sx={{ fontSize: "110%", top: "-8px" }}>
-                    {t("landingPage.selectAgent")}
-                  </InputLabel>
-                  <Select
-                    value={selectedAgent}
-                    onChange={(e) => setSelectedAgent(e.target.value)}
-                  >
-                    {agentOptions}
-                  </Select>
-                </FormControl>
-              </MenuItem>
-            )}
-            {selectedRole === "client" && (
-              <MenuItem>
-                <FormControl fullWidth sx={{ marginBottom: 2 }}>
-                  <InputLabel sx={{ fontSize: "110%", top: "-8px" }}>
-                    {t("landingPage.selectClient")}
-                  </InputLabel>
-                  <Select
-                    value={selectedClient}
-                    onChange={(e) => setSelectedClient(e.target.value)}
-                  >
-                    {clientOptions}
-                  </Select>
-                </FormControl>
-              </MenuItem>
-            )}
+            {/* Placeholder for future login/registration form */}
             <MenuItem>
               <Button
                 variant="contained"
@@ -247,28 +143,24 @@ const LandingPage: React.FC = () => {
             >
               <Button
                 href="https://www.facebook.com/RicambiCentroSud/"
-                startIcon={<FacebookIcon />}
                 sx={{ color: "#3b5998" }}
               >
                 {t("landingPage.facebook")}
               </Button>
               <Button
                 href="https://www.instagram.com/ricambicentrosud/"
-                startIcon={<InstagramIcon />}
                 sx={{ color: "#E1306C" }}
               >
                 {t("landingPage.instagram")}
               </Button>
               <Button
                 href="https://goo.gl/maps/MFy1cqdn3BbQNmtW6"
-                startIcon={<GoogleMapsIcon />}
                 sx={{ color: "#4285F4" }}
               >
                 {t("landingPage.googleMaps")}
               </Button>
               <Button
                 href="https://www.linkedin.com/company/7007068/"
-                startIcon={<LinkedInIcon />}
                 sx={{ color: "#0077B5" }}
               >
                 {t("landingPage.linkedIn")}
@@ -282,21 +174,21 @@ const LandingPage: React.FC = () => {
           sx={{
             backgroundColor: "#f0f0f0",
             color: "#333",
-            padding: "0.64rem", // Reduced by 20% from 0.8rem
+            padding: "0.64rem",
             textAlign: "center",
             position: "relative",
             mt: "auto",
             "&:before": {
               content: '""',
               display: "block",
-              height: "6.4px", // Reduced by 20% from 8px
+              height: "6.4px",
               background:
                 "linear-gradient(to bottom, rgba(255, 255, 255, 0), #f0f0f0)",
             },
             "@media (max-width: 600px)": {
-              padding: "0.4rem", // 50% smaller for mobile
+              padding: "0.4rem",
               "&:before": {
-                height: "4px", // 50% smaller for mobile
+                height: "4px",
               },
             },
           }}
@@ -309,7 +201,7 @@ const LandingPage: React.FC = () => {
               alignItems={{ xs: "center", sm: "flex-start" }}
               sx={{
                 "@media (max-width: 600px)": {
-                  flexDirection: "column", // Stack items for mobile
+                  flexDirection: "column",
                   alignItems: "center",
                 },
               }}
@@ -321,8 +213,8 @@ const LandingPage: React.FC = () => {
                   flex: 1,
                   fontSize: "64%",
                   "@media (max-width: 600px)": {
-                    padding: "0.16rem 0.32rem", // 50% smaller for mobile
-                    fontSize: "32%", // 50% smaller for mobile
+                    padding: "0.16rem 0.32rem",
+                    fontSize: "32%",
                   },
                 }}
               >
@@ -335,7 +227,7 @@ const LandingPage: React.FC = () => {
                     },
                   }}
                 >
-                  <AccessTimeIcon /> {t("landingPage.workingHours")}
+                  {t("landingPage.workingHours")}
                 </Typography>
                 <Typography
                   sx={{
@@ -346,7 +238,7 @@ const LandingPage: React.FC = () => {
                     },
                   }}
                 >
-                  <LocationOnIcon /> {t("landingPage.address")}
+                  {t("landingPage.address")}
                 </Typography>
               </Box>
               <Box
@@ -356,8 +248,8 @@ const LandingPage: React.FC = () => {
                   flex: 1,
                   fontSize: "64%",
                   "@media (max-width: 600px)": {
-                    padding: "0.16rem 0.32rem", // 50% smaller for mobile
-                    fontSize: "32%", // 50% smaller for mobile
+                    padding: "0.16rem 0.32rem",
+                    fontSize: "32%",
                   },
                 }}
               >
@@ -370,7 +262,6 @@ const LandingPage: React.FC = () => {
                     },
                   }}
                 >
-                  <PhoneIcon />{" "}
                   <a
                     href="tel:+390954190006"
                     style={{ color: "blue", textDecoration: "none" }}
@@ -387,7 +278,6 @@ const LandingPage: React.FC = () => {
                     },
                   }}
                 >
-                  <EmailIcon />{" "}
                   <a
                     href="mailto:info@ricambicentrosud.com"
                     style={{ color: "blue", textDecoration: "none" }}
@@ -404,7 +294,7 @@ const LandingPage: React.FC = () => {
                     },
                   }}
                 >
-                  <VATIcon /> 03176280877
+                  {t("landingPage.vat")}
                 </Typography>
               </Box>
             </Box>
@@ -414,8 +304,8 @@ const LandingPage: React.FC = () => {
                 padding: "0.32rem 0.64rem",
                 fontSize: "64%",
                 "@media (max-width: 600px)": {
-                  padding: "0.16rem 0.32rem", // 50% smaller for mobile
-                  fontSize: "32%", // 50% smaller for mobile
+                  padding: "0.16rem 0.32rem",
+                  fontSize: "32%",
                 },
               }}
             >

@@ -33,14 +33,36 @@ router.get('/', checkAgentOrAdminOrClientRole, async (req: Request, res: Respons
   }
 });
 
+// GET method to retrieve alerts by targetType and targetId
+router.get('/target/:targetType/:targetId', checkAgentOrAdminOrClientRole, async (req: Request, res: Response) => {
+  const { targetType, targetId } = req.params;
+  try {
+    const alerts = await Alert.find({ targetType, targetId });
+    if (alerts.length === 0) {
+      return res.status(404).json({ message: 'No alerts found for the specified target' });
+    }
+    res.json(alerts);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      res.status(500).json({ message: err.message });
+    } else {
+      console.error("Unexpected error:", err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+});
+
 // POST method to create a new alert
 router.post('/', alertValidationRules, checkValidation, checkAgentOrAdminRole, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { alertReason, message, severity } = req.body;
+    const { alertReason, message, severity, alertIssuedBy, targetType, targetId } = req.body;
     const alert = new Alert({
       alertReason,
       message,
-      severity
+      severity,
+      alertIssuedBy,
+      targetType,
+      targetId
     });
     await alert.save();
     res.status(201).json({ message: 'Alert created successfully', alert });

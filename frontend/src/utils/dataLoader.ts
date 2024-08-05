@@ -1,47 +1,13 @@
-import axios from "axios";
 import {
   Agent,
+  Alert,
   Client,
   MovementDetail,
-  Visit,
   Promo,
-  Alert,
+  Visit,
 } from "../models/models"; // Import the new types
 
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || "";
-
-if (!BASE_URL || BASE_URL === "") {
-  throw new Error("One or more environment variables are not defined");
-}
-
 const workerScriptPath = new URL("./worker.js", import.meta.url);
-
-// Generic function to fetch data from a given endpoint
-export const fetchData = async (endpoint: string): Promise<any[]> => {
-  try {
-    const response = await axios.get(`${BASE_URL}/${endpoint}`, {
-      headers: {
-        "bypass-tunnel-reminder": "true",
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching data from ${endpoint}:`, error);
-    throw new Error(`Failed to fetch data from ${endpoint}`);
-  }
-};
-
-// Fetch functions for specific data types
-export const loadJsonData = async (): Promise<any[]> => fetchData("movements");
-export const loadClientDetailsData = async (): Promise<any[]> =>
-  fetchData("clients");
-export const loadAgentDetailsData = async (): Promise<Agent[]> =>
-  fetchData("agents");
-export const loadVisitsData = async (): Promise<Visit[]> => fetchData("visits"); // New function to load visits
-export const loadPromosData = async (): Promise<Promo[]> => fetchData("promos"); // New function to load promos
-export const loadAlertsData = async (): Promise<Alert[]> => fetchData("alerts"); // New function to load alerts
-export const loadAdminDetailsData = async (): Promise<any[]> =>
-  fetchData("admins"); // New function to load admin details
 
 // Mapping data to models including the new data types (Visits, Promos, Alerts)
 export const mapDataToModels = async (
@@ -124,7 +90,6 @@ export const mapDataToAgents = async (
   visits: Visit[], // New parameter for visits
   promos: Promo[], // New parameter for promos
   alerts: Alert[] // New parameter for alerts
-
 ): Promise<Agent[]> => {
   const agentsMap = new Map<string, Agent>();
 

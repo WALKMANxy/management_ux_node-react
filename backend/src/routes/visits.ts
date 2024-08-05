@@ -14,10 +14,10 @@ router.use(authenticateUser);
 // Validation rules
 const visitValidationRules = [
   body('clientId').notEmpty().withMessage('Client ID is required'),
-  body('agentId').notEmpty().withMessage('Agent ID is required'),
   body('type').notEmpty().withMessage('Type is required'),
   body('visitReason').notEmpty().withMessage('Reason is required'),
-  body('date').isISO8601().withMessage('Date must be a valid ISO 8601 date')
+  body('date').isISO8601().withMessage('Date must be a valid ISO 8601 date'),
+  body('visitIssuedBy').notEmpty().withMessage('Visit issued by is required')
 ];
 
 // GET method to retrieve all visits
@@ -38,15 +38,15 @@ router.get('/', checkAgentOrAdminOrClientRole, async (req: Request, res: Respons
 // POST method to create a new visit
 router.post('/', visitValidationRules, checkValidation, checkAgentOrAdminRole, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { clientId, agentId, type, visitReason, date, notePublic, notePrivate } = req.body;
+    const { clientId, type, visitReason, date, notePublic, notePrivate, visitIssuedBy } = req.body;
     const visit = new Visit({
       clientId,
-      agentId,
       type,
       visitReason,
       date,
       notePublic,
-      notePrivate
+      notePrivate,
+      visitIssuedBy
     });
     await visit.save();
     res.status(201).json({ message: 'Visit created successfully', visit });
