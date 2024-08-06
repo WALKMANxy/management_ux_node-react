@@ -17,7 +17,9 @@ export const authenticateUser = async (
 ) => {
   const token =
     req.cookies.token || req.header("Authorization")?.replace("Bearer ", "");
+  console.log("Authenticate user: token is", token);
   if (!token) {
+    console.log("Token is not provided, authorization denied");
     return res
       .status(401)
       .json({ message: "No token provided, authorization denied" });
@@ -25,15 +27,20 @@ export const authenticateUser = async (
 
   try {
     const decoded: any = jwt.verify(token, JWT_SECRET);
+    console.log("Authenticate user: decoded is", decoded);
     const user = await User.findById(decoded.id);
+    console.log("Authenticate user: user is", user);
     if (!user) {
+      console.log("Invalid token, authorization denied");
       return res
         .status(401)
         .json({ message: "Invalid token, authorization denied" });
     }
     req.user = user;
+    console.log("Authenticate user: user is authenticated", req.user);
     next();
   } catch (error) {
+    console.log("Token is not valid, authorization denied:", error);
     res.status(401).json({ message: "Token is not valid" });
   }
 };

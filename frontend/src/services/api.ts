@@ -39,16 +39,17 @@ const apiCall = async <T>(
   data?: any
 ): Promise<T> => {
   try {
-    const token = Cookies.get("token"); // Extract the token from cookies
+
+
 
     const response = await axios({
       url: `${baseUrl}/${endpoint}`,
       method,
       headers: {
-        Authorization: `Bearer ${token}`, // Include the token in the Authorization header
         "bypass-tunnel-reminder": "true",
       },
       data,
+      withCredentials: true,
     });
     return response.data;
   } catch (error) {
@@ -217,9 +218,9 @@ const registerUser = async (credentials: {
 const loginUser = async (credentials: {
   email: string;
   password: string;
-}): Promise<{ redirectUrl: string; id: string, authToken: string }> => {
+}): Promise<{ redirectUrl: string; id: string }> => {
   try {
-    const response = await axios.post<{ redirectUrl: string; id: string, authToken: string }>(
+    const response = await axios.post<{ redirectUrl: string; id: string }>(
       `${baseUrl}/auth/login`,
       credentials,
       {
@@ -668,7 +669,7 @@ export const api = createApi({
       },
     }),
     loginUser: builder.mutation<
-      { redirectUrl: string, id: string, authToken: string },
+      { redirectUrl: string, id: string },
       { email: string; password: string }
     >({
       queryFn: async (credentials) => {

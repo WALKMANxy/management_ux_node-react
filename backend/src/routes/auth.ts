@@ -1,20 +1,19 @@
-import { Router, Request, Response } from "express";
-import { User, IUser } from "../models/User";
-import {
-  sendVerificationEmail,
-  sendPasswordResetEmail,
-} from "../utils/sendEmail";
-import jwt from "jsonwebtoken";
-import { generateToken } from "../utils/authentication";
-import fs from "fs";
-import path from "path";
-import { checkValidation } from "../utils/validate";
-import logger from "../utils/logger";
-import { body } from "express-validator";
-import { config } from "../config/config";
 import crypto from "crypto";
+import { Request, Response, Router } from "express";
+import { body } from "express-validator";
+import fs from "fs";
+import jwt from "jsonwebtoken";
+import path from "path";
+import { config } from "../config/config";
 import { Passcode } from "../models/Passcode";
-
+import { IUser, User } from "../models/User";
+import { generateToken } from "../utils/authentication";
+import logger from "../utils/logger";
+import {
+  sendPasswordResetEmail,
+  sendVerificationEmail,
+} from "../utils/sendEmail";
+import { checkValidation } from "../utils/validate";
 
 const router = Router();
 
@@ -28,7 +27,7 @@ const pathToDataDirectory = path.resolve(__dirname, "..", "..", "data");
 const LOG_FILE_PATH = path.join(pathToDataDirectory, "registeredUsersLog.json");
 
 const generatePasscode = () => {
-  return crypto.randomBytes(3).toString('hex').toUpperCase(); // Generates a 6-character alphanumeric passcode
+  return crypto.randomBytes(3).toString("hex").toUpperCase(); // Generates a 6-character alphanumeric passcode
 };
 
 const logRegisteredUser = (user: IUser) => {
@@ -216,6 +215,7 @@ router.post(
       res.cookie("token", token, {
         httpOnly: true,
         secure: true,
+        sameSite: "none",
       });
 
       // Determine redirect URL based on user role
@@ -229,7 +229,9 @@ router.post(
       }
 
       // Send the redirect URL to the client
-      res.status(200).json({ message: "Login successful", redirectUrl, id: user._id, authToken: token });
+      res
+        .status(200)
+        .json({ message: "Login successful", redirectUrl, id: user._id });
     } catch (error) {
       logger.error("Login error:", { error });
       res.status(500).json({ message: "Login failed", error });
@@ -288,7 +290,6 @@ router.post(
   }
 );
 
-
 router.post(
   "/reset-password",
   [
@@ -329,7 +330,9 @@ router.post(
       });
 
       if (!validPasscode) {
-        logger.warn(`Invalid or expired passcode used for password reset by user: ${user.email}`);
+        logger.warn(
+          `Invalid or expired passcode used for password reset by user: ${user.email}`
+        );
         return res.status(400).json({ message: "Invalid or expired passcode" });
       }
 
@@ -350,6 +353,5 @@ router.post(
     }
   }
 );
-
 
 export default router;
