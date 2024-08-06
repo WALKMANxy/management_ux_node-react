@@ -10,28 +10,9 @@ import { login, logout } from "../features/auth/authSlice";
 import { extractUserIdFromCookie, clearAuthData } from "../utils/authHelpers";
 import { User } from "../models/models"; // Import your User type
 import { AppDispatch } from "../app/store"; // Import AppDispatch type from your store
+import { FetchUserRoleError, LoginError, RegistrationError } from "../utils/errorHandling";
 
-// Custom Error Classes
-class RegistrationError extends Error {
-  constructor(message: string) {
-    super(`Registration failed: ${message}`);
-    this.name = "RegistrationError";
-  }
-}
 
-class LoginError extends Error {
-  constructor(message: string) {
-    super(`Login failed: ${message}`);
-    this.name = "LoginError";
-  }
-}
-
-class FetchUserRoleError extends Error {
-  constructor(message: string) {
-    super(`Failed to fetch user role: ${message}`);
-    this.name = "FetchUserRoleError";
-  }
-}
 
 // Logger utility function
 const logError = (error: Error) => {

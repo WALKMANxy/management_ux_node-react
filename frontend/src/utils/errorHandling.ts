@@ -51,7 +51,32 @@ const generateErrorResponse = (error: any) => {
   }
 };
 
+// Custom Error Classes
+class RegistrationError extends Error {
+  constructor(message: string) {
+    super(`Registration failed: ${message}`);
+    this.name = "RegistrationError";
+  }
+}
+
+class LoginError extends Error {
+  constructor(message: string) {
+    super(`Login failed: ${message}`);
+    this.name = "LoginError";
+  }
+}
+
+class FetchUserRoleError extends Error {
+  constructor(message: string) {
+    super(`Failed to fetch user role: ${message}`);
+    this.name = "FetchUserRoleError";
+  }
+}
+
 export {
+  RegistrationError,
+  LoginError,
+  FetchUserRoleError,
   NetworkError,
   ServerError,
   logError,

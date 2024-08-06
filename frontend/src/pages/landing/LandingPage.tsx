@@ -4,8 +4,6 @@ import {
   Button,
   Container,
   Divider,
-  Menu,
-  MenuItem,
   Toolbar,
   Typography,
 } from "@mui/material";
@@ -14,21 +12,21 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import Loader from "../../components/common/Loader";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import EmailIcon from "@mui/icons-material/Email";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import GoogleMapsIcon from "@mui/icons-material/Map";
+import PhoneIcon from "@mui/icons-material/Phone";
+import AuthenticationModal from "../../components/landingPage/authentication";
 
 const LandingPage: React.FC = () => {
   const { t } = useTranslation();
   const [showLoader, setShowLoader] = useState(true);
-  const [showLogin, setShowLogin] = useState(false);
+  const [showLogin, setShowLogin] = useState(false); // Control modal visibility
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
-
-  // Temporary functions to handle login/logout
-  const handleLogin = () => {
-    console.log("Login button clicked");
-  };
-
-  const handleEnter = () => {
-    console.log("Enter button clicked");
-  };
 
   useEffect(() => {
     const timer = setTimeout(() => setShowLoader(false), 2000);
@@ -62,33 +60,11 @@ const LandingPage: React.FC = () => {
               alt="Logo"
               style={{ height: "40px" }}
             />
-            <Button color="inherit" onClick={() => setShowLogin(!showLogin)}>
+            <Button color="inherit" onClick={() => setShowLogin(true)}>
               {isLoggedIn ? t("landingPage.enter") : t("landingPage.login")}
             </Button>
           </Toolbar>
         </AppBar>
-
-        {showLogin && (
-          <Menu
-            anchorEl={document.body}
-            anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            open={showLogin}
-            onClose={() => setShowLogin(false)}
-            sx={{ marginTop: "48px" }}
-          >
-            {/* Placeholder for future login/registration form */}
-            <MenuItem>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={isLoggedIn ? handleEnter : handleLogin}
-                fullWidth
-              >
-                {isLoggedIn ? t("landingPage.enter") : t("landingPage.login")}
-              </Button>
-            </MenuItem>
-          </Menu>
-        )}
 
         <Container
           component="main"
@@ -143,24 +119,28 @@ const LandingPage: React.FC = () => {
             >
               <Button
                 href="https://www.facebook.com/RicambiCentroSud/"
+                startIcon={<FacebookIcon />}
                 sx={{ color: "#3b5998" }}
               >
                 {t("landingPage.facebook")}
               </Button>
               <Button
                 href="https://www.instagram.com/ricambicentrosud/"
+                startIcon={<InstagramIcon />}
                 sx={{ color: "#E1306C" }}
               >
                 {t("landingPage.instagram")}
               </Button>
               <Button
                 href="https://goo.gl/maps/MFy1cqdn3BbQNmtW6"
+                startIcon={<GoogleMapsIcon />}
                 sx={{ color: "#4285F4" }}
               >
                 {t("landingPage.googleMaps")}
               </Button>
               <Button
                 href="https://www.linkedin.com/company/7007068/"
+                startIcon={<LinkedInIcon />}
                 sx={{ color: "#0077B5" }}
               >
                 {t("landingPage.linkedIn")}
@@ -193,7 +173,7 @@ const LandingPage: React.FC = () => {
             },
           }}
         >
-          <Container>
+           <Container>
             <Box
               display="flex"
               justifyContent="space-between"
@@ -201,7 +181,7 @@ const LandingPage: React.FC = () => {
               alignItems={{ xs: "center", sm: "flex-start" }}
               sx={{
                 "@media (max-width: 600px)": {
-                  flexDirection: "column",
+                  flexDirection: "column", // Stack items for mobile
                   alignItems: "center",
                 },
               }}
@@ -213,8 +193,8 @@ const LandingPage: React.FC = () => {
                   flex: 1,
                   fontSize: "64%",
                   "@media (max-width: 600px)": {
-                    padding: "0.16rem 0.32rem",
-                    fontSize: "32%",
+                    padding: "0.16rem 0.32rem", // 50% smaller for mobile
+                    fontSize: "32%", // 50% smaller for mobile
                   },
                 }}
               >
@@ -227,7 +207,7 @@ const LandingPage: React.FC = () => {
                     },
                   }}
                 >
-                  {t("landingPage.workingHours")}
+                  <AccessTimeIcon /> {t("landingPage.workingHours")}
                 </Typography>
                 <Typography
                   sx={{
@@ -238,7 +218,7 @@ const LandingPage: React.FC = () => {
                     },
                   }}
                 >
-                  {t("landingPage.address")}
+                  <LocationOnIcon /> {t("landingPage.address")}
                 </Typography>
               </Box>
               <Box
@@ -248,8 +228,8 @@ const LandingPage: React.FC = () => {
                   flex: 1,
                   fontSize: "64%",
                   "@media (max-width: 600px)": {
-                    padding: "0.16rem 0.32rem",
-                    fontSize: "32%",
+                    padding: "0.16rem 0.32rem", // 50% smaller for mobile
+                    fontSize: "32%", // 50% smaller for mobile
                   },
                 }}
               >
@@ -262,6 +242,7 @@ const LandingPage: React.FC = () => {
                     },
                   }}
                 >
+                  <PhoneIcon />{" "}
                   <a
                     href="tel:+390954190006"
                     style={{ color: "blue", textDecoration: "none" }}
@@ -278,6 +259,7 @@ const LandingPage: React.FC = () => {
                     },
                   }}
                 >
+                  <EmailIcon />{" "}
                   <a
                     href="mailto:info@ricambicentrosud.com"
                     style={{ color: "blue", textDecoration: "none" }}
@@ -294,7 +276,7 @@ const LandingPage: React.FC = () => {
                     },
                   }}
                 >
-                  {t("landingPage.vat")}
+                  VAT 03176280877
                 </Typography>
               </Box>
             </Box>
@@ -304,8 +286,8 @@ const LandingPage: React.FC = () => {
                 padding: "0.32rem 0.64rem",
                 fontSize: "64%",
                 "@media (max-width: 600px)": {
-                  padding: "0.16rem 0.32rem",
-                  fontSize: "32%",
+                  padding: "0.16rem 0.32rem", // 50% smaller for mobile
+                  fontSize: "32%", // 50% smaller for mobile
                 },
               }}
             >
@@ -324,6 +306,9 @@ const LandingPage: React.FC = () => {
           </Container>
         </Box>
       </Box>
+
+      {/* Authentication Modal */}
+      <AuthenticationModal open={showLogin} onClose={() => setShowLogin(false)} />
     </Box>
   );
 };
