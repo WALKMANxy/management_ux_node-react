@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QThread, pyqtSignal, QTimer
+from PyQt6.QtCore import QThread, pyqtSignal, QTimer # type: ignore
 from ftplib import FTP
 from data_processing import process_files
 import os

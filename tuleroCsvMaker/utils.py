@@ -1,9 +1,9 @@
 import os
 import platform
-from PyQt6.QtWidgets import (
+from PyQt6.QtWidgets import ( # type: ignore
     QVBoxLayout, QLabel, QLineEdit, QPushButton, QProgressBar, QFileDialog, QComboBox
-)
-from PyQt6.QtGui import QFont, QIcon
+) 
+from PyQt6.QtGui import QFont, QIcon # type: ignore
 from styles import app_stylesheet, light_stylesheet  # Import both stylesheets
 
 def setup_ui(main_window, base_path):

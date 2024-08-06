@@ -1,9 +1,9 @@
 import os
 import sys
 import json
-from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget
-from PyQt6.QtGui import QIcon, QFont
-from PyQt6.QtCore import QTimer, QDateTime
+from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget # type: ignore
+from PyQt6.QtGui import QIcon, QFont # type: ignore
+from PyQt6.QtCore import QTimer, QDateTime # type: ignore
 from worker import Worker
 from utils import setup_ui, browse_articles, browse_oem, browse_brands, browse_output
 
