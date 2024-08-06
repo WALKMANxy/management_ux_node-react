@@ -10,6 +10,11 @@ import agentsReducer from "../features/agents/agentsSlice";
 import visitsReducer from "../features/visits/visitsSlice";
 import promosReducer from "../features/promos/promosSlice"; // Import the agents reducer
 import { api } from "../services/api";
+import { loadAuthState, saveAuthState } from "../utils/localStorage";
+
+const preloadedState = {
+  auth: loadAuthState(),
+};
 
 const store = configureStore({
   reducer: {
@@ -23,12 +28,18 @@ const store = configureStore({
     agents: agentsReducer, // Add the agents reducer
     [api.reducerPath]: api.reducer,
   },
+  preloadedState,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       thunk: true,
       serializableCheck: false,
       immutableCheck: false,
     }).concat(api.middleware),
+});
+
+// Subscribe to the store to save auth state to localStorage on changes
+store.subscribe(() => {
+  saveAuthState(store.getState().auth);
 });
 
 // Dispatch the initial data fetching queries

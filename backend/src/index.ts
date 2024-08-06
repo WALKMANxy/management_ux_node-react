@@ -43,6 +43,7 @@ mongoose
 
 const corsOptions: cors.CorsOptions = {
   origin: true,
+  credentials: true,
   optionsSuccessStatus: 200,
 };
 
@@ -57,7 +58,7 @@ app.use(logRequests); // Add the logging middleware here
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 1000000,
   message: "Too many requests from this IP, please try again later.",
 });
 

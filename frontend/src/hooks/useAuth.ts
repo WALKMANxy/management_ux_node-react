@@ -7,10 +7,12 @@ import {
   api,
 } from "../services/api";
 import { login, logout } from "../features/auth/authSlice";
-import { extractUserIdFromCookie, clearAuthData } from "../utils/authHelpers";
+import {  clearAuthData } from "../utils/authHelpers";
 import { User } from "../models/models"; // Import your User type
-import { AppDispatch } from "../app/store"; // Import AppDispatch type from your store
+import store, { AppDispatch } from "../app/store"; // Import AppDispatch type from your store
 import { FetchUserRoleError, LoginError, RegistrationError } from "../utils/errorHandling";
+import Cookies from "js-cookie"; // Import js-cookie
+
 
 
 
@@ -37,8 +39,14 @@ export const useAuth = () => {
 
   const handleLogin = async (email: string, password: string) => {
     try {
-      const { redirectUrl } = await loginUser({ email, password }).unwrap();
-      const userId = extractUserIdFromCookie();
+      const { redirectUrl, id, authToken} = await loginUser({ email, password }).unwrap();
+
+      const userId = id;
+
+      Cookies.set("token", authToken, { expires: 7 }); // Expires in 7 days, you can adjust the expiry
+
+      console.log( "User ID:", userId, "Token:", authToken);
+
 
       if (userId) {
         dispatch(api.endpoints.getUserRoleById.initiate(userId))
@@ -51,7 +59,12 @@ export const useAuth = () => {
                 return;
               }
 
-              dispatch(login({ role: user.role, id: userId }));
+              dispatch(login({ role: user.role, id: user.entityCode }));
+
+              const state = store.getState(); // If not inside a React component, otherwise use `useSelector`
+              console.log("Updated auth state:", state.auth);
+
+
               window.location.href = redirectUrl;
             } else if ('error' in result) {
               throw new FetchUserRoleError('Failed to fetch user role');

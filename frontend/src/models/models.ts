@@ -13,11 +13,10 @@ export type User = {
   passwordResetToken?: string; // Optional for password reset
   passwordResetExpires?: Date; // Optional for password reset
   role: UserRole;
-  entityCode?: string; // Code linking to admin, agent, or client
+  entityCode: string; // Code linking to admin, agent, or client
   avatar?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  isEmailVerified: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export type Admin = {

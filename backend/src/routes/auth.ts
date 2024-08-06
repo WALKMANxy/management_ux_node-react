@@ -13,7 +13,8 @@ import logger from "../utils/logger";
 import { body } from "express-validator";
 import { config } from "../config/config";
 import crypto from "crypto";
-import { Passcode, IPasscode } from "../models/Passcode";
+import { Passcode } from "../models/Passcode";
+
 
 const router = Router();
 
@@ -228,7 +229,7 @@ router.post(
       }
 
       // Send the redirect URL to the client
-      res.status(200).json({ message: "Login successful", redirectUrl });
+      res.status(200).json({ message: "Login successful", redirectUrl, id: user._id, authToken: token });
     } catch (error) {
       logger.error("Login error:", { error });
       res.status(500).json({ message: "Login failed", error });

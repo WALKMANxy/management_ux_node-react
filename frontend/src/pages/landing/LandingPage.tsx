@@ -28,6 +28,8 @@ const LandingPage: React.FC = () => {
   const [showLogin, setShowLogin] = useState(false); // Control modal visibility
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
 
+  console.log("isLoggedIn: ", isLoggedIn);
+
   useEffect(() => {
     const timer = setTimeout(() => setShowLoader(false), 2000);
     return () => clearTimeout(timer);
