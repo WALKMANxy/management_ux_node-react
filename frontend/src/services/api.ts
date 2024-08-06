@@ -188,16 +188,11 @@ const authApiCall = async <T>(
   data?: any
 ): Promise<T> => {
   try {
-    const token = Cookies.get("token"); // Extract the token from cookies
-
     const config: AxiosRequestConfig = {
       url: `${baseUrl}/${endpoint}`,
       method: method,
-      headers: {
-        Authorization: `Bearer ${token}`, // Include the token in the Authorization header
-        "bypass-tunnel-reminder": "true",
-      },
       data,
+      withCredentials: true, // Ensure cookies are sent with the request
     };
 
     const response = await axios(config);
@@ -208,6 +203,7 @@ const authApiCall = async <T>(
   }
 };
 
+
 // Specific function for registering a user
 const registerUser = async (credentials: {
   email: string;
@@ -216,16 +212,25 @@ const registerUser = async (credentials: {
   return authApiCall<void>("auth/register", "POST", credentials);
 };
 
+
 // Specific function for logging in a user
 const loginUser = async (credentials: {
   email: string;
   password: string;
 }): Promise<{ redirectUrl: string }> => {
-  return authApiCall<{ redirectUrl: string }>(
-    "auth/login",
-    "POST",
-    credentials
-  );
+  try {
+    const response = await axios.post<{ redirectUrl: string }>(
+      `${baseUrl}/auth/login`,
+      credentials,
+      {
+        withCredentials: true, // Important to include cookies in the request
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error logging in:", error);
+    throw new Error("Failed to login");
+  }
 };
 
 // Specific function to request a password reset
