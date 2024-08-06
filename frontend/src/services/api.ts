@@ -217,21 +217,22 @@ const registerUser = async (credentials: {
 const loginUser = async (credentials: {
   email: string;
   password: string;
-}): Promise<{ redirectUrl: string }> => {
+}): Promise<{ redirectUrl: string; id: string, authToken: string }> => {
   try {
-    const response = await axios.post<{ redirectUrl: string }>(
+    const response = await axios.post<{ redirectUrl: string; id: string, authToken: string }>(
       `${baseUrl}/auth/login`,
       credentials,
       {
         withCredentials: true, // Important to include cookies in the request
       }
     );
-    return response.data;
+    return response.data; // Access both redirectUrl and id from response data
   } catch (error) {
     console.error("Error logging in:", error);
     throw new Error("Failed to login");
   }
 };
+
 
 // Specific function to request a password reset
 const requestPasswordReset = async (email: string): Promise<void> => {
@@ -667,7 +668,7 @@ export const api = createApi({
       },
     }),
     loginUser: builder.mutation<
-      { redirectUrl: string },
+      { redirectUrl: string, id: string, authToken: string },
       { email: string; password: string }
     >({
       queryFn: async (credentials) => {
