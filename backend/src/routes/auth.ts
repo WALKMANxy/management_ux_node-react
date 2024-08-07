@@ -85,35 +85,35 @@ const logRegisteredUser = (user: IUser) => {
 router.post(
   "/register",
   [
-    body("email").isEmail().withMessage("Invalid email"),
+    body("email").isEmail().withMessage("Invalid email."),
     body("password")
       .isLength({ min: 8 })
-      .withMessage("Password must be at least 8 characters long")
+      .withMessage("Password must be at least 8 characters long.")
       .matches(/[A-Z]/)
-      .withMessage("Password must contain at least 1 uppercase letter")
+      .withMessage("Password must contain at least 1 uppercase letter.")
       .matches(/[a-z]/)
-      .withMessage("Password must contain at least 1 lowercase letter")
+      .withMessage("Password must contain at least 1 lowercase letter.")
       .matches(/[0-9]/)
-      .withMessage("Password must contain at least 1 number")
+      .withMessage("Password must contain at least 1 number.")
       .matches(/[!@#$%^&*(),.?":{}|<>]/)
-      .withMessage("Password must contain at least 1 special character"),
+      .withMessage("Password must contain at least 1 special character."),
   ],
   checkValidation,
   async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
-    logger.info("Received registration request", { email });
+    logger.info("Received registration request", { email } );
 
     if (!JWT_SECRET) {
       logger.error("JWT_SECRET is not set");
-      return res.status(500).json({ message: "Internal server error" });
+      return res.status(500).json({ message: "Internal server error." });
     }
 
     try {
       const existingUser = await User.findOne({ email });
       if (existingUser) {
-        logger.warn(`Registration attempt with existing email: ${email}`);
-        return res.status(400).json({ message: "User already exists" });
+        logger.warn(`Registration attempt with existing email: ${email}.`);
+        return res.status(400).json({ message: "User already exists." });
       }
 
       const user = new User({
@@ -167,7 +167,7 @@ router.get("/verify-email", async (req: Request, res: Response) => {
 
     if (!user) {
       logger.warn(`Invalid token used for email verification: ${token}`);
-      return res.status(400).json({ message: "Invalid token" });
+      return res.status(400).json({ message: "Invalid token." });
     }
 
     user.isEmailVerified = true;
@@ -184,8 +184,8 @@ router.get("/verify-email", async (req: Request, res: Response) => {
 router.post(
   "/login",
   [
-    body("email").isEmail().withMessage("Invalid email"),
-    body("password").exists().withMessage("Password is required"),
+    body("email").isEmail().withMessage("Invalid email."),
+    body("password").exists().withMessage("Password is required."),
   ],
   checkValidation,
   async (req: Request, res: Response) => {
@@ -195,20 +195,20 @@ router.post(
       const user = await User.findOne({ email });
       if (!user) {
         logger.warn(`Login attempt with non-existent email: ${email}`);
-        return res.status(400).json({ message: "User not found" });
+        return res.status(400).json({ message: "User not found." });
       }
 
       const isMatch = await user.comparePassword(password);
       if (!isMatch) {
         logger.warn(`Invalid credentials for email: ${email}`);
-        return res.status(400).json({ message: "Invalid credentials" });
+        return res.status(400).json({ message: "Invalid credentials." });
       }
 
       if (!user.isEmailVerified) {
         logger.warn(`Unverified email login attempt: ${email}`);
         return res
           .status(400)
-          .json({ message: "Please verify your email before logging in" });
+          .json({ message: "Please verify your email before logging in." });
       }
 
       const token = generateToken(user);
@@ -241,7 +241,7 @@ router.post(
 
 router.post(
   "/request-password-reset",
-  [body("email").isEmail().withMessage("Invalid email")],
+  [body("email").isEmail().withMessage("Invalid email.")],
   checkValidation,
   async (req: Request, res: Response) => {
     const { email } = req.body;
@@ -252,7 +252,7 @@ router.post(
         logger.warn(`Password reset request for non-existent email: ${email}`);
         return res.status(400).json({
           message:
-            "If that email address is in our database, we will send you an email to reset your password",
+            "If that email address is in our database, we will send you an email to reset your password.",
         });
       }
 
@@ -277,11 +277,11 @@ router.post(
 
       // Send email with reset token and passcode
       await sendPasswordResetEmail(email, resetToken, passcode);
-      logger.info(`Password reset email sent to ${email}`);
+      logger.info(`Password reset email sent to ${email}.`);
 
       res.status(200).json({
         message:
-          "If that email address is in our database, we will send you an email to reset your password",
+          "If that email address is in our database, we will send you an email to reset your password.",
       });
     } catch (error) {
       logger.error("Password reset request failed", { error });
@@ -293,18 +293,18 @@ router.post(
 router.post(
   "/reset-password",
   [
-    body("passcode").exists().withMessage("Passcode is required"),
+    body("passcode").exists().withMessage("Passcode is required."),
     body("newPassword")
       .isLength({ min: 8 })
-      .withMessage("Password must be at least 8 characters long")
+      .withMessage("Password must be at least 8 characters long.")
       .matches(/[A-Z]/)
-      .withMessage("Password must contain at least 1 uppercase letter")
+      .withMessage("Password must contain at least 1 uppercase letter.")
       .matches(/[a-z]/)
-      .withMessage("Password must contain at least 1 lowercase letter")
+      .withMessage("Password must contain at least 1 lowercase letter.")
       .matches(/[0-9]/)
-      .withMessage("Password must contain at least 1 number")
+      .withMessage("Password must contain at least 1 number.")
       .matches(/[!@#$%^&*(),.?":{}|<>]/)
-      .withMessage("Password must contain at least 1 special character"),
+      .withMessage("Password must contain at least 1 special character."),
   ],
   checkValidation,
   async (req: Request, res: Response) => {
@@ -318,7 +318,7 @@ router.post(
 
       if (!user) {
         logger.warn(`Invalid token used for password reset: ${token}`);
-        return res.status(400).json({ message: "Invalid token" });
+        return res.status(400).json({ message: "Invalid token." });
       }
 
       // Verify the passcode
@@ -333,7 +333,7 @@ router.post(
         logger.warn(
           `Invalid or expired passcode used for password reset by user: ${user.email}`
         );
-        return res.status(400).json({ message: "Invalid or expired passcode" });
+        return res.status(400).json({ message: "Invalid or expired passcode." });
       }
 
       // Reset the password
@@ -344,7 +344,7 @@ router.post(
       validPasscode.used = true;
       await validPasscode.save();
 
-      logger.info(`Password reset successful for user: ${user.email}`);
+      logger.info(`Password reset successful for user: ${user.email}.`);
 
       res.redirect(config.appUrl); // Redirect to the landing page after successful reset
     } catch (error) {

@@ -20,7 +20,7 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import GoogleMapsIcon from "@mui/icons-material/Map";
 import PhoneIcon from "@mui/icons-material/Phone";
-import AuthenticationModal from "../../components/landingPage/authentication";
+import AuthenticationModal from "../../components/landingPage/authenticationModal";
 
 const LandingPage: React.FC = () => {
   const { t } = useTranslation();

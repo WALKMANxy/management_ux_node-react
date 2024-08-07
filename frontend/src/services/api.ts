@@ -21,7 +21,6 @@ import {
 } from "../utils/dataLoader";
 import { generateErrorResponse, handleApiError } from "../utils/errorHandling"; // Import error handling functions
 
-
 const baseUrl = process.env.REACT_APP_API_BASE_URL || "";
 
 if (!baseUrl || baseUrl === "") {
@@ -39,9 +38,6 @@ const apiCall = async <T>(
   data?: any
 ): Promise<T> => {
   try {
-
-
-
     const response = await axios({
       url: `${baseUrl}/${endpoint}`,
       method,
@@ -52,9 +48,13 @@ const apiCall = async <T>(
       withCredentials: true,
     });
     return response.data;
-  } catch (error) {
-    console.error(`Error during ${method} request to ${endpoint}:`, error);
-    throw new Error(`Failed to ${method} data from ${endpoint}`);
+  } catch (error: any) {
+    const serverMessage = error.response?.data?.message || "An error occurred";
+    console.error(
+      `Error during ${method} request to ${endpoint}:`,
+      serverMessage
+    );
+    throw new Error(serverMessage);
   }
 };
 
@@ -136,7 +136,6 @@ const updatePromoById = async (
   return apiCall<Promo>(`promos/${id}`, "PATCH", promoData);
 };
 
-
 // Specific function to create a visit
 const createVisit = async (visitData: {
   clientId: string;
@@ -178,16 +177,12 @@ const updateAlertById = async (
   return apiCall<Alert>(`alerts/${id}`, "PATCH", alertData);
 };
 
-
-
-
-
 // Generic function to make API calls
 const authApiCall = async <T>(
   endpoint: string,
   method: "GET" | "POST",
   data?: any
-): Promise<T> => {
+): Promise<T & { message: string; statusCode: number }> => {
   try {
     const config: AxiosRequestConfig = {
       url: `${baseUrl}/${endpoint}`,
@@ -197,55 +192,65 @@ const authApiCall = async <T>(
     };
 
     const response = await axios(config);
-    return response.data;
-  } catch (error) {
+    return {
+      ...response.data,
+      message: response.data.message || "Success",
+      statusCode: response.status,
+    };
+  } catch (error: any) {
     console.error(`Error ${method} data from ${endpoint}:`, error);
+    if (error.response) {
+      return {
+        ...error.response.data,
+        message: error.response.data.message || "An error occurred",
+        statusCode: error.response.status,
+      };
+    }
     throw new Error(`Failed to ${method.toLowerCase()} data from ${endpoint}`);
   }
 };
-
 
 // Specific function for registering a user
 const registerUser = async (credentials: {
   email: string;
   password: string;
-}): Promise<void> => {
+}): Promise<{ message: string; statusCode: number }> => {
   return authApiCall<void>("auth/register", "POST", credentials);
 };
-
 
 // Specific function for logging in a user
 const loginUser = async (credentials: {
   email: string;
   password: string;
-}): Promise<{ redirectUrl: string; id: string }> => {
-  try {
-    const response = await axios.post<{ redirectUrl: string; id: string }>(
-      `${baseUrl}/auth/login`,
-      credentials,
-      {
-        withCredentials: true, // Important to include cookies in the request
-      }
-    );
-    return response.data; // Access both redirectUrl and id from response data
-  } catch (error) {
-    console.error("Error logging in:", error);
-    throw new Error("Failed to login");
-  }
+}): Promise<{
+  redirectUrl: string;
+  id: string;
+  message: string;
+  statusCode: number;
+}> => {
+  return authApiCall<{ redirectUrl: string; id: string }>(
+    "auth/login",
+    "POST",
+    credentials
+  );
 };
 
-
 // Specific function to request a password reset
-const requestPasswordReset = async (email: string): Promise<void> => {
+const requestPasswordReset = async (
+  email: string
+): Promise<{ message: string; statusCode: number }> => {
   return authApiCall<void>("auth/request-password-reset", "POST", { email });
 };
 
 // Specific function to reset password
-const resetPassword = async (token: string, passcode: string, newPassword: string): Promise<void> => {
+const resetPassword = async (
+  token: string,
+  passcode: string,
+  newPassword: string
+): Promise<{ message: string; statusCode: number }> => {
   const data = { passcode, newPassword };
   return authApiCall<void>(`auth/reset-password?token=${token}`, "POST", data);
 };
-
 
 // Function to initiate Google OAuth flow
 export const initiateGoogleOAuth = () => {
@@ -529,27 +534,6 @@ export const api = createApi({
       keepUnusedDataFor: 60 * 20,
     }),
 
-    requestPasswordReset: builder.mutation<void, string>({
-      queryFn: async (email) => {
-        try {
-          await requestPasswordReset(email);
-          return { data: undefined };
-        } catch (error) {
-          return generateErrorResponse(error);
-        }
-      },
-    }),
-
-    resetPassword: builder.mutation<void, { token: string; passcode: string; newPassword: string }>({
-      queryFn: async ({ token, passcode, newPassword }) => {
-        try {
-          await resetPassword(token, passcode, newPassword);
-          return { data: undefined };
-        } catch (error) {
-          return generateErrorResponse(error);
-        }
-      },
-    }),
     getVisits: builder.query<Visit[], void>({
       queryFn: async () => {
         try {
@@ -658,29 +642,68 @@ export const api = createApi({
       },
     }),
 
-    registerUser: builder.mutation<void, { email: string; password: string }>({
-      queryFn: async (credentials) => {
-        try {
-          await registerUser(credentials);
-          return { data: undefined };
-        } catch (error) {
-          return generateErrorResponse(error);
-        }
-      },
-    }),
-    loginUser: builder.mutation<
-      { redirectUrl: string, id: string },
+    registerUser: builder.mutation<
+      { message: string; statusCode: number },
       { email: string; password: string }
     >({
       queryFn: async (credentials) => {
         try {
-          const result = await loginUser(credentials);
-          return { data: result };
+          const { message, statusCode } = await registerUser(credentials);
+          return { data: { message, statusCode } };
         } catch (error) {
           return generateErrorResponse(error);
         }
       },
     }),
+
+    loginUser: builder.mutation<
+      { redirectUrl: string; id: string; message: string; statusCode: number },
+      { email: string; password: string }
+    >({
+      queryFn: async (credentials) => {
+        try {
+          const { redirectUrl, id, message, statusCode } = await loginUser(
+            credentials
+          );
+          return { data: { redirectUrl, id, message, statusCode } };
+        } catch (error) {
+          return generateErrorResponse(error);
+        }
+      },
+    }),
+
+    requestPasswordReset: builder.mutation<
+      { message: string; statusCode: number },
+      string
+    >({
+      queryFn: async (email) => {
+        try {
+          const { message, statusCode } = await requestPasswordReset(email);
+          return { data: { message, statusCode } };
+        } catch (error) {
+          return generateErrorResponse(error);
+        }
+      },
+    }),
+
+    resetPassword: builder.mutation<
+      { message: string; statusCode: number },
+      { token: string; passcode: string; newPassword: string }
+    >({
+      queryFn: async ({ token, passcode, newPassword }) => {
+        try {
+          const { message, statusCode } = await resetPassword(
+            token,
+            passcode,
+            newPassword
+          );
+          return { data: { message, statusCode } };
+        } catch (error) {
+          return generateErrorResponse(error);
+        }
+      },
+    }),
+
     getUserRoleById: builder.query<User, string>({
       queryFn: async (id) => {
         try {
@@ -692,14 +715,17 @@ export const api = createApi({
       },
     }),
 
-    createAlert: builder.mutation<Alert, {
-      alertReason: string;
-      message: string;
-      severity: "low" | "medium" | "high";
-      alertIssuedBy: string;
-      targetType: "admin" | "agent" | "client";
-      targetId: string;
-    }>({
+    createAlert: builder.mutation<
+      Alert,
+      {
+        alertReason: string;
+        message: string;
+        severity: "low" | "medium" | "high";
+        alertIssuedBy: string;
+        targetType: "admin" | "agent" | "client";
+        targetId: string;
+      }
+    >({
       queryFn: async (alertData) => {
         try {
           const result = await createAlert(alertData);
@@ -710,7 +736,10 @@ export const api = createApi({
       },
     }),
 
-    updateAlertById: builder.mutation<Alert, { id: string; alertData: Partial<Alert> }>({
+    updateAlertById: builder.mutation<
+      Alert,
+      { id: string; alertData: Partial<Alert> }
+    >({
       queryFn: async ({ id, alertData }) => {
         try {
           const result = await updateAlertById(id, alertData);
@@ -721,15 +750,18 @@ export const api = createApi({
       },
     }),
 
-    createPromo: builder.mutation<Promo, {
-      clientsId: string[];
-      type: string;
-      name: string;
-      discount: string;
-      startDate: string;
-      endDate: string;
-      promoIssuedBy: string;
-    }>({
+    createPromo: builder.mutation<
+      Promo,
+      {
+        clientsId: string[];
+        type: string;
+        name: string;
+        discount: string;
+        startDate: string;
+        endDate: string;
+        promoIssuedBy: string;
+      }
+    >({
       queryFn: async (promoData) => {
         try {
           const result = await createPromo(promoData);
@@ -740,7 +772,10 @@ export const api = createApi({
       },
     }),
 
-    updatePromoById: builder.mutation<Promo, { id: string; promoData: Partial<Promo> }>({
+    updatePromoById: builder.mutation<
+      Promo,
+      { id: string; promoData: Partial<Promo> }
+    >({
       queryFn: async ({ id, promoData }) => {
         try {
           const result = await updatePromoById(id, promoData);
@@ -751,16 +786,18 @@ export const api = createApi({
       },
     }),
 
-
-    createVisit: builder.mutation<Visit, {
-      clientId: string;
-      type: string;
-      visitReason: string;
-      date: string;
-      notePublic?: string;
-      notePrivate?: string;
-      visitIssuedBy: string;
-    }>({
+    createVisit: builder.mutation<
+      Visit,
+      {
+        clientId: string;
+        type: string;
+        visitReason: string;
+        date: string;
+        notePublic?: string;
+        notePrivate?: string;
+        visitIssuedBy: string;
+      }
+    >({
       queryFn: async (visitData) => {
         try {
           const result = await createVisit(visitData);

@@ -37,9 +37,19 @@ const store = configureStore({
     }).concat(api.middleware),
 });
 
-// Subscribe to the store to save auth state to localStorage on changes
+// Subscribe to the store to save auth state to both sessionStorage and localStorage
 store.subscribe(() => {
-  saveAuthState(store.getState().auth);
+  const authState = store.getState().auth;
+
+  // Save to sessionStorage regardless
+  sessionStorage.setItem('auth', JSON.stringify(authState));
+
+  // Conditionally save to localStorage
+  if (authState.isLoggedIn && localStorage.getItem("keepMeSignedIn") === "true") {
+    saveAuthState(authState);
+  } else {
+    localStorage.removeItem("auth"); // Remove saved auth state if user is not logged in or doesn't want to stay signed in
+  }
 });
 
 // Dispatch the initial data fetching queries
