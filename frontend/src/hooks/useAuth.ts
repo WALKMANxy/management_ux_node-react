@@ -1,5 +1,3 @@
-// hooks/useAuth.ts
-
 import { useDispatch } from "react-redux";
 import store, { AppDispatch } from "../app/store"; // Import AppDispatch type from your store
 import { login, logout } from "../features/auth/authSlice";
@@ -15,84 +13,111 @@ import {
   LoginError,
   RegistrationError,
 } from "../utils/errorHandling";
+import { saveAuthState } from "../utils/localStorage";
 
-// Logger utility function
-const logError = (error: Error) => {
-  console.error(
-    `[${new Date().toISOString()}] ${error.name}: ${error.message}`
-  );
-};
+
+
 
 export const useAuth = () => {
   const dispatch = useDispatch<AppDispatch>(); // Type your dispatch with AppDispatch
   const [registerUser] = useRegisterUserMutation();
   const [loginUser] = useLoginUserMutation();
 
-  const handleRegister = async (email: string, password: string) => {
+  const handleRegister = async (
+    email: string,
+    password: string,
+    setAlertMessage: (message: string) => void,
+    setAlertSeverity: (severity: 'success' | 'error') => void,
+    setAlertOpen: (open: boolean) => void
+  ) => {
     try {
-      await registerUser({ email, password }).unwrap();
-      alert("Registration successful. Please verify your email.");
+      const { message, statusCode } = await registerUser({ email, password }).unwrap();
+      setAlertMessage(message);
+      setAlertSeverity(statusCode === 201 ? 'success' : 'error');
+      setAlertOpen(true);
     } catch (error) {
       const registrationError = new RegistrationError((error as Error).message);
-      logError(registrationError);
-      alert(registrationError.message);
+      setAlertMessage(registrationError.message);
+      setAlertSeverity('error');
+      setAlertOpen(true);
     }
   };
 
-  const handleLogin = async (email: string, password: string) => {
+  const handleLogin = async (
+    email: string,
+    password: string,
+    setAlertMessage: (message: string) => void,
+    setAlertSeverity: (severity: 'success' | 'error') => void,
+    setAlertOpen: (open: boolean) => void,
+    onClose: () => void,
+    keepMeSignedIn: boolean
+  ) => {
     try {
-      const { redirectUrl, id } = await loginUser({ email, password }).unwrap();
+      const { redirectUrl, id, message, statusCode } = await loginUser({ email, password }).unwrap();
+
+      if (statusCode !== 200) {
+        setAlertMessage(message);
+        setAlertSeverity('error');
+        setAlertOpen(true);
+        return;
+      }
 
       const userId = id;
 
-      //console.log( "User ID:", userId);
-
       if (userId) {
-        dispatch(api.endpoints.getUserRoleById.initiate(userId))
-          .then((result) => {
-            if ("data" in result) {
-              const user = result.data as User;
+        const result = await dispatch(api.endpoints.getUserRoleById.initiate(userId));
 
-              if (user.role === "guest") {
-                alert("Your account is still being verified by the admins.");
-                return;
-              }
+        if ("data" in result) {
+          const user = result.data as User;
 
-              dispatch(login({ role: user.role, id: user.entityCode }));
+          if (user.role === "guest") {
+            setAlertMessage("Your account is still being verified by the admins.");
+            setAlertSeverity('error');
+            setAlertOpen(true);
+            return;
+          }
 
-              const state = store.getState(); // If not inside a React component, otherwise use `useSelector`
-              console.log("Updated auth state:", state.auth);
+          dispatch(login({ role: user.role, id: user.entityCode }));
 
-              window.location.href = redirectUrl;
-            } else if ("error" in result) {
-              throw new FetchUserRoleError("Failed to fetch user role");
+            // Save auth state if "Keep me signed in" is checked
+            if (keepMeSignedIn) {
+              saveAuthState(store.getState().auth);
             }
-          })
-          .catch((error) => {
-            const fetchUserRoleError = new FetchUserRoleError(
-              (error as Error).message
-            );
-            logError(fetchUserRoleError);
-            alert(fetchUserRoleError.message);
-          });
+
+
+          const state = store.getState(); // If not inside a React component, otherwise use `useSelector`
+          console.log("Updated auth state:", state.auth);
+
+          window.location.href = redirectUrl;
+          onClose();
+        } else if ("error" in result) {
+          throw new FetchUserRoleError("Failed to fetch user role");
+        }
       }
     } catch (error) {
       const loginError = new LoginError((error as Error).message);
-      logError(loginError);
-      alert(loginError.message);
+      setAlertMessage(loginError.message);
+      setAlertSeverity('error');
+      setAlertOpen(true);
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = (
+    setAlertMessage: (message: string) => void,
+    setAlertSeverity: (severity: 'success' | 'error') => void,
+    setAlertOpen: (open: boolean) => void
+  ) => {
     try {
       clearAuthData();
       dispatch(logout());
-      console.log(
-        `[${new Date().toISOString()}] User logged out successfully.`
-      );
+      setAlertMessage("User logged out successfully.");
+      setAlertSeverity('success');
+      setAlertOpen(true);
     } catch (error) {
       const logoutError = new Error("Failed to log out.");
-      logError(logoutError);
+      setAlertMessage(logoutError.message);
+      setAlertSeverity('error');
+      setAlertOpen(true);
     }
   };
 

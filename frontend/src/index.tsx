@@ -9,6 +9,8 @@ import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
 import i18n from './i18n';
 import "./index.css";
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+import './utils/tokenIntercept';
+
 
 const container = document.getElementById("root");
 const root = ReactDOM.createRoot(container!);
