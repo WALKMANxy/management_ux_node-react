@@ -15,7 +15,7 @@ axios.interceptors.response.use(
       store.dispatch(logout());
       localStorage.removeItem('auth');
       sessionStorage.clear();
-      window.location.href = '/login'; // Redirect to login page
+      window.location.href = '/'; // 
     }
     return Promise.reject(error);
   }

@@ -97,7 +97,7 @@ const AdminDashboard: React.FC = () => {
     return [];
   }, [selectedAgentData]);
 
-  const loadingState = fakeLoading;
+  const loadingState = isLoading || fakeLoading;
 
   return (
     <Box
