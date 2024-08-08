@@ -1,3 +1,11 @@
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import EmailIcon from "@mui/icons-material/Email";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import GoogleMapsIcon from "@mui/icons-material/Map";
+import PhoneIcon from "@mui/icons-material/Phone";
 import {
   AppBar,
   Box,
@@ -10,16 +18,9 @@ import {
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { RootState } from "../../app/store";
 import Loader from "../../components/common/Loader";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import EmailIcon from "@mui/icons-material/Email";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import GoogleMapsIcon from "@mui/icons-material/Map";
-import PhoneIcon from "@mui/icons-material/Phone";
 import AuthenticationModal from "../../components/landingPage/authenticationModal";
 
 const LandingPage: React.FC = () => {
@@ -27,6 +28,8 @@ const LandingPage: React.FC = () => {
   const [showLoader, setShowLoader] = useState(true);
   const [showLogin, setShowLogin] = useState(false); // Control modal visibility
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
+  const userRole = useSelector((state: RootState) => state.auth.userRole);
+  const navigate = useNavigate();
 
   console.log("isLoggedIn: ", isLoggedIn);
 
@@ -34,6 +37,25 @@ const LandingPage: React.FC = () => {
     const timer = setTimeout(() => setShowLoader(false), 2000);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (isLoggedIn && userRole !== "guest") {
+      // Redirect based on user role
+      switch (userRole) {
+        case "admin":
+          navigate("/admin-dashboard");
+          break;
+        case "agent":
+          navigate("/agent-dashboard");
+          break;
+        case "client":
+          navigate("/client-dashboard");
+          break;
+        default:
+          break;
+      }
+    }
+  }, [isLoggedIn, userRole, navigate]);
 
   return (
     <Box
@@ -175,7 +197,7 @@ const LandingPage: React.FC = () => {
             },
           }}
         >
-           <Container>
+          <Container>
             <Box
               display="flex"
               justifyContent="space-between"
@@ -310,7 +332,10 @@ const LandingPage: React.FC = () => {
       </Box>
 
       {/* Authentication Modal */}
-      <AuthenticationModal open={showLogin} onClose={() => setShowLogin(false)} />
+      <AuthenticationModal
+        open={showLogin}
+        onClose={() => setShowLogin(false)}
+      />
     </Box>
   );
 };

@@ -187,6 +187,9 @@ const authApiCall = async <T>(
     const config: AxiosRequestConfig = {
       url: `${baseUrl}/${endpoint}`,
       method: method,
+      headers: {
+        "bypass-tunnel-reminder": "true",
+      },
       data,
       withCredentials: true, // Ensure cookies are sent with the request
     };

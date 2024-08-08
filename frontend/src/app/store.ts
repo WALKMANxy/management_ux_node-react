@@ -52,9 +52,7 @@ store.subscribe(() => {
   }
 });
 
-// Dispatch the initial data fetching queries
-store.dispatch(api.endpoints.getClients.initiate());
-store.dispatch(api.endpoints.getAgentDetails.initiate());
+
 
 setupListeners(store.dispatch);
 
