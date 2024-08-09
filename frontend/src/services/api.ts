@@ -12,284 +12,39 @@ import {
   Visit,
 } from "../models/models";
 
-import axios, { AxiosRequestConfig } from "axios";
-import Cookies from "js-cookie";
 import {
   mapDataToAgents,
   mapDataToModels,
   mapDataToMovementDetails,
 } from "../utils/dataLoader";
 import { generateErrorResponse, handleApiError } from "../utils/errorHandling"; // Import error handling functions
-
-const baseUrl = process.env.REACT_APP_API_BASE_URL || "";
-
-if (!baseUrl || baseUrl === "") {
-  throw new Error("One or more environment variables are not defined");
-}
-
-const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || "";
-
-const appUrl = process.env.REACT_APP_APP_URL || "";
-
-// Generic API call function
-const apiCall = async <T>(
-  endpoint: string,
-  method: "GET" | "POST" | "PUT" | "PATCH",
-  data?: any
-): Promise<T> => {
-  try {
-    const response = await axios({
-      url: `${baseUrl}/${endpoint}`,
-      method,
-      headers: {
-        "bypass-tunnel-reminder": "true",
-      },
-      data,
-      withCredentials: true,
-    });
-    return response.data;
-  } catch (error: any) {
-    const serverMessage = error.response?.data?.message || "An error occurred";
-    console.error(
-      `Error during ${method} request to ${endpoint}:`,
-      serverMessage
-    );
-    throw new Error(serverMessage);
-  }
-};
-
-// Using apiCall for specific data fetching functions
-const loadJsonData = async (): Promise<any[]> =>
-  apiCall<any[]>("movements", "GET");
-const loadClientDetailsData = async (): Promise<any[]> =>
-  apiCall<any[]>("clients", "GET");
-const loadAgentDetailsData = async (): Promise<Agent[]> =>
-  apiCall<Agent[]>("agents", "GET");
-const loadVisitsData = async (): Promise<Visit[]> =>
-  apiCall<Visit[]>("visits", "GET");
-const loadPromosData = async (): Promise<Promo[]> =>
-  apiCall<Promo[]>("promos", "GET");
-const loadAlertsData = async (): Promise<Alert[]> =>
-  apiCall<Alert[]>("alerts", "GET");
-const loadAdminDetailsData = async (): Promise<any[]> =>
-  apiCall<any[]>("admins", "GET");
-
-// Specific function to get user role by ID
-const getUserById = async (id: string): Promise<User> => {
-  return apiCall<User>(`users/${id}`, "GET");
-};
-
-// Specific function to get client by codice
-const getClientByCodice = async (codice: string): Promise<Client> => {
-  return apiCall<Client>(`clients/codice/${codice}`, "GET");
-};
-
-// Specific function to get alerts by target type and target ID
-const getAlertsByTargetTypeAndTargetId = async ({
-  targetType,
-  targetId,
-}: {
-  targetType: string;
-  targetId: string;
-}): Promise<Alert[]> => {
-  return apiCall<Alert[]>(`alerts/target/${targetType}/${targetId}`, "GET");
-};
-
-const getAgentById = async (id: string): Promise<Agent> => {
-  return apiCall<Agent>(`agents/${id}`, "GET");
-};
-
-const getAdminById = async (id: string): Promise<Admin> => {
-  return apiCall<Admin>(`admins/${id}`, "GET");
-};
-
-const getAllUsers = async (): Promise<User[]> => {
-  return apiCall<User[]>(`users`, "GET");
-};
-
-const updateUserById = async (
-  id: string,
-  updatedData: Partial<User>
-): Promise<User> => {
-  return apiCall<User>(`users/${id}`, "PATCH", updatedData);
-};
-
-// Specific function to create a promo
-// Specific function to create a promo
-const createPromo = async (promoData: {
-  clientsId: string[];
-  type: string;
-  name: string;
-  discount: string;
-  startDate: string;
-  endDate: string;
-  promoIssuedBy: string;
-}): Promise<Promo> => {
-  return apiCall<Promo>("promos", "POST", promoData);
-};
-
-// Specific function to update a promo
-const updatePromoById = async (
-  id: string,
-  promoData: Partial<Promo>
-): Promise<Promo> => {
-  return apiCall<Promo>(`promos/${id}`, "PATCH", promoData);
-};
-
-// Specific function to create a visit
-const createVisit = async (visitData: {
-  clientId: string;
-  type: string;
-  visitReason: string;
-  date: string;
-  notePublic?: string;
-  notePrivate?: string;
-  visitIssuedBy: string;
-}): Promise<Visit> => {
-  return apiCall<Visit>("visits", "POST", visitData);
-};
-
-// Specific function to update a visit by ID
-const updateVisitById = async (
-  id: string,
-  visitData: Partial<Visit>
-): Promise<Visit> => {
-  return apiCall<Visit>(`visits/${id}`, "PATCH", visitData);
-};
-
-// Specific function to create an alert
-const createAlert = async (alertData: {
-  alertReason: string;
-  message: string;
-  severity: "low" | "medium" | "high";
-  alertIssuedBy: string;
-  targetType: "admin" | "agent" | "client";
-  targetId: string;
-}): Promise<Alert> => {
-  return apiCall<Alert>("alerts", "POST", alertData);
-};
-
-// Specific function to update an alert
-const updateAlertById = async (
-  id: string,
-  alertData: Partial<Alert>
-): Promise<Alert> => {
-  return apiCall<Alert>(`alerts/${id}`, "PATCH", alertData);
-};
-
-// Generic function to make API calls
-const authApiCall = async <T>(
-  endpoint: string,
-  method: "GET" | "POST",
-  data?: any
-): Promise<T & { message: string; statusCode: number }> => {
-  try {
-    const config: AxiosRequestConfig = {
-      url: `${baseUrl}/${endpoint}`,
-      method: method,
-      headers: {
-        "bypass-tunnel-reminder": "true",
-      },
-      data,
-      withCredentials: true, // Ensure cookies are sent with the request
-    };
-
-    const response = await axios(config);
-    return {
-      ...response.data,
-      message: response.data.message || "Success",
-      statusCode: response.status,
-    };
-  } catch (error: any) {
-    console.error(`Error ${method} data from ${endpoint}:`, error);
-    if (error.response) {
-      return {
-        ...error.response.data,
-        message: error.response.data.message || "An error occurred",
-        statusCode: error.response.status,
-      };
-    }
-    throw new Error(`Failed to ${method.toLowerCase()} data from ${endpoint}`);
-  }
-};
-
-// Specific function for registering a user
-const registerUser = async (credentials: {
-  email: string;
-  password: string;
-}): Promise<{ message: string; statusCode: number }> => {
-  return authApiCall<void>("auth/register", "POST", credentials);
-};
-
-// Specific function for logging in a user
-const loginUser = async (credentials: {
-  email: string;
-  password: string;
-}): Promise<{
-  redirectUrl: string;
-  id: string;
-  message: string;
-  statusCode: number;
-}> => {
-  return authApiCall<{ redirectUrl: string; id: string }>(
-    "auth/login",
-    "POST",
-    credentials
-  );
-};
-
-// Specific function to request a password reset
-const requestPasswordReset = async (
-  email: string
-): Promise<{ message: string; statusCode: number }> => {
-  return authApiCall<void>("auth/request-password-reset", "POST", { email });
-};
-
-// Specific function to reset password
-const resetPassword = async (
-  token: string,
-  passcode: string,
-  newPassword: string
-): Promise<{ message: string; statusCode: number }> => {
-  const data = { passcode, newPassword };
-  return authApiCall<void>(`auth/reset-password?token=${token}`, "POST", data);
-};
-
-// Function to initiate Google OAuth flow
-export const initiateGoogleOAuth = () => {
-  window.location.href = `https://accounts.google.com/o/oauth2/auth?client_id=${googleClientId}&redirect_uri=${appUrl}/oauth2/callback&response_type=code&scope=email%20profile`;
-};
-
-// Function to link Google account to an existing user
-export const linkGoogleAccount = async (code: string) => {
-  try {
-    const token = Cookies.get("token"); // Get the JWT token if user is logged in
-    const response = await axios.get(`${baseUrl}/auth/link-google`, {
-      params: { code },
-      headers: {
-        Authorization: `Bearer ${token}`, // Include the token in the Authorization header
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error linking Google account:", error);
-    throw new Error("Failed to link Google account");
-  }
-};
-
-// Handle the OAuth callback and retrieve the user's session
-export const handleOAuthCallback = async (code: string) => {
-  try {
-    const response = await axios.get(`${appUrl}/oauth2/callback`, {
-      params: { code },
-      withCredentials: true, // Ensure cookies are sent back in the response
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error handling OAuth callback:", error);
-    throw new Error("Failed to process OAuth callback");
-  }
-};
+import { getAdminById } from "./api/admins";
+import { getAgentById } from "./api/agents";
+import {
+  createAlert,
+  getAlertsByTargetTypeAndTargetId,
+  updateAlertById,
+} from "./api/alerts";
+import {
+  baseUrl,
+  loadAdminDetailsData,
+  loadAgentDetailsData,
+  loadAlertsData,
+  loadClientDetailsData,
+  loadJsonData,
+  loadPromosData,
+  loadVisitsData,
+} from "./api/apiUtils";
+import {
+  loginUser,
+  registerUser,
+  requestPasswordReset,
+  resetPassword,
+} from "./api/auth";
+import { getClientByCodice } from "./api/clients";
+import { createPromo, updatePromoById } from "./api/promos";
+import { getAllUsers, getUserById, updateUserById } from "./api/users";
+import { createVisit, updateVisitById } from "./api/visits";
 
 export const api = createApi({
   reducerPath: "api",
@@ -869,8 +624,8 @@ export const {
   useGetClientByIdQuery,
   useGetAgentsQuery,
   useGetAgentDetailsQuery,
-  useGetAgentByIdQuery, // New hook for fetching agent by ID
+  useGetAgentByIdQuery,
   useGetAdminDataQuery,
-  useGetAdminByIdQuery, // New hook for fetching admin by ID
+  useGetAdminByIdQuery,
   useGetMovementDetailsQuery,
 } = api;
