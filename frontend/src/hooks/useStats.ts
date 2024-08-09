@@ -1,42 +1,69 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setVisits } from "../features/calendar/calendarSlice";
+import { setPromos } from "../features/promos/promosSlice";
 import { Admin, Agent, Client, Movement } from "../models/models";
 import {
-  useGetClientsQuery,
-  useGetAgentsQuery,
-  useGetAgentDetailsQuery,
   useGetAdminByIdQuery,
   useGetAgentByIdQuery,
-  useGetAdmin,
-  useGetClientByIdQuery
+  useGetAgentDetailsQuery,
+  useGetAgentsQuery,
+  useGetClientByIdQuery,
+  useGetClientsQuery,
 } from "../services/api";
 import {
   calculateMonthlyData,
+  calculateMonthlyRevenue,
+  calculateSalesDistributionData,
+  calculateSalesDistributionDataForAgents,
+  calculateTopArticleTypeUtil,
+  calculateTopBrandsData,
   calculateTotalOrders,
   calculateTotalRevenue,
-  calculateTopBrandsData,
-  calculateSalesDistributionData,
-  calculateMonthlyRevenue,
-  calculateSalesDistributionDataForAgents,
   calculateTotalSpentForYear,
   calculateTotalSpentForYearForClients,
-  calculateTopArticleTypeUtil,
 } from "../utils/dataUtils";
-import { setVisits } from "../features/calendar/calendarSlice";
-import { setPromos } from "../features/promos/promosSlice";
+import { RootState } from "../app/store";
 
-type Role = "admin" | "agent" | "client";
+const useStats = (isMobile: boolean) => {
 
-const useStats = (role: Role, entityCode: string | null, isMobile: boolean) => {
   const dispatch = useDispatch();
 
+   // Get role and entityCode from Redux state
+   const role = useSelector((state: RootState) => state.auth.userRole);
+   const entityCode = useSelector((state: RootState) => state.auth.id);
+
   // Fetch the required data using the RTK Query hooks
-  const { data: clientsData, isLoading: clientsLoading, error: clientsError } = useGetClientsQuery();
-  const { data: clientByIdData, isLoading: clientByIdLoading, error: clientByIdError } = useGetClientByIdQuery(entityCode || '');
-  const { data: agentsData, isLoading: agentsLoading, error: agentsError } = useGetAgentsQuery();
-  const { data: agentDetailsData, isLoading: agentDetailsLoading, error: agentDetailsError } = useGetAgentDetailsQuery();
-  const { data: agentIdDetailsData, isLoading: agentIdDetailsLoading, error: agentIdDetailsError } =  useGetAgentByIdQuery(entityCode || '');
-  const { data: adminDetailsData, isLoading: adminLoading, error: adminError } = useGetAdminByIdQuery(entityCode || '');
+  const {
+    data: clientsData,
+    isLoading: clientsLoading,
+    error: clientsError,
+  } = useGetClientsQuery();
+  const {
+    data: clientByIdData,
+    isLoading: clientByIdLoading,
+    error: clientByIdError,
+  } = useGetClientByIdQuery(entityCode || "");
+  const {
+    data: agentsData,
+    isLoading: agentsLoading,
+    error: agentsError,
+  } = useGetAgentsQuery();
+  const {
+    data: agentDetailsData,
+    isLoading: agentDetailsLoading,
+    error: agentDetailsError,
+  } = useGetAgentDetailsQuery();
+  const {
+    data: agentByIdData,
+    isLoading: agentByIdDataLoading,
+    error: agentByIdDataError,
+  } = useGetAgentByIdQuery(entityCode || "");
+  const {
+    data: adminByIdData,
+    isLoading: adminLoading,
+    error: adminError,
+  } = useGetAdminByIdQuery(entityCode || "");
 
   const [details, setDetails] = useState<Agent | Client | Admin | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
@@ -44,17 +71,21 @@ const useStats = (role: Role, entityCode: string | null, isMobile: boolean) => {
 
   useEffect(() => {
     if (entityCode) {
-      if (role === "agent" && agentIdDetailsData && clientsData) {
+      if (
+        role === "agent" &&
+        !agentByIdDataLoading &&
+        agentByIdData &&
+        clientsData
+      ) {
         const updatedAgent = {
-          ...agentIdDetailsData,
-          clients: clientsData.filter(client => client.agent === entityCode),
-          AgentVisits: clientsData.flatMap(client => client.visits || []),
-          AgentPromos: clientsData.flatMap(client => client.promos || []),
+          ...agentByIdData,
+          clients: clientsData.filter((client) => client.agent === entityCode),
+          AgentVisits: clientsData.flatMap((client) => client.visits || []),
+          AgentPromos: clientsData.flatMap((client) => client.promos || []),
         };
         setDetails(updatedAgent);
-
-      } else if (role === "client" && clientByIdData) {
-        setDetails(clientByIdData)
+      } else if (role === "client" && !clientByIdLoading && clientByIdData) {
+        setDetails(clientByIdData);
       } else if (
         role === "admin" &&
         !clientsLoading &&
@@ -62,33 +93,51 @@ const useStats = (role: Role, entityCode: string | null, isMobile: boolean) => {
         !agentDetailsLoading &&
         clientsData &&
         agentsData &&
-        agentDetailsData
+        agentDetailsData &&
+        adminByIdData
       ) {
-        const adminDetails: Admin = {
-          ...adminDetailsData,
+        const adminData: Admin = {
+          ...adminByIdData,
           agents: agentDetailsData,
           clients: clientsData,
           GlobalVisits: {},
           GlobalPromos: {},
+          adminAlerts: [], // Assuming you will handle admin-specific alerts elsewhere
         };
+
         agentDetailsData.forEach((agent) => {
-          adminDetails.GlobalVisits[agent.id] = {
+          adminData.GlobalVisits[agent.id] = {
             Visits: agent.AgentVisits || [],
           };
-          adminDetails.GlobalPromos[agent.id] = {
+          adminData.GlobalPromos[agent.id] = {
             Promos: agent.AgentPromos || [],
           };
         });
-        setDetails(adminDetails);
+
+        setDetails(adminData);
       }
     }
-  }, [role, entityCode, clientsLoading, agentsLoading, agentDetailsLoading, adminLoading, clientsData, agentsData, agentDetailsData, adminData]);
-
+  }, [
+    role,
+    entityCode,
+    clientsLoading,
+    agentsLoading,
+    agentDetailsLoading,
+    adminLoading,
+    clientsData,
+    agentsData,
+    agentDetailsData,
+    agentByIdDataLoading,
+    clientByIdData,
+    clientByIdLoading,
+    agentByIdData,
+    adminByIdData,
+  ]);
 
   const clearSelection = useCallback(() => {
     setSelectedClient(null);
     setSelectedAgent(null);
-    sessionStorage.removeItem('selectedItem'); // Clear sessionStorage when clearing selection
+    sessionStorage.removeItem("selectedItem"); // Clear sessionStorage when clearing selection
   }, []);
 
   const selectClient = useCallback(
@@ -209,18 +258,21 @@ const useStats = (role: Role, entityCode: string | null, isMobile: boolean) => {
 
   const topBrandsData = useMemo(() => {
     if (role === "agent" && details) {
-      const movements = (details as Agent).clients.flatMap(client => client.movements);
+      const movements = (details as Agent).clients.flatMap(
+        (client) => client.movements
+      );
       return calculateTopBrandsData(movements);
     } else if (role === "client" && details) {
       const movements = (details as Client).movements;
       return calculateTopBrandsData(movements);
     } else if (role === "admin" && details) {
-      const movements = (details as { clients: Client[] }).clients.flatMap(client => client.movements);
+      const movements = (details as { clients: Client[] }).clients.flatMap(
+        (client) => client.movements
+      );
       return calculateTopBrandsData(movements);
     }
     return [];
   }, [role, details]);
-
 
   const salesDistributionDataAgents = useMemo(() => {
     if (role === "admin" && details && agentDetailsData) {
@@ -420,7 +472,7 @@ const useStats = (role: Role, entityCode: string | null, isMobile: boolean) => {
     ) {
       return { revenuePercentage: 0, ordersPercentage: 0 };
     }
-/*
+    /*
     console.log("Selected Agent:", selectedAgent);
     console.log("Selected Agent Clients:", selectedAgent.clients);
  */
@@ -576,7 +628,6 @@ const useStats = (role: Role, entityCode: string | null, isMobile: boolean) => {
     };
   }, [selectedAgent, clientsData]);
 
-
   return {
     details,
     selectedClient,
@@ -606,10 +657,15 @@ const useStats = (role: Role, entityCode: string | null, isMobile: boolean) => {
     agentComparativeStatisticsMonthly,
     isLoading:
       clientsLoading ||
+      (role === "client" && clientByIdLoading) ||
+      (role === "agent" && agentByIdDataLoading) ||
       (role === "admin" && (agentsLoading || agentDetailsLoading)),
     error:
-      clientsError || (role === "admin" && (agentsError || agentDetailsError)),
+      clientsError ||
+      (role === "client" && clientByIdError) ||
+      (role === "agent" && agentByIdDataError) ||
+      (role === "admin" && (agentsError || agentDetailsError || adminError)),
   };
-};
+  };
 
-export default useStats;
+  export default useStats;

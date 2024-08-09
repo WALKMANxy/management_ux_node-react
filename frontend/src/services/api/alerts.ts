@@ -1,15 +1,24 @@
 import { Alert } from "../../models/models";
 import { apiCall } from "./apiUtils";
 
-export const getAlertsByTargetTypeAndTargetId = async ({
-  targetType,
-  targetId,
+export const getAlertsByEntityRoleAndEntityCode = async ({
+  entityRole,
+  entityCode,
 }: {
-  targetType: string;
-  targetId: string;
+  entityRole: string;
+  entityCode: string;
 }): Promise<Alert[]> => {
-  return apiCall<Alert[]>(`alerts/target/${targetType}/${targetId}`, "GET");
+  try {
+    return await apiCall<Alert[]>(`alerts/${entityRole}/${entityCode}`, "GET");
+  } catch (error: any) {
+    if (error.response && error.response.status === 404) {
+      console.log(`No alerts found for ${entityRole} with code ${entityCode}`);
+      return []; // Return an empty array if no alerts are found
+    }
+    throw error; // Re-throw other errors
+  }
 };
+
 
 export const updateAlertById = async (
   id: string,
@@ -23,8 +32,8 @@ export const createAlert = async (alertData: {
     message: string;
     severity: "low" | "medium" | "high";
     alertIssuedBy: string;
-    targetType: "admin" | "agent" | "client";
-    targetId: string;
+    entityRole: "admin" | "agent" | "client";
+    entityCode: string;
   }): Promise<Alert> => {
     return apiCall<Alert>("alerts", "POST", alertData);
   };

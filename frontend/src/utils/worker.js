@@ -81,11 +81,19 @@ onmessage = function (event) {
       paymentMethod: clientDetail
         ? clientDetail["Descizione metodo pagamento"]
         : "",
-      visits: visits.filter((visit) => visit.clientId === clientInfo["Codice Cliente"]), // Filter relevant visits
+      visits: visits.filter(
+        (visit) => visit.clientId === clientInfo["Codice Cliente"]
+      ), // Filter relevant visits
       agent: clientInfo["Codice Agente"].toString(),
       movements,
-      promos: promos.filter((promo) => promo.clientsId.includes(clientInfo["Codice Cliente"])), // Filter relevant promos
-      clientAlerts: alerts.filter((alert) => alert.clientId === clientInfo["Codice Cliente"]), // Filter relevant alerts
+      promos: promos.filter((promo) =>
+        promo.clientsId.includes(clientInfo["Codice Cliente"])
+      ), // Filter relevant promos
+      clientAlerts: alerts.filter(
+        (alert) =>
+          alert.targetType === "client" &&
+          alert.targetId === clientInfo["Codice Cliente"]
+      ), //Filter relevant alerts
     };
   });
 

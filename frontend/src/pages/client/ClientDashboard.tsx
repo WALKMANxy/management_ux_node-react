@@ -7,9 +7,8 @@ import {
   useTheme,
 } from "@mui/material";
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { RootState } from "../../app/store";
+import { useDispatch } from "react-redux";
 import ActivePromotions from "../../components/dashboard/ActivePromotions";
 import CalendarComponent from "../../components/dashboard/CalendarComponent";
 import SpentThisMonth from "../../components/dashboard/SpentThisMonth";
@@ -18,14 +17,13 @@ import TopArticleType from "../../components/dashboard/TopArticleType";
 import UpcomingVisits from "../../components/dashboard/UpcomingVisits";
 import MonthOverMonthSpendingTrend from "../../components/statistics/charts/MonthOverMonthSpendingTrend";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
+import { setVisits } from "../../features/calendar/calendarSlice";
 import useStats from "../../hooks/useStats"; // Use the new unified hook
 import { brandColors } from "../../utils/constants";
-import { setVisits } from "../../features/calendar/calendarSlice";
 
 const ClientDashboard: React.FC = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const loggedInClientId = useSelector((state: RootState) => state.auth.id);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -38,7 +36,7 @@ const ClientDashboard: React.FC = () => {
     months,
     revenueData,
     isLoading,
-  } = useStats("client", loggedInClientId, isMobile);
+  } = useStats(isMobile);
 
   useEffect(() => {
     if (clientDetails && "visits" in clientDetails) {
