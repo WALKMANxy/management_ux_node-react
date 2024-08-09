@@ -41,11 +41,14 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-const corsOptions: cors.CorsOptions = {
-  origin: true,
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
+  const corsOptions: cors.CorsOptions = {
+    origin: 'https://woodcock-prime-obviously.ngrok-free.app', // Allow requests from this origin
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    optionsSuccessStatus: 200, // For legacy browser support
+  };
+
+  // Handle CORS preflight requests
+app.options('*', cors(corsOptions)); // Preflight requests handling
 
 app.use(cors(corsOptions));
 app.use(compression());
@@ -84,15 +87,15 @@ const httpsOptions = {
   cert: fs.readFileSync(config.sslCertPath!, 'utf8'),
 };
 
+ https.createServer(httpsOptions, app).listen(PORT, async () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
 /* https.createServer(httpsOptions, app).listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
-}); */
 
-https.createServer(httpsOptions, app).listen(PORT, async () => {
-  console.log(`Server is running on port ${PORT}`);
-
-  // Set up localtunnel with custom subdomain
-  try {
+   // Set up localtunnel with custom subdomain
+   try {
     const tunnel = await localtunnel({
       port: parseInt(PORT),
       subdomain: 'rcs-test-server547915', // Set your desired subdomain
@@ -107,7 +110,7 @@ https.createServer(httpsOptions, app).listen(PORT, async () => {
   } catch (error) {
     console.error('Error setting up LocalTunnel:', error);
   }
-});
+}); */
 
 
 export default app;

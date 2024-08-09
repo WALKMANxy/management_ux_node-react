@@ -22,7 +22,7 @@ import { getAdminById } from "./api/admins";
 import { getAgentById } from "./api/agents";
 import {
   createAlert,
-  getAlertsByTargetTypeAndTargetId,
+  getAlertsByEntityRoleAndEntityCode,
   updateAlertById,
 } from "./api/alerts";
 import {
@@ -179,8 +179,9 @@ export const api = createApi({
       },
       keepUnusedDataFor: 60 * 20,
     }),
-    getAdminData: builder.query<{ agents: Agent[]; clients: Client[] }, void>({
-      queryFn: async () => {
+    getAdminData: builder.query<Admin, string>({
+      queryFn: async (entityCode) => {
+        const entityRole = "admin"; // Set the role to 'admin' for this query
         try {
           const [
             data,
@@ -197,8 +198,10 @@ export const api = createApi({
             loadAdminDetailsData(), // Load admin details
             loadVisitsData(),
             loadPromosData(),
-            loadAlertsData(),
+            getAlertsByEntityRoleAndEntityCode({ entityRole, entityCode }), // Fetch alerts for the admin
           ]);
+
+          // Map clients and agents using the fetched data
           const clients = await mapDataToModels(
             data,
             clientDetails,
@@ -214,7 +217,37 @@ export const api = createApi({
             promos,
             alerts
           );
-          return { data: { agents, clients, adminDetails } };
+
+          // Find the specific admin using the entityCode
+          const admin = adminDetails.find((admin) => admin.id === entityCode);
+          if (!admin) {
+            throw new Error("Admin not found");
+          }
+
+          // Construct the admin details with additional data
+          const adminDetailsWithData: Admin = {
+            ...admin,
+            agents,
+            clients,
+            GlobalVisits: {},
+            GlobalPromos: {},
+            adminAlerts: alerts.filter(
+              (alert) =>
+                alert.entityRole === "admin" && alert.entityCode === entityCode
+            ), // Filter alerts specific to the admin
+          };
+
+          // Populate GlobalVisits and GlobalPromos for the admin
+          agents.forEach((agent) => {
+            adminDetailsWithData.GlobalVisits[agent.id] = {
+              Visits: agent.AgentVisits || [],
+            };
+            adminDetailsWithData.GlobalPromos[agent.id] = {
+              Promos: agent.AgentPromos || [],
+            };
+          });
+
+          return { data: adminDetailsWithData };
         } catch (error) {
           handleApiError(error, "getAdminData");
           return generateErrorResponse(error);
@@ -223,7 +256,8 @@ export const api = createApi({
       keepUnusedDataFor: 60 * 20,
     }),
     getAdminById: builder.query<Admin, string>({
-      queryFn: async (adminId) => {
+      queryFn: async (entityCode) => {
+        const entityRole = "admin"; // Set the role to 'admin' for this query
         try {
           const [
             data,
@@ -237,11 +271,13 @@ export const api = createApi({
             loadJsonData(),
             loadClientDetailsData(),
             loadAgentDetailsData(),
-            loadAdminDetailsData(), // Load admin details
+            getAdminById(entityCode), // Fetch the specific admin details by entityCode
             loadVisitsData(),
             loadPromosData(),
-            loadAlertsData(),
+            getAlertsByEntityRoleAndEntityCode({ entityRole, entityCode }), // Fetch alerts for the admin
           ]);
+
+          // Map clients and agents using the fetched data
           const clients = await mapDataToModels(
             data,
             clientDetails,
@@ -257,20 +293,31 @@ export const api = createApi({
             promos,
             alerts
           );
-          const admin = adminDetails.find((admin) => admin.id === adminId);
-          if (!admin) {
-            throw new Error("Admin not found");
-          }
-          return {
-            data: {
-              ...admin,
-              agents,
-              clients,
-              GlobalVisits: {},
-              GlobalPromos: {},
-              adminAlerts: [],
-            },
+
+          // Construct the admin details with additional data
+          const adminDetailsWithData: Admin = {
+            ...adminDetails,
+            agents,
+            clients,
+            GlobalVisits: {},
+            GlobalPromos: {},
+            adminAlerts: alerts.filter(
+              (alert) =>
+                alert.entityRole === "admin" && alert.entityCode === entityCode
+            ), // Filter alerts specific to the admin
           };
+
+          // Populate GlobalVisits and GlobalPromos for the admin
+          agents.forEach((agent) => {
+            adminDetailsWithData.GlobalVisits[agent.id] = {
+              Visits: agent.AgentVisits || [],
+            };
+            adminDetailsWithData.GlobalPromos[agent.id] = {
+              Promos: agent.AgentPromos || [],
+            };
+          });
+
+          return { data: adminDetailsWithData };
         } catch (error) {
           handleApiError(error, "getAdminById");
           return generateErrorResponse(error);
@@ -480,8 +527,8 @@ export const api = createApi({
         message: string;
         severity: "low" | "medium" | "high";
         alertIssuedBy: string;
-        targetType: "admin" | "agent" | "client";
-        targetId: string;
+        entityRole: "admin" | "agent" | "client";
+        entityCode: string;
       }
     >({
       queryFn: async (alertData) => {
@@ -580,15 +627,15 @@ export const api = createApi({
       },
     }),
 
-    getAlertsByTargetTypeAndTargetId: builder.query<
+    getAlertsByEntityRoleAndEntityCode: builder.query<
       Alert[],
-      { targetType: string; targetId: string }
+      { entityRole: string; entityCode: string }
     >({
-      queryFn: async ({ targetType, targetId }) => {
+      queryFn: async ({ entityRole, entityCode }) => {
         try {
-          const result = await getAlertsByTargetTypeAndTargetId({
-            targetType,
-            targetId,
+          const result = await getAlertsByEntityRoleAndEntityCode({
+            entityRole,
+            entityCode,
           });
           return { data: result };
         } catch (error) {
@@ -619,7 +666,7 @@ export const {
   useLoginUserMutation,
   useRegisterUserMutation,
   useGetClientByCodiceQuery,
-  useGetAlertsByTargetTypeAndTargetIdQuery,
+  useGetAlertsByEntityRoleAndEntityCodeQuery,
   useGetClientsQuery,
   useGetClientByIdQuery,
   useGetAgentsQuery,

@@ -1,6 +1,6 @@
-import { useEffect, useCallback } from "react";
-import useStats from "./useStats"; // Adjust the import path as necessary
+import { useCallback, useEffect } from "react";
 import { SearchResult } from "../models/models";
+import useStats from "./useStats"; // Adjust the import path as necessary
 
 const useSelectionState = (isMobile: boolean) => {
   const {
@@ -13,7 +13,7 @@ const useSelectionState = (isMobile: boolean) => {
     clientComparativeStatisticsMonthly,
     agentComparativeStatistics,
     agentComparativeStatisticsMonthly,
-  } = useStats("admin", null, isMobile); // Use "admin" for the userRole
+  } = useStats(isMobile); // Use "admin" for the userRole
 
   const handleSelect = useCallback(
     (item: SearchResult) => {
@@ -21,10 +21,10 @@ const useSelectionState = (isMobile: boolean) => {
       clearSelection();
 
       if (item.type === "client") {
-        sessionStorage.setItem('selectedItem', JSON.stringify(item));
+        sessionStorage.setItem("selectedItem", JSON.stringify(item));
         selectClient(item.name);
       } else if (item.type === "agent") {
-        sessionStorage.setItem('selectedItem', JSON.stringify(item));
+        sessionStorage.setItem("selectedItem", JSON.stringify(item));
         selectAgent(item.name);
       } else {
         console.log(`Selected ${item.type}: ${item.name}`);
@@ -34,12 +34,12 @@ const useSelectionState = (isMobile: boolean) => {
   );
 
   useEffect(() => {
-    const selectedItem = sessionStorage.getItem('selectedItem');
+    const selectedItem = sessionStorage.getItem("selectedItem");
     if (selectedItem) {
       const item = JSON.parse(selectedItem);
-      if (item.type === 'client') {
+      if (item.type === "client") {
         selectClient(item.name);
-      } else if (item.type === 'agent') {
+      } else if (item.type === "agent") {
         selectAgent(item.name);
       }
     }

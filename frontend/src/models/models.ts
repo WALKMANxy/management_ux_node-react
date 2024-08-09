@@ -373,8 +373,8 @@ export type Alert = {
   severity: "low" | "medium" | "high";
   createdAt: Date;
   alertIssuedBy: string;
-  targetType: "admin" | "agent" | "client"; // New field
-  targetId: string; // New field
+  entityRole: "admin" | "agent" | "client"; // New field
+  entityCode: string; // New field
 };
 
 export type DataState = {

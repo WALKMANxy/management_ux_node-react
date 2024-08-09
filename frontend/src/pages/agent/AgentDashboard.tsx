@@ -11,9 +11,8 @@ import {
   useTheme,
 } from "@mui/material";
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { RootState } from "../../app/store";
+import { useDispatch } from "react-redux";
 import ActivePromotions from "../../components/dashboard/ActivePromotions";
 import CalendarComponent from "../../components/dashboard/CalendarComponent";
 import SpentThisMonth from "../../components/dashboard/SpentThisMonth";
@@ -27,15 +26,14 @@ import MonthOverMonthSpendingTrend from "../../components/statistics/charts/Mont
 import SalesDistribution from "../../components/statistics/charts/SalesDistribution";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
 import { setVisits } from "../../features/calendar/calendarSlice";
+import useSelectionState from "../../hooks/useSelectionState";
 import useStats from "../../hooks/useStats";
 import { brandColors } from "../../utils/constants";
 import { calculateMonthlyData, getTrend } from "../../utils/dataUtils";
-import useSelectionState from "../../hooks/useSelectionState";
 
 const AgentDashboard: React.FC = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const loggedInAgentId = useSelector((state: RootState) => state.auth.id);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -62,7 +60,7 @@ const AgentDashboard: React.FC = () => {
     yearlyCategories,
     yearlyOrdersData,
     isLoading,
-  } = useStats("agent", loggedInAgentId, isMobile);
+  } = useStats(isMobile);
 
   useEffect(() => {
     if (details && "AgentVisits" in details) {

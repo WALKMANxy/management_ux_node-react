@@ -130,7 +130,7 @@ export const mapDataToAgents = async (
           movements: [],
           promos: promos.filter((promo) => promo.clientsId.includes(clientId)),
           clientAlerts: alerts.filter(
-            (alert) => alert.targetType === "client" && alert.targetId === clientId
+            (alert) => alert.entityRole === "client" && alert.entityCode === clientId
           ),
         };
         agent.clients.push(newClient);
@@ -145,7 +145,7 @@ export const mapDataToAgents = async (
   // Map agent-level alerts
   agentsMap.forEach((agent) => {
     agent.agentAlerts = alerts.filter(
-      (alert) => alert.targetType === "agent" && alert.targetId === agent.id
+      (alert) => alert.entityRole === "agent" && alert.entityCode === agent.id
     );
   });
 

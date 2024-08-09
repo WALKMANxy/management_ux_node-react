@@ -1,19 +1,20 @@
-import React, { useMemo, useEffect, useState } from "react";
-import useStats from "../../hooks/useStats";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
-  Grid,
-  Typography,
-  Skeleton,
   Button,
-  Fab,
   Divider,
+  Fab,
+  Grid,
+  Skeleton,
+  Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import GlobalSearch from "../../components/Header/GlobalSearch";
 import ActivePromotions from "../../components/dashboard/ActivePromotions";
+import AgentActivityOverview from "../../components/dashboard/AgentActivityOverview";
 import CalendarComponent from "../../components/dashboard/CalendarComponent";
 import SpentThisMonth from "../../components/dashboard/SpentThisMonth";
 import SpentThisYear from "../../components/dashboard/SpentThisYear";
@@ -24,15 +25,14 @@ import UpcomingVisits from "../../components/dashboard/UpcomingVisits";
 import MonthOverMonthSpendingTrend from "../../components/statistics/charts/MonthOverMonthSpendingTrend";
 import SalesDistribution from "../../components/statistics/charts/SalesDistribution";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
-import AgentActivityOverview from "../../components/dashboard/AgentActivityOverview";
+import useSelectionState from "../../hooks/useSelectionState";
+import useStats from "../../hooks/useStats";
+import { brandColors } from "../../utils/constants";
 import {
   calculateMonthlyData,
-  getTrend,
   calculateTopBrandsData,
+  getTrend,
 } from "../../utils/dataUtils";
-import useSelectionState from "../../hooks/useSelectionState";
-import CloseIcon from "@mui/icons-material/Close";
-import { brandColors } from "../../utils/constants";
 
 const AdminDashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -66,7 +66,7 @@ const AdminDashboard: React.FC = () => {
     yearlyCategories,
     yearlyOrdersData,
     isLoading,
-  } = useStats("admin", null, isMobile);
+  } = useStats(isMobile);
 
   const [fakeLoading, setFakeLoading] = useState(true);
 

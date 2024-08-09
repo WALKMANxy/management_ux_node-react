@@ -8,8 +8,8 @@ export interface IAlert extends Document {
     severity: "low" | "medium" | "high";
     createdAt: Date;
     alertIssuedBy: string;
-    targetType: "admin" | "agent" | "client";  // New field
-    targetId: string;  // New field
+    entityRole: "admin" | "agent" | "client";  // New field
+    entityCode: string;  // New field
   }
 
 const alertSchema = new Schema<IAlert>({
@@ -18,8 +18,8 @@ const alertSchema = new Schema<IAlert>({
   severity: { type: String, enum: ["low", "medium", "high"], required: true },
   createdAt: { type: Date, default: Date.now },
   alertIssuedBy: { type: String, required: true },
-  targetType: { type: String, enum: ["admin", "agent", "client"], required: true },
-  targetId: { type: String, required: true },
+  entityRole: { type: String, enum: ["admin", "agent", "client"], required: true },
+  entityCode: { type: String, required: true },
 });
 
 export const Alert = model<IAlert>('Alert', alertSchema);
