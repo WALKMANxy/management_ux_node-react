@@ -87,9 +87,9 @@ export const mapDataToModels = async (
 export const mapDataToAgents = async (
   data: any[],
   agentDetails: Agent[],
-  visits: Visit[], // New parameter for visits
-  promos: Promo[], // New parameter for promos
-  alerts: Alert[] // New parameter for alerts
+  visits: Visit[],
+  promos: Promo[],
+  alerts: Alert[]
 ): Promise<Agent[]> => {
   const agentsMap = new Map<string, Agent>();
 
@@ -98,13 +98,13 @@ export const mapDataToAgents = async (
     agentsMap.set(agent.id, {
       ...agent,
       clients: [],
-      AgentVisits: [], // Initialize AgentVisits
-      AgentPromos: [], // Initialize AgentPromos
-      agentAlerts: [], // Initialize alerts
+      AgentVisits: [],
+      AgentPromos: [],
+      agentAlerts: [],
     });
   });
 
-  // Map clients and their visits/promos to their respective agents
+  // Map clients and their visits/promos/alerts to their respective agents
   data.forEach((item) => {
     const agentId = item["Codice Agente"].toString();
     const clientId = item["Codice Cliente"].toString();
@@ -125,22 +125,33 @@ export const mapDataToAgents = async (
           unpaidRevenue: "0",
           address: "",
           email: "",
-          visits: [],
+          visits: visits.filter((visit) => visit.clientId === clientId),
           agent: agentId,
           movements: [],
-          promos: [],
-          clientAlerts: [],
+          promos: promos.filter((promo) => promo.clientsId.includes(clientId)),
+          clientAlerts: alerts.filter(
+            (alert) => alert.targetType === "client" && alert.targetId === clientId
+          ),
         };
         agent.clients.push(newClient);
+
+        // Aggregate client's visits and promos into the agent's data
         agent.AgentVisits.push(...newClient.visits);
         agent.AgentPromos.push(...newClient.promos);
-        agent.agentAlerts.push(...newClient.clientAlerts); // Add alerts to the agent
       }
     }
   });
 
+  // Map agent-level alerts
+  agentsMap.forEach((agent) => {
+    agent.agentAlerts = alerts.filter(
+      (alert) => alert.targetType === "agent" && alert.targetId === agent.id
+    );
+  });
+
   return Array.from(agentsMap.values());
 };
+
 
 // Mapping function for movement details
 export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
