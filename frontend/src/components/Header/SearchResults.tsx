@@ -1,7 +1,7 @@
 import { Card, CardContent, Typography } from "@mui/material";
 import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { SearchResultsProps } from "../../models/models";
+import { SearchResultsProps } from "../../models/propsModels";
 import { generateRandomString } from "../../utils/constants";
 import "./SearchResults.module.css";
 
@@ -41,13 +41,17 @@ const SearchResults: React.FC<SearchResultsProps> = ({
               {result.type === "article" && (
                 <>
                   <Typography variant="body2">
-                    {t("searchResults.articleId", { articleId: result.articleId })}
+                    {t("searchResults.articleId", {
+                      articleId: result.articleId,
+                    })}
                   </Typography>
                   <Typography variant="body2">
                     {t("searchResults.brand", { brand: result.brand })}
                   </Typography>
                   <Typography variant="body2">
-                    {t("searchResults.lastSoldDate", { lastSoldDate: result.lastSoldDate })}
+                    {t("searchResults.lastSoldDate", {
+                      lastSoldDate: result.lastSoldDate,
+                    })}
                   </Typography>
                 </>
               )}
@@ -60,17 +64,23 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                     {t("searchResults.phone", { phone: result.phone })}
                   </Typography>
                   <Typography variant="body2">
-                    {t("searchResults.paymentMethod", { paymentMethod: result.paymentMethod })}
+                    {t("searchResults.paymentMethod", {
+                      paymentMethod: result.paymentMethod,
+                    })}
                   </Typography>
                 </>
               )}
               {result.type === "promo" && (
                 <>
                   <Typography variant="body2">
-                    {t("searchResults.discountAmount", { discountAmount: result.discountAmount })}
+                    {t("searchResults.discountAmount", {
+                      discountAmount: result.discountAmount,
+                    })}
                   </Typography>
                   <Typography variant="body2">
-                    {t("searchResults.startDate", { startDate: result.startDate })}
+                    {t("searchResults.startDate", {
+                      startDate: result.startDate,
+                    })}
                   </Typography>
                   <Typography variant="body2">
                     {t("searchResults.endDate", { endDate: result.endDate })}
@@ -86,7 +96,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       ) : (
         <Card className="search-result-item" sx={{ marginBottom: 2 }}>
           <CardContent>
-            <Typography variant="body2">{t("searchResults.noResults")}</Typography>
+            <Typography variant="body2">
+              {t("searchResults.noResults")}
+            </Typography>
           </CardContent>
         </Card>
       )}

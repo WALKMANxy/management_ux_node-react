@@ -2,15 +2,15 @@
 import { Box, useMediaQuery } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import MovementDetails from "../../components/movementsPage/movementsDetails";
+import MovementList from "../../components/statistics/grids/MovementList";
 import { useMovementsGrid } from "../../hooks/useMovementsGrid";
 import {
-  calculateTotalQuantity,
   calculateTotalPriceSold,
+  calculateTotalQuantity,
   currencyFormatter,
   numberComparator,
 } from "../../utils/dataUtils";
-import MovementList from "../../components/statistics/grids/MovementList";
-import MovementDetails from "../../components/movementsPage/movementsDetails";
 
 const MovementsPage: React.FC = () => {
   const { t } = useTranslation();

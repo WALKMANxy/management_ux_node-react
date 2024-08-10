@@ -1,17 +1,19 @@
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { SpentThisYearProps } from "../../models/models";
+import { SpentThisYearProps } from "../../models/propsModels";
 import { currencyFormatter } from "../../utils/dataUtils";
 
-
-
-const SpentThisYear: React.FC<SpentThisYearProps> = ({ amount, comparison, isAgentSelected }) => {
+const SpentThisYear: React.FC<SpentThisYearProps> = ({
+  amount,
+  comparison,
+  isAgentSelected,
+}) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const userRole = useSelector((state: RootState) => state.auth.userRole);
@@ -25,8 +27,7 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({ amount, comparison, isAge
   if (comparison) {
     const isAgentComparison = userRole === "admin" && isAgentSelected;
     const isClientComparison =
-      (userRole === "admin" && !isAgentSelected) ||
-      (userRole === "agent");
+      (userRole === "admin" && !isAgentSelected) || userRole === "agent";
 
     if (isAgentComparison) {
       if (comparison.value >= 10) {

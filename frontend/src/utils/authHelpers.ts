@@ -2,14 +2,12 @@
 
 import Cookies from "js-cookie";
 
-
-
 // Logger utility function
 const logError = (error: Error) => {
-  console.error(`[${new Date().toISOString()}] ${error.name}: ${error.message}`);
+  console.error(
+    `[${new Date().toISOString()}] ${error.name}: ${error.message}`
+  );
 };
-
-
 
 export const clearAuthData = () => {
   try {

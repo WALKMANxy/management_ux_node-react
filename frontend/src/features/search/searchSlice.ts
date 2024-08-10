@@ -1,13 +1,10 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import {
-  Agent,
-  Client,
-  SearchParams,
-  SearchResult,
-  SearchState,
-} from "../../models/models";
+
 import { api } from "../../services/api";
+import { SearchState } from "../../models/stateModels";
+import { SearchParams, SearchResult } from "../../models/searchModels";
+import { Agent, Client } from "../../models/entityModels";
 
 const initialState: SearchState = {
   query: "",
@@ -27,6 +24,9 @@ export const searchItems = createAsyncThunk<
       const state = getState();
       const { id, userRole } = state.auth;
 
+      const entityCode = id;
+      const entityRole = userRole;
+
       const sanitizedQuery = query.toLowerCase();
       const seen = new Map<string, string>(); // Track seen IDs
       let searchResults: SearchResult[] = [];
@@ -35,22 +35,24 @@ export const searchItems = createAsyncThunk<
       let clients: Client[] = [];
       let agents: Agent[] = [];
 
-      if (userRole === "admin") {
+      if (entityRole === "admin" && entityCode) {
         const adminData = await dispatch(
-          api.endpoints.getAdminData.initiate()
+          api.endpoints.getAdminData.initiate(entityCode)
         ).unwrap();
         clients = adminData.clients;
         agents = adminData.agents;
         //console.log("Admin Data Loaded: ", { clients, agents });
-      } else if (userRole === "agent") {
+      } else if (entityRole === "agent") {
         clients = (
           await dispatch(api.endpoints.getClients.initiate()).unwrap()
-        ).filter((client) => client.agent === id);
+        ).filter((client) => client.agent === entityCode);
         //console.log("Agent Data Loaded: ", clients);
-      } else if (userRole === "client" && id) {
+      } else if (entityRole === "client" && entityCode) {
         // Ensure id is not null
         clients = [
-          await dispatch(api.endpoints.getClientById.initiate(id)).unwrap(),
+          await dispatch(
+            api.endpoints.getClientById.initiate(entityCode)
+          ).unwrap(),
         ];
         //console.log("Client Data Loaded: ", clients);
       }
@@ -59,7 +61,7 @@ export const searchItems = createAsyncThunk<
       if (
         filter === "all" ||
         filter === "client" ||
-        (filter === "admin" && userRole === "admin")
+        (filter === "admin" && entityRole === "admin")
       ) {
         const clientResults = clients
           .filter(
@@ -85,7 +87,7 @@ export const searchItems = createAsyncThunk<
       if (
         filter === "all" ||
         filter === "agent" ||
-        (filter === "admin" && userRole === "admin")
+        (filter === "admin" && entityRole === "admin")
       ) {
         const agentResults = agents
           .filter(
@@ -150,7 +152,7 @@ export const searchItems = createAsyncThunk<
             type: "Promo",
             startDate: new Date(promo.startDate),
             endDate: new Date(promo.endDate),
-            issuedBy: promo.promoIssuedBy
+            issuedBy: promo.promoIssuedBy,
           }))
           .filter((result) => !seen.has(result.id) && seen.set(result.id, ""));
 
@@ -175,7 +177,7 @@ export const searchItems = createAsyncThunk<
             date: visit.date,
             pending: visit.pending,
             completed: visit.completed,
-            issuedBy: visit.visitIssuedBy
+            issuedBy: visit.visitIssuedBy,
           }))
           .filter((result) => !seen.has(result.id) && seen.set(result.id, ""));
 

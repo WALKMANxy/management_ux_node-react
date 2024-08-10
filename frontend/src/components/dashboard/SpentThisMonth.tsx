@@ -1,12 +1,12 @@
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { SpentThisMonthProps } from "../../models/models";
+import { SpentThisMonthProps } from "../../models/propsModels";
 import { currencyFormatter } from "../../utils/dataUtils";
 
 const SpentThisMonth: React.FC<SpentThisMonthProps> = ({

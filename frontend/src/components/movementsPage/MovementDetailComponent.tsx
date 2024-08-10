@@ -4,9 +4,12 @@ import PersonIcon from "@mui/icons-material/Person";
 import { Box, Grid, Skeleton, Typography } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { DetailProps } from "../../models/models";
+import { DetailProps } from "../../models/propsModels";
 
-const MovementDetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {
+const MovementDetailComponent: React.FC<DetailProps> = ({
+  detail,
+  isLoading,
+}) => {
   const { t } = useTranslation();
 
   const keyMap: { [key: string]: string } = {
@@ -26,8 +29,10 @@ const MovementDetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) =
           const displayKey = keyMap[key] || key;
           const displayValue = isLoading ? (
             <Skeleton width="80%" />
+          ) : key === "dateOfOrder" ? (
+            new Date(value).toLocaleDateString()
           ) : (
-            key === "dateOfOrder" ? new Date(value).toLocaleDateString() : value
+            value
           );
 
           return (

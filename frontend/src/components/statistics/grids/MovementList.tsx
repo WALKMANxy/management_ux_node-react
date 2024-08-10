@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { MovementListProps } from "../../../models/models";
+import { MovementListProps } from "../../../models/propsModels";
 import AGGridTable from "./AGGridTable";
 
 const MovementList: React.FC<MovementListProps> = ({

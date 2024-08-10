@@ -1,17 +1,17 @@
 // src/services/api/apiUtils.ts
-import axios, { AxiosRequestConfig } from 'axios';
-import { Agent, Alert, Promo, Visit } from '../../models/models';
+import axios, { AxiosRequestConfig } from "axios";
+import { Alert, Promo, Visit } from "../../models/dataModels";
+import { Agent } from "../../models/entityModels";
 
+export const baseUrl = process.env.REACT_APP_API_BASE_URL || "";
 
-export const baseUrl = process.env.REACT_APP_API_BASE_URL || '';
-
-if (!baseUrl || baseUrl === '') {
-  throw new Error('One or more environment variables are not defined');
+if (!baseUrl || baseUrl === "") {
+  throw new Error("One or more environment variables are not defined");
 }
 
 export const apiCall = async <T>(
   endpoint: string,
-  method: 'GET' | 'POST' | 'PUT' | 'PATCH',
+  method: "GET" | "POST" | "PUT" | "PATCH",
   data?: any
 ): Promise<T> => {
   try {
@@ -19,22 +19,39 @@ export const apiCall = async <T>(
       url: `${baseUrl}/${endpoint}`,
       method,
       headers: {
-        'bypass-tunnel-reminder': 'true',
+        "bypass-tunnel-reminder": "true",
       },
       data,
       withCredentials: true,
     });
     return response.data;
   } catch (error: any) {
-    const serverMessage = error.response?.data?.message || 'An error occurred';
-    console.error(`Error during ${method} request to ${endpoint}:`, serverMessage);
-    throw new Error(serverMessage);
+    if (error.response) {
+      // Handling 404 specifically for PUT and PATCH methods
+      if (
+        (method === "PUT" || method === "PATCH") &&
+        error.response.status === 404
+      ) {
+        console.log(`Resource not found at ${endpoint}, cannot update.`);
+        return Promise.reject({
+          status: error.response.status,
+          message: error.response.data.message || "Resource not found",
+        });
+      }
+      const serverMessage = error.response.data.message || "An error occurred";
+      console.error(
+        `Error during ${method} request to ${endpoint}:`,
+        serverMessage
+      );
+      throw new Error(serverMessage);
+    }
+    throw new Error("Network Error");
   }
 };
 
 export const authApiCall = async <T>(
   endpoint: string,
-  method: 'GET' | 'POST',
+  method: "GET" | "POST",
   data?: any
 ): Promise<T & { message: string; statusCode: number }> => {
   try {
@@ -42,7 +59,7 @@ export const authApiCall = async <T>(
       url: `${baseUrl}/${endpoint}`,
       method,
       headers: {
-        'bypass-tunnel-reminder': 'true',
+        "bypass-tunnel-reminder": "true",
       },
       data,
       withCredentials: true,
@@ -51,7 +68,7 @@ export const authApiCall = async <T>(
     const response = await axios(config);
     return {
       ...response.data,
-      message: response.data.message || 'Success',
+      message: response.data.message || "Success",
       statusCode: response.status,
     };
   } catch (error: any) {
@@ -59,14 +76,13 @@ export const authApiCall = async <T>(
     if (error.response) {
       return {
         ...error.response.data,
-        message: error.response.data.message || 'An error occurred',
+        message: error.response.data.message || "An error occurred",
         statusCode: error.response.status,
       };
     }
     throw new Error(`Failed to ${method.toLowerCase()} data from ${endpoint}`);
   }
 };
-
 
 export const loadJsonData = async (): Promise<any[]> =>
   apiCall<any[]>("movements", "GET");

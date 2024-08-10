@@ -1,16 +1,18 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from './useAuth';
+import { useEffect, useState } from "react";
+import { useAuth } from "./useAuth";
 
 export const useHandleSignin = (onClose: () => void) => {
   const [isLoginMode, setIsLoginMode] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [keepMeSignedIn, setKeepMeSignedIn] = useState(false); // Track "Keep me signed in" state
   const [loading, setLoading] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
+  const [alertMessage, setAlertMessage] = useState("");
   const [alertOpen, setAlertOpen] = useState(false);
-  const [alertSeverity, setAlertSeverity] = useState<'success' | 'error'>('error');
+  const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
+    "error"
+  );
   const [shakeEmail, setShakeEmail] = useState(false);
   const [shakePassword, setShakePassword] = useState(false);
   const [shakeConfirmPassword, setShakeConfirmPassword] = useState(false); // For confirming password shake effect
@@ -23,12 +25,12 @@ export const useHandleSignin = (onClose: () => void) => {
 
   useEffect(() => {
     // Watch for changes in alertMessage and trigger the shake effect
-    if (alertMessage.includes('email')) {
+    if (alertMessage.includes("email")) {
       setTimeout(() => {
         setShakeEmail(true);
       }, Math.random() * 50); // Random delay for email shake
     }
-    if (alertMessage.includes('Password')) {
+    if (alertMessage.includes("Password")) {
       setTimeout(() => {
         setShakePassword(true);
         setShakeConfirmPassword(true);
@@ -52,12 +54,20 @@ export const useHandleSignin = (onClose: () => void) => {
     setShakeConfirmPassword(false);
     try {
       if (isLoginMode) {
-        await handleLogin(email, password, setAlertMessage, setAlertSeverity, setAlertOpen, onClose, keepMeSignedIn);
+        await handleLogin(
+          email,
+          password,
+          setAlertMessage,
+          setAlertSeverity,
+          setAlertOpen,
+          onClose,
+          keepMeSignedIn
+        );
       } else {
         let hasError = false;
         if (password !== confirmPassword) {
-          setAlertMessage('Passwords do not match.');
-          setAlertSeverity('error');
+          setAlertMessage("Passwords do not match.");
+          setAlertSeverity("error");
           setAlertOpen(true);
           setShakePassword(true);
           setShakeConfirmPassword(true);
@@ -72,11 +82,17 @@ export const useHandleSignin = (onClose: () => void) => {
           }, 2000);
           return;
         }
-        await handleRegister(email, password, setAlertMessage, setAlertSeverity, setAlertOpen);
+        await handleRegister(
+          email,
+          password,
+          setAlertMessage,
+          setAlertSeverity,
+          setAlertOpen
+        );
       }
     } catch (error) {
-      setAlertMessage('An unexpected error occurred');
-      setAlertSeverity('error');
+      setAlertMessage("An unexpected error occurred");
+      setAlertSeverity("error");
       setAlertOpen(true);
     } finally {
       setLoading(false);

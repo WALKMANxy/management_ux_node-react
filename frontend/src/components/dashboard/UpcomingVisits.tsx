@@ -9,9 +9,9 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { UpcomingVisitsProps } from "../../models/models";
 import { useSelector } from "react-redux";
 import { selectVisits } from "../../features/visits/visitsSlice";
+import { UpcomingVisitsProps } from "../../models/propsModels";
 
 const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
   const { t } = useTranslation();
@@ -36,14 +36,16 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
               <ListItem key={visit.id}>
                 <ListItemText
                   primary={`Type: ${visit.type}, Reason: ${visit.reason}`}
-                  secondary={`Date: ${visit.date}, Pending: ${visit.pending ? "Yes" : "No"}`}
+                  secondary={`Date: ${visit.date}, Pending: ${
+                    visit.pending ? "Yes" : "No"
+                  }`}
                 />
               </ListItem>
             ))}
           </List>
         ) : (
           <Typography variant="body1">
-            {t('upcomingVisits.noProgrammedVisits')}
+            {t("upcomingVisits.noProgrammedVisits")}
           </Typography>
         )}
       </Box>

@@ -1,4 +1,4 @@
-import { Promo } from "../../models/models";
+import { Promo } from "../../models/dataModels";
 import { apiCall } from "./apiUtils";
 
 export const createPromo = async (promoData: {
@@ -19,5 +19,3 @@ export const updatePromoById = async (
 ): Promise<Promo> => {
   return apiCall<Promo>(`promos/${id}`, "PATCH", promoData);
 };
-
-

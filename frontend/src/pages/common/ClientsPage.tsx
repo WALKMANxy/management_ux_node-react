@@ -2,11 +2,11 @@
 import { Box, useMediaQuery } from "@mui/material";
 import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
 import ClientDetails from "../../components/clientpage/ClientDetails";
 import ClientList from "../../components/statistics/grids/ClientList";
 import { useClientsGrid } from "../../hooks/useClientGrid";
-import { useSelector } from "react-redux";
-import { RootState } from "../../app/store";
 import {
   calculateMonthlyData,
   calculateNetRevenue,
@@ -43,13 +43,13 @@ const ClientsPage: React.FC = () => {
   } = useClientsGrid();
 
   useEffect(() => {
-    const selectedItem = sessionStorage.getItem('searchedItem');
+    const selectedItem = sessionStorage.getItem("searchedItem");
     if (selectedItem) {
       const item = JSON.parse(selectedItem);
-      if (item.type === 'client') {
+      if (item.type === "client") {
         handleClientSelect(item.id);
       }
-      sessionStorage.removeItem('searchedItem'); // Clear the item from storage
+      sessionStorage.removeItem("searchedItem"); // Clear the item from storage
     }
   }, [handleClientSelect]);
 
@@ -128,7 +128,9 @@ const ClientsPage: React.FC = () => {
       {
         headerName: t("clientsPage.netRevenueThisMonth"),
         valueGetter: (params: any) => {
-          const { months, netRevenueData } = calculateMonthlyData([params.data]);
+          const { months, netRevenueData } = calculateMonthlyData([
+            params.data,
+          ]);
           return netRevenueData[months.length - 1] || 0; // Get the latest month's data
         },
         filter: "agNumberColumnFilter",
@@ -168,7 +170,6 @@ const ClientsPage: React.FC = () => {
   const loggedInClientDetails = filteredClients().find(
     (client) => client.id === loggedInClientId
   );
-  
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>

@@ -1,40 +1,40 @@
-import React, { useState } from "react";
+import {
+  BarChart as BarChartIcon,
+  Category as CategoryIcon,
+  Close as CloseIcon,
+  EventNote as EventNoteIcon,
+  History as HistoryIcon,
+  Home as HomeIcon,
+  LocalOffer as LocalOfferIcon,
+  Logout as LogoutIcon,
+  Menu as MenuIcon,
+  Notifications as NotificationsIcon,
+  People as PeopleIcon,
+  Warning as WarningIcon,
+} from "@mui/icons-material";
 import {
   AppBar,
-  Toolbar,
-  IconButton,
-  Badge,
   Avatar,
+  Badge,
+  Box,
   Drawer,
+  Fade,
+  IconButton,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Box,
   Modal,
+  Toolbar,
   Typography,
-  Fade,
 } from "@mui/material";
-import {
-  Menu as MenuIcon,
-  Notifications as NotificationsIcon,
-  Home as HomeIcon,
-  People as PeopleIcon,
-  EventNote as EventNoteIcon,
-  BarChart as BarChartIcon,
-  LocalOffer as LocalOfferIcon,
-  Warning as WarningIcon,
-  Logout as LogoutIcon,
-  Close as CloseIcon,
-  Category as CategoryIcon,
-  History as HistoryIcon, // Import icon for Articles
-} from "@mui/icons-material";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import { RootState } from "../../app/store";
 import { logout } from "../../features/auth/authSlice";
 import GlobalSearch from "./GlobalSearch";
-import { useTranslation } from "react-i18next";
 
 const Header: React.FC = () => {
   const { t } = useTranslation();
@@ -55,7 +55,6 @@ const Header: React.FC = () => {
       setIconChange(!drawerOpen);
     }, 500); // 500ms delay for icon change
   };
-
 
   const handleLogoClick = () => {
     let dashboardLink = "/";
@@ -104,7 +103,12 @@ const Header: React.FC = () => {
           </ListItemIcon>
           <ListItemText primary={t("headerDashboard")} />
         </ListItem>
-        <ListItem button component={Link} to="/movements" onClick={toggleDrawer}>
+        <ListItem
+          button
+          component={Link}
+          to="/movements"
+          onClick={toggleDrawer}
+        >
           <ListItemIcon sx={{ color: "white" }}>
             <HistoryIcon />
           </ListItemIcon>

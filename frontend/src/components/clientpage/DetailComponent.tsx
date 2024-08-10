@@ -10,7 +10,7 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import { Box, Grid, Link, Skeleton, Typography } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { DetailProps } from "../../models/models";
+import { DetailProps } from "../../models/propsModels";
 import { currencyFormatter } from "../../utils/dataUtils";
 
 const DetailComponent: React.FC<DetailProps> = ({ detail, isLoading }) => {

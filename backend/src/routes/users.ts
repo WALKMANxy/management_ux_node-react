@@ -99,9 +99,7 @@ router.get(
   async (req: Request, res: Response) => {
     try {
       const user = await User.findById(req.params.id).select("-password"); // Exclude password from the response
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
+
       res.json(user);
     } catch (err: unknown) {
       if (err instanceof Error) {

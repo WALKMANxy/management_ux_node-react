@@ -4,9 +4,9 @@ import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../app/store";
+import { MovementDetailsHistoryProps } from "../../../models/propsModels";
 import { currencyFormatter, numberComparator } from "../../../utils/dataUtils";
 import AGGridTable from "./AGGridTable";
-import { MovementDetailsHistoryProps } from "../../../models/models";
 
 const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
   movementDetails,

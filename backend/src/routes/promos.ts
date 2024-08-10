@@ -26,6 +26,9 @@ const promoValidationRules = [
 router.get('/', checkAgentOrAdminOrClientRole, async (req: Request, res: Response) => {
   try {
     const promos = await Promo.find();
+
+   
+
     res.json(promos);
   } catch (err: unknown) {
     if (err instanceof Error) {

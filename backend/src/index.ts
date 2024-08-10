@@ -43,6 +43,7 @@ mongoose
 
   const corsOptions: cors.CorsOptions = {
     origin: 'https://woodcock-prime-obviously.ngrok-free.app', // Allow requests from this origin
+   // origin: ['https://localhost:3000'],
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
     optionsSuccessStatus: 200, // For legacy browser support
   };
@@ -87,11 +88,11 @@ const httpsOptions = {
   cert: fs.readFileSync(config.sslCertPath!, 'utf8'),
 };
 
- https.createServer(httpsOptions, app).listen(PORT, async () => {
+/*  https.createServer(httpsOptions, app).listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
-/* https.createServer(httpsOptions, app).listen(PORT, async () => {
+ */
+ https.createServer(httpsOptions, app).listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 
    // Set up localtunnel with custom subdomain
@@ -110,7 +111,7 @@ const httpsOptions = {
   } catch (error) {
     console.error('Error setting up LocalTunnel:', error);
   }
-}); */
+});
 
 
 export default app;

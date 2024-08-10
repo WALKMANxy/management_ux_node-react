@@ -1,7 +1,7 @@
 // features/auth/authSlice.ts
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AuthState } from "../../models/models";
+import { AuthState } from "../../models/stateModels";
 
 const initialState: AuthState = {
   isLoggedIn: false,

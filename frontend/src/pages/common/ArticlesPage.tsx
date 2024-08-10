@@ -3,11 +3,11 @@ import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { currencyFormatter} from "../../utils/dataUtils";
-import ArticlesList from "../../components/statistics/grids/ArticlesList";
 import ArticleDetails from "../../components/articlepage/ArticleDetails";
+import ArticlesList from "../../components/statistics/grids/ArticlesList";
 import { useArticlesGrid } from "../../hooks/useArticlesGrid";
-import { ArticleColumnDefinition } from "../../models/models";
+import { ArticleColumnDefinition } from "../../models/propsModels";
+import { currencyFormatter } from "../../utils/dataUtils";
 
 const ArticlesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -35,15 +35,13 @@ const ArticlesPage: React.FC = () => {
   } = useArticlesGrid();
 
   useEffect(() => {
-    const selectedItem = sessionStorage.getItem('searchedItem');
+    const selectedItem = sessionStorage.getItem("searchedItem");
     if (selectedItem) {
       const item = JSON.parse(selectedItem);
       handleArticleSelect(item.articleId);
-      sessionStorage.removeItem('searchedItem'); // Clear the item from storage
+      sessionStorage.removeItem("searchedItem"); // Clear the item from storage
     }
   }, [handleArticleSelect]);
-
- 
 
   const columnDefinitions: ArticleColumnDefinition[] = useMemo(() => {
     const baseColumns: ArticleColumnDefinition[] = [
@@ -97,7 +95,8 @@ const ArticlesPage: React.FC = () => {
         },
         {
           headerName: t("articlesPage.quantitySold"),
-          valueGetter: (params: any) => totalQuantitySold[params.data.articleId] || 0,
+          valueGetter: (params: any) =>
+            totalQuantitySold[params.data.articleId] || 0,
           filter: "agNumberColumnFilter",
           sortable: true,
         }

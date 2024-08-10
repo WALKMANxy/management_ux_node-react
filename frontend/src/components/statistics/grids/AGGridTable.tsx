@@ -3,7 +3,7 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { AgGridReact } from "ag-grid-react";
 import { forwardRef, useEffect } from "react";
-import { AGGridTableProps } from "../../../models/models";
+import { AGGridTableProps } from "../../../models/propsModels";
 import { paginationPageSizeSelector } from "../../../utils/constants";
 import "../grids/AGGridTable.css";
 

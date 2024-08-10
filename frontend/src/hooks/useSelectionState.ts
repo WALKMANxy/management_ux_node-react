@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "react";
-import { SearchResult } from "../models/models";
-import useStats from "./useStats"; // Adjust the import path as necessary
+import { SearchResult } from "../models/searchModels";
+import useStats from "./useStats";
 
 const useSelectionState = (isMobile: boolean) => {
   const {

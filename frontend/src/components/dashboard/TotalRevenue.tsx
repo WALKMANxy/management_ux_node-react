@@ -3,9 +3,9 @@ import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
-import { TotalEarningProps } from "../../models/models";
-import { currencyFormatter } from "../../utils/dataUtils";
 import { useTranslation } from "react-i18next";
+import { TotalEarningProps } from "../../models/propsModels";
+import { currencyFormatter } from "../../utils/dataUtils";
 
 const TotalEarning: React.FC<TotalEarningProps> = ({ totalEarning }) => {
   const { t } = useTranslation();

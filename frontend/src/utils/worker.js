@@ -1,5 +1,13 @@
 onmessage = function (event) {
-  const { data, clientDetails, visits, promos, alerts } = event.data;
+  const {
+    data,
+    clientDetails,
+    visits = [],
+    promos = [],
+    alerts = [],
+  } = event.data;
+
+  //console.log("Worker received data:", visits, promos, alerts)
 
   // Create a map for clientDetails for faster lookup
   const clientDetailsMap = new Map(

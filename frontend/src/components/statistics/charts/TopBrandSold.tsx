@@ -50,7 +50,9 @@ const TopBrandsSold: React.FC<{
         }}
       >
         <Typography variant="h6" gutterBottom>
-          {userRole === "agent" ? t("topBrandsSold.titleAgent") : t("topBrandsSold.titleClient")}
+          {userRole === "agent"
+            ? t("topBrandsSold.titleAgent")
+            : t("topBrandsSold.titleClient")}
         </Typography>
       </Box>
 

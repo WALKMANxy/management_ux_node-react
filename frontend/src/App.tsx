@@ -13,10 +13,10 @@ import Layout from "./layout/Layout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AgentDashboard from "./pages/agent/AgentDashboard";
 import ClientDashboard from "./pages/client/ClientDashboard";
-import ClientsPage from "./pages/common/ClientsPage";
-import LandingPage from "./pages/landing/LandingPage";
 import ArticlesPage from "./pages/common/ArticlesPage";
+import ClientsPage from "./pages/common/ClientsPage";
 import MovementsPage from "./pages/common/MovementsPage";
+import LandingPage from "./pages/landing/LandingPage";
 
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);

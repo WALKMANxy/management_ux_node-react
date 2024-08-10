@@ -1,7 +1,7 @@
 import { Avatar, Box, Divider, Grid, Paper, Typography } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { TopArticleTypeProps } from "../../models/models";
+import { TopArticleTypeProps } from "../../models/propsModels";
 
 const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {
   const { t } = useTranslation();
@@ -50,7 +50,7 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {
                 color: "#000",
               }}
             >
-              {t('topArticleType.title')}
+              {t("topArticleType.title")}
             </Typography>
           </Grid>
           <Divider sx={{ my: 2, borderRadius: "12px" }} />
@@ -68,7 +68,7 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {
                   >
                     <img
                       src="/icons/garage.svg"
-                      alt={t('topArticleType.iconAlt')}
+                      alt={t("topArticleType.iconAlt")}
                       style={{ width: "100%", height: "100%" }}
                     />
                   </Avatar>
@@ -83,7 +83,7 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {
                   {article.name} (ID: {article.id})
                 </Typography>
                 <Typography sx={{ fontSize: "1rem", color: "#000" }}>
-                  {t('topArticleType.amountPurchased')}: {article.quantity}
+                  {t("topArticleType.amountPurchased")}: {article.quantity}
                 </Typography>
               </Box>
             ))}

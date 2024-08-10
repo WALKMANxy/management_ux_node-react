@@ -1,4 +1,4 @@
-import { Client } from "../../models/models";
+import { Client } from "../../models/entityModels";
 import { apiCall } from "./apiUtils";
 
 export const getClientByCodice = async (codice: string): Promise<Client> => {

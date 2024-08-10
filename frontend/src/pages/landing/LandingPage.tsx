@@ -27,6 +27,7 @@ const LandingPage: React.FC = () => {
   const { t } = useTranslation();
   const [showLoader, setShowLoader] = useState(true);
   const [showLogin, setShowLogin] = useState(false); // Control modal visibility
+  const [isRedirected, setIsRedirected] = useState(false);
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
   const userRole = useSelector((state: RootState) => state.auth.userRole);
   const navigate = useNavigate();
@@ -34,12 +35,13 @@ const LandingPage: React.FC = () => {
   console.log("isLoggedIn: ", isLoggedIn);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowLoader(false), 2000);
+    const timer = setTimeout(() => setShowLoader(false), 1500);
     return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
     if (isLoggedIn && userRole !== "guest") {
+      setIsRedirected(true); // Set the flag as redirected
       // Redirect based on user role
       switch (userRole) {
         case "admin":
@@ -55,7 +57,7 @@ const LandingPage: React.FC = () => {
           break;
       }
     }
-  }, [isLoggedIn, userRole, navigate]);
+  }, [isLoggedIn, userRole, isRedirected, navigate]);
 
   return (
     <Box

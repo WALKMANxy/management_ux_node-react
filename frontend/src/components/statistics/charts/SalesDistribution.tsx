@@ -1,12 +1,19 @@
-import { Box, Button, Divider, Paper, Skeleton, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  Paper,
+  Skeleton,
+  Typography,
+} from "@mui/material";
 import { ApexOptions } from "apexcharts";
 import React, { useMemo, useState } from "react";
 import Chart from "react-apexcharts";
-import { SalesDistributionProps } from "../../../models/models";
-import { currencyFormatter } from "../../../utils/dataUtils";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../app/store";
+import { SalesDistributionProps } from "../../../models/propsModels";
+import { currencyFormatter } from "../../../utils/dataUtils";
 
 // SalesDistribution.tsx
 

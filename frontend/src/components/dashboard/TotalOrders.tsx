@@ -11,8 +11,8 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
-import { useTranslation } from "react-i18next";
 import Chart from "react-apexcharts";
+import { useTranslation } from "react-i18next";
 import { ChartData } from "../../utils/constants";
 
 interface TotalOrderProps {
@@ -111,7 +111,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
                   }}
                   onClick={(e) => handleChangeTime(e, true)}
                 >
-                  {t('totalOrder.month')}
+                  {t("totalOrder.month")}
                 </Button>
                 <Button
                   disableElevation
@@ -128,7 +128,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
                   }}
                   onClick={(e) => handleChangeTime(e, false)}
                 >
-                  {t('totalOrder.year')}
+                  {t("totalOrder.year")}
                 </Button>
               </Grid>
             </Grid>
@@ -185,7 +185,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
                         color: "#000",
                       }}
                     >
-                      {t('totalOrder.totalOrders')}
+                      {t("totalOrder.totalOrders")}
                     </Typography>
                   </Grid>
                 </Grid>

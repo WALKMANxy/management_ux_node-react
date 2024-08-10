@@ -74,12 +74,12 @@ class FetchUserRoleError extends Error {
 }
 
 export {
-  RegistrationError,
-  LoginError,
   FetchUserRoleError,
+  LoginError,
   NetworkError,
+  RegistrationError,
   ServerError,
-  logError,
-  handleApiError,
   generateErrorResponse,
+  handleApiError,
+  logError,
 };
