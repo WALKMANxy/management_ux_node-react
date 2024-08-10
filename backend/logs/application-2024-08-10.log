@@ -1501,3 +1501,17 @@
 2024-08-10T12:20:30.854Z [info]: Response status: 304 for GET /
 2024-08-10T12:20:31.365Z [info]: Incoming request: GET /agents from 95.234.101.22
 2024-08-10T12:20:31.462Z [info]: Response status: 304 for GET /
+2024-08-10T12:36:33.963Z [info]: Incoming request: GET /clients from 95.234.101.22
+2024-08-10T12:36:33.967Z [info]: Incoming request: GET /alerts/admin/8 from 95.234.101.22
+2024-08-10T12:36:33.971Z [info]: Incoming request: GET /movements from 95.234.101.22
+2024-08-10T12:36:33.974Z [info]: Incoming request: GET /visits from 95.234.101.22
+2024-08-10T12:36:33.976Z [info]: Incoming request: GET /admins from 95.234.101.22
+2024-08-10T12:36:33.978Z [info]: Incoming request: GET /agents from 95.234.101.22
+2024-08-10T12:36:33.981Z [info]: Incoming request: GET /promos from 95.234.101.22
+2024-08-10T12:36:34.040Z [info]: Response status: 304 for GET /
+2024-08-10T12:36:34.481Z [info]: Response status: 304 for GET /
+2024-08-10T12:36:34.481Z [info]: Response status: 304 for GET /
+2024-08-10T12:36:34.481Z [info]: Response status: 304 for GET /
+2024-08-10T12:36:34.483Z [info]: Response status: 304 for GET /admin/8
+2024-08-10T12:36:34.533Z [info]: Response status: 304 for GET /
+2024-08-10T12:36:34.534Z [info]: Response status: 304 for GET /

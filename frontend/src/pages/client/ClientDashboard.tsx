@@ -53,7 +53,7 @@ const ClientDashboard: React.FC = () => {
         {clientDetails && "name" in clientDetails ? (
           <>{t("clientDashboard.welcomeBack", { name: clientDetails.name })}</>
         ) : (
-          <Skeleton width="30%" />
+          <Skeleton animation="wave" width="30%" />
         )}
       </Typography>
       <Grid container spacing={6} mt={2}>
@@ -74,6 +74,7 @@ const ClientDashboard: React.FC = () => {
                   />
                 ) : (
                   <Skeleton
+                    animation="wave"
                     variant="rectangular"
                     width="100%"
                     height={200}
@@ -90,6 +91,7 @@ const ClientDashboard: React.FC = () => {
                   />
                 ) : (
                   <Skeleton
+                    animation="wave"
                     variant="rectangular"
                     width="100%"
                     height={200}
@@ -104,6 +106,7 @@ const ClientDashboard: React.FC = () => {
                   />
                 ) : (
                   <Skeleton
+                    animation="wave"
                     variant="rectangular"
                     width="100%"
                     height={200}
@@ -120,6 +123,7 @@ const ClientDashboard: React.FC = () => {
                   />
                 ) : (
                   <Skeleton
+                    animation="wave"
                     variant="rectangular"
                     width="100%"
                     height={300}
@@ -137,6 +141,7 @@ const ClientDashboard: React.FC = () => {
                   />
                 ) : (
                   <Skeleton
+                    animation="wave"
                     variant="rectangular"
                     width="100%"
                     height={300}
@@ -163,6 +168,7 @@ const ClientDashboard: React.FC = () => {
                 <CalendarComponent />
               ) : (
                 <Skeleton
+                  animation="wave"
                   variant="rectangular"
                   width="100%"
                   height={300}
