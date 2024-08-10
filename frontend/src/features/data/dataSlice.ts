@@ -1,89 +1,156 @@
-// dataSlice.ts
 
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Client, Agent, Admin } from "../../models/entityModels";
-import { api } from "../../services/api";
+import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
+import { Admin, Agent, Client } from "../../models/entityModels";
+import { superApi } from "../../services/api/centralizedApi";
+
 
 interface DataState {
-  clients: Client[];
-  agents: Agent[];
-  agentDetails: Agent[];
+  clients: Record<string, Client>;
+  agents: Record<string, Agent>;
+  agentDetails: Record<string, Agent>;
   currentUserDetails: Client | Agent | Admin | null;
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  selectedClientId: string | null;
+  selectedAgentId: string | null;
+  status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
 
 const initialState: DataState = {
-  clients: [],
-  agents: [],
-  agentDetails: [],
+  clients: {},
+  agents: {},
+  agentDetails: {},
   currentUserDetails: null,
-  status: 'idle',
+  selectedClientId: null,
+  selectedAgentId: null,
+  status: "idle",
   error: null,
 };
+
+export const fetchInitialData = createAsyncThunk(
+  'data/fetchInitialData',
+  async (_, { getState, dispatch }) => {
+    const state = getState() as { auth: { userRole: string, id: string } };
+    const { userRole, id } = state.auth;
+
+    await dispatch(superApi.endpoints.getClients.initiate());
+    await dispatch(superApi.endpoints.getAgents.initiate());
+    await dispatch(superApi.endpoints.getAgentDetails.initiate());
+
+    if (userRole === 'client') {
+      await dispatch(superApi.endpoints.getClientById.initiate(id));
+    } else if (userRole === 'agent') {
+      await dispatch(superApi.endpoints.getAgentDetailsById.initiate(id));
+    } else if (userRole === 'admin') {
+      await dispatch(superApi.endpoints.getAdminById.initiate(id));
+    }
+  }
+);
 
 const dataSlice = createSlice({
   name: "data",
   initialState,
-  reducers: {},
+  reducers: {
+    clearSelection: (state) => {
+      state.selectedClientId = null;
+      state.selectedAgentId = null;
+    },
+    selectClient: (state, action: PayloadAction<string>) => {
+      state.selectedClientId = action.payload;
+      state.selectedAgentId = null;
+    },
+    selectAgent: (state, action: PayloadAction<string>) => {
+      state.selectedAgentId = action.payload;
+      state.selectedClientId = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchInitialData.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchInitialData.fulfilled, (state) => {
+        state.status = 'succeeded';
+      })
+      .addCase(fetchInitialData.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'An error occurred';
+      })
       .addMatcher(
-        api.endpoints.getClients.matchFulfilled,
+        superApi.endpoints.getClients.matchFulfilled,
         (state, action: PayloadAction<Client[]>) => {
-          state.clients = action.payload;
-          state.status = 'succeeded';
+          action.payload.forEach(client => {
+            state.clients[client.id] = client;
+          });
         }
       )
       .addMatcher(
-        api.endpoints.getAgents.matchFulfilled,
+        superApi.endpoints.getAgents.matchFulfilled,
         (state, action: PayloadAction<Agent[]>) => {
-          state.agents = action.payload;
-          state.status = 'succeeded';
+          action.payload.forEach(agent => {
+            state.agents[agent.id] = agent;
+          });
         }
       )
       .addMatcher(
-        api.endpoints.getAgentDetails.matchFulfilled,
+        superApi.endpoints.getAgentDetails.matchFulfilled,
         (state, action: PayloadAction<Agent[]>) => {
-          state.agentDetails = action.payload;
-          state.status = 'succeeded';
+          action.payload.forEach(agent => {
+            state.agentDetails[agent.id] = agent;
+          });
         }
       )
       .addMatcher(
-        api.endpoints.getClientById.matchFulfilled,
+        superApi.endpoints.getClientById.matchFulfilled,
         (state, action: PayloadAction<Client>) => {
           state.currentUserDetails = action.payload;
-          state.status = 'succeeded';
+          state.clients[action.payload.id] = action.payload;
         }
       )
       .addMatcher(
-        api.endpoints.getAgentDetailsById.matchFulfilled,
+        superApi.endpoints.getAgentDetailsById.matchFulfilled,
         (state, action: PayloadAction<Agent>) => {
-          state.currentUserDetails = action.payload;
-          state.status = 'succeeded';
+          const agentData = action.payload;
+          const agentClients = Object.values(state.clients).filter(
+            (client) => client.agent === agentData.id
+          );
+          const updatedAgent = {
+            ...agentData,
+            clients: agentClients,
+            AgentVisits: agentClients.flatMap((client) => client.visits || []),
+            AgentPromos: agentClients.flatMap((client) => client.promos || []),
+          };
+          state.currentUserDetails = updatedAgent;
+          state.agents[agentData.id] = updatedAgent;
+          state.agentDetails[agentData.id] = updatedAgent;
         }
       )
       .addMatcher(
-        api.endpoints.getAdminById.matchFulfilled,
+        superApi.endpoints.getAdminById.matchFulfilled,
         (state, action: PayloadAction<Admin>) => {
-          state.currentUserDetails = action.payload;
-          state.status = 'succeeded';
-        }
-      )
-      .addMatcher(
-        api.endpoints.getClients.matchPending,
-        (state) => {
-          state.status = 'loading';
-        }
-      )
-      .addMatcher(
-        api.endpoints.getClients.matchRejected,
-        (state, action) => {
-          state.status = 'failed';
-          state.error = action.error.message || 'An error occurred';
+          const adminData = action.payload;
+          const adminDetails: Admin = {
+            ...adminData,
+            agents: Object.values(state.agentDetails),
+            clients: Object.values(state.clients),
+            GlobalVisits: {},
+            GlobalPromos: {},
+            adminAlerts: [],
+          };
+
+          Object.values(state.agentDetails).forEach((agent) => {
+            adminDetails.GlobalVisits[agent.id] = {
+              Visits: agent.AgentVisits || [],
+            };
+            adminDetails.GlobalPromos[agent.id] = {
+              Promos: agent.AgentPromos || [],
+            };
+          });
+
+          state.currentUserDetails = adminDetails;
         }
       );
   },
 });
 
+export const { clearSelection, selectClient, selectAgent } = dataSlice.actions;
 export default dataSlice.reducer;
