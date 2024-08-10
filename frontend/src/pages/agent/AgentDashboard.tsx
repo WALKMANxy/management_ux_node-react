@@ -77,13 +77,14 @@ const AgentDashboard: React.FC = () => {
         {details && "name" in details ? (
           <>{t("agentDashboard.welcomeBack", { name: details.name })}</>
         ) : (
-          <Skeleton width="30%" />
+          <Skeleton animation="wave" width="30%" />
         )}
       </Typography>
       {details && "clients" in details ? (
         <GlobalSearch filter="client" onSelect={handleSelect} />
       ) : (
         <Skeleton
+          animation="wave"
           variant="rectangular"
           width="100%"
           height={50}
@@ -186,7 +187,7 @@ const AgentDashboard: React.FC = () => {
                 {details && "name" in details ? (
                   t("agentDashboard.yourStatistics")
                 ) : (
-                  <Skeleton width="40%" />
+                  <Skeleton animation="wave" width="40%" />
                 )}
               </Typography>
 
@@ -200,6 +201,7 @@ const AgentDashboard: React.FC = () => {
                     />
                   ) : (
                     <Skeleton
+                      animation="wave"
                       variant="rectangular"
                       width="100%"
                       height={200}
@@ -220,6 +222,7 @@ const AgentDashboard: React.FC = () => {
                     />
                   ) : (
                     <Skeleton
+                      animation="wave"
                       variant="rectangular"
                       width="100%"
                       height={200}
@@ -237,6 +240,7 @@ const AgentDashboard: React.FC = () => {
                     />
                   ) : (
                     <Skeleton
+                      animation="wave"
                       variant="rectangular"
                       width="100%"
                       height={300}
@@ -255,6 +259,7 @@ const AgentDashboard: React.FC = () => {
                     />
                   ) : (
                     <Skeleton
+                      animation="wave"
                       variant="rectangular"
                       width="100%"
                       height={300}
@@ -272,6 +277,7 @@ const AgentDashboard: React.FC = () => {
                     />
                   ) : (
                     <Skeleton
+                      animation="wave"
                       variant="rectangular"
                       width="100%"
                       height={300}
@@ -293,7 +299,7 @@ const AgentDashboard: React.FC = () => {
               {details && "name" in details ? (
                 t("agentDashboard.calendar")
               ) : (
-                <Skeleton width="30%" />
+                <Skeleton animation="wave" width="30%" />
               )}
             </Typography>
 
@@ -304,6 +310,7 @@ const AgentDashboard: React.FC = () => {
               </Box>
             ) : (
               <Skeleton
+                animation="wave"
                 variant="rectangular"
                 width="100%"
                 height={300}

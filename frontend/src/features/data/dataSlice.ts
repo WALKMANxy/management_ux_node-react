@@ -1,68 +1,89 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Client } from "../../models/entityModels";
-import { DataState } from "../../models/stateModels";
-import { api } from "../../services/api"; // Import the API slice
+// dataSlice.ts
 
-// Define the initial state
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Client, Agent, Admin } from "../../models/entityModels";
+import { api } from "../../services/api";
+
+interface DataState {
+  clients: Client[];
+  agents: Agent[];
+  agentDetails: Agent[];
+  currentUserDetails: Client | Agent | Admin | null;
+  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  error: string | null;
+}
+
 const initialState: DataState = {
   clients: [],
-  clientIndex: new Map(),
-  status: "idle",
+  agents: [],
+  agentDetails: [],
+  currentUserDetails: null,
+  status: 'idle',
   error: null,
 };
 
 const dataSlice = createSlice({
   name: "data",
   initialState,
-  reducers: {
-    setAgentClients(state, action: PayloadAction<Client[]>) {
-      state.clients = action.payload;
-      state.clientIndex = new Map<string, Client>(
-        action.payload.map((client) => [client.id, client])
-      );
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
-    // Integrate RTK Query's getClients and getAgentDetails query lifecycle actions
     builder
-      .addMatcher(api.endpoints.getClients.matchPending, (state) => {
-        state.status = "loading";
-      })
-      .addMatcher(api.endpoints.getClients.matchFulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.clients = action.payload;
-        state.clientIndex = new Map<string, Client>(
-          action.payload.map((client) => [client.id, client])
-        );
-      })
-      .addMatcher(api.endpoints.getClients.matchRejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error?.message || null;
-      })
-      .addMatcher(api.endpoints.getAgentDetails.matchPending, (state) => {
-        state.status = "loading";
-      })
       .addMatcher(
-        api.endpoints.getAgentDetails.matchFulfilled,
-        (state, action) => {
-          state.status = "succeeded";
-          // Assuming action.payload is an array of agents with nested clients
-          const clients = action.payload.flatMap((agent) => agent.clients);
-          state.clients = clients;
-          state.clientIndex = new Map<string, Client>(
-            clients.map((client) => [client.id, client])
-          );
+        api.endpoints.getClients.matchFulfilled,
+        (state, action: PayloadAction<Client[]>) => {
+          state.clients = action.payload;
+          state.status = 'succeeded';
         }
       )
       .addMatcher(
-        api.endpoints.getAgentDetails.matchRejected,
+        api.endpoints.getAgents.matchFulfilled,
+        (state, action: PayloadAction<Agent[]>) => {
+          state.agents = action.payload;
+          state.status = 'succeeded';
+        }
+      )
+      .addMatcher(
+        api.endpoints.getAgentDetails.matchFulfilled,
+        (state, action: PayloadAction<Agent[]>) => {
+          state.agentDetails = action.payload;
+          state.status = 'succeeded';
+        }
+      )
+      .addMatcher(
+        api.endpoints.getClientById.matchFulfilled,
+        (state, action: PayloadAction<Client>) => {
+          state.currentUserDetails = action.payload;
+          state.status = 'succeeded';
+        }
+      )
+      .addMatcher(
+        api.endpoints.getAgentDetailsById.matchFulfilled,
+        (state, action: PayloadAction<Agent>) => {
+          state.currentUserDetails = action.payload;
+          state.status = 'succeeded';
+        }
+      )
+      .addMatcher(
+        api.endpoints.getAdminById.matchFulfilled,
+        (state, action: PayloadAction<Admin>) => {
+          state.currentUserDetails = action.payload;
+          state.status = 'succeeded';
+        }
+      )
+      .addMatcher(
+        api.endpoints.getClients.matchPending,
+        (state) => {
+          state.status = 'loading';
+        }
+      )
+      .addMatcher(
+        api.endpoints.getClients.matchRejected,
         (state, action) => {
-          state.status = "failed";
-          state.error = action.error?.message || null;
+          state.status = 'failed';
+          state.error = action.error.message || 'An error occurred';
         }
       );
   },
 });
 
-export const { setAgentClients } = dataSlice.actions;
 export default dataSlice.reducer;

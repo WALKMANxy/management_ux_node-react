@@ -109,6 +109,7 @@ const AdminDashboard: React.FC = () => {
       </Typography>
       {loadingState ? (
         <Skeleton
+          animation="wave"
           variant="rectangular"
           width="100%"
           height={50}
@@ -339,6 +340,7 @@ const AdminDashboard: React.FC = () => {
                 <Grid item xs={12} md={6}>
                   {loadingState ? (
                     <Skeleton
+                      animation="wave"
                       variant="rectangular"
                       width="100%"
                       height={200}
@@ -355,6 +357,7 @@ const AdminDashboard: React.FC = () => {
                 <Grid item xs={12} md={6}>
                   {loadingState ? (
                     <Skeleton
+                      animation="wave"
                       variant="rectangular"
                       width="100%"
                       height={200}
@@ -375,6 +378,7 @@ const AdminDashboard: React.FC = () => {
                 <Grid item xs={12} md={6}>
                   {loadingState ? (
                     <Skeleton
+                      animation="wave"
                       variant="rectangular"
                       width="100%"
                       height={300}
@@ -392,6 +396,7 @@ const AdminDashboard: React.FC = () => {
                 <Grid item xs={12} md={6}>
                   {loadingState ? (
                     <Skeleton
+                      animation="wave"
                       variant="rectangular"
                       width="100%"
                       height={300}
@@ -410,6 +415,7 @@ const AdminDashboard: React.FC = () => {
                 <Grid item xs={12}>
                   {loadingState ? (
                     <Skeleton
+                      animation="wave"
                       variant="rectangular"
                       width="100%"
                       height={300}
@@ -441,6 +447,7 @@ const AdminDashboard: React.FC = () => {
             <Divider sx={{ my: 2, borderRadius: "12px" }} />
             {loadingState ? (
               <Skeleton
+                animation="wave"
                 variant="rectangular"
                 width="100%"
                 height={300}
