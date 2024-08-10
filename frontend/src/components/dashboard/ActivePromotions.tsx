@@ -9,12 +9,11 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ActivePromotionsProps } from "../../models/models";
 import { useSelector } from "react-redux";
 import { selectPromos } from "../../features/promos/promosSlice";
+import { ActivePromotionsProps } from "../../models/propsModels";
 
-
-const ActivePromotions: React.FC<ActivePromotionsProps> = ({  isLoading }) => {
+const ActivePromotions: React.FC<ActivePromotionsProps> = ({ isLoading }) => {
   const { t } = useTranslation();
   const promos = useSelector(selectPromos);
 
@@ -24,7 +23,7 @@ const ActivePromotions: React.FC<ActivePromotionsProps> = ({  isLoading }) => {
   return (
     <Box>
       <Typography variant="h5" gutterBottom>
-        {t('promotions.activePromotions')}
+        {t("promotions.activePromotions")}
       </Typography>
       <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
         {isLoading ? (
@@ -44,7 +43,7 @@ const ActivePromotions: React.FC<ActivePromotionsProps> = ({  isLoading }) => {
           </List>
         ) : (
           <Typography variant="body1">
-            {t('promotions.noActivePromotions')}
+            {t("promotions.noActivePromotions")}
           </Typography>
         )}
       </Box>
@@ -53,7 +52,7 @@ const ActivePromotions: React.FC<ActivePromotionsProps> = ({  isLoading }) => {
         color="primary"
         sx={{ mt: 3, borderRadius: "8px" }}
       >
-        {t('promotions.viewMore')}
+        {t("promotions.viewMore")}
       </Button>
     </Box>
   );

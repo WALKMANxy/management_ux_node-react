@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
-import { Agent, Client, Movement } from "../models/models";
+import { Movement } from "../models/dataModels";
+import { Agent, Client } from "../models/entityModels";
 import { ignoreArticleNames } from "./constants";
 
 // Helper function to get month and year from a date string
@@ -32,7 +33,7 @@ export const calculateNetRevenue = (clients: Client[]): string => {
              console.log("priceBought:", priceBought);
              console.log("quantity:", Math.abs(detail.quantity || 0));
              console.log("netRevenue for this detail:", detailSum + priceSold - priceBought);
- 
+
  */
             return detailSum + priceSold - priceBought;
           },

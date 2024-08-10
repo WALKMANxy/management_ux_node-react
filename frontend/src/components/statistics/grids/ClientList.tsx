@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ClientListProps } from "../../../models/models";
+import { ClientListProps } from "../../../models/propsModels";
 import AGGridTable from "./AGGridTable";
 
 const ClientList: React.FC<ClientListProps> = ({

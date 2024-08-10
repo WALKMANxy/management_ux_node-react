@@ -1,12 +1,15 @@
 import express, { Request, Response } from "express";
+import { body } from "express-validator";
 import fs from "fs";
 import path from "path";
-import { body } from "express-validator";
-import { authenticateUser } from "../utils/authentication";
-import { AuthenticatedRequest, Client } from "../models/types";
-import { checkValidation } from "../utils/validate";
-import { checkAdminRole, checkAgentOrAdminOrClientRole } from "../utils/roleChecker";
 import { config } from "../config/config";
+import { AuthenticatedRequest, Client } from "../models/types";
+import { authenticateUser } from "../utils/authentication";
+import {
+  checkAdminRole,
+  checkAgentOrAdminOrClientRole,
+} from "../utils/roleChecker";
+import { checkValidation } from "../utils/validate";
 
 const router = express.Router();
 
@@ -15,105 +18,130 @@ router.use(authenticateUser);
 
 // Validation rules
 const clientValidationRules = [
-  body('RAGIONE SOCIALE').notEmpty().withMessage('Ragione Sociale is required'),
-  body('INDIRIZZO').notEmpty().withMessage('Indirizzo is required'),
-  body('C.A.P. - COMUNE (PROV.)').notEmpty().withMessage('CAP Comune Prov is required'),
-  body('PARTITA IVA').notEmpty().withMessage('Partita IVA is required'),
-  body('MP').notEmpty().withMessage('MP is required'),
-  body('CS').notEmpty().withMessage('CS is required'),
-  body('AG').notEmpty().withMessage('AG is required'),
+  body("RAGIONE SOCIALE").notEmpty().withMessage("Ragione Sociale is required"),
+  body("INDIRIZZO").notEmpty().withMessage("Indirizzo is required"),
+  body("C.A.P. - COMUNE (PROV.)")
+    .notEmpty()
+    .withMessage("CAP Comune Prov is required"),
+  body("PARTITA IVA").notEmpty().withMessage("Partita IVA is required"),
+  body("MP").notEmpty().withMessage("MP is required"),
+  body("CS").notEmpty().withMessage("CS is required"),
+  body("AG").notEmpty().withMessage("AG is required"),
 ];
 
 // GET method to retrieve all clients
-router.get("/", checkAgentOrAdminOrClientRole, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const filePath = path.resolve(config.clientDetailsFilePath || "");
-    const clients: Client[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-    res.json(clients);
-  } catch (err) {
-    if (err instanceof Error) {
-      res.status(500).json({ message: err.message });
-    } else {
-      console.error("Unexpected error:", err);
-      res.status(500).json({ message: "Internal Server Error" });
+router.get(
+  "/",
+  checkAgentOrAdminOrClientRole,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const filePath = path.resolve(config.clientDetailsFilePath || "");
+      const clients: Client[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+      res.json(clients);
+    } catch (err) {
+      if (err instanceof Error) {
+        res.status(500).json({ message: err.message });
+      } else {
+        console.error("Unexpected error:", err);
+        res.status(500).json({ message: "Internal Server Error" });
+      }
     }
   }
-});
+);
 
 // GET method to retrieve a client by codice
-router.get("/codice/:codice", checkAgentOrAdminOrClientRole, async (req: Request, res: Response) => {
-  try {
-    const filePath = path.resolve(config.clientDetailsFilePath || "");
-    const clients: Client[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+router.get(
+  "/codice/:codice",
+  checkAgentOrAdminOrClientRole,
+  async (req: Request, res: Response) => {
+    try {
+      const filePath = path.resolve(config.clientDetailsFilePath || "");
+      const clients: Client[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
 
-    const client = clients.find((client) => client.CODICE === req.params.codice);
-    if (!client) {
-      return res.status(404).json({ message: "Client not found" });
-    }
+      const client = clients.find(
+        (client) => client.CODICE === req.params.codice
+      );
 
-    res.json(client);
-  } catch (err) {
-    if (err instanceof Error) {
-      res.status(500).json({ message: err.message });
-    } else {
-      console.error("Unexpected error:", err);
-      res.status(500).json({ message: "Internal Server Error" });
+      res.json(client);
+    } catch (err) {
+      if (err instanceof Error) {
+        res.status(500).json({ message: err.message });
+      } else {
+        console.error("Unexpected error:", err);
+        res.status(500).json({ message: "Internal Server Error" });
+      }
     }
   }
-});
+);
 
 // PUT method to replace an entire client
-router.put("/:id", clientValidationRules, checkValidation, checkAdminRole, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const filePath = path.resolve(config.clientDetailsFilePath || "");
-    const clients: Client[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+router.put(
+  "/:id",
+  clientValidationRules,
+  checkValidation,
+  checkAdminRole,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const filePath = path.resolve(config.clientDetailsFilePath || "");
+      const clients: Client[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
 
-    const clientIndex = clients.findIndex((client) => client.CODICE === req.params.id);
-    if (clientIndex === -1) {
-      return res.status(404).json({ message: "Client not found" });
-    }
+      const clientIndex = clients.findIndex(
+        (client) => client.CODICE === req.params.id
+      );
+      if (clientIndex === -1) {
+        return res.status(404).json({ message: "Client not found" });
+      }
 
-    // Replace client
-    clients[clientIndex] = { CODICE: req.params.id, ...req.body };
+      // Replace client
+      clients[clientIndex] = { CODICE: req.params.id, ...req.body };
 
-    fs.writeFileSync(filePath, JSON.stringify(clients, null, 2));
-    res.status(200).json({ message: "Client updated successfully" });
-  } catch (err) {
-    if (err instanceof Error) {
-      res.status(500).json({ message: err.message });
-    } else {
-      console.error("Unexpected error:", err);
-      res.status(500).json({ message: "Internal Server Error" });
+      fs.writeFileSync(filePath, JSON.stringify(clients, null, 2));
+      res.status(200).json({ message: "Client updated successfully" });
+    } catch (err) {
+      if (err instanceof Error) {
+        res.status(500).json({ message: err.message });
+      } else {
+        console.error("Unexpected error:", err);
+        res.status(500).json({ message: "Internal Server Error" });
+      }
     }
   }
-});
+);
 
 // PATCH method to update part of a client's information
-router.patch("/:id", clientValidationRules, checkValidation, checkAdminRole, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const filePath = path.resolve(config.clientDetailsFilePath || "");
-    const clients: Client[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+router.patch(
+  "/:id",
+  clientValidationRules,
+  checkValidation,
+  checkAdminRole,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const filePath = path.resolve(config.clientDetailsFilePath || "");
+      const clients: Client[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
 
-    const clientIndex = clients.findIndex((client) => client.CODICE === req.params.id);
-    if (clientIndex === -1) {
-      return res.status(404).json({ message: "Client not found" });
-    }
+      const clientIndex = clients.findIndex(
+        (client) => client.CODICE === req.params.id
+      );
+      if (clientIndex === -1) {
+        return res.status(404).json({ message: "Client not found" });
+      }
 
-    // Update only the fields provided in req.body
-    const updatedClient = { ...clients[clientIndex], ...req.body };
+      // Update only the fields provided in req.body
+      const updatedClient = { ...clients[clientIndex], ...req.body };
 
-    clients[clientIndex] = updatedClient;
+      clients[clientIndex] = updatedClient;
 
-    fs.writeFileSync(filePath, JSON.stringify(clients, null, 2));
-    res.status(200).json({ message: "Client updated successfully" });
-  } catch (err) {
-    if (err instanceof Error) {
-      res.status(500).json({ message: err.message });
-    } else {
-      console.error("Unexpected error:", err);
-      res.status(500).json({ message: "Internal Server Error" });
+      fs.writeFileSync(filePath, JSON.stringify(clients, null, 2));
+      res.status(200).json({ message: "Client updated successfully" });
+    } catch (err) {
+      if (err instanceof Error) {
+        res.status(500).json({ message: err.message });
+      } else {
+        console.error("Unexpected error:", err);
+        res.status(500).json({ message: "Internal Server Error" });
+      }
     }
   }
-});
+);
 
 export default router;

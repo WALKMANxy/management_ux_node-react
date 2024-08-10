@@ -1,111 +1,14 @@
-// src/models/models.ts
-
 import { ColDef } from "ag-grid-community";
 import { ReactNode } from "react";
-
-export type UserRole = "admin" | "agent" | "client" | "guest";
-
-export type User = {
-  id: string; // Corresponds to MongoDB's _id
-  email: string;
-  googleId?: string;
-  password?: string; // Optional for OAuth users
-  passwordResetToken?: string; // Optional for password reset
-  passwordResetExpires?: Date; // Optional for password reset
-  role: UserRole;
-  entityCode: string; // Code linking to admin, agent, or client
-  avatar?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-};
-
-export type Admin = {
-  id: string;
-  name: string;
-  email: string;
-  agents: Agent[];
-  clients: Client[];
-  GlobalVisits: {
-    [agentId: string]: {
-      Visits: Visit[];
-    };
-  };
-  GlobalPromos: {
-    [agentId: string]: {
-      Promos: Promo[];
-    };
-  };
-  adminAlerts: Alert[];
-};
-
-export type AuthState = {
-  isLoggedIn: boolean;
-  userRole: UserRole;
-  id: string | null;
-};
-
-export type ClientsState = {
-  clients: Client[];
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error: string | null;
-};
-
-export type CalendarState = {
-  visits: Visit[];
-};
+import { Movement, MovementDetail } from "./dataModels";
+import { Agent, Client } from "./entityModels";
+import { SearchResult } from "./searchModels";
 
 export type AuthHandlersProps = {
   selectedRole: "admin" | "agent" | "client";
   selectedAgent: string;
   selectedClient: string;
   agents: Agent[];
-};
-
-export type SearchResult = {
-  id: string;
-  name: string;
-  type: string;
-  // Article-specific properties
-  articleId?: string;
-  brand?: string;
-  lastSoldDate?: string;
-  // Client-specific properties
-  province?: string;
-  phone?: string;
-  paymentMethod?: string;
-  address?: string;
-  email?: string;
-  agent?: string;
-  // Promo-specific properties
-  discountAmount?: string;
-  startDate?: Date; // Keep as Date
-  endDate?: Date; // Keep as Date
-  promoIssuedBy?: string;
-  // Visit-specific properties
-  reason?: string;
-  date?: Date;
-  pending?: boolean;
-  completed?: boolean;
-  visitIssuedBy?: string;
-  // Alert-specific properties
-  createdAt?: string;
-  alertReason?: string;
-  severity?: string;
-  alertIssuedBy?: string;
-};
-
-export type SearchParams = {
-  query: string;
-  filter: string;
-  results?: SearchResult[];
-};
-
-export type SearchState = {
-  query: string;
-  results: SearchResult[];
-  status: "idle" | "loading" | "succeeded" | "failed";
-
-  error: string | null;
 };
 
 export type GlobalSearchProps = {
@@ -172,10 +75,6 @@ export type SpentThisYearProps = {
 
 export type Props = {
   children: ReactNode;
-};
-
-export type State = {
-  hasError: boolean;
 };
 
 export type ClientListProps = {
@@ -258,20 +157,6 @@ export type ClientDetailsProps = {
   ref: React.Ref<HTMLDivElement>; // Add ref prop
 };
 
-export type Visit = {
-  id: string;
-  clientId: string; // Unique association with a client
-  type: string;
-  reason: string;
-  createdAt: Date;
-  date: Date;
-  notePublic?: string;
-  notePrivate?: string;
-  pending: boolean;
-  completed: boolean;
-  visitIssuedBy: string;
-};
-
 export type ArticlesListProps = {
   quickFilterText: string;
   setQuickFilterText: (value: string) => void;
@@ -298,93 +183,4 @@ export type ArticleDetailsProps = {
 
 export type MovementDetailsHistoryProps = {
   movementDetails: MovementDetail[];
-};
-
-export type MovementDetail = {
-  articleId: string;
-  name: string;
-  brand: string;
-  quantity: number; // Added quantity
-  unitPrice: string; // Added unit price
-  priceSold: string;
-  priceBought: string;
-};
-
-export type Movement = {
-  id: string;
-  discountCategory: string;
-  details: MovementDetail[];
-  unpaidAmount: string;
-  paymentDueDate: string;
-  dateOfOrder: string;
-};
-
-export type Promo = {
-  id: string;
-  clientsId: string[]; // Array of client IDs this promo applies to
-  promoType: string;
-  name: string;
-  discount: string;
-  createdAt: Date;
-  startDate: Date;
-  endDate: string;
-  promoIssuedBy: string;
-};
-
-export type Client = {
-  id: string;
-  name: string;
-  extendedName?: string; // New property
-  province?: string;
-  phone?: string;
-  totalOrders: number;
-  totalRevenue: string;
-  unpaidRevenue: string;
-  address?: string;
-  email?: string;
-  pec?: string; // New property
-  taxCode?: string; // New property
-  extendedTaxCode?: string; // New property
-  paymentMethodID?: string; // New property
-  paymentMethod?: string; // New property
-  visits: Visit[];
-  agent: string;
-  agentName?: string;
-  movements: Movement[];
-  promos: Promo[];
-  clientAlerts: Alert[];
-};
-
-export type Agent = {
-  id: string;
-  name: string;
-  email?: string;
-  phone?: string;
-  clients: Client[];
-  agentAlerts: Alert[];
-  AgentVisits: Visit[]; // New property
-  AgentPromos: Promo[]; // New property
-};
-
-export type Alert = {
-  id: string;
-  alertReason: string;
-  message: string;
-  severity: "low" | "medium" | "high";
-  createdAt: Date;
-  alertIssuedBy: string;
-  entityRole: "admin" | "agent" | "client"; // New field
-  entityCode: string; // New field
-};
-
-export type DataState = {
-  clients: Client[];
-  clientIndex: Map<string, Client>;
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error: string | null;
-};
-
-export type FetchDataPayload = {
-  clients: Client[];
-  clientIndex: Map<string, Client>;
 };

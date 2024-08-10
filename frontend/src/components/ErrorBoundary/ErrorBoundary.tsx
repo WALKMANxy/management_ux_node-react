@@ -1,7 +1,7 @@
 //src/components/ErrorBoundary/ErrorBoundary.tsx
 import { Component, ErrorInfo } from "react";
-import { Props, State } from "../../models/models";
-
+import { Props } from "../../models/propsModels";
+import { State } from "../../models/stateModels";
 
 class ErrorBoundary extends Component<Props, State> {
   state: State = {

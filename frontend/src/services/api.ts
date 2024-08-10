@@ -1,16 +1,9 @@
 // services/api.ts
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import {
-  Admin,
-  Agent,
-  Alert,
-  Client,
-  MovementDetail,
-  Promo,
-  User,
-  Visit,
-} from "../models/models";
+import { Alert, MovementDetail, Promo, Visit } from "../models/dataModels";
+
+import { Admin, Agent, Client, User } from "../models/entityModels";
 
 import {
   mapDataToAgents,
@@ -149,25 +142,27 @@ export const api = createApi({
       },
       keepUnusedDataFor: 60 * 20,
     }),
-    getAgentById: builder.query<Agent, string>({
-      queryFn: async (agentId) => {
+    getAgentDetailsById: builder.query<Agent, string>({
+      queryFn: async (entityCode) => {
         try {
+          const entityRole = "agent"; // Set the role to 'agent' for this query
           const [data, agentDetails, visits, promos, alerts] =
             await Promise.all([
               loadJsonData(),
-              loadAgentDetailsData(),
+              getAgentById(entityCode),
               loadVisitsData(),
               loadPromosData(),
               loadAlertsData(),
+              getAlertsByEntityRoleAndEntityCode({ entityRole, entityCode }),
             ]);
           const agents = await mapDataToAgents(
             data,
-            agentDetails,
+            [agentDetails],
             visits,
             promos,
             alerts
           );
-          const agent = agents.find((agent) => agent.id === agentId);
+          const agent = agents.find((agent) => agent.id === entityCode);
           if (!agent) {
             throw new Error("Agent not found");
           }
@@ -376,28 +371,6 @@ export const api = createApi({
         }
       },
       keepUnusedDataFor: 60 * 20,
-    }),
-
-    getOnlyAgentById: builder.query<Agent, string>({
-      queryFn: async (id) => {
-        try {
-          const result = await getAgentById(id);
-          return { data: result };
-        } catch (error) {
-          return generateErrorResponse(error);
-        }
-      },
-    }),
-
-    getOnlyAdminById: builder.query<Admin, string>({
-      queryFn: async (id) => {
-        try {
-          const result = await getAdminById(id);
-          return { data: result };
-        } catch (error) {
-          return generateErrorResponse(error);
-        }
-      },
     }),
 
     getClientByCodice: builder.query<Client, string>({
@@ -657,8 +630,7 @@ export const {
   useUpdateVisitByIdMutation,
   useCreatePromoMutation,
   useUpdatePromoByIdMutation,
-  useGetOnlyAgentByIdQuery,
-  useGetOnlyAdminByIdQuery,
+  useGetVisitsQuery,
   useGetUserByIdQuery,
   useGetAllUsersQuery,
   useUpdateUserByIdMutation,
@@ -671,7 +643,7 @@ export const {
   useGetClientByIdQuery,
   useGetAgentsQuery,
   useGetAgentDetailsQuery,
-  useGetAgentByIdQuery,
+  useGetAgentDetailsByIdQuery,
   useGetAdminDataQuery,
   useGetAdminByIdQuery,
   useGetMovementDetailsQuery,

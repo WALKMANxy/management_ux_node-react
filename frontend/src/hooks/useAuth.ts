@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
 import store, { AppDispatch } from "../app/store"; // Import AppDispatch type from your store
 import { login, logout } from "../features/auth/authSlice";
-import { User } from "../models/models"; // Import your User type
+import { User } from "../models/entityModels"; // Import your User type
 import {
   api,
   useLoginUserMutation,
@@ -15,9 +15,6 @@ import {
 } from "../utils/errorHandling";
 import { saveAuthState } from "../utils/localStorage";
 
-
-
-
 export const useAuth = () => {
   const dispatch = useDispatch<AppDispatch>(); // Type your dispatch with AppDispatch
   const [registerUser] = useRegisterUserMutation();
@@ -27,18 +24,21 @@ export const useAuth = () => {
     email: string,
     password: string,
     setAlertMessage: (message: string) => void,
-    setAlertSeverity: (severity: 'success' | 'error') => void,
+    setAlertSeverity: (severity: "success" | "error") => void,
     setAlertOpen: (open: boolean) => void
   ) => {
     try {
-      const { message, statusCode } = await registerUser({ email, password }).unwrap();
+      const { message, statusCode } = await registerUser({
+        email,
+        password,
+      }).unwrap();
       setAlertMessage(message);
-      setAlertSeverity(statusCode === 201 ? 'success' : 'error');
+      setAlertSeverity(statusCode === 201 ? "success" : "error");
       setAlertOpen(true);
     } catch (error) {
       const registrationError = new RegistrationError((error as Error).message);
       setAlertMessage(registrationError.message);
-      setAlertSeverity('error');
+      setAlertSeverity("error");
       setAlertOpen(true);
     }
   };
@@ -47,17 +47,20 @@ export const useAuth = () => {
     email: string,
     password: string,
     setAlertMessage: (message: string) => void,
-    setAlertSeverity: (severity: 'success' | 'error') => void,
+    setAlertSeverity: (severity: "success" | "error") => void,
     setAlertOpen: (open: boolean) => void,
     onClose: () => void,
     keepMeSignedIn: boolean
   ) => {
     try {
-      const { redirectUrl, id, message, statusCode } = await loginUser({ email, password }).unwrap();
+      const { redirectUrl, id, message, statusCode } = await loginUser({
+        email,
+        password,
+      }).unwrap();
 
       if (statusCode !== 200) {
         setAlertMessage(message);
-        setAlertSeverity('error');
+        setAlertSeverity("error");
         setAlertOpen(true);
         return;
       }
@@ -65,25 +68,28 @@ export const useAuth = () => {
       const userId = id;
 
       if (userId) {
-        const result = await dispatch(api.endpoints.getUserRoleById.initiate(userId));
+        const result = await dispatch(
+          api.endpoints.getUserRoleById.initiate(userId)
+        );
 
         if ("data" in result) {
           const user = result.data as User;
 
           if (user.role === "guest") {
-            setAlertMessage("Your account is still being verified by the admins.");
-            setAlertSeverity('error');
+            setAlertMessage(
+              "Your account is still being verified by the admins."
+            );
+            setAlertSeverity("error");
             setAlertOpen(true);
             return;
           }
 
           dispatch(login({ role: user.role, id: user.entityCode }));
 
-            // Save auth state if "Keep me signed in" is checked
-            if (keepMeSignedIn) {
-              saveAuthState(store.getState().auth);
-            }
-
+          // Save auth state if "Keep me signed in" is checked
+          if (keepMeSignedIn) {
+            saveAuthState(store.getState().auth);
+          }
 
           const state = store.getState(); // If not inside a React component, otherwise use `useSelector`
           console.log("Updated auth state:", state.auth);
@@ -97,26 +103,26 @@ export const useAuth = () => {
     } catch (error) {
       const loginError = new LoginError((error as Error).message);
       setAlertMessage(loginError.message);
-      setAlertSeverity('error');
+      setAlertSeverity("error");
       setAlertOpen(true);
     }
   };
 
   const handleLogout = (
     setAlertMessage: (message: string) => void,
-    setAlertSeverity: (severity: 'success' | 'error') => void,
+    setAlertSeverity: (severity: "success" | "error") => void,
     setAlertOpen: (open: boolean) => void
   ) => {
     try {
       clearAuthData();
       dispatch(logout());
       setAlertMessage("User logged out successfully.");
-      setAlertSeverity('success');
+      setAlertSeverity("success");
       setAlertOpen(true);
     } catch (error) {
       const logoutError = new Error("Failed to log out.");
       setAlertMessage(logoutError.message);
-      setAlertSeverity('error');
+      setAlertSeverity("error");
       setAlertOpen(true);
     }
   };

@@ -1,9 +1,9 @@
 //src/hooks/useClientGrid.ts
-import { useCallback,  useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
-import { Agent, Client } from "../models/models";
-import { useGetClientsQuery, useGetAgentDetailsQuery } from "../services/api";
+import { Agent, Client } from "../models/entityModels";
+import { useGetAgentDetailsQuery, useGetClientsQuery } from "../services/api";
 
 export const useClientsGrid = () => {
   const { data: clients = [] } = useGetClientsQuery();
@@ -59,9 +59,7 @@ export const useClientsGrid = () => {
     },
     [clients, agentDetails]
   );
-  
-  
-  
+
   const filteredClients = useCallback(() => {
     let filtered = clients;
     if (userRole === "agent") {
@@ -72,7 +70,7 @@ export const useClientsGrid = () => {
     if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
-      filtered = filtered.filter((client) => {
+      filtered = filtered.filter((client: Client) => {
         return client.movements.some((movement) => {
           const movementDate = new Date(movement.dateOfOrder);
           return movementDate >= start && movementDate <= end;
@@ -81,12 +79,9 @@ export const useClientsGrid = () => {
     }
     return filtered.map((client) => addAgentNameToClient(client, agentDetails));
   }, [clients, userRole, userId, startDate, endDate, agentDetails]);
-  
-  
-  
 
   return {
-    clients, 
+    clients,
     selectedClient,
     setSelectedClient,
     quickFilterText,

@@ -1,11 +1,6 @@
-import {
-  Agent,
-  Alert,
-  Client,
-  MovementDetail,
-  Promo,
-  Visit,
-} from "../models/models"; // Import the new types
+import { Alert, MovementDetail, Promo, Visit } from "../models/dataModels";
+
+import { Agent, Client } from "../models/entityModels";
 
 const workerScriptPath = new URL("./worker.js", import.meta.url);
 
@@ -14,9 +9,9 @@ export const mapDataToModels = async (
   data: any[],
   clientDetails: any[],
   agentDetails: any[],
-  visits: Visit[], // New parameter for visits
-  promos: Promo[], // New parameter for promos
-  alerts: Alert[] // New parameter for alerts
+  visits: Visit[] = [], // Default to an empty array if undefined
+  promos: Promo[] = [], // Default to an empty array if undefined
+  alerts: Alert[] = [] // Default to an empty array if undefined
 ): Promise<Client[]> => {
   const numWorkers = Math.min(navigator.hardwareConcurrency || 4, data.length);
   const chunkSize = Math.ceil(data.length / numWorkers);
@@ -75,9 +70,9 @@ export const mapDataToModels = async (
         data: chunk,
         clientDetails,
         agentDetails,
-        visits,
-        promos,
-        alerts,
+        visits: visits || [], // Ensure this is always an array
+        promos: promos || [], // Ensure this is always an array
+        alerts: alerts || [], // Ensure this is always an array
       }); // Include new data in the worker
     });
   });
@@ -87,9 +82,9 @@ export const mapDataToModels = async (
 export const mapDataToAgents = async (
   data: any[],
   agentDetails: Agent[],
-  visits: Visit[],
-  promos: Promo[],
-  alerts: Alert[]
+  visits: Visit[] = [], // Default to an empty array if undefined
+  promos: Promo[] = [], // Default to an empty array if undefined
+  alerts: Alert[] = [] // Default to an empty array if undefined
 ): Promise<Agent[]> => {
   const agentsMap = new Map<string, Agent>();
 
@@ -130,7 +125,8 @@ export const mapDataToAgents = async (
           movements: [],
           promos: promos.filter((promo) => promo.clientsId.includes(clientId)),
           clientAlerts: alerts.filter(
-            (alert) => alert.entityRole === "client" && alert.entityCode === clientId
+            (alert) =>
+              alert.entityRole === "client" && alert.entityCode === clientId
           ),
         };
         agent.clients.push(newClient);
@@ -151,7 +147,6 @@ export const mapDataToAgents = async (
 
   return Array.from(agentsMap.values());
 };
-
 
 // Mapping function for movement details
 export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {

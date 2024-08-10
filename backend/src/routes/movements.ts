@@ -41,6 +41,8 @@ router.get("/", checkAgentOrAdminOrClientRole, async (req: AuthenticatedRequest,
     const movements: Movement[] = JSON.parse(
       fs.readFileSync(filePath, "utf-8")
     );
+
+   
     res.json(movements);
   } catch (err) {
     if (err instanceof Error) {

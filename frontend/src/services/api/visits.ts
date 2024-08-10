@@ -1,4 +1,4 @@
-import { Visit } from "../../models/models";
+import { Visit } from "../../models/dataModels";
 import { apiCall } from "./apiUtils";
 
 export const createVisit = async (visitData: {

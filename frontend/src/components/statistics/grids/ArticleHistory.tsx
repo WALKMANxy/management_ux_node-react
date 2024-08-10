@@ -1,7 +1,7 @@
 import { Box, Paper, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Movement } from "../../../models/models";
+import { Movement } from "../../../models/dataModels";
 import { currencyFormatter, numberComparator } from "../../../utils/dataUtils";
 import AGGridTable from "./AGGridTable";
 import { useGetClientsQuery } from "../../../services/api";

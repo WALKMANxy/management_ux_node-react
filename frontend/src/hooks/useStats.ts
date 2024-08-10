@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../app/store";
 import { setVisits } from "../features/calendar/calendarSlice";
 import { setPromos } from "../features/promos/promosSlice";
-import { Admin, Agent, Client, Movement } from "../models/models";
+import { Movement } from "../models/dataModels";
+import { Admin, Agent, Client } from "../models/entityModels";
 import {
   useGetAdminByIdQuery,
-  useGetAgentByIdQuery,
+  useGetAgentDetailsByIdQuery,
   useGetAgentDetailsQuery,
   useGetAgentsQuery,
   useGetClientByIdQuery,
@@ -23,15 +25,17 @@ import {
   calculateTotalSpentForYear,
   calculateTotalSpentForYearForClients,
 } from "../utils/dataUtils";
-import { RootState } from "../app/store";
 
 const useStats = (isMobile: boolean) => {
-
   const dispatch = useDispatch();
 
-   // Get role and entityCode from Redux state
-   const role = useSelector((state: RootState) => state.auth.userRole);
-   const entityCode = useSelector((state: RootState) => state.auth.id);
+  // Get role and entityCode from Redux state
+  const role = useSelector((state: RootState) => state.auth.userRole);
+  const entityCode = useSelector((state: RootState) => state.auth.id);
+
+  const skipClientById = role !== "client" || !entityCode;
+  const skipAgentById = role !== "agent" || !entityCode;
+  const skipAdminById = role !== "admin" || !entityCode;
 
   // Fetch the required data using the RTK Query hooks
   const {
@@ -39,11 +43,7 @@ const useStats = (isMobile: boolean) => {
     isLoading: clientsLoading,
     error: clientsError,
   } = useGetClientsQuery();
-  const {
-    data: clientByIdData,
-    isLoading: clientByIdLoading,
-    error: clientByIdError,
-  } = useGetClientByIdQuery(entityCode || "");
+
   const {
     data: agentsData,
     isLoading: agentsLoading,
@@ -55,15 +55,20 @@ const useStats = (isMobile: boolean) => {
     error: agentDetailsError,
   } = useGetAgentDetailsQuery();
   const {
+    data: clientByIdData,
+    isLoading: clientByIdLoading,
+    error: clientByIdError,
+  } = useGetClientByIdQuery(entityCode || "", { skip: skipClientById });
+  const {
     data: agentByIdData,
     isLoading: agentByIdDataLoading,
     error: agentByIdDataError,
-  } = useGetAgentByIdQuery(entityCode || "");
+  } = useGetAgentDetailsByIdQuery(entityCode || "", { skip: skipAgentById });
   const {
     data: adminByIdData,
     isLoading: adminLoading,
     error: adminError,
-  } = useGetAdminByIdQuery(entityCode || "");
+  } = useGetAdminByIdQuery(entityCode || "", { skip: skipAdminById });
 
   const [details, setDetails] = useState<Agent | Client | Admin | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
@@ -412,7 +417,7 @@ const useStats = (isMobile: boolean) => {
     });
 
     // Filter movements for all clients for the current month and year
-    const allMovements = clientsData.flatMap((client) =>
+    const allMovements = clientsData.flatMap((client: Client) =>
       client.movements.filter((movement) => {
         const movementDate = new Date(movement.dateOfOrder);
         return (
@@ -529,32 +534,35 @@ const useStats = (isMobile: boolean) => {
     //console.log("Agent Clients:", agentClients);
 
     // Calculate the total revenue for the selected agent's clients for the current month and year
-    const selectedMonthlyTotal = agentClients.reduce((total, client) => {
-      const monthlyRevenue = client.movements
-        .filter((movement) => {
-          const movementDate = new Date(movement.dateOfOrder);
-          return (
-            movementDate.getMonth() + 1 === currentMonth &&
-            movementDate.getFullYear() === currentYear
-          );
-        })
-        .reduce((movementSum, movement) => {
-          return (
-            movementSum +
-            movement.details.reduce(
-              (detailSum, detail) =>
-                detailSum + (parseFloat(detail.priceSold) || 0),
-              0
-            )
-          );
-        }, 0);
-      return total + monthlyRevenue;
-    }, 0);
+    const selectedMonthlyTotal = agentClients.reduce(
+      (total, client: Client) => {
+        const monthlyRevenue = client.movements
+          .filter((movement) => {
+            const movementDate = new Date(movement.dateOfOrder);
+            return (
+              movementDate.getMonth() + 1 === currentMonth &&
+              movementDate.getFullYear() === currentYear
+            );
+          })
+          .reduce((movementSum, movement) => {
+            return (
+              movementSum +
+              movement.details.reduce(
+                (detailSum, detail) =>
+                  detailSum + (parseFloat(detail.priceSold) || 0),
+                0
+              )
+            );
+          }, 0);
+        return total + monthlyRevenue;
+      },
+      0
+    );
 
     //console.log("Selected Agent's Monthly Total Revenue:", selectedMonthlyTotal);
 
     // Calculate the total revenue for all clients for the current month and year
-    const allMonthlyTotal = clientsData.reduce((total, client) => {
+    const allMonthlyTotal = clientsData.reduce((total, client: Client) => {
       const monthlyRevenue = client.movements
         .filter((movement) => {
           const movementDate = new Date(movement.dateOfOrder);
@@ -587,7 +595,7 @@ const useStats = (isMobile: boolean) => {
     //console.log("Revenue Percentage:", revenuePercentage);
 
     // Calculate the number of orders for the selected agent's clients for the current month and year
-    const selectedOrdersTotal = agentClients.reduce((total, client) => {
+    const selectedOrdersTotal = agentClients.reduce((total, client: Client) => {
       const monthlyOrders = client.movements.filter((movement) => {
         const movementDate = new Date(movement.dateOfOrder);
         return (
@@ -601,7 +609,7 @@ const useStats = (isMobile: boolean) => {
     //console.log("Selected Agent's Monthly Total Orders:", selectedOrdersTotal);
 
     // Calculate the total number of orders for all clients for the current month and year
-    const allOrdersTotal = clientsData.reduce((total, client) => {
+    const allOrdersTotal = clientsData.reduce((total, client: Client) => {
       const monthlyOrders = client.movements.filter((movement) => {
         const movementDate = new Date(movement.dateOfOrder);
         return (
@@ -666,6 +674,6 @@ const useStats = (isMobile: boolean) => {
       (role === "agent" && agentByIdDataError) ||
       (role === "admin" && (agentsError || agentDetailsError || adminError)),
   };
-  };
+};
 
-  export default useStats;
+export default useStats;

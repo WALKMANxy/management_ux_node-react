@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
-import { Client } from "../models/models";
+import { Client } from "../models/entityModels";
+import { useGetClientsQuery } from "../services/api";
 import {
   calculateSalesDistributionData,
   calculateTopBrandsData,
 } from "../utils/dataUtils";
-import { useGetClientsQuery } from "../services/api";
 
 const useClientDetails = (clientName: string | null) => {
   const { data: clients = [] } = useGetClientsQuery();
@@ -27,7 +27,6 @@ const useClientDetails = (clientName: string | null) => {
     }
     return [];
   }, [selectedClient]);
-  
 
   const salesDistributionData = useMemo(
     () =>

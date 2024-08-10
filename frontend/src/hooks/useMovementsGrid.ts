@@ -1,9 +1,10 @@
 // src/hooks/useMovementsGrid.ts
-import { useCallback, useRef, useState, useMemo } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
-import { useGetClientsQuery, useGetAgentDetailsQuery } from "../services/api";
-import { Client, Movement } from "../models/models";
+import { Movement } from "../models/dataModels";
+import { Client } from "../models/entityModels";
+import { useGetAgentDetailsQuery, useGetClientsQuery } from "../services/api";
 
 export const useMovementsGrid = () => {
   const { data: clients = [] } = useGetClientsQuery();

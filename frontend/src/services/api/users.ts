@@ -1,4 +1,4 @@
-import { User } from "../../models/models";
+import { User } from "../../models/entityModels";
 import { apiCall } from "./apiUtils";
 
 export const getUserById = async (id: string): Promise<User> => {
@@ -16,8 +16,9 @@ export const updateUserById = async (
   return apiCall<User>(`users/${id}`, "PATCH", updatedData);
 };
 
-
-
-export const getEntityByRoleAndCode = async (role: string, entityCode: string): Promise<User> => {
+export const getEntityByRoleAndCode = async (
+  role: string,
+  entityCode: string
+): Promise<User> => {
   return apiCall<User>(`entities/${role}/${entityCode}`, "GET");
 };

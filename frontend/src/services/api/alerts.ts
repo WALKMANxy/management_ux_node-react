@@ -1,4 +1,4 @@
-import { Alert } from "../../models/models";
+import { Alert } from "../../models/dataModels";
 import { apiCall } from "./apiUtils";
 
 export const getAlertsByEntityRoleAndEntityCode = async ({

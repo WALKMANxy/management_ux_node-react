@@ -2,12 +2,13 @@ import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import useGlobalSearch from "../../hooks/useGlobalSearch";
-import { GlobalSearchProps, SearchResult } from "../../models/models";
+import { GlobalSearchProps } from "../../models/propsModels";
+import { SearchResult } from "../../models/searchModels";
 import Spinner from "../common/Spinner";
 import "./GlobalSearch.css";
 import SearchResults from "./SearchResults";
-import { useNavigate } from "react-router-dom";
 
 const GlobalSearch: React.FC<GlobalSearchProps> = ({
   filter = "all",
@@ -33,11 +34,11 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
 
   const handleSelect = (item: SearchResult) => {
     if (isHeaderSearch) {
-      sessionStorage.setItem('searchedItem', JSON.stringify(item));
-      if (item.type === 'article') {
-        navigate('/articles');
-      } else if (item.type === 'client') {
-        navigate('/clients');
+      sessionStorage.setItem("searchedItem", JSON.stringify(item));
+      if (item.type === "article") {
+        navigate("/articles");
+      } else if (item.type === "client") {
+        navigate("/clients");
       }
     } else if (onSelect) {
       onSelect(item); // Call the provided onSelect callback
@@ -45,7 +46,6 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
     setShowResults(false);
     setSelectedIndex(-1);
   };
-
 
   return (
     <div ref={searchRef} className="global-search-container">

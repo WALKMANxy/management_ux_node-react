@@ -1,7 +1,8 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
-import { Movement, MovementDetail } from "../models/models";
+import { Movement, MovementDetail } from "../models/dataModels";
+import { Client } from "../models/entityModels";
 import { useGetClientsQuery } from "../services/api";
 import { calculateTotalQuantitySold } from "../utils/dataUtils";
 
@@ -64,7 +65,7 @@ export const useArticlesGrid = () => {
   );
 
   const filteredArticles = useCallback(() => {
-    let allDetails: MovementDetail[] = clients.flatMap((client) =>
+    let allDetails: MovementDetail[] = clients.flatMap((client: Client) =>
       client.movements.flatMap((movement) => movement.details)
     );
 
@@ -87,7 +88,7 @@ export const useArticlesGrid = () => {
       const start = new Date(startDate);
       const end = new Date(endDate);
       allDetails = allDetails.filter((detail) => {
-        const detailMovements = clients.flatMap((client) =>
+        const detailMovements = clients.flatMap((client: Client) =>
           client.movements.filter((movement) =>
             movement.details.some(
               (movDetail) => movDetail.articleId === detail.articleId
@@ -128,7 +129,7 @@ export const useArticlesGrid = () => {
   // Get movements for the selected article based on the user role
   const clientMovements = useMemo(() => {
     if (!selectedArticle) return [];
-    const movements = filteredClients.flatMap((client) =>
+    const movements = filteredClients.flatMap((client: Client) =>
       client.movements
         .filter((movement) =>
           movement.details.some(
@@ -144,13 +145,11 @@ export const useArticlesGrid = () => {
     return movements;
   }, [filteredClients, selectedArticle]);
 
-
-    // Calculate total quantity sold for each article
-    const totalQuantitySold = useMemo(() => {
-      const allMovements = clients.flatMap(client => client.movements);
-      return calculateTotalQuantitySold(allMovements);
-    }, [clients]);
-  
+  // Calculate total quantity sold for each article
+  const totalQuantitySold = useMemo(() => {
+    const allMovements = clients.flatMap((client) => client.movements);
+    return calculateTotalQuantitySold(allMovements);
+  }, [clients]);
 
   return {
     clients,

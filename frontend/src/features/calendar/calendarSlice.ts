@@ -1,7 +1,8 @@
 // src/features/calendar/calendarSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { CalendarState, Visit } from "../../models/models";
+import { Visit } from "../../models/dataModels";
+import { CalendarState } from "../../models/stateModels";
 
 const initialState: CalendarState = {
   visits: [],

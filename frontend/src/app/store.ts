@@ -1,14 +1,14 @@
 // src/app/store.ts
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
+import agentsReducer from "../features/agents/agentsSlice";
 import authReducer from "../features/auth/authSlice";
 import calendarReducer from "../features/calendar/calendarSlice";
 import clientsReducer from "../features/clients/clientsSlice";
 import dataReducer from "../features/data/dataSlice";
-import searchReducer from "../features/search/searchSlice";
-import agentsReducer from "../features/agents/agentsSlice";
-import visitsReducer from "../features/visits/visitsSlice";
 import promosReducer from "../features/promos/promosSlice"; // Import the agents reducer
+import searchReducer from "../features/search/searchSlice";
+import visitsReducer from "../features/visits/visitsSlice";
 import { api } from "../services/api";
 import { loadAuthState, saveAuthState } from "../utils/localStorage";
 
@@ -42,17 +42,18 @@ store.subscribe(() => {
   const authState = store.getState().auth;
 
   // Save to sessionStorage regardless
-  sessionStorage.setItem('auth', JSON.stringify(authState));
+  sessionStorage.setItem("auth", JSON.stringify(authState));
 
   // Conditionally save to localStorage
-  if (authState.isLoggedIn && localStorage.getItem("keepMeSignedIn") === "true") {
+  if (
+    authState.isLoggedIn &&
+    localStorage.getItem("keepMeSignedIn") === "true"
+  ) {
     saveAuthState(authState);
   } else {
     localStorage.removeItem("auth"); // Remove saved auth state if user is not logged in or doesn't want to stay signed in
   }
 });
-
-
 
 setupListeners(store.dispatch);
 

@@ -1,10 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { Promo } from "../../models/models";
-
-type PromosState = {
-  promos: Promo[];
-};
+import { Promo } from "../../models/dataModels";
+import { PromosState } from "../../models/stateModels";
 
 const initialState: PromosState = {
   promos: [],

@@ -49,8 +49,11 @@ const MonthOverMonthSpendingTrend: React.FC<{
         y: {
           formatter: (val: number) => currencyFormatter(val),
           title: {
-            formatter: () => userRole === "agent" ? t("monthOverMonthSpendingTrend.revenue") : t("monthOverMonthSpendingTrend.expense")
-          }
+            formatter: () =>
+              userRole === "agent"
+                ? t("monthOverMonthSpendingTrend.revenue")
+                : t("monthOverMonthSpendingTrend.expense"),
+          },
         },
       },
       fill: {
@@ -92,7 +95,10 @@ const MonthOverMonthSpendingTrend: React.FC<{
   const series = useMemo(
     () => [
       {
-        name: userRole === "agent" ? t("monthOverMonthSpendingTrend.revenue") : t("monthOverMonthSpendingTrend.expense"),
+        name:
+          userRole === "agent"
+            ? t("monthOverMonthSpendingTrend.revenue")
+            : t("monthOverMonthSpendingTrend.expense"),
         data: data.map((d) => d.revenue),
       },
     ],

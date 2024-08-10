@@ -1,7 +1,7 @@
 import { Box, Collapse, Grid, IconButton, Paper, Typography, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ArticleDetailsProps } from "../../models/models";
+import { ArticleDetailsProps } from "../../models/propsModels";
 import ArticleHistory from "../statistics/grids/ArticleHistory";
 import ArticleDetailComponent from "./ArticleDetailComponent";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";

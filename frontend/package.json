@@ -28,6 +28,7 @@
     "dayjs": "^1.11.12",
     "dompurify": "^3.1.6",
     "dotenv-webpack": "^8.1.0",
+    "http-proxy-middleware": "^3.0.0",
     "i18next": "^23.12.2",
     "i18next-browser-languagedetector": "^8.0.0",
     "i18next-http-backend": "^2.5.2",
@@ -47,7 +48,7 @@
     "web-vitals": "^4.2.2"
   },
   "scripts": {
-    "start": "cross-env NODE_ENV=development react-app-rewired start",
+    "start": "cross-env NODE_ENV=development react-scripts start",
     "build": "cross-env NODE_ENV=production react-app-rewired build",
     "test": "cross-env NODE_ENV=test react-app-rewired test",
     "eject": "react-scripts eject"

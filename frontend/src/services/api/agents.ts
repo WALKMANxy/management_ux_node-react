@@ -1,4 +1,4 @@
-import { Agent } from "../../models/models";
+import { Agent } from "../../models/entityModels";
 import { apiCall } from "./apiUtils";
 
 export const getAgentById = async (id: string): Promise<Agent> => {

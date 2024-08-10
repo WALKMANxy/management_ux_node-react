@@ -39,5 +39,8 @@
   "terminal.integrated.suggest.enabled": true,
   "problems.showCurrentInStatus": false,
   "notebook.formatOnCellExecution": true,
-  "notebook.formatOnSave.enabled": true
+  "notebook.formatOnSave.enabled": true,
+  "[dotenv]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  }
 }

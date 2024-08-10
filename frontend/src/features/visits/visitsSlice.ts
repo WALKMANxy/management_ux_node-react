@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { Visit } from "../../models/models";
+import { Visit } from "../../models/dataModels";
 
 const initialState: Visit[] = [];
 
