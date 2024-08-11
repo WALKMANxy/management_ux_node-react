@@ -1,10 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-
-import { api } from "../../services/api";
 import { SearchState } from "../../models/stateModels";
 import { SearchParams, SearchResult } from "../../models/searchModels";
-import { Agent, Client } from "../../models/entityModels";
+import {Client } from "../../models/entityModels";
 
 const initialState: SearchState = {
   query: "",
@@ -19,42 +17,26 @@ export const searchItems = createAsyncThunk<
   { state: RootState }
 >(
   "search/searchItems",
-  async ({ query, filter }, { getState, dispatch, rejectWithValue }) => {
+  async ({ query, filter }, { getState, rejectWithValue }) => {
     try {
       const state = getState();
-      const { id, userRole } = state.auth;
-
-      const entityCode = id;
-      const entityRole = userRole;
+      const { id: entityCode, userRole: entityRole } = state.auth;
+      const { clients, agentDetails } = state.data;
 
       const sanitizedQuery = query.toLowerCase();
       const seen = new Map<string, string>(); // Track seen IDs
       let searchResults: SearchResult[] = [];
 
-      // Load data based on user role and search context
-      let clients: Client[] = [];
-      let agents: Agent[] = [];
-
-      if (entityRole === "admin" && entityCode) {
-        const adminData = await dispatch(
-          api.endpoints.getAdminData.initiate(entityCode)
-        ).unwrap();
-        clients = adminData.clients;
-        agents = adminData.agents;
-        //console.log("Admin Data Loaded: ", { clients, agents });
+      // Filter clients based on user role
+      let filteredClients: Client[] = [];
+      if (entityRole === "admin") {
+        filteredClients = Object.values(clients);
       } else if (entityRole === "agent") {
-        clients = (
-          await dispatch(api.endpoints.getClients.initiate()).unwrap()
-        ).filter((client) => client.agent === entityCode);
-        //console.log("Agent Data Loaded: ", clients);
-      } else if (entityRole === "client" && entityCode) {
-        // Ensure id is not null
-        clients = [
-          await dispatch(
-            api.endpoints.getClientById.initiate(entityCode)
-          ).unwrap(),
-        ];
-        //console.log("Client Data Loaded: ", clients);
+        filteredClients = Object.values(clients).filter(
+          (client) => client.agent === entityCode
+        );
+      } else if (entityRole === "client") {
+        filteredClients = entityCode ? [clients[entityCode]] : [];
       }
 
       // Filter and map clients
@@ -63,7 +45,7 @@ export const searchItems = createAsyncThunk<
         filter === "client" ||
         (filter === "admin" && entityRole === "admin")
       ) {
-        const clientResults = clients
+        const clientResults = filteredClients
           .filter(
             (client) =>
               client.name?.toLowerCase().includes(sanitizedQuery) ||
@@ -80,7 +62,6 @@ export const searchItems = createAsyncThunk<
           .filter((result) => !seen.has(result.id) && seen.set(result.id, ""));
 
         searchResults = searchResults.concat(clientResults);
-        //console.log("Client Search Results: ", clientResults);
       }
 
       // Filter and map agents
@@ -89,7 +70,7 @@ export const searchItems = createAsyncThunk<
         filter === "agent" ||
         (filter === "admin" && entityRole === "admin")
       ) {
-        const agentResults = agents
+        const agentResults = Object.values(agentDetails)
           .filter(
             (agent) =>
               agent.name?.toLowerCase().includes(sanitizedQuery) ||
@@ -103,12 +84,11 @@ export const searchItems = createAsyncThunk<
           .filter((result) => !seen.has(result.id) && seen.set(result.id, ""));
 
         searchResults = searchResults.concat(agentResults);
-        //console.log("Agent Search Results: ", agentResults);
       }
 
       // Filter and map articles
       if (filter === "all" || filter === "article") {
-        const articleResults = clients
+        const articleResults = filteredClients
           .flatMap((client) =>
             client.movements.flatMap((movement) =>
               movement.details
@@ -134,12 +114,11 @@ export const searchItems = createAsyncThunk<
           );
 
         searchResults = searchResults.concat(articleResults);
-        //console.log("Article Search Results: ", articleResults);
       }
 
       // Filter and map promos
       if (filter === "all" || filter === "promo") {
-        const promoResults = clients
+        const promoResults = filteredClients
           .flatMap((client) => client.promos)
           .filter(
             (promo) =>
@@ -157,12 +136,11 @@ export const searchItems = createAsyncThunk<
           .filter((result) => !seen.has(result.id) && seen.set(result.id, ""));
 
         searchResults = searchResults.concat(promoResults);
-        //console.log("Promo Search Results: ", promoResults);
       }
 
       // Filter and map visits
       if (filter === "all" || filter === "visit") {
-        const visitResults = clients
+        const visitResults = filteredClients
           .flatMap((client) => client.visits)
           .filter(
             (visit) =>
@@ -182,7 +160,6 @@ export const searchItems = createAsyncThunk<
           .filter((result) => !seen.has(result.id) && seen.set(result.id, ""));
 
         searchResults = searchResults.concat(visitResults);
-        //console.log("Visit Search Results: ", visitResults);
       }
 
       return searchResults;

@@ -1,8 +1,6 @@
-
-import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Admin, Agent, Client } from "../../models/entityModels";
 import { superApi } from "../../services/api/centralizedApi";
-
 
 interface DataState {
   clients: Record<string, Client>;
@@ -27,20 +25,27 @@ const initialState: DataState = {
 };
 
 export const fetchInitialData = createAsyncThunk(
-  'data/fetchInitialData',
+  "data/fetchInitialData",
   async (_, { getState, dispatch }) => {
-    const state = getState() as { auth: { userRole: string, id: string } };
+    const state = getState() as { auth: { userRole: string; id: string } };
     const { userRole, id } = state.auth;
 
-    await dispatch(superApi.endpoints.getClients.initiate());
-    await dispatch(superApi.endpoints.getAgents.initiate());
-    await dispatch(superApi.endpoints.getAgentDetails.initiate());
+    // Fetch clients, agents, and agent details only if not already in the cache
+    const clientsPromise = dispatch(
+      superApi.endpoints.getClients.initiate());
+    const agentsPromise = dispatch(
+      superApi.endpoints.getAgents.initiate());
+    const agentDetailsPromise = dispatch(
+      superApi.endpoints.getAgentDetails.initiate()
+    );
 
-    if (userRole === 'client') {
+    await Promise.all([clientsPromise, agentsPromise, agentDetailsPromise]);
+
+    if (userRole === "client") {
       await dispatch(superApi.endpoints.getClientById.initiate(id));
-    } else if (userRole === 'agent') {
+    } else if (userRole === "agent") {
       await dispatch(superApi.endpoints.getAgentDetailsById.initiate(id));
-    } else if (userRole === 'admin') {
+    } else if (userRole === "admin") {
       await dispatch(superApi.endpoints.getAdminById.initiate(id));
     }
   }
@@ -66,19 +71,19 @@ const dataSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchInitialData.pending, (state) => {
-        state.status = 'loading';
+        state.status = "loading";
       })
       .addCase(fetchInitialData.fulfilled, (state) => {
-        state.status = 'succeeded';
+        state.status = "succeeded";
       })
       .addCase(fetchInitialData.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message || 'An error occurred';
+        state.status = "failed";
+        state.error = action.error.message || "An error occurred";
       })
       .addMatcher(
         superApi.endpoints.getClients.matchFulfilled,
         (state, action: PayloadAction<Client[]>) => {
-          action.payload.forEach(client => {
+          action.payload.forEach((client) => {
             state.clients[client.id] = client;
           });
         }
@@ -86,7 +91,7 @@ const dataSlice = createSlice({
       .addMatcher(
         superApi.endpoints.getAgents.matchFulfilled,
         (state, action: PayloadAction<Agent[]>) => {
-          action.payload.forEach(agent => {
+          action.payload.forEach((agent) => {
             state.agents[agent.id] = agent;
           });
         }
@@ -94,7 +99,7 @@ const dataSlice = createSlice({
       .addMatcher(
         superApi.endpoints.getAgentDetails.matchFulfilled,
         (state, action: PayloadAction<Agent[]>) => {
-          action.payload.forEach(agent => {
+          action.payload.forEach((agent) => {
             state.agentDetails[agent.id] = agent;
           });
         }

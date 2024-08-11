@@ -1,13 +1,13 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import { Visit } from "../models/Visit";
-import { AuthenticatedRequest } from "../models/types";
-import { authenticateUser } from "../utils/authentication";
+import { authenticateUser } from "../middlewares/authentication";
 import {
   checkAgentOrAdminOrClientRole,
   checkAgentOrAdminRole,
-} from "../utils/roleChecker";
-import { checkValidation } from "../utils/validate";
+} from "../middlewares/roleChecker";
+import { Visit } from "../models/Visit";
+import { AuthenticatedRequest } from "../models/types";
+import { checkValidation } from "../middlewares/validate";
 
 const router = express.Router();
 
