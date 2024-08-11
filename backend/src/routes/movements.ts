@@ -16,7 +16,7 @@ const router = express.Router();
 // Middleware to authenticate and authorize user
 router.use(authenticateUser);
 
-console.log("Movements File Path:", config.jsonFilePath);
+//console.log("Movements File Path:", config.jsonFilePath);
 
 // Validation rules
 const movementValidationRules = [

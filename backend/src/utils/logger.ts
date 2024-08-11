@@ -12,15 +12,15 @@ dotenv.config();
 const { combine, timestamp, printf } = format;
 
 const logFormat = printf(({ level, message, timestamp, ...metadata }) => {
-  let metaString = Object.entries(metadata).map(([key, value]) => `${key}: ${value}`).join(', ');
-  return `${timestamp} [${level}]: ${message} ${metaString ? ` | ${metaString}` : ''}`;
+  let metaString = JSON.stringify(metadata);
+  return `${timestamp} [${level}]: ${message} ${metaString !== '{}' ? ` | ${metaString}` : ''}`;
 });
 
 const logger = createLogger({
   level: 'info',
   format: combine(
     timestamp(),
-    format.metadata({ fillExcept: ['message', 'level', 'timestamp'] }), // Ensures metadata is included
+    format.metadata({ fillExcept: ['message', 'level', 'timestamp'] }),
     logFormat
   ),
   transports: [
@@ -39,16 +39,16 @@ export const logRequestsIp = async (
   res: Response,
   next: NextFunction
 ) => {
-  // Log basic request info immediately
-  logger.info(`Incoming request: ${req.method} ${req.url}`, {
+  const logData = {
     userId: req.user?.id,
     userEmail: req.user?.email,
     userRole: req.user?.role,
     entityCode: req.user?.entityCode,
     ip: req.ip
-  });
+  };
 
-  // After response is sent, log IP info and other details
+  logger.info(`Incoming request: ${req.method} ${req.url}`, logData);
+
   res.on("finish", async () => {
     try {
       const clientIp = req.ip ? req.ip.replace("::ffff:", "") : "unknown";
@@ -58,23 +58,23 @@ export const logRequestsIp = async (
         );
         const ipInfo: IpInfo = response.data;
 
-        // Log the IP information with user details
-        logger.info(`IP info fetched`, {
-          ip: ipInfo.ip,
-          country: ipInfo.country,
-          org: ipInfo.org,
-          timezone: ipInfo.timezone,
-          userId: req.user?.id,
-          userEmail: req.user?.email,
-          userRole: req.user?.role,
-          entityCode: req.user?.entityCode,
+        logger.info(`IP info fetched for ${logData.userEmail}, ${logData.userRole}, ${logData.entityCode}, ${logData.entityCode}`, {
+          
+          ipInfo: {
+            ip: ipInfo.ip,
+            country: ipInfo.country,
+            org: ipInfo.org,
+            timezone: ipInfo.timezone,
+          }
         });
       }
+
+      logger.info(`Response status: ${res.statusCode} for ${req.method} ${req.url}`, logData);
     } catch (error: unknown) {
       if (error instanceof Error) {
-        logger.error(`Error fetching IP information: ${error.message}`);
+        logger.error(`Error fetching IP information: ${error.message}`, logData);
       } else {
-        logger.error(`An unknown error occurred: ${JSON.stringify(error)}`);
+        logger.error(`An unknown error occurred: ${JSON.stringify(error)}`, logData);
       }
     }
   });

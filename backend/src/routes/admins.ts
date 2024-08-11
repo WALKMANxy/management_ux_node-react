@@ -9,7 +9,7 @@ const router = express.Router();
 // Middleware to authenticate and authorize user
 router.use(authenticateUser);
 
-console.log("Admin Details File Path:", config.adminDetailsFilePath);
+//console.log("Admin Details File Path:", config.adminDetailsFilePath);
 
 // GET method to retrieve all admins, restricted to admin users
 router.get("/", checkAdminRole, fetchAllAdmins);

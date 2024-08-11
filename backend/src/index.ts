@@ -9,7 +9,7 @@ import localtunnel from "localtunnel";
 import mongoose from "mongoose";
 import { config } from "./config/config"; // Import the config
 import { authenticateUser } from "./middlewares/authentication";
-import logRequests from "./middlewares/logRequests";
+import logRequests, { logRequestsIp } from "./middlewares/logRequests";
 import adminRoutes from "./routes/admins";
 import agentRoutes from "./routes/agents";
 import alertsRoutes from "./routes/alerts";
@@ -22,8 +22,7 @@ import usersRoutes from "./routes/users";
 import visitsRoutes from "./routes/visits";
 import { errorHandler } from "./utils/errorHandler";
 
-console.log(`JWT_SECRET inside config: ${config.jwtSecret}`); // Check if JWT_SECRET is loaded
-console.log(`PORT inside config: ${config.port}`); // Check if JWT_SECRET is loaded
+
 
 const app = express();
 const PORT = config.port || "";
@@ -50,7 +49,8 @@ app.use(compression());
 app.use(cookieParser());
 app.use(express.json());
 app.use(authenticateUser);
-app.use(logRequests); // Add the logging middleware here
+app.use(logRequestsIp); // Add the logging middleware here
+
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,

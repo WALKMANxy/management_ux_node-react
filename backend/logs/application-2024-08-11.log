@@ -1,0 +1,857 @@
+2024-08-11T11:12:50.771Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:12:50.776Z [info]: Incoming request: GET /clients  | metadata: [object Object]
+2024-08-11T11:12:50.778Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:12:50.817Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:12:51.072Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:51.076Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:51.077Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:51.080Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:51.140Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:51.579Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:51.581Z [info]: Incoming request: GET /alerts  | metadata: [object Object]
+2024-08-11T11:12:51.583Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:12:51.584Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:51.584Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:51.737Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:51.739Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:51.824Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:51.846Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:51.939Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:12:51.948Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:12:51.950Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:12:52.096Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:52.104Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:52.127Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:52.642Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:52.714Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:52.715Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:12:52.717Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:52.723Z [info]: Incoming request: GET /alerts  | metadata: [object Object]
+2024-08-11T11:12:52.867Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:52.875Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:52.945Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:52.998Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:53.302Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:12:53.452Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:53.528Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:55.593Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:12:55.603Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:12:55.610Z [info]: Incoming request: GET /clients  | metadata: [object Object]
+2024-08-11T11:12:55.624Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:12:55.637Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:12:55.803Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:55.805Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:55.817Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:55.835Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:56.256Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:56.258Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:56.283Z [info]: Incoming request: GET /admins/8  | metadata: [object Object]
+2024-08-11T11:12:56.284Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:56.285Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:56.401Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:56.474Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:12:56.485Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:56.543Z [info]: Response status: 304 for GET /8  | metadata: [object Object]
+2024-08-11T11:12:56.687Z [info]: Incoming request: GET /alerts/admin/8  | metadata: [object Object]
+2024-08-11T11:12:56.839Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:12:56.932Z [info]: Response status: 304 for GET /admin/8  | metadata: [object Object]
+2024-08-11T11:13:04.819Z [info]: Incoming request: POST /auth/login  | metadata: [object Object]
+2024-08-11T11:13:05.064Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:05.159Z [info]: Response status: 200 for POST /login  | metadata: [object Object]
+2024-08-11T11:13:05.821Z [info]: Incoming request: GET /users/66b2c23a33097d3e3633a00b  | metadata: [object Object]
+2024-08-11T11:13:05.979Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:06.081Z [info]: Response status: 200 for GET /66b2c23a33097d3e3633a00b  | metadata: [object Object]
+2024-08-11T11:13:08.157Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:13:08.171Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:13:08.173Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:13:08.182Z [info]: Incoming request: GET /clients  | metadata: [object Object]
+2024-08-11T11:13:08.184Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:13:08.200Z [info]: Incoming request: GET /alerts  | metadata: [object Object]
+2024-08-11T11:13:08.315Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:08.857Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:08.863Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:08.865Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:08.866Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:08.868Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:08.869Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:08.944Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:08.969Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:08.970Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:08.994Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:09.024Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:09.220Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:13:09.317Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:13:09.324Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:13:09.334Z [info]: Incoming request: GET /alerts  | metadata: [object Object]
+2024-08-11T11:13:09.370Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:13:09.378Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:09.842Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:09.846Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:09.847Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:09.848Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:09.849Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:09.917Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:09.977Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:09.982Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:09.983Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:10.288Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:13:10.440Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:10.536Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:12.659Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:13:12.663Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:13:12.663Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:13:12.666Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:13:12.667Z [info]: Incoming request: GET /clients  | metadata: [object Object]
+2024-08-11T11:13:12.812Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:12.814Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:12.818Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:12.819Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:12.824Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:12.889Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:13.357Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:13.358Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:13.363Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:13.363Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:13.413Z [info]: Incoming request: GET /alerts/admin/8  | metadata: [object Object]
+2024-08-11T11:13:13.414Z [info]: Incoming request: GET /admins/8  | metadata: [object Object]
+2024-08-11T11:13:13.569Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:13.570Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:13.622Z [info]: Response status: 304 for GET /8  | metadata: [object Object]
+2024-08-11T11:13:13.669Z [info]: Response status: 304 for GET /admin/8  | metadata: [object Object]
+2024-08-11T11:13:53.654Z [info]: Incoming request: POST /auth/login  | metadata: [object Object]
+2024-08-11T11:13:53.935Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:54.030Z [info]: Response status: 200 for POST /login  | metadata: [object Object]
+2024-08-11T11:13:54.691Z [info]: Incoming request: GET /users/66b2c23a33097d3e3633a00b  | metadata: [object Object]
+2024-08-11T11:13:54.847Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:54.945Z [info]: Response status: 304 for GET /66b2c23a33097d3e3633a00b  | metadata: [object Object]
+2024-08-11T11:13:56.848Z [info]: Incoming request: GET /alerts  | metadata: [object Object]
+2024-08-11T11:13:56.849Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:13:56.858Z [info]: Incoming request: GET /clients  | metadata: [object Object]
+2024-08-11T11:13:56.860Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:13:56.869Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:13:56.875Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:13:57.004Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:57.085Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:57.092Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:57.094Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:57.095Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:57.109Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:57.113Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:57.595Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:57.643Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:57.643Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:57.686Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:57.690Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:57.698Z [info]: Incoming request: GET /alerts  | metadata: [object Object]
+2024-08-11T11:13:57.853Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:57.961Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:57.979Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:13:57.985Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:13:58.036Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:13:58.049Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:13:58.132Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:58.138Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:58.660Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:58.683Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:58.684Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:58.685Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:58.783Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:58.785Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:13:59.029Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:13:59.181Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:13:59.250Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:14:00.273Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:14:00.276Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:14:00.281Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:14:00.287Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:14:00.289Z [info]: Incoming request: GET /clients  | metadata: [object Object]
+2024-08-11T11:14:00.427Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:14:00.430Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:14:00.438Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:14:00.443Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:14:00.445Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:14:00.500Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:14:00.916Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:14:00.917Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:14:00.996Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:14:01.006Z [info]: Incoming request: GET /admins/8  | metadata: [object Object]
+2024-08-11T11:14:01.017Z [info]: Incoming request: GET /alerts/admin/8  | metadata: [object Object]
+2024-08-11T11:14:01.045Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:14:01.159Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:14:01.171Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:14:01.212Z [info]: Response status: 304 for GET /8  | metadata: [object Object]
+2024-08-11T11:14:01.278Z [info]: Response status: 304 for GET /admin/8  | metadata: [object Object]
+2024-08-11T11:22:20.624Z [info]: Incoming request: POST /auth/login  | metadata: [object Object]
+2024-08-11T11:22:20.904Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:21.004Z [info]: Response status: 200 for POST /login  | metadata: [object Object]
+2024-08-11T11:22:23.250Z [info]: Incoming request: GET /users/66b2c23a33097d3e3633a00b  | metadata: [object Object]
+2024-08-11T11:22:23.407Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:23.515Z [info]: Response status: 304 for GET /66b2c23a33097d3e3633a00b  | metadata: [object Object]
+2024-08-11T11:22:27.260Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:22:27.262Z [info]: Incoming request: GET /alerts  | metadata: [object Object]
+2024-08-11T11:22:27.264Z [info]: Incoming request: GET /clients  | metadata: [object Object]
+2024-08-11T11:22:27.266Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:22:27.366Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:22:27.369Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:22:27.416Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:27.486Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:27.507Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:27.509Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:27.518Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:27.593Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:27.610Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:27.613Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:27.644Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:27.648Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:28.155Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:28.157Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:30.829Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:22:30.843Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:22:30.850Z [info]: Incoming request: GET /alerts  | metadata: [object Object]
+2024-08-11T11:22:30.869Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:22:30.904Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:22:30.983Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:30.997Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:31.007Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:31.029Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:31.060Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:31.105Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:31.504Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:31.506Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:31.506Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:31.549Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:32.011Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:22:32.166Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:32.254Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:32.953Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:22:32.963Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:22:32.968Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:22:33.050Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:22:33.056Z [info]: Incoming request: GET /admins/8  | metadata: [object Object]
+2024-08-11T11:22:33.062Z [info]: Incoming request: GET /alerts/admin/8  | metadata: [object Object]
+2024-08-11T11:22:33.070Z [info]: Incoming request: GET /clients  | metadata: [object Object]
+2024-08-11T11:22:33.110Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:33.118Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:33.122Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:33.689Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:33.719Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:33.719Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:33.721Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:33.722Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:33.724Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:22:33.774Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:33.799Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:33.804Z [info]: Response status: 304 for GET /8  | metadata: [object Object]
+2024-08-11T11:22:33.827Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:22:33.865Z [info]: Response status: 304 for GET /admin/8  | metadata: [object Object]
+2024-08-11T11:23:19.585Z [info]: Incoming request: POST /auth/login  | metadata: [object Object]
+2024-08-11T11:23:19.938Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:20.042Z [info]: Response status: 200 for POST /login  | metadata: [object Object]
+2024-08-11T11:23:20.755Z [info]: Incoming request: GET /users/66b2c23a33097d3e3633a00b  | metadata: [object Object]
+2024-08-11T11:23:20.906Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:21.020Z [info]: Response status: 304 for GET /66b2c23a33097d3e3633a00b  | metadata: [object Object]
+2024-08-11T11:23:22.361Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:23:22.372Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:23:22.377Z [info]: Incoming request: GET /clients  | metadata: [object Object]
+2024-08-11T11:23:22.381Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:23:22.387Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:23:22.394Z [info]: Incoming request: GET /alerts  | metadata: [object Object]
+2024-08-11T11:23:22.512Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:23.042Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:23.045Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:23.047Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:23.048Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:23.050Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:23.052Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:23.118Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:23.143Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:23.163Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:23.190Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:23.195Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:25.719Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:23:25.722Z [info]: Incoming request: GET /alerts  | metadata: [object Object]
+2024-08-11T11:23:25.723Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:23:25.727Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:23:25.737Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:23:25.873Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:25.877Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:25.878Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:25.884Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:25.893Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:26.326Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:26.347Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:26.348Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:26.390Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:26.400Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:27.140Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:23:27.295Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:27.368Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:27.781Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:23:27.935Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:28.006Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:28.065Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:23:28.069Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:23:28.087Z [info]: Incoming request: GET /admins/8  | metadata: [object Object]
+2024-08-11T11:23:28.189Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:23:28.212Z [info]: Incoming request: GET /clients  | metadata: [object Object]
+2024-08-11T11:23:28.214Z [info]: Incoming request: GET /alerts/admin/8  | metadata: [object Object]
+2024-08-11T11:23:28.218Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:28.224Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:28.241Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:28.697Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:28.706Z [info]: Response status: 304 for GET /8  | metadata: [object Object]
+2024-08-11T11:23:28.706Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:28.707Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:28.709Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:28.782Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:28.797Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:23:28.860Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:23:28.949Z [info]: Response status: 304 for GET /admin/8  | metadata: [object Object]
+2024-08-11T11:28:34.757Z [info]: Incoming request: POST /auth/login  | metadata: [object Object]
+2024-08-11T11:28:35.047Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:35.139Z [info]: Response status: 200 for POST /login  | metadata: [object Object]
+2024-08-11T11:28:35.795Z [info]: Incoming request: GET /users/66b2c23a33097d3e3633a00b  | metadata: [object Object]
+2024-08-11T11:28:35.948Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:36.040Z [info]: Response status: 304 for GET /66b2c23a33097d3e3633a00b  | metadata: [object Object]
+2024-08-11T11:28:37.472Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:28:37.478Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:28:37.482Z [info]: Incoming request: GET /clients  | metadata: [object Object]
+2024-08-11T11:28:37.486Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:28:37.489Z [info]: Incoming request: GET /alerts  | metadata: [object Object]
+2024-08-11T11:28:37.503Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:28:37.627Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:37.713Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:37.714Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:37.716Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:37.720Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:37.722Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:37.739Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:38.300Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:38.332Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:38.333Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:38.333Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:38.378Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:41.251Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:28:41.259Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:28:41.267Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:28:41.268Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:28:41.270Z [info]: Incoming request: GET /alerts  | metadata: [object Object]
+2024-08-11T11:28:41.409Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:41.421Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:41.422Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:41.423Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:41.424Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:41.868Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:41.896Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:41.964Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:41.965Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:41.969Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:42.698Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:28:42.850Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:42.927Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:43.302Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:28:43.459Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:43.535Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:43.588Z [info]: Incoming request: GET /admins/8  | metadata: [object Object]
+2024-08-11T11:28:43.590Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:28:43.594Z [info]: Incoming request: GET /alerts/admin/8  | metadata: [object Object]
+2024-08-11T11:28:43.726Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:28:43.731Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:28:43.740Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:43.741Z [info]: Incoming request: GET /clients  | metadata: [object Object]
+2024-08-11T11:28:43.743Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:43.744Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:43.796Z [info]: Response status: 304 for GET /8  | metadata: [object Object]
+2024-08-11T11:28:44.250Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:44.253Z [info]: Response status: 304 for GET /admin/8  | metadata: [object Object]
+2024-08-11T11:28:44.254Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:44.256Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:44.258Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:28:44.341Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:44.349Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:28:44.365Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:31.530Z [info]: Incoming request: POST /auth/login  | metadata: [object Object]
+2024-08-11T11:29:31.812Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:31.910Z [info]: Response status: 200 for POST /login  | metadata: [object Object]
+2024-08-11T11:29:32.596Z [info]: Incoming request: GET /users/66b2c23a33097d3e3633a00b  | metadata: [object Object]
+2024-08-11T11:29:32.751Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:32.850Z [info]: Response status: 304 for GET /66b2c23a33097d3e3633a00b  | metadata: [object Object]
+2024-08-11T11:29:33.938Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:29:33.944Z [info]: Incoming request: GET /clients  | metadata: [object Object]
+2024-08-11T11:29:33.958Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:29:33.960Z [info]: Incoming request: GET /alerts  | metadata: [object Object]
+2024-08-11T11:29:33.963Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:29:33.971Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:29:34.092Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:34.623Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:34.626Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:34.628Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:34.629Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:34.631Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:34.632Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:34.699Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:34.721Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:34.769Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:34.770Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:34.776Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:37.214Z [info]: Incoming request: GET /alerts  | metadata: [object Object]
+2024-08-11T11:29:37.215Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:29:37.219Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:29:37.223Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:29:37.228Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:29:37.369Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:37.370Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:37.373Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:37.374Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:37.381Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:37.448Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:37.885Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:37.887Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:37.888Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:37.888Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:38.385Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:29:38.538Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:38.612Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:39.272Z [info]: Incoming request: GET /promos  | metadata: [object Object]
+2024-08-11T11:29:39.273Z [info]: Incoming request: GET /clients  | metadata: [object Object]
+2024-08-11T11:29:39.280Z [info]: Incoming request: GET /visits  | metadata: [object Object]
+2024-08-11T11:29:39.400Z [info]: Incoming request: GET /agents  | metadata: [object Object]
+2024-08-11T11:29:39.410Z [info]: Incoming request: GET /alerts/admin/8  | metadata: [object Object]
+2024-08-11T11:29:39.411Z [info]: Incoming request: GET /admins/8  | metadata: [object Object]
+2024-08-11T11:29:39.421Z [info]: Incoming request: GET /movements  | metadata: [object Object]
+2024-08-11T11:29:39.426Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:39.428Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:39.434Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:39.501Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:39.518Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:39.550Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:39.559Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:39.564Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:39.633Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:29:39.655Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:39.658Z [info]: IP info fetched  | metadata: [object Object]
+2024-08-11T11:29:39.680Z [info]: Response status: 304 for GET /admin/8  | metadata: [object Object]
+2024-08-11T11:29:39.707Z [info]: Response status: 304 for GET /8  | metadata: [object Object]
+2024-08-11T11:29:40.180Z [info]: Response status: 304 for GET /  | metadata: [object Object]
+2024-08-11T11:48:29.300Z [info]: Incoming request: POST /auth/login  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:29.563Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:29.664Z [info]: Response status: 200 for POST /login  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:30.452Z [info]: Incoming request: GET /users/66b2c23a33097d3e3633a00b  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:30.612Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:30.718Z [info]: Response status: 304 for GET /66b2c23a33097d3e3633a00b  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:32.127Z [info]: Incoming request: GET /movements  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:32.179Z [info]: Incoming request: GET /clients  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:32.185Z [info]: Incoming request: GET /visits  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:32.188Z [info]: Incoming request: GET /promos  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:32.283Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:32.918Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:32.927Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:32.930Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:32.931Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:32.999Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:33.128Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:33.135Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:33.177Z [info]: Incoming request: GET /alerts  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:33.242Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:33.332Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:33.401Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:33.445Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:33.466Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:36.586Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:36.597Z [info]: Incoming request: GET /promos  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:36.598Z [info]: Incoming request: GET /alerts  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:36.600Z [info]: Incoming request: GET /movements  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:36.602Z [info]: Incoming request: GET /visits  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:36.741Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:36.750Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:36.752Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:36.755Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:36.814Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:37.249Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:37.251Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:37.253Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:37.302Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:37.358Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:39.860Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:40.014Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:40.084Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:41.043Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:41.199Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:41.282Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:41.283Z [info]: Incoming request: GET /admins/8  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:41.437Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:41.495Z [info]: Response status: 304 for GET /8  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:47.582Z [info]: Incoming request: GET /clients  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:47.592Z [info]: Incoming request: GET /movements  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:47.596Z [info]: Incoming request: GET /alerts  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:47.601Z [info]: Incoming request: GET /visits  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:47.717Z [info]: Incoming request: GET /promos  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:47.721Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:47.827Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:47.834Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:47.835Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:47.844Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:47.893Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:48.340Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:48.342Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:48.343Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:48.392Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:48.393Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:48.417Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:48.434Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:51.340Z [info]: Incoming request: GET /movements  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:51.348Z [info]: Incoming request: GET /alerts  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:51.353Z [info]: Incoming request: GET /promos  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:51.354Z [info]: Incoming request: GET /visits  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:51.356Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:51.495Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:51.503Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:51.508Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:51.509Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:51.511Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:51.989Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:52.011Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:52.076Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:52.081Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:52.082Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:52.830Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:52.986Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:53.055Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:54.085Z [info]: Incoming request: GET /movements  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:54.240Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:54.266Z [info]: Incoming request: GET /visits  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:54.272Z [info]: Incoming request: GET /promos  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:54.278Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:54.282Z [info]: Incoming request: GET /clients  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:54.294Z [info]: Incoming request: GET /alerts/admin/8  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:54.418Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:54.427Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:54.431Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:54.434Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:54.450Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:54.498Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:54.520Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:54.522Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:54.528Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:54.572Z [info]: Response status: 304 for GET /admin/8  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:55.053Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:55.054Z [info]: Incoming request: GET /admins/8  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T11:48:55.209Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T11:48:55.273Z [info]: Response status: 304 for GET /8  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:42.379Z [info]: Incoming request: POST /auth/login  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:42.645Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:42.741Z [info]: Response status: 200 for POST /login  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:44.331Z [info]: Incoming request: GET /users/66b2c23a33097d3e3633a00b  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:44.487Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:44.582Z [info]: Response status: 304 for GET /66b2c23a33097d3e3633a00b  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:47.308Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:47.311Z [info]: Incoming request: GET /movements  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:47.401Z [info]: Incoming request: GET /visits  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:47.406Z [info]: Incoming request: GET /promos  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:47.421Z [info]: Incoming request: GET /alerts  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:47.465Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:47.535Z [info]: Response status: 200 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:47.573Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:48.045Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:48.047Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:48.048Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:48.085Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:48.136Z [info]: Response status: 200 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:48.141Z [info]: Response status: 200 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:48.241Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:48.317Z [info]: Response status: 200 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:48.505Z [info]: Response status: 200 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:49.223Z [info]: Response status: 200 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:51.533Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:51.537Z [info]: Incoming request: GET /movements  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:51.539Z [info]: Incoming request: GET /clients  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:51.687Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:51.691Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:51.699Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:52.208Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:52.208Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:52.223Z [info]: Response status: 200 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:55.631Z [info]: Incoming request: GET /movements  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:55.647Z [info]: Incoming request: GET /clients  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:55.652Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:55.793Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:55.800Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:55.806Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:55.868Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:56.354Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:56.354Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:56.409Z [info]: Incoming request: GET /alerts  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:56.412Z [info]: Incoming request: GET /visits  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:56.417Z [info]: Incoming request: GET /promos  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:56.564Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:56.566Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:56.576Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:08:56.660Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:56.669Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:56.677Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:59.735Z [info]: Incoming request: GET /alerts  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:08:59.895Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:09:00.008Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:09:00.290Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:09:00.445Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:09:00.526Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:09:01.846Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:09:02.001Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:09:02.080Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:50.586Z [info]: Incoming request: GET /visits  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:50.591Z [info]: Incoming request: GET /clients  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:50.592Z [info]: Incoming request: GET /movements  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:50.628Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:50.845Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:50.848Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:50.850Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:50.855Z [info]: Incoming request: GET /alerts  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:50.857Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:51.390Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:51.438Z [info]: Incoming request: GET /promos  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:51.440Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:51.440Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:51.440Z [info]: Response status: 200 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:51.441Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:51.556Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:51.596Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:51.714Z [info]: Response status: 200 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:54.531Z [info]: Incoming request: GET /movements  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:54.532Z [info]: Incoming request: GET /alerts  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:54.538Z [info]: Incoming request: GET /promos  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:54.539Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:54.541Z [info]: Incoming request: GET /visits  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:54.688Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:54.689Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:54.693Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:54.695Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:54.754Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:55.150Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:55.153Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:55.153Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:55.154Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:55.248Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:56.113Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:56.269Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:56.343Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:56.855Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:57.009Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:57.082Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:57.254Z [info]: Incoming request: GET /clients  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:57.275Z [info]: Incoming request: GET /admins/8  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:57.282Z [info]: Incoming request: GET /movements  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:57.284Z [info]: Incoming request: GET /alerts/admin/8  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:57.297Z [info]: Incoming request: GET /promos  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:57.408Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:57.425Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:57.437Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:57.438Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:57.453Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:57.472Z [info]: Response status: 304 for GET /8  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:57.504Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:57.944Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:57.988Z [info]: Response status: 304 for GET /admin/8  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:57.999Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:58.049Z [info]: Incoming request: GET /visits  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:11:58.206Z [info]: IP info fetched  | {"metadata":{"ip":"95.234.101.22","hostname":"host-95-234-101-22.retail.telecomitalia.it","city":"Messina","region":"Sicily","country":"IT","loc":"38.1939,15.5526","org":"AS3269 Telecom Italia S.p.A.","postal":"98100","timezone":"Europe/Rome","userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:11:58.303Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:08.891Z [info]: Incoming request: GET /promos  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:08.894Z [info]: Incoming request: GET /movements  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:08.896Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:08.942Z [info]: Incoming request: GET /visits  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:09.529Z [info]: Incoming request: GET /alerts  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:09.579Z [info]: Incoming request: GET /clients  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:09.623Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:09.623Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:09.625Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:09.625Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:09.649Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:09.650Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:09.672Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:09.673Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:09.776Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:09.777Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:09.805Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:09.805Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:11.818Z [info]: Incoming request: GET /alerts  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:11.820Z [info]: Incoming request: GET /movements  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:11.834Z [info]: Incoming request: GET /visits  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:11.835Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:11.846Z [info]: Incoming request: GET /promos  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:12.458Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:12.458Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:12.484Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:12.484Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:12.488Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:12.488Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:12.518Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:12.518Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:12.625Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:12.626Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:12.805Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:13.030Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:13.031Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:13.233Z [info]: Incoming request: GET /clients  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:13.234Z [info]: Incoming request: GET /movements  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:13.239Z [info]: Incoming request: GET /agents  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:13.245Z [info]: Incoming request: GET /visits  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:13.247Z [info]: Incoming request: GET /promos  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:13.729Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:13.730Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:13.785Z [info]: Incoming request: GET /alerts/admin/8  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:13.786Z [info]: Incoming request: GET /admins/8  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:13.877Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:13.877Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:13.879Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:13.879Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:13.932Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:13.932Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:13.945Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:13.945Z [info]: Response status: 304 for GET /  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:14.013Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:14.014Z [info]: Response status: 304 for GET /8  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:18:14.049Z [info]: IP info fetched for dvwm@protonmail.ch, admin, 8, 8  | {"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}
+2024-08-11T12:18:14.050Z [info]: Response status: 304 for GET /admin/8  | {"metadata":{"userId":"66b2c23a33097d3e3633a00b","userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8","ip":"95.234.101.22"}}
+2024-08-11T12:42:13.674Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:13.680Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:13.681Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:13.683Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:13.741Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:14.239Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:14.239Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:14.240Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:14.310Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:14.370Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:14.425Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:14.539Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:16.697Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:16.715Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:16.717Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:16.718Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:16.722Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:17.182Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:17.203Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:17.258Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:17.269Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:17.270Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:17.715Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:17.824Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:18.511Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:18.512Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:18.516Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:18.580Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:18.599Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:18.599Z [info]: Response status: 304 for GET /8  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:18.648Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:18.650Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:18.656Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:18.658Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8  | {"metadata":{"metadata":{"ipInfo":{"ip":"95.234.101.22","country":"IT","org":"AS3269 Telecom Italia S.p.A.","timezone":"Europe/Rome"}}}}
+2024-08-11T12:42:19.286Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:19.290Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:19.391Z [info]: Response status: 304 for GET /  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:42:19.392Z [info]: Response status: 304 for GET /admin/8  | {"metadata":{"userEmail":"dvwm@protonmail.ch","userRole":"admin","entityCode":"8"}}
+2024-08-11T12:50:41.982Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:41.984Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:41.986Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:41.990Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:42.053Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:42.078Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:42.079Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:42.119Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:42.125Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:42.596Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:42.599Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:42.717Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:44.954Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:44.955Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:44.958Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:44.959Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:44.961Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:45.441Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:45.469Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:45.485Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:45.486Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:45.491Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:45.996Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:46.063Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:46.404Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:46.408Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:46.409Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:46.413Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:46.419Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:46.889Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:46.925Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:46.925Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:46.948Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:46.948Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:46.975Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:46.977Z [info]: Incoming request from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:50:47.027Z [info]: Response status: 304 for GET /8 | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:50:47.079Z [info]: Response status: 304 for GET /admin/8 | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:16.500Z [info]: Incoming request GET//visits : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:16.503Z [info]: Incoming request GET//clients : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:16.505Z [info]: Incoming request GET//movements : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:16.538Z [info]: Incoming request GET//agents : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:17.039Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:17.086Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:17.086Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:17.086Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:17.087Z [info]: Incoming request GET//promos : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:17.088Z [info]: Incoming request GET//alerts : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:17.179Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:17.196Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:20.154Z [info]: Incoming request GET//agents : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:20.237Z [info]: Response status: 200 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:20.587Z [info]: Incoming request GET//agents : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:20.670Z [info]: Response status: 200 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:22.020Z [info]: Incoming request GET//movements : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:22.030Z [info]: Incoming request GET//admins/8 : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:22.041Z [info]: Incoming request GET//visits : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:22.043Z [info]: Incoming request GET//agents : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:22.658Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:22.659Z [info]: Incoming request GET//promos : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:22.667Z [info]: Response status: 304 for GET /8 | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:22.720Z [info]: Response status: 200 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:22.751Z [info]: Response status: 200 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:22.842Z [info]: Incoming request GET//alerts/admin/8 : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:22.881Z [info]: Incoming request GET//clients : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:22.933Z [info]: Response status: 304 for GET /admin/8 | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:22.962Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:23.725Z [info]: Incoming request GET//movements : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:23.728Z [info]: Incoming request GET//clients : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:23.748Z [info]: Incoming request GET//visits : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:23.766Z [info]: Incoming request GET//promos : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:23.769Z [info]: Incoming request GET//agents : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:24.348Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:24.358Z [info]: Response status: 200 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:24.374Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:24.382Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:24.412Z [info]: Incoming request GET//alerts : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:24.526Z [info]: Response status: 200 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:25.404Z [info]: Response status: 200 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:28.453Z [info]: Incoming request GET//alerts : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:28.564Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:28.753Z [info]: Incoming request GET//promos : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:28.759Z [info]: Incoming request GET//agents : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:28.760Z [info]: Incoming request GET//visits : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:28.766Z [info]: Incoming request GET//movements : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:28.838Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:29.270Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:29.272Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:29.272Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:29.801Z [info]: Incoming request GET//agents : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:29.876Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:30.235Z [info]: Incoming request GET//movements : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:30.237Z [info]: Incoming request GET//visits : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:30.245Z [info]: Incoming request GET//promos : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:30.254Z [info]: Incoming request GET//agents : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:30.801Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:30.825Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:30.854Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:30.863Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:30.872Z [info]: Incoming request GET//admins/8 : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:30.875Z [info]: Incoming request GET//clients : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:30.882Z [info]: Incoming request GET//alerts/admin/8 : from: dvwm@protonmail.ch, admin, 8 | ipInfo: [95.234.101.22, country: IT, org: AS3269 Telecom Italia S.p.A., timezone: Europe/Rome]
+2024-08-11T12:53:30.920Z [info]: Response status: 304 for GET /8 | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:30.946Z [info]: Response status: 304 for GET / | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
+2024-08-11T12:53:31.003Z [info]: Response status: 200 for GET /admin/8 | User data: [email: dvwm@protonmail.ch, role: admin, code: 8]
