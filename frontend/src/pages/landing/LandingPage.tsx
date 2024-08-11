@@ -32,7 +32,7 @@ const LandingPage: React.FC = () => {
   const userRole = useSelector((state: RootState) => state.auth.userRole);
   const navigate = useNavigate();
 
-  console.log("isLoggedIn: ", isLoggedIn);
+  // console.log("Logged in?: ", isLoggedIn);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowLoader(false), 1500);

@@ -6,6 +6,7 @@ export interface CustomUser {
   email: IUser['email'];
   role: IUser['role'];
   entityCode: IUser['entityCode'];
+  entityRole: IUser['role'];
 }
 
 export interface AuthenticatedRequest extends Request {
