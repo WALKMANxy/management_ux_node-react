@@ -1,8 +1,19 @@
 import { Request } from "express";
 import { IUser } from "./User";
 
+export interface CustomUser {
+  id: IUser['_id'];
+  email: IUser['email'];
+  role: IUser['role'];
+  entityCode: IUser['entityCode'];
+}
+
 export interface AuthenticatedRequest extends Request {
-  user?: IUser;
+  user?: Partial<IUser>; // Use Partial if you might not always have all properties
+}
+
+export interface UserRequest extends Request {
+  user: IUser;
 }
 
 // models/Admin.ts (Optional, just for structure)

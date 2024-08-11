@@ -9,6 +9,7 @@ export interface IUser extends Document {
   passwordResetExpires?: Date; // Optional for password reset
   role: "admin" | "agent" | "client" | "guest";
   entityCode?: string; // Code linking to admin, agent, or client
+  linkedEntities?: string[];
   avatar?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -30,6 +31,7 @@ const userSchema = new Schema<IUser>(
       default: "guest",
     },
     entityCode: { type: String }, // Link to admin, agent, or client via code
+    linkedEntities: { type: [String] },
     avatar: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },

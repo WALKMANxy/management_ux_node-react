@@ -3,13 +3,14 @@ import { body } from "express-validator";
 import fs from "fs";
 import path from "path";
 import { config } from "../config/config";
-import { AuthenticatedRequest, Client } from "../models/types";
-import { authenticateUser } from "../utils/authentication";
+import { authenticateUser } from "../middlewares/authentication";
 import {
   checkAdminRole,
   checkAgentOrAdminOrClientRole,
-} from "../utils/roleChecker";
-import { checkValidation } from "../utils/validate";
+} from "../middlewares/roleChecker";
+import { checkValidation } from "../middlewares/validate";
+import { AuthenticatedRequest, Client } from "../models/types";
+import { getClientById, getClientsFromFile } from "../utils/fetchClientsUtil";
 
 const router = express.Router();
 
@@ -35,8 +36,7 @@ router.get(
   checkAgentOrAdminOrClientRole,
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const filePath = path.resolve(config.clientDetailsFilePath || "");
-      const clients: Client[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+      const clients = getClientsFromFile();
       res.json(clients);
     } catch (err) {
       if (err instanceof Error) {
@@ -55,14 +55,8 @@ router.get(
   checkAgentOrAdminOrClientRole,
   async (req: Request, res: Response) => {
     try {
-      const filePath = path.resolve(config.clientDetailsFilePath || "");
-      const clients: Client[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-
-      const client = clients.find(
-        (client) => client.CODICE === req.params.codice
-      );
-
-      res.json(client);
+      const clients = getClientById(req.params.codice);
+      res.json(clients);
     } catch (err) {
       if (err instanceof Error) {
         res.status(500).json({ message: err.message });

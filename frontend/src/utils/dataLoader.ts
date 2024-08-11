@@ -9,9 +9,9 @@ export const mapDataToModels = async (
   data: any[],
   clientDetails: any[],
   agentDetails: any[],
-  visits: Visit[] = [], // Default to an empty array if undefined
-  promos: Promo[] = [], // Default to an empty array if undefined
-  alerts: Alert[] = [] // Default to an empty array if undefined
+  visits: Visit[] = [],
+  promos: Promo[] = [],
+  alerts: Alert[] = []
 ): Promise<Client[]> => {
   const numWorkers = Math.min(navigator.hardwareConcurrency || 4, data.length);
   const chunkSize = Math.ceil(data.length / numWorkers);
@@ -19,64 +19,55 @@ export const mapDataToModels = async (
     data.slice(i * chunkSize, (i + 1) * chunkSize)
   );
 
-  return new Promise<Client[]>((resolve, reject) => {
-    const workers: Worker[] = [];
-    const resultsMap = new Map<string, Client>();
-    let completed = 0;
-
-    const handleWorkerMessage = (
-      index: number,
-      event: MessageEvent<Client[]>
-    ) => {
-      const workerResults = event.data;
-
-      workerResults.forEach((client) => {
-        if (resultsMap.has(client.id)) {
-          const existingClient = resultsMap.get(client.id)!;
-          existingClient.movements.push(...client.movements);
-          existingClient.totalOrders += client.totalOrders;
-          existingClient.totalRevenue = (
-            parseFloat(existingClient.totalRevenue) +
-            parseFloat(client.totalRevenue)
-          ).toFixed(2);
-        } else {
-          resultsMap.set(client.id, client);
-        }
-      });
-
-      completed += 1;
-      workers[index].terminate();
-
-      if (completed === workers.length) {
-        const results = Array.from(resultsMap.values());
-        resolve(results);
-      }
-    };
-
-    const handleWorkerError = (index: number, error: ErrorEvent) => {
-      console.error(`Worker ${index} error:`, error);
-      workers.forEach((worker) => worker.terminate());
-      reject(error);
-    };
-
-    chunks.forEach((chunk, index) => {
+  const workers = chunks.map((chunk, index) => {
+    return new Promise<Client[]>((resolve, reject) => {
       const worker = new Worker(workerScriptPath);
-      workers.push(worker);
 
-      worker.onmessage = (event) => handleWorkerMessage(index, event);
-      worker.onerror = (error) => handleWorkerError(index, error);
+      worker.onmessage = (event: MessageEvent<Client[]>) => {
+        resolve(event.data);
+        worker.terminate(); // Terminate worker after it finishes
+      };
+
+      worker.onerror = (error) => {
+        console.error(`Worker ${index} error:`, error);
+        reject(error);
+        worker.terminate(); // Terminate worker on error
+      };
 
       worker.postMessage({
         data: chunk,
         clientDetails,
         agentDetails,
-        visits: visits || [], // Ensure this is always an array
-        promos: promos || [], // Ensure this is always an array
-        alerts: alerts || [], // Ensure this is always an array
-      }); // Include new data in the worker
+        visits,
+        promos,
+        alerts,
+      });
     });
   });
+
+  // Wait for all workers to complete
+  const results = await Promise.all(workers);
+
+  // Combine results from all workers
+  const resultsMap = new Map<string, Client>();
+
+  results.flat().forEach((client) => {
+    if (resultsMap.has(client.id)) {
+      const existingClient = resultsMap.get(client.id)!;
+      existingClient.movements.push(...client.movements);
+      existingClient.totalOrders += client.totalOrders;
+      existingClient.totalRevenue = (
+        parseFloat(existingClient.totalRevenue) +
+        parseFloat(client.totalRevenue)
+      ).toFixed(2);
+    } else {
+      resultsMap.set(client.id, client);
+    }
+  });
+
+  return Array.from(resultsMap.values());
 };
+
 
 // Mapping function for full agent data
 export const mapDataToAgents = async (

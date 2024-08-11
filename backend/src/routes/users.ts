@@ -1,13 +1,15 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import { User } from "../models/User";
-import { AuthenticatedRequest } from "../models/types";
-import { authenticateUser } from "../utils/authentication";
+import { authenticateUser } from "../middlewares/authentication";
 import {
   checkAdminRole,
   checkAgentOrAdminOrClientRole,
-} from "../utils/roleChecker"; // Assuming only admins can update user roles or details
-import { checkValidation } from "../utils/validate";
+} from "../middlewares/roleChecker"; // Assuming only admins can update user roles or details
+import { checkValidation } from "../middlewares/validate";
+import { User } from "../models/User";
+import { AuthenticatedRequest } from "../models/types";
+import { getAgentById } from "../utils/fetchAgentUtil";
+import { getClientById } from "../utils/fetchClientsUtil";
 
 const router = express.Router();
 
@@ -107,6 +109,69 @@ router.get(
       } else {
         console.error("Unexpected error:", err);
         res.status(500).json({ message: "Internal Server Error" });
+      }
+    }
+  }
+);
+
+// In your user routes file
+router.get(
+  "/linked-entities",
+  checkAgentOrAdminOrClientRole,
+  authenticateUser,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const user = req.user;
+
+      if (!user || !user.role || !user.entityCode) {
+        return res
+          .status(200)
+          .json({ message: "User information is incomplete or missing", user });
+      }
+
+      if (user.role === "client") {
+        // Fetch the agent ID for this client
+        const clientData = getClientById(user.entityCode);
+        if (clientData) {
+          user.linkedEntities = [clientData.AG];
+        } else {
+          return res
+            .status(200)
+            .json({ message: "Linked agent for client not found." });
+        }
+      } else if (user.role === "agent") {
+        // Fetch all client IDs for this agent
+        const agentData = getAgentById(user.entityCode);
+        if (agentData) {
+          user.linkedEntities = agentData.clients.map(
+            (client) => client.CODICE
+          );
+        } else {
+          return res.status(200).json({ message: "Agent data not found" });
+        }
+      }
+
+      // Save the updated user object
+      if (user.save) {
+        await user.save();
+      } else {
+        return res.status(500).json({
+          message:
+            "Unable to save user data, the user is missing the 'user.save' method",
+        });
+      }
+
+      res.status(200).json({ linkedEntities: user.linkedEntities });
+    } catch (error: unknown) {
+      console.error("Error fetching linked entities:", error); // Log the error for monitoring
+
+      // Type check before accessing properties
+      if (error instanceof Error) {
+        res
+          .status(500)
+          .json({ message: "Internal Server Error", error: error.message });
+      } else {
+        res.status(500).json({ message: "An unknown error occurred" });
       }
     }
   }
