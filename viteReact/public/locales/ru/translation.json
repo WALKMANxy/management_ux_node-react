@@ -1,0 +1,161 @@
+{
+    "welcome": "Добро пожаловать",
+    "login": "Войти",
+    "logout": "Выйти",
+    "headerDashboard": "Панель управления",
+    "clients": "Клиенты",
+    "visits": "Визиты",
+    "statistics": "Статистика",
+    "promos": "Акции",
+    "alerts": "Оповещения",
+    "notifications": "Уведомления",
+    "no_notifications": "Новых уведомлений нет",
+    "clientDetails": {
+      "title": "Детали клиента"
+    },
+    "details": {
+      "name": "Имя",
+      "phone": "Номер телефона",
+      "totalRevenue": "Общий доход",
+      "pec": "Электронная почта PEC",
+      "extendedTaxCode": "Дополнительный налоговый код",
+      "paymentMethod": "Способ оплаты",
+      "province": "Местоположение",
+      "totalOrders": "Всего заказов",
+      "unpaidRevenue": "Неоплаченный доход",
+      "email": "Электронная почта",
+      "taxCode": "Налоговый код",
+      "paymentMethodID": "ID способа оплаты",
+      "address": "Адрес",
+      "agent": "Агент"
+    },
+    "promotions": {
+      "activePromotionsFor": "Активные акции для",
+      "activePromotionsWithClients": "Активные акции с вашими клиентами",
+      "promo1": "Акция 1",
+      "promo2": "Акция 2",
+      "promo3": "Акция 3",
+      "viewMore": "Показать больше"
+    },
+    "spentThisMonth": {
+      "title": "Потрачено в этом месяце",
+      "iconAlt": "Иконка расходов"
+    },
+    "spentThisYear": {
+      "title": "Потрачено в этом году",
+      "iconAlt": "Иконка расходов"
+    },
+    "topArticleType": {
+      "title": "Самые покупаемые статьи",
+      "iconAlt": "Иконка статей",
+      "amountPurchased": "Количество покупок"
+    },
+    "totalOrder": {
+      "month": "Месяц",
+      "year": "Год",
+      "totalOrders": "Всего заказов"
+    },
+    "dashboard": {
+      "totalEarning": "Общий доход"
+    },
+    "upcomingVisits": {
+      "titleForClient": "Предстоящие визиты для {{clientName}}",
+      "titleForAgent": "Ваши предстоящие визиты",
+      "visitPlaceholder1": "Визит 1",
+      "visitPlaceholder2": "Визит 2",
+      "visitPlaceholder3": "Визит 3",
+      "planVisit": "Запланировать визит"
+    },
+    "globalSearch": {
+      "placeholder": "Поиск..."
+    },
+    "searchResults": {
+      "articleId": "OEM статьи: {{articleId}}",
+      "brand": "Бренд: {{brand}}",
+      "lastSoldDate": "Последняя продажа: {{lastSoldDate}}",
+      "province": "Провинция: {{province}}",
+      "phone": "Телефон: {{phone}}",
+      "paymentMethod": "Способ оплаты: {{paymentMethod}}",
+      "discountAmount": "Сумма скидки: {{discountAmount}}",
+      "startDate": "Дата начала: {{startDate}}",
+      "endDate": "Дата окончания: {{endDate}}",
+      "type": "Тип: {{type}}",
+      "noResults": "Результатов не найдено"
+    },
+    "monthOverMonthSpendingTrend": {
+      "title": "Месячная тенденция расходов",
+      "revenue": "Доход"
+    },
+    "salesDistribution": {
+      "title": "Распределение продаж среди клиентов",
+      "revenue": "Доход"
+    },
+    "topBrandsSold": {
+      "title": "Самые продаваемые бренды",
+      "brandLabel": "Бренд"
+    },
+    "clientList": {
+      "title": "Клиенты",
+      "quickFilterPlaceholder": "Быстрый фильтр...",
+      "startDate": "Дата начала",
+      "endDate": "Дата окончания",
+      "exportCSV": "Экспорт CSV"
+    },
+    "movementsHistory": {
+      "date": "Дата",
+      "brand": "Бренд",
+      "oemId": "OEM ID",
+      "name": "Имя",
+      "revenue": "Доход",
+      "cost": "Стоимость"
+    },
+    "agentDashboard": {
+      "welcomeBack": "Добро пожаловать, {{name}}",
+      "statisticsFor": "Статистика для {{name}}",
+      "yourStatistics": "Ваша статистика",
+      "calendar": "Календарь",
+      "viewMore": "Показать больше",
+      "totalEarning": "Общий доход",
+      "totalOrder": "Всего заказов",
+      "spentThisMonth": "Потрачено в этом месяце",
+      "spentThisYear": "Потрачено в этом году",
+      "topArticleType": "Самые покупаемые статьи",
+      "monthOverMonthSpendingTrend": "Месячная тенденция расходов",
+      "topBrandsSold": "Самые продаваемые бренды",
+      "salesDistribution": "Распределение продаж среди клиентов",
+      "upcomingVisits": "Предстоящие визиты для {{name}}"
+    },
+    "clientsPage": {
+      "name": "Имя",
+      "province": "Провинция",
+      "phone": "Номер телефона",
+      "totalOrders": "Всего заказов",
+      "ordersThisMonth": "Заказы в этом месяце",
+      "totalRevenue": "Общий доход",
+      "revenueThisMonth": "Доход в этом месяце",
+      "unpaidRevenue": "Неоплаченный доход",
+      "paymentMethod": "Способ оплаты"
+    },
+    "landingPage": {
+      "welcome": "Добро пожаловать, {name}",
+      "login": "Войти",
+      "enter": "Войти",
+      "userRole": "Роль пользователя",
+      "admin": "Администратор",
+      "agent": "Агент",
+      "client": "Клиент",
+      "selectAgent": "Выбрать агента",
+      "selectClient": "Выбрать клиента",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "googleMaps": "Google Maps",
+      "linkedIn": "LinkedIn",
+      "workingHours": "Пн - Пт, 8:30 - 13:00 и 14:30 - 18:30",
+      "address": "Виа Алессандро Вольта 17, Катания",
+      "phone": "Телефон",
+      "email": "Электронная почта",
+      "vat": "Номер НДС",
+      "credits": "Кредиты: @2024"
+    }
+  }
+  
