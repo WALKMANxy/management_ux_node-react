@@ -1,0 +1,219 @@
++---public
+ª   ª   index.html
+ª   ª
+ª   +---icons
+ª   ª       earning.svg
+ª   ª       favicon.ico
+ª   ª       garage.svg
+ª   ª       money.svg
+ª   ª       moneybag.svg
+ª   ª
+ª   +---images
+ª   ª       checkerboard-cross.png
+ª   ª       funky-lines.png
+ª   ª       light_noise_diagonal.png
+ª   ª       logo-appbar.png
+ª   ª       logo192.png
+ª   ª       logo512.png
+ª   ª       logobig.png
+ª   ª       noise_lines.png
+ª   ª       pipes.png
+ª   ª       rough_diagonal.png
+ª   ª       struckaxiom.png
+ª   ª
+ª   +---locales
+ª   ª   +---de
+ª   ª   ª       translation.json
+ª   ª   ª
+ª   ª   +---en
+ª   ª   ª       translation.json
+ª   ª   ª
+ª   ª   +---es
+ª   ª   ª       translation.json
+ª   ª   ª
+ª   ª   +---fr
+ª   ª   ª       translation.json
+ª   ª   ª
+ª   ª   +---it
+ª   ª   ª       translation.json
+ª   ª   ª
+ª   ª   +---ru
+ª   ª           translation.json
+ª   ª
+ª   +---misc
+ª           manifest.json
+ª           robots.txt
+ª           service-worker.ts
+ª
++---src
+    ª   App.css
+    ª   App.test.tsx
+    ª   App.tsx
+    ª   i18n.ts
+    ª   index.css
+    ª   index.tsx
+    ª   logo.svg
+    ª   react-app-env.d.ts
+    ª   reportWebVitals.ts
+    ª   serviceWorkerRegistration.ts
+    ª   setupTests.ts
+    ª
+    +---app
+    ª       hooks.ts
+    ª       rootReducer.ts
+    ª       store.ts
+    ª
+    +---components
+    ª   +---articlepage
+    ª   ª       ArticleDetailComponent.tsx
+    ª   ª       ArticleDetails.tsx
+    ª   ª
+    ª   +---clientpage
+    ª   ª       ClientDetails.tsx
+    ª   ª       DetailComponent.tsx
+    ª   ª
+    ª   +---common
+    ª   ª       HistoryComponent.tsx
+    ª   ª       Loader.tsx
+    ª   ª       Spinner.tsx
+    ª   ª
+    ª   +---dashboard
+    ª   ª       ActivePromotions.tsx
+    ª   ª       AgentActivityOverview.tsx
+    ª   ª       CalendarComponent.tsx
+    ª   ª       ServerDay.tsx
+    ª   ª       SpentThisMonth.tsx
+    ª   ª       SpentThisYear.tsx
+    ª   ª       TopArticleType.tsx
+    ª   ª       TotalOrders.tsx
+    ª   ª       TotalRevenue.tsx
+    ª   ª       UpcomingVisits.tsx
+    ª   ª
+    ª   +---ErrorBoundary
+    ª   ª       ErrorBoundary.tsx
+    ª   ª
+    ª   +---Header
+    ª   ª       GlobalSearch.css
+    ª   ª       GlobalSearch.tsx
+    ª   ª       Header.tsx
+    ª   ª       SearchResults.module.css
+    ª   ª       SearchResults.tsx
+    ª   ª
+    ª   +---landingPage
+    ª   ª       authenticationModal.tsx
+    ª   ª
+    ª   +---movementsPage
+    ª   ª       MovementDetailComponent.tsx
+    ª   ª       movementsDetails.tsx
+    ª   ª
+    ª   +---statistics
+    ª       +---charts
+    ª       ª       MonthOverMonthSpendingTrend.tsx
+    ª       ª       SalesDistribution.tsx
+    ª       ª       TopBrandSold.tsx
+    ª       ª
+    ª       +---grids
+    ª               AGGridTable.css
+    ª               AGGridTable.tsx
+    ª               ArticleHistory.tsx
+    ª               ArticlesList.tsx
+    ª               ClientList.tsx
+    ª               MovementDetailsHistory.tsx
+    ª               MovementList.tsx
+    ª               MovementsHistory.tsx
+    ª
+    +---features
+    ª   +---agents
+    ª   ª       agentsSlice.ts
+    ª   ª
+    ª   +---auth
+    ª   ª       authSlice.ts
+    ª   ª
+    ª   +---calendar
+    ª   ª       calendarSlice.ts
+    ª   ª
+    ª   +---clients
+    ª   ª       clientsSlice.ts
+    ª   ª
+    ª   +---data
+    ª   ª       dataSlice.ts
+    ª   ª
+    ª   +---promos
+    ª   ª       promosSlice.ts
+    ª   ª
+    ª   +---search
+    ª   ª       searchSlice.ts
+    ª   ª
+    ª   +---visits
+    ª           visitsSlice.ts
+    ª
+    +---hooks
+    ª       useArticlesGrid.ts
+    ª       useAuth.ts
+    ª       useClearSearchOnNavigate.ts
+    ª       useClientDetails.ts
+    ª       useClientGrid.ts
+    ª       useDebounce.ts
+    ª       useGlobalSearch.ts
+    ª       useHandleSignin.ts
+    ª       useMovementsGrid.ts
+    ª       useResizeObserver.ts
+    ª       useSelectionState.ts
+    ª       useStats.ts
+    ª
+    +---layout
+    ª       Layout.tsx
+    ª
+    +---models
+    ª       dataModels.ts
+    ª       entityModels.ts
+    ª       propsModels.ts
+    ª       searchModels.ts
+    ª       stateModels.ts
+    ª
+    +---pages
+    ª   +---admin
+    ª   ª       AdminDashboard.tsx
+    ª   ª
+    ª   +---agent
+    ª   ª       AgentDashboard.tsx
+    ª   ª
+    ª   +---client
+    ª   ª       ClientDashboard.tsx
+    ª   ª
+    ª   +---common
+    ª   ª       ArticlesPage.tsx
+    ª   ª       ClientsPage.tsx
+    ª   ª       MovementsPage.tsx
+    ª   ª
+    ª   +---landing
+    ª           LandingPage.tsx
+    ª
+    +---services
+    ª   ª   api.ts
+    ª   ª
+    ª   +---api
+    ª           admins.ts
+    ª           agents.ts
+    ª           alerts.ts
+    ª           apiUtils.ts
+    ª           auth.ts
+    ª           centralizedApi.ts
+    ª           clients.ts
+    ª           promos.ts
+    ª           users.ts
+    ª           visits.ts
+    ª
+    +---styles
+    ª       global.css
+    ª
+    +---utils
+            authHelpers.ts
+            constants.ts
+            dataLoader.ts
+            dataUtils.ts
+            errorHandling.ts
+            localStorage.ts
+            mongoose.ts
+            tokenIntercept.ts
+            worker.js

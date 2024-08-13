@@ -1,0 +1,161 @@
+{
+    "welcome": "Bienvenue",
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "headerDashboard": "Tableau de bord",
+    "clients": "Clients",
+    "visits": "Visites",
+    "statistics": "Statistiques",
+    "promos": "Promotions",
+    "alerts": "Alertes",
+    "notifications": "Notifications",
+    "no_notifications": "Aucune nouvelle notification",
+    "clientDetails": {
+      "title": "Détails du client"
+    },
+    "details": {
+      "name": "Nom",
+      "phone": "Numéro de téléphone",
+      "totalRevenue": "Revenu total",
+      "pec": "E-mail PEC",
+      "extendedTaxCode": "Code fiscal supplémentaire",
+      "paymentMethod": "Méthode de paiement",
+      "province": "Emplacement",
+      "totalOrders": "Total des commandes",
+      "unpaidRevenue": "Revenu impayé",
+      "email": "E-mail",
+      "taxCode": "Code fiscal",
+      "paymentMethodID": "ID méthode de paiement",
+      "address": "Adresse",
+      "agent": "Agent"
+    },
+    "promotions": {
+      "activePromotionsFor": "Promotions actives pour",
+      "activePromotionsWithClients": "Promotions actives avec vos clients",
+      "promo1": "Promotion 1",
+      "promo2": "Promotion 2",
+      "promo3": "Promotion 3",
+      "viewMore": "Voir plus"
+    },
+    "spentThisMonth": {
+      "title": "Dépensé ce mois-ci",
+      "iconAlt": "Icône des dépenses"
+    },
+    "spentThisYear": {
+      "title": "Dépensé cette année",
+      "iconAlt": "Icône des dépenses"
+    },
+    "topArticleType": {
+      "title": "Articles les plus achetés",
+      "iconAlt": "Icône des articles",
+      "amountPurchased": "Quantité achetée"
+    },
+    "totalOrder": {
+      "month": "Mois",
+      "year": "Année",
+      "totalOrders": "Total des commandes"
+    },
+    "dashboard": {
+      "totalEarning": "Revenu total"
+    },
+    "upcomingVisits": {
+      "titleForClient": "Visites à venir pour {{clientName}}",
+      "titleForAgent": "Vos visites à venir",
+      "visitPlaceholder1": "Visite 1",
+      "visitPlaceholder2": "Visite 2",
+      "visitPlaceholder3": "Visite 3",
+      "planVisit": "Planifier une visite"
+    },
+    "globalSearch": {
+      "placeholder": "Rechercher..."
+    },
+    "searchResults": {
+      "articleId": "ID article OEM: {{articleId}}",
+      "brand": "Marque: {{brand}}",
+      "lastSoldDate": "Dernière vente: {{lastSoldDate}}",
+      "province": "Province: {{province}}",
+      "phone": "Téléphone: {{phone}}",
+      "paymentMethod": "Méthode de paiement: {{paymentMethod}}",
+      "discountAmount": "Montant de la remise: {{discountAmount}}",
+      "startDate": "Date de début: {{startDate}}",
+      "endDate": "Date de fin: {{endDate}}",
+      "type": "Type: {{type}}",
+      "noResults": "Aucun résultat trouvé"
+    },
+    "monthOverMonthSpendingTrend": {
+      "title": "Tendance des dépenses mensuelles",
+      "revenue": "Revenu"
+    },
+    "salesDistribution": {
+      "title": "Répartition des ventes par clients",
+      "revenue": "Revenu"
+    },
+    "topBrandsSold": {
+      "title": "Marques les plus vendues",
+      "brandLabel": "Marque"
+    },
+    "clientList": {
+      "title": "Clients",
+      "quickFilterPlaceholder": "Filtre rapide...",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "exportCSV": "Exporter en CSV"
+    },
+    "movementsHistory": {
+      "date": "Date",
+      "brand": "Marque",
+      "oemId": "ID OEM",
+      "name": "Nom",
+      "revenue": "Revenu",
+      "cost": "Coût"
+    },
+    "agentDashboard": {
+      "welcomeBack": "Bon retour, {{name}}",
+      "statisticsFor": "Statistiques pour {{name}}",
+      "yourStatistics": "Vos statistiques",
+      "calendar": "Calendrier",
+      "viewMore": "Voir plus",
+      "totalEarning": "Revenu total",
+      "totalOrder": "Total des commandes",
+      "spentThisMonth": "Dépensé ce mois-ci",
+      "spentThisYear": "Dépensé cette année",
+      "topArticleType": "Articles les plus achetés",
+      "monthOverMonthSpendingTrend": "Tendance des dépenses mensuelles",
+      "topBrandsSold": "Marques les plus vendues",
+      "salesDistribution": "Répartition des ventes par clients",
+      "upcomingVisits": "Visites à venir pour {{name}}"
+    },
+    "clientsPage": {
+      "name": "Nom",
+      "province": "Province",
+      "phone": "Numéro de téléphone",
+      "totalOrders": "Total des commandes",
+      "ordersThisMonth": "Commandes ce mois-ci",
+      "totalRevenue": "Revenu total",
+      "revenueThisMonth": "Revenu ce mois-ci",
+      "unpaidRevenue": "Revenu impayé",
+      "paymentMethod": "Méthode de paiement"
+    },
+    "landingPage": {
+      "welcome": "Bon retour, {name}",
+      "login": "Connexion",
+      "enter": "Entrer",
+      "userRole": "Rôle de l'utilisateur",
+      "admin": "Administrateur",
+      "agent": "Agent",
+      "client": "Client",
+      "selectAgent": "Sélectionner un agent",
+      "selectClient": "Sélectionner un client",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "googleMaps": "Google Maps",
+      "linkedIn": "LinkedIn",
+      "workingHours": "Lun - Ven, 8:30 - 13:00 et 14:30 - 18:30",
+      "address": "Via Alessandro Volta 17, Catane",
+      "phone": "Téléphone",
+      "email": "E-mail",
+      "vat": "Numéro de TVA",
+      "credits": "Crédits: @2024"
+    }
+  }
+  

@@ -1,0 +1,162 @@
+{
+  "welcome": "Welcome",
+  "login": "Login",
+  "logout": "Logout",
+  "headerDashboard": "Dashboard",
+  "clients": "Clients",
+  "visits": "Visits",
+  "statistics": "Statistics",
+  "promos": "Promos",
+  "alerts": "Alerts",
+  "notifications": "Notifications",
+  "no_notifications": "No new notifications",
+  "clientDetails": {
+    "title": "Client Details"
+  },
+  "details": {
+    "name": "Name",
+    "phone": "Phone Number",
+    "totalRevenue": "Total Revenue",
+    "pec": "E-mail PEC",
+    "extendedTaxCode": "Additional Tax Code",
+    "paymentMethod": "Payment Method",
+    "province": "Location",
+    "totalOrders": "Total Orders",
+    "unpaidRevenue": "Unpaid Revenue",
+    "email": "E-mail",
+    "taxCode": "Tax Code",
+    "paymentMethodID": "PMID",
+    "address": "Address",
+    "agent": "Agent"
+  },
+  "promotions": {
+    "activePromotionsFor": "Active Promotions for",
+    "activePromotionsWithClients": "Active Promotions with Your Clients",
+    "promo1": "Promo 1",
+    "promo2": "Promo 2",
+    "promo3": "Promo 3",
+    "viewMore": "View More"
+  },
+  "spentThisMonth": {
+    "title": "Spent This Month",
+    "iconAlt": "Spent Icon"
+  },
+  "spentThisYear": {
+    "title": "Spent This Year",
+    "iconAlt": "Spent Icon"
+  },
+  "topArticleType": {
+    "title": "Most bought articles",
+    "iconAlt": "Articles Icon",
+    "amountPurchased": "Amount Purchased"
+  },
+  "totalOrder": {
+    "month": "Month",
+    "year": "Year",
+    "totalOrders": "Total Orders"
+  },
+  "dashboard": {
+    "totalEarning": "Total Earning"
+  },
+  "upcomingVisits": {
+    "titleForClient": "Upcoming Visits for {{clientName}}",
+    "titleForAgent": "Your Upcoming Visits",
+    "visitPlaceholder1": "Visit 1",
+    "visitPlaceholder2": "Visit 2",
+    "visitPlaceholder3": "Visit 3",
+    "planVisit": "Plan Visit"
+  },
+  "globalSearch": {
+    "placeholder": "Search..."
+  },
+  "searchResults": {
+    "articleId": "Article OEM: {{articleId}}",
+    "brand": "Brand: {{brand}}",
+    "lastSoldDate": "Last Sold: {{lastSoldDate}}",
+    "province": "Province: {{province}}",
+    "phone": "Phone: {{phone}}",
+    "paymentMethod": "Payment Method: {{paymentMethod}}",
+    "discountAmount": "Discount Amount: {{discountAmount}}",
+    "startDate": "Start Date: {{startDate}}",
+    "endDate": "End Date: {{endDate}}",
+    "type": "Type: {{type}}",
+    "noResults": "No results found"
+  },
+  "monthOverMonthSpendingTrend": {
+    "title": "Monthly Spending Trend",
+    "revenue": "Revenue",
+    "expense": "Expense"
+  },
+  "salesDistribution": {
+    "title": "Sales Distribution Through Clients",
+    "revenue": "Revenue"
+  },
+  "topBrandsSold": {
+    "titleAgent": "Top Brands Sold",
+    "titleClient": "Top Brands Bought",
+    "brandLabel": "Brand"
+  },
+  "clientList": {
+    "title": "Clients",
+    "quickFilterPlaceholder": "Quick Filter...",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "exportCSV": "Export CSV"
+  },
+  "movementsHistory": {
+    "date": "Date",
+    "brand": "Brand",
+    "oemId": "OEM ID",
+    "name": "Name",
+    "revenue": "Revenue",
+    "cost": "Cost"
+  },
+  "agentDashboard": {
+    "welcomeBack": "Welcome back, {{name}}",
+    "statisticsFor": "Statistics for {{name}}",
+    "yourStatistics": "Your Statistics",
+    "calendar": "Calendar",
+    "viewMore": "View More",
+    "totalEarning": "Total Earning",
+    "totalOrder": "Total Orders",
+    "spentThisMonth": "Spent This Month",
+    "spentThisYear": "Spent This Year",
+    "topArticleType": "Most Bought Articles",
+    "monthOverMonthSpendingTrend": "Month Over Month Spending Trend",
+    "topBrandsSold": "Top Brands Sold",
+    "salesDistribution": "Sales Distribution Through Clients",
+    "upcomingVisits": "Upcoming Visits for {{name}}"
+  },
+  "clientsPage": {
+    "name": "Name",
+    "province": "Province",
+    "phone": "Phone Number",
+    "totalOrders": "Total Orders",
+    "ordersThisMonth": "Orders This Month",
+    "totalRevenue": "Total Revenue",
+    "revenueThisMonth": "Revenue This Month",
+    "unpaidRevenue": "Unpaid Revenue",
+    "paymentMethod": "Payment Method"
+  },
+  "landingPage": {
+    "welcome": "Welcome back, {name}",
+    "login": "Login",
+    "enter": "Enter",
+    "userRole": "User Role",
+    "admin": "Admin",
+    "agent": "Agent",
+    "client": "Client",
+    "selectAgent": "Select Agent",
+    "selectClient": "Select Client",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "googleMaps": "Google Maps",
+    "linkedIn": "LinkedIn",
+    "workingHours": "Mon - Fri, 8:30 - 13:00 and 14:30 - 18:30",
+    "address": "Via Alessandro Volta 17, Catania",
+    "phone": "Phone",
+    "email": "E-mail",
+    "vat": "VAT Number",
+    "credits": "credits: @2024"
+  }
+}
