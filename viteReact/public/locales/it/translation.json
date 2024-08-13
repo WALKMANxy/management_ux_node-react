@@ -1,0 +1,165 @@
+{
+  "welcome": "Benvenuto",
+  "login": "Accedi",
+  "logout": "Disconnetti",
+  "headerDashboard": "Dashboard",
+  "clients": "Clienti",
+  "visits": "Visite",
+  "statistics": "Statistiche",
+  "promos": "Promozioni",
+  "alerts": "Avvisi",
+  "notifications": "Notifiche",
+  "no_notifications": "Nessuna nuova notifica",
+  "clientDetails": {
+    "title": "Dettagli Cliente"
+  },
+  "details": {
+    "name": "Ragione Sociale",
+    "phone": "Numero di telefono",
+    "totalRevenue": "Entrate totali",
+    "pec": "E-mail PEC",
+    "extendedTaxCode": "Codice fiscale aggiuntivo",
+    "paymentMethod": "Metodo di pagamento",
+    "province": "Località",
+    "totalOrders": "Ordini totali",
+    "unpaidRevenue": "Insoluto",
+    "email": "E-mail",
+    "taxCode": "Codice fiscale",
+    "paymentMethodID": "PMID",
+    "address": "Indirizzo",
+    "agent": "Agente"
+  },
+  "promotions": {
+    "activePromotionsFor": "Promozioni attive per",
+    "activePromotionsWithClients": "Promozioni attive con i tuoi clienti",
+    "promo1": "Promo 1",
+    "promo2": "Promo 2",
+    "promo3": "Promo 3",
+    "viewMore": "Vedi di più"
+  },
+  "spentThisMonth": {
+    "title": "Speso questo mese",
+    "iconAlt": "Icona spese"
+  },
+  "spentThisYear": {
+    "title": "Speso quest'anno",
+    "iconAlt": "Icona spese"
+  },
+  "topArticleType": {
+    "title": "Articoli più acquistati",
+    "iconAlt": "Icona degli articoli",
+    "amountPurchased": "Quantità acquistata"
+  },
+  "totalOrder": {
+    "month": "Mese",
+    "year": "Anno",
+    "totalOrders": "Ordini Totali"
+  },
+  "dashboard": {
+    "totalEarning": "Guadagno Totale"
+  },
+  "upcomingVisits": {
+    "titleForClient": "Prossime Visite per {{clientName}}",
+    "titleForAgent": "Le Tue Prossime Visite",
+    "visitPlaceholder1": "Visita 1",
+    "visitPlaceholder2": "Visita 2",
+    "visitPlaceholder3": "Visita 3",
+    "planVisit": "Pianifica Visita"
+  },
+  "globalSearch": {
+    "placeholder": "Cerca..."
+  },
+  "searchResults": {
+    "articleId": "OEM Articolo: {{articleId}}",
+    "brand": "Marca: {{brand}}",
+    "lastSoldDate": "Ultima Vendita: {{lastSoldDate}}",
+    "province": "Provincia: {{province}}",
+    "phone": "Telefono: {{phone}}",
+    "paymentMethod": "Metodo di Pagamento: {{paymentMethod}}",
+    "discountAmount": "Importo Sconto: {{discountAmount}}",
+    "startDate": "Data di Inizio: {{startDate}}",
+    "endDate": "Data di Fine: {{endDate}}",
+    "type": "Tipo: {{type}}",
+    "noResults": "Nessun risultato trovato"
+  },
+  "monthOverMonthSpendingTrend": {
+    "title": "Trend Spesa Mensile",
+    "revenue": "Entrate"
+  },
+  "salesDistribution": {
+    "title": "Distribuzione delle Vendite tra i Clienti",
+    "revenue": "Entrate"
+  },
+  "topBrandsSold": {
+    "titleAgent": "Marche più vendute",
+    "titleClient": "Marche più acquistate",
+    "brandLabel": "Marca"
+  },
+  "clientList": {
+    "title": "Clienti",
+    "quickFilterPlaceholder": "Filtro Rapido...",
+    "startDate": "Data  Inizio",
+    "endDate": "Data  Fine",
+    "exportCSV": "Esporta CSV"
+  },
+  "movementsHistory": {
+    "date": "Data",
+    "brand": "Marca",
+    "oemId": "ID OEM",
+    "name": "Nome",
+    "revenue": "Entrate",
+    "cost": "Costo"
+  },
+  "agentDashboard": {
+    "welcomeBack": "Bentornato, {{name}}",
+    "statisticsFor": "Statistiche per {{name}}",
+    "yourStatistics": "Le Tue Statistiche",
+    "calendar": "Calendario",
+    "viewMore": "Vedi di Più",
+    "totalEarning": "Guadagni Totali",
+    "totalOrder": "Ordini Totali",
+    "spentThisMonth": "Speso Questo Mese",
+    "spentThisYear": "Speso Quest'Anno",
+    "topArticleType": "Articoli più Acquistati",
+    "monthOverMonthSpendingTrend": {
+      "title": "Andamento delle spese mensili",
+      "revenue": "Entrate",
+      "expense": "Spese"
+    },
+    "topBrandsSold": "Marche Più Vendute",
+    "salesDistribution": "Distribuzione delle Vendite tra i Clienti",
+    "upcomingVisits": "Visite in Arrivo per {{name}}"
+  },
+  "clientsPage": {
+    "name": "Nome",
+    "province": "Provincia",
+    "phone": "Numero di Telefono",
+    "totalOrders": "Ordini Totali",
+    "ordersThisMonth": "Ordini di Questo Mese",
+    "totalRevenue": "Entrate Totali",
+    "revenueThisMonth": "Entrate di Questo Mese",
+    "unpaidRevenue": "Entrate Non Pagate",
+    "paymentMethod": "Metodo di Pagamento"
+  },
+  "landingPage": {
+    "welcome": "Bentornato, {name}",
+    "login": "Accesso",
+    "enter": "Entra",
+    "userRole": "Ruolo Utente",
+    "admin": "Amministratore",
+    "agent": "Agente",
+    "client": "Cliente",
+    "selectAgent": "Seleziona Agente",
+    "selectClient": "Seleziona Cliente",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "googleMaps": "Google Maps",
+    "linkedIn": "LinkedIn",
+    "workingHours": "Lun - Ven, 8:30 - 13:00 e 14:30 - 18:30",
+    "address": "Via Alessandro Volta 17, Catania",
+    "phone": "Telefono",
+    "email": "E-mail",
+    "vat": "Partita IVA",
+    "credits": "crediti: @2024"
+  }
+}
