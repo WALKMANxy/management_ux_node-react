@@ -179,3 +179,4 @@ export const visitValidationRules = [
   body("date").isISO8601().withMessage("Date must be a valid ISO 8601 date"),
   body("visitIssuedBy").notEmpty().withMessage("Visit issued by is required"),
 ];
+
