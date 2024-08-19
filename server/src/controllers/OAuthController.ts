@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { generateToken } from "../middlewares/authentication";
 import { AuthenticatedRequest } from "../models/types";
 import { IUser } from "../models/User";
 import { OAuthService } from "../services/OAuthService";
+import { generateAccessToken, generateRefreshToken } from "../utils/tokenUtils";
+import { config } from "../config/config";
 
 export class OAuthController {
   static async handleOAuthCallback(req: Request, res: Response) {
@@ -14,31 +15,17 @@ export class OAuthController {
 
     try {
       const tokens = await OAuthService.getToken(code);
+      const { id, email, name, picture } = await OAuthService.getUserInfo(tokens.access_token!);
+      const user = await OAuthService.findOrCreateUser(id, email, name, picture);
 
-      if (!tokens.access_token) {
-        return res
-          .status(500)
-          .json({ message: "Failed to obtain access token" });
-      }
+      const accessToken = generateAccessToken(user);
+      const refreshToken = generateRefreshToken(user);
+      await user.save();
 
-      const { id, email, name, picture } = await OAuthService.getUserInfo(
-        tokens.access_token
-      );
-      const user = await OAuthService.findOrCreateUser(
-        id,
-        email,
-        name,
-        picture
-      );
+      res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "none" });
+      res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "none" });
 
-      const token = generateToken(user, "google");
-      res.cookie("token", token, { httpOnly: true, secure: true });
-
-      let redirectUrl = "/";
-      if (user.role === "admin") redirectUrl = "/admin-dashboard";
-      else if (user.role === "agent") redirectUrl = "/agent-dashboard";
-      else if (user.role === "client") redirectUrl = "/client-dashboard";
-
+      const redirectUrl = `${config.appUrl}/${user.role}-dashboard`;
       res.redirect(redirectUrl);
     } catch (error) {
       console.error("Error during OAuth callback", error);

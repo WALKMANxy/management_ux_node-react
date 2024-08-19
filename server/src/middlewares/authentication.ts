@@ -1,40 +1,32 @@
-import { NextFunction, Response } from "express";
-import jwt from "jsonwebtoken";
-import { config } from "../config/config";
-import { IUser, User } from "../models/User";
-import { AuthenticatedRequest, DecodedToken } from "../models/types";
+import {  Response, NextFunction } from "express";
+import { User } from "../models/User";
+import { verifyToken, generateAccessToken, generateRefreshToken, isTokenBlacklisted } from "../utils/tokenUtils";
+import jwt from 'jsonwebtoken';
+import { AuthenticatedRequest } from "../models/types";
 
-const JWT_SECRET = config.jwtSecret || "";
-
-export const generateToken = (user: IUser, tokenType: "email" | "google") => {
-  return jwt.sign({ id: user._id, tokenType }, JWT_SECRET, { expiresIn: "7d" });
-};
 
 export const authenticateUser = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) => {
-  const token =
-    req.cookies.token || req.header("Authorization")?.replace("Bearer ", "");
+  const accessToken = req.cookies.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+  const refreshToken = req.cookies.refreshToken;
 
-  if (!token) {
-    return res
-      .status(401)
-      .json({ message: "No token provided, authorization denied" });
+  if (!accessToken) {
+    return res.status(401).json({ message: "No access token provided, authorization denied" });
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as DecodedToken;
-
-    if (decoded.exp && Date.now() >= decoded.exp * 1000) {
-      return res.status(401).json({ message: "Token has expired" });
-    }
-
+    const decoded = verifyToken(accessToken);
     const user = await User.findById(decoded.id);
 
     if (!user) {
       return res.status(401).json({ message: "Invalid token, user not found" });
+    }
+
+    if (await isTokenBlacklisted(accessToken)) {
+      return res.status(401).json({ message: "Token has been blacklisted" });
     }
 
     req.user = {
@@ -47,15 +39,45 @@ export const authenticateUser = async (
 
     next();
   } catch (error) {
-    if (error instanceof jwt.TokenExpiredError) {
-      return res.status(401).json({ message: "Token has expired" });
-    }
-    if (error instanceof jwt.JsonWebTokenError) {
+    if (error instanceof jwt.TokenExpiredError && refreshToken) {
+      try {
+        const decoded = verifyToken(refreshToken);
+        const user = await User.findById(decoded.id);
+
+        if (!user || !user.refreshTokens.includes(refreshToken) || await isTokenBlacklisted(refreshToken)) {
+          return res.status(401).json({ message: "Invalid refresh token" });
+        }
+
+        user.refreshTokens = user.refreshTokens.filter(token => token !== refreshToken);
+        const newAccessToken = generateAccessToken(user);
+        const newRefreshToken = generateRefreshToken(user);
+        await user.save();
+
+        res.cookie("accessToken", newAccessToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+        });
+        res.cookie("refreshToken", newRefreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+        });
+
+        req.user = {
+          id: user._id,
+          email: user.email,
+          role: user.role,
+          entityCode: user.entityCode,
+          authType: decoded.authType,
+        };
+
+        next();
+      } catch (refreshError) {
+        return res.status(401).json({ message: "Invalid refresh token" });
+      }
+    } else {
       return res.status(401).json({ message: "Invalid token" });
     }
-    console.error("Authentication error:", error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error during authentication" });
   }
 };
