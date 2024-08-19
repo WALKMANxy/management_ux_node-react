@@ -45,6 +45,7 @@ export const config = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
   passwordResetExpiresIn: process.env.PASSWORD_RESET_EXPIRES_IN || "1h",
   tunnelSubdomain: process.env.TUNNEL_SUBDOMAIN || "",
+  refreshTokenDuration: process.env.REFRESH_TOKEN_DURATION || "7d",
 };
 
 // Validate required environment variables

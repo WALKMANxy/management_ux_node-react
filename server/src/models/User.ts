@@ -14,6 +14,7 @@ export interface IUser extends Document {
   createdAt: Date;
   updatedAt: Date;
   isEmailVerified: boolean;
+  refreshTokens: string[];
   authType: "email" | "google"; // New field to distinguish authentication type
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
@@ -37,6 +38,7 @@ const userSchema = new Schema<IUser>(
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
     isEmailVerified: { type: Boolean, default: false },
+    refreshTokens: [{ type: String }],
     authType: { type: String, required: true, enum: ["email", "google"] }, // New field
   },
   { timestamps: true }
