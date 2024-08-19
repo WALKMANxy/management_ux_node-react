@@ -7,12 +7,15 @@ import fs from "fs";
 import https from "https";
 import localtunnel from "localtunnel";
 import mongoose from "mongoose";
-import { config } from "./config/config"; // Import the config
+import { Server as SocketIOServer } from "socket.io";
+import helmet from "helmet";
+import { config } from "./config/config";
 import { authenticateUser } from "./middlewares/authentication";
 import { logRequestsIp } from "./middlewares/logRequests";
+import { setupWebSocket } from "./middlewares/webSocket";
 import adminRoutes from "./routes/admins";
 import agentRoutes from "./routes/agents";
-import alertsRoutes from "./routes/alerts";
+import setupAlertRoutes from "./routes/alerts";
 import authRoutes from "./routes/auth";
 import clientRoutes from "./routes/clients";
 import movementsRoutes from "./routes/movements";
@@ -23,31 +26,28 @@ import visitsRoutes from "./routes/visits";
 import { errorHandler } from "./utils/errorHandler";
 
 const app = express();
-const PORT = config.port || "";
+const PORT = config.port || "3000";
 
-app.set("trust proxy", 1); // Trust first proxy
+app.set("trust proxy", 1);
 
 mongoose
-  .connect(config.mongoUri!, {})
+  .connect(config.mongoUri!, {
+  })
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
 const corsOptions: cors.CorsOptions = {
-  origin: "https://woodcock-prime-obviously.ngrok-free.app", // Allow requests from this origin
-  // origin: ['https://localhost:3000'],
-  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-  optionsSuccessStatus: 200, // For legacy browser support
+  origin: config.appUrl,
+  credentials: true,
+  optionsSuccessStatus: 200,
 };
 
-// Handle CORS preflight requests
-app.options("*", cors(corsOptions)); // Preflight requests handling
-
+app.use(helmet());
 app.use(cors(corsOptions));
 app.use(compression());
 app.use(cookieParser());
 app.use(express.json());
-app.use(authenticateUser);
-app.use(logRequestsIp); // Add the logging middleware here
+app.use(logRequestsIp);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -57,15 +57,18 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
+// Public routes
 app.use("/auth", authRoutes);
 app.use("/oauth", oauthRoutes);
+
+// Protected routes
+app.use(authenticateUser);
 app.use("/agents", agentRoutes);
 app.use("/admins", adminRoutes);
 app.use("/clients", clientRoutes);
 app.use("/movements", movementsRoutes);
 app.use("/promos", promosRoutes);
 app.use("/visits", visitsRoutes);
-app.use("/alerts", alertsRoutes);
 app.use("/users", usersRoutes);
 
 app.use(errorHandler);
@@ -75,28 +78,36 @@ const httpsOptions = {
   cert: fs.readFileSync(config.sslCertPath!, "utf8"),
 };
 
-/*  https.createServer(httpsOptions, app).listen(PORT, async () => {
-  console.log(`Server is running on port ${PORT}`);
+const server = https.createServer(httpsOptions, app);
+
+const io = new SocketIOServer(server, {
+  cors: corsOptions,
 });
- */
-https.createServer(httpsOptions, app).listen(PORT, async () => {
+
+const { emitAlert } = setupWebSocket(io);
+
+const alertRoutes = setupAlertRoutes(emitAlert);
+app.use("/alerts", alertRoutes);
+
+server.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 
-  // Set up localtunnel with custom subdomain
-  try {
-    const tunnel = await localtunnel({
-      port: parseInt(PORT),
-      subdomain: "rcs-test-server547915", // Set your desired subdomain
-      local_https: true,
-      allow_invalid_cert: true,
-    });
-    console.log(`LocalTunnel running at ${tunnel.url} with port: ${PORT}`);
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      const tunnel = await localtunnel({
+        port: parseInt(PORT),
+        subdomain: config.tunnelSubdomain,
+        local_https: true,
+        allow_invalid_cert: true,
+      });
+      console.log(`LocalTunnel running at ${tunnel.url}`);
 
-    tunnel.on("close", () => {
-      console.log("LocalTunnel closed");
-    });
-  } catch (error) {
-    console.error("Error setting up LocalTunnel:", error);
+      tunnel.on("close", () => {
+        console.log("LocalTunnel closed");
+      });
+    } catch (error) {
+      console.error("Error setting up LocalTunnel:", error);
+    }
   }
 });
 

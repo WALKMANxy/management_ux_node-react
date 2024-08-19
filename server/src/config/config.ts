@@ -44,6 +44,7 @@ export const config = {
   emailFrom: process.env.EMAIL_FROM || "",
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
   passwordResetExpiresIn: process.env.PASSWORD_RESET_EXPIRES_IN || "1h",
+  tunnelSubdomain: process.env.TUNNEL_SUBDOMAIN || "",
 };
 
 // Validate required environment variables
