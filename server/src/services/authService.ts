@@ -9,6 +9,7 @@ import {
   sendPasswordResetEmail,
   sendVerificationEmail,
 } from "../utils/sendEmail";
+import { invalidateAllUserSessions } from "../utils/sessionUtils";
 
 const JWT_SECRET = config.jwtSecret || "";
 
@@ -141,5 +142,9 @@ export const resetPassword = async (
   validPasscode.used = true;
   await validPasscode.save();
 
+   // Invalidate all sessions for the user
+   await invalidateAllUserSessions(user.id);
+
   logger.info(`Password reset successful for user: ${user.email}.`);
 };
+

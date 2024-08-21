@@ -10,6 +10,7 @@ export interface IAlert extends Document {
   alertIssuedBy: string;
   entityRole: "admin" | "agent" | "client"; // New field
   entityCode: string; // New field
+  markedAsRead: boolean;
 }
 
 const alertSchema = new Schema<IAlert>({
@@ -24,6 +25,11 @@ const alertSchema = new Schema<IAlert>({
     required: true,
   },
   entityCode: { type: String, required: true },
+  markedAsRead: { type: Boolean, default: false },
 });
+
+// Indexes for optimized querying
+alertSchema.index({ entityRole: 1, entityCode: 1 });
+alertSchema.index({ alertIssuedBy: 1 });
 
 export const Alert = model<IAlert>("Alert", alertSchema);

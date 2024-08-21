@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { config } from "../config/config";
-import { User } from "../models/User";
+import { AuthenticatedRequest } from "../models/types";
 import {
   loginUser,
   registerUser,
@@ -10,11 +10,13 @@ import {
 } from "../services/authService";
 import logger from "../utils/logger";
 import {
-  blacklistToken,
-  generateAccessToken,
-  generateRefreshToken,
-  verifyToken,
-} from "../utils/tokenUtils";
+  createSession,
+  generateSessionToken,
+  getUserSessions,
+  invalidateAllUserSessions,
+  invalidateSession,
+  renewSession,
+} from "../utils/sessionUtils";
 
 export const register = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -54,25 +56,22 @@ export const login = async (req: Request, res: Response) => {
         .json({ message: "Please verify your email before logging in." });
     }
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
-    await user.save();
+    const sessionToken = generateSessionToken();
+    const session = await createSession(user.id, sessionToken, req);
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie("sessionToken", sessionToken, {
       httpOnly: true,
       secure: true,
       sameSite: "none",
     });
 
     let redirectUrl = `${config.appUrl}/${user.role}-dashboard`;
-    res
-      .status(200)
-      .json({ message: "Login successful", redirectUrl, id: user._id });
+    res.status(200).json({
+      message: "Login successful",
+      redirectUrl,
+      id: user.id,
+      sessionId: session._id,
+    });
   } catch (error: unknown) {
     if (error instanceof Error) {
       logger.error("Login error:", { error: error.message });
@@ -85,27 +84,61 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
-  const refreshToken = req.cookies.refreshToken;
+  const sessionToken = req.cookies.sessionToken;
 
-  if (refreshToken) {
+  if (sessionToken) {
     try {
-      await blacklistToken(refreshToken);
-      const decoded = verifyToken(refreshToken);
-      const user = await User.findById(decoded.id);
-      if (user) {
-        user.refreshTokens = user.refreshTokens.filter(
-          (token) => token !== refreshToken
-        );
-        await user.save();
-      }
+      await invalidateSession(sessionToken);
     } catch (error) {
-      logger.error("Error blacklisting refresh token:", { error });
+      logger.error("Error invalidating session:", { error });
     }
   }
 
-  res.clearCookie("accessToken");
-  res.clearCookie("refreshToken");
+  res.clearCookie("sessionToken");
   res.status(200).json({ message: "Logout successful" });
+};
+
+export const logoutAllDevices = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  const userId = req.user?.id;
+
+  if (userId) {
+    try {
+      await invalidateAllUserSessions(userId);
+      res.clearCookie("sessionToken");
+      res
+        .status(200)
+        .json({ message: "Logged out from all devices successfully" });
+    } catch (error) {
+      logger.error("Error logging out from all devices:", { error });
+      res
+        .status(500)
+        .json({ message: "Failed to logout from all devices", error });
+    }
+  } else {
+    res.status(401).json({ message: "User not authenticated" });
+  }
+};
+
+export const getUserActiveSessions = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  const userId = req.user?.id;
+
+  if (userId) {
+    try {
+      const sessions = await getUserSessions(userId);
+      res.status(200).json(sessions);
+    } catch (error) {
+      logger.error("Error fetching user sessions:", { error });
+      res.status(500).json({ message: "Failed to fetch user sessions", error });
+    }
+  } else {
+    res.status(401).json({ message: "User not authenticated" });
+  }
 };
 
 export const verifyEmail = async (req: Request, res: Response) => {
@@ -148,5 +181,40 @@ export const resetPasswordHandler = async (req: Request, res: Response) => {
   } catch (error) {
     logger.error("Password reset failed", { error });
     res.status(500).json({ message: "Password reset failed", error });
+  }
+};
+
+export const refreshSession = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  const sessionToken =
+    req.cookies.sessionToken ||
+    req.header("Authorization")?.replace("Bearer ", "");
+
+  if (!sessionToken) {
+    return res.status(401).json({ message: "No session token provided" });
+  }
+
+  try {
+    const renewedSession = await renewSession(sessionToken);
+    if (!renewedSession) {
+      return res.status(401).json({ message: "Invalid or expired session" });
+    }
+
+    res.cookie("sessionToken", renewedSession.token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      expires: renewedSession.expiresAt,
+    });
+
+    return res.status(200).json({
+      message: "Session renewed successfully",
+      expiresAt: renewedSession.expiresAt,
+    });
+  } catch (error) {
+    console.error("Error renewing session:", error);
+    return res.status(500).json({ message: "Failed to renew session" });
   }
 };

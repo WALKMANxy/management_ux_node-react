@@ -14,6 +14,8 @@ export interface AuthenticatedRequest extends Request {
   user?: Partial<IUser>; // Use Partial if you might not always have all properties
 }
 
+
+
 export interface UserRequest extends Request {
   user: IUser;
 }

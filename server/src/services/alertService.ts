@@ -1,3 +1,5 @@
+// services/alertService.ts
+
 import { FilterQuery } from "mongoose";
 import { Alert, IAlert } from "../models/Alert";
 
@@ -24,6 +26,15 @@ export class AlertService {
     } catch (error) {
       console.error("Error fetching alerts by entity:", error);
       throw new Error("Failed to fetch alerts by entity");
+    }
+  }
+
+  static async getAlertsByIssuer(alertIssuedBy: string): Promise<IAlert[]> {
+    try {
+      return await Alert.find({ alertIssuedBy }).sort({ createdAt: -1 });
+    } catch (error) {
+      console.error("Error fetching alerts by issuer:", error);
+      throw new Error("Failed to fetch alerts by issuer");
     }
   }
 

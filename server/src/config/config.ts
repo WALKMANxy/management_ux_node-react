@@ -46,6 +46,7 @@ export const config = {
   passwordResetExpiresIn: process.env.PASSWORD_RESET_EXPIRES_IN || "1h",
   tunnelSubdomain: process.env.TUNNEL_SUBDOMAIN || "",
   refreshTokenDuration: process.env.REFRESH_TOKEN_DURATION || "7d",
+  sessionDuration: process.env.SESSION_DURATION || "24d",
 };
 
 // Validate required environment variables
