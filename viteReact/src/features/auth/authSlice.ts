@@ -19,6 +19,7 @@ const initialState: AuthState = {
   isLoggedIn: false,
   userRole: "guest",
   id: "",
+  userId: "",
  /*  linkedEntities: [], */
 };
 
@@ -28,16 +29,18 @@ const authSlice = createSlice({
   reducers: {
     login: (
       state,
-      action: PayloadAction<{ role: AuthState["userRole"]; id: string }>
+      action: PayloadAction<{ role: AuthState["userRole"]; id: string, userId: string }>
     ) => {
       state.isLoggedIn = true;
       state.userRole = action.payload.role;
       state.id = action.payload.id;
+      state.userId = action.payload.id;
     },
     logout: (state) => {
       state.isLoggedIn = false;
       state.userRole = "guest";
       state.id = "";
+      state.userId = "";
       /* state.linkedEntities = []; */
       // Consider moving side effects to a thunk or middleware
       sessionStorage.clear();

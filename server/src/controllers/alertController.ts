@@ -35,6 +35,16 @@ export class AlertController {
     }
   };
 
+  fetchAlertsByIssuer = async (req: Request, res: Response) => {
+    try {
+      const { alertIssuedBy } = req.params;
+      const alerts = await AlertService.getAlertsByIssuer(alertIssuedBy);
+      res.json(alerts);
+    } catch (error) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  };
+
   createNewAlert = async (req: Request, res: Response) => {
     try {
       const alert = await AlertService.createAlert(req.body);

@@ -1,6 +1,6 @@
 import { Alert, MovementDetail, Promo, Visit } from "../models/dataModels";
 
-import { Agent, Client } from "../models/entityModels";
+import { Admin, Agent, Client } from "../models/entityModels";
 
 const workerScriptPath = new URL("./worker.js", import.meta.url);
 
@@ -67,7 +67,6 @@ export const mapDataToModels = async (
 
   return Array.from(resultsMap.values());
 };
-
 
 // Mapping function for full agent data
 export const mapDataToAgents = async (
@@ -150,4 +149,70 @@ export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
     priceSold: parseFloat(item["Valore"]).toFixed(2),
     priceBought: parseFloat(item["Costo"]).toFixed(2),
   }));
+};
+
+// utils/dataLoader.ts
+
+export const mapVisitsToEntity = <T extends Client | Agent | Admin>(
+  entity: T,
+  visits: Visit[]
+) => {
+  if ((entity as Client).id) {
+    // Client
+    (entity as Client).visits = visits.filter(
+      (visit) => visit.clientId === (entity as Client).id
+    );
+  } else if ((entity as Agent).id) {
+    // Agent
+    const agent = entity as Agent;
+    agent.AgentVisits = agent.clients.flatMap((client) =>
+      visits.filter((visit) => visit.clientId === client.id)
+    );
+  } else if ((entity as Admin).id) {
+    // Admin
+    const admin = entity as Admin;
+    admin.agents.forEach((agent) => {
+      agent.AgentVisits = agent.clients.flatMap((client) =>
+        visits.filter((visit) => visit.clientId === client.id)
+      );
+    });
+    admin.GlobalVisits = {};
+    admin.agents.forEach((agent) => {
+      admin.GlobalVisits[agent.id] = {
+        Visits: agent.AgentVisits || [],
+      };
+    });
+  }
+};
+
+export const mapPromosToEntity = <T extends Client | Agent | Admin>(
+  entity: T,
+  promos: Promo[]
+) => {
+  if ((entity as Client).id) {
+    // Client
+    (entity as Client).promos = promos.filter((promo) =>
+      promo.clientsId.includes((entity as Client).id)
+    );
+  } else if ((entity as Agent).id) {
+    // Agent
+    const agent = entity as Agent;
+    agent.AgentPromos = agent.clients.flatMap((client) =>
+      promos.filter((promo) => promo.clientsId.includes(client.id))
+    );
+  } else if ((entity as Admin).id) {
+    // Admin
+    const admin = entity as Admin;
+    admin.agents.forEach((agent) => {
+      agent.AgentPromos = agent.clients.flatMap((client) =>
+        promos.filter((promo) => promo.clientsId.includes(client.id))
+      );
+    });
+    admin.GlobalPromos = {};
+    admin.agents.forEach((agent) => {
+      admin.GlobalPromos[agent.id] = {
+        Promos: agent.AgentPromos || [],
+      };
+    });
+  }
 };

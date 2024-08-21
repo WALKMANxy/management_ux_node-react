@@ -6,8 +6,11 @@ import {
   resetPasswordValidationRules,
 } from "../constants/validationRules";
 import {
+  getUserActiveSessions,
   login,
   logout,
+  logoutAllDevices,
+  refreshSession,
   register,
   requestPasswordResetHandler,
   resetPasswordHandler,
@@ -22,6 +25,9 @@ router.post("/register", registerValidationRules, checkValidation, register);
 router.get("/verify-email", verifyEmail);
 router.post("/login", loginValidationRules, checkValidation, login);
 router.post("/logout", authenticateUser, logout);
+router.post("/logout-all", authenticateUser, logoutAllDevices);
+router.get("/active-sessions", authenticateUser, getUserActiveSessions);
+router.post("/refresh-session", authenticateUser, refreshSession);
 
 router.post(
   "/request-password-reset",
