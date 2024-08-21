@@ -84,7 +84,7 @@ export const useAuth = () => {
             return;
           }
 
-          dispatch(login({ role: user.role, id: user.entityCode }));
+          dispatch(login({ role: user.role, id: user.entityCode, userId: user.id }));
 
           /* // Fetch linked entities
           await dispatch(fetchLinkedEntities()); */

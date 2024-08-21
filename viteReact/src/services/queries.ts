@@ -62,6 +62,7 @@ export const dataApi = createApi({
             promos,
             alerts
           );
+          
 
           // Construct the admin details with additional data
           const adminDetailsWithData: Admin = {

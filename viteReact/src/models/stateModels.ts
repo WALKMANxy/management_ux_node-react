@@ -6,6 +6,7 @@ export type AuthState = {
   isLoggedIn: boolean;
   userRole: UserRole;
   id: string | null;
+  userId: string | null;
 };
 
 export type ClientsState = {

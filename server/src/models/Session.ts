@@ -7,10 +7,6 @@ export interface ISession extends Document {
   ipAddress?: string;
   userAgent?: string;
   deviceId?: string;
-  preferences?: {
-    theme?: string; // e.g., 'light' or 'dark'
-    language?: string; // e.g., 'en', 'fr', etc.
-  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,10 +19,6 @@ const sessionSchema = new Schema<ISession>(
     ipAddress: { type: String },
     userAgent: { type: String },
     deviceId: { type: String },
-    preferences: {
-      theme: { type: String, enum: ['light', 'dark'], default: 'light' },
-      language: { type: String, default: 'en' }
-    },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
   },

@@ -34,6 +34,13 @@ export const setupAlertRoutes = (emitAlert: EmitAlertFunction) => {
     alertController.fetchAlertsByEntity
   );
 
+  // GET method to retrieve alerts by alertIssuedBy
+  router.get(
+    "/issued-by/:alertIssuedBy",
+    checkAgentOrAdminRole,
+    alertController.fetchAlertsByIssuer
+  );
+
   // POST method to create a new alert
   router.post(
     "/",

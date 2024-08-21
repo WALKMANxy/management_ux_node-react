@@ -7,6 +7,7 @@ export type Alert = {
   alertIssuedBy: string;
   entityRole: "admin" | "agent" | "client"; // New field
   entityCode: string; // New field
+  markedAsRead: boolean;
 };
 
 export type Promo = {

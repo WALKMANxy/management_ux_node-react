@@ -1,14 +1,8 @@
-import jwt from "jsonwebtoken";
+import cookie from "cookie";
 import { Socket, Server as SocketIOServer } from "socket.io";
 import { IAlert } from "../models/Alert";
 import { User } from "../models/User";
-import { DecodedToken } from "../models/types";
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  isTokenBlacklisted,
-  verifyToken,
-} from "../utils/tokenUtils";
+import { getSessionByToken } from "../utils/sessionUtils";
 
 interface AuthenticatedSocket extends Socket {
   userId?: string;
@@ -18,61 +12,33 @@ interface AuthenticatedSocket extends Socket {
 }
 
 export const setupWebSocket = (io: SocketIOServer) => {
-  const connectedClients = new Map<string, AuthenticatedSocket>();
+  const connectedClients = new Map<string, Set<AuthenticatedSocket>>();
 
   io.use(async (socket: AuthenticatedSocket, next) => {
-    const accessToken =
-      socket.handshake.auth.accessToken ||
+    const sessionToken =
+      socket.handshake.auth.sessionToken ||
       socket.handshake.headers.authorization?.replace("Bearer ", "") ||
-      parseCookie(socket.handshake.headers.cookie || "")["accessToken"];
-    const refreshToken =
-      socket.handshake.auth.refreshToken ||
-      parseCookie(socket.handshake.headers.cookie || "")["refreshToken"];
+      parseCookie(socket.handshake.headers.cookie || "")["sessionToken"];
 
-    if (!accessToken) {
-      return next(new Error("Authentication error: No access token provided"));
+    if (!sessionToken) {
+      const error = new Error("Authentication error: No session token provided");
+      console.error(error.message);
+      return next(error);
     }
 
     try {
-      const decoded = verifyToken(accessToken);
-      if (await isTokenBlacklisted(accessToken)) {
-        throw new Error("Token has been blacklisted");
+      const session = await getSessionByToken(sessionToken);
+      if (!session) {
+        const error = new Error("Invalid or expired session");
+        console.error(`Authentication error: ${error.message} for token: ${sessionToken}`);
+        return next(error);
       }
-      await authenticateSocket(socket, decoded);
+      await authenticateSocket(socket, session.userId.toString());
+      console.log(`Socket authenticated: User ID ${session.userId}`);
       next();
     } catch (error) {
-      if (error instanceof jwt.TokenExpiredError && refreshToken) {
-        try {
-          const decoded = verifyToken(refreshToken);
-          const user = await User.findById(decoded.id);
-
-          if (
-            !user ||
-            !user.refreshTokens.includes(refreshToken) ||
-            (await isTokenBlacklisted(refreshToken))
-          ) {
-            throw new Error("Invalid refresh token");
-          }
-
-          user.refreshTokens = user.refreshTokens.filter(
-            (token) => token !== refreshToken
-          );
-          const newAccessToken = generateAccessToken(user);
-          const newRefreshToken = generateRefreshToken(user);
-          await user.save();
-
-          socket.emit("token_refreshed", {
-            accessToken: newAccessToken,
-            refreshToken: newRefreshToken,
-          });
-          await authenticateSocket(socket, verifyToken(newAccessToken));
-          next();
-        } catch (refreshError) {
-          return next(new Error("Authentication error: Invalid refresh token"));
-        }
-      } else {
-        return next(new Error("Authentication error: Invalid token"));
-      }
+      console.error("Authentication error:", error);
+      return next(new Error("Authentication error: Invalid session"));
     }
   });
 
@@ -80,23 +46,23 @@ export const setupWebSocket = (io: SocketIOServer) => {
     console.log(`Client connected: ${socket.userId}`);
 
     if (socket.userId && socket.userRole && socket.entityCode) {
-      connectedClients.set(socket.userId, socket);
+      if (!connectedClients.has(socket.userId)) {
+        connectedClients.set(socket.userId, new Set());
+      }
+      connectedClients.get(socket.userId)!.add(socket);
     }
-
-    let heartbeatInterval = setInterval(() => {
-      socket.emit("heartbeat");
-    }, 30000);
-
-    socket.on("heartbeat", () => {
-      // Client is still alive
-    });
 
     socket.on("disconnect", () => {
       console.log(`Client disconnected: ${socket.userId}`);
       if (socket.userId) {
-        connectedClients.delete(socket.userId);
+        const sockets = connectedClients.get(socket.userId);
+        if (sockets) {
+          sockets.delete(socket);
+          if (sockets.size === 0) {
+            connectedClients.delete(socket.userId);
+          }
+        }
       }
-      clearInterval(heartbeatInterval);
     });
 
     socket.on("logout", () => {
@@ -109,26 +75,25 @@ export const setupWebSocket = (io: SocketIOServer) => {
   });
 
   const emitAlert = (alert: IAlert) => {
-    connectedClients.forEach((socket) => {
-      if (
-        socket.userRole === "admin" ||
-        socket.userRole === "agent" ||
-        (socket.userRole === alert.entityRole &&
-          socket.entityCode === alert.entityCode)
-      ) {
-        socket.emit("alert_update", alert);
-      }
+    connectedClients.forEach((sockets) => {
+      sockets.forEach((socket) => {
+        if (
+          socket.userRole === "admin" ||
+          socket.userRole === "agent" ||
+          (socket.userRole === alert.entityRole &&
+            socket.entityCode === alert.entityCode)
+        ) {
+          socket.emit("alerts:update", alert);
+        }
+      });
     });
   };
 
   return { emitAlert };
 };
 
-async function authenticateSocket(
-  socket: AuthenticatedSocket,
-  decoded: DecodedToken
-) {
-  const user = await User.findById(decoded.id);
+async function authenticateSocket(socket: AuthenticatedSocket, userId: string) {
+  const user = await User.findById(userId);
 
   if (!user) {
     throw new Error("User not found");
@@ -137,14 +102,9 @@ async function authenticateSocket(
   socket.userId = user.id.toString();
   socket.userRole = user.role;
   socket.entityCode = user.entityCode;
-  socket.authType = decoded.authType;
+  socket.authType = user.authType;
 }
 
-// Helper function to parse cookies
-function parseCookie(cookie: string) {
-  return cookie.split(";").reduce((acc, pair) => {
-    const [key, value] = pair.trim().split("=");
-    acc[key] = decodeURIComponent(value);
-    return acc;
-  }, {} as Record<string, string>);
+function parseCookie(cookieString: string) {
+  return cookie.parse(cookieString);
 }
