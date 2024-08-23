@@ -92,7 +92,7 @@ To build a standalone executable for the application without UPX compression, fo
 3. **Install Required Packages**
 
    ```bash
-   pip install pyinstaller openpyxl PyQt6 pandas xlrd
+   pip install pyinstaller openpyxl PyQt6 pandas xlrd pandarallel
    ```
 
 4. **Create the Executable**
