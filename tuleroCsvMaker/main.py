@@ -1,25 +1,41 @@
+import json
 import os
 import sys
-import json
-from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget # type: ignore
-from PyQt6.QtGui import QIcon, QFont # type: ignore
-from PyQt6.QtCore import QTimer, QDateTime # type: ignore
-from worker import Worker
-from utils import setup_ui, browse_articles, browse_oem, browse_brands, browse_output
 
-CONFIG_FILE = 'config.json'
-DATA_FOLDER = 'Data'
-OUTPUT_FOLDER = 'Output'
+from PyQt6.QtCore import QDateTime, QTimer  # type: ignore
+from PyQt6.QtGui import QFont, QIcon  # type: ignore
+from PyQt6.QtWidgets import (
+    QApplication,
+    QMainWindow,  # type: ignore
+    QMessageBox,
+    QWidget,
+)
+from utils import (
+    browse_articles,
+    browse_brands,
+    browse_oem,
+    browse_output,
+    browse_warehouse,
+    setup_ui,
+)
+from worker import Worker
+
+CONFIG_FILE = "config.json"
+DATA_FOLDER = "Data"
+OUTPUT_FOLDER = "Output"
+
 
 def load_config():
     if os.path.exists(CONFIG_FILE):
-        with open(CONFIG_FILE, 'r') as file:
+        with open(CONFIG_FILE, "r") as file:
             return json.load(file)
     return {}
 
+
 def save_config(config):
-    with open(CONFIG_FILE, 'w') as file:
+    with open(CONFIG_FILE, "w") as file:
         json.dump(config, file)
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -29,8 +45,8 @@ class MainWindow(QMainWindow):
         self.setGeometry(100, 100, 800, 600)
 
         # Determine the base path for the icons
-        base_path = sys._MEIPASS if hasattr(sys, '_MEIPASS') else os.path.abspath(".")
-        self.setWindowIcon(QIcon(os.path.join(base_path, 'icons', 'icon256.ico')))
+        base_path = sys._MEIPASS if hasattr(sys, "_MEIPASS") else os.path.abspath(".")
+        self.setWindowIcon(QIcon(os.path.join(base_path, "icons", "icon256.ico")))
 
         # Setup UI using utils
         layout, widgets = setup_ui(self, base_path)
@@ -43,6 +59,8 @@ class MainWindow(QMainWindow):
         self.oem_entry = widgets["oem_entry"]
         self.brands_entry = widgets["brands_entry"]
         self.output_entry = widgets["output_entry"]
+        self.warehouse_entry = widgets["warehouse_entry"]  # New
+
         self.ftp_host_entry = widgets["ftp_host_entry"]
         self.ftp_user_entry = widgets["ftp_user_entry"]
         self.ftp_pass_entry = widgets["ftp_pass_entry"]
@@ -50,15 +68,17 @@ class MainWindow(QMainWindow):
         self.process_button = widgets["process_button"]
         self.ftp_dir_combo = widgets["ftp_dir_combo"]
 
-
         self.articles_button = widgets["articles_button"]
         self.oem_button = widgets["oem_button"]
         self.brands_button = widgets["brands_button"]
         self.output_button = widgets["output_button"]
+        self.warehouse_button = widgets["warehouse_button"]  # New
 
         self.articles_file = None
         self.output_folder = None
         self.oem_folder = None
+        self.warehouse_file = None  # New
+
         self.brands_file = None
         self.ftp_host = None
         self.ftp_user = None
@@ -76,20 +96,28 @@ class MainWindow(QMainWindow):
         config = load_config()
 
         data_folder = os.path.join(os.path.dirname(__file__), DATA_FOLDER)
-        articles_file = config.get('articles_file', os.path.join(data_folder, 'articles.xls'))
-        oem_folder = config.get('oem_folder', os.path.join(data_folder, 'oems'))
-        brands_file = config.get('brands_file', os.path.join(data_folder, 'brands.csv'))
-        output_folder = config.get('output_folder', os.path.join(os.path.dirname(__file__), OUTPUT_FOLDER))
-        self.ftp_host = config.get('ftp_host', '')
-        self.ftp_user = config.get('ftp_user', '')
-        self.ftp_pass = config.get('ftp_pass', '')
+        articles_file = config.get(
+            "articles_file", os.path.join(data_folder, "articles.xls")
+        )
+        oem_folder = config.get("oem_folder", os.path.join(data_folder, "oems"))
+        brands_file = config.get("brands_file", os.path.join(data_folder, "brands.csv"))
+        warehouse_file = config.get(
+            "warehouse_file", os.path.join(data_folder, "warehouse.xls")
+        )  # New
+
+        output_folder = config.get(
+            "output_folder", os.path.join(os.path.dirname(__file__), OUTPUT_FOLDER)
+        )
+        self.ftp_host = config.get("ftp_host", "")
+        self.ftp_user = config.get("ftp_user", "")
+        self.ftp_pass = config.get("ftp_pass", "")
         # update UI elements
         self.ftp_host_entry.setText(self.ftp_host)
         self.ftp_user_entry.setText(self.ftp_user)
         self.ftp_pass_entry.setText(self.ftp_pass)
 
-        if 'ftp_dir' in config:  # Ensure the ftp_dir is in the configuration
-            self.ftp_dir_combo.setCurrentText(config['ftp_dir'])
+        if "ftp_dir" in config:  # Ensure the ftp_dir is in the configuration
+            self.ftp_dir_combo.setCurrentText(config["ftp_dir"])
 
         if os.path.exists(articles_file):
             self.articles_file = articles_file
@@ -103,6 +131,12 @@ class MainWindow(QMainWindow):
             self.brands_file = brands_file
             self.brands_entry.setText(brands_file)
             self.brands_button.setStyleSheet("background-color: green; color: white;")
+        if os.path.exists(warehouse_file):  # New
+            self.warehouse_file = warehouse_file
+            self.warehouse_entry.setText(warehouse_file)
+            self.warehouse_button.setStyleSheet(
+                "background-color: green; color: white;"
+            )
         if os.path.exists(output_folder):
             self.output_folder = output_folder
             self.output_entry.setText(output_folder)
@@ -117,26 +151,47 @@ class MainWindow(QMainWindow):
         self.check_ready_to_process()
 
     def check_ready_to_process(self):
-        if self.articles_file and self.oem_folder and self.brands_file and self.output_folder:
+        if (
+            self.articles_file
+            and self.oem_folder
+            and self.brands_file
+            and self.output_folder
+            and self.warehouse_file
+        ):
             self.process_button.setEnabled(True)
 
     def start_processing(self):
+        print(f"Processing with warehouse file: {self.warehouse_file}")
+
         self.processing = True
         self.process_button.setEnabled(False)
-        self.process_button.setStyleSheet("background-color: lightgray; color: darkgray;")
+        self.process_button.setStyleSheet(
+            "background-color: lightgray; color: darkgray;"
+        )
         self.progress_bar.setValue(0)
 
-        current_time = QDateTime.currentDateTime().toString("yyyyMMdd_HHmmss")
-        final_output_file_name = f"rcs_stock_{current_time}.csv"
+        # Get the selected FTP directory
+        ftp_dir = self.ftp_dir_combo.currentText().strip()
+
+        # Determine the output file name based on the FTP directory
+        if ftp_dir == "/csv/":
+            final_output_file_name = "rcs_stock_update.csv"
+        else:  # Assume any other directory, including "/test/"
+            current_time = QDateTime.currentDateTime().toString("yyyyMMdd_HHmmss")
+            final_output_file_name = f"rcs_stock_{current_time}.csv"
+
         final_output_path = os.path.join(self.output_folder, final_output_file_name)
 
         self.ftp_host = self.ftp_host_entry.text().strip()
         self.ftp_user = self.ftp_user_entry.text().strip()
         self.ftp_pass = self.ftp_pass_entry.text().strip()
-        ftp_dir = self.ftp_dir_combo.currentText().strip()  # Get the selected FTP directory
+        ftp_dir = (
+            self.ftp_dir_combo.currentText().strip()
+        )  # Get the selected FTP directory
 
         self.worker = Worker(
             self.articles_file,
+            self.warehouse_file,  # This should correctly be the warehouse file
             f"{self.output_folder}/cleaned_Articles.csv",
             self.oem_folder,
             self.brands_file,
@@ -144,7 +199,7 @@ class MainWindow(QMainWindow):
             self.ftp_host,
             self.ftp_user,
             self.ftp_pass,
-            ftp_dir  # Pass the selected directory to the worker
+            ftp_dir,
         )
         self.worker.progress.connect(self.update_progress)
         self.worker.finished_processing.connect(self.processing_complete)
@@ -172,7 +227,6 @@ class MainWindow(QMainWindow):
         # Stop the timer if it reaches 100%
         if self.fake_progress >= 100:
             self.timer.stop()
-
 
     def update_progress(self, value):
         self.progress_bar.setValue(value)
@@ -202,7 +256,7 @@ class MainWindow(QMainWindow):
         msg_box = QMessageBox(self)
         msg_box.setWindowTitle("Processing Complete")
         msg_box.setText(
-            f"The file has been saved to {self.output_folder}/final_output_with_brands.csv"
+            "The file has been successfully uploaded to the FTP server."
         )
         msg_box.setIcon(QMessageBox.Icon.Information)
         msg_box.addButton(QMessageBox.StandardButton.Ok)
@@ -215,15 +269,15 @@ class MainWindow(QMainWindow):
 
     def save_config(self):
         config = {
-            'articles_file': self.articles_file,
-            'oem_folder': self.oem_folder,
-            'brands_file': self.brands_file,
-            'output_folder': self.output_folder,
-            'ftp_host': self.ftp_host,
-            'ftp_user': self.ftp_user,
-            'ftp_pass': self.ftp_pass,
-            'ftp_dir': self.ftp_dir_combo.currentText()  # Save the current directory setting
-
+            "articles_file": self.articles_file,
+            "oem_folder": self.oem_folder,
+            "brands_file": self.brands_file,
+            "output_folder": self.output_folder,
+            "warehouse_file": self.warehouse_file,  # New
+            "ftp_host": self.ftp_host,
+            "ftp_user": self.ftp_user,
+            "ftp_pass": self.ftp_pass,
+            "ftp_dir": self.ftp_dir_combo.currentText(),  # Save the current directory setting
         }
         save_config(config)
 
@@ -232,6 +286,21 @@ class MainWindow(QMainWindow):
     browse_oem = browse_oem
     browse_brands = browse_brands
     browse_output = browse_output
+    browse_warehouse = browse_warehouse  # Ensure this is included
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+
+    # Set the Roboto font
+    roboto_font = QFont("Roboto")
+    app.setFont(roboto_font)
+
+    main_window = MainWindow()
+    main_window.show()
+
+    sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
