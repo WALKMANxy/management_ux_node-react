@@ -2,7 +2,7 @@ import os
 import platform
 from PyQt6.QtWidgets import ( # type: ignore
     QVBoxLayout, QLabel, QLineEdit, QPushButton, QProgressBar, QFileDialog, QComboBox
-) 
+)
 from PyQt6.QtGui import QFont, QIcon # type: ignore
 from styles import app_stylesheet, light_stylesheet  # Import both stylesheets
 
@@ -32,6 +32,17 @@ def setup_ui(main_window, base_path):
     widgets["articles_button"].setIcon(QIcon(icon_path))
     widgets["articles_button"].clicked.connect(main_window.browse_articles)
     layout.addWidget(widgets["articles_button"])
+
+    widgets["warehouse_label"] = QLabel("Select Warehouse File")  # New
+    layout.addWidget(widgets["warehouse_label"])
+
+    widgets["warehouse_entry"] = QLineEdit()  # New
+    layout.addWidget(widgets["warehouse_entry"])
+
+    widgets["warehouse_button"] = QPushButton("Browse")  # New
+    widgets["warehouse_button"].setIcon(QIcon(icon_path))
+    widgets["warehouse_button"].clicked.connect(main_window.browse_warehouse)
+    layout.addWidget(widgets["warehouse_button"])
 
     # FTP Host input
     widgets["ftp_host_label"] = QLabel("FTP Host")
@@ -136,6 +147,16 @@ def browse_articles(main_window):
     main_window.articles_file = articles_file
     main_window.articles_entry.setText(articles_file)
     main_window.articles_button.setStyleSheet("background-color: green; color: white;")
+    main_window.check_ready_to_process()
+    main_window.save_config()
+
+def browse_warehouse(main_window):  # New
+    warehouse_file, _ = QFileDialog.getOpenFileName(
+        main_window, "Select Warehouse File", "", "Excel files (*.xls;*.xlsx)"
+    )
+    main_window.warehouse_file = warehouse_file
+    main_window.warehouse_entry.setText(warehouse_file)
+    main_window.warehouse_button.setStyleSheet("background-color: green; color: white;")
     main_window.check_ready_to_process()
     main_window.save_config()
 
