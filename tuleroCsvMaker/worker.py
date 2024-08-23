@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QThread, pyqtSignal, QTimer # type: ignore
+from PyQt6.QtCore import QThread, pyqtSignal, QTimer  # type: ignore
 from ftplib import FTP
 from data_processing import process_files
 import os
@@ -7,9 +7,10 @@ class Worker(QThread):
     progress = pyqtSignal(int)
     finished_processing = pyqtSignal()
 
-    def __init__(self, articles_file, output_file, oem_folder, brands_file, final_output_file, ftp_host, ftp_user, ftp_pass, ftp_dir):
+    def __init__(self, articles_file, warehouse_file, output_file, oem_folder, brands_file, final_output_file, ftp_host, ftp_user, ftp_pass, ftp_dir):
         super().__init__()
         self.articles_file = articles_file
+        self.warehouse_file = warehouse_file  # New parameter added
         self.output_file = output_file
         self.oem_folder = oem_folder
         self.brands_file = brands_file
@@ -27,13 +28,22 @@ class Worker(QThread):
         self.timer.timeout.connect(self.update_fake_progress)
         self.timer.start(200)  # Update every 200ms
 
+        # Debugging prints
+        print(f"Articles file: {self.articles_file}")
+        print(f"Warehouse file: {self.warehouse_file}")
+        print(f"Output file: {self.output_file}")
+        print(f"OEM folder: {self.oem_folder}")
+        print(f"Brands file: {self.brands_file}")
+        print(f"Final output file: {self.final_output_file}")
+
         # Perform the actual processing
         process_files(
-            self.articles_file,
-            self.output_file,
-            self.oem_folder,
-            self.brands_file,
-            self.final_output_file
+            self.articles_file,             # 1. Articles file
+            self.output_file,               # 2. Output file (intermediate)
+            self.oem_folder,                # 3. OEM folder
+            self.brands_file,               # 4. Brands file
+            self.warehouse_file,            # 5. Warehouse file (new addition)
+            self.final_output_file          # 6. Final output file
         )
 
         # Upload the file via FTP after processing
