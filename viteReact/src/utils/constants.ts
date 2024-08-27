@@ -105,3 +105,22 @@ export const ignoreArticleNames = new Set([
   "TRASPORTO ",
   "TRASPORTO URGENTE",
 ]);
+
+
+export const agentColorMap: { [key: string]: string } = {
+  "10": "#FFD700", // Fazio Adriano Salvatore
+  "11": "#FFB6C1", // Salvatore Spinella
+  "12": "#ADD8E6", // Riccardo Carpentiere
+  "13": "#90EE90", // Vito D'Antonio
+  "14": "#FF69B4", // G.C.
+  "15": "#FFA07A", // Luddeni Renato
+  "16": "#20B2AA", // Luca Scaffo
+  "50": "#9370DB", // Marco Coppola
+  "60": "#C0C0C0", // Web
+  "90": "#8A2BE2", // Direzionale
+  "91": "#FF4500", // Direzionale Diesel
+  "92": "#B0C4DE", // Direzionale D
+  "95": "#FA8072", // Cliente Agente
+  "99": "#D2691E", // Seguito da Avvocato
+  "100": "#808080", // Non Assegnato
+};

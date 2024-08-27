@@ -20,6 +20,7 @@ import MovementsPage from "./pages/common/MovementsPage";
 import LandingPage from "./pages/landing/LandingPage";
 import { webSocketService } from "./services/webSocket";
 import { loadAuthState, saveAuthState } from "./utils/localStorage";
+import { refreshSession } from "./services/sessionService";
 
 const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes
 

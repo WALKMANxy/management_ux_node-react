@@ -1,25 +1,38 @@
-// src/features/calendar/calendarSlice.ts
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { Visit } from "../../models/dataModels";
-import { CalendarState } from "../../models/stateModels";
+import { Client, Agent, Admin } from "../../models/entityModels";
 
-const initialState: CalendarState = {
-  visits: [],
-};
+// Extend the Visit type to include agent information
+type VisitWithAgent = Visit & { agentId?: string; agentName?: string };
 
-const calendarSlice = createSlice({
-  name: "calendar",
-  initialState,
-  reducers: {
-    setVisits(state, action: PayloadAction<Visit[]>) {
-      state.visits = action.payload;
-    },
-  },
-});
+export const selectVisits = createSelector(
+  [(state: RootState) => state.data.currentUserData],
+  (currentUserData): VisitWithAgent[] => {
+    if (!currentUserData) return [];
 
-export const { setVisits } = calendarSlice.actions;
+    if ((currentUserData as Client).visits) {
+      // Client case
+      return (currentUserData as Client).visits;
+    } else if ((currentUserData as Agent).AgentVisits) {
+      // Agent case
+      return (currentUserData as Agent).AgentVisits;
+    } else if ((currentUserData as Admin).GlobalVisits) {
+      // Admin case
+      const adminData = currentUserData as Admin;
 
-export const selectVisits = (state: RootState) => state.calendar.visits;
+      // Map over each agent's visits and include the agent's ID and name with each visit
+      return Object.entries(adminData.GlobalVisits).flatMap(
+        ([agentId, { Visits }]) =>
+          Visits.map((visit) => ({
+            ...visit,
+            agentId,
+            agentName: adminData.agents.find((agent) => agent.id === agentId)
+              ?.name || "Unknown Agent", // Add agent name based on agentId
+          }))
+      );
+    }
 
-export default calendarSlice.reducer;
+    return [];
+  }
+);
