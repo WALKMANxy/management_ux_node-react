@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Alert } from "../../models/dataModels";
 import { Admin, Agent, Client } from "../../models/entityModels";
 import { DataSliceState } from "../../models/stateModels";
 import { updateApi } from "../../services/promosVisitsQueries";
@@ -19,27 +20,29 @@ const initialState: DataSliceState = {
 export const fetchInitialData = createAsyncThunk(
   "data/fetchInitialData",
   async (_, { getState, dispatch }) => {
-    const state = getState() as { auth: { userRole: string; id: string } };
-    const { userRole, id } = state.auth;
+    const state = getState() as {
+      auth: { userRole: string; id: string; userId: string };
+    };
+    const { userRole, id, userId } = state.auth;
 
     let userData;
     if (userRole === "client") {
       userData = await dispatch(
-        dataApi.endpoints.getUserClientData.initiate(id)
+        dataApi.endpoints.getUserClientData.initiate({ entityCode: id, userId })
       ).unwrap();
     } else if (userRole === "agent") {
       userData = await dispatch(
-        dataApi.endpoints.getUserAgentData.initiate(id)
+        dataApi.endpoints.getUserAgentData.initiate({ entityCode: id, userId })
       ).unwrap();
     } else if (userRole === "admin") {
       userData = await dispatch(
-        dataApi.endpoints.getUserAdminData.initiate(id)
+        dataApi.endpoints.getUserAdminData.initiate({ entityCode: id, userId })
       ).unwrap();
     } else {
       throw new Error("Invalid user role");
     }
 
-    return { userRole, userData };
+    return { userRole, userData, userId };
   }
 );
 
@@ -73,7 +76,46 @@ const dataSlice = createSlice({
       state.selectedAgentId = action.payload;
       state.selectedClientId = null;
     },
+    addAlert: (state, action: PayloadAction<Alert>) => {
+      const alert = action.payload;
+      if (state.currentUserData && state.currentUserDetails) {
+        if (state.currentUserDetails.role === "client") {
+          (state.currentUserData as Client).clientAlerts.push(alert);
+        } else if (state.currentUserDetails.role === "agent") {
+          (state.currentUserData as Agent).agentAlerts.push(alert);
+        } else if (state.currentUserDetails.role === "admin") {
+          (state.currentUserData as Admin).adminAlerts.push(alert);
+        }
+      }
+    },
+    updateAlert: (state, action: PayloadAction<Alert>) => {
+      const alert = action.payload;
+      if (state.currentUserData && state.currentUserDetails) {
+        if (state.currentUserDetails.role === "client") {
+          const client = state.currentUserData as Client;
+          const index = client.clientAlerts.findIndex(
+            (a) => a._id === alert._id
+          );
+          if (index !== -1) {
+            client.clientAlerts[index] = alert;
+          }
+        } else if (state.currentUserDetails.role === "agent") {
+          const agent = state.currentUserData as Agent;
+          const index = agent.agentAlerts.findIndex((a) => a._id === alert._id);
+          if (index !== -1) {
+            agent.agentAlerts[index] = alert;
+          }
+        } else if (state.currentUserDetails.role === "admin") {
+          const admin = state.currentUserData as Admin;
+          const index = admin.adminAlerts.findIndex((a) => a._id === alert._id);
+          if (index !== -1) {
+            admin.adminAlerts[index] = alert;
+          }
+        }
+      }
+    },
   },
+
   extraReducers: (builder) => {
     builder
       .addCase(fetchInitialData.pending, (state) => {
@@ -81,7 +123,7 @@ const dataSlice = createSlice({
       })
       .addCase(fetchInitialData.fulfilled, (state, action) => {
         state.status = "succeeded";
-        const { userRole, userData } = action.payload;
+        const { userRole, userData, userId } = action.payload;
 
         if (userRole === "client") {
           const clientData = userData as Client;
@@ -91,6 +133,7 @@ const dataSlice = createSlice({
             id: clientData.id,
             role: "client",
             name: clientData.name,
+            userId: userId, // Add userId here
           };
         } else if (userRole === "agent") {
           const agentData = userData as Agent;
@@ -104,6 +147,7 @@ const dataSlice = createSlice({
             id: agentData.id,
             role: "agent",
             name: agentData.name,
+            userId: userId, // Add userId here
           };
         } else if (userRole === "admin") {
           const adminData = userData as Admin;
@@ -119,6 +163,7 @@ const dataSlice = createSlice({
             id: adminData.id,
             role: "admin",
             name: adminData.name,
+            userId: userId, // Add userId here
           };
         }
       })
@@ -158,19 +203,6 @@ const dataSlice = createSlice({
           ) {
             state.currentUserData.GlobalVisits = updatedEntity.GlobalVisits;
           }
-          // Update agents' visits
-          Object.keys(updatedEntity.GlobalVisits).forEach((agentId) => {
-            if (state.agents[agentId]) {
-              state.agents[agentId] = {
-                ...state.agents[agentId],
-                AgentVisits: updatedEntity.GlobalVisits[agentId].Visits,
-              };
-              state.agentDetails[agentId] = {
-                ...state.agentDetails[agentId],
-                AgentVisits: updatedEntity.GlobalVisits[agentId].Visits,
-              };
-            }
-          });
         }
       })
       .addCase(updatePromos.fulfilled, (state, action) => {
@@ -205,24 +237,11 @@ const dataSlice = createSlice({
           ) {
             state.currentUserData.GlobalPromos = updatedEntity.GlobalPromos;
           }
-          // Update agents' promos
-          Object.keys(updatedEntity.GlobalPromos).forEach((agentId) => {
-            if (state.agents[agentId]) {
-              state.agents[agentId] = {
-                ...state.agents[agentId],
-                AgentPromos: updatedEntity.GlobalPromos[agentId].Promos,
-              };
-              state.agentDetails[agentId] = {
-                ...state.agentDetails[agentId],
-                AgentPromos: updatedEntity.GlobalPromos[agentId].Promos,
-              };
-            }
-          });
         }
       });
   },
 });
 
-export const { clearSelection, selectClient, selectAgent } = dataSlice.actions;
+export const { clearSelection, selectClient, selectAgent, addAlert, updateAlert } = dataSlice.actions;
 
 export default dataSlice.reducer;

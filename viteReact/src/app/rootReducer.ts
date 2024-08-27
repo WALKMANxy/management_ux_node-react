@@ -2,10 +2,10 @@ import { Action, combineReducers } from "@reduxjs/toolkit";
 import authReducer, { logout } from "../features/auth/authSlice";
 import calendarReducer from "../features/calendar/calendarSlice";
 import dataReducer from "../features/data/dataSlice";
-import promosReducer from "../features/promos/promosSlice";
-import searchReducer from "../features/search/searchSlice";
-import visitsReducer from "../features/visits/visitsSlice";
-import { api } from "../services/api";
+/* import promosReducer from "../features/promos/promosSlice";
+ */import searchReducer from "../features/search/searchSlice";
+/* import visitsReducer from "../features/visits/visitsSlice";
+ */import { api } from "../services/api";
 
 // Combine all your reducers
 const appReducer = combineReducers({
@@ -13,8 +13,8 @@ const appReducer = combineReducers({
   search: searchReducer,
   data: dataReducer,
   calendar: calendarReducer,
-  visits: visitsReducer,
-  promos: promosReducer,
+  /* visits: visitsReducer,
+  promos: promosReducer, */
   [api.reducerPath]: api.reducer,
 });
 

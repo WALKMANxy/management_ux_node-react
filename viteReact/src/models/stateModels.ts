@@ -40,6 +40,7 @@ export interface DataSliceState {
     id: string;
     role: "client" | "agent" | "admin";
     name: string;
+    userId: string, // Add userId here
     // Add any other common fields here
   } | null;
   selectedClientId: string | null;

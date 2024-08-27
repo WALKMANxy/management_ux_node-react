@@ -47,14 +47,25 @@ export const getUserSessions = async (userId: string): Promise<ISession[]> => {
 };
 
 export const renewSession = async (
-  sessionToken: string
+  sessionToken: string,
+  req: Request
 ): Promise<ISession | null> => {
   const session = await Session.findOne({
     token: sessionToken,
     expiresAt: { $gt: new Date() },
   });
+
   if (!session) {
     return null;
+  }
+
+  // Compare user-agent strings
+  const incomingUserAgent = req.get("User-Agent");
+  if (session.userAgent !== incomingUserAgent) {
+    console.warn(
+      `User-Agent mismatch: stored (${session.userAgent}) vs incoming (${incomingUserAgent})`
+    );
+    return null;  // Deny session renewal if user-agent doesn't match
   }
 
   const newExpiresAt = new Date(Date.now() + config.sessionDuration);

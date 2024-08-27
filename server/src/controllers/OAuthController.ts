@@ -7,7 +7,7 @@ import { createSession, generateSessionToken, renewSession } from "../utils/sess
 
 export class OAuthController {
   static async handleOAuthCallback(req: Request, res: Response) {
-    const { code } = req.query;
+    const { code } = req.body;
 
     if (typeof code !== "string") {
       return res.status(400).json({ message: "Invalid authorization code" });
@@ -56,7 +56,7 @@ export class OAuthController {
     }
 
     try {
-      const renewedSession = await renewSession(sessionToken);
+      const renewedSession = await renewSession(sessionToken, req);
       if (!renewedSession) {
         return res.status(401).json({ message: "Invalid or expired session" });
       }

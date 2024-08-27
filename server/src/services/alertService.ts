@@ -68,9 +68,9 @@ export class AlertService {
     }
   }
 
-  static async deleteAlert(id: string): Promise<void> {
+  static async deleteAlert(_id: string): Promise<void> {
     try {
-      const result = await Alert.findByIdAndDelete(id);
+      const result = await Alert.findByIdAndDelete(_id);
       if (!result) {
         throw new Error("Alert not found");
       }
@@ -80,9 +80,9 @@ export class AlertService {
     }
   }
 
-  static async getAlertById(id: string): Promise<IAlert | null> {
+  static async getAlertById(_id: string): Promise<IAlert | null> {
     try {
-      const alert = await Alert.findById(id);
+      const alert = await Alert.findById(_id);
       return alert;
     } catch (error) {
       console.error("Error fetching alert by ID:", error);

@@ -3,13 +3,14 @@
 import { Document, Schema, model } from "mongoose";
 
 export interface IAlert extends Document {
+  _id: string; // Add the _id field
   alertReason: string;
   message: string;
   severity: "low" | "medium" | "high";
   createdAt: Date;
   alertIssuedBy: string;
-  entityRole: "admin" | "agent" | "client"; // New field
-  entityCode: string; // New field
+  entityRole: "admin" | "agent" | "client";
+  entityCode: string;
   markedAsRead: boolean;
 }
 

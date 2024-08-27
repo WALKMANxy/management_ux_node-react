@@ -602,7 +602,10 @@ export const api = createApi({
 
     getAlertsByEntityRoleAndEntityCode: builder.query<
       Alert[],
-      { entityRole: string; entityCode: string }
+      {
+        entityRole: "admin" | "agent" | "client"; // New field
+        entityCode: string;
+      }
     >({
       queryFn: async ({ entityRole, entityCode }) => {
         try {
