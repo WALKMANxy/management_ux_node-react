@@ -57,6 +57,7 @@ export type Client = {
   movements: Movement[];
   promos: Promo[];
   clientAlerts: Alert[];
+  colour?: string;
 };
 
 export type Agent = {
