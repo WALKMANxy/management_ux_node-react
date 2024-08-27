@@ -11,8 +11,6 @@ import { Visit } from '../../models/dataModels';
 import ServerDay  from './ServerDay';  // Import the ServerDay component
 import { ServerDayProps } from '../../models/propsModels';
 
-
-
 const CalendarComponent: React.FC = () => {
   const visits = useSelector(selectVisits);
   const [isLoading, setIsLoading] = useState(false);
@@ -77,7 +75,6 @@ const CalendarComponent: React.FC = () => {
               highlightedDays,
             } as ServerDayProps,
           }}
-
           fixedWeekNumber={6}
           displayWeekNumber
         />
