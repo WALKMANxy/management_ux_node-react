@@ -3,7 +3,7 @@ import { Alert, Movement, Promo, Visit } from "./dataModels";
 export type UserRole = "admin" | "agent" | "client" | "guest";
 
 export type User = {
-  id: string; // Corresponds to MongoDB's _id
+  _id: string; // Corresponds to MongoDB's _id
   email: string;
   googleId?: string;
   password?: string; // Optional for OAuth users

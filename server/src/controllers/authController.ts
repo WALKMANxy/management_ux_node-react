@@ -197,7 +197,7 @@ export const refreshSession = async (
   }
 
   try {
-    const renewedSession = await renewSession(sessionToken);
+    const renewedSession = await renewSession(sessionToken, req);
     if (!renewedSession) {
       return res.status(401).json({ message: "Invalid or expired session" });
     }

@@ -3,6 +3,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { authApiCall } from "./apiUtils";
+import { getDeviceId, getUserAgent } from "../../utils/deviceUtils";
 
 const baseUrl = process.env.VITE_API_BASE_URL || "";
 const googleClientId = process.env.VITE_GOOGLE_CLIENT_ID || "";
@@ -26,10 +27,17 @@ export const loginUser = async (credentials: {
   message: string;
   statusCode: number;
 }> => {
+  const userAgent = getUserAgent();
+  const deviceId = getDeviceId();
+
   return authApiCall<{ redirectUrl: string; id: string }>(
     "auth/login",
     "POST",
-    credentials
+    {
+      ...credentials,
+      userAgent,
+      deviceId,
+    }
   );
 };
 
@@ -74,11 +82,22 @@ export const linkGoogleAccount = async (code: string) => {
 
 // Handle the OAuth callback and retrieve the user's session
 export const handleOAuthCallback = async (code: string) => {
+  const userAgent = navigator.userAgent;
+  const deviceId = getDeviceId(); // Retrieve the device ID
+
   try {
-    const response = await axios.get(`${appUrl}/oauth2/callback`, {
-      params: { code },
-      withCredentials: true, // Ensure cookies are sent back in the response
-    });
+    const response = await axios.post(
+      `${appUrl}/auth/oauth2/callback`,
+      {
+        code,
+        userAgent,
+        deviceId,
+      },
+      {
+        withCredentials: true, // To ensure the session cookie is set
+      }
+    );
+
     return response.data;
   } catch (error) {
     console.error("Error handling OAuth callback:", error);

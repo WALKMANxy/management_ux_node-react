@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
-import store, { AppDispatch } from "../app/store"; // Import AppDispatch type from your store
-import { /* fetchLinkedEntities, */ login, logout } from "../features/auth/authSlice";
-import { User } from "../models/entityModels"; // Import your User type
+import store, { AppDispatch } from "../app/store";
+import { login, logout } from "../features/auth/authSlice";
+import { User } from "../models/entityModels";
 import {
   api,
   useLoginUserMutation,
@@ -16,7 +16,7 @@ import {
 import { saveAuthState } from "../utils/localStorage";
 
 export const useAuth = () => {
-  const dispatch = useDispatch<AppDispatch>(); // Type your dispatch with AppDispatch
+  const dispatch = useDispatch<AppDispatch>();
   const [registerUser] = useRegisterUserMutation();
   const [loginUser] = useLoginUserMutation();
 
@@ -84,17 +84,15 @@ export const useAuth = () => {
             return;
           }
 
-          dispatch(login({ role: user.role, id: user.entityCode, userId: user.id }));
+          dispatch(
+            login({ role: user.role, id: user.entityCode, userId: user._id })
+          );
 
-          /* // Fetch linked entities
-          await dispatch(fetchLinkedEntities()); */
-
-          // Save auth state if "Keep me signed in" is checked
           if (keepMeSignedIn) {
             saveAuthState(store.getState().auth);
           }
 
-          const state = store.getState(); // If not inside a React component, otherwise use `useSelector`
+          const state = store.getState();
           console.log("Updated auth state:", state.auth);
 
           window.location.href = redirectUrl;
@@ -123,14 +121,12 @@ export const useAuth = () => {
       setAlertSeverity("success");
       setAlertOpen(true);
     } catch (error: unknown) {
-      // Ensure error is an instance of Error before proceeding
       if (error instanceof Error) {
         const logoutError = new Error("Failed to log out.");
         setAlertMessage(logoutError.message);
         setAlertSeverity("error");
         setAlertOpen(true);
       } else {
-        // Handle the case where the error is not an instance of Error
         setAlertMessage("An unexpected error occurred.");
         setAlertSeverity("error");
         setAlertOpen(true);
