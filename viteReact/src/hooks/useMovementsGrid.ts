@@ -10,6 +10,10 @@ export const useMovementsGrid = () => {
   const clients = useSelector((state: DataSliceState) => state.clients);
   const agentDetails = useSelector((state: DataSliceState) => state.agentDetails);
 
+  const userRole = useSelector((state: DataSliceState) => {
+    const currentUserDetails = state.currentUserDetails;
+    return currentUserDetails ? currentUserDetails.role : null;
+  });
   const [selectedMovement, setSelectedMovement] = useState<Movement | null>(null);
   const [isMovementListCollapsed, setMovementListCollapsed] = useState(false);
   const [isMovementDetailsCollapsed, setMovementDetailsCollapsed] = useState(false);
@@ -130,5 +134,6 @@ export const useMovementsGrid = () => {
     handleMenuClose,
     anchorEl,
     exportDataAsCsv,
+    userRole
   };
 };

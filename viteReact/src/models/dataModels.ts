@@ -12,17 +12,6 @@ export interface Alert {
   markedAsRead: boolean;
 }
 
-export type Promo = {
-  id: string;
-  clientsId: string[]; // Array of client IDs this promo applies to
-  promoType: string;
-  name: string;
-  discount: string;
-  createdAt: Date;
-  startDate: Date;
-  endDate: string;
-  promoIssuedBy: string;
-};
 
 export type MovementDetail = {
   articleId: string;
@@ -56,3 +45,28 @@ export type Visit = {
   completed: boolean;
   visitIssuedBy: string;
 };
+
+export interface GlobalVisits {
+  [agentId: string]: {
+    Visits: Visit[];
+  };
+}
+
+export type Promo = {
+  id: string;
+  clientsId: string[]; // Array of client IDs this promo applies to
+  promoType: string;
+  name: string;
+  discount: string;
+  createdAt: Date;
+  startDate: Date;
+  endDate: string;
+  promoIssuedBy: string;
+};
+
+
+export interface GlobalPromos {
+  [agentId: string]: {
+    Promos: Promo[];
+  };
+}

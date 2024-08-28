@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Alert } from "../../models/dataModels";
-import { Admin, Agent, Client } from "../../models/entityModels";
+import { Alert, GlobalPromos, GlobalVisits, Promo, Visit } from "../../models/dataModels";
+import { Agent, Client } from "../../models/entityModels";
 import { DataSliceState } from "../../models/stateModels";
 import { updateApi } from "../../services/promosVisitsQueries";
-import { dataApi } from "../../services/queries";
+import { dataApi } from "../../services/dataQueries";
 
 const initialState: DataSliceState = {
   clients: {},
@@ -11,6 +11,9 @@ const initialState: DataSliceState = {
   agentDetails: {},
   currentUserData: null,
   currentUserDetails: null,
+  currentUserPromos: null,
+  currentUserAlerts: null,
+  currentUserVisits: null,
   selectedClientId: null,
   selectedAgentId: null,
   status: "idle",
@@ -78,39 +81,18 @@ const dataSlice = createSlice({
     },
     addAlert: (state, action: PayloadAction<Alert>) => {
       const alert = action.payload;
-      if (state.currentUserData && state.currentUserDetails) {
-        if (state.currentUserDetails.role === "client") {
-          (state.currentUserData as Client).clientAlerts.push(alert);
-        } else if (state.currentUserDetails.role === "agent") {
-          (state.currentUserData as Agent).agentAlerts.push(alert);
-        } else if (state.currentUserDetails.role === "admin") {
-          (state.currentUserData as Admin).adminAlerts.push(alert);
-        }
+      if (state.currentUserAlerts) {
+        state.currentUserAlerts.push(alert);
       }
     },
     updateAlert: (state, action: PayloadAction<Alert>) => {
       const alert = action.payload;
-      if (state.currentUserData && state.currentUserDetails) {
-        if (state.currentUserDetails.role === "client") {
-          const client = state.currentUserData as Client;
-          const index = client.clientAlerts.findIndex(
-            (a) => a._id === alert._id
-          );
-          if (index !== -1) {
-            client.clientAlerts[index] = alert;
-          }
-        } else if (state.currentUserDetails.role === "agent") {
-          const agent = state.currentUserData as Agent;
-          const index = agent.agentAlerts.findIndex((a) => a._id === alert._id);
-          if (index !== -1) {
-            agent.agentAlerts[index] = alert;
-          }
-        } else if (state.currentUserDetails.role === "admin") {
-          const admin = state.currentUserData as Admin;
-          const index = admin.adminAlerts.findIndex((a) => a._id === alert._id);
-          if (index !== -1) {
-            admin.adminAlerts[index] = alert;
-          }
+      if (state.currentUserAlerts) {
+        const index = state.currentUserAlerts.findIndex(
+          (a) => a._id === alert._id
+        );
+        if (index !== -1) {
+          state.currentUserAlerts[index] = alert;
         }
       }
     },
@@ -125,21 +107,24 @@ const dataSlice = createSlice({
         state.status = "succeeded";
         const { userRole, userData, userId } = action.payload;
 
-        if (userRole === "client") {
-          const clientData = userData as Client;
+        if (userRole === "client" && "clientData" in userData) {
+          const { clientData, visits, promos, alerts } = userData;
           state.clients[clientData.id] = clientData;
           state.currentUserData = clientData;
           state.currentUserDetails = {
             id: clientData.id,
             role: "client",
             name: clientData.name,
-            userId: userId, // Add userId here
+            userId: userId,
           };
-        } else if (userRole === "agent") {
-          const agentData = userData as Agent;
+          state.currentUserPromos = promos;
+          state.currentUserAlerts = alerts;
+          state.currentUserVisits = visits;
+        } else if (userRole === "agent" && "agentData" in userData) {
+          const { agentData, visits, promos, alerts } = userData;
           state.agents[agentData.id] = agentData;
           state.agentDetails[agentData.id] = agentData;
-          agentData.clients.forEach((client) => {
+          agentData.clients.forEach((client: Client) => {
             state.clients[client.id] = client;
           });
           state.currentUserData = agentData;
@@ -147,14 +132,17 @@ const dataSlice = createSlice({
             id: agentData.id,
             role: "agent",
             name: agentData.name,
-            userId: userId, // Add userId here
+            userId: userId,
           };
-        } else if (userRole === "admin") {
-          const adminData = userData as Admin;
-          adminData.clients.forEach((client) => {
+          state.currentUserPromos = promos;
+          state.currentUserAlerts = alerts;
+          state.currentUserVisits = visits;
+        } else if (userRole === "admin" && "adminData" in userData) {
+          const { adminData, globalVisits, globalPromos, alerts } = userData;
+          adminData.clients.forEach((client: Client) => {
             state.clients[client.id] = client;
           });
-          adminData.agents.forEach((agent) => {
+          adminData.agents.forEach((agent: Agent) => {
             state.agents[agent.id] = agent;
             state.agentDetails[agent.id] = agent;
           });
@@ -163,8 +151,20 @@ const dataSlice = createSlice({
             id: adminData.id,
             role: "admin",
             name: adminData.name,
-            userId: userId, // Add userId here
+            userId: userId,
           };
+          state.currentUserPromos = globalPromos;
+          state.currentUserAlerts = alerts;
+          state.currentUserVisits = globalVisits;
+        } else {
+          // Handle unexpected data structure
+          console.error(
+            "Unexpected user role or data structure:",
+            userRole,
+            userData
+          );
+          state.status = "failed";
+          state.error = "Unexpected user role or data structure";
         }
       })
       .addCase(fetchInitialData.rejected, (state, action) => {
@@ -172,71 +172,27 @@ const dataSlice = createSlice({
         state.error = action.error.message || "An error occurred";
       })
       .addCase(updateVisits.fulfilled, (state, action) => {
-        const updatedEntity = action.payload;
-        if ("visits" in updatedEntity) {
-          // Client case
-          state.clients[updatedEntity.id] = {
-            ...state.clients[updatedEntity.id],
-            visits: updatedEntity.visits,
-          };
-          if (state.currentUserData && "visits" in state.currentUserData) {
-            state.currentUserData.visits = updatedEntity.visits;
-          }
-        } else if ("AgentVisits" in updatedEntity) {
-          // Agent case
-          state.agents[updatedEntity.id] = {
-            ...state.agents[updatedEntity.id],
-            AgentVisits: updatedEntity.AgentVisits,
-          };
-          state.agentDetails[updatedEntity.id] = {
-            ...state.agentDetails[updatedEntity.id],
-            AgentVisits: updatedEntity.AgentVisits,
-          };
-          if (state.currentUserData && "AgentVisits" in state.currentUserData) {
-            state.currentUserData.AgentVisits = updatedEntity.AgentVisits;
-          }
-        } else if ("GlobalVisits" in updatedEntity) {
-          // Admin case
-          if (
-            state.currentUserData &&
-            "GlobalVisits" in state.currentUserData
-          ) {
-            state.currentUserData.GlobalVisits = updatedEntity.GlobalVisits;
-          }
+        const updatedVisits = action.payload;
+
+        if (
+          state.currentUserDetails?.role === "client" ||
+          state.currentUserDetails?.role === "agent"
+        ) {
+          state.currentUserVisits = updatedVisits as Visit[];
+        } else if (state.currentUserDetails?.role === "admin") {
+          state.currentUserVisits = updatedVisits as GlobalVisits;
         }
       })
       .addCase(updatePromos.fulfilled, (state, action) => {
-        const updatedEntity = action.payload;
-        if ("promos" in updatedEntity) {
-          // Client case
-          state.clients[updatedEntity.id] = {
-            ...state.clients[updatedEntity.id],
-            promos: updatedEntity.promos,
-          };
-          if (state.currentUserData && "promos" in state.currentUserData) {
-            state.currentUserData.promos = updatedEntity.promos;
-          }
-        } else if ("AgentPromos" in updatedEntity) {
-          // Agent case
-          state.agents[updatedEntity.id] = {
-            ...state.agents[updatedEntity.id],
-            AgentPromos: updatedEntity.AgentPromos,
-          };
-          state.agentDetails[updatedEntity.id] = {
-            ...state.agentDetails[updatedEntity.id],
-            AgentPromos: updatedEntity.AgentPromos,
-          };
-          if (state.currentUserData && "AgentPromos" in state.currentUserData) {
-            state.currentUserData.AgentPromos = updatedEntity.AgentPromos;
-          }
-        } else if ("GlobalPromos" in updatedEntity) {
-          // Admin case
-          if (
-            state.currentUserData &&
-            "GlobalPromos" in state.currentUserData
-          ) {
-            state.currentUserData.GlobalPromos = updatedEntity.GlobalPromos;
-          }
+        const updatedPromos = action.payload;
+
+        if (
+          state.currentUserDetails?.role === "client" ||
+          state.currentUserDetails?.role === "agent"
+        ) {
+          state.currentUserPromos = updatedPromos as Promo[];
+        } else if (state.currentUserDetails?.role === "admin") {
+          state.currentUserPromos = updatedPromos as GlobalPromos;
         }
       });
   },

@@ -121,9 +121,17 @@ function App() {
   useEffect(() => {
     const initializeApp = async () => {
       const storedAuthState = loadAuthState();
+
+      // Check if storedAuthState exists, user is logged in, and id is not null or undefined
       if (storedAuthState && storedAuthState.isLoggedIn) {
         dispatch(login(storedAuthState));
         await handleSessionRefresh();
+      } else if (!storedAuthState) {
+        console.warn("Stored auth state is missing.");
+        // Handle cases where the auth state is invalid, e.g., redirect to login or reset state
+      } else if (storedAuthState && storedAuthState.isLoggedIn === false) {
+        console.warn("Stored auth state is invalid.");
+        // Handle cases where the auth state is invalid, e.g., redirect to login or reset state
       }
     };
 

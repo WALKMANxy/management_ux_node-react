@@ -1,14 +1,15 @@
-onmessage = function (event) {
-  const {
-    data,
-    clientDetails,
-    visits = [],
-    promos = [],
-    alerts = [],
-  } = event.data;
+// Worker script adjustments to use specific types
 
-  //console.log("Worker received data:", visits, promos, alerts)
+import { Movement, MovementDetail } from "../models/dataModels";
+import { serverClient, serverMovement } from "../models/dataSetTypes";
 
+onmessage = function (
+  event: MessageEvent<{
+    data: serverMovement[];
+    clientDetails: serverClient[];
+  }>
+) {
+  const { data, clientDetails } = event.data;
   // Create a map for clientDetails for faster lookup
   const clientDetailsMap = new Map(
     clientDetails.map((detail) => [detail["CODICE"], detail])
@@ -30,34 +31,42 @@ onmessage = function (event) {
     );
 
     // Aggregate movements by "Numero Lista"
-    const movementsMap = clientData.reduce((map, item) => {
-      const movementId = item["Numero Lista"].toString();
-      map.has(movementId)
-        ? map.get(movementId).push(item)
-        : map.set(movementId, [item]);
-      return map;
-    }, new Map());
+    const movementsMap = clientData.reduce(
+      (map: Map<string, serverMovement[]>, item: serverMovement) => {
+        const movementId = item["Numero Lista"].toString();
+        if (map.has(movementId)) {
+          map.get(movementId)!.push(item);
+        } else {
+          map.set(movementId, [item]);
+        }
+        return map;
+      },
+      new Map<string, serverMovement[]>()
+    );
 
-    const movements = Array.from(movementsMap.values()).map((movementData) => {
-      const movementInfo = movementData[0];
-      const details = movementData.map((item) => ({
-        articleId: item["Codice Articolo"].toString(),
-        name: item["Descrizione Articolo"],
-        brand: item["Marca Articolo"],
-        quantity: parseFloat(item["Quantita"]),
-        unitPrice: parseFloat(item["Prezzo Articolo"]).toFixed(2),
-        priceSold: parseFloat(item["Valore"]).toFixed(2),
-        priceBought: parseFloat(item["Costo"]).toFixed(2),
-      }));
-      return {
-        id: movementInfo["Numero Lista"].toString(),
-        discountCategory: movementInfo["Categoria Sconto Vendita"],
-        details,
-        unpaidAmount: "",
-        paymentDueDate: "",
-        dateOfOrder: movementInfo["Data Documento Precedente"].split("T")[0],
-      };
-    });
+    const movements: Movement[] = Array.from(movementsMap.values()).map(
+      (movementData) => {
+        const typedMovementData = movementData as serverMovement[];
+        const movementInfo = typedMovementData[0];
+        const details: MovementDetail[] = typedMovementData.map((item) => ({
+          articleId: item["Codice Articolo"].toString(),
+          name: item["Descrizione Articolo"],
+          brand: item["Marca Articolo"],
+          quantity: parseFloat(item["Quantita"].toString()),
+          unitPrice: parseFloat(item["Prezzo Articolo"].toString()).toFixed(2),
+          priceSold: parseFloat(item["Valore"].toString()).toFixed(2),
+          priceBought: parseFloat(item["Costo"].toString()).toFixed(2),
+        }));
+        return {
+          id: movementInfo["Numero Lista"].toString(),
+          discountCategory: "",
+          details,
+          unpaidAmount: "",
+          paymentDueDate: "",
+          dateOfOrder: movementInfo["Data Documento Precedente"].split("T")[0],
+        };
+      }
+    );
 
     const totalRevenue = movements
       .reduce(
@@ -74,7 +83,7 @@ onmessage = function (event) {
     return {
       id: clientInfo["Codice Cliente"].toString(),
       name: clientInfo["Ragione Sociale Cliente"],
-      extendedName: clientDetail ? clientDetail["EXTENDED_NAME"] : "",
+      extendedName: clientDetail ? clientDetail["RAGIONE SOCIALE AGG."] : "",
       province: clientDetail ? clientDetail["C.A.P. - COMUNE (PROV.)"] : "",
       phone: clientDetail ? clientDetail["TELEFONO"] : "",
       totalOrders: movementsMap.size,
@@ -89,19 +98,8 @@ onmessage = function (event) {
       paymentMethod: clientDetail
         ? clientDetail["Descizione metodo pagamento"]
         : "",
-      visits: visits.filter(
-        (visit) => visit.clientId === clientInfo["Codice Cliente"]
-      ), // Filter relevant visits
       agent: clientInfo["Codice Agente"].toString(),
       movements,
-      promos: promos.filter((promo) =>
-        promo.clientsId.includes(clientInfo["Codice Cliente"])
-      ), // Filter relevant promos
-      clientAlerts: alerts.filter(
-        (alert) =>
-          alert.targetType === "client" &&
-          alert.targetId === clientInfo["Codice Cliente"]
-      ), //Filter relevant alerts
     };
   });
 

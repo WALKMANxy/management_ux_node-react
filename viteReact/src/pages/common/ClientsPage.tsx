@@ -1,4 +1,4 @@
-//src/pages/common/ClientsPage.tsx
+// src/pages/common/ClientsPage.tsx
 import { Box, useMediaQuery } from "@mui/material";
 import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -7,6 +7,8 @@ import { RootState } from "../../app/store";
 import ClientDetails from "../../components/clientpage/ClientDetails";
 import ClientList from "../../components/statistics/grids/ClientList";
 import { useClientsGrid } from "../../hooks/useClientGrid";
+import { Client } from "../../models/entityModels";
+import { ClientColumnDefinition } from "../../models/propsModels";
 import {
   calculateMonthlyData,
   calculateNetRevenue,
@@ -21,6 +23,7 @@ const ClientsPage: React.FC = () => {
   const loggedInClientId = useSelector((state: RootState) => state.auth.id);
 
   const {
+    clients,
     selectedClient,
     quickFilterText,
     setQuickFilterText,
@@ -29,7 +32,6 @@ const ClientsPage: React.FC = () => {
     endDate,
     setEndDate,
     handleClientSelect,
-    filteredClients,
     gridRef,
     isClientListCollapsed,
     setClientListCollapsed,
@@ -53,14 +55,14 @@ const ClientsPage: React.FC = () => {
     }
   }, [handleClientSelect]);
 
-  const columnDefinitions = useMemo(() => {
-    const baseColumns = [
+  const columnDefinitions: ClientColumnDefinition[] = useMemo(() => {
+    const baseColumns: ClientColumnDefinition[] = [
       {
         headerName: t("clientsPage.name"),
         field: "name",
         filter: "agTextColumnFilter",
         sortable: true,
-        cellRenderer: (params: any) => {
+        cellRenderer: (params: { data: Client; value: string }) => {
           return (
             <span
               onDoubleClick={() => handleClientSelect(params.data.id)}
@@ -88,7 +90,7 @@ const ClientsPage: React.FC = () => {
       },
       {
         headerName: t("clientsPage.ordersThisMonth"),
-        valueGetter: (params: any) => {
+        valueGetter: (params) => {
           const { months, ordersData } = calculateMonthlyData([params.data]);
           return ordersData[months.length - 1] || 0; // Get the latest month's data
         },
@@ -101,33 +103,36 @@ const ClientsPage: React.FC = () => {
         field: "totalRevenue",
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
-        valueFormatter: (params: any) => currencyFormatter(params.value),
+        valueFormatter: (params) =>
+          currencyFormatter(params.value),
         sortable: true,
       },
       {
         headerName: t("clientsPage.totalNetRevenue"),
-        valueGetter: (params: any) => {
+        valueGetter: (params) => {
           return calculateNetRevenue([params.data]);
         },
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
-        valueFormatter: (params: any) => currencyFormatter(params.value),
+        valueFormatter: (params) =>
+          currencyFormatter(params.value),
         sortable: true,
       },
       {
         headerName: t("clientsPage.revenueThisMonth"),
-        valueGetter: (params: any) => {
+        valueGetter: (params) => {
           const { months, revenueData } = calculateMonthlyData([params.data]);
           return revenueData[months.length - 1] || 0; // Get the latest month's data
         },
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
-        valueFormatter: (params: any) => currencyFormatter(params.value),
+        valueFormatter: (params) =>
+          currencyFormatter(params.value),
         sortable: true,
       },
       {
         headerName: t("clientsPage.netRevenueThisMonth"),
-        valueGetter: (params: any) => {
+        valueGetter: (params) => {
           const { months, netRevenueData } = calculateMonthlyData([
             params.data,
           ]);
@@ -135,7 +140,8 @@ const ClientsPage: React.FC = () => {
         },
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
-        valueFormatter: (params: any) => currencyFormatter(params.value),
+        valueFormatter: (params) =>
+          currencyFormatter(params.value),
         sortable: true,
       },
       {
@@ -143,7 +149,8 @@ const ClientsPage: React.FC = () => {
         field: "unpaidRevenue",
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
-        valueFormatter: (params: any) => currencyFormatter(params.value),
+        valueFormatter: (params) =>
+          currencyFormatter(params.value),
         sortable: true,
       },
       {
@@ -166,8 +173,8 @@ const ClientsPage: React.FC = () => {
     return baseColumns;
   }, [handleClientSelect, t, userRole]);
 
-  // Extract the logged-in client details from filteredClients
-  const loggedInClientDetails = filteredClients().find(
+  // Find the logged-in client details from clients array
+  const loggedInClientDetails = clients.find(
     (client) => client.id === loggedInClientId
   );
 
@@ -192,7 +199,7 @@ const ClientsPage: React.FC = () => {
             setStartDate={setStartDate}
             endDate={endDate}
             setEndDate={setEndDate}
-            filteredClients={filteredClients}
+            filteredClients={clients}
             columnDefs={columnDefinitions}
             gridRef={gridRef}
             handleMenuOpen={handleMenuOpen}
@@ -204,13 +211,15 @@ const ClientsPage: React.FC = () => {
             isMobile={isMobile}
             clientDetailsRef={clientDetailsRef}
           />
-          <ClientDetails
-            ref={clientDetailsRef}
-            isLoading={false}
-            selectedClient={selectedClient}
-            isClientDetailsCollapsed={isClientDetailsCollapsed}
-            setClientDetailsCollapsed={setClientDetailsCollapsed}
-          />
+          {selectedClient && (
+            <ClientDetails
+              ref={clientDetailsRef}
+              isLoading={false}
+              selectedClient={selectedClient}
+              isClientDetailsCollapsed={isClientDetailsCollapsed}
+              setClientDetailsCollapsed={setClientDetailsCollapsed}
+            />
+          )}
         </>
       )}
     </Box>

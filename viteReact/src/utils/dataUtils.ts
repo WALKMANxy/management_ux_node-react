@@ -350,13 +350,19 @@ export const calculateTotalPriceSold = (movement: Movement): string => {
   return total.toFixed(2);
 };
 
-export const currencyFormatter = (value: any): string => {
-  const numberValue = parseFloat(value);
+export const currencyFormatter = (value: number | string): string => {
+  // Parse the value to a float if it's a string; keep it as is if it's already a number
+  const numberValue = typeof value === 'string' ? parseFloat(value) : value;
+
+  // Check if the parsed value is a valid number
   if (isNaN(numberValue)) {
     return "";
   }
+
+  // Format the number as currency with commas as thousand separators
   return `€${numberValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,")}`;
 };
+
 
 export const numberComparator = (valueA: number, valueB: number) => {
   return valueA - valueB;

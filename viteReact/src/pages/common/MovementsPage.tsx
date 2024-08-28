@@ -1,10 +1,13 @@
 // src/pages/common/MovementsPage.tsx
+
 import { Box, useMediaQuery } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import MovementDetails from "../../components/movementsPage/movementsDetails";
 import MovementList from "../../components/statistics/grids/MovementList";
 import { useMovementsGrid } from "../../hooks/useMovementsGrid";
+import { Movement } from "../../models/dataModels";
+import { MovementColumnDefinition } from "../../models/propsModels"; // Import the new type
 import {
   calculateTotalPriceSold,
   calculateTotalQuantity,
@@ -36,17 +39,18 @@ const MovementsPage: React.FC = () => {
     anchorEl,
     movementDetailsRef,
     exportDataAsCsv,
-    userRole, // Added userRole to props
+    userRole,
   } = useMovementsGrid();
 
-  const columnDefinitions = useMemo(
+  // Define column definitions using the MovementColumnDefinition type
+  const columnDefinitions: MovementColumnDefinition[] = useMemo(
     () =>
       [
         {
           headerName: t("movementsPage.id"),
           field: "id",
           sortable: true,
-          cellRenderer: (params: any) => (
+          cellRenderer: (params: { data: Movement; value: string }) => (
             <span
               onDoubleClick={() => handleMovementSelect(params.data.id)}
               style={{ cursor: "pointer" }}
@@ -75,23 +79,26 @@ const MovementsPage: React.FC = () => {
           field: "dateOfOrder",
           filter: "agDateColumnFilter",
           sortable: true,
-          valueFormatter: (params: any) =>
+          valueFormatter: (params: { value: string }) =>
             new Date(params.value).toLocaleDateString(),
         },
         {
           headerName: t("movementsPage.totalQuantity"),
-          valueGetter: (params: any) => calculateTotalQuantity(params.data),
+          valueGetter: (params: { data: Movement }) =>
+            calculateTotalQuantity(params.data),
           sortable: true,
           comparator: numberComparator,
         },
         {
           headerName: t("movementsPage.totalPriceSold"),
-          valueGetter: (params: any) => calculateTotalPriceSold(params.data),
-          valueFormatter: (params: any) => currencyFormatter(params.value),
+          valueGetter: (params: { data: Movement }) =>
+            calculateTotalPriceSold(params.data),
+          valueFormatter: (params: { value: number }) =>
+            currencyFormatter(params.value),
           comparator: numberComparator,
           sortable: true,
         },
-      ].filter(Boolean), // Remove null entries
+      ].filter(Boolean) as MovementColumnDefinition[], // Filter out null entries
     [handleMovementSelect, t, userRole]
   );
 

@@ -1,12 +1,12 @@
-import { Promo, Visit } from "./dataModels";
+import { Alert, GlobalPromos, GlobalVisits, Promo, Visit } from "./dataModels";
 import { Admin, Agent, Client, UserRole } from "./entityModels";
 import { SearchResult } from "./searchModels";
 
 export type AuthState = {
   isLoggedIn: boolean;
-  userRole: UserRole;
-  id: string | null;
-  userId: string | null;
+  role: UserRole;
+  id: string ;
+  userId: string;
 };
 
 export type ClientsState = {
@@ -38,16 +38,19 @@ export interface DataSliceState {
   currentUserData: Client | Agent | Admin | null;
   currentUserDetails: {
     id: string;
-    role: "client" | "agent" | "admin";
+    role: 'client' | 'agent' | 'admin';
     name: string;
-    userId: string; // Add userId here
-    // Add any other common fields here
+    userId: string;
   } | null;
+  currentUserPromos: Promo[] | GlobalPromos | null;
+  currentUserAlerts: Alert[] | null;
+  currentUserVisits: Visit[] | GlobalVisits | null;
   selectedClientId: string | null;
   selectedAgentId: string | null;
-  status: "idle" | "loading" | "succeeded" | "failed";
+  status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
+
 
 export type State = {
   hasError: boolean;

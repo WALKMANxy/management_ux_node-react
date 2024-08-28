@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
-import { api } from "../services/api";
+import { authApi } from "../services/authQueries";
 import { loadAuthState, saveAuthState } from "../utils/localStorage";
 import rootReducer from "./rootReducer";
 
@@ -16,7 +16,7 @@ const store = configureStore({
       thunk: true,
       serializableCheck: false,
       immutableCheck: false,
-    }).concat(api.middleware),
+    }).concat(authApi.middleware),
 });
 
 store.subscribe(() => {

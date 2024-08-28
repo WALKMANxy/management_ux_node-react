@@ -3,10 +3,10 @@ import store, { AppDispatch } from "../app/store";
 import { login, logout } from "../features/auth/authSlice";
 import { User } from "../models/entityModels";
 import {
-  api,
+  authApi,
   useLoginUserMutation,
   useRegisterUserMutation,
-} from "../services/api";
+} from "../services/authQueries";
 import { clearAuthData } from "../utils/authHelpers";
 import {
   FetchUserRoleError,
@@ -69,7 +69,7 @@ export const useAuth = () => {
 
       if (userId) {
         const result = await dispatch(
-          api.endpoints.getUserRoleById.initiate(userId)
+          authApi.endpoints.getUserRoleById.initiate(userId)
         );
 
         if ("data" in result) {

@@ -1,7 +1,18 @@
 // api.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import {
+  Alert,
+  GlobalPromos,
+  GlobalVisits,
+  Promo,
+  Visit,
+} from "../models/dataModels";
 import { Admin, Agent, Client } from "../models/entityModels";
-import { mapDataToAgents, mapDataToModels } from "../utils/dataLoader";
+import {
+  mapDataToAgents,
+  mapDataToModels,
+  mapVisitsPromosToAdmin,
+} from "../utils/dataLoader";
 import { generateErrorResponse, handleApiError } from "../utils/errorHandling";
 import { getAdminById } from "./api/admins";
 import { getAgentByClientEntityCode, getAgentById } from "./api/agents";
@@ -25,7 +36,12 @@ export const dataApi = createApi({
   tagTypes: ["Client", "Agent", "Admin"],
   endpoints: (builder) => ({
     getUserAdminData: builder.query<
-      Admin,
+      {
+        adminData: Admin;
+        globalVisits: GlobalVisits;
+        globalPromos: GlobalPromos;
+        alerts: Alert[];
+      },
       { entityCode: string; userId: string }
     >({
       queryFn: async ({ entityCode, userId }) => {
@@ -55,20 +71,25 @@ export const dataApi = createApi({
           const alerts = [...roleBasedAlerts, ...issuerAlerts];
 
           // Map clients and agents using the fetched data
-          const clients = await mapDataToModels(
+          const { clients } = await mapDataToModels(
             data,
             clientDetails,
             agentDetails,
             visits,
-            promos,
-            alerts
+            promos
           );
-          const agents = await mapDataToAgents(
-            data,
-            agentDetails,
-            visits,
-            promos,
-            alerts
+
+          const {
+            agents,
+            visits: aggregatedVisits,
+            promos: aggregatedPromos,
+          } = await mapDataToAgents(data, agentDetails, visits, promos);
+
+          // Use mapVisitsPromosToAdmin to aggregate visits and promos for admin
+          const { globalVisits, globalPromos } = mapVisitsPromosToAdmin(
+            agents,
+            aggregatedVisits,
+            aggregatedPromos
           );
 
           // Construct the admin details with additional data
@@ -76,30 +97,26 @@ export const dataApi = createApi({
             ...adminDetails,
             agents,
             clients,
-            GlobalVisits: {},
-            GlobalPromos: {},
-            adminAlerts: alerts,
           };
 
-          // Populate GlobalVisits and GlobalPromos for the admin
-          agents.forEach((agent) => {
-            adminDetailsWithData.GlobalVisits[agent.id] = {
-              Visits: agent.AgentVisits || [],
-            };
-            adminDetailsWithData.GlobalPromos[agent.id] = {
-              Promos: agent.AgentPromos || [],
-            };
-          });
-
-          return { data: adminDetailsWithData };
+          // Return admin data along with visits, promos, and alerts separately
+          return {
+            data: {
+              adminData: adminDetailsWithData,
+              globalVisits,
+              globalPromos,
+              alerts, // Directly returning alerts as they're already filtered
+            },
+          };
         } catch (error) {
           handleApiError(error, "getUserAdminData");
           return generateErrorResponse(error);
         }
       },
     }),
+
     getUserClientData: builder.query<
-      Client,
+      { clientData: Client; visits: Visit[]; promos: Promo[]; alerts: Alert[] },
       { entityCode: string; userId: string }
     >({
       queryFn: async ({ entityCode, userId }) => {
@@ -127,25 +144,35 @@ export const dataApi = createApi({
 
           const alerts = [...roleBasedAlerts, ...issuerAlerts];
 
-          const clients = await mapDataToModels(
+          // Updated to use the new return structure from mapDataToModels
+          const {
+            clients,
+            visits: filteredVisits,
+            promos: filteredPromos,
+          } = await mapDataToModels(
             data,
             [clientDetails],
             [agentDetails],
             visits,
-            promos,
-            alerts
+            promos
           );
 
           if (clients.length === 0) {
             throw new Error("Client not found");
           }
 
-          const clientData: Client = {
-            ...clients[0],
-            clientAlerts: alerts,
-          };
+          // Construct the clientData object without embedding alerts
+          const clientData: Client = clients[0];
 
-          return { data: clientData };
+          // Return clientData along with visits, promos, and alerts separately
+          return {
+            data: {
+              clientData,
+              visits: filteredVisits,
+              promos: filteredPromos,
+              alerts, // Directly returning alerts as they're already filtered
+            },
+          };
         } catch (error) {
           handleApiError(error, "getUserClientData");
           return generateErrorResponse(error);
@@ -154,7 +181,7 @@ export const dataApi = createApi({
     }),
 
     getUserAgentData: builder.query<
-      Agent,
+      { agentData: Agent; visits: Visit[]; promos: Promo[]; alerts: Alert[] },
       { entityCode: string; userId: string }
     >({
       queryFn: async ({ entityCode, userId }) => {
@@ -182,34 +209,41 @@ export const dataApi = createApi({
 
           const alerts = [...roleBasedAlerts, ...issuerAlerts];
 
-          const clients = await mapDataToModels(
+          // Extract clients from mapDataToModels
+          const { clients } = await mapDataToModels(
             data,
             clientDetails,
             [agentDetails],
             visits,
-            promos,
-            []
+            promos
           );
 
-          const agents = await mapDataToAgents(
-            data,
-            [agentDetails],
-            visits,
-            promos,
-            alerts
-          );
+          // Extract agents, visits, and promos from mapDataToAgents
+          const {
+            agents,
+            visits: aggregatedVisits,
+            promos: aggregatedPromos,
+          } = await mapDataToAgents(data, [agentDetails], visits, promos);
 
           if (agents.length === 0) {
             throw new Error("Agent not found");
           }
 
+          // Construct the agentData object without embedding alerts
           const agentData: Agent = {
             ...agents[0],
             clients,
-            agentAlerts: alerts,
           };
 
-          return { data: agentData };
+          // Return agentData along with visits, promos, and alerts separately
+          return {
+            data: {
+              agentData,
+              visits: aggregatedVisits,
+              promos: aggregatedPromos,
+              alerts, // Directly returning alerts as they're already filtered
+            },
+          };
         } catch (error) {
           handleApiError(error, "getUserAgentData");
           return generateErrorResponse(error);
