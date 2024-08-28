@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { ClientListProps } from "../../../models/propsModels";
 import AGGridTable from "./AGGridTable";
@@ -47,11 +47,6 @@ const ClientList: React.FC<ClientListProps> = ({
   const toggleClientListCollapse = useCallback(() => {
     setClientListCollapsed(!isClientListCollapsed);
   }, [isClientListCollapsed, setClientListCollapsed]);
-
-  const memoizedFilteredClients = useMemo(
-    () => filteredClients(),
-    [filteredClients]
-  );
 
   return (
     <Paper elevation={8} sx={{ mb: 2 }}>
@@ -135,7 +130,7 @@ const ClientList: React.FC<ClientListProps> = ({
           <AGGridTable
             ref={gridRef}
             columnDefs={columnDefs}
-            rowData={memoizedFilteredClients}
+            rowData={filteredClients}
             paginationPageSize={500}
             quickFilterText={quickFilterText}
           />

@@ -15,8 +15,12 @@ export const clearAuthData = () => {
     sessionStorage.clear();
     localStorage.clear();
     console.log(`[${new Date().toISOString()}] Auth data cleared.`);
-  } catch (error) {
-    const clearError = new Error("Failed to clear auth data.");
-    logError(clearError);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logError(error);
+    } else {
+      const clearError = new Error("Failed to clear auth data.");
+      logError(clearError);
+    }
   }
 };

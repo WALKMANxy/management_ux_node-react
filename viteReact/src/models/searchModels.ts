@@ -3,34 +3,66 @@ export type SearchResult = {
   name: string;
   type: "client" | "agent" | "article" | "promo" | "visit" | "alert";
 
+  notAvailable?: "Not Available";
+
+
+  // Client-specific properties
+  extendedName?: string;
+  province?: string;
+  phone?: string;
+  totalOrders?: number;
+  totalRevenue?: string;
+  unpaidRevenue?: string;
+  address?: string;
+  email?: string;
+  pec?: string;
+  taxCode?: string;
+  extendedTaxCode?: string;
+  paymentMethodID?: string;
+  paymentMethod?: string;
+  agent?: string;
+  agentName?: string;
+  colour?: string;
+
+  // Agent-specific properties
+  // (already covered by common fields)
+
   // Article-specific properties
   articleId?: string;
   brand?: string;
+  quantity?: number;
+  unitPrice?: string;
+  priceSold?: string;
+  priceBought?: string;
   lastSoldDate?: string;
-  // Client-specific properties
-  province?: string;
-  phone?: string;
-  paymentMethod?: string;
-  address?: string;
-  email?: string;
-  agent?: string;
+
   // Promo-specific properties
-  promoType: string;
-  discountAmount?: string;
-  startDate: Date; // Keep as Date
-  endDate: Date; // Keep as Date
-  promoIssuedBy: string;
+  promoType?: string;
+  discount?: string;
+  startDate?: Date;
+  endDate?: Date;
+  promoIssuedBy?: string;
+
   // Visit-specific properties
-  reason: string;
-  date: Date;
+  clientId?: string;
+  visitType?: string;
+  reason?: string;
+  date?: Date;
+  notePublic?: string;
+  notePrivate?: string;
   pending?: boolean;
   completed?: boolean;
-  visitIssuedBy: string;
+  visitIssuedBy?: string;
+
   // Alert-specific properties
-  createdAt: string;
-  alertReason: string;
-  severity: "low" | "medium" | "high";
+  alertReason?: string;
+  message?: string;
+  severity?: "low" | "medium" | "high";
+  createdAt?: string;
   alertIssuedBy?: string;
+  entityRole?: "admin" | "agent" | "client";
+  entityCode?: string;
+  markedAsRead?: boolean;
 };
 
 export type SearchParams = {

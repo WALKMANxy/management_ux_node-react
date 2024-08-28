@@ -1,9 +1,10 @@
 import { Box, Paper, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
 import { Movement, MovementDetail } from "../../../models/dataModels";
 import { Client } from "../../../models/entityModels";
-import { useGetClientsQuery } from "../../../services/api";
+import { DataSliceState } from "../../../models/stateModels";
 import { currencyFormatter, numberComparator } from "../../../utils/dataUtils";
 import AGGridTable from "./AGGridTable";
 
@@ -17,7 +18,9 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({
   clientMovements,
 }) => {
   const { t } = useTranslation();
-  const { data: clients = [] } = useGetClientsQuery();
+  const clients = useSelector((state: DataSliceState) =>
+    Object.values(state.clients)
+  );
 
   const movements: Movement[] = useMemo(() => {
     const allMovements =

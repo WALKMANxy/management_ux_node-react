@@ -5,9 +5,9 @@ import Cookies from "js-cookie";
 import { getDeviceId, getUserAgent } from "../../utils/deviceUtils";
 import { authApiCall } from "./apiUtils";
 
-const baseUrl = process.env.VITE_API_BASE_URL || "";
-const googleClientId = process.env.VITE_GOOGLE_CLIENT_ID || "";
-const appUrl = process.env.VITE_APP_URL || "";
+const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+const appUrl = import.meta.env.ITE_APP_URL || "";
 
 // Specific function for registering a user
 export const registerUser = async (credentials: {

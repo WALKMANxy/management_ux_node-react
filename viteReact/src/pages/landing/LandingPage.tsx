@@ -29,7 +29,7 @@ const LandingPage: React.FC = () => {
   const [showLogin, setShowLogin] = useState(false); // Control modal visibility
   const [isRedirected, setIsRedirected] = useState(false);
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
-  const userRole = useSelector((state: RootState) => state.auth.userRole);
+  const userRole = useSelector((state: RootState) => state.auth.role);
   const navigate = useNavigate();
 
   // console.log("Logged in?: ", isLoggedIn);
