@@ -32,3 +32,9 @@ export type SearchResult = {
   severity: "low" | "medium" | "high";
   alertIssuedBy?: string;
 };
+
+export type SearchParams = {
+  query: string;
+  filter: string;
+  results?: SearchResult[];
+};
