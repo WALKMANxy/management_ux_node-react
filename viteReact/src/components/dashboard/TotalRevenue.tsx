@@ -1,8 +1,8 @@
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "@mui/material/styles";
-import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { TotalEarningProps } from "../../models/propsModels";
 import { currencyFormatter } from "../../utils/dataUtils";
 
@@ -86,11 +86,7 @@ const TotalEarning: React.FC<TotalEarningProps> = ({ totalEarning }) => {
             </Grid>
           </Grid>
           <Grid item>
-            <Typography
-              variant="h5"
-              component="div"
-              sx={{ fontWeight: 500 }}
-            >
+            <Typography variant="h5" component="div" sx={{ fontWeight: 500 }}>
               {t("dashboard.totalEarning")}
             </Typography>
           </Grid>

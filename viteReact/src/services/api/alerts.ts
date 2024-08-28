@@ -12,7 +12,6 @@ class ApiError extends Error {
   }
 }
 
-
 // Helper function to handle API errors
 function handleApiError(error: unknown, context: string): never {
   if (error instanceof ApiError) {
@@ -22,7 +21,10 @@ function handleApiError(error: unknown, context: string): never {
     throw new ApiError(500, `An error occurred while ${context.toLowerCase()}`);
   } else {
     console.error(`${context}:`, error);
-    throw new ApiError(500, `An unknown error occurred while ${context.toLowerCase()}`);
+    throw new ApiError(
+      500,
+      `An unknown error occurred while ${context.toLowerCase()}`
+    );
   }
 }
 
@@ -40,14 +42,19 @@ export const getAlertsByEntityRoleAndEntityCode = async ({
       `alerts/${entityRole}/${entityCode}`,
       "GET"
     );
-    console.debug(`Fetched ${alerts.length} alerts for ${entityRole} with code ${entityCode}`);
+    console.debug(
+      `Fetched ${alerts.length} alerts for ${entityRole} with code ${entityCode}`
+    );
     return alerts;
   } catch (error: unknown) {
     if (error instanceof ApiError && error.status === 404) {
       console.warn(`No alerts found for ${entityRole} with code ${entityCode}`);
       return []; // Return an empty array if no alerts are found
     }
-    return handleApiError(error, `Error fetching alerts for ${entityRole} with code ${entityCode}`);
+    return handleApiError(
+      error,
+      `Error fetching alerts for ${entityRole} with code ${entityCode}`
+    );
   }
 };
 
@@ -56,17 +63,21 @@ export const getAlertsByIssuer = async (userId: string): Promise<Alert[]> => {
   try {
     console.debug(`Fetching alerts issued by user with ID: ${userId}`);
     const alerts = await apiCall<Alert[]>(`alerts/issuedby/${userId}`, "GET");
-    console.debug(`Fetched ${alerts.length} alerts issued by user with ID: ${userId}`);
+    console.debug(
+      `Fetched ${alerts.length} alerts issued by user with ID: ${userId}`
+    );
     return alerts;
   } catch (error: unknown) {
     if (error instanceof ApiError && error.status === 404) {
       console.warn(`No alerts found issued by user with ID: ${userId}`);
       return []; // Return an empty array if no alerts are found
     }
-    return handleApiError(error, `Error fetching alerts issued by user with ID: ${userId}`);
+    return handleApiError(
+      error,
+      `Error fetching alerts issued by user with ID: ${userId}`
+    );
   }
 };
-
 
 // Update an alert by its ID
 export const updateAlertById = async (
@@ -75,7 +86,11 @@ export const updateAlertById = async (
 ): Promise<Alert> => {
   try {
     console.debug(`Updating alert with ID: ${_id}`);
-    const updatedAlert = await apiCall<Alert>(`alerts/${_id}`, "PATCH", alertData);
+    const updatedAlert = await apiCall<Alert>(
+      `alerts/${_id}`,
+      "PATCH",
+      alertData
+    );
     console.debug(`Alert with ID: ${_id} updated successfully`);
     return updatedAlert;
   } catch (error: unknown) {
@@ -93,7 +108,9 @@ export const createAlert = async (alertData: {
   entityCode: string;
 }): Promise<Alert> => {
   try {
-    console.debug(`Creating new alert for ${alertData.entityRole} with code ${alertData.entityCode}`);
+    console.debug(
+      `Creating new alert for ${alertData.entityRole} with code ${alertData.entityCode}`
+    );
     const newAlert = await apiCall<Alert>("alerts", "POST", alertData);
     console.debug(`New alert created successfully with ID: ${newAlert._id}`);
     return newAlert;

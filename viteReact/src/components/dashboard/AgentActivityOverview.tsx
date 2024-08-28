@@ -1,12 +1,19 @@
-import React from 'react';
 import { Timeline } from "@mui/icons-material";
-import { timelineItemClasses, TimelineItem, TimelineSeparator, TimelineDot, TimelineConnector, TimelineContent } from "@mui/lab";
+import {
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  TimelineItem,
+  timelineItemClasses,
+  TimelineSeparator,
+} from "@mui/lab";
 import { Card, CardHeader, Typography } from "@mui/material";
+import React from "react";
 
 // Define the structure of an activity item
 interface ActivityItem {
   id: string;
-  type: 'visits' | 'sales' | 'alerts' | string;
+  type: "visits" | "sales" | "alerts" | string;
   title: string;
   time: string;
 }
@@ -22,7 +29,9 @@ interface OrderItemProps {
   lastTimeline: boolean;
 }
 
-const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({ list }) => {
+const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({
+  list,
+}) => {
   return (
     <Card>
       <CardHeader title="Agent Activity Overview" />
@@ -37,7 +46,11 @@ const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({ list }) =
         }}
       >
         {list.map((item, index) => (
-          <OrderItem key={item.id} item={item} lastTimeline={index === list.length - 1} />
+          <OrderItem
+            key={item.id}
+            item={item}
+            lastTimeline={index === list.length - 1}
+          />
         ))}
       </Timeline>
     </Card>
@@ -47,7 +60,9 @@ const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({ list }) =
 const OrderItem: React.FC<OrderItemProps> = ({ item, lastTimeline }) => {
   const { type, title, time } = item;
 
-  const getDotColor = (type: string): "primary" | "success" | "error" | "grey" => {
+  const getDotColor = (
+    type: string
+  ): "primary" | "success" | "error" | "grey" => {
     switch (type) {
       case "visits":
         return "primary";

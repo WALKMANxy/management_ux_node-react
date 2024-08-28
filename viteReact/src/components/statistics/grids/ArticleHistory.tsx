@@ -1,11 +1,11 @@
-import React, { useMemo } from "react";
 import { Box, Paper, Typography } from "@mui/material";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Movement,  MovementDetail } from "../../../models/dataModels";
+import { Movement, MovementDetail } from "../../../models/dataModels";
+import { Client } from "../../../models/entityModels";
+import { useGetClientsQuery } from "../../../services/api";
 import { currencyFormatter, numberComparator } from "../../../utils/dataUtils";
 import AGGridTable from "./AGGridTable";
-import { useGetClientsQuery } from "../../../services/api";
-import { Client } from "../../../models/entityModels";
 
 type ArticleHistoryProps = {
   articleId: string;
@@ -20,15 +20,19 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({
   const { data: clients = [] } = useGetClientsQuery();
 
   const movements: Movement[] = useMemo(() => {
-    const allMovements = clientMovements || clients.flatMap((client: Client) =>
-      client.movements.map((movement: Movement) => ({
-        ...movement,
-        clientName: client.name,
-      }))
-    );
+    const allMovements =
+      clientMovements ||
+      clients.flatMap((client: Client) =>
+        client.movements.map((movement: Movement) => ({
+          ...movement,
+          clientName: client.name,
+        }))
+      );
 
     return allMovements.filter((movement: Movement) =>
-      movement.details.some((detail: MovementDetail) => detail.articleId === articleId)
+      movement.details.some(
+        (detail: MovementDetail) => detail.articleId === articleId
+      )
     );
   }, [clientMovements, clients, articleId]);
 
@@ -63,7 +67,8 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({
           );
           return detail ? detail.priceSold : 0;
         },
-        valueFormatter: (params: { value: number }) => currencyFormatter(params.value),
+        valueFormatter: (params: { value: number }) =>
+          currencyFormatter(params.value),
         comparator: numberComparator,
         sortable: true,
       },
@@ -75,7 +80,8 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({
           );
           return detail ? detail.priceBought : 0;
         },
-        valueFormatter: (params: { value: number }) => currencyFormatter(params.value),
+        valueFormatter: (params: { value: number }) =>
+          currencyFormatter(params.value),
         comparator: numberComparator,
         sortable: true,
       },

@@ -242,6 +242,12 @@ const dataSlice = createSlice({
   },
 });
 
-export const { clearSelection, selectClient, selectAgent, addAlert, updateAlert } = dataSlice.actions;
+export const {
+  clearSelection,
+  selectClient,
+  selectAgent,
+  addAlert,
+  updateAlert,
+} = dataSlice.actions;
 
 export default dataSlice.reducer;

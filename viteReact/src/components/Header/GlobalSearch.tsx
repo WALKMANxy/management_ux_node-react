@@ -32,22 +32,28 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
     status,
   } = useGlobalSearch(filter);
 
-  const handleSelect = useCallback((item: SearchResult) => {
-    if (isHeaderSearch) {
-      sessionStorage.setItem("searchedItem", JSON.stringify(item));
-      if (item.type === "article") {
-        navigate("/articles");
-      } else if (item.type === "client") {
-        navigate("/clients");
+  const handleSelect = useCallback(
+    (item: SearchResult) => {
+      if (isHeaderSearch) {
+        sessionStorage.setItem("searchedItem", JSON.stringify(item));
+        if (item.type === "article") {
+          navigate("/articles");
+        } else if (item.type === "client") {
+          navigate("/clients");
+        }
+      } else if (onSelect) {
+        onSelect(item);
       }
-    } else if (onSelect) {
-      onSelect(item);
-    }
-    setShowResults(false);
-    setSelectedIndex(-1);
-  }, [isHeaderSearch, navigate, onSelect, setShowResults, setSelectedIndex]);
+      setShowResults(false);
+      setSelectedIndex(-1);
+    },
+    [isHeaderSearch, navigate, onSelect, setShowResults, setSelectedIndex]
+  );
 
-  const searchPlaceholder = useMemo(() => placeholder || t("globalSearch.placeholder"), [placeholder, t]);
+  const searchPlaceholder = useMemo(
+    () => placeholder || t("globalSearch.placeholder"),
+    [placeholder, t]
+  );
 
   return (
     <div ref={searchRef} className="global-search-container">
@@ -82,4 +88,5 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
   );
 };
 
-export default GlobalSearch; React.memo(GlobalSearch);
+export default GlobalSearch;
+React.memo(GlobalSearch);

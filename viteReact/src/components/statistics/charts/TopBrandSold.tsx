@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
 import { Box, Divider, Paper, Skeleton, Typography } from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 // Define more specific types
@@ -52,104 +52,120 @@ const titleStyles = {
   zIndex: 1,
 };
 
-const TopBrandsSold: React.FC<TopBrandsSoldProps> = React.memo(({
-  topBrandsData,
-  brandColors,
-  isMobile,
-  userRole
-}) => {
-  const { t } = useTranslation();
-  const loading = topBrandsData.length === 0;
+const TopBrandsSold: React.FC<TopBrandsSoldProps> = React.memo(
+  ({ topBrandsData, brandColors, isMobile, userRole }) => {
+    const { t } = useTranslation();
+    const loading = topBrandsData.length === 0;
 
-  const chartData = useMemo(() => topBrandsData.map(brand => ({
-    id: brand.id,
-    value: brand.value,
-    label: brand.label,
-  })), [topBrandsData]);
+    const chartData = useMemo(
+      () =>
+        topBrandsData.map((brand) => ({
+          id: brand.id,
+          value: brand.value,
+          label: brand.label,
+        })),
+      [topBrandsData]
+    );
 
-  const titleKey = userRole === "agent" ? "topBrandsSold.titleAgent" : "topBrandsSold.titleClient";
+    const titleKey =
+      userRole === "agent"
+        ? "topBrandsSold.titleAgent"
+        : "topBrandsSold.titleClient";
 
-  return (
-    <Paper elevation={4} sx={paperStyles}>
-      <Box sx={titleStyles}>
-        <Typography variant="h6" gutterBottom>
-          {t(titleKey)}
-        </Typography>
-      </Box>
+    return (
+      <Paper elevation={4} sx={paperStyles}>
+        <Box sx={titleStyles}>
+          <Typography variant="h6" gutterBottom>
+            {t(titleKey)}
+          </Typography>
+        </Box>
 
-      <Divider sx={{ width: "100%", mb: 2, zIndex: 1 }} />
+        <Divider sx={{ width: "100%", mb: 2, zIndex: 1 }} />
 
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: isMobile ? "column" : "row",
-          alignItems: "center",
-          width: "100%",
-          zIndex: 1,
-        }}
-      >
-        {loading ? (
-          <Skeleton variant="circular" width={200} height={200} />
-        ) : (
-          <PieChart
-            colors={brandColors}
-            series={[
-              {
-                data: chartData,
-                outerRadius: 100,
-                highlightScope: { faded: "global", highlighted: "item" },
-                faded: { innerRadius: 30, additionalRadius: -30, color: "gray" },
-                arcLabel: (item) => `${item.label}: ${item.value}`,
-              },
-            ]}
-            height={200}
-            width={200}
-            slotProps={{
-              legend: { hidden: true },
-            }}
-            sx={{
-              flex: 1,
-              position: "relative",
-              left: isMobile ? "50px" : "auto",
-              right: isMobile ? "auto" : "-20px",
-            }}
-          />
-        )}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            alignItems: "center",
+            width: "100%",
+            zIndex: 1,
+          }}
+        >
+          {loading ? (
+            <Skeleton variant="circular" width={200} height={200} />
+          ) : (
+            <PieChart
+              colors={brandColors}
+              series={[
+                {
+                  data: chartData,
+                  outerRadius: 100,
+                  highlightScope: { faded: "global", highlighted: "item" },
+                  faded: {
+                    innerRadius: 30,
+                    additionalRadius: -30,
+                    color: "gray",
+                  },
+                  arcLabel: (item) => `${item.label}: ${item.value}`,
+                },
+              ]}
+              height={200}
+              width={200}
+              slotProps={{
+                legend: { hidden: true },
+              }}
+              sx={{
+                flex: 1,
+                position: "relative",
+                left: isMobile ? "50px" : "auto",
+                right: isMobile ? "auto" : "-20px",
+              }}
+            />
+          )}
 
-        {loading ? (
-          <Skeleton variant="rectangular" width="60%" height={30} sx={{ borderRadius: "12px", mt: 2 }} />
-        ) : (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: isMobile ? "center" : "flex-start",
-              mt: isMobile ? 2 : 0,
-              ml: isMobile ? 0 : 2,
-            }}
-          >
-            {topBrandsData.map((brand, index) => (
-              <Box key={brand.id} display="flex" alignItems="center" mb={1}>
-                <Box
-                  sx={{
-                    width: 16,
-                    height: 16,
-                    backgroundColor: brandColors[index],
-                    marginRight: 1,
-                    borderRadius: "50%",
-                  }}
-                />
-                <Typography variant="body2" sx={{ textShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)" }}>
-                  {brand.label}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-        )}
-      </Box>
-    </Paper>
-  );
-});
+          {loading ? (
+            <Skeleton
+              variant="rectangular"
+              width="60%"
+              height={30}
+              sx={{ borderRadius: "12px", mt: 2 }}
+            />
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: isMobile ? "center" : "flex-start",
+                mt: isMobile ? 2 : 0,
+                ml: isMobile ? 0 : 2,
+              }}
+            >
+              {topBrandsData.map((brand, index) => (
+                <Box key={brand.id} display="flex" alignItems="center" mb={1}>
+                  <Box
+                    sx={{
+                      width: 16,
+                      height: 16,
+                      backgroundColor: brandColors[index],
+                      marginRight: 1,
+                      borderRadius: "50%",
+                    }}
+                  />
+                  <Typography
+                    variant="body2"
+                    sx={{ textShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)" }}
+                  >
+                    {brand.label}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          )}
+        </Box>
+      </Paper>
+    );
+  }
+);
 
 TopBrandsSold.displayName = "TopBrandsSold";
 

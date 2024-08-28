@@ -19,7 +19,6 @@ export const useHandleSignin = (onClose: () => void) => {
 
   const { handleLogin, handleRegister } = useAuth();
 
-
   const toggleMode = () => {
     setIsLoginMode(!isLoginMode);
   };
@@ -92,20 +91,20 @@ export const useHandleSignin = (onClose: () => void) => {
         );
       }
     } catch (error: unknown) {
-  // Handling the error with proper type checking
-  if (error instanceof Error) {
-    setAlertMessage("An unexpected error occurred");
-    setAlertSeverity("error");
-    setAlertOpen(true);
-  } else {
-    // Fallback in case error is not an instance of Error
-    setAlertMessage("An unknown error occurred");
-    setAlertSeverity("error");
-    setAlertOpen(true);
-  }
-} finally {
-  setLoading(false);
-}
+      // Handling the error with proper type checking
+      if (error instanceof Error) {
+        setAlertMessage("An unexpected error occurred");
+        setAlertSeverity("error");
+        setAlertOpen(true);
+      } else {
+        // Fallback in case error is not an instance of Error
+        setAlertMessage("An unknown error occurred");
+        setAlertSeverity("error");
+        setAlertOpen(true);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return {

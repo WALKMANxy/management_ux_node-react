@@ -1,5 +1,3 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -13,6 +11,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import React from "react";
+import { useTranslation } from "react-i18next";
 import { ArticlesListProps } from "../../../models/propsModels";
 import AGGridTable from "./AGGridTable";
 
@@ -53,7 +53,9 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
         <Typography variant="h6">{t("articleList.title")}</Typography>
         <IconButton
           onClick={() => setArticleListCollapsed(!isArticleListCollapsed)}
-          aria-label={t(isArticleListCollapsed ? "common.expand" : "common.collapse")}
+          aria-label={t(
+            isArticleListCollapsed ? "common.expand" : "common.collapse"
+          )}
         >
           {isArticleListCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
         </IconButton>
@@ -80,7 +82,10 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
                 onChange={onFilterTextBoxChanged}
                 value={quickFilterText}
               />
-              <IconButton onClick={handleMenuOpen} aria-label={t("common.moreOptions")}>
+              <IconButton
+                onClick={handleMenuOpen}
+                aria-label={t("common.moreOptions")}
+              >
                 <MoreVertIcon />
               </IconButton>
             </Box>

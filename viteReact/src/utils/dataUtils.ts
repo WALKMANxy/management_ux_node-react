@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { Movement } from "../models/dataModels";
-import { Agent, Client } from "../models/entityModels";
+import { Admin, Agent, Client } from "../models/entityModels";
 import { ignoreArticleNames } from "./constants";
 
 // Helper function to get month and year from a date string
@@ -364,3 +364,72 @@ export const numberComparator = (valueA: number, valueB: number) => {
 
 export const getTrend = (percentage: string | number) =>
   parseFloat(`${percentage}`) > 50 ? "up" : "down";
+
+export const getClientListByRole = (
+  role: "admin" | "agent" | "client" | undefined,
+  currentUserData: Admin | Client | Agent | null,
+  clients: Record<string, Client>
+): Client[] => {
+  if (!currentUserData) return [];
+
+  switch (role) {
+    case "agent":
+      return Object.values(clients).filter(
+        (client) => client.agent === currentUserData.id
+      );
+    case "client":
+      return [currentUserData as Client];
+    case "admin":
+      return Object.values(clients);
+    default:
+      return [];
+  }
+};
+
+export const getMovementsByRole = (
+  role: "admin" | "agent" | "client" | undefined,
+  currentUserData: Admin | Client | Agent | null,
+  clients: Record<string, Client>
+): Movement[] => {
+  if (!currentUserData) return [];
+
+  switch (role) {
+    case "agent":
+      return Object.values(clients)
+        .filter((client) => client.agent === currentUserData.id)
+        .flatMap((client) => client.movements);
+    case "client":
+      return (currentUserData as Client).movements;
+    case "admin":
+      return Object.values(clients).flatMap((client) => client.movements);
+    default:
+      return [];
+  }
+};
+
+export const filterCurrentMonthMovements = (
+  movements: Movement[],
+  currentMonth: number,
+  currentYear: number
+) =>
+  movements.filter((movement) => {
+    const movementDate = new Date(movement.dateOfOrder);
+    return (
+      movementDate.getMonth() === currentMonth &&
+      movementDate.getFullYear() === currentYear
+    );
+  });
+
+export const calculateRevenue = (movements: Movement[]) =>
+  movements.reduce(
+    (movementSum, movement) =>
+      movementSum +
+      movement.details.reduce(
+        (detailSum, detail) => detailSum + (parseFloat(detail.priceSold) || 0),
+        0
+      ),
+    0
+  );
+
+export const calculatePercentage = (part: number, total: number): string =>
+  total === 0 ? "0.00" : ((part / total) * 100).toFixed(2);

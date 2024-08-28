@@ -25,7 +25,7 @@ import GlobalSearch from "../../components/Header/GlobalSearch";
 import MonthOverMonthSpendingTrend from "../../components/statistics/charts/MonthOverMonthSpendingTrend";
 import SalesDistribution from "../../components/statistics/charts/SalesDistribution";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
-import { setVisits } from "../../features/calendar/calendarSlice";
+import { setVisits } from "../../features/utility/utilitySlice";
 import useSelectionState from "../../hooks/useSelectionState";
 import useStats from "../../hooks/useStats";
 import { brandColors } from "../../utils/constants";

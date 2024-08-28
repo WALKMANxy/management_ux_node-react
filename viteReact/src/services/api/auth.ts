@@ -2,8 +2,8 @@
 
 import axios from "axios";
 import Cookies from "js-cookie";
-import { authApiCall } from "./apiUtils";
 import { getDeviceId, getUserAgent } from "../../utils/deviceUtils";
+import { authApiCall } from "./apiUtils";
 
 const baseUrl = process.env.VITE_API_BASE_URL || "";
 const googleClientId = process.env.VITE_GOOGLE_CLIENT_ID || "";
