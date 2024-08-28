@@ -1,7 +1,7 @@
 export type SearchResult = {
   id: string;
   name: string;
-  type: 'client' | 'agent' | 'article' | 'promo' | 'visit' | 'alert';
+  type: "client" | "agent" | "article" | "promo" | "visit" | "alert";
 
   // Article-specific properties
   articleId?: string;
@@ -29,6 +29,6 @@ export type SearchResult = {
   // Alert-specific properties
   createdAt: string;
   alertReason: string;
-  severity: 'low' | 'medium' | 'high';
+  severity: "low" | "medium" | "high";
   alertIssuedBy?: string;
 };

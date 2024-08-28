@@ -17,7 +17,7 @@ import TopArticleType from "../../components/dashboard/TopArticleType";
 import UpcomingVisits from "../../components/dashboard/UpcomingVisits";
 import MonthOverMonthSpendingTrend from "../../components/statistics/charts/MonthOverMonthSpendingTrend";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
-import { setVisits } from "../../features/calendar/calendarSlice";
+import { setVisits } from "../../features/utility/utilitySlice";
 import useStats from "../../hooks/useStats"; // Use the new unified hook
 import { brandColors } from "../../utils/constants";
 

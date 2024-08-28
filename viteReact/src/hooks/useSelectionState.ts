@@ -1,11 +1,15 @@
 import { useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
+import {
+  clearSelection,
+  selectAgent,
+  selectClient,
+} from "../features/data/dataSlice";
 import { SearchResult } from "../models/searchModels";
 import useStats from "./useStats";
-import { selectClient, selectAgent, clearSelection } from "../features/data/dataSlice";
+import { UseSelectionStateReturn } from "../models/dataSetTypes";
 
-const useSelectionState = (isMobile: boolean) => {
-  const dispatch = useDispatch();
+const useSelectionState = (isMobile: boolean): UseSelectionStateReturn => {  const dispatch = useDispatch();
   const {
     selectedClient,
     selectedAgent,
@@ -41,11 +45,19 @@ const useSelectionState = (isMobile: boolean) => {
   useEffect(() => {
     const selectedItem = sessionStorage.getItem("selectedItem");
     if (selectedItem) {
-      const item = JSON.parse(selectedItem);
-      if (item.type === "client") {
-        dispatch(selectClient(item.id));
-      } else if (item.type === "agent") {
-        dispatch(selectAgent(item.id));
+      try {
+        const item = JSON.parse(selectedItem);
+        if (item.type === "client") {
+          dispatch(selectClient(item.id));
+        } else if (item.type === "agent") {
+          dispatch(selectAgent(item.id));
+        }
+      } catch (error) {
+        console.error(
+          "Failed to parse selected item from session storage:",
+          error
+        );
+        sessionStorage.removeItem("selectedItem");
       }
     }
   }, [dispatch]);

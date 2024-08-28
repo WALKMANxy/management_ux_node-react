@@ -12,7 +12,7 @@ if (!baseUrl || baseUrl === "") {
 export const apiCall = async <T>(
   endpoint: string,
   method: "GET" | "POST" | "PUT" | "PATCH",
-  data?: any
+  data?: unknown
 ): Promise<T> => {
   try {
     const response = await axios({
@@ -52,7 +52,7 @@ export const apiCall = async <T>(
 export const authApiCall = async <T>(
   endpoint: string,
   method: "GET" | "POST",
-  data?: any
+  data?: unknown
 ): Promise<T & { message: string; statusCode: number }> => {
   try {
     const config: AxiosRequestConfig = {

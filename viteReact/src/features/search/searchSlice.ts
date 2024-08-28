@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { SearchState } from "../../models/stateModels";
-import { SearchParams, SearchResult } from "../../models/searchModels";
+import { SearchResult } from "../../models/searchModels";
 import {Client } from "../../models/entityModels";
 
 const initialState: SearchState = {

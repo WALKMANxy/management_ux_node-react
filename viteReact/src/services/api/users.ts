@@ -17,6 +17,8 @@ export const updateUserById = async (
 };
 
 // New function to fetch linked entities
-export const getLinkedEntities = async (): Promise<{ linkedEntities: string[] }> => {
-  return apiCall<{ linkedEntities: string[] }>('linked-entities', 'GET');
+export const getLinkedEntities = async (): Promise<{
+  linkedEntities: string[];
+}> => {
+  return apiCall<{ linkedEntities: string[] }>("linked-entities", "GET");
 };

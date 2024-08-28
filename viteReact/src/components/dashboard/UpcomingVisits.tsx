@@ -10,16 +10,35 @@ import {
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { selectVisits } from "../../features/visits/visitsSlice";
+import {
+  selectVisits,
+  VisitWithAgent,
+} from "../../features/utility/utilitySlice"; // Updated import
 import { UpcomingVisitsProps } from "../../models/propsModels";
-import { Visit } from "../../models/dataModels";
 
 const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
   const { t } = useTranslation();
   const visits = useSelector(selectVisits);
 
+  const getUpcomingVisits = () => {
+    // Filter visits to include only those that are pending and not completed
+    const filteredVisits = visits.filter(
+      (visit) => visit.pending && !visit.completed
+    );
+
+    // Sort the visits by date (earliest first)
+    const sortedVisits = filteredVisits.sort(
+      (a, b) => +new Date(a.date) - +new Date(b.date)
+    );
+
+    // Return the top 3 upcoming visits
+    return sortedVisits.slice(0, 3);
+  };
+
   const renderVisitList = () => {
-    if (visits.length === 0) {
+    const upcomingVisits = getUpcomingVisits();
+
+    if (upcomingVisits.length === 0) {
       return (
         <Typography variant="body1">
           {t("upcomingVisits.noProgrammedVisits")}
@@ -29,15 +48,17 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
 
     return (
       <List>
-        {visits.map((visit: Visit) => (
+        {upcomingVisits.map((visit: VisitWithAgent) => (
           <ListItem key={visit.id}>
             <ListItemText
               primary={t("upcomingVisits.visitDetails", {
                 type: visit.type,
                 reason: visit.reason,
+                clientId: visit.clientId,
+                agentName: visit.agentName,
               })}
               secondary={t("upcomingVisits.visitDate", {
-                date: visit.date,
+                date: visit.date.toLocaleDateString(),
                 pending: visit.pending ? t("common.yes") : t("common.no"),
               })}
             />

@@ -1,4 +1,6 @@
-import React, { useMemo, useCallback } from 'react';
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
   Box,
   Collapse,
@@ -8,13 +10,11 @@ import {
   Paper,
   TextField,
   Typography,
-} from '@mui/material';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { useTranslation } from 'react-i18next';
-import { ClientListProps } from '../../../models/propsModels';
-import AGGridTable from './AGGridTable';
+} from "@mui/material";
+import React, { useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { ClientListProps } from "../../../models/propsModels";
+import AGGridTable from "./AGGridTable";
 
 const ClientList: React.FC<ClientListProps> = ({
   quickFilterText,
@@ -48,24 +48,27 @@ const ClientList: React.FC<ClientListProps> = ({
     setClientListCollapsed(!isClientListCollapsed);
   }, [isClientListCollapsed, setClientListCollapsed]);
 
-  const memoizedFilteredClients = useMemo(() => filteredClients(), [filteredClients]);
+  const memoizedFilteredClients = useMemo(
+    () => filteredClients(),
+    [filteredClients]
+  );
 
   return (
     <Paper elevation={8} sx={{ mb: 2 }}>
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
           p: 2,
         }}
       >
-        <Typography variant="h6">{t('clientList.title')}</Typography>
+        <Typography variant="h6">{t("clientList.title")}</Typography>
         <IconButton
           onClick={toggleClientListCollapse}
           aria-expanded={!isClientListCollapsed}
           aria-label={t(
-            isClientListCollapsed ? 'clientList.expand' : 'clientList.collapse'
+            isClientListCollapsed ? "clientList.expand" : "clientList.collapse"
           )}
         >
           {isClientListCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
@@ -75,49 +78,49 @@ const ClientList: React.FC<ClientListProps> = ({
         <Box sx={{ p: 2 }}>
           <Box
             sx={{
-              display: 'flex',
-              flexDirection: isMobile ? 'column' : 'row',
+              display: "flex",
+              flexDirection: isMobile ? "column" : "row",
               gap: 2,
               mb: 2,
             }}
           >
             <Box
-              sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}
+              sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}
             >
               <TextField
                 id="filter-text-box"
-                placeholder={t('clientList.quickFilterPlaceholder')}
+                placeholder={t("clientList.quickFilterPlaceholder")}
                 variant="outlined"
                 size="small"
                 fullWidth
                 onChange={onFilterTextBoxChanged}
                 value={quickFilterText}
-                aria-label={t('clientList.quickFilterAriaLabel')}
+                aria-label={t("clientList.quickFilterAriaLabel")}
               />
               <IconButton
                 onClick={handleMenuOpen}
-                aria-label={t('clientList.moreOptions')}
+                aria-label={t("clientList.moreOptions")}
               >
                 <MoreVertIcon />
               </IconButton>
             </Box>
             <TextField
               type="date"
-              label={t('clientList.startDate')}
+              label={t("clientList.startDate")}
               InputLabelProps={{ shrink: true }}
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               fullWidth={isMobile}
-              aria-label={t('clientList.startDateAriaLabel')}
+              aria-label={t("clientList.startDateAriaLabel")}
             />
             <TextField
               type="date"
-              label={t('clientList.endDate')}
+              label={t("clientList.endDate")}
               InputLabelProps={{ shrink: true }}
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               fullWidth={isMobile}
-              aria-label={t('clientList.endDateAriaLabel')}
+              aria-label={t("clientList.endDateAriaLabel")}
             />
           </Box>
           <Menu
@@ -126,7 +129,7 @@ const ClientList: React.FC<ClientListProps> = ({
             onClose={handleMenuClose}
           >
             <MenuItem onClick={exportDataAsCsv}>
-              {t('clientList.exportCSV')}
+              {t("clientList.exportCSV")}
             </MenuItem>
           </Menu>
           <AGGridTable
@@ -143,4 +146,5 @@ const ClientList: React.FC<ClientListProps> = ({
   );
 };
 
-export default ClientList; React.memo(ClientList);
+export default ClientList;
+React.memo(ClientList);

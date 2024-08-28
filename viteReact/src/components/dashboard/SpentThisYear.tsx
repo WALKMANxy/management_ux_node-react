@@ -1,25 +1,21 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import { useTranslation } from "react-i18next";
-import { useTheme, Theme } from "@mui/material/styles";
-import {
-  Avatar,
-  Box,
-  Grid,
-  Paper,
-  Typography,
-} from "@mui/material";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
+import { Theme, useTheme } from "@mui/material/styles";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { ComparisonDetails, SpentThisYearProps } from "../../models/propsModels";
+import {
+  ComparisonDetails,
+  SpentThisYearProps,
+} from "../../models/propsModels";
 import { currencyFormatter } from "../../utils/dataUtils";
 
 const AGENT_HIGH_THRESHOLD = 10;
 const AGENT_NEUTRAL_THRESHOLD = 5;
-const CLIENT_HIGH_THRESHOLD = 1.10;
+const CLIENT_HIGH_THRESHOLD = 1.1;
 const CLIENT_NEUTRAL_THRESHOLD = 0.75;
-
 
 const getComparisonDetails = (
   comparison: number,
@@ -29,19 +25,43 @@ const getComparisonDetails = (
 ): ComparisonDetails => {
   if (isAgentComparison) {
     if (comparison >= AGENT_HIGH_THRESHOLD) {
-      return { color: theme.palette.success.main, icon: <ArrowUpwardIcon fontSize="inherit" />, text: t("more") };
+      return {
+        color: theme.palette.success.main,
+        icon: <ArrowUpwardIcon fontSize="inherit" />,
+        text: t("more"),
+      };
     } else if (comparison >= AGENT_NEUTRAL_THRESHOLD) {
-      return { color: theme.palette.grey[500], icon: <ArrowUpwardIcon fontSize="inherit" />, text: t("neutral") };
+      return {
+        color: theme.palette.grey[500],
+        icon: <ArrowUpwardIcon fontSize="inherit" />,
+        text: t("neutral"),
+      };
     } else {
-      return { color: theme.palette.error.main, icon: <ArrowDownwardIcon fontSize="inherit" />, text: t("less") };
+      return {
+        color: theme.palette.error.main,
+        icon: <ArrowDownwardIcon fontSize="inherit" />,
+        text: t("less"),
+      };
     }
   } else {
     if (comparison >= CLIENT_HIGH_THRESHOLD) {
-      return { color: theme.palette.success.main, icon: <ArrowUpwardIcon fontSize="inherit" />, text: t("more") };
+      return {
+        color: theme.palette.success.main,
+        icon: <ArrowUpwardIcon fontSize="inherit" />,
+        text: t("more"),
+      };
     } else if (comparison > CLIENT_NEUTRAL_THRESHOLD) {
-      return { color: theme.palette.grey[500], icon: <ArrowUpwardIcon fontSize="inherit" />, text: t("neutral") };
+      return {
+        color: theme.palette.grey[500],
+        icon: <ArrowUpwardIcon fontSize="inherit" />,
+        text: t("neutral"),
+      };
     } else {
-      return { color: theme.palette.error.main, icon: <ArrowDownwardIcon fontSize="inherit" />, text: t("less") };
+      return {
+        color: theme.palette.error.main,
+        icon: <ArrowDownwardIcon fontSize="inherit" />,
+        text: t("less"),
+      };
     }
   }
 };
@@ -150,7 +170,7 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
                       bgcolor: comparisonDetails.color,
                       color: "#000",
                     }}
-                    aria-label={`${comparisonDetails.text} ${t('comparedTo')}`}
+                    aria-label={`${comparisonDetails.text} ${t("comparedTo")}`}
                   >
                     {comparisonDetails.icon}
                   </Avatar>
@@ -190,4 +210,5 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
   );
 };
 
-export default SpentThisYear; React.memo(SpentThisYear);
+export default SpentThisYear;
+React.memo(SpentThisYear);

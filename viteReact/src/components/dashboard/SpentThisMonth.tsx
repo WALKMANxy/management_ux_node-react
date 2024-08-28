@@ -6,10 +6,11 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
+import {
+  ComparisonResult,
+  SpentThisMonthProps,
+} from "../../models/propsModels";
 import { currencyFormatter } from "../../utils/dataUtils";
-import { ComparisonResult, SpentThisMonthProps } from "../../models/propsModels";
-
-
 
 const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
   amount,
@@ -24,21 +25,52 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
 
   const getComparisonResult = (value: number): ComparisonResult => {
     const isAgentComparison = userRole === "admin" && isAgentSelected;
-    const isClientComparison = (userRole === "admin" && !isAgentSelected) || userRole === "agent";
+    const isClientComparison =
+      (userRole === "admin" && !isAgentSelected) || userRole === "agent";
 
     if (isAgentComparison) {
-      if (value >= 10) return { color: theme.palette.success.main, icon: <ArrowUpwardIcon fontSize="inherit" />, text: t("more") };
-      if (value >= 5) return { color: theme.palette.grey[500], icon: <ArrowUpwardIcon fontSize="inherit" />, text: t("neutral") };
-      return { color: theme.palette.error.main, icon: <ArrowDownwardIcon fontSize="inherit" />, text: t("less") };
+      if (value >= 10)
+        return {
+          color: theme.palette.success.main,
+          icon: <ArrowUpwardIcon fontSize="inherit" />,
+          text: t("more"),
+        };
+      if (value >= 5)
+        return {
+          color: theme.palette.grey[500],
+          icon: <ArrowUpwardIcon fontSize="inherit" />,
+          text: t("neutral"),
+        };
+      return {
+        color: theme.palette.error.main,
+        icon: <ArrowDownwardIcon fontSize="inherit" />,
+        text: t("less"),
+      };
     } else if (isClientComparison) {
-      if (value >= 1.25) return { color: theme.palette.success.main, icon: <ArrowUpwardIcon fontSize="inherit" />, text: t("more") };
-      if (value > 0.75) return { color: theme.palette.grey[500], icon: <ArrowUpwardIcon fontSize="inherit" />, text: t("neutral") };
-      return { color: theme.palette.error.main, icon: <ArrowDownwardIcon fontSize="inherit" />, text: t("less") };
+      if (value >= 1.25)
+        return {
+          color: theme.palette.success.main,
+          icon: <ArrowUpwardIcon fontSize="inherit" />,
+          text: t("more"),
+        };
+      if (value > 0.75)
+        return {
+          color: theme.palette.grey[500],
+          icon: <ArrowUpwardIcon fontSize="inherit" />,
+          text: t("neutral"),
+        };
+      return {
+        color: theme.palette.error.main,
+        icon: <ArrowDownwardIcon fontSize="inherit" />,
+        text: t("less"),
+      };
     }
     return { color: "", icon: <></>, text: "" };
   };
 
-  const comparisonResult = comparison ? getComparisonResult(comparison.value) : null;
+  const comparisonResult = comparison
+    ? getComparisonResult(comparison.value)
+    : null;
 
   const styles = {
     paper: {
@@ -136,9 +168,13 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
             </Grid>
           </Grid>
           <Grid item sx={{ mb: 1.25 }}>
-            <Typography sx={styles.title}>{t("spentThisMonth.title")}</Typography>
+            <Typography sx={styles.title}>
+              {t("spentThisMonth.title")}
+            </Typography>
             {userRole !== "client" && comparisonResult && (
-              <Typography sx={{ ...styles.comparison, color: comparisonResult.color }}>
+              <Typography
+                sx={{ ...styles.comparison, color: comparisonResult.color }}
+              >
                 {Math.abs(comparison!.value)}% {comparisonResult.text}{" "}
                 {userRole === "admin" && isAgentSelected
                   ? t("comparedToOtherAgents")
@@ -152,4 +188,5 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
   );
 };
 
-export default SpentThisMonth; React.memo(SpentThisMonth);
+export default SpentThisMonth;
+React.memo(SpentThisMonth);

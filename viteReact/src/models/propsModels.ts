@@ -14,8 +14,13 @@ export type AuthHandlersProps = {
   agents: Agent[];
 };
 
+export interface HighlightedDay {
+  date: number;
+  color: string;
+}
+
 export interface ServerDayProps extends PickersDayProps<Dayjs> {
-  highlightedDays?: number[];
+  highlightedDays?: HighlightedDay[];
 }
 
 export type GlobalSearchProps = {
