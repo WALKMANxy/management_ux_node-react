@@ -6,49 +6,34 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
 import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../app/store";
-import { selectVisits } from "../../features/utility/utilitySlice";
-import { Visit } from "../../models/dataModels";
-import { Agent } from "../../models/entityModels";
+import { selectVisits, VisitWithAgent } from "../../features/utility/utilitySlice";
 import { ServerDayProps } from "../../models/propsModels";
 import { agentColorMap } from "../../utils/constants";
-import ServerDay from "./ServerDay"; // Import the ServerDay component
-
-type VisitWithAgent = Visit & { agentId?: string; agentName?: string };
+import ServerDay from "./ServerDay";
+import { DataSliceState } from "../../models/stateModels";
 
 const CalendarComponent: React.FC = () => {
   const visits = useSelector(selectVisits);
-  const currentUserData = useSelector(
-    (state: RootState) => state.data.currentUserData
-  );
+  const currentUserDetails = useSelector((state: DataSliceState) => state.currentUserDetails);
+  const clients = useSelector((state: DataSliceState) => state.clients);
   const [isLoading, setIsLoading] = useState(false);
-  const [highlightedDays, setHighlightedDays] = useState<
-    { date: number; color: string }[]
-  >([]);
+  const [highlightedDays, setHighlightedDays] = useState<{ date: number; color: string }[]>([]);
   const [currentMonth, setCurrentMonth] = useState<Dayjs>(dayjs());
 
   const updateHighlightedDays = useCallback(
     (month: Dayjs) => {
       const days = visits
-        .filter(
-          (visit: VisitWithAgent) =>
-            visit?.date && dayjs(visit.date).isSame(month, "month")
-        )
+        .filter((visit: VisitWithAgent) => visit?.date && dayjs(visit.date).isSame(month, "month"))
         .map((visit: VisitWithAgent) => {
           let color = "#ADD8E6"; // Default pastel blue
 
-          if (currentUserData) {
-            if ("GlobalVisits" in currentUserData) {
+          if (currentUserDetails) {
+            if (currentUserDetails.role === "admin") {
               // Admin view, color by agent
-              color = visit.agentId
-                ? agentColorMap[visit.agentId] ?? color
-                : color;
-            } else if ("AgentVisits" in currentUserData) {
+              color = visit.agentId ? agentColorMap[visit.agentId] ?? color : color;
+            } else if (currentUserDetails.role === "agent") {
               // Agent view, color by client
-              const agentData = currentUserData as Agent;
-              const client = agentData.clients.find(
-                (c) => c.id === visit.clientId
-              );
+              const client = clients[visit.clientId];
               color = client?.colour ?? color;
             }
             // Clients have a single default color, no change needed
@@ -59,7 +44,7 @@ const CalendarComponent: React.FC = () => {
 
       setHighlightedDays(days);
     },
-    [visits, currentUserData]
+    [visits, currentUserDetails, clients]
   );
 
   useEffect(() => {

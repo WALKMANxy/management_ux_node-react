@@ -8,6 +8,7 @@ import ArticlesList from "../../components/statistics/grids/ArticlesList";
 import { useArticlesGrid } from "../../hooks/useArticlesGrid";
 import { ArticleColumnDefinition } from "../../models/propsModels";
 import { currencyFormatter } from "../../utils/dataUtils";
+import { MovementDetail } from "../../models/dataModels";
 
 const ArticlesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -50,7 +51,7 @@ const ArticlesPage: React.FC = () => {
         field: "name",
         filter: "agTextColumnFilter",
         sortable: true,
-        cellRenderer: (params: any) => {
+        cellRenderer: (params: { data: MovementDetail; value: string }) => {
           return (
             <span
               onDoubleClick={() => handleArticleSelect(params.data.articleId)}
@@ -83,19 +84,19 @@ const ArticlesPage: React.FC = () => {
           headerName: t("articlesPage.unitPrice"),
           field: "unitPrice",
           filter: "agNumberColumnFilter",
-          valueFormatter: (params: any) => currencyFormatter(params.value),
+          valueFormatter: (params: { value: string }) => currencyFormatter(params.value),
           sortable: true,
         },
         {
           headerName: t("articlesPage.cost"),
           field: "priceBought",
           filter: "agNumberColumnFilter",
-          valueFormatter: (params: any) => currencyFormatter(params.value),
+          valueFormatter: (params: { value: string }) => currencyFormatter(params.value),
           sortable: true,
         },
         {
           headerName: t("articlesPage.quantitySold"),
-          valueGetter: (params: any) =>
+          valueGetter: (params: { data: MovementDetail }) =>
             totalQuantitySold[params.data.articleId] || 0,
           filter: "agNumberColumnFilter",
           sortable: true,

@@ -74,7 +74,7 @@ const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children, fallback }) => 
         <ErrorMessage>
           {t('errorBoundary.message', 'We\'re sorry for the inconvenience. Please try again or contact support if the problem persists.')}
         </ErrorMessage>
-        {process.env.NODE_ENV === 'development' && error && (
+        {import.meta.env.NODE_ENV === 'development' && error && (
           <Box>
             <ErrorDetails>
               {error.toString()}

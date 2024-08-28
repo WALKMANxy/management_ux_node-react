@@ -1,8 +1,7 @@
 import { io, Socket } from "socket.io-client";
-import { Alert } from "../models/dataModels";
 import store from "../app/store";
 import { addAlert, updateAlert } from "../features/data/dataSlice"; // Assuming dataSlice is in features/data
-import { Admin, Agent, Client } from "../models/entityModels";
+import { Alert } from "../models/dataModels";
 
 class WebSocketService {
   private socket: Socket | null = null;
@@ -10,12 +9,12 @@ class WebSocketService {
   private maxReconnectAttempts = 5;
 
   connect() {
-    if (!process.env.REACT_APP_API_URL) {
+    if (!import.meta.env.VITE_APP_API_URL) {
       console.error("REACT_APP_API_URL is not defined");
       return;
     }
 
-    this.socket = io(process.env.REACT_APP_API_URL, {
+    this.socket = io(import.meta.env.VITE_APP_API_URL, {
       withCredentials: true, // This allows the cookie to be sent
       transports: ["websocket"],
     });
@@ -60,30 +59,22 @@ class WebSocketService {
   private tryReconnect() {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
-      console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+      console.log(
+        `Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})`
+      );
       setTimeout(() => this.socket?.connect(), 5000 * this.reconnectAttempts);
     } else {
-      console.error("Max reconnection attempts reached. Please refresh the page.");
+      console.error(
+        "Max reconnection attempts reached. Please refresh the page."
+      );
     }
   }
 
   // This function should now look inside currentUserData for the alerts
   private findAlertById(alertId: string): Alert | undefined {
     const state = store.getState().data;
-    if (state.currentUserData) {
-      if (state.currentUserDetails?.role === "client") {
-        return (state.currentUserData as Client).clientAlerts.find(
-          (alert) => alert._id === alertId
-        );
-      } else if (state.currentUserDetails?.role === "agent") {
-        return (state.currentUserData as Agent).agentAlerts.find(
-          (alert) => alert._id === alertId
-        );
-      } else if (state.currentUserDetails?.role === "admin") {
-        return (state.currentUserData as Admin).adminAlerts.find(
-          (alert) => alert._id === alertId
-        );
-      }
+    if (state.currentUserAlerts) {
+      return state.currentUserAlerts.find((alert) => alert._id === alertId);
     }
     return undefined;
   }

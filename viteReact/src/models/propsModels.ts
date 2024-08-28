@@ -1,5 +1,9 @@
 import { PickersDayProps } from "@mui/x-date-pickers/PickersDay";
-import { ColDef } from "ag-grid-community";
+import {
+  ColDef,
+  ValueFormatterParams,
+  ValueGetterParams,
+} from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { Dayjs } from "dayjs";
 import { ReactNode } from "react";
@@ -30,14 +34,52 @@ export type GlobalSearchProps = {
   isHeaderSearch?: boolean;
 };
 
-export type DetailProps = {
-  detail: { [key: string]: any };
-  isLoading: boolean;
-};
 
-export type HistoryProps = {
-  history: { [key: string]: any }[];
-};
+export type MovementProp = {
+  detail: {
+    id: string;
+    dateOfOrder: string;
+    [key: string]: string | number;
+  };
+  isLoading: boolean;
+}
+
+export type ArticleProp = {
+  detail: {
+    articleId: string;
+    name: string;
+    brand: string;
+    priceSold: string;
+    priceBought: string;
+    [key: string]: string | number;
+  };
+  isLoading: boolean;
+}
+
+export type ClientProp = {
+  detail: {  id: string;
+    name: string;
+    extendedName?: string; // New property
+    province?: string;
+    phone?: string;
+    totalOrders: number;
+    totalRevenue: string;
+    unpaidRevenue: string;
+    address?: string;
+    email?: string;
+    pec?: string; // New property
+    taxCode?: string; // New property
+    extendedTaxCode?: string; // New property
+    paymentMethodID?: string; // New property
+    paymentMethod?: string; // New property
+    agent: string;
+    agentName?: string;
+    movements: Movement[];
+    colour?: string;
+  };
+  isLoading: boolean;
+}
+
 
 export type SearchResultsProps = {
   onSelect: (item: SearchResult) => void; // Change this to accept SearchResult
@@ -59,9 +101,34 @@ export type ArticleColumnDefinition = {
   field?: string;
   filter: string;
   sortable: boolean;
-  cellRenderer?: (params: any) => JSX.Element;
-  valueFormatter?: (params: any) => string;
-  valueGetter?: (params: any) => number;
+  cellRenderer?: (params: {
+    data: MovementDetail;
+    value: string;
+  }) => JSX.Element;
+  valueFormatter?: (params: ValueFormatterParams) => string;
+  valueGetter?: (params: ValueGetterParams) => number;
+};
+
+export type ClientColumnDefinition = {
+  headerName: string;
+  field?: string;
+  filter: string;
+  sortable: boolean;
+  cellRenderer?: (params: { data: Client; value: string }) => JSX.Element;
+  valueGetter?: (params: ValueGetterParams) => number | string;
+  valueFormatter?: (params: ValueFormatterParams) => string;
+  comparator?: (valueA: number, valueB: number) => number;
+};
+
+export type MovementColumnDefinition = {
+  headerName: string;
+  field?: keyof Movement | string; // Allow fields from Movement or string for additional calculated fields
+  filter?: string; // Filter type for the column
+  sortable: boolean;
+  cellRenderer?: (params: { data: Movement; value: string }) => JSX.Element;
+  valueFormatter?: (params: ValueFormatterParams) => string;
+  valueGetter?: (params: ValueGetterParams) => number | string;
+  comparator?: (valueA: number, valueB: number) => number; // Comparator function for sorting
 };
 
 export type ActivePromotionsProps = {
@@ -106,7 +173,7 @@ export type ClientListProps = {
   setStartDate: (value: string) => void;
   endDate: string;
   setEndDate: (value: string) => void;
-  filteredClients: () => any[];
+  filteredClients: Client[];
   columnDefs: ColDef[];
   gridRef: React.RefObject<AgGridReact>;
   handleMenuOpen: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -126,7 +193,7 @@ export type MovementListProps = {
   setStartDate: (value: string) => void;
   endDate: string;
   setEndDate: (value: string) => void;
-  filteredMovements: () => any[];
+  filteredMovements: () => Movement[];
   columnDefs: ColDef[];
   gridRef: React.RefObject<AgGridReact>;
   handleMenuOpen: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -162,7 +229,7 @@ export type UpcomingVisitsProps = {
 
 export type AGGridTableProps = {
   columnDefs: ColDef[];
-  rowData: any[];
+  rowData: unknown[];
   paginationPageSize: number;
   quickFilterText: string; // Added quickFilterText prop
 };

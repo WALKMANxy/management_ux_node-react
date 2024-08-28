@@ -1,28 +1,32 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { GlobalPromos, GlobalVisits, Promo, Visit } from "../models/dataModels";
+import { Admin, Agent, Client } from "../models/entityModels";
 import { DataSliceState } from "../models/stateModels";
 import { mapPromosToEntity, mapVisitsToEntity } from "../utils/dataLoader";
 import { generateErrorResponse } from "../utils/errorHandling";
 import { loadPromosData, loadVisitsData } from "./api/apiUtils";
-import { Client, Agent, Admin } from "../models/entityModels";
 
 export const updateApi = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({ baseUrl: "/" }),
   tagTypes: ["Client", "Agent", "Admin", "Visit", "Promo"],
   endpoints: (builder) => ({
-    updateVisits: builder.query<Client | Agent | Admin, void>({
+    updateVisits: builder.query<Visit[] | GlobalVisits, void>({
       queryFn: async (_, { getState }) => {
         try {
           const visits = await loadVisitsData();
 
           const state = getState() as { data: DataSliceState };
-          const entity = { ...state.data.currentUserData } as Client | Agent | Admin;
+          const entity = state.data.currentUserData as Client | Agent | Admin;
+          const role = state.data.currentUserDetails?.role;
 
-          if (!entity) throw new Error("No entity found in the state.");
+          if (!entity || !role)
+            throw new Error("No entity or role found in the state.");
 
-          mapVisitsToEntity(entity, visits);
+          // Map visits based on role
+          const mappedVisits = mapVisitsToEntity(entity, visits, role);
 
-          return { data: entity };
+          return { data: mappedVisits };
         } catch (error) {
           return generateErrorResponse(error);
         }
@@ -30,19 +34,22 @@ export const updateApi = createApi({
       providesTags: ["Visit"],
     }),
 
-    updatePromos: builder.query<Client | Agent | Admin, void>({
+    updatePromos: builder.query<Promo[] | GlobalPromos, void>({
       queryFn: async (_, { getState }) => {
         try {
           const promos = await loadPromosData();
 
           const state = getState() as { data: DataSliceState };
-          const entity = { ...state.data.currentUserData } as Client | Agent | Admin;
+          const entity = state.data.currentUserData as Client | Agent | Admin;
+          const role = state.data.currentUserDetails?.role;
 
-          if (!entity) throw new Error("No entity found in the state.");
+          if (!entity || !role)
+            throw new Error("No entity or role found in the state.");
 
-          mapPromosToEntity(entity, promos);
+          // Map promos based on role
+          const mappedPromos = mapPromosToEntity(entity, promos, role);
 
-          return { data: entity };
+          return { data: mappedPromos };
         } catch (error) {
           return generateErrorResponse(error);
         }

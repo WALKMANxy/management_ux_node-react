@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import { Bookmark, Calendar, ShoppingCart, Tag, User } from "lucide-react";
+import { Bookmark, Calendar, ShoppingCart, Tag, User, Bell } from "lucide-react";
 import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { SearchResultsProps } from "../../models/propsModels";
@@ -39,7 +39,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   const getIcon = (type: string) => {
     switch (type) {
       case "client":
-        return <User className="h-6 w-6" />;
       case "agent":
         return <User className="h-6 w-6" />;
       case "article":
@@ -48,27 +47,44 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         return <Tag className="h-6 w-6" />;
       case "visit":
         return <Calendar className="h-6 w-6" />;
+      case "alert":
+        return <Bell className="h-6 w-6" />;
       default:
         return <Bookmark className="h-6 w-6" />;
     }
   };
 
   const renderResultDetails = (result: SearchResult) => {
+    const formatDate = (date: string | Date | undefined) => {
+      if (!date) return t("searchResults.notAvailable");
+      return new Date(date).toLocaleDateString();
+    };
+
     switch (result.type) {
       case "client":
         return (
           <>
             <Typography>
-              {t("searchResults.province", { province: result.province })}
+              {t("searchResults.province", { province: result.province || t("searchResults.notAvailable") })}
             </Typography>
             <Typography>
-              {t("searchResults.phone", { phone: result.phone })}
+              {t("searchResults.phone", { phone: result.phone || t("searchResults.notAvailable") })}
             </Typography>
             <Typography>
               {t("searchResults.paymentMethod", {
-                paymentMethod: result.paymentMethod,
+                paymentMethod: result.paymentMethod || t("searchResults.notAvailable"),
               })}
             </Typography>
+            {result.email && (
+              <Typography>
+                {t("searchResults.email", { email: result.email })}
+              </Typography>
+            )}
+            {result.agent && (
+              <Typography>
+                {t("searchResults.agent", { agent: result.agent })}
+              </Typography>
+            )}
           </>
         );
       case "agent":
@@ -81,36 +97,38 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         return (
           <>
             <Typography>
-              {t("searchResults.articleId", { articleId: result.articleId })}
+              {t("searchResults.articleId", { articleId: result.articleId || t("searchResults.notAvailable") })}
             </Typography>
             <Typography>
-              {t("searchResults.brand", { brand: result.brand })}
+              {t("searchResults.brand", { brand: result.brand || t("searchResults.notAvailable") })}
             </Typography>
-            <Typography>
-              {t("searchResults.lastSoldDate", {
-                lastSoldDate: result.lastSoldDate,
-              })}
-            </Typography>
+            {result.lastSoldDate && (
+              <Typography>
+                {t("searchResults.lastSoldDate", {
+                  lastSoldDate: formatDate(result.lastSoldDate),
+                })}
+              </Typography>
+            )}
           </>
         );
       case "promo":
         return (
           <>
             <Typography>
-              {t("searchResults.promoType", { promoType: result.promoType })}
+              {t("searchResults.promoType", { promoType: result.promoType || t("searchResults.notAvailable") })}
             </Typography>
             <Typography>
               {t("searchResults.startDate", {
-                startDate: result.startDate.toLocaleDateString(),
+                startDate: formatDate(result.startDate),
               })}
             </Typography>
             <Typography>
               {t("searchResults.endDate", {
-                endDate: result.endDate.toLocaleDateString(),
+                endDate: formatDate(result.endDate),
               })}
             </Typography>
             <Typography>
-              {t("searchResults.issuedBy", { issuedBy: result.promoIssuedBy })}
+              {t("searchResults.issuedBy", { issuedBy: result.promoIssuedBy || t("searchResults.notAvailable") })}
             </Typography>
           </>
         );
@@ -119,7 +137,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
           <>
             <Typography>
               {t("searchResults.date", {
-                date: result.date.toLocaleDateString(),
+                date: formatDate(result.date),
               })}
             </Typography>
             <Typography>
@@ -132,7 +150,31 @@ const SearchResults: React.FC<SearchResultsProps> = ({
               })}
             </Typography>
             <Typography>
-              {t("searchResults.issuedBy", { issuedBy: result.visitIssuedBy })}
+              {t("searchResults.issuedBy", { issuedBy: result.visitIssuedBy || t("searchResults.notAvailable") })}
+            </Typography>
+            {result.reason && (
+              <Typography>
+                {t("searchResults.reason", { reason: result.reason })}
+              </Typography>
+            )}
+          </>
+        );
+      case "alert":
+        return (
+          <>
+            <Typography>
+              {t("searchResults.alertReason", { alertReason: result.alertReason || t("searchResults.notAvailable") })}
+            </Typography>
+            <Typography>
+              {t("searchResults.createdAt", {
+                createdAt: formatDate(result.createdAt),
+              })}
+            </Typography>
+            <Typography>
+              {t("searchResults.severity", { severity: result.severity || t("searchResults.notAvailable") })}
+            </Typography>
+            <Typography>
+              {t("searchResults.issuedBy", { issuedBy: result.alertIssuedBy || t("searchResults.notAvailable") })}
             </Typography>
           </>
         );

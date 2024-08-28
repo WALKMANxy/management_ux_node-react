@@ -15,7 +15,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { ClientDetailsProps } from "../../models/propsModels";
 import MovementsHistory from "../statistics/grids/MovementsHistory";
-import DetailComponent from "./DetailComponent";
+import DetailComponent from "./ClientDetailComponent";
 
 const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
   (

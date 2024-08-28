@@ -1,62 +1,70 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { Promo, Visit } from "../../models/dataModels";
-import { Admin } from "../../models/entityModels";
+import { Alert, Promo, Visit, GlobalVisits, GlobalPromos } from "../../models/dataModels";
+import { Agent } from "../../models/entityModels";
 
 // Extend the Visit type to include agent information for admins
 export type VisitWithAgent = Visit & { agentId?: string; agentName?: string };
 
 export const selectVisits = createSelector(
-  [(state: RootState) => state.data.currentUserData],
-  (currentUserData): VisitWithAgent[] => {
-    if (!currentUserData) return [];
+  [
+    (state: RootState) => state.data.currentUserVisits,
+    (state: RootState) => state.data.agents,
+    (state: RootState) => state.data.currentUserDetails,
+  ],
+  (currentUserVisits, agents, currentUserDetails): VisitWithAgent[] => {
+    if (!currentUserVisits || !currentUserDetails) return [];
 
-    if ("visits" in currentUserData) {
-      // Client case
-      return currentUserData.visits;
-    } else if ("AgentVisits" in currentUserData) {
-      // Agent case
-      return currentUserData.AgentVisits;
-    } else if ("GlobalVisits" in currentUserData) {
+    const findAgentForClient = (clientId: string): Agent | undefined => {
+      return Object.values(agents).find(agent =>
+        agent.clients.some(client => client.id === clientId)
+      );
+    };
+
+    const processVisit = (visit: Visit): VisitWithAgent => {
+      const agent = findAgentForClient(visit.clientId);
+      return {
+        ...visit,
+        agentId: agent?.id || 'unknown',
+        agentName: agent?.name || 'Unknown Agent',
+      };
+    };
+
+    if (Array.isArray(currentUserVisits)) {
+      // Client or Agent case
+      return currentUserVisits.map(processVisit);
+    } else {
       // Admin case
-      const adminData = currentUserData as Admin;
-
-      return Object.entries(adminData.GlobalVisits).flatMap(
-        ([agentId, { Visits }]) =>
-          Visits.map((visit) => ({
-            ...visit,
-            agentId,
-            agentName:
-              adminData.agents.find((agent) => agent.id === agentId)?.name ??
-              "Unknown Agent",
-          }))
+      const globalVisits = currentUserVisits as GlobalVisits;
+      return Object.values(globalVisits).flatMap(({ Visits }) =>
+        Visits.map(processVisit)
       );
     }
-
-    return [];
   }
 );
 
 export const selectPromos = createSelector(
-  [(state: RootState) => state.data.currentUserData],
-  (currentUserData): Promo[] => {
-    if (!currentUserData) return [];
+  [
+    (state: RootState) => state.data.currentUserPromos,
+    (state: RootState) => state.data.agents,
+  ],
+  (currentUserPromos): Promo[] => {
+    if (!currentUserPromos) return [];
 
-    if ("promos" in currentUserData) {
-      // Client case
-      return currentUserData.promos;
-    } else if ("AgentPromos" in currentUserData) {
-      // Agent case
-      return currentUserData.AgentPromos;
-    } else if ("GlobalPromos" in currentUserData) {
+    if (Array.isArray(currentUserPromos)) {
+      // Client or Agent case
+      return currentUserPromos;
+    } else {
       // Admin case
-      const adminData = currentUserData as Admin;
-
-      return Object.entries(adminData.GlobalPromos).flatMap(
-        ([, { Promos }]) => Promos
-      );
+      const globalPromos = currentUserPromos as GlobalPromos;
+      return Object.values(globalPromos).flatMap(({ Promos }) => Promos);
     }
+  }
+);
 
-    return [];
+export const selectAlerts = createSelector(
+  [(state: RootState) => state.data.currentUserAlerts],
+  (currentUserAlerts): Alert[] => {
+    return currentUserAlerts || [];
   }
 );

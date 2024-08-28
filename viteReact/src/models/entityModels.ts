@@ -1,4 +1,4 @@
-import { Alert, Movement, Promo, Visit } from "./dataModels";
+import { Movement } from "./dataModels";
 
 export type UserRole = "admin" | "agent" | "client" | "guest";
 
@@ -22,17 +22,6 @@ export type Admin = {
   email: string;
   agents: Agent[];
   clients: Client[];
-  GlobalVisits: {
-    [agentId: string]: {
-      Visits: Visit[];
-    };
-  };
-  GlobalPromos: {
-    [agentId: string]: {
-      Promos: Promo[];
-    };
-  };
-  adminAlerts: Alert[];
 };
 
 export type Client = {
@@ -51,12 +40,9 @@ export type Client = {
   extendedTaxCode?: string; // New property
   paymentMethodID?: string; // New property
   paymentMethod?: string; // New property
-  visits: Visit[];
   agent: string;
   agentName?: string;
   movements: Movement[];
-  promos: Promo[];
-  clientAlerts: Alert[];
   colour?: string;
 };
 
@@ -66,7 +52,4 @@ export type Agent = {
   email?: string;
   phone?: string;
   clients: Client[];
-  agentAlerts: Alert[];
-  AgentVisits: Visit[]; // New property
-  AgentPromos: Promo[]; // New property
 };

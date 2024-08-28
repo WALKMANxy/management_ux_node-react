@@ -1,4 +1,11 @@
-import { Alert, MovementDetail, Promo, Visit } from "../models/dataModels";
+import {
+  GlobalPromos,
+  GlobalVisits,
+  MovementDetail,
+  Promo,
+  Visit,
+} from "../models/dataModels";
+import { serverClient, serverMovement } from "../models/dataSetTypes";
 
 import { Admin, Agent, Client } from "../models/entityModels";
 
@@ -6,13 +13,12 @@ const workerScriptPath = new URL("./worker.js", import.meta.url);
 
 // Mapping data to models including the new data types (Visits, Promos, Alerts)
 export const mapDataToModels = async (
-  data: any[],
-  clientDetails: any[],
-  agentDetails: any[],
+  data: serverMovement[],
+  clientDetails: serverClient[],
+  agentDetails: Agent[],
   visits: Visit[] = [],
-  promos: Promo[] = [],
-  alerts: Alert[] = []
-): Promise<Client[]> => {
+  promos: Promo[] = []
+): Promise<{ clients: Client[]; visits: Visit[]; promos: Promo[] }> => {
   const numWorkers = Math.min(navigator.hardwareConcurrency || 4, data.length);
   const chunkSize = Math.ceil(data.length / numWorkers);
   const chunks = Array.from({ length: numWorkers }, (_, i) =>
@@ -38,9 +44,6 @@ export const mapDataToModels = async (
         data: chunk,
         clientDetails,
         agentDetails,
-        visits,
-        promos,
-        alerts,
       });
     });
   });
@@ -65,31 +68,44 @@ export const mapDataToModels = async (
     }
   });
 
-  return Array.from(resultsMap.values());
+  // Convert the map back to an array
+  const clients = Array.from(resultsMap.values());
+
+  // Filtering visits, promos, and alerts based on client associations
+  const filteredVisits = visits.filter((visit) =>
+    clients.some((client) => client.id === visit.clientId)
+  );
+  const filteredPromos = promos.filter((promo) =>
+    clients.some((client) => promo.clientsId.includes(client.id))
+  );
+
+  return {
+    clients,
+    visits: filteredVisits,
+    promos: filteredPromos,
+  };
 };
 
 // Mapping function for full agent data
 export const mapDataToAgents = async (
-  data: any[],
+  data: serverMovement[],
   agentDetails: Agent[],
   visits: Visit[] = [], // Default to an empty array if undefined
-  promos: Promo[] = [], // Default to an empty array if undefined
-  alerts: Alert[] = [] // Default to an empty array if undefined
-): Promise<Agent[]> => {
+  promos: Promo[] = [] // Default to an empty array if undefined
+): Promise<{ agents: Agent[]; visits: Visit[]; promos: Promo[] }> => {
   const agentsMap = new Map<string, Agent>();
+  const aggregatedVisits: Visit[] = [];
+  const aggregatedPromos: Promo[] = [];
 
   // Populate agents map from agentDetails
   agentDetails.forEach((agent) => {
     agentsMap.set(agent.id, {
       ...agent,
       clients: [],
-      AgentVisits: [],
-      AgentPromos: [],
-      agentAlerts: [],
     });
   });
 
-  // Map clients and their visits/promos/alerts to their respective agents
+  // Map clients to their respective agents and aggregate visits and promos
   data.forEach((item) => {
     const agentId = item["Codice Agente"].toString();
     const clientId = item["Codice Cliente"].toString();
@@ -110,109 +126,146 @@ export const mapDataToAgents = async (
           unpaidRevenue: "0",
           address: "",
           email: "",
-          visits: visits.filter((visit) => visit.clientId === clientId),
           agent: agentId,
           movements: [],
-          promos: promos.filter((promo) => promo.clientsId.includes(clientId)),
-          clientAlerts: alerts.filter(
-            (alert) =>
-              alert.entityRole === "client" && alert.entityCode === clientId
-          ),
         };
+
         agent.clients.push(newClient);
 
-        // Aggregate client's visits and promos into the agent's data
-        agent.AgentVisits.push(...newClient.visits);
-        agent.AgentPromos.push(...newClient.promos);
+        // Aggregate client's visits and promos into the aggregated data
+        const clientVisits = visits.filter(
+          (visit) => visit.clientId === clientId
+        );
+        const clientPromos = promos.filter((promo) =>
+          promo.clientsId.includes(clientId)
+        );
+
+        aggregatedVisits.push(...clientVisits);
+        aggregatedPromos.push(...clientPromos);
       }
     }
   });
 
-  // Map agent-level alerts
-  agentsMap.forEach((agent) => {
-    agent.agentAlerts = alerts.filter(
-      (alert) => alert.entityRole === "agent" && alert.entityCode === agent.id
-    );
+  // Convert the map back to an array
+  const agents = Array.from(agentsMap.values());
+
+  // Returning agents, along with aggregated visits and promos
+  return {
+    agents,
+    visits: aggregatedVisits,
+    promos: aggregatedPromos,
+  };
+};
+
+export const mapVisitsPromosToAdmin = (
+  agents: Agent[],
+  visits: Visit[],
+  promos: Promo[]
+): { globalVisits: GlobalVisits; globalPromos: GlobalPromos } => {
+  const globalVisits: GlobalVisits = {};
+  const globalPromos: GlobalPromos = {};
+
+  agents.forEach((agent) => {
+    globalVisits[agent.id] = {
+      Visits: visits.filter((visit) =>
+        agent.clients.some((client) => client.id === visit.clientId)
+      ),
+    };
+
+    globalPromos[agent.id] = {
+      Promos: promos.filter((promo) =>
+        promo.clientsId.some((clientId) =>
+          agent.clients.some((client) => client.id === clientId)
+        )
+      ),
+    };
   });
 
-  return Array.from(agentsMap.values());
+  return { globalVisits, globalPromos };
 };
 
 // Mapping function for movement details
-export const mapDataToMovementDetails = (data: any[]): MovementDetail[] => {
+export const mapDataToMovementDetails = (
+  data: serverMovement[]
+): MovementDetail[] => {
   return data.map((item) => ({
     articleId: item["Codice Articolo"].toString(),
     name: item["Descrizione Articolo"],
     brand: item["Marca Articolo"],
-    quantity: parseFloat(item["Quantita"]),
-    unitPrice: parseFloat(item["Prezzo Articolo"]).toFixed(2),
-    priceSold: parseFloat(item["Valore"]).toFixed(2),
-    priceBought: parseFloat(item["Costo"]).toFixed(2),
+    quantity: item["Quantita"],
+    unitPrice: item["Prezzo Articolo"].toFixed(2),
+    priceSold: item["Valore"].toFixed(2),
+    priceBought: item["Costo"].toFixed(2),
   }));
 };
 
 // utils/dataLoader.ts
 
-export const mapVisitsToEntity = <T extends Client | Agent | Admin>(
-  entity: T,
-  visits: Visit[]
-) => {
-  if ((entity as Client).id) {
-    // Client
-    (entity as Client).visits = visits.filter(
-      (visit) => visit.clientId === (entity as Client).id
-    );
-  } else if ((entity as Agent).id) {
-    // Agent
-    const agent = entity as Agent;
-    agent.AgentVisits = agent.clients.flatMap((client) =>
-      visits.filter((visit) => visit.clientId === client.id)
-    );
-  } else if ((entity as Admin).id) {
-    // Admin
-    const admin = entity as Admin;
-    admin.agents.forEach((agent) => {
-      agent.AgentVisits = agent.clients.flatMap((client) =>
+export const mapVisitsToEntity = (
+  entity: Client | Agent | Admin,
+  visits: Visit[],
+  role: "client" | "agent" | "admin"
+): Visit[] | GlobalVisits => {
+  switch (role) {
+    case "client":
+      // For client, return a flat array of visits
+      return visits.filter((visit) => visit.clientId === (entity as Client).id);
+
+    case "agent":
+      // For agent, return visits for all the agent's clients
+      return (entity as Agent).clients.flatMap((client) =>
         visits.filter((visit) => visit.clientId === client.id)
       );
-    });
-    admin.GlobalVisits = {};
-    admin.agents.forEach((agent) => {
-      admin.GlobalVisits[agent.id] = {
-        Visits: agent.AgentVisits || [],
-      };
-    });
+
+    case "admin": {
+      const globalVisits: GlobalVisits = {};
+      (entity as Admin).agents.forEach((agent) => {
+        globalVisits[agent.id] = {
+          Visits: agent.clients.flatMap((client) =>
+            visits.filter((visit) => visit.clientId === client.id)
+          ),
+        };
+      });
+      return globalVisits;
+    }
+
+    default:
+      throw new Error("Invalid user role");
   }
 };
 
-export const mapPromosToEntity = <T extends Client | Agent | Admin>(
-  entity: T,
-  promos: Promo[]
-) => {
-  if ((entity as Client).id) {
-    // Client
-    (entity as Client).promos = promos.filter((promo) =>
-      promo.clientsId.includes((entity as Client).id)
-    );
-  } else if ((entity as Agent).id) {
-    // Agent
-    const agent = entity as Agent;
-    agent.AgentPromos = agent.clients.flatMap((client) =>
-      promos.filter((promo) => promo.clientsId.includes(client.id))
-    );
-  } else if ((entity as Admin).id) {
-    // Admin
-    const admin = entity as Admin;
-    admin.agents.forEach((agent) => {
-      agent.AgentPromos = agent.clients.flatMap((client) =>
+export const mapPromosToEntity = (
+  entity: Client | Agent | Admin,
+  promos: Promo[],
+  role: "client" | "agent" | "admin"
+): Promo[] | GlobalPromos => {
+  switch (role) {
+    case "client":
+      // For client, return a flat array of promos
+      return promos.filter((promo) =>
+        promo.clientsId.includes((entity as Client).id)
+      );
+
+    case "agent":
+      // For agent, return promos for all the agent's clients
+      return (entity as Agent).clients.flatMap((client) =>
         promos.filter((promo) => promo.clientsId.includes(client.id))
       );
-    });
-    admin.GlobalPromos = {};
-    admin.agents.forEach((agent) => {
-      admin.GlobalPromos[agent.id] = {
-        Promos: agent.AgentPromos || [],
-      };
-    });
+
+    case "admin": {
+      // For admin, group promos by agent ID
+      const globalPromos: GlobalPromos = {};
+      (entity as Admin).agents.forEach((agent) => {
+        globalPromos[agent.id] = {
+          Promos: agent.clients.flatMap((client) =>
+            promos.filter((promo) => promo.clientsId.includes(client.id))
+          ),
+        };
+      });
+      return globalPromos;
+    }
+
+    default:
+      throw new Error("Invalid user role");
   }
 };

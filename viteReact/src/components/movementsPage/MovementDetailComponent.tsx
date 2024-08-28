@@ -3,9 +3,9 @@ import PersonIcon from "@mui/icons-material/Person";
 import { Box, Grid, Skeleton, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { DetailProps } from "../../models/propsModels";
+import {  MovementProp } from "../../models/propsModels";
 
-const MovementDetailComponent: React.FC<DetailProps> = ({
+const MovementDetailComponent: React.FC<MovementProp> = ({
   detail,
   isLoading,
 }) => {
@@ -45,7 +45,7 @@ const MovementDetailComponent: React.FC<DetailProps> = ({
           const displayValue = isLoading ? (
             <Skeleton width="80%" />
           ) : key === "dateOfOrder" ? (
-            formatDate(value)
+            formatDate(value as string)
           ) : (
             value
           );
