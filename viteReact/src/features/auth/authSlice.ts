@@ -1,4 +1,7 @@
-import { /* createAsyncThunk, */ createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  /* createAsyncThunk, */ createSlice,
+  PayloadAction,
+} from "@reduxjs/toolkit";
 import { AuthState } from "../../models/stateModels";
 import { webSocketService } from "../../services/webSocket";
 /* import { getLinkedEntities } from "../../services/api/users";
@@ -21,7 +24,7 @@ const initialState: AuthState = {
   userRole: "guest",
   id: "",
   userId: "",
- /*  linkedEntities: [], */
+  /*  linkedEntities: [], */
 };
 
 const authSlice = createSlice({
@@ -30,7 +33,11 @@ const authSlice = createSlice({
   reducers: {
     login: (
       state,
-      action: PayloadAction<{ role: AuthState["userRole"]; id: string, userId: string }>
+      action: PayloadAction<{
+        role: AuthState["userRole"];
+        id: string;
+        userId: string;
+      }>
     ) => {
       state.isLoggedIn = true;
       state.userRole = action.payload.role;
@@ -45,20 +52,20 @@ const authSlice = createSlice({
       localStorage.clear();
       webSocketService.disconnect(); // Disconnect WebSocket on logout
     },
-   /*  setLinkedEntities: (state, action: PayloadAction<string[]>) => {
+    /*  setLinkedEntities: (state, action: PayloadAction<string[]>) => {
       state.linkedEntities = action.payload;
     }, */
   },
 });
 
-
-
-export const { login, logout, /* setLinkedEntities */ } = authSlice.actions;
+export const { login, logout /* setLinkedEntities */ } = authSlice.actions;
 
 export default authSlice.reducer;
 
 // Selectors
-export const selectIsLoggedIn = (state: { auth: AuthState }) => state.auth.isLoggedIn;
-export const selectUserRole = (state: { auth: AuthState }) => state.auth.userRole;
+export const selectIsLoggedIn = (state: { auth: AuthState }) =>
+  state.auth.isLoggedIn;
+export const selectUserRole = (state: { auth: AuthState }) =>
+  state.auth.userRole;
 export const selectUserId = (state: { auth: AuthState }) => state.auth.userId;
 export const selectId = (state: { auth: AuthState }) => state.auth.id;

@@ -10,15 +10,12 @@ import {
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { selectPromos } from "../../features/promos/promosSlice";
+import { selectPromos } from "../../features/utility/utilitySlice"; // Updated import
 import { ActivePromotionsProps } from "../../models/propsModels";
 
 const ActivePromotions: React.FC<ActivePromotionsProps> = ({ isLoading }) => {
   const { t } = useTranslation();
-  const promos = useSelector(selectPromos);
-
-  // Debugging output
-  //console.log("Promos: ", promos);
+  const promos = useSelector(selectPromos); // Using the updated selector
 
   return (
     <Box>

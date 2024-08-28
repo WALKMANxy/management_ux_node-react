@@ -18,9 +18,9 @@ import ArticlesPage from "./pages/common/ArticlesPage";
 import ClientsPage from "./pages/common/ClientsPage";
 import MovementsPage from "./pages/common/MovementsPage";
 import LandingPage from "./pages/landing/LandingPage";
+import { refreshSession } from "./services/sessionService";
 import { webSocketService } from "./services/webSocket";
 import { loadAuthState, saveAuthState } from "./utils/localStorage";
-import { refreshSession } from "./services/sessionService";
 
 const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes
 

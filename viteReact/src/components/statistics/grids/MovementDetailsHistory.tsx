@@ -1,14 +1,14 @@
+import { Box, Paper } from "@mui/material";
+import { ColDef } from "ag-grid-community";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { Box, Paper } from "@mui/material";
-import { ColDef } from "ag-grid-community";
 import { RootState } from "../../../app/store";
-import { MovementDetailsHistoryProps,  } from "../../../models/propsModels";
+import { MovementDetailsHistoryProps } from "../../../models/propsModels";
 
+import { MovementDetail } from "../../../models/dataModels";
 import { currencyFormatter, numberComparator } from "../../../utils/dataUtils";
 import AGGridTable from "./AGGridTable";
-import { MovementDetail } from "../../../models/dataModels";
 
 const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
   movementDetails,
@@ -45,7 +45,8 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
       {
         headerName: t("movementDetailsHistory.priceSold"),
         field: "priceSold",
-        valueFormatter: (params) => currencyFormatter(parseFloat(params.value as string)),
+        valueFormatter: (params) =>
+          currencyFormatter(parseFloat(params.value as string)),
         comparator: numberComparator,
         sortable: true,
       },
@@ -56,14 +57,16 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
         {
           headerName: t("movementDetailsHistory.unitPrice"),
           field: "unitPrice",
-          valueFormatter: (params) => currencyFormatter(parseFloat(params.value as string)),
+          valueFormatter: (params) =>
+            currencyFormatter(parseFloat(params.value as string)),
           comparator: numberComparator,
           sortable: true,
         },
         {
           headerName: t("movementDetailsHistory.priceBought"),
           field: "priceBought",
-          valueFormatter: (params) => currencyFormatter(parseFloat(params.value as string)),
+          valueFormatter: (params) =>
+            currencyFormatter(parseFloat(params.value as string)),
           comparator: numberComparator,
           sortable: true,
         }
@@ -98,4 +101,4 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
   );
 };
 
-export default  MovementDetailsHistory;
+export default MovementDetailsHistory;

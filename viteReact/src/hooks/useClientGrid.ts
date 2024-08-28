@@ -1,22 +1,21 @@
-//src/hooks/useClientGrid.ts
 import { useCallback, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../app/store";
 import { Agent, Client } from "../models/entityModels";
-import { useGetAgentDetailsQuery, useGetClientsQuery } from "../services/api";
+import { AgGridReact } from "ag-grid-react";
+import { DataSliceState } from "../models/stateModels";
 
 export const useClientsGrid = () => {
-  const { data: clients = [] } = useGetClientsQuery();
-  const { data: agentDetails = [] } = useGetAgentDetailsQuery();
+  // Get the pre-filtered clients and agent details from Redux store
+  const clients = useSelector((state: DataSliceState) => state.clients);
+  const agentDetails = useSelector((state: DataSliceState) => state.agentDetails);
+
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isClientListCollapsed, setClientListCollapsed] = useState(false);
   const [isClientDetailsCollapsed, setClientDetailsCollapsed] = useState(false);
-  const userRole = useSelector((state: RootState) => state.auth.userRole);
-  const userId = useSelector((state: RootState) => state.auth.id);
   const [quickFilterText, setQuickFilterText] = useState("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const gridRef = useRef<any>(null);
+  const gridRef = useRef<AgGridReact>(null);
   const clientDetailsRef = useRef<HTMLDivElement>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -34,17 +33,17 @@ export const useClientsGrid = () => {
     }
   }, []);
 
-  const addAgentNameToClient = (client: Client, agentDetails: Agent[]) => {
-    const agent = agentDetails.find((agent) => agent.id === client.agent);
+  const addAgentNameToClient = useCallback((client: Client, agentDetails: Record<string, Agent>) => {
+    const agent = agentDetails[client.agent];
     return {
       ...client,
       agentName: agent ? agent.name : "Unknown Agent",
     };
-  };
+  }, []);
 
   const handleClientSelect = useCallback(
     (clientId: string) => {
-      const client = clients.find((client) => client.id === clientId) || null;
+      const client = clients[clientId] || null;
       if (client) {
         const clientWithAgentName = addAgentNameToClient(client, agentDetails);
         setSelectedClient(clientWithAgentName);
@@ -57,31 +56,11 @@ export const useClientsGrid = () => {
         setSelectedClient(null);
       }
     },
-    [clients, agentDetails]
+    [clients, agentDetails, addAgentNameToClient]
   );
 
-  const filteredClients = useCallback(() => {
-    let filtered = clients;
-    if (userRole === "agent") {
-      filtered = filtered.filter((client) => client.agent === userId);
-    } else if (userRole === "client") {
-      filtered = filtered.filter((client) => client.id === userId);
-    }
-    if (startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      filtered = filtered.filter((client: Client) => {
-        return client.movements.some((movement) => {
-          const movementDate = new Date(movement.dateOfOrder);
-          return movementDate >= start && movementDate <= end;
-        });
-      });
-    }
-    return filtered.map((client) => addAgentNameToClient(client, agentDetails));
-  }, [clients, userRole, userId, startDate, endDate, agentDetails]);
-
   return {
-    clients,
+    clients: Object.values(clients), // Convert the object to an array for easier use in components
     selectedClient,
     setSelectedClient,
     quickFilterText,
@@ -91,7 +70,6 @@ export const useClientsGrid = () => {
     endDate,
     setEndDate,
     handleClientSelect,
-    filteredClients,
     gridRef,
     clientDetailsRef,
     isClientListCollapsed,

@@ -106,7 +106,6 @@ export const ignoreArticleNames = new Set([
   "TRASPORTO URGENTE",
 ]);
 
-
 export const agentColorMap: { [key: string]: string } = {
   "10": "#FFD700", // Fazio Adriano Salvatore
   "11": "#FFB6C1", // Salvatore Spinella

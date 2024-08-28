@@ -1,10 +1,10 @@
+import { Box, Paper } from "@mui/material";
+import { ColDef } from "ag-grid-community";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Box, Paper } from "@mui/material";
 import { MovementsHistoryProps } from "../../../models/propsModels";
 import { currencyFormatter, numberComparator } from "../../../utils/dataUtils";
 import AGGridTable from "./AGGridTable";
-import { ColDef } from "ag-grid-community";
 
 const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
   const { t } = useTranslation();

@@ -1,8 +1,8 @@
-import React, { useMemo } from "react";
-import { useTranslation } from "react-i18next";
 import { Box, Divider, Paper, Skeleton, Typography } from "@mui/material";
 import { ApexOptions } from "apexcharts";
+import React, { useMemo } from "react";
 import Chart from "react-apexcharts";
+import { useTranslation } from "react-i18next";
 import { monthMap } from "../../../utils/constants";
 import { currencyFormatter } from "../../../utils/dataUtils";
 
@@ -12,8 +12,8 @@ interface MonthOverMonthSpendingTrendProps {
   userRole: "agent" | "client" | "admin";
 }
 
-const MonthOverMonthSpendingTrend: React.FC<MonthOverMonthSpendingTrendProps> = React.memo(
-  ({ months, revenueData, userRole }) => {
+const MonthOverMonthSpendingTrend: React.FC<MonthOverMonthSpendingTrendProps> =
+  React.memo(({ months, revenueData, userRole }) => {
     const { t } = useTranslation();
     const loading = revenueData.length === 0;
 
@@ -146,7 +146,6 @@ const MonthOverMonthSpendingTrend: React.FC<MonthOverMonthSpendingTrendProps> = 
         </Box>
       </Paper>
     );
-  }
-);
+  });
 
 export default MonthOverMonthSpendingTrend;

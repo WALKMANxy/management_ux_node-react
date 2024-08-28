@@ -195,4 +195,5 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
   );
 };
 
-export default SalesDistribution; React.memo(SalesDistribution);
+export default SalesDistribution;
+React.memo(SalesDistribution);

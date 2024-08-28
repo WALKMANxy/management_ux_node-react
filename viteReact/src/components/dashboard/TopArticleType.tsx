@@ -1,6 +1,6 @@
+import { Avatar, Box, Divider, Grid, Paper, Typography } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Avatar, Box, Divider, Grid, Paper, Typography } from "@mui/material";
 import { TopArticleTypeProps } from "../../models/propsModels";
 
 const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {

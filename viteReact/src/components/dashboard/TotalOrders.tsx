@@ -45,7 +45,12 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
   const renderContent = () => {
     if (isLoading) {
       return (
-        <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="100%"
+        >
           <CircularProgress />
         </Box>
       );
@@ -53,21 +58,48 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
 
     return (
       <>
-        <Grid container alignItems="center" direction={isMobile ? "column" : "row"}>
+        <Grid
+          container
+          alignItems="center"
+          direction={isMobile ? "column" : "row"}
+        >
           <Grid item xs={12} md={6} textAlign={isMobile ? "center" : "left"}>
-            <Grid container alignItems="center" justifyContent={isMobile ? "center" : "flex-start"}>
+            <Grid
+              container
+              alignItems="center"
+              justifyContent={isMobile ? "center" : "flex-start"}
+            >
               <Grid item>
-                <Typography sx={{ fontSize: "2.5rem", fontWeight: 500, mr: 1, mt: 1.5, mb: 0.5 }}>
+                <Typography
+                  sx={{
+                    fontSize: "2.5rem",
+                    fontWeight: 500,
+                    mr: 1,
+                    mt: 1.5,
+                    mb: 0.5,
+                  }}
+                >
                   {totalOrder}
                 </Typography>
               </Grid>
               <Grid item>
-                <Avatar sx={{ cursor: "pointer", bgcolor: theme.palette.primary.light, color: "#000" }}>
-                  <ArrowDownwardIcon fontSize="inherit" sx={{ transform: "rotate3d(1, 1, 1, 45deg)" }} />
+                <Avatar
+                  sx={{
+                    cursor: "pointer",
+                    bgcolor: theme.palette.primary.light,
+                    color: "#000",
+                  }}
+                >
+                  <ArrowDownwardIcon
+                    fontSize="inherit"
+                    sx={{ transform: "rotate3d(1, 1, 1, 45deg)" }}
+                  />
                 </Avatar>
               </Grid>
               <Grid item xs={12}>
-                <Typography sx={{ fontSize: "1.4rem", fontWeight: 500, color: "#000" }}>
+                <Typography
+                  sx={{ fontSize: "1.4rem", fontWeight: 500, color: "#000" }}
+                >
                   {t("totalOrder.totalOrders")}
                 </Typography>
               </Grid>
@@ -75,7 +107,10 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
           </Grid>
           <Grid item xs={12} md={6}>
             <Chart
-              {...ChartData(isMonthly ? monthlyCategories : yearlyCategories, isMonthly ? monthlyOrders : yearlyOrders)}
+              {...ChartData(
+                isMonthly ? monthlyCategories : yearlyCategories,
+                isMonthly ? monthlyOrders : yearlyOrders
+              )}
               height="150"
             />
           </Grid>
@@ -123,7 +158,14 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
           <Grid item>
             <Grid container justifyContent="space-between" alignItems="center">
               <Grid item>
-                <Avatar variant="rounded" sx={{ bgcolor: theme.palette.primary.main, color: "#000", mt: 1 }}>
+                <Avatar
+                  variant="rounded"
+                  sx={{
+                    bgcolor: theme.palette.primary.main,
+                    color: "#000",
+                    mt: 1,
+                  }}
+                >
                   <LocalMallOutlinedIcon fontSize="inherit" />
                 </Avatar>
               </Grid>
