@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { RootState } from "./app/store";
+import { handleLogout } from "./features/auth/authSlice";
 import Layout from "./layout/Layout";
 import { UserRole } from "./models/entityModels";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -19,7 +20,6 @@ import ClientsPage from "./pages/common/ClientsPage";
 import MovementsPage from "./pages/common/MovementsPage";
 import LandingPage from "./pages/landing/LandingPage";
 import { refreshSession } from "./services/sessionService";
-import { handleLogout } from "./features/auth/authSlice";
 
 console.log("Vite mode:", import.meta.env.MODE);
 
@@ -116,7 +116,6 @@ const theme = createTheme({
 });
 
 function App() {
-
   const dispatch = useAppDispatch();
 
   useEffect(() => {
