@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import {
   selectVisits,
   VisitWithAgent,
-} from "../../features/utility/utilitySelectors";
+} from "../../features/data/dataSelectors";
 import { ServerDayProps } from "../../models/propsModels";
 import { DataSliceState } from "../../models/stateModels";
 import { agentColorMap } from "../../utils/constants";
