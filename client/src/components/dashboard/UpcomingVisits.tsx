@@ -13,7 +13,7 @@ import { useSelector } from "react-redux";
 import {
   selectVisits,
   VisitWithAgent,
-} from "../../features/utility/utilitySelectors"; // Updated import
+} from "../../features/data/dataSelectors"; // Updated import
 import { UpcomingVisitsProps } from "../../models/propsModels";
 
 const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {

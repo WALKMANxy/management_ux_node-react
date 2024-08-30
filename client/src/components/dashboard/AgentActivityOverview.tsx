@@ -13,7 +13,7 @@ import { Card, CardHeader, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
-import { selectAlerts } from "../../features/utility/utilitySelectors";
+import { selectAlerts } from "../../features/data/dataSelectors";
 import { Alert, GlobalVisits, Visit } from "../../models/dataModels";
 import { Client } from "../../models/entityModels";
 import { generateActivityList } from "../../utils/activityUtils";
