@@ -1,11 +1,10 @@
 import axios from "axios";
 import store from "../app/store";
-import { handleLogin, handleLogout } from "../features/auth/authSlice";
-import { getDeviceId } from "../utils/deviceUtils"; // Import the device ID utility function
-import { saveAuthState } from "../utils/localStorage";
 import { getApiUrl } from "../config/config";
+import { handleLogin, handleLogout } from "../features/auth/authSlice";
+import { saveAuthState } from "../utils/localStorage";
 
-const apiUrl = getApiUrl()
+const apiUrl = getApiUrl();
 
 if (!apiUrl) {
   console.error("Api URL is not defined inside sessionService.ts.");
@@ -14,10 +13,9 @@ if (!apiUrl) {
 export const refreshSession = async (): Promise<boolean> => {
   try {
     const userAgent = navigator.userAgent;
-    const deviceId = getDeviceId(); // Retrieve the device ID
     const response = await axios.post(
       `${apiUrl}/auth/refresh-session`, // Use the full URL with the base path
-      { userAgent, deviceId }, // Send both userAgent and deviceId
+      { userAgent }, // Send userAgent
       {
         withCredentials: true,
       }

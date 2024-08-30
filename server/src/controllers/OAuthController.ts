@@ -5,9 +5,9 @@ import { IUser } from "../models/User";
 import { OAuthService } from "../services/OAuthService";
 import {
   createSession,
-  generateSessionToken,
   renewSession,
 } from "../utils/sessionUtils";
+import { generateSessionToken } from "../utils/jwtUtils";
 
 export class OAuthController {
   static async handleOAuthCallback(req: Request, res: Response) {
@@ -29,7 +29,7 @@ export class OAuthController {
         picture
       );
 
-      const sessionToken = generateSessionToken();
+      const sessionToken = generateSessionToken(user);
       await createSession(user.id.toString(), sessionToken, req);
 
       res.cookie("sessionToken", sessionToken, {
