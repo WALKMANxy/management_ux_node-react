@@ -24,6 +24,9 @@ onmessage = function (
     return map;
   }, new Map());
 
+  // Create a map to track the latest movement timestamp for each client
+  const latestMovementTimestampMap = new Map<string, number>();
+
   const clients = Array.from(clientsMap.values()).map((clientData) => {
     const clientInfo = clientData[0];
     const clientDetail = clientDetailsMap.get(
@@ -44,6 +47,9 @@ onmessage = function (
       new Map<string, serverMovement[]>()
     );
 
+    // Convert movementsMap to array of Movement objects and sort by dateOfOrder
+    let latestMovementTimestamp = 0; // Track the latest timestamp for sorting
+
     const movements: Movement[] = Array.from(movementsMap.values()).map(
       (movementData) => {
         const typedMovementData = movementData as serverMovement[];
@@ -57,15 +63,31 @@ onmessage = function (
           priceSold: parseFloat(item["Valore"].toString()).toFixed(2),
           priceBought: parseFloat(item["Costo"].toString()).toFixed(2),
         }));
+
+        const movementTimestamp = new Date(
+          movementInfo["Data Documento Precedente"]
+        ).getTime();
+
+        // Update the latest movement timestamp if this movement is newer
+        if (movementTimestamp > latestMovementTimestamp) {
+          latestMovementTimestamp = movementTimestamp;
+        }
+
         return {
           id: movementInfo["Numero Lista"].toString(),
           discountCategory: "",
           details,
           unpaidAmount: "",
           paymentDueDate: "",
-          dateOfOrder: movementInfo["Data Documento Precedente"].split("T")[0],
+          dateOfOrder: new Date(movementTimestamp).toISOString().split("T")[0], // Convert back to YYYY-MM-DD format
         };
       }
+    );
+
+    // Store the latest movement timestamp for sorting later
+    latestMovementTimestampMap.set(
+      clientInfo["Codice Cliente"].toString(),
+      latestMovementTimestamp
     );
 
     const totalRevenue = movements
@@ -101,6 +123,13 @@ onmessage = function (
       agent: clientInfo["Codice Agente"].toString(),
       movements,
     };
+  });
+
+  // Sort clients by the most recent movement timestamp
+  clients.sort((a, b) => {
+    const timestampA = latestMovementTimestampMap.get(a.id) || 0;
+    const timestampB = latestMovementTimestampMap.get(b.id) || 0;
+    return timestampB - timestampA;
   });
 
   postMessage(clients);

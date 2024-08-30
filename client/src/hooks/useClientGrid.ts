@@ -1,13 +1,15 @@
+import { AgGridReact } from "ag-grid-react";
 import { useCallback, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Agent, Client } from "../models/entityModels";
-import { AgGridReact } from "ag-grid-react";
 import { DataSliceState } from "../models/stateModels";
 
 export const useClientsGrid = () => {
   // Get the pre-filtered clients and agent details from Redux store
   const clients = useSelector((state: DataSliceState) => state.clients);
-  const agentDetails = useSelector((state: DataSliceState) => state.agentDetails);
+  const agentDetails = useSelector(
+    (state: DataSliceState) => state.agentDetails
+  );
 
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isClientListCollapsed, setClientListCollapsed] = useState(false);
@@ -33,13 +35,16 @@ export const useClientsGrid = () => {
     }
   }, []);
 
-  const addAgentNameToClient = useCallback((client: Client, agentDetails: Record<string, Agent>) => {
-    const agent = agentDetails[client.agent];
-    return {
-      ...client,
-      agentName: agent ? agent.name : "Unknown Agent",
-    };
-  }, []);
+  const addAgentNameToClient = useCallback(
+    (client: Client, agentDetails: Record<string, Agent>) => {
+      const agent = agentDetails[client.agent];
+      return {
+        ...client,
+        agentName: agent ? agent.name : "Unknown Agent",
+      };
+    },
+    []
+  );
 
   const handleClientSelect = useCallback(
     (clientId: string) => {

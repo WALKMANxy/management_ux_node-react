@@ -1,3 +1,5 @@
+// AgentActivityOverview.tsx
+
 import { Timeline } from "@mui/icons-material";
 import {
   TimelineConnector,
@@ -8,19 +10,22 @@ import {
   TimelineSeparator,
 } from "@mui/lab";
 import { Card, CardHeader, Typography } from "@mui/material";
-import React from "react";
+import React, { useMemo } from "react";
+import { useAppSelector } from "../../app/hooks";
+import { RootState } from "../../app/store";
+import { selectAlerts } from "../../features/utility/utilitySelectors";
+import { Alert, GlobalVisits, Visit } from "../../models/dataModels";
+import { Client } from "../../models/entityModels";
+import { generateActivityList } from "../../utils/activityUtils";
 
 // Define the structure of an activity item
 interface ActivityItem {
   id: string;
-  type: "visits" | "sales" | "alerts" | string;
+  type: "visits" | "sales" | "alerts";
   title: string;
   time: string;
-}
-
-// Props for the AgentActivityOverview component
-interface AgentActivityOverviewProps {
-  list: ActivityItem[];
+  details: string;
+  subDetails?: string;
 }
 
 // Props for the OrderItem component
@@ -29,9 +34,22 @@ interface OrderItemProps {
   lastTimeline: boolean;
 }
 
-const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({
-  list,
-}) => {
+const AgentActivityOverview: React.FC = () => {
+  // Fetch clients, visits, and alerts from the store
+  const clients: Record<string, Client> = useAppSelector(
+    (state: RootState) => state.data.clients
+  );
+  const globalVisits: GlobalVisits = useAppSelector(
+    (state: RootState) => state.data.currentUserVisits
+  ) as Record<string, { Visits: Visit[] }>;
+  const alerts: Alert[] = useAppSelector(selectAlerts);
+
+  // Generate activity list using the utility function
+  const activityList: ActivityItem[] = useMemo(
+    () => generateActivityList(clients, globalVisits, alerts),
+    [clients, globalVisits, alerts]
+  );
+
   return (
     <Card>
       <CardHeader title="Agent Activity Overview" />
@@ -45,11 +63,11 @@ const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({
           },
         }}
       >
-        {list.map((item, index) => (
+        {activityList.map((item, index) => (
           <OrderItem
             key={item.id}
             item={item}
-            lastTimeline={index === list.length - 1}
+            lastTimeline={index === activityList.length - 1}
           />
         ))}
       </Timeline>
@@ -58,7 +76,7 @@ const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({
 };
 
 const OrderItem: React.FC<OrderItemProps> = ({ item, lastTimeline }) => {
-  const { type, title, time } = item;
+  const { type, title, time, details, subDetails } = item;
 
   const getDotColor = (
     type: string
@@ -86,6 +104,12 @@ const OrderItem: React.FC<OrderItemProps> = ({ item, lastTimeline }) => {
         <Typography variant="caption" sx={{ color: "text.disabled" }}>
           {time}
         </Typography>
+        <Typography variant="body2">{details}</Typography>
+        {subDetails && (
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
+            {subDetails}
+          </Typography>
+        )}
       </TimelineContent>
     </TimelineItem>
   );

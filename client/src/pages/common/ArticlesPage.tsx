@@ -6,14 +6,14 @@ import { RootState } from "../../app/store";
 import ArticleDetails from "../../components/articlepage/ArticleDetails";
 import ArticlesList from "../../components/statistics/grids/ArticlesList";
 import { useArticlesGrid } from "../../hooks/useArticlesGrid";
+import { MovementDetail } from "../../models/dataModels";
 import { ArticleColumnDefinition } from "../../models/propsModels";
 import { currencyFormatter } from "../../utils/dataUtils";
-import { MovementDetail } from "../../models/dataModels";
 
 const ArticlesPage: React.FC = () => {
   const { t } = useTranslation();
   const isMobile = useMediaQuery("(max-width:600px)");
-  const userRole = useSelector((state: RootState) => state.auth.userRole);
+  const userRole = useSelector((state: RootState) => state.auth.role);
 
   const {
     selectedArticle,
@@ -84,14 +84,16 @@ const ArticlesPage: React.FC = () => {
           headerName: t("articlesPage.unitPrice"),
           field: "unitPrice",
           filter: "agNumberColumnFilter",
-          valueFormatter: (params: { value: string }) => currencyFormatter(params.value),
+          valueFormatter: (params: { value: string }) =>
+            currencyFormatter(params.value),
           sortable: true,
         },
         {
           headerName: t("articlesPage.cost"),
           field: "priceBought",
           filter: "agNumberColumnFilter",
-          valueFormatter: (params: { value: string }) => currencyFormatter(params.value),
+          valueFormatter: (params: { value: string }) =>
+            currencyFormatter(params.value),
           sortable: true,
         },
         {

@@ -3,7 +3,7 @@ import { IVisit, Visit } from "../models/Visit";
 export class VisitService {
   static async getAllVisits(): Promise<IVisit[]> {
     try {
-      return await Visit.find().exec();
+      return await Visit.find().sort({ date: -1 }).exec();
     } catch (err) {
       throw new Error(
         `Error retrieving visits: ${

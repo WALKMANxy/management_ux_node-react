@@ -1,3 +1,4 @@
+//src/features/search/searchSlice.ts
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import {
@@ -11,7 +12,11 @@ import {
 import { Agent, Client } from "../../models/entityModels";
 import { SearchParams, SearchResult } from "../../models/searchModels";
 import { SearchState } from "../../models/stateModels";
-import { selectAlerts, selectPromos, selectVisits } from "../utility/utilitySlice";
+import {
+  selectAlerts,
+  selectPromos,
+  selectVisits,
+} from "../utility/utilitySelectors";
 
 const initialState: SearchState = {
   query: "",
@@ -29,7 +34,7 @@ export const searchItems = createAsyncThunk<
   async ({ query, filter }, { getState, rejectWithValue }) => {
     try {
       const state = getState();
-      const { userRole } = state.auth;
+      const userRole = state.auth.role;
       const userData = state.data.currentUserData;
       const visits = selectVisits(state);
       const promos = selectPromos(state);

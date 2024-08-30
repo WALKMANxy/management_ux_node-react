@@ -1,15 +1,16 @@
 import { useCallback, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "../app/hooks";
 import {
   clearSelection,
   selectAgent,
   selectClient,
 } from "../features/data/dataSlice";
+import { UseSelectionStateReturn } from "../models/dataSetTypes";
 import { SearchResult } from "../models/searchModels";
 import useStats from "./useStats";
-import { UseSelectionStateReturn } from "../models/dataSetTypes";
 
-const useSelectionState = (isMobile: boolean): UseSelectionStateReturn => {  const dispatch = useDispatch();
+const useSelectionState = (isMobile: boolean): UseSelectionStateReturn => {
+  const dispatch = useAppDispatch();
   const {
     selectedClient,
     selectedAgent,

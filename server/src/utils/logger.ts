@@ -1,6 +1,7 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import { NextFunction, Response } from "express";
+import { LRUCache } from "lru-cache";
 import { createLogger, format, transports } from "winston";
 import "winston-daily-rotate-file";
 import { config } from "../config/config";
@@ -10,88 +11,92 @@ dotenv.config();
 
 const { combine, timestamp, printf } = format;
 
-const logFormat = printf(({ level, message, timestamp, ...metadata }) => {
-  let metaString = JSON.stringify(metadata);
-  return `${timestamp} [${level}]: ${message} ${
-    metaString !== "{}" ? ` | ${metaString}` : ""
-  }`;
+const logFormat = printf(({ level, message, timestamp }) => {
+  return `${timestamp} [${level}]: ${message}`;
 });
 
 const logger = createLogger({
   level: "info",
-  format: combine(
-    timestamp(),
-    format.metadata({ fillExcept: ["message", "level", "timestamp"] }),
-    logFormat
-  ),
+  format: combine(timestamp(), logFormat),
   transports: [
-    new transports.Console(),
     new transports.DailyRotateFile({
       filename: "logs/application-%DATE%.log",
       datePattern: "YYYY-MM-DD",
       maxFiles: "14d",
       zippedArchive: true,
     }),
+    new transports.Console({
+      format: combine(format.colorize(), logFormat),
+    }),
   ],
 });
+
+export { logger };
+
+// LRU cache for IP info
+const ipInfoCache = new LRUCache<string, IpInfo>({
+  max: 500, // Maximum number of items to store in the cache
+  ttl: 1000 * 60 * 60, // 1 hour
+});
+
+// Function to fetch IP info
+async function fetchIpInfo(ip: string): Promise<IpInfo | null> {
+  try {
+    const response = await axios.get(
+      `https://ipinfo.io/${ip}?token=${config.ipinfoToken}`
+    );
+    return response.data;
+  } catch (error) {
+    logger.error(
+      `Error fetching IP information: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
+    return null;
+  }
+}
 
 export const logRequestsIp = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) => {
+  const clientIp = req.ip ? req.ip.replace("::ffff:", "") : "unknown";
+  let ipInfo: IpInfo | null = null;
+
+  if (clientIp !== "unknown") {
+    ipInfo = ipInfoCache.get(clientIp) || null;
+    if (!ipInfo) {
+      ipInfo = await fetchIpInfo(clientIp);
+      if (ipInfo) {
+        ipInfoCache.set(clientIp, ipInfo);
+      }
+    }
+  }
+
   const logData = {
-    userId: req.user?.id,
     userEmail: req.user?.email,
     userRole: req.user?.role,
     entityCode: req.user?.entityCode,
-    ip: req.ip,
+    ip: clientIp,
+    ipInfo: ipInfo,
   };
 
-  logger.info(`Incoming request: ${req.method} ${req.url}`, logData);
+  const ipInfoString = ipInfo
+    ? `[${ipInfo.ip}, country: ${ipInfo.country}, org: ${ipInfo.org}, timezone: ${ipInfo.timezone}]`
+    : `[${clientIp}]`;
 
-  res.on("finish", async () => {
-    try {
-      const clientIp = req.ip ? req.ip.replace("::ffff:", "") : "unknown";
-      if (clientIp !== "unknown") {
-        const response = await axios.get(
-          `https://ipinfo.io/${clientIp}?token=${config.ipinfoToken}`
-        );
-        const ipInfo: IpInfo = response.data;
+  logger.info(
+    `Incoming request ${req.method}${req.url} : from: ${logData.userEmail}, ${logData.userRole}, ${logData.entityCode} | ipInfo: ${ipInfoString}`
+  );
 
-        logger.info(
-          `IP info fetched for ${logData.userEmail}, ${logData.userRole}, ${logData.entityCode}, ${logData.entityCode}`,
-          {
-            ipInfo: {
-              ip: ipInfo.ip,
-              country: ipInfo.country,
-              org: ipInfo.org,
-              timezone: ipInfo.timezone,
-            },
-          }
-        );
-      }
-
-      logger.info(
-        `Response status: ${res.statusCode} for ${req.method} ${req.url}`,
-        logData
-      );
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        logger.error(
-          `Error fetching IP information: ${error.message}`,
-          logData
-        );
-      } else {
-        logger.error(
-          `An unknown error occurred: ${JSON.stringify(error)}`,
-          logData
-        );
-      }
-    }
+  res.on("finish", () => {
+    logger.info(
+      `Response status: ${res.statusCode} for ${req.method} ${req.url} | User data: [email: ${logData.userEmail}, role: ${logData.userRole}, code: ${logData.entityCode}]`
+    );
   });
 
   next();
 };
 
-export default logger;
+export default logRequestsIp;

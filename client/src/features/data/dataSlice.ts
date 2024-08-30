@@ -1,9 +1,16 @@
+//src/features/data/dataSlice.ts
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Alert, GlobalPromos, GlobalVisits, Promo, Visit } from "../../models/dataModels";
+import {
+  Alert,
+  GlobalPromos,
+  GlobalVisits,
+  Promo,
+  Visit,
+} from "../../models/dataModels";
 import { Agent, Client } from "../../models/entityModels";
 import { DataSliceState } from "../../models/stateModels";
-import { updateApi } from "../../services/promosVisitsQueries";
 import { dataApi } from "../../services/dataQueries";
+import { updateApi } from "../../services/promosVisitsQueries";
 
 const initialState: DataSliceState = {
   clients: {},

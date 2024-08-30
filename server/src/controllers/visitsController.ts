@@ -39,7 +39,7 @@ export class VisitController {
     try {
       const visit = await VisitService.replaceVisit(req.params.id, req.body);
       if (!visit) {
-        res.status(404).json({ message: "Visit not found" });
+        res.status(200).json({ message: "Visit not found" });
         return;
       }
       res.status(200).json({ message: "Visit updated successfully", visit });
@@ -59,7 +59,7 @@ export class VisitController {
     try {
       const visit = await VisitService.updateVisit(req.params.id, req.body);
       if (!visit) {
-        res.status(404).json({ message: "Visit not found" });
+        res.status(200).json({ message: "Visit not found" });
         return;
       }
       res.status(200).json({ message: "Visit updated successfully", visit });

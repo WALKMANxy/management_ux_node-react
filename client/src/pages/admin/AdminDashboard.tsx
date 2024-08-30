@@ -31,7 +31,6 @@ import { brandColors } from "../../utils/constants";
 import {
   calculateMonthlyData,
   calculateTopBrandsData,
-  getTrend,
 } from "../../utils/dataUtils";
 
 const AdminDashboard: React.FC = () => {
@@ -146,10 +145,6 @@ const AdminDashboard: React.FC = () => {
                           "0"
                         }`
                       ),
-                      trend: getTrend(
-                        agentComparativeStatisticsMonthly?.revenuePercentage ||
-                          "0"
-                      ),
                     }}
                     isAgentSelected={true}
                   />
@@ -164,9 +159,6 @@ const AdminDashboard: React.FC = () => {
                         `${
                           agentComparativeStatistics?.revenuePercentage || "0"
                         }`
-                      ),
-                      trend: getTrend(
-                        agentComparativeStatistics?.revenuePercentage || "0"
                       ),
                     }}
                     isAgentSelected={true}
@@ -203,26 +195,7 @@ const AdminDashboard: React.FC = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <AgentActivityOverview
-                    list={[
-                      {
-                        id: 1,
-                        type: "visits",
-                        title: "Visits This Month",
-                        time: new Date(),
-                      },
-                      {
-                        id: 2,
-                        type: "sales",
-                        title: "Sales This Month",
-                        time: new Date(),
-                      },
-                      {
-                        id: 3,
-                        type: "alerts",
-                        title: "Alerts This Month",
-                        time: new Date(),
-                      },
-                    ]}
+
                   />
                 </Grid>
               </Grid>
@@ -264,10 +237,6 @@ const AdminDashboard: React.FC = () => {
                           "0"
                         }`
                       ),
-                      trend: getTrend(
-                        clientComparativeStatisticsMonthly?.revenuePercentage ||
-                          "0"
-                      ),
                     }}
                     isAgentSelected={false}
                   />
@@ -282,9 +251,6 @@ const AdminDashboard: React.FC = () => {
                         `${
                           clientComparativeStatistics?.revenuePercentage || "0"
                         }`
-                      ),
-                      trend: getTrend(
-                        clientComparativeStatistics?.revenuePercentage || "0"
                       ),
                     }}
                     isAgentSelected={false}

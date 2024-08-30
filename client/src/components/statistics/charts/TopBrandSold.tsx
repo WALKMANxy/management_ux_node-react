@@ -2,23 +2,9 @@ import { Box, Divider, Paper, Skeleton, Typography } from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { TopBrandsSoldProps } from "../../../models/propsModels";
 
 // Define more specific types
-type BrandData = {
-  id: string;
-  label: string;
-  value: number;
-};
-
-type UserRole = "agent" | "client" | "admin";
-
-interface TopBrandsSoldProps {
-  topBrandsData: BrandData[];
-  brandColors: string[];
-  isMobile: boolean;
-  userRole: UserRole;
-}
-
 const paperStyles = {
   p: 3,
   borderRadius: "12px",

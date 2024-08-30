@@ -1,8 +1,8 @@
 // src/hooks/useGlobalSearch.ts
 import DOMPurify from "dompurify";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../app/store";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { RootState } from "../app/store";
 import {
   clearResults,
   searchItems,
@@ -12,13 +12,13 @@ import useDebounce from "./useDebounce";
 
 const useGlobalSearch = (filter: string) => {
   const [input, setInput] = useState("");
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const searchRef = useRef<HTMLDivElement>(null);
   const [showResults, setShowResults] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const debouncedInput = useDebounce(input, 300);
-  const results = useSelector((state: RootState) => state.search.results);
-  const status = useSelector((state: RootState) => state.search.status);
+  const results = useAppSelector((state: RootState) => state.search.results);
+  const status = useAppSelector((state: RootState) => state.search.status);
 
   const handleSearch = useCallback(() => {
     const sanitizedInput = DOMPurify.sanitize(debouncedInput.trim());

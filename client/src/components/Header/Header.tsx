@@ -31,10 +31,10 @@ import {
 import { styled } from "@mui/material/styles";
 import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
-import { logout } from "../../features/auth/authSlice";
+import { handleLogout } from "../../features/auth/authSlice";
 import GlobalSearch from "./GlobalSearch";
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -51,14 +51,14 @@ const Header: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [iconChange, setIconChange] = useState(false);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const userRole = useSelector((state: RootState) => state.auth.userRole);
+  const userRole = useAppSelector((state: RootState) => state.auth.role);
   const memoizedUserRole = useMemo(() => userRole, [userRole]);
 
-  const handleLogout = useCallback(() => {
-    dispatch(logout());
+  const initiateLogout = useCallback(() => {
+    dispatch(handleLogout());
   }, [dispatch]);
 
   const toggleDrawer = useCallback(() => {
@@ -164,7 +164,7 @@ const Header: React.FC = () => {
         component={Link}
         to="/"
         onClick={() => {
-          handleLogout();
+          initiateLogout();
           toggleDrawer();
         }}
         sx={{ color: "white", paddingBottom: "20px" }}
@@ -175,7 +175,7 @@ const Header: React.FC = () => {
         <ListItemText primary={t("logout")} />
       </ListItem>
     ),
-    [handleLogout, toggleDrawer, t]
+    [initiateLogout, toggleDrawer, t]
   );
 
   const memoizedLinks = useMemo(() => renderLinks(), [renderLinks]);

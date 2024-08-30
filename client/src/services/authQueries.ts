@@ -2,7 +2,7 @@
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { User } from "../models/entityModels";
-import { generateErrorResponse,  } from "../utils/errorHandling"; // Import error handling functions
+import { generateErrorResponse } from "../utils/errorHandling"; // Import error handling functions
 import { baseUrl } from "./api/apiUtils";
 import {
   loginUser,
@@ -16,8 +16,6 @@ export const authApi = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({ baseUrl }),
   endpoints: (builder) => ({
-
-
     getUserById: builder.query<User, string>({
       queryFn: async (id) => {
         try {

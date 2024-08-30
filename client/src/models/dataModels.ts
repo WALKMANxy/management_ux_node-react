@@ -12,7 +12,6 @@ export interface Alert {
   markedAsRead: boolean;
 }
 
-
 export type MovementDetail = {
   articleId: string;
   name: string;
@@ -63,7 +62,6 @@ export type Promo = {
   endDate: string;
   promoIssuedBy: string;
 };
-
 
 export interface GlobalPromos {
   [agentId: string]: {

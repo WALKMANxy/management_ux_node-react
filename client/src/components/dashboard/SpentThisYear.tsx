@@ -74,7 +74,7 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const userRole = useSelector((state: RootState) => state.auth.userRole);
+  const userRole = useSelector((state: RootState) => state.auth.role);
 
   if (!amount || isNaN(parseFloat(amount))) {
     return <Typography>Invalid amount data</Typography>;
