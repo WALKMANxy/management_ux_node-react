@@ -1,27 +1,40 @@
-import crypto from "crypto";
 import { Request } from "express";
-import { config } from "../config/config";
 import { ISession, Session } from "../models/Session";
 import { logger } from "./logger";
-
+import { verifySessionToken } from "./jwtUtils"; // Only keep the verifySessionToken function
+import { config } from "../config/config";
+import { AuthenticatedRequest } from "../models/types";
 
 const ms = require("ms");
 
 const sessionDurationMs = ms(config.sessionDuration);
 
-
-export const generateSessionToken = (): string => {
-  const token = crypto.randomBytes(32).toString("hex");
-  logger.debug("Generated new session token", { token });
-  return token;
-};
-
+// Create or renew a session using the provided session token
 export const createSession = async (
   userId: string,
   token: string,
-  req: Request
+  req: AuthenticatedRequest
 ): Promise<ISession> => {
   try {
+    const existingSession = await Session.findOne({
+      userId,
+      userAgent: req.get("User-Agent"),
+      expiresAt: { $gt: new Date() },
+    });
+
+    if (existingSession) {
+      // Renew existing session
+      existingSession.expiresAt = new Date(Date.now() + sessionDurationMs);
+      const renewedSession = await existingSession.save();
+      logger.info("Existing session renewed successfully", {
+        userId,
+        sessionId: renewedSession._id,
+        ipAddress: req.ip,
+        userAgent: req.get("User-Agent"),
+      });
+      return renewedSession;
+    }
+
     const expiresAt = new Date(Date.now() + sessionDurationMs);
     const session = new Session({
       userId,
@@ -29,7 +42,6 @@ export const createSession = async (
       expiresAt,
       ipAddress: req.ip,
       userAgent: req.get("User-Agent"),
-      deviceId: req.body.deviceId || "unknown",
     });
 
     const savedSession = await session.save();
@@ -47,33 +59,15 @@ export const createSession = async (
   }
 };
 
-export const invalidateSession = async (token: string): Promise<void> => {
-  try {
-    await Session.deleteOne({ token });
-    logger.info("Session invalidated", { token });
-  } catch (error) {
-    logger.error("Error invalidating session", { token, error });
-    throw error;
-  }
-};
-
-export const invalidateAllUserSessions = async (
-  userId: string
-): Promise<void> => {
-  try {
-    await Session.deleteMany({ userId });
-    logger.info("All sessions invalidated for user", { userId });
-  } catch (error) {
-    logger.error("Error invalidating all sessions for user", { userId, error });
-    throw error;
-  }
-};
-
+// Validate a session by verifying the JWT token
 export const getSessionByToken = async (
   token: string
 ): Promise<ISession | null> => {
   try {
+    // Verify the token
+    const decoded = verifySessionToken(token);
     const session = await Session.findOne({
+      userId: decoded.userId,
       token,
       expiresAt: { $gt: new Date() },
     }).populate("userId");
@@ -88,6 +82,31 @@ export const getSessionByToken = async (
   }
 };
 
+// Invalidate a session by deleting it from the database
+export const invalidateSession = async (token: string): Promise<void> => {
+  try {
+    await Session.deleteOne({ token });
+    logger.info("Session invalidated", { token });
+  } catch (error) {
+    logger.error("Error invalidating session", { token, error });
+    throw error;
+  }
+};
+
+// Invalidate all sessions for a specific user
+export const invalidateAllUserSessions = async (
+  userId: string
+): Promise<void> => {
+  try {
+    await Session.deleteMany({ userId });
+    logger.info("All sessions invalidated for user", { userId });
+  } catch (error) {
+    logger.error("Error invalidating all sessions for user", { userId, error });
+    throw error;
+  }
+};
+
+// Fetch all valid sessions for a user
 export const getUserSessions = async (userId: string): Promise<ISession[]> => {
   try {
     const sessions = await Session.find({
@@ -105,13 +124,17 @@ export const getUserSessions = async (userId: string): Promise<ISession[]> => {
   }
 };
 
+// Renew an existing session by extending its expiration time
 export const renewSession = async (
   sessionToken: string,
   req: Request
 ): Promise<ISession | null> => {
   try {
+    const decoded = verifySessionToken(sessionToken);
     const session = await Session.findOne({
+      userId: decoded.userId,
       token: sessionToken,
+      userAgent: req.get("User-Agent"),
       expiresAt: { $gt: new Date() },
     });
 
@@ -132,24 +155,17 @@ export const renewSession = async (
       return null; // Deny session renewal if user-agent doesn't match
     }
 
-    const newExpiresAt = new Date(Date.now() + config.sessionDuration);
-    const updatedSession = await Session.findOneAndUpdate(
-      { _id: session._id },
-      {
-        $set: {
-          expiresAt: newExpiresAt,
-          updatedAt: new Date(),
-        },
-      },
-      { new: true }
-    );
+    // Renew session expiry time
+    const newExpiresAt = new Date(Date.now() + sessionDurationMs);
+    session.expiresAt = newExpiresAt;
+    await session.save();
 
     logger.info("Session renewed successfully", {
       sessionId: session._id,
       newExpiresAt,
     });
 
-    return updatedSession;
+    return session;
   } catch (error) {
     logger.error("Error renewing session", { sessionToken, error });
     throw error;

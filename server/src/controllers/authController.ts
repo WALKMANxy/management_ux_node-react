@@ -10,13 +10,13 @@ import {
 } from "../services/authService";
 import {
   createSession,
-  generateSessionToken,
   getUserSessions,
   invalidateAllUserSessions,
   invalidateSession,
   renewSession,
 } from "../utils/sessionUtils";
 import { logger } from "../utils/logger";
+import { generateSessionToken } from "../utils/jwtUtils";
 
 export const register = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -56,7 +56,7 @@ export const login = async (req: Request, res: Response) => {
         .json({ message: "Please verify your email before logging in." });
     }
 
-    const sessionToken = generateSessionToken();
+    const sessionToken = generateSessionToken(user);
     const session = await createSession(user.id, sessionToken, req);
 
     res.cookie("sessionToken", sessionToken, {

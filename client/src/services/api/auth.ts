@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import Cookies from "js-cookie";
-import { getDeviceId, getUserAgent } from "../../utils/deviceUtils";
+import {  getUserAgent } from "../../utils/deviceUtils";
 import { authApiCall } from "./apiUtils";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
@@ -28,7 +28,6 @@ export const loginUser = async (credentials: {
   statusCode: number;
 }> => {
   const userAgent = getUserAgent();
-  const deviceId = getDeviceId();
 
   return authApiCall<{ redirectUrl: string; id: string }>(
     "auth/login",
@@ -36,7 +35,6 @@ export const loginUser = async (credentials: {
     {
       ...credentials,
       userAgent,
-      deviceId,
     }
   );
 };
@@ -83,7 +81,6 @@ export const linkGoogleAccount = async (code: string) => {
 // Handle the OAuth callback and retrieve the user's session
 export const handleOAuthCallback = async (code: string) => {
   const userAgent = navigator.userAgent;
-  const deviceId = getDeviceId(); // Retrieve the device ID
 
   try {
     const response = await axios.post(
@@ -91,7 +88,6 @@ export const handleOAuthCallback = async (code: string) => {
       {
         code,
         userAgent,
-        deviceId,
       },
       {
         withCredentials: true, // To ensure the session cookie is set

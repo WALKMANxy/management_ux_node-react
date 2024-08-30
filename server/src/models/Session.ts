@@ -6,7 +6,6 @@ export interface ISession extends Document {
   expiresAt: Date;
   ipAddress?: string;
   userAgent?: string;
-  deviceId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,7 +17,6 @@ const sessionSchema = new Schema<ISession>(
     expiresAt: { type: Date, required: true },
     ipAddress: { type: String },
     userAgent: { type: String },
-    deviceId: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
   },
