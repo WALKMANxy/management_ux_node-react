@@ -5,7 +5,7 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { AuthState } from "../../models/stateModels";
-import { webSocketService } from "../../services/webSocket";
+import { webSocketService } from "../../services/webSocketService";
 
 const initialState: AuthState = {
   isLoggedIn: false,

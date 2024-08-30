@@ -1,8 +1,8 @@
 import axios from "axios";
 import store from "../app/store";
 import { getApiUrl } from "../config/config";
-import { handleLogin, handleLogout } from "../features/auth/authSlice";
-import { saveAuthState } from "../utils/localStorage";
+import { handleLogout } from "../features/auth/authSlice";
+import { webSocketService } from "./webSocketService"; // Import the WebSocket service
 
 const apiUrl = getApiUrl();
 
@@ -22,21 +22,9 @@ export const refreshSession = async (): Promise<boolean> => {
     );
 
     if (response.status === 200) {
-      const authState = store.getState().auth;
-
-      if (authState.id && authState.userId) {
-        store.dispatch(
-          handleLogin({
-            role: authState.role,
-            id: authState.id,
-            userId: authState.userId,
-          })
-        );
-        saveAuthState(store.getState().auth);
-        return true;
-      } else {
-        throw new Error("Missing user id or userId in auth state");
-      }
+      // Session refreshed successfully, establish WebSocket connection
+      webSocketService.connect(); // Connect WebSocket after session refresh
+      return true;
     } else {
       throw new Error("Session refresh failed");
     }

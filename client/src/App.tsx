@@ -1,15 +1,14 @@
 // src/App.tsx
 import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   createBrowserRouter,
   Navigate,
   RouterProvider,
 } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
-import store, { RootState } from "./app/store";
-import { handleLogin, handleLogout } from "./features/auth/authSlice"; // Import the thunks
+import { RootState } from "./app/store";
 import Layout from "./layout/Layout";
 import { UserRole } from "./models/entityModels";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -20,13 +19,9 @@ import ClientsPage from "./pages/common/ClientsPage";
 import MovementsPage from "./pages/common/MovementsPage";
 import LandingPage from "./pages/landing/LandingPage";
 import { refreshSession } from "./services/sessionService";
-import { webSocketService } from "./services/webSocket";
-import { loadAuthState, saveAuthState } from "./utils/localStorage";
-
-const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes
+import { handleLogout } from "./features/auth/authSlice";
 
 console.log("Vite mode:", import.meta.env.MODE);
-
 
 // Enhanced ProtectedRoute to include role-based protection
 const ProtectedRoute: React.FC<{
@@ -121,68 +116,36 @@ const theme = createTheme({
 });
 
 function App() {
-  const dispatch = useAppDispatch();
-  const isLoggedIn = useAppSelector(
-    (state: RootState) => state.auth.isLoggedIn
-  );
 
-  const handleSessionRefresh = useCallback(async () => {
-    try {
-      const success = await refreshSession();
-      if (success) {
-        // If session refresh is successful, ensure WebSocket is connected
-        webSocketService.connect();
-      } else {
-        dispatch(handleLogout());
-      }
-    } catch (error) {
-      console.error("Session refresh failed:", error);
-      dispatch(handleLogout());
-    }
-  }, [dispatch]);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const initializeApp = async () => {
-      const storedAuthState = loadAuthState();
+      // Check if the auth state is present in the session storage
+      const sessionAuthState = sessionStorage.getItem("auth");
 
-      // Check if storedAuthState exists, user is logged in, and id is not null or undefined
-      if (storedAuthState && storedAuthState.isLoggedIn) {
-        dispatch(handleLogin(storedAuthState));
-        await handleSessionRefresh();
-      } else if (!storedAuthState) {
-        console.warn("Stored auth state is missing.");
-        // Handle cases where the auth state is invalid, e.g., redirect to login or reset state
-      } else if (storedAuthState && storedAuthState.isLoggedIn === false) {
-        console.warn("Stored auth state is invalid.");
-        // Handle cases where the auth state is invalid, e.g., redirect to login or reset state
+      // If the auth state is present and the user is logged in
+      if (sessionAuthState) {
+        const storedAuthState = JSON.parse(sessionAuthState);
+
+        // Check if user is logged in and has a valid role (not "guest")
+        if (storedAuthState.isLoggedIn && storedAuthState.role !== "guest") {
+          // Attempt to refresh the session to validate and extend it on the server side
+          const refreshSuccessful = await refreshSession();
+
+          if (!refreshSuccessful) {
+            console.warn("Session refresh failed or session expired.");
+            dispatch(handleLogout());
+          }
+        }
+      } else {
+        console.warn("No auth state found in session storage.");
+        // Optionally handle redirect to login or other logic here
       }
     };
 
     initializeApp();
-  }, [dispatch, handleSessionRefresh]);
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      // Set up periodic session refresh
-      const refreshInterval = setInterval(
-        handleSessionRefresh,
-        REFRESH_INTERVAL
-      );
-
-      // Set up WebSocket connection
-      webSocketService.connect();
-
-      return () => {
-        clearInterval(refreshInterval);
-        webSocketService.disconnect();
-      };
-    }
-  }, [isLoggedIn, handleSessionRefresh]);
-
-  useEffect(() => {
-    // Update localStorage whenever auth state changes
-    saveAuthState(store.getState().auth);
-  }, [isLoggedIn]);
+  }, [dispatch]);
 
   return (
     <ThemeProvider theme={theme}>
