@@ -80,7 +80,10 @@ const httpsOptions = {
 const server = https.createServer(httpsOptions, app);
 
 const io = new SocketIOServer(server, {
-  cors: corsOptions,
+  cors: {
+    origin: config.appUrl,
+    credentials: true,
+  },
 });
 
 const { emitAlert } = setupWebSocket(io);
