@@ -1,9 +1,8 @@
 //src/features/auth/authSlice.ts
-import {
-  createAsyncThunk,
-  /* createAsyncThunk, */ createSlice,
-  PayloadAction,
-} from "@reduxjs/toolkit";
+console.log('Initializing authSlice');
+
+
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AuthState } from "../../models/stateModels";
 import { webSocketService } from "../../services/webSocketService";
 

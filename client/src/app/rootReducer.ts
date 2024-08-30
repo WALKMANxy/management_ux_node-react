@@ -1,6 +1,9 @@
 //src/app/rootReducer.ts
+
+console.log('Initializing rootReducer');
+
 import { Action, combineReducers } from "@reduxjs/toolkit";
-import authReducer, { handleLogout } from "../features/auth/authSlice";
+import authReducer from "../features/auth/authSlice";
 import dataReducer from "../features/data/dataSlice";
 import searchReducer from "../features/search/searchSlice";
 import { authApi } from "../services/authQueries";
@@ -19,7 +22,11 @@ const rootReducer = (
   state: Partial<ReturnType<typeof appReducer>> | undefined,
   action: Action
 ) => {
-  if (action.type === handleLogout.fulfilled.type) {
+
+  console.log('Executing rootReducer with action:', action.type);
+
+
+  if (action.type === "auth/handleLogout/fulfilled") {
     // Reset entire state, including API slice
     state = undefined;
   }
