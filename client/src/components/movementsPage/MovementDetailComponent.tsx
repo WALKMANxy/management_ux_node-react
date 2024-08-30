@@ -3,7 +3,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import { Box, Grid, Skeleton, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import {  MovementProp } from "../../models/propsModels";
+import { MovementProp } from "../../models/propsModels";
 
 const MovementDetailComponent: React.FC<MovementProp> = ({
   detail,

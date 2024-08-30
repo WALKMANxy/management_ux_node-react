@@ -3,13 +3,13 @@ import jwt from "jsonwebtoken";
 import { config } from "../config/config";
 import { Passcode } from "../models/Passcode";
 import { IUser, User } from "../models/User";
-import logger from "../utils/logger";
 import { logRegisteredUser } from "../utils/logRegisteredUsers";
 import {
   sendPasswordResetEmail,
   sendVerificationEmail,
 } from "../utils/sendEmail";
 import { invalidateAllUserSessions } from "../utils/sessionUtils";
+import { logger } from "../utils/logger";
 
 const JWT_SECRET = config.jwtSecret || "";
 
@@ -147,4 +147,3 @@ export const resetPassword = async (
 
   logger.info(`Password reset successful for user: ${user.email}.`);
 };
-

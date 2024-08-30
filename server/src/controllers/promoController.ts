@@ -39,7 +39,7 @@ export class PromoController {
     try {
       const promo = await PromoService.replacePromo(req.params.id, req.body);
       if (!promo) {
-        res.status(404).json({ message: "Promo not found" });
+        res.status(200).json({ message: "Promo not found" });
         return; // Ensure the function stops execution here
       }
       res.status(200).json({ message: "Promo updated successfully", promo });
@@ -59,7 +59,7 @@ export class PromoController {
     try {
       const promo = await PromoService.updatePromo(req.params.id, req.body);
       if (!promo) {
-        res.status(404).json({ message: "Promo not found" });
+        res.status(200).json({ message: "Promo not found" });
         return; // Ensure the function stops execution here
       }
       res.status(200).json({ message: "Promo updated successfully", promo });

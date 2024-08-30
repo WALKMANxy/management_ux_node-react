@@ -1,7 +1,14 @@
 import { io, Socket } from "socket.io-client";
 import store from "../app/store";
+import { getApiUrl } from "../config/config";
 import { addAlert, updateAlert } from "../features/data/dataSlice"; // Assuming dataSlice is in features/data
 import { Alert } from "../models/dataModels";
+
+const apiUrl = getApiUrl();
+
+if (!apiUrl) {
+  console.error("Api URL is not defined inside webSocket.ts.");
+}
 
 class WebSocketService {
   private socket: Socket | null = null;
@@ -9,12 +16,7 @@ class WebSocketService {
   private maxReconnectAttempts = 5;
 
   connect() {
-    if (!import.meta.env.VITE_APP_API_URL) {
-      console.error("REACT_APP_API_URL is not defined");
-      return;
-    }
-
-    this.socket = io(import.meta.env.VITE_APP_API_URL, {
+    this.socket = io(apiUrl, {
       withCredentials: true, // This allows the cookie to be sent
       transports: ["websocket"],
     });

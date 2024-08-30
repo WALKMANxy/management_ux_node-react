@@ -34,7 +34,7 @@ export class ClientController {
         res.json(client);
       } else {
         res
-          .status(404)
+          .status(200)
           .json({
             message: `Client with codice ${req.params.codice} not found.`,
           });

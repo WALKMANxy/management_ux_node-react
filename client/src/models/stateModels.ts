@@ -5,7 +5,7 @@ import { SearchResult } from "./searchModels";
 export type AuthState = {
   isLoggedIn: boolean;
   role: UserRole;
-  id: string ;
+  id: string;
   userId: string;
 };
 
@@ -38,7 +38,7 @@ export interface DataSliceState {
   currentUserData: Client | Agent | Admin | null;
   currentUserDetails: {
     id: string;
-    role: 'client' | 'agent' | 'admin';
+    role: "client" | "agent" | "admin";
     name: string;
     userId: string;
   } | null;
@@ -47,10 +47,9 @@ export interface DataSliceState {
   currentUserVisits: Visit[] | GlobalVisits | null;
   selectedClientId: string | null;
   selectedAgentId: string | null;
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
-
 
 export type State = {
   hasError: boolean;

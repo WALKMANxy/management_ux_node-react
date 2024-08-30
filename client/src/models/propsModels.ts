@@ -8,7 +8,7 @@ import { AgGridReact } from "ag-grid-react";
 import { Dayjs } from "dayjs";
 import { ReactNode } from "react";
 import { Movement, MovementDetail } from "./dataModels";
-import { Agent, Client } from "./entityModels";
+import { Agent, Client, UserRole } from "./entityModels";
 import { SearchResult } from "./searchModels";
 
 export type AuthHandlersProps = {
@@ -34,7 +34,6 @@ export type GlobalSearchProps = {
   isHeaderSearch?: boolean;
 };
 
-
 export type MovementProp = {
   detail: {
     id: string;
@@ -42,7 +41,7 @@ export type MovementProp = {
     [key: string]: string | number;
   };
   isLoading: boolean;
-}
+};
 
 export type ArticleProp = {
   detail: {
@@ -54,10 +53,11 @@ export type ArticleProp = {
     [key: string]: string | number;
   };
   isLoading: boolean;
-}
+};
 
 export type ClientProp = {
-  detail: {  id: string;
+  detail: {
+    id: string;
     name: string;
     extendedName?: string; // New property
     province?: string;
@@ -78,8 +78,7 @@ export type ClientProp = {
     colour?: string;
   };
   isLoading: boolean;
-}
-
+};
 
 export type SearchResultsProps = {
   onSelect: (item: SearchResult) => void; // Change this to accept SearchResult
@@ -140,7 +139,7 @@ export interface SpentThisMonthProps {
   comparison?: {
     value: number;
   };
-  isAgentSelected: boolean;
+  isAgentSelected?: boolean;
 }
 
 export interface ComparisonResult {
@@ -158,7 +157,7 @@ export interface ComparisonDetails {
 export type SpentThisYearProps = {
   amount: string;
   comparison?: { value: number };
-  isAgentSelected: boolean;
+  isAgentSelected?: boolean;
   backgroundColor?: string;
 };
 
@@ -273,3 +272,18 @@ export type ArticleDetailsProps = {
 export type MovementDetailsHistoryProps = {
   movementDetails: MovementDetail[];
 };
+
+
+
+export type BrandData = {
+  id: string;
+  label: string;
+  value: number;
+};
+
+export interface TopBrandsSoldProps {
+  topBrandsData: BrandData[];
+  brandColors: string[];
+  isMobile: boolean;
+  userRole: UserRole;
+}

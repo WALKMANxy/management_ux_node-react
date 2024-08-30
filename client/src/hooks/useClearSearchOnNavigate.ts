@@ -1,12 +1,12 @@
 // src/hooks/useClearSearchOnNavigate.ts
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
+import { useAppDispatch } from "../app/hooks";
 import { clearResults } from "../features/search/searchSlice";
 
 const useClearSearchOnNavigate = () => {
   const location = useLocation();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(clearResults());

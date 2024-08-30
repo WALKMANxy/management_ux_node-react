@@ -7,7 +7,14 @@ import {
   Typography,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import { Bookmark, Calendar, ShoppingCart, Tag, User, Bell } from "lucide-react";
+import {
+  Bell,
+  Bookmark,
+  Calendar,
+  ShoppingCart,
+  Tag,
+  User,
+} from "lucide-react";
 import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { SearchResultsProps } from "../../models/propsModels";
@@ -65,14 +72,19 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         return (
           <>
             <Typography>
-              {t("searchResults.province", { province: result.province || t("searchResults.notAvailable") })}
+              {t("searchResults.province", {
+                province: result.province || t("searchResults.notAvailable"),
+              })}
             </Typography>
             <Typography>
-              {t("searchResults.phone", { phone: result.phone || t("searchResults.notAvailable") })}
+              {t("searchResults.phone", {
+                phone: result.phone || t("searchResults.notAvailable"),
+              })}
             </Typography>
             <Typography>
               {t("searchResults.paymentMethod", {
-                paymentMethod: result.paymentMethod || t("searchResults.notAvailable"),
+                paymentMethod:
+                  result.paymentMethod || t("searchResults.notAvailable"),
               })}
             </Typography>
             {result.email && (
@@ -97,10 +109,14 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         return (
           <>
             <Typography>
-              {t("searchResults.articleId", { articleId: result.articleId || t("searchResults.notAvailable") })}
+              {t("searchResults.articleId", {
+                articleId: result.articleId || t("searchResults.notAvailable"),
+              })}
             </Typography>
             <Typography>
-              {t("searchResults.brand", { brand: result.brand || t("searchResults.notAvailable") })}
+              {t("searchResults.brand", {
+                brand: result.brand || t("searchResults.notAvailable"),
+              })}
             </Typography>
             {result.lastSoldDate && (
               <Typography>
@@ -115,7 +131,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         return (
           <>
             <Typography>
-              {t("searchResults.promoType", { promoType: result.promoType || t("searchResults.notAvailable") })}
+              {t("searchResults.promoType", {
+                promoType: result.promoType || t("searchResults.notAvailable"),
+              })}
             </Typography>
             <Typography>
               {t("searchResults.startDate", {
@@ -128,7 +146,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({
               })}
             </Typography>
             <Typography>
-              {t("searchResults.issuedBy", { issuedBy: result.promoIssuedBy || t("searchResults.notAvailable") })}
+              {t("searchResults.issuedBy", {
+                issuedBy:
+                  result.promoIssuedBy || t("searchResults.notAvailable"),
+              })}
             </Typography>
           </>
         );
@@ -150,7 +171,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({
               })}
             </Typography>
             <Typography>
-              {t("searchResults.issuedBy", { issuedBy: result.visitIssuedBy || t("searchResults.notAvailable") })}
+              {t("searchResults.issuedBy", {
+                issuedBy:
+                  result.visitIssuedBy || t("searchResults.notAvailable"),
+              })}
             </Typography>
             {result.reason && (
               <Typography>
@@ -163,7 +187,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         return (
           <>
             <Typography>
-              {t("searchResults.alertReason", { alertReason: result.alertReason || t("searchResults.notAvailable") })}
+              {t("searchResults.alertReason", {
+                alertReason:
+                  result.alertReason || t("searchResults.notAvailable"),
+              })}
             </Typography>
             <Typography>
               {t("searchResults.createdAt", {
@@ -171,10 +198,15 @@ const SearchResults: React.FC<SearchResultsProps> = ({
               })}
             </Typography>
             <Typography>
-              {t("searchResults.severity", { severity: result.severity || t("searchResults.notAvailable") })}
+              {t("searchResults.severity", {
+                severity: result.severity || t("searchResults.notAvailable"),
+              })}
             </Typography>
             <Typography>
-              {t("searchResults.issuedBy", { issuedBy: result.alertIssuedBy || t("searchResults.notAvailable") })}
+              {t("searchResults.issuedBy", {
+                issuedBy:
+                  result.alertIssuedBy || t("searchResults.notAvailable"),
+              })}
             </Typography>
           </>
         );

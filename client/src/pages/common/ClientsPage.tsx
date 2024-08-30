@@ -19,7 +19,7 @@ import {
 const ClientsPage: React.FC = () => {
   const { t } = useTranslation();
   const isMobile = useMediaQuery("(max-width:600px)");
-  const userRole = useSelector((state: RootState) => state.auth.userRole);
+  const userRole = useSelector((state: RootState) => state.auth.role);
   const loggedInClientId = useSelector((state: RootState) => state.auth.id);
 
   const {
@@ -103,8 +103,7 @@ const ClientsPage: React.FC = () => {
         field: "totalRevenue",
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
-        valueFormatter: (params) =>
-          currencyFormatter(params.value),
+        valueFormatter: (params) => currencyFormatter(params.value),
         sortable: true,
       },
       {
@@ -114,8 +113,7 @@ const ClientsPage: React.FC = () => {
         },
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
-        valueFormatter: (params) =>
-          currencyFormatter(params.value),
+        valueFormatter: (params) => currencyFormatter(params.value),
         sortable: true,
       },
       {
@@ -126,8 +124,7 @@ const ClientsPage: React.FC = () => {
         },
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
-        valueFormatter: (params) =>
-          currencyFormatter(params.value),
+        valueFormatter: (params) => currencyFormatter(params.value),
         sortable: true,
       },
       {
@@ -140,8 +137,7 @@ const ClientsPage: React.FC = () => {
         },
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
-        valueFormatter: (params) =>
-          currencyFormatter(params.value),
+        valueFormatter: (params) => currencyFormatter(params.value),
         sortable: true,
       },
       {
@@ -149,8 +145,7 @@ const ClientsPage: React.FC = () => {
         field: "unpaidRevenue",
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
-        valueFormatter: (params) =>
-          currencyFormatter(params.value),
+        valueFormatter: (params) => currencyFormatter(params.value),
         sortable: true,
       },
       {

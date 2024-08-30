@@ -24,7 +24,7 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
   const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<"clients" | "agents">("clients");
 
-  const userRole = useSelector((state: RootState) => state.auth.userRole);
+  const userRole = useSelector((state: RootState) => state.auth.role);
 
   const loading =
     (viewMode === "clients" && salesDistributionDataClients.length === 0) ||

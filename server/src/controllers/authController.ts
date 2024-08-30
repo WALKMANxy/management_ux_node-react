@@ -8,7 +8,6 @@ import {
   resetPassword,
   verifyUserEmail,
 } from "../services/authService";
-import logger from "../utils/logger";
 import {
   createSession,
   generateSessionToken,
@@ -17,6 +16,7 @@ import {
   invalidateSession,
   renewSession,
 } from "../utils/sessionUtils";
+import { logger } from "../utils/logger";
 
 export const register = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -74,7 +74,7 @@ export const login = async (req: Request, res: Response) => {
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      logger.error("Login error:", { error: error.message });
+      logger.error("Login error:", { error: error });
       res.status(500).json({ message: "Login failed", error: error.message });
     } else {
       logger.error("Unexpected login error:", { error: String(error) });

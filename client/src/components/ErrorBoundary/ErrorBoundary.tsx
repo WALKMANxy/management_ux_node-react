@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Box, Typography, Button, Paper } from "@mui/material";
+import { Box, Button, Paper, Typography } from "@mui/material";
 import { styled } from "@mui/system";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface ErrorBoundaryProps {
@@ -20,12 +20,15 @@ const ErrorMessage = styled(Typography)(({ theme }) => ({
 }));
 
 const ErrorDetails = styled(Typography)(({ theme }) => ({
-  whiteSpace: 'pre-wrap',
+  whiteSpace: "pre-wrap",
   marginBottom: theme.spacing(2),
-  fontSize: '0.8rem',
+  fontSize: "0.8rem",
 }));
 
-const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children, fallback }) => {
+const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({
+  children,
+  fallback,
+}) => {
   const { t } = useTranslation();
   const [hasError, setHasError] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -51,7 +54,7 @@ const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children, fallback }) => 
       if (err) {
         console.error(`Error: ${message} at ${source}:${lineno}:${colno}`);
 
-        errorHandler(err, { componentStack: '' });
+        errorHandler(err, { componentStack: "" });
       }
       return true;
     };
@@ -69,25 +72,28 @@ const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({ children, fallback }) => 
     return (
       <ErrorContainer>
         <ErrorMessage variant="h5">
-          {t('errorBoundary.title', 'Oops! Something went wrong.')}
+          {t("errorBoundary.title", "Oops! Something went wrong.")}
         </ErrorMessage>
         <ErrorMessage>
-          {t('errorBoundary.message', 'We\'re sorry for the inconvenience. Please try again or contact support if the problem persists.')}
+          {t(
+            "errorBoundary.message",
+            "We're sorry for the inconvenience. Please try again or contact support if the problem persists."
+          )}
         </ErrorMessage>
-        {import.meta.env.NODE_ENV === 'development' && error && (
+        {import.meta.env.NODE_ENV === "development" && error && (
           <Box>
-            <ErrorDetails>
-              {error.toString()}
-            </ErrorDetails>
+            <ErrorDetails>{error.toString()}</ErrorDetails>
             {errorInfo && (
-              <ErrorDetails>
-                {errorInfo.componentStack}
-              </ErrorDetails>
+              <ErrorDetails>{errorInfo.componentStack}</ErrorDetails>
             )}
           </Box>
         )}
-        <Button variant="contained" color="primary" onClick={resetErrorBoundary}>
-          {t('errorBoundary.tryAgain', 'Try again')}
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={resetErrorBoundary}
+        >
+          {t("errorBoundary.tryAgain", "Try again")}
         </Button>
       </ErrorContainer>
     );

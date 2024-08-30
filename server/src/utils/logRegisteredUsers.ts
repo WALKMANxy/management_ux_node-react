@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { IUser } from "../models/User";
 import { readFile, resolveFilePath, writeFile } from "./fileUtils";
-import logger from "./logger";
+import { logger } from "./logger";
 
 const LOG_FILE_PATH = resolveFilePath("data/registeredUsersLog.json");
 

@@ -6,31 +6,43 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
 import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { selectVisits, VisitWithAgent } from "../../features/utility/utilitySlice";
+import {
+  selectVisits,
+  VisitWithAgent,
+} from "../../features/utility/utilitySelectors";
 import { ServerDayProps } from "../../models/propsModels";
+import { DataSliceState } from "../../models/stateModels";
 import { agentColorMap } from "../../utils/constants";
 import ServerDay from "./ServerDay";
-import { DataSliceState } from "../../models/stateModels";
 
 const CalendarComponent: React.FC = () => {
   const visits = useSelector(selectVisits);
-  const currentUserDetails = useSelector((state: DataSliceState) => state.currentUserDetails);
+  const currentUserDetails = useSelector(
+    (state: DataSliceState) => state.currentUserDetails
+  );
   const clients = useSelector((state: DataSliceState) => state.clients);
   const [isLoading, setIsLoading] = useState(false);
-  const [highlightedDays, setHighlightedDays] = useState<{ date: number; color: string }[]>([]);
+  const [highlightedDays, setHighlightedDays] = useState<
+    { date: number; color: string }[]
+  >([]);
   const [currentMonth, setCurrentMonth] = useState<Dayjs>(dayjs());
 
   const updateHighlightedDays = useCallback(
     (month: Dayjs) => {
       const days = visits
-        .filter((visit: VisitWithAgent) => visit?.date && dayjs(visit.date).isSame(month, "month"))
+        .filter(
+          (visit: VisitWithAgent) =>
+            visit?.date && dayjs(visit.date).isSame(month, "month")
+        )
         .map((visit: VisitWithAgent) => {
           let color = "#ADD8E6"; // Default pastel blue
 
           if (currentUserDetails) {
             if (currentUserDetails.role === "admin") {
               // Admin view, color by agent
-              color = visit.agentId ? agentColorMap[visit.agentId] ?? color : color;
+              color = visit.agentId
+                ? agentColorMap[visit.agentId] ?? color
+                : color;
             } else if (currentUserDetails.role === "agent") {
               // Agent view, color by client
               const client = clients[visit.clientId];

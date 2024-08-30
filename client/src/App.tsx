@@ -2,15 +2,16 @@
 import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import React, { useCallback, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   createBrowserRouter,
   Navigate,
   RouterProvider,
 } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "./app/hooks";
 import store, { RootState } from "./app/store";
-import { login, logout } from "./features/auth/authSlice";
+import { handleLogin, handleLogout } from "./features/auth/authSlice"; // Import the thunks
 import Layout from "./layout/Layout";
+import { UserRole } from "./models/entityModels";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AgentDashboard from "./pages/agent/AgentDashboard";
 import ClientDashboard from "./pages/client/ClientDashboard";
@@ -24,9 +25,29 @@ import { loadAuthState, saveAuthState } from "./utils/localStorage";
 
 const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes
 
-const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
-  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
-  return isLoggedIn ? children : <Navigate to="/" />;
+console.log("Vite mode:", import.meta.env.MODE);
+
+
+// Enhanced ProtectedRoute to include role-based protection
+const ProtectedRoute: React.FC<{
+  children: JSX.Element;
+  requiredRole?: UserRole;
+}> = ({ children, requiredRole }) => {
+  const isLoggedIn = useAppSelector(
+    (state: RootState) => state.auth.isLoggedIn
+  );
+  const userRole = useAppSelector((state: RootState) => state.auth.role);
+
+  // Check if the user is logged in and has the correct role, if a role is required
+  if (!isLoggedIn) {
+    return <Navigate to="/" />;
+  }
+
+  if (requiredRole && userRole !== requiredRole) {
+    return <Navigate to="/" />;
+  }
+
+  return children;
 };
 
 const router = createBrowserRouter([
@@ -41,7 +62,7 @@ const router = createBrowserRouter([
       {
         path: "agent-dashboard",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="agent">
             <AgentDashboard />
           </ProtectedRoute>
         ),
@@ -49,7 +70,7 @@ const router = createBrowserRouter([
       {
         path: "admin-dashboard",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="admin">
             <AdminDashboard />
           </ProtectedRoute>
         ),
@@ -57,7 +78,7 @@ const router = createBrowserRouter([
       {
         path: "client-dashboard",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="client">
             <ClientDashboard />
           </ProtectedRoute>
         ),
@@ -100,8 +121,10 @@ const theme = createTheme({
 });
 
 function App() {
-  const dispatch = useDispatch();
-  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
+  const dispatch = useAppDispatch();
+  const isLoggedIn = useAppSelector(
+    (state: RootState) => state.auth.isLoggedIn
+  );
 
   const handleSessionRefresh = useCallback(async () => {
     try {
@@ -110,11 +133,11 @@ function App() {
         // If session refresh is successful, ensure WebSocket is connected
         webSocketService.connect();
       } else {
-        dispatch(logout());
+        dispatch(handleLogout());
       }
     } catch (error) {
       console.error("Session refresh failed:", error);
-      dispatch(logout());
+      dispatch(handleLogout());
     }
   }, [dispatch]);
 
@@ -124,7 +147,7 @@ function App() {
 
       // Check if storedAuthState exists, user is logged in, and id is not null or undefined
       if (storedAuthState && storedAuthState.isLoggedIn) {
-        dispatch(login(storedAuthState));
+        dispatch(handleLogin(storedAuthState));
         await handleSessionRefresh();
       } else if (!storedAuthState) {
         console.warn("Stored auth state is missing.");

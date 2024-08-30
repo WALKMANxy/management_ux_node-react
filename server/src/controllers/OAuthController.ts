@@ -3,7 +3,11 @@ import { config } from "../config/config";
 import { AuthenticatedRequest } from "../models/types";
 import { IUser } from "../models/User";
 import { OAuthService } from "../services/OAuthService";
-import { createSession, generateSessionToken, renewSession } from "../utils/sessionUtils";
+import {
+  createSession,
+  generateSessionToken,
+  renewSession,
+} from "../utils/sessionUtils";
 
 export class OAuthController {
   static async handleOAuthCallback(req: Request, res: Response) {
@@ -26,11 +30,7 @@ export class OAuthController {
       );
 
       const sessionToken = generateSessionToken();
-      const session = await createSession(
-        user.id.toString(),
-        sessionToken,
-        req
-      );
+      await createSession(user.id.toString(), sessionToken, req);
 
       res.cookie("sessionToken", sessionToken, {
         httpOnly: true,

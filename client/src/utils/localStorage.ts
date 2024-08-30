@@ -52,8 +52,10 @@ function isAuthState(obj: unknown): obj is AuthState {
     "role" in obj &&
     typeof (obj as AuthState).role === "string" && // Assuming userRole is of string type or validate as per actual enum/type
     "id" in obj &&
-    (typeof (obj as AuthState).id === "string" || (obj as AuthState).id === null) &&
+    (typeof (obj as AuthState).id === "string" ||
+      (obj as AuthState).id === null) &&
     "userId" in obj &&
-    (typeof (obj as AuthState).userId === "string" || (obj as AuthState).userId === null)
+    (typeof (obj as AuthState).userId === "string" ||
+      (obj as AuthState).userId === null)
   );
 }

@@ -10,9 +10,8 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useEffect } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
-import { useDispatch } from "react-redux";
 import ActivePromotions from "../../components/dashboard/ActivePromotions";
 import CalendarComponent from "../../components/dashboard/CalendarComponent";
 import SpentThisMonth from "../../components/dashboard/SpentThisMonth";
@@ -28,11 +27,10 @@ import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
 import useSelectionState from "../../hooks/useSelectionState";
 import useStats from "../../hooks/useStats";
 import { brandColors } from "../../utils/constants";
-import { calculateMonthlyData, getTrend } from "../../utils/dataUtils";
+import { calculateMonthlyData } from "../../utils/dataUtils";
 
 const AgentDashboard: React.FC = () => {
   const { t } = useTranslation();
-  const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -60,12 +58,6 @@ const AgentDashboard: React.FC = () => {
     yearlyOrdersData,
     isLoading,
   } = useStats(isMobile);
-
-  useEffect(() => {
-    if (details && "AgentVisits" in details) {
-      dispatch(setVisits(details.AgentVisits));
-    }
-  }, [details, dispatch]);
 
   return (
     <Box
@@ -114,11 +106,7 @@ const AgentDashboard: React.FC = () => {
                           clientComparativeStatisticsMonthly?.revenuePercentage ||
                           "0"
                         }`
-                      ), // Ensure string type
-                      trend: getTrend(
-                        clientComparativeStatisticsMonthly?.revenuePercentage ||
-                          "0"
-                      ), // Ensure string type
+                      ),
                     }}
                     isAgentSelected={false}
                   />
@@ -133,10 +121,7 @@ const AgentDashboard: React.FC = () => {
                         `${
                           clientComparativeStatistics?.revenuePercentage || "0"
                         }`
-                      ), // Ensure string type
-                      trend: getTrend(
-                        clientComparativeStatistics?.revenuePercentage || "0"
-                      ), // Ensure string type
+                      ),
                     }}
                     isAgentSelected={false}
                   />

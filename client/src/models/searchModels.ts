@@ -5,7 +5,6 @@ export type SearchResult = {
 
   notAvailable?: "Not Available";
 
-
   // Client-specific properties
   extendedName?: string;
   province?: string;

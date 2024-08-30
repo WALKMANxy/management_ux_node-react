@@ -1,10 +1,10 @@
 import nodemailer from "nodemailer";
 import { config } from "../config/config";
-import logger from "./logger"; // Assuming logger is in the same directory
+import { logger } from "./logger";
 
 const transporter = nodemailer.createTransport({
-  host: "smtps.aruba.it",
-  port: 465,
+  host: config.emailHost,
+  port: parseInt(config.emailHostPort),
   secure: true, // Use SSL
   auth: {
     user: config.smtpUser, // Your Aruba email username
@@ -12,8 +12,26 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Helper function to handle and log email errors
+function handleEmailError(message: string, error: unknown, context: Record<string, unknown>) {
+  if (error instanceof Error) {
+    logger.error(message, {
+      ...context,
+      error: error.message,
+      stack: error.stack,
+    });
+  } else {
+    logger.error(message, {
+      ...context,
+      error: String(error),
+    });
+  }
+}
+
 export const sendVerificationEmail = async (email: string, token: string) => {
   const verificationUrl = `${config.baseUrl}/auth/verify-email?token=${token}`;
+  logger.debug("Preparing to send verification email", { email, verificationUrl });
+
 
   const mailOptions = {
     from: '"Ricambi Centro Sud" <ordini.piattaforme@ricambicentrosud.com>', // Your email
@@ -36,26 +54,14 @@ export const sendVerificationEmail = async (email: string, token: string) => {
 
   try {
     const response = await transporter.sendMail(mailOptions);
-    logger.info("Verification email sent", {
+    logger.info("Verification email sent successfully", {
       email,
-      verificationUrl,
-      response,
+      response: response.messageId, // Log only the message ID or minimal details
     });
     return response;
   } catch (error) {
-    if (error instanceof Error) {
-      logger.error("Failed to send verification email", {
-        email,
-        error: error.message,
-        stack: error.stack,
-      });
-    } else {
-      logger.error("Failed to send verification email", {
-        email,
-        error: String(error),
-      });
-    }
-    throw error;
+    handleEmailError("Failed to send verification email", error, { email, verificationUrl });
+    throw error; // Re-throw error after logging
   }
 };
 
@@ -65,6 +71,7 @@ export const sendPasswordResetEmail = async (
   passcode: string
 ) => {
   const resetUrl = `${config.baseUrl}/auth/reset-password?token=${token}`;
+  logger.debug("Preparing to send password reset email", { email, resetUrl });
 
   const mailOptions = {
     from: '"Ricambi Centro Sud" <ordini.piattaforme@ricambicentrosud.com>',
@@ -90,21 +97,13 @@ export const sendPasswordResetEmail = async (
 
   try {
     const response = await transporter.sendMail(mailOptions);
-    logger.info("Password reset email sent", { email, resetUrl, response });
+    logger.info("Password reset email sent successfully", {
+      email,
+      response: response.messageId,
+    });
     return response;
   } catch (error) {
-    if (error instanceof Error) {
-      logger.error("Failed to send password reset email", {
-        email,
-        error: error.message,
-        stack: error.stack,
-      });
-    } else {
-      logger.error("Failed to send password reset email", {
-        email,
-        error: String(error),
-      });
-    }
+    handleEmailError("Failed to send password reset email", error, { email, resetUrl });
     throw error;
   }
 };

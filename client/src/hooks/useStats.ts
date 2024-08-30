@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../app/store";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { RootState } from "../app/store";
 import {
   clearSelection,
   fetchInitialData,
@@ -30,7 +30,7 @@ import {
 } from "../utils/dataUtils";
 
 const useStats = (isMobile: boolean) => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   const [localError, setLocalError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -46,7 +46,7 @@ const useStats = (isMobile: boolean) => {
     selectedAgentId, // ID of the currently selected agent
     status, // Status of data fetch (loading, success, error)
     error, // Error message if data fetch fails
-  } = useSelector<RootState, DataSliceState>((state) => state.data);
+  } = useAppSelector<RootState, DataSliceState>((state) => state.data);
 
   // Extract the role from currentUserDetails
   const role = currentUserDetails?.role;
@@ -248,14 +248,22 @@ const useStats = (isMobile: boolean) => {
     }
 
     const clientRevenue = parseFloat(selectedClient.totalRevenue);
-    const totalRevenueAllClients = parseFloat(calculateTotalRevenue(Object.values(clients)));
-    const revenuePercentage = calculatePercentage(clientRevenue, totalRevenueAllClients);
+    const totalRevenueAllClients = parseFloat(
+      calculateTotalRevenue(Object.values(clients))
+    );
+    const revenuePercentage = calculatePercentage(
+      clientRevenue,
+      totalRevenueAllClients
+    );
 
     const totalOrdersAllClients = Object.values(clients).reduce(
       (sum, client) => sum + client.movements.length,
       0
     );
-    const ordersPercentage = calculatePercentage(selectedClient.movements.length, totalOrdersAllClients);
+    const ordersPercentage = calculatePercentage(
+      selectedClient.movements.length,
+      totalOrdersAllClients
+    );
 
     return { revenuePercentage, ordersPercentage };
   }, [selectedClient, clients]);
@@ -268,15 +276,25 @@ const useStats = (isMobile: boolean) => {
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
 
-    const selectedMovements = filterCurrentMonthMovements(selectedClient.movements, currentMonth, currentYear);
-    const allMovements = Object.values(clients).flatMap(client =>
+    const selectedMovements = filterCurrentMonthMovements(
+      selectedClient.movements,
+      currentMonth,
+      currentYear
+    );
+    const allMovements = Object.values(clients).flatMap((client) =>
       filterCurrentMonthMovements(client.movements, currentMonth, currentYear)
     );
 
     const selectedMonthlyTotal = calculateRevenue(selectedMovements);
     const allMonthlyTotal = calculateRevenue(allMovements);
-    const revenuePercentage = calculatePercentage(selectedMonthlyTotal, allMonthlyTotal);
-    const ordersPercentage = calculatePercentage(selectedMovements.length, allMovements.length);
+    const revenuePercentage = calculatePercentage(
+      selectedMonthlyTotal,
+      allMonthlyTotal
+    );
+    const ordersPercentage = calculatePercentage(
+      selectedMovements.length,
+      allMovements.length
+    );
 
     return { revenuePercentage, ordersPercentage };
   }, [selectedClient, clients]);
@@ -291,12 +309,20 @@ const useStats = (isMobile: boolean) => {
     );
 
     const agentRevenue = parseFloat(calculateTotalRevenue(agentClients));
-    const totalRevenueAllClients = parseFloat(calculateTotalRevenue(Object.values(clients)));
-    const revenuePercentage = calculatePercentage(agentRevenue, totalRevenueAllClients);
+    const totalRevenueAllClients = parseFloat(
+      calculateTotalRevenue(Object.values(clients))
+    );
+    const revenuePercentage = calculatePercentage(
+      agentRevenue,
+      totalRevenueAllClients
+    );
 
     const agentOrders = calculateTotalOrders(agentClients);
     const totalOrdersAllClients = calculateTotalOrders(Object.values(clients));
-    const ordersPercentage = calculatePercentage(agentOrders, totalOrdersAllClients);
+    const ordersPercentage = calculatePercentage(
+      agentOrders,
+      totalOrdersAllClients
+    );
 
     return { revenuePercentage, ordersPercentage };
   }, [selectedAgent, clients]);
@@ -315,35 +341,58 @@ const useStats = (isMobile: boolean) => {
 
     const selectedMonthlyTotal = agentClients.reduce(
       (total, client) =>
-        total + calculateRevenue(filterCurrentMonthMovements(client.movements, currentMonth, currentYear)),
+        total +
+        calculateRevenue(
+          filterCurrentMonthMovements(
+            client.movements,
+            currentMonth,
+            currentYear
+          )
+        ),
       0
     );
 
     const allMonthlyTotal = Object.values(clients).reduce(
       (total, client) =>
-        total + calculateRevenue(filterCurrentMonthMovements(client.movements, currentMonth, currentYear)),
+        total +
+        calculateRevenue(
+          filterCurrentMonthMovements(
+            client.movements,
+            currentMonth,
+            currentYear
+          )
+        ),
       0
     );
 
-    const revenuePercentage = calculatePercentage(selectedMonthlyTotal, allMonthlyTotal);
+    const revenuePercentage = calculatePercentage(
+      selectedMonthlyTotal,
+      allMonthlyTotal
+    );
 
     const selectedOrdersTotal = agentClients.reduce(
       (total, client) =>
-        total + filterCurrentMonthMovements(client.movements, currentMonth, currentYear).length,
+        total +
+        filterCurrentMonthMovements(client.movements, currentMonth, currentYear)
+          .length,
       0
     );
 
     const allOrdersTotal = Object.values(clients).reduce(
       (total, client) =>
-        total + filterCurrentMonthMovements(client.movements, currentMonth, currentYear).length,
+        total +
+        filterCurrentMonthMovements(client.movements, currentMonth, currentYear)
+          .length,
       0
     );
 
-    const ordersPercentage = calculatePercentage(selectedOrdersTotal, allOrdersTotal);
+    const ordersPercentage = calculatePercentage(
+      selectedOrdersTotal,
+      allOrdersTotal
+    );
 
     return { revenuePercentage, ordersPercentage };
   }, [selectedAgent, clients]);
-
 
   return {
     details: currentUserData,

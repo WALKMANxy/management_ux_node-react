@@ -17,7 +17,7 @@ export const useHandleSignin = (onClose: () => void) => {
   const [shakePassword, setShakePassword] = useState(false);
   const [shakeConfirmPassword, setShakeConfirmPassword] = useState(false); // For confirming password shake effect
 
-  const { handleLogin, handleRegister } = useAuth();
+  const { initiateLogin, initiateRegister } = useAuth();
 
   const toggleMode = () => {
     setIsLoginMode(!isLoginMode);
@@ -54,7 +54,7 @@ export const useHandleSignin = (onClose: () => void) => {
     setShakeConfirmPassword(false);
     try {
       if (isLoginMode) {
-        await handleLogin(
+        await initiateLogin(
           email,
           password,
           setAlertMessage,
@@ -82,7 +82,7 @@ export const useHandleSignin = (onClose: () => void) => {
           }, 2000);
           return;
         }
-        await handleRegister(
+        await initiateRegister(
           email,
           password,
           setAlertMessage,
