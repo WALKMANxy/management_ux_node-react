@@ -16,7 +16,7 @@ import {
   selectAlerts,
   selectPromos,
   selectVisits,
-} from "../utility/utilitySelectors";
+} from "../data/dataSelectors";
 
 const initialState: SearchState = {
   query: "",
