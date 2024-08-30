@@ -1,6 +1,0 @@
-2024-07-29T11:51:00.573Z [info]: Incoming request: GET /api/movements from ::ffff:192.168.1.231
-2024-07-29T11:51:00.580Z [info]: Response status: 404 for GET /api/movements
-2024-07-29T11:51:07.071Z [info]: Incoming request: GET /api/movements from ::ffff:192.168.1.231
-2024-07-29T11:51:07.074Z [info]: Response status: 404 for GET /api/movements
-2024-07-29T11:51:14.462Z [info]: Incoming request: GET /api/clients from ::ffff:192.168.1.231
-2024-07-29T11:51:14.463Z [info]: Response status: 404 for GET /api/clients

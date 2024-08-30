@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import { Movement } from "../models/dataModels";
 import { Admin, Agent, Client } from "../models/entityModels";
 import { ignoreArticleNames } from "./constants";
+import { BrandData } from "../models/propsModels";
 
 // Helper function to get month and year from a date string
 export const getMonthYear = (dateString: string) => {
@@ -93,7 +94,7 @@ export const calculateTotalOrders = (clients: Client[]): number => {
 
 export const calculateTopBrandsData = (
   movements: Movement[]
-): { label: string; value: number }[] => {
+): BrandData[] => {
   const brandCount: { [key: string]: { name: string; quantity: number } } = {};
 
   // Iterate over each movement
@@ -118,14 +119,15 @@ export const calculateTopBrandsData = (
 
   // Sort the brands by quantity in descending order and return the top 10
   return Object.values(brandCount)
-    .map((brand, index) => ({
-      label: brand.name,
-      value: brand.quantity,
-      key: `${brand.name}-${index}`, // Ensure unique keys by adding an index
-    }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 10);
+  .map((brand, index) => ({
+    id: `${brand.name.replace(/\s+/g, '-').toLowerCase()}-${index}`, // Generate unique ID
+    label: brand.name,
+    value: brand.quantity,
+  }))
+  .sort((a, b) => b.value - a.value)
+  .slice(0, 10);
 };
+
 
 // Calculate sales distribution data for a list of clients
 export const calculateSalesDistributionData = (
@@ -352,7 +354,7 @@ export const calculateTotalPriceSold = (movement: Movement): string => {
 
 export const currencyFormatter = (value: number | string): string => {
   // Parse the value to a float if it's a string; keep it as is if it's already a number
-  const numberValue = typeof value === 'string' ? parseFloat(value) : value;
+  const numberValue = typeof value === "string" ? parseFloat(value) : value;
 
   // Check if the parsed value is a valid number
   if (isNaN(numberValue)) {
@@ -362,7 +364,6 @@ export const currencyFormatter = (value: number | string): string => {
   // Format the number as currency with commas as thousand separators
   return `€${numberValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,")}`;
 };
-
 
 export const numberComparator = (valueA: number, valueB: number) => {
   return valueA - valueB;

@@ -10,7 +10,7 @@ import {
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { selectPromos } from "../../features/utility/utilitySlice"; // Updated import
+import { selectPromos } from "../../features/utility/utilitySelectors"; // Updated import
 import { ActivePromotionsProps } from "../../models/propsModels";
 
 const ActivePromotions: React.FC<ActivePromotionsProps> = ({ isLoading }) => {

@@ -1,5 +1,6 @@
+//src/app/rootReducer.ts
 import { Action, combineReducers } from "@reduxjs/toolkit";
-import authReducer, { logout } from "../features/auth/authSlice";
+import authReducer, { handleLogout } from "../features/auth/authSlice";
 import dataReducer from "../features/data/dataSlice";
 import searchReducer from "../features/search/searchSlice";
 import { authApi } from "../services/authQueries";
@@ -18,7 +19,7 @@ const rootReducer = (
   state: Partial<ReturnType<typeof appReducer>> | undefined,
   action: Action
 ) => {
-  if (action.type === logout.type) {
+  if (action.type === handleLogout.fulfilled.type) {
     // Reset entire state, including API slice
     state = undefined;
   }

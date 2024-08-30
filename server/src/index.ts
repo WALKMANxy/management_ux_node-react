@@ -4,14 +4,13 @@ import cors from "cors";
 import express from "express";
 import rateLimit from "express-rate-limit";
 import fs from "fs";
+import helmet from "helmet";
 import https from "https";
 import localtunnel from "localtunnel";
 import mongoose from "mongoose";
 import { Server as SocketIOServer } from "socket.io";
-import helmet from "helmet";
 import { config } from "./config/config";
 import { authenticateUser } from "./middlewares/authentication";
-import { logRequestsIp } from "./middlewares/logRequests";
 import { setupWebSocket } from "./middlewares/webSocket";
 import adminRoutes from "./routes/admins";
 import agentRoutes from "./routes/agents";
@@ -24,6 +23,7 @@ import promosRoutes from "./routes/promos";
 import usersRoutes from "./routes/users";
 import visitsRoutes from "./routes/visits";
 import { errorHandler } from "./utils/errorHandler";
+import { logger, logRequestsIp } from "./utils/logger";
 
 const app = express();
 const PORT = config.port || "3000";
@@ -31,10 +31,9 @@ const PORT = config.port || "3000";
 app.set("trust proxy", 1);
 
 mongoose
-  .connect(config.mongoUri!, {
-  })
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .connect(config.mongoUri!, {})
+  .then(() => logger.info("MongoDB connected"))
+  .catch((err) => logger.error("MongoDB connection error:", { error: err }));
 
 const corsOptions: cors.CorsOptions = {
   origin: config.appUrl,
@@ -86,13 +85,19 @@ const io = new SocketIOServer(server, {
 
 const { emitAlert } = setupWebSocket(io);
 
+// Log when the WebSocket server starts
+logger.info("WebSocket server initialized");
+
 const alertRoutes = setupAlertRoutes(emitAlert);
 app.use("/alerts", alertRoutes);
 
 server.listen(PORT, async () => {
-  console.log(`Server is running on port ${PORT}`);
+  logger.info(`Server is running on port ${PORT}`, {
+    port: PORT,
+    environment: process.env.NODE_ENV || "development",
+  });
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     try {
       const tunnel = await localtunnel({
         port: parseInt(PORT),
@@ -100,13 +105,13 @@ server.listen(PORT, async () => {
         local_https: true,
         allow_invalid_cert: true,
       });
-      console.log(`LocalTunnel running at ${tunnel.url}`);
+      logger.info(`LocalTunnel running at ${tunnel.url}`);
 
       tunnel.on("close", () => {
-        console.log("LocalTunnel closed");
+        logger.warn("LocalTunnel closed");
       });
     } catch (error) {
-      console.error("Error setting up LocalTunnel:", error);
+      logger.error("Error setting up LocalTunnel:", { error });
     }
   }
 });

@@ -1,6 +1,13 @@
+//src/features/utility/utilitySlice.ts
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { Alert, Promo, Visit, GlobalVisits, GlobalPromos } from "../../models/dataModels";
+import {
+  Alert,
+  GlobalPromos,
+  GlobalVisits,
+  Promo,
+  Visit,
+} from "../../models/dataModels";
 import { Agent } from "../../models/entityModels";
 
 // Extend the Visit type to include agent information for admins
@@ -16,8 +23,8 @@ export const selectVisits = createSelector(
     if (!currentUserVisits || !currentUserDetails) return [];
 
     const findAgentForClient = (clientId: string): Agent | undefined => {
-      return Object.values(agents).find(agent =>
-        agent.clients.some(client => client.id === clientId)
+      return Object.values(agents).find((agent) =>
+        agent.clients.some((client) => client.id === clientId)
       );
     };
 
@@ -25,8 +32,8 @@ export const selectVisits = createSelector(
       const agent = findAgentForClient(visit.clientId);
       return {
         ...visit,
-        agentId: agent?.id || 'unknown',
-        agentName: agent?.name || 'Unknown Agent',
+        agentId: agent?.id || "unknown",
+        agentName: agent?.name || "Unknown Agent",
       };
     };
 

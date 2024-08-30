@@ -1,6 +1,6 @@
-import { useDispatch } from "react-redux";
-import store, { AppDispatch } from "../app/store";
-import { login, logout } from "../features/auth/authSlice";
+import { useAppDispatch } from "../app/hooks";
+import store from "../app/store";
+import { handleLogin, handleLogout } from "../features/auth/authSlice";
 import { User } from "../models/entityModels";
 import {
   authApi,
@@ -16,11 +16,11 @@ import {
 import { saveAuthState } from "../utils/localStorage";
 
 export const useAuth = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const [registerUser] = useRegisterUserMutation();
   const [loginUser] = useLoginUserMutation();
 
-  const handleRegister = async (
+  const initiateRegister = async (
     email: string,
     password: string,
     setAlertMessage: (message: string) => void,
@@ -43,7 +43,7 @@ export const useAuth = () => {
     }
   };
 
-  const handleLogin = async (
+  const initiateLogin = async (
     email: string,
     password: string,
     setAlertMessage: (message: string) => void,
@@ -85,7 +85,11 @@ export const useAuth = () => {
           }
 
           dispatch(
-            login({ role: user.role, id: user.entityCode, userId: user._id })
+            handleLogin({
+              role: user.role,
+              id: user.entityCode,
+              userId: user._id,
+            })
           );
 
           if (keepMeSignedIn) {
@@ -109,14 +113,14 @@ export const useAuth = () => {
     }
   };
 
-  const handleLogout = (
+  const initiateLogout = (
     setAlertMessage: (message: string) => void,
     setAlertSeverity: (severity: "success" | "error") => void,
     setAlertOpen: (open: boolean) => void
   ) => {
     try {
       clearAuthData();
-      dispatch(logout());
+      dispatch(handleLogout());
       setAlertMessage("User logged out successfully.");
       setAlertSeverity("success");
       setAlertOpen(true);
@@ -134,5 +138,5 @@ export const useAuth = () => {
     }
   };
 
-  return { handleRegister, handleLogin, handleLogout };
+  return { initiateRegister, initiateLogin, initiateLogout };
 };

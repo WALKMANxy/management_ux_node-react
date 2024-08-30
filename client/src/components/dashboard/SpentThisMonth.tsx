@@ -19,7 +19,7 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const userRole = useSelector((state: RootState) => state.auth.userRole);
+  const userRole = useSelector((state: RootState) => state.auth.role);
 
   const formattedAmount = currencyFormatter(parseFloat(amount));
 

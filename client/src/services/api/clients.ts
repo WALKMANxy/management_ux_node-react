@@ -1,7 +1,9 @@
 import { serverClient } from "../../models/dataSetTypes";
 import { apiCall } from "./apiUtils";
 
-export const getClientByCodice = async (codice: string): Promise<serverClient> => {
+export const getClientByCodice = async (
+  codice: string
+): Promise<serverClient> => {
   return apiCall<serverClient>(`clients/codice/${codice}`, "GET");
 };
 

@@ -14,7 +14,7 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
   movementDetails,
 }) => {
   const { t } = useTranslation();
-  const userRole = useSelector((state: RootState) => state.auth.userRole);
+  const userRole = useSelector((state: RootState) => state.auth.role);
 
   const columnDefinitions = useMemo<ColDef<MovementDetail>[]>(() => {
     const baseColumns: ColDef<MovementDetail>[] = [

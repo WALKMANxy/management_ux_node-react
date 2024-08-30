@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
+import { logger } from "../utils/logger";
 
 const nodeEnv = process.env.NODE_ENV || "development";
 
@@ -9,10 +10,10 @@ const loadEnvFile = () => {
   const envFile = path.resolve(process.cwd(), `.env.${nodeEnv}`);
 
   if (fs.existsSync(envFile)) {
-    console.log(`Loading environment variables from ${envFile}`);
+    logger.info(`Loading environment variables from ${envFile}`);
     dotenv.config({ path: envFile });
   } else {
-    console.warn(
+    logger.warn(
       `No .env.${nodeEnv} file found. Using default environment variables.`
     );
     dotenv.config(); // This will load the default .env file if it exists
@@ -47,6 +48,8 @@ export const config = {
   tunnelSubdomain: process.env.TUNNEL_SUBDOMAIN || "",
   refreshTokenDuration: process.env.REFRESH_TOKEN_DURATION || "7d",
   sessionDuration: process.env.SESSION_DURATION || "24d",
+  emailHost: process.env.EMAIL_HOST || "",
+  emailHostPort: process.env.EMAIL_HOST_PORT || "",
 };
 
 // Validate required environment variables
@@ -61,6 +64,7 @@ const requiredEnvVars = [
 
 requiredEnvVars.forEach((envVar) => {
   if (!process.env[envVar]) {
+    logger.error(`${envVar} is not set in the environment variables`);
     throw new Error(`${envVar} is not set in the environment variables`);
   }
 });
@@ -68,6 +72,9 @@ requiredEnvVars.forEach((envVar) => {
 // Additional validations
 if (config.nodeEnv === "production") {
   if (!config.sslKeyPath || !config.sslCertPath) {
+    logger.error(
+      "SSL key and certificate paths are required in production mode"
+    );
     throw new Error(
       "SSL key and certificate paths are required in production mode"
     );
@@ -75,7 +82,11 @@ if (config.nodeEnv === "production") {
 }
 
 if (!config.smtpUser || !config.smtpPass) {
-  console.warn(
+  logger.warn(
     "SMTP credentials are not set. Email functionality may not work properly."
   );
 }
+
+logger.info("Configuration loaded successfully", {
+  environment: config.nodeEnv,
+});

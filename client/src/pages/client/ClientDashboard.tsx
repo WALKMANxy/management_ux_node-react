@@ -6,9 +6,8 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useEffect } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
-import { useDispatch } from "react-redux";
 import ActivePromotions from "../../components/dashboard/ActivePromotions";
 import CalendarComponent from "../../components/dashboard/CalendarComponent";
 import SpentThisMonth from "../../components/dashboard/SpentThisMonth";
@@ -22,7 +21,6 @@ import { brandColors } from "../../utils/constants";
 
 const ClientDashboard: React.FC = () => {
   const { t } = useTranslation();
-  const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -36,12 +34,6 @@ const ClientDashboard: React.FC = () => {
     revenueData,
     isLoading,
   } = useStats(isMobile);
-
-  useEffect(() => {
-    if (clientDetails && "visits" in clientDetails) {
-      dispatch(setVisits(clientDetails.visits));
-    }
-  }, [clientDetails, dispatch]);
 
   return (
     <Box

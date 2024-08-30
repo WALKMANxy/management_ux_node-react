@@ -1,22 +1,27 @@
+import { AgGridReact } from "ag-grid-react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Movement } from "../models/dataModels";
 import { Client } from "../models/entityModels";
-import { AgGridReact } from "ag-grid-react";
 import { DataSliceState } from "../models/stateModels";
 
 export const useMovementsGrid = () => {
   // Access clients and agent details directly from the Redux store
   const clients = useSelector((state: DataSliceState) => state.clients);
-  const agentDetails = useSelector((state: DataSliceState) => state.agentDetails);
+  const agentDetails = useSelector(
+    (state: DataSliceState) => state.agentDetails
+  );
 
   const userRole = useSelector((state: DataSliceState) => {
     const currentUserDetails = state.currentUserDetails;
     return currentUserDetails ? currentUserDetails.role : null;
   });
-  const [selectedMovement, setSelectedMovement] = useState<Movement | null>(null);
+  const [selectedMovement, setSelectedMovement] = useState<Movement | null>(
+    null
+  );
   const [isMovementListCollapsed, setMovementListCollapsed] = useState(false);
-  const [isMovementDetailsCollapsed, setMovementDetailsCollapsed] = useState(false);
+  const [isMovementDetailsCollapsed, setMovementDetailsCollapsed] =
+    useState(false);
   const [quickFilterText, setQuickFilterText] = useState("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -63,7 +68,8 @@ export const useMovementsGrid = () => {
       const allMovements: Movement[] = enrichedClients.flatMap(
         (client: Client) => client.movements
       );
-      const movement = allMovements.find((movement) => movement.id === movementId) || null;
+      const movement =
+        allMovements.find((movement) => movement.id === movementId) || null;
       setSelectedMovement(movement);
       setTimeout(() => {
         if (movementDetailsRef.current) {
@@ -134,6 +140,6 @@ export const useMovementsGrid = () => {
     handleMenuClose,
     anchorEl,
     exportDataAsCsv,
-    userRole
+    userRole,
   };
 };

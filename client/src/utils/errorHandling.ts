@@ -11,10 +11,10 @@ interface ErrorWithStatus {
 
 function isErrorWithStatus(error: unknown): error is ErrorWithStatus {
   return (
-    typeof error === 'object' &&
+    typeof error === "object" &&
     error !== null &&
-    'status' in error &&
-    typeof (error as ErrorWithStatus).status === 'number'
+    "status" in error &&
+    typeof (error as ErrorWithStatus).status === "number"
   );
 }
 
@@ -55,7 +55,6 @@ class FetchUserRoleError extends Error {
     this.name = "FetchUserRoleError";
   }
 }
-
 
 // Logger utility function
 const logError = (error: Error): void => {
@@ -100,24 +99,24 @@ const generateErrorResponse = (
     // Assuming network errors should be treated as FETCH_ERROR
     return {
       error: {
-        status: 'FETCH_ERROR',
-        error: error.message
-      }
+        status: "FETCH_ERROR",
+        error: error.message,
+      },
     };
-  } else if (typeof error === 'string') {
+  } else if (typeof error === "string") {
     // Handling string errors as FETCH_ERROR
     return {
       error: {
-        status: 'FETCH_ERROR',
-        error: error
+        status: "FETCH_ERROR",
+        error: error,
       },
     };
   } else {
     // Default case for truly unknown errors
     return {
       error: {
-        status: 'FETCH_ERROR',
-        error: "An unknown error occurred"
+        status: "FETCH_ERROR",
+        error: "An unknown error occurred",
       },
     };
   }
@@ -127,11 +126,11 @@ const generateErrorResponse = (
 
 export {
   FetchUserRoleError,
+  generateErrorResponse,
+  handleApiError,
+  logError,
   LoginError,
   NetworkError,
   RegistrationError,
   ServerError,
-  generateErrorResponse,
-  handleApiError,
-  logError,
 };
