@@ -1,8 +1,11 @@
 import { io, Socket } from "socket.io-client";
-import store from "../app/store";
+import { AppStore } from "../app/store";
 import { getApiUrl } from "../config/config";
 import { addAlert, updateAlert } from "../features/data/dataSlice"; // Assuming dataSlice is in features/data
 import { Alert } from "../models/dataModels";
+
+// Define a variable to hold the store reference
+let store: AppStore;
 
 const apiUrl = getApiUrl();
 
@@ -14,6 +17,11 @@ class WebSocketService {
   private socket: Socket | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
+
+  // Inject the store reference at runtime
+  injectStore(_store: AppStore) {
+    store = _store;
+  }
 
   connect() {
     this.socket = io(apiUrl, {
@@ -44,8 +52,17 @@ class WebSocketService {
   };
 
   private handleAlertUpdate = (alert: Alert) => {
-    // Use findAlertById to check if the alert already exists in the state
-    const existingAlert = this.findAlertById(alert._id);
+    // Check if the store has been injected before using it
+    if (!store) {
+      console.error("Store has not been injected into WebSocketService.");
+      return;
+    }
+
+    const state = store.getState().data;
+    const existingAlert = state.currentUserAlerts?.find(
+      (a) => a._id === alert._id
+    );
+
     if (existingAlert) {
       store.dispatch(updateAlert(alert)); // Update the existing alert
     } else {
@@ -58,7 +75,7 @@ class WebSocketService {
     this.tryReconnect();
   };
 
-  private tryReconnect() {
+  tryReconnect() {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       console.log(
@@ -70,15 +87,6 @@ class WebSocketService {
         "Max reconnection attempts reached. Please refresh the page."
       );
     }
-  }
-
-  // This function should now look inside currentUserData for the alerts
-  private findAlertById(alertId: string): Alert | undefined {
-    const state = store.getState().data;
-    if (state.currentUserAlerts) {
-      return state.currentUserAlerts.find((alert) => alert._id === alertId);
-    }
-    return undefined;
   }
 
   disconnect() {

@@ -21,8 +21,8 @@ import MovementsPage from "./pages/common/MovementsPage";
 import LandingPage from "./pages/landing/LandingPage";
 import { refreshSession } from "./services/sessionService";
 
-console.log("Vite mode:", import.meta.env.MODE);
-
+/* console.log("Vite mode:", import.meta.env.MODE);
+ */
 // Enhanced ProtectedRoute to include role-based protection
 const ProtectedRoute: React.FC<{
   children: JSX.Element;
@@ -121,7 +121,7 @@ function App() {
   useEffect(() => {
     const initializeApp = async () => {
       // Check if the auth state is present in the session storage
-      const sessionAuthState = sessionStorage.getItem("auth");
+      const sessionAuthState = sessionStorage.getItem("authState");
 
       // If the auth state is present and the user is logged in
       if (sessionAuthState) {

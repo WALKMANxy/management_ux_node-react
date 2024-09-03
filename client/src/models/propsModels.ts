@@ -108,12 +108,19 @@ export type ArticleColumnDefinition = {
   valueGetter?: (params: ValueGetterParams) => number;
 };
 
+export interface EnrichedClient extends Client {
+  agentName: string;
+}
+
 export type ClientColumnDefinition = {
   headerName: string;
   field?: string;
   filter: string;
   sortable: boolean;
-  cellRenderer?: (params: { data: Client; value: string }) => JSX.Element;
+  cellRenderer?: (params: {
+    data: EnrichedClient;
+    value: string;
+  }) => JSX.Element;
   valueGetter?: (params: ValueGetterParams) => number | string;
   valueFormatter?: (params: ValueFormatterParams) => string;
   comparator?: (valueA: number, valueB: number) => number;
@@ -172,7 +179,7 @@ export type ClientListProps = {
   setStartDate: (value: string) => void;
   endDate: string;
   setEndDate: (value: string) => void;
-  filteredClients: Client[];
+  filteredClients: EnrichedClient[]; // Update this to use EnrichedClient type
   columnDefs: ColDef[];
   gridRef: React.RefObject<AgGridReact>;
   handleMenuOpen: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -272,8 +279,6 @@ export type ArticleDetailsProps = {
 export type MovementDetailsHistoryProps = {
   movementDetails: MovementDetail[];
 };
-
-
 
 export type BrandData = {
   id: string;

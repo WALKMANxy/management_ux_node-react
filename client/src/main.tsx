@@ -8,9 +8,11 @@ import store from "./app/store";
 import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
 import i18n from "./i18n";
 import "./main.css";
-
 import { registerPWA } from "./pwa";
+import { webSocketService } from "./services/webSocketService";
 import "./utils/tokenIntercept";
+
+webSocketService.injectStore(store);
 
 const container = document.getElementById("root");
 const root = ReactDOM.createRoot(container!);

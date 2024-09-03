@@ -40,7 +40,12 @@ export interface serverAgent {
   name: string;
   email: string;
   phone: string;
-  clients: serverClient[];
+  clients: ClientReference[];
+}
+
+export interface ClientReference {
+  CODICE: string;
+  colour: string;
 }
 
 export type MonthlyRevenue = {

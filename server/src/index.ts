@@ -6,8 +6,8 @@ import rateLimit from "express-rate-limit";
 import fs from "fs";
 import helmet from "helmet";
 import https from "https";
-import localtunnel from "localtunnel";
-import mongoose from "mongoose";
+/* import localtunnel from "localtunnel";
+ */ import mongoose from "mongoose";
 import { Server as SocketIOServer } from "socket.io";
 import { config } from "./config/config";
 import { authenticateUser } from "./middlewares/authentication";
@@ -35,8 +35,10 @@ mongoose
   .then(() => logger.info("MongoDB connected"))
   .catch((err) => logger.error("MongoDB connection error:", { error: err }));
 
+const appUrl = config.appUrl.split(",");
+
 const corsOptions: cors.CorsOptions = {
-  origin: config.appUrl,
+  origin:[...appUrl],
   credentials: true,
   optionsSuccessStatus: 200,
 };
@@ -50,7 +52,7 @@ app.use(logRequestsIp);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 10000,
   message: "Too many requests from this IP, please try again later.",
 });
 
@@ -100,7 +102,7 @@ server.listen(PORT, async () => {
     environment: process.env.NODE_ENV || "development",
   });
 
-  if (process.env.NODE_ENV !== "production") {
+  /* if (process.env.NODE_ENV !== "production") {
     try {
       const tunnel = await localtunnel({
         port: parseInt(PORT),
@@ -116,7 +118,7 @@ server.listen(PORT, async () => {
     } catch (error) {
       logger.error("Error setting up LocalTunnel:", { error });
     }
-  }
+  } */
 });
 
 export default app;

@@ -1,3 +1,4 @@
+//src/components/statistics/grids/ClientList.tsx
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -11,7 +12,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useCallback } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { ClientListProps } from "../../../models/propsModels";
 import AGGridTable from "./AGGridTable";
@@ -33,20 +34,15 @@ const ClientList: React.FC<ClientListProps> = ({
   isClientListCollapsed,
   setClientListCollapsed,
   isMobile,
-  clientDetailsRef,
+  clientDetailsRef, // Add the clientDetailsRef prop
 }) => {
   const { t } = useTranslation();
 
-  const onFilterTextBoxChanged = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setQuickFilterText(event.target.value);
-    },
-    [setQuickFilterText]
-  );
-
-  const toggleClientListCollapse = useCallback(() => {
-    setClientListCollapsed(!isClientListCollapsed);
-  }, [isClientListCollapsed, setClientListCollapsed]);
+  const onFilterTextBoxChanged = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setQuickFilterText(event.target.value);
+  };
 
   return (
     <Paper elevation={8} sx={{ mb: 2 }}>
@@ -60,11 +56,7 @@ const ClientList: React.FC<ClientListProps> = ({
       >
         <Typography variant="h6">{t("clientList.title")}</Typography>
         <IconButton
-          onClick={toggleClientListCollapse}
-          aria-expanded={!isClientListCollapsed}
-          aria-label={t(
-            isClientListCollapsed ? "clientList.expand" : "clientList.collapse"
-          )}
+          onClick={() => setClientListCollapsed(!isClientListCollapsed)}
         >
           {isClientListCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
         </IconButton>
@@ -89,13 +81,8 @@ const ClientList: React.FC<ClientListProps> = ({
                 size="small"
                 fullWidth
                 onChange={onFilterTextBoxChanged}
-                value={quickFilterText}
-                aria-label={t("clientList.quickFilterAriaLabel")}
               />
-              <IconButton
-                onClick={handleMenuOpen}
-                aria-label={t("clientList.moreOptions")}
-              >
+              <IconButton onClick={handleMenuOpen}>
                 <MoreVertIcon />
               </IconButton>
             </Box>
@@ -106,7 +93,6 @@ const ClientList: React.FC<ClientListProps> = ({
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               fullWidth={isMobile}
-              aria-label={t("clientList.startDateAriaLabel")}
             />
             <TextField
               type="date"
@@ -115,7 +101,6 @@ const ClientList: React.FC<ClientListProps> = ({
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               fullWidth={isMobile}
-              aria-label={t("clientList.endDateAriaLabel")}
             />
           </Box>
           <Menu
@@ -142,4 +127,3 @@ const ClientList: React.FC<ClientListProps> = ({
 };
 
 export default ClientList;
-React.memo(ClientList);

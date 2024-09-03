@@ -17,20 +17,23 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {
         position: "relative",
         overflow: "hidden",
         height: "100%",
-        "&::after, &::before": {
+        "&:after": {
           content: '""',
           position: "absolute",
           width: 210,
           height: 210,
-          borderRadius: "50%",
-        },
-        "&::after": {
           background: "#1e88e5", // Dark Blue
+          borderRadius: "50%",
           top: -85,
           right: -95,
         },
-        "&::before": {
+        "&:before": {
+          content: '""',
+          position: "absolute",
+          width: 210,
+          height: 210,
           background: "#90caf9", // Light Blue
+          borderRadius: "50%",
           top: -125,
           right: -15,
           opacity: 0.5,
@@ -38,11 +41,11 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {
       }}
     >
       <Box sx={{ p: 2.25 }}>
-        <Grid container direction="column" spacing={2}>
+        <Grid container direction="column">
           <Grid item>
             <Typography
-              variant="h4"
               sx={{
+                fontSize: "1.605rem", // Increased by 7%
                 fontWeight: 500,
                 color: "#000",
               }}
@@ -50,31 +53,36 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {
               {t("topArticleType.title")}
             </Typography>
           </Grid>
+          <Divider sx={{ my: 2, borderRadius: "12px" }} />
           <Grid item>
-            <Divider />
-          </Grid>
-          <Grid item>
-            <Avatar
-              variant="rounded"
-              sx={{
-                bgcolor: "#1e88e5", // Dark Blue
-                color: "#000",
-              }}
-            >
-              <img
-                src="/icons/garage.svg"
-                alt={t("topArticleType.iconAlt")}
-                style={{ width: "100%", height: "100%" }}
-              />
-            </Avatar>
+            <Grid container justifyContent="space-between">
+              <Grid item>
+                <Box sx={{ pb: 2 }}>
+                  <Avatar
+                    variant="rounded"
+                    sx={{
+                      bgcolor: "#1e88e5", // Dark Blue
+                      color: "#000",
+                      mt: 1,
+                    }}
+                  >
+                    <img
+                      src="/icons/garage.svg"
+                      alt={t("topArticleType.iconAlt")}
+                      style={{ width: "100%", height: "100%" }}
+                    />
+                  </Avatar>
+                </Box>
+              </Grid>
+            </Grid>
           </Grid>
           <Grid item>
             {articles.map((article) => (
               <Box key={article.id} sx={{ mb: 1 }}>
-                <Typography variant="h6">
+                <Typography sx={{ fontSize: "1.2rem", fontWeight: 500 }}>
                   {article.name} (ID: {article.id})
                 </Typography>
-                <Typography variant="body1" color="textSecondary">
+                <Typography sx={{ fontSize: "1rem", color: "#000" }}>
                   {t("topArticleType.amountPurchased")}: {article.quantity}
                 </Typography>
               </Box>

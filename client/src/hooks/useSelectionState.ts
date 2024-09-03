@@ -32,7 +32,8 @@ const useSelectionState = (isMobile: boolean): UseSelectionStateReturn => {
         sessionStorage.setItem("selectedItem", JSON.stringify(item));
         dispatch(selectAgent(item.id)); // Assuming item.id is the agent's id
       } else {
-        console.log(`Selected ${item.type}: ${item.name}`);
+        /*         console.log(`Selected ${item.type}: ${item.name}`);
+         */
       }
     },
     [dispatch]

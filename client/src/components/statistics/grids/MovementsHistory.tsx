@@ -1,5 +1,6 @@
+//src/components/statistics/grids/MovementsHistory.tsx
 import { Box, Paper } from "@mui/material";
-import { ColDef } from "ag-grid-community";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { MovementsHistoryProps } from "../../../models/propsModels";
@@ -9,6 +10,11 @@ import AGGridTable from "./AGGridTable";
 const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
   const { t } = useTranslation();
 
+  /* useEffect(() => {
+    console.log("Movements:", movements);
+  }, [movements]);
+ */
+  // Flatten the movements array and filter out invalid articles
   const flattenedMovements = useMemo(() => {
     return movements.flatMap((movement) =>
       movement.details
@@ -20,7 +26,7 @@ const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
     );
   }, [movements]);
 
-  const columnDefinitions: ColDef[] = useMemo(
+  const columnDefinitions = useMemo(
     () => [
       {
         headerName: t("movementsHistory.date"),
@@ -47,23 +53,22 @@ const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
         field: "quantity",
         comparator: numberComparator,
         sortable: true,
-        type: "numericColumn",
       },
       {
         headerName: t("movementsHistory.revenue"),
         field: "priceSold",
-        valueFormatter: (params) => currencyFormatter(parseFloat(params.value)),
+        valueFormatter: (params: any) =>
+          currencyFormatter(parseFloat(params.value)),
         comparator: numberComparator,
         sortable: true,
-        type: "numericColumn",
       },
       {
         headerName: t("movementsHistory.cost"),
         field: "priceBought",
-        valueFormatter: (params) => currencyFormatter(parseFloat(params.value)),
+        valueFormatter: (params: any) =>
+          currencyFormatter(parseFloat(params.value)),
         comparator: numberComparator,
         sortable: true,
-        type: "numericColumn",
       },
     ],
     [t]

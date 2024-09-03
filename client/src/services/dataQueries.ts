@@ -15,7 +15,7 @@ import {
 } from "../utils/dataLoader";
 import { generateErrorResponse, handleApiError } from "../utils/errorHandling";
 import { getAdminById } from "./api/admins";
-import { getAgentByClientEntityCode, getAgentById } from "./api/agents";
+import { getAgentById } from "./api/agents";
 import {
   getAlertsByEntityRoleAndEntityCode,
   getAlertsByIssuer,
@@ -31,9 +31,8 @@ import { getClientByCodice, getClientsByAgent } from "./api/clients";
 import { getFilteredMovements } from "./api/movements";
 
 export const dataApi = createApi({
-  reducerPath: "api",
+  reducerPath: "dataApi",
   baseQuery: fetchBaseQuery({ baseUrl: "/" }),
-  tagTypes: ["Client", "Agent", "Admin"],
   endpoints: (builder) => ({
     getUserAdminData: builder.query<
       {
@@ -74,7 +73,6 @@ export const dataApi = createApi({
           const { clients } = await mapDataToModels(
             data,
             clientDetails,
-            agentDetails,
             visits,
             promos
           );
@@ -83,7 +81,7 @@ export const dataApi = createApi({
             agents,
             visits: aggregatedVisits,
             promos: aggregatedPromos,
-          } = await mapDataToAgents(data, agentDetails, visits, promos);
+          } = await mapDataToAgents(clients, agentDetails, visits, promos);
 
           // Use mapVisitsPromosToAdmin to aggregate visits and promos for admin
           const { globalVisits, globalPromos } = mapVisitsPromosToAdmin(
@@ -124,7 +122,6 @@ export const dataApi = createApi({
           const [
             data,
             clientDetails,
-            agentDetails,
             visits,
             promos,
             roleBasedAlerts,
@@ -132,7 +129,6 @@ export const dataApi = createApi({
           ] = await Promise.all([
             getFilteredMovements(),
             getClientByCodice(entityCode),
-            getAgentByClientEntityCode(),
             loadVisitsData(),
             loadPromosData(),
             getAlertsByEntityRoleAndEntityCode({
@@ -149,13 +145,7 @@ export const dataApi = createApi({
             clients,
             visits: filteredVisits,
             promos: filteredPromos,
-          } = await mapDataToModels(
-            data,
-            [clientDetails],
-            [agentDetails],
-            visits,
-            promos
-          );
+          } = await mapDataToModels(data, [clientDetails], visits, promos);
 
           if (clients.length === 0) {
             throw new Error("Client not found");
@@ -213,7 +203,6 @@ export const dataApi = createApi({
           const { clients } = await mapDataToModels(
             data,
             clientDetails,
-            [agentDetails],
             visits,
             promos
           );
@@ -223,7 +212,7 @@ export const dataApi = createApi({
             agents,
             visits: aggregatedVisits,
             promos: aggregatedPromos,
-          } = await mapDataToAgents(data, [agentDetails], visits, promos);
+          } = await mapDataToAgents(clients, [agentDetails], visits, promos);
 
           if (agents.length === 0) {
             throw new Error("Agent not found");

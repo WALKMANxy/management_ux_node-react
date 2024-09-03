@@ -8,6 +8,8 @@ import {
   resetPassword,
   verifyUserEmail,
 } from "../services/authService";
+import { generateSessionToken, verifySessionToken } from "../utils/jwtUtils";
+import { logger } from "../utils/logger";
 import {
   createSession,
   getUserSessions,
@@ -15,8 +17,6 @@ import {
   invalidateSession,
   renewSession,
 } from "../utils/sessionUtils";
-import { logger } from "../utils/logger";
-import { generateSessionToken } from "../utils/jwtUtils";
 
 export const register = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -41,10 +41,12 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
+// Modified login endpoint to handle existing session tokens
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
+    // Attempt to log in the user with the provided credentials
     const user = await loginUser(email, password);
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials." });
@@ -56,15 +58,52 @@ export const login = async (req: Request, res: Response) => {
         .json({ message: "Please verify your email before logging in." });
     }
 
-    const sessionToken = generateSessionToken(user);
-    const session = await createSession(user.id, sessionToken, req);
+    // Check for an existing session token in the request cookies
+    const existingToken = req.cookies.sessionToken;
 
+    let sessionToken;
+    let session;
+
+    if (existingToken) {
+      try {
+        // Verify the existing token
+        const decoded = verifySessionToken(existingToken);
+        console.log("Existing token found and verified:", decoded);
+
+        // Attempt to renew the session with the existing token
+        session = await createSession(user.id, existingToken, req);
+        sessionToken = existingToken; // Use the existing token for the response
+      } catch (error) {
+        // If token verification fails, log the error and proceed to generate a new token
+        console.warn(
+          "Existing token verification failed, generating a new token.",
+          error
+        );
+        sessionToken = generateSessionToken(user); // Generate a new token
+        session = await createSession(user.id, sessionToken, req);
+      }
+    } else {
+      // No existing token found, generate a new one
+      sessionToken = generateSessionToken(user);
+      session = await createSession(user.id, sessionToken, req);
+    }
+
+    // Log the cookie being set
+    console.log("Setting session cookie with attributes:", {
+      sessionToken,
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+
+    // Set the session token in the cookie
     res.cookie("sessionToken", sessionToken, {
       httpOnly: true,
       secure: true,
       sameSite: "none",
     });
 
+    // Redirect URL based on user role
     let redirectUrl = `${config.appUrl}/${user.role}-dashboard`;
     res.status(200).json({
       message: "Login successful",
@@ -73,13 +112,8 @@ export const login = async (req: Request, res: Response) => {
       sessionId: session._id,
     });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      logger.error("Login error:", { error: error });
-      res.status(500).json({ message: "Login failed", error: error.message });
-    } else {
-      logger.error("Unexpected login error:", { error: String(error) });
-      res.status(500).json({ message: "Login failed", error: String(error) });
-    }
+    logger.error("Login error:", { error });
+    res.status(500).json({ message: "Login failed", error });
   }
 };
 

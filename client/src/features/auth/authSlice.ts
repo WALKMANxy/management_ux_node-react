@@ -1,8 +1,9 @@
 //src/features/auth/authSlice.ts
-console.log('Initializing authSlice');
-
+/* console.log('Initializing authSlice');
+ */
 
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import Cookies from "js-cookie";
 import { AuthState } from "../../models/stateModels";
 import { webSocketService } from "../../services/webSocketService";
 
@@ -24,11 +25,17 @@ export const handleLogin = createAsyncThunk(
     }: { role: AuthState["role"]; id: string; userId: string },
     { dispatch }
   ) => {
+    /*     console.log("Logging in with:", { role, id, userId });
+     */
     // Perform side effects needed on login
     sessionStorage.setItem(
       "auth",
       JSON.stringify({ isLoggedIn: true, role, id, userId })
     );
+
+    /*     console.log("Session storage after login:", sessionStorage.getItem("auth"));
+     */
+
     webSocketService.connect();
 
     // Dispatch the login action after side effects are handled
@@ -41,9 +48,11 @@ export const handleLogout = createAsyncThunk(
   "auth/handleLogout",
   async (_, { dispatch }) => {
     // Perform side effects needed on logout
+
     sessionStorage.clear();
     localStorage.clear();
     webSocketService.disconnect();
+    Cookies.remove("token");
 
     // Dispatch the logout action after side effects are handled
     dispatch(logout());

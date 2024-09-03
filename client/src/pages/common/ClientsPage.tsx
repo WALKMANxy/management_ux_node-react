@@ -7,8 +7,10 @@ import { RootState } from "../../app/store";
 import ClientDetails from "../../components/clientpage/ClientDetails";
 import ClientList from "../../components/statistics/grids/ClientList";
 import { useClientsGrid } from "../../hooks/useClientGrid";
-import { Client } from "../../models/entityModels";
-import { ClientColumnDefinition } from "../../models/propsModels";
+import {
+  ClientColumnDefinition,
+  EnrichedClient,
+} from "../../models/propsModels";
 import {
   calculateMonthlyData,
   calculateNetRevenue,
@@ -23,7 +25,7 @@ const ClientsPage: React.FC = () => {
   const loggedInClientId = useSelector((state: RootState) => state.auth.id);
 
   const {
-    clients,
+    filteredClients,
     selectedClient,
     quickFilterText,
     setQuickFilterText,
@@ -62,7 +64,7 @@ const ClientsPage: React.FC = () => {
         field: "name",
         filter: "agTextColumnFilter",
         sortable: true,
-        cellRenderer: (params: { data: Client; value: string }) => {
+        cellRenderer: (params: { data: EnrichedClient; value: string }) => {
           return (
             <span
               onDoubleClick={() => handleClientSelect(params.data.id)}
@@ -169,7 +171,7 @@ const ClientsPage: React.FC = () => {
   }, [handleClientSelect, t, userRole]);
 
   // Find the logged-in client details from clients array
-  const loggedInClientDetails = clients.find(
+  const loggedInClientDetails = filteredClients().find(
     (client) => client.id === loggedInClientId
   );
 
@@ -194,7 +196,7 @@ const ClientsPage: React.FC = () => {
             setStartDate={setStartDate}
             endDate={endDate}
             setEndDate={setEndDate}
-            filteredClients={clients}
+            filteredClients={filteredClients()}
             columnDefs={columnDefinitions}
             gridRef={gridRef}
             handleMenuOpen={handleMenuOpen}

@@ -2,21 +2,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import {
-  Alert,
   GlobalPromos,
   GlobalVisits,
-  MovementDetail,
   Promo,
   Visit,
 } from "../../models/dataModels";
-import { Agent, Client } from "../../models/entityModels";
 import { SearchParams, SearchResult } from "../../models/searchModels";
-import { SearchState } from "../../models/stateModels";
-import {
-  selectAlerts,
-  selectPromos,
-  selectVisits,
-} from "../data/dataSelectors";
+import { SearchState, ThunkError } from "../../models/stateModels";
 
 const initialState: SearchState = {
   query: "",
@@ -34,241 +26,210 @@ export const searchItems = createAsyncThunk<
   async ({ query, filter }, { getState, rejectWithValue }) => {
     try {
       const state = getState();
-      const userRole = state.auth.role;
-      const userData = state.data.currentUserData;
-      const visits = selectVisits(state);
-      const promos = selectPromos(state);
-      const alerts = selectAlerts(state);
+
+      // Access data from the state correctly
+      const entityRole = state.data.currentUserDetails?.role;
+      const clients = Object.values(state.data.clients);
+      const agentDetails = Object.values(state.data.agents);
+      const promos = state.data.currentUserPromos;
+      const visits = state.data.currentUserVisits;
 
       const sanitizedQuery = query.toLowerCase();
-      const searchResults: SearchResult[] = [];
-      const seenIds = new Set<string>(); // Set to track seen IDs for deduplication
+      const seen = new Map<string, string>(); // Track seen IDs
+      let searchResults: SearchResult[] = [];
 
-      const addResult = (result: SearchResult) => {
-        if (!seenIds.has(result.id)) {
-          seenIds.add(result.id);
-          searchResults.push(result);
-        }
-      };
+      // Filter and map clients
+      if (
+        filter === "all" ||
+        filter === "client" ||
+        (filter === "admin" && entityRole === "admin")
+      ) {
+        const clientResults = clients
+          .filter(
+            (client) =>
+              client.name?.toLowerCase().includes(sanitizedQuery) ||
+              client.id?.toLowerCase().includes(sanitizedQuery)
+          )
+          .map((client) => ({
+            id: client.id,
+            name: client.name,
+            type: "client" as SearchResult["type"],
+            province: client.province,
+            phone: client.phone,
+            paymentMethod: client.paymentMethod,
+          }))
+          .filter((result) => !seen.has(result.id) && seen.set(result.id, ""));
 
-      const searchInClients = (clientsToSearch: Client[]) => {
-        clientsToSearch.forEach((client) => {
-          if (
-            client.name?.toLowerCase().includes(sanitizedQuery) ||
-            client.id?.toLowerCase().includes(sanitizedQuery)
-          ) {
-            addResult({
-              id: client.id,
-              name: client.name,
-              type: "client",
-              province: client.province,
-              phone: client.phone,
-              paymentMethod: client.paymentMethod,
-              email: client.email,
-              agent: client.agent,
-            });
-          }
-        });
-      };
+        searchResults = searchResults.concat(clientResults);
+      }
 
-      const searchInAgents = (agentsToSearch: Agent[]) => {
-        agentsToSearch.forEach((agent) => {
-          if (
-            agent.name?.toLowerCase().includes(sanitizedQuery) ||
-            agent.id?.toLowerCase().includes(sanitizedQuery)
-          ) {
-            addResult({
-              id: agent.id,
-              name: agent.name,
-              type: "agent",
-            });
-          }
-        });
-      };
+      // Filter and map agents
+      if (
+        filter === "all" ||
+        filter === "agent" ||
+        (filter === "admin" && entityRole === "admin")
+      ) {
+        const agentResults = agentDetails
+          .filter(
+            (agent) =>
+              agent.name?.toLowerCase().includes(sanitizedQuery) ||
+              agent.id?.toLowerCase().includes(sanitizedQuery)
+          )
+          .map((agent) => ({
+            id: agent.id,
+            name: agent.name,
+            type: "agent" as SearchResult["type"],
+          }))
+          .filter((result) => !seen.has(result.id) && seen.set(result.id, ""));
 
-      const searchInArticles = (clientsToSearch: Client[]) => {
-        clientsToSearch.forEach((client) => {
-          client.movements.forEach((movement) => {
-            movement.details.forEach((detail: MovementDetail) => {
-              if (
-                detail.name?.toLowerCase().includes(sanitizedQuery) ||
-                detail.articleId?.toLowerCase().includes(sanitizedQuery) ||
-                detail.brand?.toLowerCase().includes(sanitizedQuery)
-              ) {
-                const existingResult = searchResults.find(
-                  (r) => r.id === detail.articleId
-                ) as SearchResult | undefined;
-                const newLastSoldDate = new Date(movement.dateOfOrder);
-                const existingLastSoldDate = existingResult?.lastSoldDate
-                  ? new Date(existingResult.lastSoldDate)
-                  : null;
+        searchResults = searchResults.concat(agentResults);
+      }
 
-                if (
-                  !existingResult ||
-                  (existingLastSoldDate &&
-                    newLastSoldDate > existingLastSoldDate)
-                ) {
-                  addResult({
-                    id: detail.articleId,
-                    name: detail.name,
-                    type: "article",
-                    articleId: detail.articleId,
-                    brand: detail.brand,
-                    lastSoldDate: newLastSoldDate.toISOString(), // Store as ISO string for consistency
-                  });
-                }
-              }
-            });
-          });
-        });
-      };
+      // Filter and map articles
+      if (filter === "all" || filter === "article") {
+        const articleResults = clients
+          .flatMap((client) =>
+            client.movements.flatMap((movement) =>
+              movement.details
+                .filter(
+                  (detail) =>
+                    detail.name?.toLowerCase().includes(sanitizedQuery) ||
+                    detail.articleId?.toLowerCase().includes(sanitizedQuery) ||
+                    detail.brand?.toLowerCase().includes(sanitizedQuery)
+                )
+                .map((detail) => ({
+                  id: detail.articleId,
+                  name: detail.name,
+                  type: "article" as SearchResult["type"],
+                  brand: detail.brand,
+                  articleId: detail.articleId,
+                  lastSoldDate: movement.dateOfOrder,
+                }))
+            )
+          )
+          .filter(
+            (result) =>
+              !seen.has(result.id) && seen.set(result.id, result.lastSoldDate)
+          );
 
-      const searchInPromos = (promosToSearch: Promo[] | GlobalPromos) => {
-        const processPromo = (promo: Promo) => {
-          if (
-            promo.name.toLowerCase().includes(sanitizedQuery) ||
-            promo.promoType.toLowerCase().includes(sanitizedQuery) ||
-            promo.discount.toLowerCase().includes(sanitizedQuery)
-          ) {
-            addResult({
-              id: promo.id,
-              name: promo.name,
-              type: "promo",
-              promoType: promo.promoType,
-              startDate: promo.startDate,
-              endDate: new Date(promo.endDate),
-              promoIssuedBy: promo.promoIssuedBy,
-            });
-          }
-        };
+        searchResults = searchResults.concat(articleResults);
+      }
 
-        if (Array.isArray(promosToSearch)) {
-          promosToSearch.forEach(processPromo);
-        } else {
-          Object.values(promosToSearch).forEach(({ Promos }) => {
-            Promos.forEach(processPromo);
-          });
-        }
-      };
+      // Filter and map promos for admins using GlobalPromos
+      if (
+        (filter === "all" || filter === "promo") &&
+        entityRole === "admin" &&
+        promos
+      ) {
+        if ("globalPromos" in promos) {
+          const globalPromoResults = Object.entries(promos as GlobalPromos)
+            .flatMap(([agentId, { Promos }]) =>
+              Promos.filter((promo) =>
+                promo.name?.toLowerCase().includes(sanitizedQuery)
+              ).map((promo) => ({
+                id: promo.id,
+                name: promo.name,
+                promoType: promo.promoType,
+                type: "promo" as SearchResult["type"],
+                startDate: new Date(promo.startDate),
+                endDate: new Date(promo.endDate),
+                issuedBy: promo.promoIssuedBy,
+                agentId, // Include the agentId if needed
+              }))
+            )
+            .filter(
+              (result) => !seen.has(result.id) && seen.set(result.id, "")
+            );
 
-      const searchInVisits = (visitsToSearch: Visit[] | GlobalVisits) => {
-        const processVisit = (visit: Visit) => {
-          if (
-            visit.reason.toLowerCase().includes(sanitizedQuery) ||
-            visit.type.toLowerCase().includes(sanitizedQuery)
-          ) {
-            addResult({
-              id: visit.id,
-              name: visit.reason,
-              type: "visit",
-              reason: visit.reason,
-              date: visit.date,
-              pending: visit.pending,
-              completed: visit.completed,
-              visitIssuedBy: visit.visitIssuedBy,
-            });
-          }
-        };
+          searchResults = searchResults.concat(globalPromoResults);
+        }
+      } else if (filter === "all" || filter === "promo") {
+        // Regular promo handling for non-admin roles
+        const promoResults = Array.isArray(promos)
+          ? (promos as Promo[]) // Explicitly assert the type as an array of Promo
+              .filter(
+                (promo) =>
+                  promo.name &&
+                  promo.name.toLowerCase().includes(sanitizedQuery)
+              )
+              .map((promo) => ({
+                id: promo.id,
+                name: promo.name,
+                promoType: promo.promoType,
+                type: "promo" as SearchResult["type"],
+                startDate: new Date(promo.startDate),
+                endDate: new Date(promo.endDate),
+                issuedBy: promo.promoIssuedBy,
+              }))
+          : [];
+        searchResults = searchResults.concat(promoResults);
+      }
 
-        if (Array.isArray(visitsToSearch)) {
-          visitsToSearch.forEach(processVisit);
-        } else {
-          Object.values(visitsToSearch).forEach(({ Visits }) => {
-            Visits.forEach(processVisit);
-          });
-        }
-      };
-      const searchInAlerts = (alertsToSearch: Alert[]) => {
-        alertsToSearch.forEach((alert) => {
-          if (
-            alert.alertReason.toLowerCase().includes(sanitizedQuery) ||
-            alert.message.toLowerCase().includes(sanitizedQuery)
-          ) {
-            addResult({
-              id: alert._id,
-              name: alert.alertReason,
-              type: "alert",
-              alertReason: alert.alertReason,
-              createdAt: alert.createdAt.toISOString(),
-              severity: alert.severity,
-              alertIssuedBy: alert.alertIssuedBy,
-            });
-          }
-        });
-      };
+      // Filter and map visits for admins using GlobalVisits
+      if (
+        (filter === "all" || filter === "visit") &&
+        entityRole === "admin" &&
+        visits
+      ) {
+        if ("globalVisits" in visits) {
+          const globalVisitResults = Object.entries(visits as GlobalVisits)
+            .flatMap(([agentId, { Visits }]) =>
+              Visits.filter(
+                (visit) =>
+                  visit.reason?.toLowerCase().includes(sanitizedQuery) ||
+                  visit.notePublic?.toLowerCase().includes(sanitizedQuery)
+              ).map((visit) => ({
+                id: visit.id,
+                name: visit.reason,
+                type: "visit" as SearchResult["type"],
+                date: visit.date,
+                pending: visit.pending,
+                completed: visit.completed,
+                issuedBy: visit.visitIssuedBy,
+                agentId, // Include the agentId if needed
+              }))
+            )
+            .filter(
+              (result) => !seen.has(result.id) && seen.set(result.id, "")
+            );
 
-      if (userRole === "admin") {
-        if (filter === "all" || filter === "client") {
-          searchInClients(Object.values(state.data.clients));
+          searchResults = searchResults.concat(globalVisitResults);
         }
-        if (filter === "all" || filter === "agent") {
-          searchInAgents(Object.values(state.data.agents));
-        }
-        if (filter === "all" || filter === "article") {
-          searchInArticles(Object.values(state.data.clients));
-        }
-        if (filter === "all" || filter === "promo") {
-          searchInPromos(promos);
-        }
-        if (filter === "all" || filter === "visit") {
-          searchInVisits(visits);
-        }
-        if (filter === "all" || filter === "alert") {
-          searchInAlerts(alerts as Alert[]);
-        }
-      } else if (userRole === "agent") {
-        if (filter === "all" || filter === "client") {
-          searchInClients(Object.values(state.data.clients));
-        }
-        if (filter === "all" || filter === "article") {
-          searchInArticles(Object.values(state.data.clients));
-        }
-        if (filter === "all" || filter === "promo") {
-          searchInPromos(promos as Promo[]);
-        }
-        if (filter === "all" || filter === "visit") {
-          searchInVisits(visits as Visit[]);
-        }
-        if (filter === "all" || filter === "alert") {
-          searchInAlerts(alerts as Alert[]);
-        }
-      } else if (userRole === "client") {
-        const clientData = userData as Client;
-        if (filter === "all" || filter === "article") {
-          searchInArticles([clientData]);
-        }
-        if (filter === "all" || filter === "promo") {
-          searchInPromos(promos as Promo[]);
-        }
-        if (filter === "all" || filter === "visit") {
-          searchInVisits(visits as Visit[]);
-        }
-        if (filter === "all" || filter === "alert") {
-          searchInAlerts(alerts as Alert[]);
-        }
+      } else if (filter === "all" || filter === "visit") {
+        // Regular visit handling for non-admin roles
+        const visitResults = Array.isArray(visits)
+          ? (visits as Visit[]) // Explicitly assert the type as an array of Visit
+              .filter(
+                (visit) =>
+                  visit.reason.toLowerCase().includes(sanitizedQuery) ||
+                  visit.notePublic?.toLowerCase().includes(sanitizedQuery) ||
+                  visit.date.toISOString().slice(0, 10).includes(sanitizedQuery)
+              )
+              .map((visit) => ({
+                id: visit.id,
+                name: visit.reason,
+                type: "visit" as SearchResult["type"],
+                date: visit.date,
+                pending: visit.pending,
+                completed: visit.completed,
+                issuedBy: visit.visitIssuedBy,
+              }))
+          : [];
+        searchResults = searchResults.concat(visitResults);
       }
 
       return searchResults;
     } catch (error: unknown) {
-      console.error("Error searching items:", error);
+      // Narrow the unknown error to the expected error type
+      const typedError = error as ThunkError;
 
-      let errorMessage: string;
+      // Enhanced error logging with fallback handling
+      console.error("Error searching items:", typedError);
 
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (
-        typeof error === "object" &&
-        error !== null &&
-        "message" in error
-      ) {
-        errorMessage = String((error as { message: unknown }).message);
-      } else if (typeof error === "string") {
-        errorMessage = error;
-      } else {
-        errorMessage = "An unknown error occurred.";
-      }
-
-      return rejectWithValue(errorMessage);
+      // Reject with a specific error message or fallback
+      return rejectWithValue(
+        typedError.message || "An unknown error occurred."
+      );
     }
   }
 );

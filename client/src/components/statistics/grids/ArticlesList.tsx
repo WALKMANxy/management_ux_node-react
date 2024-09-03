@@ -1,3 +1,4 @@
+// src/components/articlepage/ArticlesList.tsx
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -29,14 +30,14 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
   isArticleListCollapsed,
   setArticleListCollapsed,
   isMobile,
-  articleDetailsRef,
+  articleDetailsRef, // Add the articleDetailsRef prop
 }) => {
   const { t } = useTranslation();
 
   const onFilterTextBoxChanged = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const value = event.target.value || "";
+    const value = event.target.value || ""; // Ensure value is not null
     setQuickFilterText(value);
   };
 
@@ -53,9 +54,6 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
         <Typography variant="h6">{t("articleList.title")}</Typography>
         <IconButton
           onClick={() => setArticleListCollapsed(!isArticleListCollapsed)}
-          aria-label={t(
-            isArticleListCollapsed ? "common.expand" : "common.collapse"
-          )}
         >
           {isArticleListCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
         </IconButton>
@@ -80,12 +78,8 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
                 size="small"
                 fullWidth
                 onChange={onFilterTextBoxChanged}
-                value={quickFilterText}
               />
-              <IconButton
-                onClick={handleMenuOpen}
-                aria-label={t("common.moreOptions")}
-              >
+              <IconButton onClick={handleMenuOpen}>
                 <MoreVertIcon />
               </IconButton>
             </Box>
