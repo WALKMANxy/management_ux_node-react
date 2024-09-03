@@ -15,7 +15,6 @@ import { updateApi } from "../../services/promosVisitsQueries";
 const initialState: DataSliceState = {
   clients: {},
   agents: {},
-  agentDetails: {},
   currentUserData: null,
   currentUserDetails: null,
   currentUserPromos: null,
@@ -31,28 +30,33 @@ export const fetchInitialData = createAsyncThunk(
   "data/fetchInitialData",
   async (_, { getState, dispatch }) => {
     const state = getState() as {
-      auth: { userRole: string; id: string; userId: string };
+      auth: { role: string; id: string; userId: string };
     };
-    const { userRole, id, userId } = state.auth;
+    const { role, id, userId } = state.auth;
 
     let userData;
-    if (userRole === "client") {
+    /* let agentData = null; */
+    if (role === "client") {
       userData = await dispatch(
         dataApi.endpoints.getUserClientData.initiate({ entityCode: id, userId })
       ).unwrap();
-    } else if (userRole === "agent") {
+    } else if (role === "agent") {
       userData = await dispatch(
         dataApi.endpoints.getUserAgentData.initiate({ entityCode: id, userId })
       ).unwrap();
-    } else if (userRole === "admin") {
+    } else if (role === "admin") {
+      // Fetch clients, agents, and agent details using the CRA API endpoints
+
+      /* agentData = await dispatch(
+        superApi.endpoints.getAgentDetails.initiate()
+      ).unwrap(); */
       userData = await dispatch(
         dataApi.endpoints.getUserAdminData.initiate({ entityCode: id, userId })
       ).unwrap();
     } else {
       throw new Error("Invalid user role");
     }
-
-    return { userRole, userData, userId };
+    return { role, userData, userId /* agentData */ };
   }
 );
 
@@ -112,9 +116,9 @@ const dataSlice = createSlice({
       })
       .addCase(fetchInitialData.fulfilled, (state, action) => {
         state.status = "succeeded";
-        const { userRole, userData, userId } = action.payload;
+        const { role, userData, userId /* , agentData */ } = action.payload;
 
-        if (userRole === "client" && "clientData" in userData) {
+        if (role === "client" && "clientData" in userData) {
           const { clientData, visits, promos, alerts } = userData;
           state.clients[clientData.id] = clientData;
           state.currentUserData = clientData;
@@ -127,13 +131,26 @@ const dataSlice = createSlice({
           state.currentUserPromos = promos;
           state.currentUserAlerts = alerts;
           state.currentUserVisits = visits;
-        } else if (userRole === "agent" && "agentData" in userData) {
+        } else if (role === "agent" && "agentData" in userData) {
+          // Handle agent data
           const { agentData, visits, promos, alerts } = userData;
+
+          // Populate agent and assign its clients
           state.agents[agentData.id] = agentData;
-          state.agentDetails[agentData.id] = agentData;
           agentData.clients.forEach((client: Client) => {
             state.clients[client.id] = client;
           });
+
+          // Explicitly associate clients, visits, and promos with the agent
+          const agentClients = agentData.clients.map(
+            (client) => state.clients[client.id]
+          );
+          state.agents[agentData.id] = {
+            ...agentData,
+            clients: agentClients,
+          };
+
+          // Populate current user data for the agent
           state.currentUserData = agentData;
           state.currentUserDetails = {
             id: agentData.id,
@@ -144,15 +161,27 @@ const dataSlice = createSlice({
           state.currentUserPromos = promos;
           state.currentUserAlerts = alerts;
           state.currentUserVisits = visits;
-        } else if (userRole === "admin" && "adminData" in userData) {
+        } else if (role === "admin" && "adminData" in userData) {
+          // Handle admin data
           const { adminData, globalVisits, globalPromos, alerts } = userData;
+
+          // Populate the clients in the state
           adminData.clients.forEach((client: Client) => {
             state.clients[client.id] = client;
           });
+
+          /* if (agentData) {
+            agentData.forEach((agent: Agent) => {
+              state.agents[agent.id] = agent;
+            });
+          } */
+
+          // Populate the agents in the state
           adminData.agents.forEach((agent: Agent) => {
             state.agents[agent.id] = agent;
-            state.agentDetails[agent.id] = agent;
           });
+
+          // Populate current user data for the admin
           state.currentUserData = adminData;
           state.currentUserDetails = {
             id: adminData.id,
@@ -167,7 +196,7 @@ const dataSlice = createSlice({
           // Handle unexpected data structure
           console.error(
             "Unexpected user role or data structure:",
-            userRole,
+            role,
             userData
           );
           state.status = "failed";
@@ -176,7 +205,20 @@ const dataSlice = createSlice({
       })
       .addCase(fetchInitialData.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message || "An error occurred";
+
+        // Enhanced error logging
+        console.error("fetchInitialData rejected:", {
+          errorMessage: action.error.message,
+          errorStack: action.error.stack,
+          actionError: action.error, // Entire error object
+          actionPayload: action.meta.arg, // Payload that was passed to the action
+        });
+
+        if (action.error && action.error.message) {
+          state.error = action.error.message;
+        } else {
+          state.error = "An unknown error occurred during data fetching.";
+        }
       })
       .addCase(updateVisits.fulfilled, (state, action) => {
         const updatedVisits = action.payload;

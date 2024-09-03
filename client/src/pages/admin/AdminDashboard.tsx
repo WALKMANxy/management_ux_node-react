@@ -194,9 +194,7 @@ const AdminDashboard: React.FC = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <AgentActivityOverview
-
-                  />
+                  <AgentActivityOverview />
                 </Grid>
               </Grid>
               <Button

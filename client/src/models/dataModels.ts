@@ -24,7 +24,9 @@ export type MovementDetail = {
 
 export type Movement = {
   id: string;
-  discountCategory: string;
+  discountCategory?: string;
+  clientId?: string;
+  agentId?: string;
   details: MovementDetail[];
   unpaidAmount: string;
   paymentDueDate: string;

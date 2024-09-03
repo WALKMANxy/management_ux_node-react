@@ -1,18 +1,16 @@
 import { AgGridReact } from "ag-grid-react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { RootState } from "../app/store";
 import { Movement, MovementDetail } from "../models/dataModels";
 import { Client } from "../models/entityModels";
-import { DataSliceState } from "../models/stateModels";
 import { calculateTotalQuantitySold } from "../utils/dataUtils";
 
 export const useArticlesGrid = () => {
-  // Access the necessary state from Redux
-  const clients = useSelector((state: DataSliceState) => state.clients);
-
-  const [selectedArticle, setSelectedArticle] = useState<MovementDetail | null>(
-    null
-  );
+  const clients = useSelector((state: RootState) => state.data.clients);
+  /*   console.log("Clients:", clients);
+   */ const [selectedArticle, setSelectedArticle] =
+    useState<MovementDetail | null>(null);
   const [isArticleListCollapsed, setArticleListCollapsed] = useState(false);
   const [isArticleDetailsCollapsed, setArticleDetailsCollapsed] =
     useState(false);
@@ -22,6 +20,9 @@ export const useArticlesGrid = () => {
   const gridRef = useRef<AgGridReact>(null);
   const articleDetailsRef = useRef<HTMLDivElement>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const userRole = useSelector((state: RootState) => state.auth.role);
+  const userId = useSelector((state: RootState) => state.auth.id);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -69,7 +70,7 @@ export const useArticlesGrid = () => {
         client.movements.flatMap((movement) => movement.details)
     );
 
-    // Filter out articles with invalid articleId or brand
+    // Filter out articles with invalid oemID or brand
     allDetails = allDetails.filter(
       (detail) =>
         detail.articleId &&
@@ -115,6 +116,19 @@ export const useArticlesGrid = () => {
     return uniqueArticles;
   }, [clients, quickFilterText, startDate, endDate]);
 
+  // Filter clients based on the user role
+  const filteredClients = useMemo(() => {
+    if (userRole === "admin") {
+      return clients;
+    } else if (userRole === "agent") {
+      return Object.values(clients).filter((client) => client.agent === userId);
+    } else if (userRole === "client") {
+      return Object.values(clients).filter((client) => client.id === userId);
+    }
+    return [];
+  }, [clients, userRole, userId]);
+
+  // Get movements for the selected article based on the user role
   const clientMovements = useMemo(() => {
     if (!selectedArticle) return [];
     const movements = Object.values(clients).flatMap((client: Client) =>
@@ -129,9 +143,11 @@ export const useArticlesGrid = () => {
           clientName: client.name,
         }))
     );
-    return movements;
+    /*     console.log("clientMovements: ", movements);
+     */ return movements;
   }, [clients, selectedArticle]);
 
+  // Calculate total quantity sold for each article
   const totalQuantitySold = useMemo(() => {
     const allMovements = Object.values(clients).flatMap(
       (client) => client.movements
@@ -140,7 +156,7 @@ export const useArticlesGrid = () => {
   }, [clients]);
 
   return {
-    clients: Object.values(clients), // Convert the object to an array for easier use in components
+    clients,
     selectedArticle,
     setSelectedArticle,
     quickFilterText,
@@ -162,6 +178,7 @@ export const useArticlesGrid = () => {
     handleMenuClose,
     anchorEl,
     exportDataAsCsv,
+    filteredClients,
     clientMovements,
   };
 };

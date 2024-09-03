@@ -34,7 +34,6 @@ export type SearchState = {
 export interface DataSliceState {
   clients: Record<string, Client>;
   agents: Record<string, Agent>;
-  agentDetails: Record<string, Agent>;
   currentUserData: Client | Agent | Admin | null;
   currentUserDetails: {
     id: string;
@@ -77,4 +76,10 @@ export type ClientState = {
 export type FetchDataPayload = {
   clients: Client[];
   clientIndex: Map<string, Client>;
+};
+
+export type ThunkError = {
+  message: string;
+  stack?: string;
+  [key: string]: unknown; // To handle any additional properties that may exist
 };

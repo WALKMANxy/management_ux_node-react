@@ -1,21 +1,18 @@
+// src/hooks/useMovementsGrid.ts
 import { AgGridReact } from "ag-grid-react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { RootState } from "../app/store";
 import { Movement } from "../models/dataModels";
 import { Client } from "../models/entityModels";
-import { DataSliceState } from "../models/stateModels";
 
 export const useMovementsGrid = () => {
-  // Access clients and agent details directly from the Redux store
-  const clients = useSelector((state: DataSliceState) => state.clients);
-  const agentDetails = useSelector(
-    (state: DataSliceState) => state.agentDetails
+  const clients = Object.values(
+    useSelector((state: RootState) => state.data.clients)
   );
-
-  const userRole = useSelector((state: DataSliceState) => {
-    const currentUserDetails = state.currentUserDetails;
-    return currentUserDetails ? currentUserDetails.role : null;
-  });
+  const agentDetails = Object.values(
+    useSelector((state: RootState) => state.data.agents)
+  );
   const [selectedMovement, setSelectedMovement] = useState<Movement | null>(
     null
   );
@@ -29,7 +26,16 @@ export const useMovementsGrid = () => {
   const movementDetailsRef = useRef<HTMLDivElement>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  // Handle menu open/close
+  const userRole = useSelector((state: RootState) => state.auth.role);
+  const userId = useSelector((state: RootState) => state.auth.id);
+
+  /* useEffect(() => {
+    console.log("Clients:", clients);
+    console.log("Agent Details:", agentDetails);
+    console.log("User Role:", userRole);
+    console.log("User ID:", userId);
+  }, [clients, agentDetails, userRole, userId]);
+ */
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -38,7 +44,6 @@ export const useMovementsGrid = () => {
     setAnchorEl(null);
   };
 
-  // Export data as CSV
   const exportDataAsCsv = useCallback(() => {
     if (gridRef.current) {
       gridRef.current.api.exportDataAsCsv();
@@ -48,21 +53,20 @@ export const useMovementsGrid = () => {
   // Create a map of agent IDs to agent names
   const agentMap = useMemo(() => {
     const map: Record<string, string> = {};
-    Object.values(agentDetails).forEach((agent) => {
+    agentDetails.forEach((agent) => {
       map[agent.id] = agent.name;
     });
     return map;
   }, [agentDetails]);
 
-  // Enrich clients with agent names
+  // Add agent names to clients
   const enrichedClients = useMemo(() => {
-    return Object.values(clients).map((client) => ({
+    return clients.map((client) => ({
       ...client,
       agentName: agentMap[client.agent] || "Unknown Agent",
     }));
   }, [clients, agentMap]);
 
-  // Handle movement selection
   const handleMovementSelect = useCallback(
     (movementId: string) => {
       const allMovements: Movement[] = enrichedClients.flatMap(
@@ -80,7 +84,6 @@ export const useMovementsGrid = () => {
     [enrichedClients]
   );
 
-  // Filter movements based on search criteria
   const filteredMovements = useCallback(() => {
     type EnrichedMovement = Movement & {
       clientId: string;
@@ -98,10 +101,16 @@ export const useMovementsGrid = () => {
         }))
     );
 
-    if (quickFilterText) {
+    if (userRole === "agent") {
       movements = movements.filter((movement) =>
-        movement.details.some((detail) =>
-          detail.name.toLowerCase().includes(quickFilterText.toLowerCase())
+        enrichedClients.some(
+          (client) => client.agent === userId && client.id === movement.clientId
+        )
+      );
+    } else if (userRole === "client") {
+      movements = movements.filter((movement) =>
+        enrichedClients.some(
+          (client) => client.id === userId && client.id === movement.clientId
         )
       );
     }
@@ -116,7 +125,7 @@ export const useMovementsGrid = () => {
     }
 
     return movements;
-  }, [enrichedClients, quickFilterText, startDate, endDate]);
+  }, [enrichedClients, userRole, userId, startDate, endDate]);
 
   return {
     clients: enrichedClients,
@@ -140,6 +149,6 @@ export const useMovementsGrid = () => {
     handleMenuClose,
     anchorEl,
     exportDataAsCsv,
-    userRole,
+    userRole, // Added userRole to return object
   };
 };

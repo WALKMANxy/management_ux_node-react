@@ -4,14 +4,13 @@ import {
   Avatar,
   Box,
   Button,
-  CircularProgress,
   Grid,
   Paper,
   Typography,
   useMediaQuery,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import React, { useState } from "react";
+import React from "react";
 import Chart from "react-apexcharts";
 import { useTranslation } from "react-i18next";
 import { ChartData } from "../../utils/constants";
@@ -27,7 +26,6 @@ interface TotalOrderProps {
 
 const TotalOrder: React.FC<TotalOrderProps> = ({
   totalOrder,
-  isLoading,
   monthlyOrders,
   yearlyOrders,
   monthlyCategories,
@@ -36,87 +34,13 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [isMonthly, setIsMonthly] = useState(true);
+  const [timeValue, setTimeValue] = React.useState(true); // Initialize with "month" chart
 
-  const handleChangeTime = (newValue: boolean) => {
-    setIsMonthly(newValue);
-  };
-
-  const renderContent = () => {
-    if (isLoading) {
-      return (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="100%"
-        >
-          <CircularProgress />
-        </Box>
-      );
-    }
-
-    return (
-      <>
-        <Grid
-          container
-          alignItems="center"
-          direction={isMobile ? "column" : "row"}
-        >
-          <Grid item xs={12} md={6} textAlign={isMobile ? "center" : "left"}>
-            <Grid
-              container
-              alignItems="center"
-              justifyContent={isMobile ? "center" : "flex-start"}
-            >
-              <Grid item>
-                <Typography
-                  sx={{
-                    fontSize: "2.5rem",
-                    fontWeight: 500,
-                    mr: 1,
-                    mt: 1.5,
-                    mb: 0.5,
-                  }}
-                >
-                  {totalOrder}
-                </Typography>
-              </Grid>
-              <Grid item>
-                <Avatar
-                  sx={{
-                    cursor: "pointer",
-                    bgcolor: theme.palette.primary.light,
-                    color: "#000",
-                  }}
-                >
-                  <ArrowDownwardIcon
-                    fontSize="inherit"
-                    sx={{ transform: "rotate3d(1, 1, 1, 45deg)" }}
-                  />
-                </Avatar>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography
-                  sx={{ fontSize: "1.4rem", fontWeight: 500, color: "#000" }}
-                >
-                  {t("totalOrder.totalOrders")}
-                </Typography>
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Chart
-              {...ChartData(
-                isMonthly ? monthlyCategories : yearlyCategories,
-                isMonthly ? monthlyOrders : yearlyOrders
-              )}
-              height="150"
-            />
-          </Grid>
-        </Grid>
-      </>
-    );
+  const handleChangeTime = (
+    _event: React.MouseEvent<HTMLElement>,
+    newValue: boolean
+  ) => {
+    setTimeValue(newValue);
   };
 
   return (
@@ -129,7 +53,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
         color: "#000",
         position: "relative",
         overflow: "hidden",
-        height: isMobile ? "auto" : "250px",
+        height: isMobile ? "auto" : "250px", // Allow to grow in height for mobile view
         "&:after": {
           content: '""',
           position: "absolute",
@@ -172,30 +96,36 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
               <Grid item>
                 <Button
                   disableElevation
-                  variant={isMonthly ? "contained" : "text"}
+                  variant={timeValue ? "contained" : "text"}
                   size="small"
                   sx={{
                     color: "#fff",
-                    bgcolor: isMonthly ? "#000" : "transparent",
+                    bgcolor: timeValue ? "#000" : "transparent",
                     zIndex: 1,
-                    "&:hover": { bgcolor: "#000", color: "#fff" },
+                    "&:hover": {
+                      bgcolor: "#000",
+                      color: "#fff",
+                    },
                     mr: 1,
                   }}
-                  onClick={() => handleChangeTime(true)}
+                  onClick={(e) => handleChangeTime(e, true)}
                 >
                   {t("totalOrder.month")}
                 </Button>
                 <Button
                   disableElevation
-                  variant={!isMonthly ? "contained" : "text"}
+                  variant={!timeValue ? "contained" : "text"}
                   size="small"
                   sx={{
                     color: "#fff",
-                    bgcolor: !isMonthly ? "#000" : "transparent",
+                    bgcolor: !timeValue ? "#000" : "transparent",
                     zIndex: 1,
-                    "&:hover": { bgcolor: "#000", color: "#fff" },
+                    "&:hover": {
+                      bgcolor: "#000",
+                      color: "#fff",
+                    },
                   }}
-                  onClick={() => handleChangeTime(false)}
+                  onClick={(e) => handleChangeTime(e, false)}
                 >
                   {t("totalOrder.year")}
                 </Button>
@@ -203,7 +133,76 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
             </Grid>
           </Grid>
           <Grid item sx={{ mb: 0.5 }}>
-            {renderContent()}
+            <Grid
+              container
+              alignItems="center"
+              direction={isMobile ? "column" : "row"}
+            >
+              <Grid
+                item
+                xs={12}
+                md={6}
+                textAlign={isMobile ? "center" : "left"}
+              >
+                <Grid
+                  container
+                  alignItems="center"
+                  justifyContent={isMobile ? "center" : "flex-start"}
+                >
+                  <Grid item>
+                    <Typography
+                      sx={{
+                        fontSize: "2.5rem",
+                        fontWeight: 500,
+                        mr: 1,
+                        mt: 1.5,
+                        mb: 0.5,
+                      }}
+                    >
+                      {totalOrder}
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Avatar
+                      sx={{
+                        cursor: "pointer",
+                        bgcolor: theme.palette.primary.light,
+                        color: "#000",
+                      }}
+                    >
+                      <ArrowDownwardIcon
+                        fontSize="inherit"
+                        sx={{ transform: "rotate3d(1, 1, 1, 45deg)" }}
+                      />
+                    </Avatar>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography
+                      sx={{
+                        fontSize: "1.4rem",
+                        fontWeight: 500,
+                        color: "#000",
+                      }}
+                    >
+                      {t("totalOrder.totalOrders")}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                {timeValue ? (
+                  <Chart
+                    {...ChartData(monthlyCategories, monthlyOrders)}
+                    height="150"
+                  />
+                ) : (
+                  <Chart
+                    {...ChartData(yearlyCategories, yearlyOrders)}
+                    height="150"
+                  />
+                )}
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </Box>
