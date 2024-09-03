@@ -13,7 +13,7 @@ import {
 import { getAllUsers, getUserById, updateUserById } from "./api/users";
 
 export const authApi = createApi({
-  reducerPath: "api",
+  reducerPath: "authApi",
   baseQuery: fetchBaseQuery({ baseUrl }),
   endpoints: (builder) => ({
     getUserById: builder.query<User, string>({

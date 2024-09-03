@@ -1,6 +1,6 @@
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useCallback, useMemo } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import useGlobalSearch from "../../hooks/useGlobalSearch";
@@ -29,31 +29,23 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
     selectedIndex,
     setShowResults,
     setSelectedIndex,
-    status,
+    status, // Add status to the destructured properties
   } = useGlobalSearch(filter);
 
-  const handleSelect = useCallback(
-    (item: SearchResult) => {
-      if (isHeaderSearch) {
-        sessionStorage.setItem("searchedItem", JSON.stringify(item));
-        if (item.type === "article") {
-          navigate("/articles");
-        } else if (item.type === "client") {
-          navigate("/clients");
-        }
-      } else if (onSelect) {
-        onSelect(item);
+  const handleSelect = (item: SearchResult) => {
+    if (isHeaderSearch) {
+      sessionStorage.setItem("searchedItem", JSON.stringify(item));
+      if (item.type === "article") {
+        navigate("/articles");
+      } else if (item.type === "client") {
+        navigate("/clients");
       }
-      setShowResults(false);
-      setSelectedIndex(-1);
-    },
-    [isHeaderSearch, navigate, onSelect, setShowResults, setSelectedIndex]
-  );
-
-  const searchPlaceholder = useMemo(
-    () => placeholder || t("globalSearch.placeholder"),
-    [placeholder, t]
-  );
+    } else if (onSelect) {
+      onSelect(item); // Call the provided onSelect callback
+    }
+    setShowResults(false);
+    setSelectedIndex(-1);
+  };
 
   return (
     <div ref={searchRef} className="global-search-container">
@@ -64,7 +56,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
         <input
           type="text"
           className="form-control search-bar"
-          placeholder={searchPlaceholder}
+          placeholder={placeholder || t("globalSearch.placeholder")}
           value={input}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
@@ -74,7 +66,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
       {showResults && (
         <div className="search-results-container">
           {status === "loading" ? (
-            <Spinner />
+            <Spinner /> // Show the spinner when the search is loading
           ) : (
             <SearchResults
               onSelect={handleSelect}
@@ -89,4 +81,3 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
 };
 
 export default GlobalSearch;
-React.memo(GlobalSearch);

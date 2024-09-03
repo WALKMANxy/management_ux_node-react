@@ -1,3 +1,4 @@
+// src/components/TotalEarning.tsx
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -8,6 +9,7 @@ import { currencyFormatter } from "../../utils/dataUtils";
 
 const TotalEarning: React.FC<TotalEarningProps> = ({ totalEarning }) => {
   const { t } = useTranslation();
+
   const theme = useTheme();
   const formattedEarning = currencyFormatter(totalEarning);
 
@@ -18,23 +20,27 @@ const TotalEarning: React.FC<TotalEarningProps> = ({ totalEarning }) => {
         p: 3,
         borderRadius: "12px",
         background: "linear-gradient(135deg, #fffde7 30%, #fff9c4 100%)",
-        color: theme.palette.text.primary,
+        color: "#000",
         position: "relative",
         overflow: "hidden",
         height: "100%",
-        "&::after, &::before": {
+        "&:after": {
           content: '""',
           position: "absolute",
           width: 210,
           height: 210,
           background: theme.palette.secondary.main,
           borderRadius: "50%",
-        },
-        "&::after": {
           top: -85,
           right: -95,
         },
-        "&::before": {
+        "&:before": {
+          content: '""',
+          position: "absolute",
+          width: 210,
+          height: 210,
+          background: theme.palette.secondary.main,
+          borderRadius: "50%",
           top: -125,
           right: -15,
           opacity: 0.5,
@@ -42,29 +48,38 @@ const TotalEarning: React.FC<TotalEarningProps> = ({ totalEarning }) => {
       }}
     >
       <Box sx={{ p: 2.25 }}>
-        <Grid container direction="column" spacing={2}>
+        <Grid container direction="column">
           <Grid item>
-            <Avatar
-              variant="rounded"
-              sx={{
-                bgcolor: theme.palette.secondary.main,
-                color: theme.palette.secondary.contrastText,
-              }}
-            >
-              <img
-                src="/icons/earning.svg"
-                alt="Earning Icon"
-                style={{ width: "100%", height: "100%" }}
-              />
-            </Avatar>
+            <Grid container justifyContent="space-between">
+              <Grid item>
+                <Avatar
+                  variant="rounded"
+                  sx={{
+                    bgcolor: theme.palette.secondary.main,
+                    color: "#000",
+                    mt: 1,
+                  }}
+                >
+                  <img
+                    src="/icons/earning.svg"
+                    alt="Earning Icon"
+                    style={{ width: "100%", height: "100%" }}
+                  />
+                </Avatar>
+              </Grid>
+            </Grid>
           </Grid>
           <Grid item>
-            <Grid container alignItems="center" spacing={1}>
+            <Grid container alignItems="center">
               <Grid item>
                 <Typography
-                  variant="h3"
-                  component="div"
-                  sx={{ fontWeight: 500 }}
+                  sx={{
+                    fontSize: "2.7rem",
+                    fontWeight: 500,
+                    mr: 1,
+                    mt: 1.75,
+                    mb: 0.75,
+                  }}
                 >
                   {formattedEarning}
                 </Typography>
@@ -74,19 +89,25 @@ const TotalEarning: React.FC<TotalEarningProps> = ({ totalEarning }) => {
                   sx={{
                     cursor: "pointer",
                     bgcolor: theme.palette.secondary.light,
-                    color: theme.palette.secondary.contrastText,
+                    color: "#000",
                   }}
                 >
                   <ArrowUpwardIcon
                     fontSize="inherit"
-                    sx={{ transform: "rotate(45deg)" }}
+                    sx={{ transform: "rotate3d(1, 1, 1, 45deg)" }}
                   />
                 </Avatar>
               </Grid>
             </Grid>
           </Grid>
-          <Grid item>
-            <Typography variant="h5" component="div" sx={{ fontWeight: 500 }}>
+          <Grid item sx={{ mb: 1.25 }}>
+            <Typography
+              sx={{
+                fontSize: "1.5rem",
+                fontWeight: 500,
+                color: "#000",
+              }}
+            >
               {t("dashboard.totalEarning")}
             </Typography>
           </Grid>

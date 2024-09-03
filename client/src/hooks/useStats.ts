@@ -8,7 +8,7 @@ import {
   selectClient,
 } from "../features/data/dataSlice";
 import { Movement } from "../models/dataModels";
-import { MonthlyRevenue, TopArticleType } from "../models/dataSetTypes";
+import { TopArticleType } from "../models/dataSetTypes";
 import { Agent, Client } from "../models/entityModels";
 import { DataSliceState } from "../models/stateModels";
 import {
@@ -25,7 +25,7 @@ import {
   calculateTotalSpentForYear,
   calculateTotalSpentForYearForClients,
   filterCurrentMonthMovements,
-  getClientListByRole,
+  getAdjustedClients,
   getMovementsByRole,
 } from "../utils/dataUtils";
 
@@ -39,7 +39,7 @@ const useStats = (isMobile: boolean) => {
   // Get data from the dataSlice
   const {
     clients, // List of clients
-    agentDetails, // Details of agents
+    agents,
     currentUserData, // Current logged-in user's data
     currentUserDetails, // Current logged-in user's details
     selectedClientId, // ID of the currently selected client
@@ -50,6 +50,8 @@ const useStats = (isMobile: boolean) => {
 
   // Extract the role from currentUserDetails
   const role = currentUserDetails?.role;
+
+  const agentDetails = agents;
 
   // Fetch initial data
   useEffect(() => {
@@ -89,51 +91,47 @@ const useStats = (isMobile: boolean) => {
     }
   }, [retryCount, dispatch]);
 
-  // Memoized selectors for selectedClient and selectedAgent
-  const selectedClient = useMemo<Client | null>(() => {
-    return selectedClientId ? clients[selectedClientId] ?? null : null;
-  }, [clients, selectedClientId]);
+  // Create memoized selectors for selectedClient and selectedAgent
+  const selectedClient = useMemo(
+    () => (selectedClientId ? clients[selectedClientId] : null),
+    [clients, selectedClientId]
+  );
 
-  const selectedAgent = useMemo<Agent | null>(() => {
-    return selectedAgentId ? agentDetails[selectedAgentId] ?? null : null;
-  }, [agentDetails, selectedAgentId]);
+  const selectedAgent = useMemo(
+    () => (selectedAgentId ? agents[selectedAgentId] : null),
+    [agents, selectedAgentId]
+  );
 
-  // Handler functions with strong typing
-  const clearSelectionHandler = useCallback((): void => {
+  // Update the clearSelection, selectClient, and selectAgent functions
+  const clearSelectionHandler = useCallback(() => {
     dispatch(clearSelection());
   }, [dispatch]);
 
   const selectClientHandler = useCallback(
-    (clientId: string): void => {
+    (clientId: string) => {
       dispatch(selectClient(clientId));
     },
     [dispatch]
   );
 
   const selectAgentHandler = useCallback(
-    (agentId: string): void => {
+    (agentId: string) => {
       dispatch(selectAgent(agentId));
     },
     [dispatch]
   );
+  const calculateTotalSpentThisMonth = useCallback((movements: Movement[]) => {
+    const totalSpent = calculateMonthlyRevenue(movements);
+    return totalSpent;
+  }, []);
 
-  const calculateTotalSpentThisMonth = useCallback(
-    (movements: Movement[]): MonthlyRevenue => {
-      return calculateMonthlyRevenue(movements);
-    },
-    []
-  );
-
-  const calculateTotalSpentThisYear = useCallback(
-    (movements: Movement[]): string => {
-      const currentYear = new Date().getFullYear();
-      return calculateTotalSpentForYear(movements, currentYear);
-    },
-    []
-  );
+  const calculateTotalSpentThisYear = useCallback((movements: Movement[]) => {
+    const currentYear = new Date().getFullYear();
+    return calculateTotalSpentForYear(movements, currentYear);
+  }, []);
 
   const calculateTotalSpentThisYearForAgents = useCallback(
-    (clients: Client[]): string => {
+    (clients: Client[]) => {
       const currentYear = new Date().getFullYear();
       return calculateTotalSpentForYearForClients(clients, currentYear);
     },
@@ -148,44 +146,70 @@ const useStats = (isMobile: boolean) => {
   );
 
   const totalRevenue = useMemo<number>(() => {
-    if (!currentUserData) return 0;
+    if (!currentUserData || !role) return 0;
 
-    const clientList = getClientListByRole(role, currentUserData, clients);
+    const clientList = getAdjustedClients(role, currentUserData, clients);
     return parseFloat(calculateTotalRevenue(clientList));
   }, [role, currentUserData, clients]);
 
   const totalOrders = useMemo<number>(() => {
-    if (!currentUserData) return 0;
+    if (!currentUserData || !role) return 0;
 
-    const clientList = getClientListByRole(role, currentUserData, clients);
+    const clientList = getAdjustedClients(role, currentUserData, clients);
     return calculateTotalOrders(clientList);
   }, [role, currentUserData, clients]);
 
   const topBrandsData = useMemo(() => {
-    if (!currentUserData) return [];
+    if (!currentUserData || !role) return 0;
 
     const movements = getMovementsByRole(role, currentUserData, clients);
     return calculateTopBrandsData(movements);
   }, [role, currentUserData, clients]);
 
   const salesDistributionDataAgents = useMemo(() => {
-    if (!currentUserData) return { agents: [], data: [] };
+    if (!currentUserDetails) {
+      return { agents: [], data: [] };
+    }
 
     if (role === "admin") {
-      // Instead of re-mapping, use the existing agentDetails
-      const agents = Object.values(agentDetails);
+      const agentsMap = Object.values(clients).reduce((acc, client) => {
+        const agentId = client.agent;
+        if (!acc[agentId]) {
+          const agentDetail = agentDetails[agentId];
+          acc[agentId] = {
+            id: agentId,
+            name: agentDetail ? agentDetail.name : `Agent ${agentId}`,
+            clients: [],
+          };
+        }
+        acc[agentId].clients.push(client);
+        return acc;
+      }, {} as { [key: string]: Agent });
+
+      const agents = Object.values(agentsMap);
+
       const data = calculateSalesDistributionDataForAgents(agents, isMobile);
+
       return { agents, data };
     } else if (role === "agent") {
       const agentClients = Object.values(clients).filter(
-        (client) => client.agent === currentUserData.id
+        (client) => client.agent === currentUserDetails.id
       );
+
       const data = calculateSalesDistributionData(agentClients, isMobile);
+
       return { agents: [currentUserData as Agent], data };
     }
 
     return { agents: [], data: [] };
-  }, [role, currentUserData, clients, agentDetails, isMobile]);
+  }, [
+    role,
+    currentUserDetails,
+    agentDetails,
+    clients,
+    currentUserData,
+    isMobile,
+  ]);
 
   const salesDistributionDataClients = useMemo(() => {
     if (!currentUserData) return [];
@@ -194,11 +218,11 @@ const useStats = (isMobile: boolean) => {
       return calculateSalesDistributionData(Object.values(clients), isMobile);
     } else if (role === "agent") {
       // Use the existing association from agentDetails if available
-      const agentData = agentDetails[currentUserData.id];
+      const agentData = agents[currentUserData.id];
       return calculateSalesDistributionData(agentData?.clients || [], isMobile);
     }
     return [];
-  }, [role, currentUserData, clients, agentDetails, isMobile]);
+  }, [role, currentUserData, clients, agents, isMobile]);
 
   const { months, revenueData, ordersData } = useMemo(() => {
     if (!currentUserData)

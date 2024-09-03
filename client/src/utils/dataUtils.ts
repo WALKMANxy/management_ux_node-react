@@ -2,7 +2,6 @@ import dayjs from "dayjs";
 import { Movement } from "../models/dataModels";
 import { Admin, Agent, Client } from "../models/entityModels";
 import { ignoreArticleNames } from "./constants";
-import { BrandData } from "../models/propsModels";
 
 // Helper function to get month and year from a date string
 export const getMonthYear = (dateString: string) => {
@@ -94,7 +93,7 @@ export const calculateTotalOrders = (clients: Client[]): number => {
 
 export const calculateTopBrandsData = (
   movements: Movement[]
-): BrandData[] => {
+): { label: string; value: number }[] => {
   const brandCount: { [key: string]: { name: string; quantity: number } } = {};
 
   // Iterate over each movement
@@ -119,15 +118,14 @@ export const calculateTopBrandsData = (
 
   // Sort the brands by quantity in descending order and return the top 10
   return Object.values(brandCount)
-  .map((brand, index) => ({
-    id: `${brand.name.replace(/\s+/g, '-').toLowerCase()}-${index}`, // Generate unique ID
-    label: brand.name,
-    value: brand.quantity,
-  }))
-  .sort((a, b) => b.value - a.value)
-  .slice(0, 10);
+    .map((brand, index) => ({
+      label: brand.name,
+      value: brand.quantity,
+      key: `${brand.name}-${index}`, // Ensure unique keys by adding an index
+    }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 10);
 };
-
 
 // Calculate sales distribution data for a list of clients
 export const calculateSalesDistributionData = (
@@ -372,24 +370,15 @@ export const numberComparator = (valueA: number, valueB: number) => {
 export const getTrend = (percentage: string | number) =>
   parseFloat(`${percentage}`) > 50 ? "up" : "down";
 
-export const getClientListByRole = (
+export const getAdjustedClients = (
   role: "admin" | "agent" | "client" | undefined,
-  currentUserData: Admin | Client | Agent | null,
+  currentUserData: Client | Admin | Agent | null,
   clients: Record<string, Client>
-): Client[] => {
-  if (!currentUserData) return [];
-
-  switch (role) {
-    case "agent":
-      return Object.values(clients).filter(
-        (client) => client.agent === currentUserData.id
-      );
-    case "client":
-      return [currentUserData as Client];
-    case "admin":
-      return Object.values(clients);
-    default:
-      return [];
+) => {
+  if (role === "client" && currentUserData) {
+    return [currentUserData as Client]; // Adjusted clients for client role
+  } else {
+    return Object.values(clients); // Adjusted clients for other roles
   }
 };
 
@@ -402,9 +391,7 @@ export const getMovementsByRole = (
 
   switch (role) {
     case "agent":
-      return Object.values(clients)
-        .filter((client) => client.agent === currentUserData.id)
-        .flatMap((client) => client.movements);
+      return Object.values(clients).flatMap((client) => client.movements);
     case "client":
       return (currentUserData as Client).movements;
     case "admin":

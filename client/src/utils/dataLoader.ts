@@ -15,35 +15,50 @@ const workerScriptPath = new URL("./worker.js", import.meta.url);
 export const mapDataToModels = async (
   data: serverMovement[],
   clientDetails: serverClient[],
-  agentDetails: Agent[],
   visits: Visit[] = [],
   promos: Promo[] = []
 ): Promise<{ clients: Client[]; visits: Visit[]; promos: Promo[] }> => {
+  // Determine the number of workers based on hardware concurrency or default to 4
   const numWorkers = Math.min(navigator.hardwareConcurrency || 4, data.length);
   const chunkSize = Math.ceil(data.length / numWorkers);
+
+  // Pre-process client details into a map for easy lookup
+  const clientDetailsMap = new Map(
+    clientDetails.map((detail) => [detail["CODICE"], detail])
+  );
+
+  // Split the data into chunks based on the number of workers
   const chunks = Array.from({ length: numWorkers }, (_, i) =>
     data.slice(i * chunkSize, (i + 1) * chunkSize)
   );
 
+  // Create workers and assign them relevant chunks of data with filtered client details
   const workers = chunks.map((chunk, index) => {
+    // Filter client details that are relevant to the current chunk
+    const relevantClientDetailsMap = Object.fromEntries(
+      [...clientDetailsMap].filter(([clientId]) =>
+        chunk.some((item) => item["Codice Cliente"].toString() === clientId)
+      )
+    );
+
     return new Promise<Client[]>((resolve, reject) => {
       const worker = new Worker(workerScriptPath);
 
       worker.onmessage = (event: MessageEvent<Client[]>) => {
         resolve(event.data);
-        worker.terminate(); // Terminate worker after it finishes
+        worker.terminate(); // Terminate the worker after it finishes
       };
 
       worker.onerror = (error) => {
         console.error(`Worker ${index} error:`, error);
         reject(error);
-        worker.terminate(); // Terminate worker on error
+        worker.terminate(); // Terminate the worker on error
       };
 
+      // Send the chunk of data and the relevant client details map
       worker.postMessage({
         data: chunk,
-        clientDetails,
-        agentDetails,
+        clientDetailsMap: relevantClientDetailsMap, // Send only the relevant client details
       });
     });
   });
@@ -88,68 +103,57 @@ export const mapDataToModels = async (
 
 // Mapping function for full agent data
 export const mapDataToAgents = async (
-  data: serverMovement[],
-  agentDetails: Agent[],
-  visits: Visit[] = [], // Default to an empty array if undefined
-  promos: Promo[] = [] // Default to an empty array if undefined
+  clients: Client[], // Accept clients already mapped with correct movements
+  agentDetails: Agent[], // Array of agent details including clients' CODICE
+  visits: Visit[] = [],
+  promos: Promo[] = []
 ): Promise<{ agents: Agent[]; visits: Visit[]; promos: Promo[] }> => {
   const agentsMap = new Map<string, Agent>();
   const aggregatedVisits: Visit[] = [];
   const aggregatedPromos: Promo[] = [];
 
-  // Populate agents map from agentDetails
-  agentDetails.forEach((agent) => {
-    agentsMap.set(agent.id, {
-      ...agent,
-      clients: [],
+  // Populate agents map using agent details
+  agentDetails.forEach((agentDetail) => {
+    agentsMap.set(agentDetail.id, {
+      ...agentDetail,
+      clients: [], // Initialize with empty clients array
     });
   });
 
-  // Map clients to their respective agents and aggregate visits and promos
-  data.forEach((item) => {
-    const agentId = item["Codice Agente"].toString();
-    const clientId = item["Codice Cliente"].toString();
-    const agent = agentsMap.get(agentId);
+  // Map clients to their respective agents
+  clients.forEach((client) => {
+    const agent = agentsMap.get(client.agent); // Find the corresponding agent by id
 
     if (agent) {
-      const existingClient = agent.clients.find(
-        (client) => client.id === clientId
+      // Assign additional client properties like colour if available from agent details
+      const clientDetailsFromAgent = agent.clients.find(
+        (agentClient) => agentClient.id === client.id
       );
-      if (!existingClient) {
-        const newClient: Client = {
-          id: clientId,
-          name: item["Ragione Sociale Cliente"],
-          province: "",
-          phone: "",
-          totalOrders: 0,
-          totalRevenue: "0",
-          unpaidRevenue: "0",
-          address: "",
-          email: "",
-          agent: agentId,
-          movements: [],
-        };
 
-        agent.clients.push(newClient);
+      // Update the client with additional properties from agentDetails if available
+      client.colour = clientDetailsFromAgent
+        ? clientDetailsFromAgent.colour
+        : client.colour;
 
-        // Aggregate client's visits and promos into the aggregated data
-        const clientVisits = visits.filter(
-          (visit) => visit.clientId === clientId
-        );
-        const clientPromos = promos.filter((promo) =>
-          promo.clientsId.includes(clientId)
-        );
+      // Add client to the corresponding agent's clients array
+      agent.clients.push(client);
 
-        aggregatedVisits.push(...clientVisits);
-        aggregatedPromos.push(...clientPromos);
-      }
+      // Aggregate client's visits and promos
+      const clientVisits = visits.filter(
+        (visit) => visit.clientId === client.id
+      );
+      const clientPromos = promos.filter((promo) =>
+        promo.clientsId.includes(client.id)
+      );
+
+      aggregatedVisits.push(...clientVisits);
+      aggregatedPromos.push(...clientPromos);
     }
   });
 
-  // Convert the map back to an array
+  // Convert the map back to an array of agents
   const agents = Array.from(agentsMap.values());
 
-  // Returning agents, along with aggregated visits and promos
   return {
     agents,
     visits: aggregatedVisits,

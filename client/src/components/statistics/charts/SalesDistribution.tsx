@@ -62,13 +62,6 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
           },
         },
       },
-      yaxis: {
-        labels: {
-          formatter: (value) => {
-            return currencyFormatter(value);
-          },
-        },
-      },
       dataLabels: {
         enabled: false,
       },
@@ -195,5 +188,4 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
   );
 };
 
-export default SalesDistribution;
-React.memo(SalesDistribution);
+export default React.memo(SalesDistribution);

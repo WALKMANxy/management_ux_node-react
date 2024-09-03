@@ -37,19 +37,19 @@ export const getAlertsByEntityRoleAndEntityCode = async ({
   entityCode: string;
 }): Promise<Alert[]> => {
   try {
-    console.debug(`Fetching alerts for ${entityRole} with code ${entityCode}`);
-    const alerts = await apiCall<Alert[]>(
+    /*     console.debug(`Fetching alerts for ${entityRole} with code ${entityCode}`);
+     */ const alerts = await apiCall<Alert[]>(
       `alerts/${entityRole}/${entityCode}`,
       "GET"
     );
-    console.debug(
+    /* console.debug(
       `Fetched ${alerts.length} alerts for ${entityRole} with code ${entityCode}`
-    );
+    ); */
     return alerts;
   } catch (error: unknown) {
     if (error instanceof ApiError && error.status === 404) {
-      console.warn(`No alerts found for ${entityRole} with code ${entityCode}`);
-      return []; // Return an empty array if no alerts are found
+      /*       console.warn(`No alerts found for ${entityRole} with code ${entityCode}`);
+       */ return []; // Return an empty array if no alerts are found
     }
     return handleApiError(
       error,
@@ -61,11 +61,14 @@ export const getAlertsByEntityRoleAndEntityCode = async ({
 // Fetch alerts by the user who issued them
 export const getAlertsByIssuer = async (userId: string): Promise<Alert[]> => {
   try {
-    console.debug(`Fetching alerts issued by user with ID: ${userId}`);
-    const alerts = await apiCall<Alert[]>(`alerts/issuedby/${userId}`, "GET");
-    console.debug(
-      `Fetched ${alerts.length} alerts issued by user with ID: ${userId}`
+    /*     console.debug(`Fetching alerts issued by user with ID: ${userId}`);
+     */ const alerts = await apiCall<Alert[]>(
+      `alerts/issuedby/${userId}`,
+      "GET"
     );
+    /* console.debug(
+      `Fetched ${alerts.length} alerts issued by user with ID: ${userId}`
+    ); */
     return alerts;
   } catch (error: unknown) {
     if (error instanceof ApiError && error.status === 404) {

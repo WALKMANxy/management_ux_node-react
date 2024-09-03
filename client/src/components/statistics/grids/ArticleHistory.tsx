@@ -2,9 +2,9 @@ import { Box, Paper, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
+import { RootState } from "../../../app/store";
 import { Movement, MovementDetail } from "../../../models/dataModels";
 import { Client } from "../../../models/entityModels";
-import { DataSliceState } from "../../../models/stateModels";
 import { currencyFormatter, numberComparator } from "../../../utils/dataUtils";
 import AGGridTable from "./AGGridTable";
 
@@ -18,14 +18,12 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({
   clientMovements,
 }) => {
   const { t } = useTranslation();
-  const clients = useSelector((state: DataSliceState) =>
-    Object.values(state.clients)
-  );
+  const clients = useSelector((state: RootState) => state.data.clients);
 
   const movements: Movement[] = useMemo(() => {
     const allMovements =
       clientMovements ||
-      clients.flatMap((client: Client) =>
+      Object.values(clients).flatMap((client: Client) =>
         client.movements.map((movement: Movement) => ({
           ...movement,
           clientName: client.name,
@@ -92,6 +90,8 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({
     [t, articleId]
   );
 
+  /*   console.log("ArticleHistory movements: ", movements);
+   */
   return (
     <Paper
       elevation={3}

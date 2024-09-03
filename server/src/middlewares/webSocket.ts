@@ -16,10 +16,11 @@ export const setupWebSocket = (io: SocketIOServer) => {
   const connectedClients = new Map<string, Set<AuthenticatedSocket>>();
 
   io.use(async (socket: AuthenticatedSocket, next) => {
-    const sessionToken =
-      socket.handshake.auth.sessionToken ||
-      socket.handshake.headers.authorization?.replace("Bearer ", "") ||
-      parseCookie(socket.handshake.headers.cookie || "")["sessionToken"];
+    // Extract session token exclusively from cookies
+    const cookies = parseCookie(socket.handshake.headers.cookie || "");
+    const sessionToken = cookies["sessionToken"];
+
+    console.log("Extracted session token from cookies:", sessionToken);
 
     if (!sessionToken) {
       const error = new Error(
@@ -39,6 +40,12 @@ export const setupWebSocket = (io: SocketIOServer) => {
         );
         return next(error);
       }
+
+       // Extract userId as a string from the session object
+       const userId = session.userId.toString(); // Correctly extract the userId from the session
+       console.log("User ID extracted from session:", userId);
+
+       
       await authenticateSocket(socket, session.userId.toString());
       logger.info(`Socket authenticated`, {
         userId: session.userId,
@@ -124,6 +131,9 @@ export const setupWebSocket = (io: SocketIOServer) => {
 // Authenticate the socket based on the session token
 async function authenticateSocket(socket: AuthenticatedSocket, userId: string) {
   try {
+    console.log("Authenticating socket with userId:", userId);
+
+    // Retrieve the user from the database
     const user = await User.findById(userId);
 
     if (!user) {
@@ -132,6 +142,15 @@ async function authenticateSocket(socket: AuthenticatedSocket, userId: string) {
       throw error;
     }
 
+    // Log detailed information about the retrieved user
+    console.log("User details retrieved for socket authentication:", {
+      userId: user.id,
+      role: user.role,
+      entityCode: user.entityCode,
+      authType: user.authType,
+    });
+
+    // Set user information on the socket
     socket.userId = user.id.toString();
     socket.userRole = user.role;
     socket.entityCode = user.entityCode;
@@ -142,7 +161,7 @@ async function authenticateSocket(socket: AuthenticatedSocket, userId: string) {
     });
   } catch (error) {
     logger.error("Error during socket authentication", {
-      error,
+      error: error,
       userId,
       socketId: socket.id,
     });

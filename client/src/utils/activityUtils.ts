@@ -34,7 +34,9 @@ export const generateActivityList = (
         title: `Visit - agent: ${agentId}`,
         time: visit.date.toLocaleDateString(),
         details: `${visit.reason} - Client: ${visit.clientId}`,
-        subDetails: visit.notePublic ? visit.notePublic.slice(0, 50) + "..." : "",
+        subDetails: visit.notePublic
+          ? visit.notePublic.slice(0, 50) + "..."
+          : "",
       });
       visitCount++;
     }

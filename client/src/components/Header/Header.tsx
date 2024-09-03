@@ -28,23 +28,14 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useAppDispatch } from "../../app/hooks";
 import { RootState } from "../../app/store";
 import { handleLogout } from "../../features/auth/authSlice";
 import GlobalSearch from "./GlobalSearch";
-
-const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  backgroundColor: theme.palette.common.black,
-  color: theme.palette.common.white,
-}));
-
-const StyledIconButton = styled(IconButton)(({ theme }) => ({
-  color: theme.palette.common.white,
-}));
 
 const Header: React.FC = () => {
   const { t } = useTranslation();
@@ -53,40 +44,52 @@ const Header: React.FC = () => {
   const [iconChange, setIconChange] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const userRole = useSelector((state: RootState) => state.auth.role);
 
-  const userRole = useAppSelector((state: RootState) => state.auth.role);
-  const memoizedUserRole = useMemo(() => userRole, [userRole]);
-
-  const initiateLogout = useCallback(() => {
+  const initiateLogout = () => {
     dispatch(handleLogout());
-  }, [dispatch]);
+  };
 
-  const toggleDrawer = useCallback(() => {
-    setDrawerOpen((prev) => !prev);
+  const toggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
     setTimeout(() => {
       setIconChange(!drawerOpen);
-    }, 500);
-  }, [drawerOpen]);
+    }, 500); // 500ms delay for icon change
+  };
 
-  const getDashboardLink = useCallback(() => {
-    switch (memoizedUserRole) {
+  const handleLogoClick = () => {
+    let dashboardLink = "/";
+    switch (userRole) {
       case "admin":
-        return "/admin-dashboard";
+        dashboardLink = "/admin-dashboard";
+        break;
       case "agent":
-        return "/agent-dashboard";
+        dashboardLink = "/agent-dashboard";
+        break;
       case "client":
-        return "/client-dashboard";
+        dashboardLink = "/client-dashboard";
+        break;
       default:
-        return "/";
+        dashboardLink = "/";
     }
-  }, [memoizedUserRole]);
+    navigate(dashboardLink);
+  };
 
-  const handleLogoClick = useCallback(() => {
-    navigate(getDashboardLink());
-  }, [navigate, getDashboardLink]);
-
-  const renderLinks = useCallback(() => {
-    const dashboardLink = getDashboardLink();
+  const renderLinks = () => {
+    let dashboardLink = "/";
+    switch (userRole) {
+      case "admin":
+        dashboardLink = "/admin-dashboard";
+        break;
+      case "agent":
+        dashboardLink = "/agent-dashboard";
+        break;
+      case "client":
+        dashboardLink = "/client-dashboard";
+        break;
+      default:
+        dashboardLink = "/";
+    }
 
     return (
       <>
@@ -155,47 +158,43 @@ const Header: React.FC = () => {
         </ListItem>
       </>
     );
-  }, [getDashboardLink, toggleDrawer, t]);
+  };
 
-  const renderLogoutLink = useCallback(
-    () => (
-      <ListItem
-        button
-        component={Link}
-        to="/"
-        onClick={() => {
-          initiateLogout();
-          toggleDrawer();
-        }}
-        sx={{ color: "white", paddingBottom: "20px" }}
-      >
-        <ListItemIcon sx={{ color: "white" }}>
-          <LogoutIcon />
-        </ListItemIcon>
-        <ListItemText primary={t("logout")} />
-      </ListItem>
-    ),
-    [initiateLogout, toggleDrawer, t]
-  );
-
-  const memoizedLinks = useMemo(() => renderLinks(), [renderLinks]);
-  const memoizedLogoutLink = useMemo(
-    () => renderLogoutLink(),
-    [renderLogoutLink]
+  const renderLogoutLink = () => (
+    <ListItem
+      button
+      component={Link}
+      to="/"
+      onClick={() => {
+        initiateLogout();
+        toggleDrawer(); // Close the drawer on logout
+      }}
+      sx={{ color: "white", paddingBottom: "20px" }}
+    >
+      <ListItemIcon sx={{ color: "white" }}>
+        <LogoutIcon />
+      </ListItemIcon>
+      <ListItemText primary={t("logout")} />
+    </ListItem>
   );
 
   return (
     <>
-      <StyledAppBar position="fixed">
+      <AppBar
+        position="fixed"
+        sx={{ backgroundColor: "black", color: "black" }}
+      >
         <Toolbar>
           <Fade in={!iconChange} timeout={500}>
-            <StyledIconButton
+            <IconButton
               edge="start"
+              color="inherit"
               aria-label="menu"
               onClick={toggleDrawer}
+              sx={{ color: "white" }} // Scoped color style
             >
               {iconChange ? <CloseIcon /> : <MenuIcon />}
-            </StyledIconButton>
+            </IconButton>
           </Fade>
           <img
             src="/images/logo-appbar.png"
@@ -208,17 +207,22 @@ const Header: React.FC = () => {
             placeholder={t("search")}
             isHeaderSearch={true}
           />
-          <StyledIconButton onClick={() => setModalOpen(true)}>
+          <IconButton
+            color="inherit"
+            onClick={() => setModalOpen(true)}
+            sx={{ color: "white" }}
+          >
             <Badge badgeContent={4} color="secondary">
               <NotificationsIcon />
             </Badge>
-          </StyledIconButton>
-          <StyledIconButton>
+          </IconButton>
+          <IconButton color="inherit" sx={{ color: "white" }}>
             <Avatar alt="Agent Name" src="/path-to-avatar.jpg" />
-          </StyledIconButton>
+          </IconButton>
         </Toolbar>
-      </StyledAppBar>
-      <Toolbar />
+      </AppBar>
+      <Toolbar />{" "}
+      {/* This Toolbar component is added to push the content down */}
       <Drawer
         anchor="left"
         open={drawerOpen}
@@ -233,9 +237,15 @@ const Header: React.FC = () => {
       >
         <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
           <Box sx={{ display: "flex", alignItems: "center", padding: "16px" }}>
-            <StyledIconButton edge="start" onClick={toggleDrawer}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={toggleDrawer}
+              sx={{ color: "white" }}
+            >
               <CloseIcon />
-            </StyledIconButton>
+            </IconButton>
             <img
               src="/images/logo-appbar.png"
               alt="Logo"
@@ -243,8 +253,8 @@ const Header: React.FC = () => {
               onClick={handleLogoClick}
             />
           </Box>
-          <List sx={{ flexGrow: 1 }}>{memoizedLinks}</List>
-          <Box sx={{ mt: "auto" }}>{memoizedLogoutLink}</Box>
+          <List sx={{ flexGrow: 1 }}>{renderLinks()}</List>
+          <Box sx={{ mt: "auto" }}>{renderLogoutLink()}</Box>
         </Box>
       </Drawer>
       <Modal
@@ -277,5 +287,4 @@ const Header: React.FC = () => {
   );
 };
 
-export default Header;
-React.memo(Header);
+export default React.memo(Header);

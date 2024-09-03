@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import Cookies from "js-cookie";
-import {  getUserAgent } from "../../utils/deviceUtils";
+import { getUserAgent } from "../../utils/deviceUtils";
 import { authApiCall } from "./apiUtils";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
