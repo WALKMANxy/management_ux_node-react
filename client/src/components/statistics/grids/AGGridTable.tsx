@@ -23,12 +23,14 @@ const AGGridTable = forwardRef<AgGridReact, AGGridTableProps>(
           paginationPageSize={20}
           paginationPageSizeSelector={paginationPageSizeSelector}
           quickFilterText={quickFilterText} // Pass quickFilterText to AgGridReact
+          enableCellTextSelection={true}
           defaultColDef={{
             flex: 1,
             minWidth: 150,
             filter: true,
             floatingFilter: true, // Enable floating filters
             suppressHeaderMenuButton: true,
+
           }}
         />
       </div>

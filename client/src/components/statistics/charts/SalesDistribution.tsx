@@ -62,6 +62,11 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
           },
         },
       },
+      yaxis: {
+        labels: {
+          formatter: (value: number) => currencyFormatter(value), // Apply currency formatting
+        },
+      },
       dataLabels: {
         enabled: false,
       },

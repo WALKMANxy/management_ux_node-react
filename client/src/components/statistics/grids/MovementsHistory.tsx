@@ -1,6 +1,5 @@
 //src/components/statistics/grids/MovementsHistory.tsx
 import { Box, Paper } from "@mui/material";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { MovementsHistoryProps } from "../../../models/propsModels";
@@ -53,22 +52,25 @@ const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
         field: "quantity",
         comparator: numberComparator,
         sortable: true,
+        type: "numericColumn",
       },
       {
         headerName: t("movementsHistory.revenue"),
         field: "priceSold",
-        valueFormatter: (params: any) =>
+        valueFormatter: (params: { value: string }) =>
           currencyFormatter(parseFloat(params.value)),
         comparator: numberComparator,
         sortable: true,
+        type: "numericColumn",
       },
       {
         headerName: t("movementsHistory.cost"),
         field: "priceBought",
-        valueFormatter: (params: any) =>
+        valueFormatter: (params: { value: string }) =>
           currencyFormatter(parseFloat(params.value)),
         comparator: numberComparator,
         sortable: true,
+        type: "numericColumn",
       },
     ],
     [t]

@@ -194,7 +194,7 @@ const AdminDashboard: React.FC = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <AgentActivityOverview />
+                <AgentActivityOverview selectedAgent={selectedAgentData} />                   
                 </Grid>
               </Grid>
               <Button
