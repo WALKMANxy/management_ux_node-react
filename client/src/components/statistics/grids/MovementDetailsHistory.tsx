@@ -47,7 +47,7 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
       {
         headerName: t("movementDetailsHistory.priceSold"),
         field: "priceSold",
-        valueFormatter: (params: any) =>
+        valueFormatter: (params: { value: string }) =>
           currencyFormatter(parseFloat(params.value)),
         comparator: numberComparator,
         sortable: true,
@@ -59,7 +59,7 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
         {
           headerName: t("movementDetailsHistory.unitPrice"),
           field: "unitPrice",
-          valueFormatter: (params: any) =>
+          valueFormatter: (params: { value: string }) =>
             currencyFormatter(parseFloat(params.value)),
           comparator: numberComparator,
           sortable: true,
@@ -67,7 +67,7 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
         {
           headerName: t("movementDetailsHistory.priceBought"),
           field: "priceBought",
-          valueFormatter: (params: any) =>
+          valueFormatter: (params: { value: string }) =>
             currencyFormatter(parseFloat(params.value)),
           comparator: numberComparator,
           sortable: true,

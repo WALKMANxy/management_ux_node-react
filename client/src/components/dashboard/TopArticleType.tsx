@@ -77,8 +77,9 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {
             </Grid>
           </Grid>
           <Grid item>
-            {articles.map((article) => (
-              <Box key={article.id} sx={{ mb: 1 }}>
+            {articles.map((article, index) => (
+              // Ensure a unique key by combining id and index
+              <Box key={`${article.id}-${index}`} sx={{ mb: 1 }}>
                 <Typography sx={{ fontSize: "1.2rem", fontWeight: 500 }}>
                   {article.name} (ID: {article.id})
                 </Typography>

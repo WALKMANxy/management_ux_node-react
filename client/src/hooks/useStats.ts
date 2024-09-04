@@ -160,7 +160,7 @@ const useStats = (isMobile: boolean) => {
   }, [role, currentUserData, clients]);
 
   const topBrandsData = useMemo(() => {
-    if (!currentUserData || !role) return 0;
+    if (!currentUserData || !role) return [];
 
     const movements = getMovementsByRole(role, currentUserData, clients);
     return calculateTopBrandsData(movements);

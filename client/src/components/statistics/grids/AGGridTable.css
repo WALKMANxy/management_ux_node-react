@@ -7,6 +7,9 @@
   font-size: var(--ag-font-size);
   padding: 20px 0;
 }
+/* .ag-theme-quartz .ag-cell {
+  user-select: text !important;
+} */
 
 @media (max-width: 600px) {
   .ag-theme-quartz .ag-paging-panel {
