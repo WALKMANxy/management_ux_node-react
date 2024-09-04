@@ -10,7 +10,8 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import React from "react";
+import dayjs from "dayjs";
+import React, { useMemo } from "react";
 import Chart from "react-apexcharts";
 import { useTranslation } from "react-i18next";
 import { ChartData } from "../../utils/constants";
@@ -36,12 +37,30 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [timeValue, setTimeValue] = React.useState(true); // Initialize with "month" chart
 
+  // Get the current month index (0 = January, 1 = February, etc.)
+  const currentMonthIndex = useMemo(() => new Date().getMonth(), []);
+
   const handleChangeTime = (
     _event: React.MouseEvent<HTMLElement>,
     newValue: boolean
   ) => {
     setTimeValue(newValue);
   };
+
+  // Display the current month's orders or the total orders based on timeValue
+  const displayedTotal = useMemo(() => {
+    if (timeValue) {
+      // If the timeValue is true, show the current month's orders
+      return monthlyOrders[currentMonthIndex] || 0;
+    }
+    // Otherwise, show the total orders
+    return totalOrder;
+  }, [timeValue, monthlyOrders, totalOrder, currentMonthIndex]);
+
+  const formattedMonthlyCategories = useMemo(
+    () => monthlyCategories.map((date) => dayjs(date).format("MMM")),
+    [monthlyCategories]
+  );
 
   return (
     <Paper
@@ -53,7 +72,9 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
         color: "#000",
         position: "relative",
         overflow: "hidden",
-        height: isMobile ? "auto" : "250px", // Allow to grow in height for mobile view
+        minHeight: "250px", // Set a minimum height but allow to grow
+
+        height: "auto", // Allow the paper to adjust based on content
         "&:after": {
           content: '""',
           position: "absolute",
@@ -78,7 +99,12 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
       }}
     >
       <Box sx={{ p: 1.5 }}>
-        <Grid container direction="column" sx={{ height: "100%" }}>
+        <Grid
+          container
+          direction="column"
+          sx={{ height: "auto" }} // Allow grid to expand with content
+          wrap="wrap" // Wrap content to avoid overflow
+        >
           <Grid item>
             <Grid container justifyContent="space-between" alignItems="center">
               <Grid item>
@@ -138,17 +164,8 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
               alignItems="center"
               direction={isMobile ? "column" : "row"}
             >
-              <Grid
-                item
-                xs={12}
-                md={6}
-                textAlign={isMobile ? "center" : "left"}
-              >
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent={isMobile ? "center" : "flex-start"}
-                >
+              <Grid item xs={10} md={5} textAlign="left">
+                <Grid container alignItems="center" justifyContent="flex-start">
                   <Grid item>
                     <Typography
                       sx={{
@@ -159,7 +176,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
                         mb: 0.5,
                       }}
                     >
-                      {totalOrder}
+                      {displayedTotal}
                     </Typography>
                   </Grid>
                   <Grid item>
@@ -176,23 +193,18 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
                       />
                     </Avatar>
                   </Grid>
-                  <Grid item xs={12}>
-                    <Typography
-                      sx={{
-                        fontSize: "1.4rem",
-                        fontWeight: 500,
-                        color: "#000",
-                      }}
-                    >
-                      {t("totalOrder.totalOrders")}
-                    </Typography>
-                  </Grid>
                 </Grid>
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid
+                item
+                xs={10}
+                md={6}
+                sx={{
+                }}
+              >
                 {timeValue ? (
                   <Chart
-                    {...ChartData(monthlyCategories, monthlyOrders)}
+                    {...ChartData(formattedMonthlyCategories, monthlyOrders)}
                     height="150"
                   />
                 ) : (
@@ -203,6 +215,19 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
                 )}
               </Grid>
             </Grid>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography
+              sx={{
+                fontSize: "1.4rem",
+                fontWeight: 500,
+                color: "#000",
+              }}
+            >
+              {timeValue
+                ? t("totalOrder.ordersThisMonth")
+                : t("totalOrder.totalOrders")}
+            </Typography>
           </Grid>
         </Grid>
       </Box>

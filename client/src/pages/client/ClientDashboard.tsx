@@ -1,12 +1,13 @@
 import {
   Box,
+  Fab,
   Grid,
   Skeleton,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import ActivePromotions from "../../components/dashboard/ActivePromotions";
 import CalendarComponent from "../../components/dashboard/CalendarComponent";
@@ -18,11 +19,18 @@ import MonthOverMonthSpendingTrend from "../../components/statistics/charts/Mont
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
 import useStats from "../../hooks/useStats"; // Use the new unified hook
 import { brandColors } from "../../utils/constants";
+import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+
 
 const ClientDashboard: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery("(min-width:600px) and (max-width:1250px)");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+
 
   const {
     details: clientDetails,
@@ -34,6 +42,10 @@ const ClientDashboard: React.FC = () => {
     revenueData,
     isLoading,
   } = useStats(isMobile);
+
+  const handleToggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
+  };
 
   return (
     <Box
@@ -142,39 +154,68 @@ const ClientDashboard: React.FC = () => {
               </Grid>
             </Grid>
             {clientDetails && "visits" in clientDetails && (
-              <UpcomingVisits
+              <ActivePromotions
                 isLoading={isLoading} // Update this line
               />
             )}
           </Box>
         </Grid>
-        <Grid item xs={12} md={3}>
-          <Box mb={4}>
-            <Typography variant="h5" gutterBottom>
-              {t("clientDashboard.calendar")}
-            </Typography>
+       {/* Conditionally render CalendarComponent and UpcomingVisits based on screen size */}
+       {!isTablet && (
+          <Grid item xs={12} md={3}>
+            <Box mb={4}>
+              <Typography variant="h5" gutterBottom>
+                {t("clientDashboard.calendar")}
+              </Typography>
 
-            <Box sx={{ maxWidth: "400px", margin: "0 auto" }}>
-              {clientDetails ? (
-                <CalendarComponent />
-              ) : (
-                <Skeleton
-                  animation="wave"
-                  variant="rectangular"
-                  width="100%"
-                  height={300}
-                  sx={{ borderRadius: "12px" }}
-                />
-              )}
+              <Box sx={{ maxWidth: "400px", margin: "0 auto" }}>
+                {clientDetails ? (
+                  <CalendarComponent />
+                ) : (
+                  <Skeleton
+                    animation="wave"
+                    variant="rectangular"
+                    width="100%"
+                    height={300}
+                    sx={{ borderRadius: "12px" }}
+                  />
+                )}
+              </Box>
             </Box>
-          </Box>
-          {clientDetails && "promos" in clientDetails && (
-            <ActivePromotions
-              isLoading={isLoading} // Update this line
-            />
-          )}
-        </Grid>
+            {clientDetails && "promos" in clientDetails && (
+              <UpcomingVisits
+                isLoading={isLoading} // Update this line
+              />
+            )}
+          </Grid>
+        )}
       </Grid>
+
+      {/* FAB Button to Toggle Drawer */}
+      {isTablet && (
+        <>
+          <Fab
+            color="primary"
+            aria-label="calendar"
+            onClick={handleToggleDrawer}
+            sx={{
+              position: "fixed",
+              bottom: 16,
+              left: 16,
+              zIndex: 1000,
+            }}
+          >
+            <CalendarMonthIcon />
+          </Fab>
+
+          {/* Drawer with CalendarComponent and UpcomingVisits */}
+          <DrawerContainer
+            open={drawerOpen}
+            onClose={handleToggleDrawer}
+            isLoading={isLoading}
+          />
+        </>
+      )}
     </Box>
   );
 };

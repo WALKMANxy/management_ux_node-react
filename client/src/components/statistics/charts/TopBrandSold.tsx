@@ -1,4 +1,12 @@
-import { Box, Divider, Paper, Skeleton, Typography } from "@mui/material";
+import PieChartIcon from '@mui/icons-material/PieChart';import {
+  Avatar,
+  Box,
+  Divider,
+  Paper,
+  Skeleton,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -10,6 +18,7 @@ const TopBrandsSold: React.FC<{
   isMobile: boolean;
   userRole: "agent" | "client" | "admin"; // New prop to determine user role
 }> = ({ topBrandsData, brandColors, isMobile, userRole }) => {
+  const theme = useTheme();
   const { t } = useTranslation();
   const loading = topBrandsData.length === 0;
 
@@ -17,7 +26,7 @@ const TopBrandsSold: React.FC<{
     <Paper
       elevation={4}
       sx={{
-        p: 3,
+        p: 2,
         borderRadius: "12px",
         display: "flex",
         flexDirection: "column",
@@ -25,28 +34,59 @@ const TopBrandsSold: React.FC<{
         position: "relative",
         overflow: "hidden",
         background: "linear-gradient(135deg, #E6F1F4 30%, #AEC6CF 100%)",
+        "&::after": {
+          content: '""',
+          position: "absolute",
+          width: 790,
+          height: 210,
+          background: theme.palette.primary.main,
+          borderRadius: "50%",
+          bottom: -85,
+          right: -95,
+          opacity: 0.5,
+        },
         "&::before": {
           content: '""',
           position: "absolute",
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0,
-          backgroundImage: `url('/checkerboard-cross.png')`,
-          backgroundSize: "cover",
-          opacity: 0.1,
-          zIndex: 0,
+          width: 180,
+          height: 180,
+          background: theme.palette.primary.light,
+          borderRadius: "50%",
+          bottom: -125,
+          right: -15,
         },
       }}
     >
       <Box
         sx={{
-          display: "inline-block",
-          backgroundColor: "rgba(0, 0, 0, 4%)",
-          borderRadius: "24px",
-          px: 2,
-          py: 0.5,
-          mb: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between", // Distributes items to the start and end of the box
+          width: "100%",
+          mb: 1,
+        }}
+      >
+        <Avatar
+          variant="rounded"
+          sx={{
+            bgcolor: theme.palette.primary.main,
+            color: "#fff",
+            mt: 1,
+            left: 18
+          }}
+        >
+          <PieChartIcon fontSize="inherit"  />
+        </Avatar>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          position: "absolute",
+          top: 26,
+          left: "50%",
+          transform: "translateX(-50%)",
           zIndex: 1,
         }}
       >
@@ -57,7 +97,7 @@ const TopBrandsSold: React.FC<{
         </Typography>
       </Box>
 
-      <Divider sx={{ width: "100%", mb: 2, zIndex: 1 }} />
+      <Divider sx={{ width: "100%", mb: 1.5, zIndex: 1 }} />
 
       <Box
         sx={{
@@ -66,6 +106,9 @@ const TopBrandsSold: React.FC<{
           alignItems: "center",
           width: "100%",
           zIndex: 1,
+          overflow: "visible",
+          gap: 1,
+          paddingBottom: "20px",
         }}
       >
         {loading ? (
@@ -96,7 +139,8 @@ const TopBrandsSold: React.FC<{
             }}
             sx={{
               flex: 1,
-              position: "absolute",
+              position: "relative",
+              overflow: "visible",
               left: isMobile ? "50px" : "auto",
               right: isMobile ? "auto" : "-20px",
             }}
@@ -111,40 +155,42 @@ const TopBrandsSold: React.FC<{
             sx={{ borderRadius: "12px", mt: 2 }}
           />
         ) : (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: isMobile ? "center" : "flex-start",
-              mt: isMobile ? 2 : 0,
-              ml: isMobile ? 0 : 2,
-            }}
-          >
-            {topBrandsData.map((brand, index) => (
-              <Box
-                key={`${brand.label}-${index}`}
-                display="flex"
-                alignItems="center"
-                mb={1}
-              >
+          !isMobile && (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                mt: 0,
+                ml: 1,
+              }}
+            >
+              {topBrandsData.map((brand, index) => (
                 <Box
-                  sx={{
-                    width: 16,
-                    height: 16,
-                    backgroundColor: brandColors[index],
-                    marginRight: 1,
-                    borderRadius: "50%",
-                  }}
-                />
-                <Typography
-                  variant="body2"
-                  sx={{ textShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)" }}
+                  key={`${brand.label}-${index}`}
+                  display="flex"
+                  alignItems="center"
+                  mb={0.5}
                 >
-                  {brand.label}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
+                  <Box
+                    sx={{
+                      width: 14,
+                      height: 14,
+                      backgroundColor: brandColors[index],
+                      marginRight: 0.5,
+                      borderRadius: "50%",
+                    }}
+                  />
+                  <Typography
+                    variant="body2"
+                    sx={{ textShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)" }}
+                  >
+                    {brand.label}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          )
         )}
       </Box>
     </Paper>

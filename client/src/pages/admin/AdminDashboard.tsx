@@ -1,3 +1,4 @@
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -22,6 +23,7 @@ import TopArticleType from "../../components/dashboard/TopArticleType";
 import TotalOrder from "../../components/dashboard/TotalOrders";
 import TotalEarning from "../../components/dashboard/TotalRevenue";
 import UpcomingVisits from "../../components/dashboard/UpcomingVisits";
+import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
 import MonthOverMonthSpendingTrend from "../../components/statistics/charts/MonthOverMonthSpendingTrend";
 import SalesDistribution from "../../components/statistics/charts/SalesDistribution";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
@@ -37,6 +39,12 @@ const AdminDashboard: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery("(min-width:900px) and (max-width:1250px)");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const handleToggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
+  };
 
   const {
     selectedClient,
@@ -118,15 +126,38 @@ const AdminDashboard: React.FC = () => {
       ) : (
         <GlobalSearch filter="admin" onSelect={handleSelect} />
       )}
-      <Grid container spacing={6} mt={2}>
-        <Grid item xs={12} md={9}>
+
+      <Grid container spacing={6} mt={ 2}>
+        <Grid  item xs={!isTablet ? 12 : 0} md={!isTablet ? 9 : 0}>
+
           {selectedAgentData ? (
             <Box mb={4}>
-              <Typography variant="h5" gutterBottom>
-                {t("adminDashboard.statisticsFor", {
-                  name: selectedAgentData.name,
-                })}
-              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 2,
+                }}
+              >
+                <Typography variant="h5" gutterBottom>
+                  {t("adminDashboard.statisticsFor", {
+                    name: selectedAgentData.name,
+                  })}
+                </Typography>
+                {isTablet && (
+                  <Fab
+                    color="primary"
+                    aria-label="calendar"
+                    onClick={handleToggleDrawer}
+                    sx={{
+                      zIndex: 1000,
+                    }}
+                  >
+                    <CalendarMonthIcon />
+                  </Fab>
+                )}
+              </Box>
 
               <Grid container spacing={2}>
                 <Grid item xs={12} md={4}>
@@ -194,7 +225,7 @@ const AdminDashboard: React.FC = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                <AgentActivityOverview selectedAgent={selectedAgentData} />                   
+                  <AgentActivityOverview selectedAgent={selectedAgentData} />
                 </Grid>
               </Grid>
               <Button
@@ -215,11 +246,32 @@ const AdminDashboard: React.FC = () => {
             </Box>
           ) : selectedClient ? (
             <Box mb={4}>
-              <Typography variant="h5" gutterBottom>
-                {t("adminDashboard.statisticsFor", {
-                  name: selectedClient.name,
-                })}
-              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 2,
+                }}
+              >
+                <Typography variant="h5" gutterBottom>
+                  {t("adminDashboard.statisticsFor", {
+                    name: selectedClient.name,
+                  })}
+                </Typography>
+                {isTablet && (
+                  <Fab
+                    color="primary"
+                    aria-label="calendar"
+                    onClick={handleToggleDrawer}
+                    sx={{
+                      zIndex: 1000,
+                    }}
+                  >
+                    <CalendarMonthIcon />
+                  </Fab>
+                )}
+              </Box>
 
               <Grid container spacing={2}>
                 <Grid item xs={12} md={4}>
@@ -295,9 +347,30 @@ const AdminDashboard: React.FC = () => {
             </Box>
           ) : (
             <Box mb={4}>
-              <Typography variant="h5" gutterBottom>
-                {t("adminDashboard.yourStatistics")}
-              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 2,
+                }}
+              >
+                <Typography variant="h5" gutterBottom>
+                  {t("adminDashboard.yourStatistics")}
+                </Typography>
+                {isTablet && (
+                  <Fab
+                    color="primary"
+                    aria-label="calendar"
+                    onClick={handleToggleDrawer}
+                    sx={{
+                      zIndex: 1000,
+                    }}
+                  >
+                    <CalendarMonthIcon />
+                  </Fab>
+                )}
+              </Box>
 
               <Divider sx={{ my: 2, borderRadius: "12px" }} />
               <Grid container spacing={2}>
@@ -400,33 +473,44 @@ const AdminDashboard: React.FC = () => {
               </Grid>
             </Box>
           )}
-          <UpcomingVisits isLoading={isLoading} />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Box mb={4}>
-            <Typography variant="h5" gutterBottom>
-              {t("adminDashboard.calendar")}
-            </Typography>
-
-            <Divider sx={{ my: 2, borderRadius: "12px" }} />
-            {loadingState ? (
-              <Skeleton
-                animation="wave"
-                variant="rectangular"
-                width="100%"
-                height={300}
-                sx={{ borderRadius: "12px" }}
-                aria-label="skeleton"
-              />
-            ) : (
-              <Box sx={{ maxWidth: "400px", margin: "0 auto" }}>
-                <CalendarComponent />
-              </Box>
-            )}
-          </Box>
           <ActivePromotions isLoading={isLoading} />
         </Grid>
+        {/* Calendar and Upcoming Visits section */}
+        {!isTablet && (
+          <Grid item xs={12} md={3}>
+            <Box mb={4}>
+              <Typography variant="h5" gutterBottom>
+                {t("adminDashboard.calendar")}
+              </Typography>
+              <Divider sx={{ my: 2, borderRadius: "12px" }} />
+              {loadingState ? (
+                <Skeleton
+                  animation="wave"
+                  variant="rectangular"
+                  width="100%"
+                  height={300}
+                  sx={{ borderRadius: "12px" }}
+                  aria-label="skeleton"
+                />
+              ) : (
+                <Box sx={{ maxWidth: "400px", margin: "0 auto" }}>
+                  <CalendarComponent />
+                </Box>
+              )}
+            </Box>
+            <UpcomingVisits isLoading={isLoading} />
+          </Grid>
+        )}
       </Grid>
+
+      {/* Drawer Container for Calendar and Upcoming Visits */}
+      {isTablet && (
+        <DrawerContainer
+          open={drawerOpen}
+          onClose={handleToggleDrawer}
+          isLoading={isLoading}
+        />
+      )}
     </Box>
   );
 };

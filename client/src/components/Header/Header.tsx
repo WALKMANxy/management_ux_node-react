@@ -1,3 +1,5 @@
+// Header.tsx
+
 import {
   BarChart as BarChartIcon,
   Category as CategoryIcon,
@@ -27,6 +29,8 @@ import {
   Modal,
   Toolbar,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -38,6 +42,8 @@ import { handleLogout } from "../../features/auth/authSlice";
 import GlobalSearch from "./GlobalSearch";
 
 const Header: React.FC = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -182,9 +188,14 @@ const Header: React.FC = () => {
     <>
       <AppBar
         position="fixed"
-        sx={{ backgroundColor: "black", color: "black" }}
+        sx={{ backgroundColor: "black", color: "black", width: "100%", right: "auto", left: "auto",     maxWidth: '100vw', // Prevents overflowing past the viewport width
+        }}
       >
-        <Toolbar>
+         <Toolbar
+          sx={{
+            display: "flex",
+          }}
+        >
           <Fade in={!iconChange} timeout={500}>
             <IconButton
               edge="start"
@@ -221,8 +232,25 @@ const Header: React.FC = () => {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <Toolbar />{" "}
+      <Toolbar/>
       {/* This Toolbar component is added to push the content down */}
+      {/* Blur backdrop */}
+      {drawerOpen && (
+        <Box
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1000,
+            backdropFilter: "blur(6px)", // Apply blur effect
+            backgroundColor: "rgba(0, 0, 0, 0.2)", // Slight dark overlay
+            transition: "backdrop-filter 0.3s ease",
+          }}
+          onClick={toggleDrawer} // Close drawer when backdrop is clicked
+        />
+      )}
       <Drawer
         anchor="left"
         open={drawerOpen}
@@ -231,8 +259,13 @@ const Header: React.FC = () => {
           sx: {
             backgroundColor: "black",
             color: "white",
-            width: 250,
+            width: isMobile ? "auto" : "250px", // Conditional width based on screen size
+            height: "100vh",
           },
+        }}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+          disableScrollLock: true, // Prevent body padding adjustment
         }}
       >
         <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
@@ -265,7 +298,7 @@ const Header: React.FC = () => {
       >
         <Box
           sx={{
-            position: "absolute",
+            position: "relative",
             top: "7%",
             right: "2%",
             width: 250,
