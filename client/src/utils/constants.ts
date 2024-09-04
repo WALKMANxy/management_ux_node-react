@@ -69,6 +69,9 @@ export const ChartData = (categories: string[], data: number[]) => ({
   options: {
     chart: {
       id: "basic-bar",
+      toolbar: {
+        show: false,
+      }
     },
     xaxis: {
       categories,

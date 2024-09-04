@@ -104,8 +104,8 @@ export const getSessionByToken = async (
 ): Promise<ISession | null> => {
   try {
     const decoded = verifySessionToken(token);
-    console.log("Decoded token from client:", decoded);
-
+/*     console.log("Decoded token from client:", decoded);
+ */
     // Fetch the session by the token and compare
     const session = await Session.findOne({
       userId: decoded.userId,
@@ -113,19 +113,19 @@ export const getSessionByToken = async (
       expiresAt: { $gt: new Date() },
     });
 
-    console.log("Session details:", {
+    /* console.log("Session details:", {
       clientToken: token,
       storedToken: session?.token,
       sessionExists: !!session,
-    });
+    }); */
 
-    if (!session || session.token !== token) {
+    /* if (!session || session.token !== token) {
       console.warn("Token mismatch or session not found", {
         clientToken: token,
         storedToken: session?.token,
         sessionExists: !!session,
       });
-    }
+    } */
 
     return session;
   } catch (error) {

@@ -1,10 +1,14 @@
+import PollIcon from "@mui/icons-material/Poll";
 import {
+  Avatar,
   Box,
   Button,
   Divider,
   Paper,
   Skeleton,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { ApexOptions } from "apexcharts";
 import React, { useMemo, useState } from "react";
@@ -21,8 +25,10 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
   salesDistributionDataClients,
   salesDistributionDataAgents,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<"clients" | "agents">("clients");
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const userRole = useSelector((state: RootState) => state.auth.role);
 
@@ -115,7 +121,7 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
     <Paper
       elevation={3}
       sx={{
-        p: 3,
+        p: 2,
         borderRadius: "12px",
         position: "relative",
         overflow: "hidden",
@@ -123,26 +129,62 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
         "&::before": {
           content: '""',
           position: "absolute",
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0,
-          backgroundImage: `url('/struckaxiom.png')`,
-          backgroundSize: "cover",
-          opacity: 0.1,
-          zIndex: 0,
+          width: 900,
+          height: 210,
+          background: theme.palette.success.main,
+          borderRadius: "50%",
+          top: -150,
+          right: -95,
+          opacity: 0.2,
+        },
+        "&::after": {
+          content: '""',
+          position: "absolute",
+          width: 700,
+          height: 180,
+          background: theme.palette.success.light,
+          borderRadius: "50%",
+          bottom: -150,
+          left: -95,
+          zIndex: 5,
+          opacity: 0.3,
+
         },
       }}
     >
       <Box
         sx={{
-          display: "inline-block",
-          backgroundColor: "rgba(0, 0, 0, 4%)",
-          borderRadius: "24px",
-          px: 2,
-          py: 0.5,
-          mb: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          mb: 1,
+        }}
+      >
+        <Avatar
+          variant="rounded"
+          sx={{
+            bgcolor: theme.palette.primary.main,
+            color: "#fff",
+            mt: 1,
+            left: 18,
+            top: 12
+          }}
+        >
+          <PollIcon fontSize="inherit" />
+        </Avatar>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          position: "absolute",
+          top: 26,
+          left: "54%",
+          transform: "translateX(-50%)",
           zIndex: 1,
+          height: "auto",
         }}
       >
         <Typography variant="h6" gutterBottom>
@@ -150,6 +192,7 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
         </Typography>
       </Box>
 
+      {/* Admin-specific Buttons */}
       {userRole === "admin" && (
         <Box
           sx={{
@@ -158,6 +201,7 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
             gap: 1,
             mb: 2,
             zIndex: 1,
+            mt: isMobile ? 5 : 0,
           }}
         >
           <Button
@@ -177,7 +221,7 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
 
       <Divider sx={{ my: 2, borderRadius: "12px", zIndex: 1 }} />
 
-      <Box sx={{ width: "100%", height: "300px", zIndex: 1 }}>
+      <Box sx={{ width: "100%", height: "300px", zIndex: 2 }}>
         {loading ? (
           <Skeleton
             variant="rectangular"

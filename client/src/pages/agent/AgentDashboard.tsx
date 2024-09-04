@@ -273,7 +273,7 @@ const AgentDashboard: React.FC = () => {
               </Grid>
             </Box>
           )}
-          <UpcomingVisits
+          <ActivePromotions
             isLoading={isLoading} // Update this line
           />
         </Grid>
@@ -303,7 +303,7 @@ const AgentDashboard: React.FC = () => {
               />
             )}
           </Box>
-          <ActivePromotions
+          <UpcomingVisits
             isLoading={isLoading} // Update this line
           />
         </Grid>

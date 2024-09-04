@@ -106,6 +106,7 @@ const TotalEarning: React.FC<TotalEarningProps> = ({ totalEarning }) => {
                 fontSize: "1.5rem",
                 fontWeight: 500,
                 color: "#000",
+                mt: 2,
               }}
             >
               {t("dashboard.totalEarning")}
