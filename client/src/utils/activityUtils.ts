@@ -2,7 +2,7 @@
 
 import { Alert, GlobalVisits } from "../models/dataModels";
 import { Client } from "../models/entityModels";
-import { calculateRevenue } from "./dataUtils";
+import { calculateRevenue, currencyFormatter } from "./dataUtils";
 
 // Define the structure of an activity item
 interface ActivityItem {
@@ -15,7 +15,8 @@ interface ActivityItem {
 }
 
 export const generateActivityList = (
-  clients: Record<string, Client>,
+  clients: Client[], // Accept clients directly from the selected agent
+  agentId: string, // Accept agentId for filtering visits and alerts
   globalVisits: GlobalVisits,
   alerts: Alert[]
 ): ActivityItem[] => {
@@ -23,53 +24,75 @@ export const generateActivityList = (
 
   // Process completed visits, limit to the first 5
   let visitCount = 0;
-  Object.entries(globalVisits).forEach(([agentId, { Visits }]) => {
-    for (const visit of Visits.filter((v) => v.completed).sort(
-      (a, b) => b.date.getTime() - a.date.getTime()
-    )) {
-      if (visitCount >= 5) break; // Limit to 5 visits
-      activities.push({
-        id: visit.id,
-        type: "visits",
-        title: `Visit - agent: ${agentId}`,
-        time: visit.date.toLocaleDateString(),
-        details: `${visit.reason} - Client: ${visit.clientId}`,
-        subDetails: visit.notePublic
-          ? visit.notePublic.slice(0, 50) + "..."
-          : "",
-      });
-      visitCount++;
+/*   console.log("Initial globalVisits:", globalVisits);
+ */  Object.entries(globalVisits).forEach(([visitAgentId, { Visits }]) => {
+    // Filter visits to include only those with the selected agentId
+    if (visitAgentId === agentId) {
+/*       console.log(`Processing visits for agent ${visitAgentId}:`, Visits);
+ */      for (const visit of Visits.filter((v) => v.completed).sort(
+        (a, b) => b.date.getTime() - a.date.getTime()
+      )) {
+        if (visitCount >= 5) break; // Limit to 5 visits
+/*         console.log("Adding visit to activities:", visit);
+ */        activities.push({
+          id: visit.id,
+          type: "visits",
+          title: `Visit - agent: ${visitAgentId}`,
+          time: visit.date.toLocaleDateString(),
+          details: `${visit.reason} - Client: ${visit.clientId}`,
+          subDetails: visit.notePublic
+            ? visit.notePublic.slice(0, 50) + "..."
+            : "",
+        });
+        visitCount++;
+      }
     }
   });
 
-  // Initialize a counter for processed movements
-  let movementCount = 0;
+  // Process sales (movements), limit to the first 5 based on the most recent dateOfOrder
+  const recentMovements = clients
+    .flatMap((client) =>
+      client.movements.map((movement) => ({ ...movement, client }))
+    )
+    .sort(
+      (a, b) =>
+        new Date(b.dateOfOrder).getTime() - new Date(a.dateOfOrder).getTime()
+    )
+    .slice(0, 5);
 
-  // Process sales (movements), limit to the first 5
-  Object.values(clients).forEach((client) => {
-    for (const movement of client.movements) {
-      if (movementCount >= 5) break; // Limit to 5 movements
-      activities.push({
-        id: movement.id,
-        type: "sales",
-        title: `Sale - agent: ${client.agent}`,
-        time: movement.dateOfOrder,
-        details: `Client: ${client.id} - Revenue: ${calculateRevenue([
-          movement,
-        ]).toFixed(2)}`,
-        subDetails: `Order Date: ${movement.dateOfOrder}`,
-      });
-      movementCount++;
-    }
+  recentMovements.forEach((movement) => {
+    const revenue = calculateRevenue([movement]);
+    /* console.log(
+      "Adding movement to activities:",
+      movement,
+      "Calculated revenue:",
+      revenue
+    ); */
+    activities.push({
+      id: movement.id,
+      type: "sales",
+      title: "Sale",
+      time: movement.dateOfOrder,
+      details: `Client: ${movement.client.id}, ${movement.client.name}  - Revenue: ${currencyFormatter(revenue)}`,
+      subDetails: `Order Date: ${movement.dateOfOrder}`,
+    });
   });
 
   // Initialize a counter for processed alerts
   let alertCount = 0;
-
-  // Process alerts, limit to the first 5
+/*   console.log("Initial alerts:", alerts);
+ */
+  // Process alerts, limit to the first 5, and filter by agentId
   for (const alert of alerts) {
-    if (alert.entityRole === "agent" && alertCount < 5) {
-      activities.push({
+/*     console.log("Processing alert:", alert);
+ */    // Update condition to check for matching agent ID and limit the count
+    if (
+      alert.entityRole === "agent" &&
+      alert.entityCode === agentId &&
+      alertCount < 5
+    ) {
+/*       console.log("Adding alert to activities:", alert);
+ */      activities.push({
         id: alert._id,
         type: "alerts",
         title: `Alert - agent: ${alert.entityCode}`,
@@ -83,7 +106,10 @@ export const generateActivityList = (
   }
 
   // Sort all activities by time (most recent first) and limit to 10 items
-  return activities
+  const sortedActivities = activities
     .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
     .slice(0, 10);
+
+/*   console.log("Final sorted activities:", sortedActivities);
+ */  return sortedActivities;
 };

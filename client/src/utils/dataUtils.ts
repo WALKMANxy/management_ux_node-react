@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import { Movement } from "../models/dataModels";
 import { Admin, Agent, Client } from "../models/entityModels";
 import { ignoreArticleNames } from "./constants";
+import { BrandData } from "../models/propsModels";
 
 // Helper function to get month and year from a date string
 export const getMonthYear = (dateString: string) => {
@@ -93,7 +94,7 @@ export const calculateTotalOrders = (clients: Client[]): number => {
 
 export const calculateTopBrandsData = (
   movements: Movement[]
-): { label: string; value: number }[] => {
+): BrandData[] => { // Ensure the return type is BrandData[]
   const brandCount: { [key: string]: { name: string; quantity: number } } = {};
 
   // Iterate over each movement
@@ -119,9 +120,9 @@ export const calculateTopBrandsData = (
   // Sort the brands by quantity in descending order and return the top 10
   return Object.values(brandCount)
     .map((brand, index) => ({
+      id: `${brand.name}-${index}`, // Ensure unique keys by adding an index
       label: brand.name,
       value: brand.quantity,
-      key: `${brand.name}-${index}`, // Ensure unique keys by adding an index
     }))
     .sort((a, b) => b.value - a.value)
     .slice(0, 10);
