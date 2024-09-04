@@ -1,4 +1,5 @@
-import { Box, Divider, Paper, Skeleton, Typography } from "@mui/material";
+import ShowChartIcon from '@mui/icons-material/ShowChart'; // Import the ShowChart icon
+import { Box, Divider, Paper, Skeleton, Typography, Avatar, useTheme } from "@mui/material";
 import { ApexOptions } from "apexcharts";
 import React, { useMemo } from "react";
 import Chart from "react-apexcharts";
@@ -11,6 +12,7 @@ const MonthOverMonthSpendingTrend: React.FC<{
   revenueData: number[];
   userRole: "agent" | "client" | "admin"; // New prop to determine user role
 }> = ({ months, revenueData, userRole }) => {
+  const theme = useTheme();
   const { t } = useTranslation();
   const loading = revenueData.length === 0;
 
@@ -109,27 +111,78 @@ const MonthOverMonthSpendingTrend: React.FC<{
     <Paper
       elevation={3}
       sx={{
-        p: 3,
         borderRadius: "12px",
         background: "linear-gradient(135deg, #fffde7 30%, #fff9c4 100%)",
+        position: "relative",
+        overflow: "hidden",
+        "&::after": {
+          content: '""',
+          position: "absolute",
+          width: 700,
+          height: 200,
+          background: theme.palette.primary.main,
+          borderRadius: "100%",
+          top: -100,
+          right: 109,
+          opacity: 0.1,
+        },
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          width: 250,
+          height: 180,
+          background: theme.palette.primary.light,
+          borderRadius: "50%",
+          bottom: -125,
+          left: -100,
+          opacity: 0.3
+        },
       }}
     >
       <Box
         sx={{
-          display: "inline-block",
-          backgroundColor: "rgba(0, 0, 0, 3%)",
-          borderRadius: "24px",
-          px: 1,
-          py: 1.5,
-          mb: -2.5,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          mb: 0,
+
+        }}
+      >
+        <Avatar
+          variant="rounded"
+          sx={{
+            bgcolor: theme.palette.primary.main,
+            color: "#fff",
+            mt: 1,
+            left: 39,
+            top: 16
+          }}
+        >
+          <ShowChartIcon fontSize="inherit" />
+        </Avatar>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          position: "absolute",
+          top: 26,
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 1,
+          width: "100%",
         }}
       >
         <Typography variant="h6" gutterBottom>
           {t("monthOverMonthSpendingTrend.title")}
         </Typography>
       </Box>
-      <Divider sx={{ my: 1, borderRadius: "8px" }} />
-      <Box sx={{ width: "100%", height: "300px" }}>
+
+      <Divider sx={{ width: "100%", mt: 2, zIndex: 1, position: "relative", top: 10 }} />
+
+      <Box sx={{ width: "100%", height: "auto" }}>
         {loading ? (
           <Skeleton
             variant="rectangular"

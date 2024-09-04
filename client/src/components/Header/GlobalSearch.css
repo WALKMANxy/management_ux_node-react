@@ -1,14 +1,18 @@
 /* src/styles/globalSearch.css */
 .global-search-container {
   position: relative;
-  width: 100%;
+  width: 100%; /* Ensure the container takes the full available width */
+  max-width: 100%; /* Prevent exceeding parent width */
+  display: flex; /* Use flex for responsive layout */
+  flex-grow: 1; /* Allow the search bar to grow */
 }
 
 .global-search {
-  width: 100%;
   display: flex;
   align-items: center;
+  flex-grow: 1; /* Allow search bar to grow within the container */
 }
+
 
 .search-icon-wrapper {
   position: absolute;
