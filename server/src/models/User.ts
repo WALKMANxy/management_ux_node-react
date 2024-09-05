@@ -9,7 +9,7 @@ export interface IUser extends Document {
   passwordResetExpires?: Date;
   role: "admin" | "agent" | "client" | "guest";
   entityCode?: string;
-  linkedEntities?: string[];
+  entityName?: string;
   avatar?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -33,7 +33,7 @@ const userSchema = new Schema<IUser>(
       default: "guest",
     },
     entityCode: { type: String },
-    linkedEntities: { type: [String] },
+    entityName: {type: String},
     avatar: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },

@@ -9,6 +9,7 @@ import {
 } from "../../models/dataModels";
 import { SearchParams, SearchResult } from "../../models/searchModels";
 import { SearchState, ThunkError } from "../../models/stateModels";
+import { Agent, Client } from "../../models/entityModels";
 
 const initialState: SearchState = {
   query: "",
@@ -29,8 +30,8 @@ export const searchItems = createAsyncThunk<
 
       // Access data from the state correctly
       const entityRole = state.data.currentUserDetails?.role;
-      const clients = Object.values(state.data.clients);
-      const agentDetails = Object.values(state.data.agents);
+      const clients: Client[] = Object.values(state.data.clients);
+      const agentDetails: Agent[] = Object.values(state.data.agents);
       const promos = state.data.currentUserPromos;
       const visits = state.data.currentUserVisits;
 

@@ -1,36 +1,41 @@
 // models/Alert.ts
 
-import { Document, Schema, model } from "mongoose";
+import { Document, Schema, Types, model } from "mongoose";
 
 export interface IAlert extends Document {
-  _id: string; // Add the _id field
+  _id: string;
   alertReason: string;
   message: string;
   severity: "low" | "medium" | "high";
   createdAt: Date;
-  alertIssuedBy: string;
-  entityRole: "admin" | "agent" | "client";
-  entityCode: string;
-  markedAsRead: boolean;
+  updatedAt: Date;
+  sender: Types.ObjectId; // Single sender, always just one
+  receiver: Types.ObjectId[]; // Array for handling group or broadcast messages
+  markedAsRead: { userId: Types.ObjectId; read: boolean }[]; // Array to track read status per user
 }
 
-const alertSchema = new Schema<IAlert>({
-  alertReason: { type: String, required: true },
-  message: { type: String, required: true },
-  severity: { type: String, enum: ["low", "medium", "high"], required: true },
-  createdAt: { type: Date, default: Date.now },
-  alertIssuedBy: { type: String, required: true },
-  entityRole: {
-    type: String,
-    enum: ["admin", "agent", "client"],
-    required: true,
+const alertSchema = new Schema<IAlert>(
+  {
+    alertReason: { type: String, required: true },
+    message: { type: String, required: true },
+    severity: { type: String, enum: ["low", "medium", "high"], required: true },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
+    sender: { type: Schema.Types.ObjectId, ref: "User", required: true }, // Single sender
+    receiver: [{ type: Schema.Types.ObjectId, ref: "User", required: true }], // Array to support group or broadcast messaging
+    markedAsRead: [
+      {
+        userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        read: { type: Boolean, default: false },
+      },
+    ], // Tracks read status for each user
   },
-  entityCode: { type: String, required: true },
-  markedAsRead: { type: Boolean, default: false },
-});
+  { timestamps: true }
+);
 
 // Indexes for optimized querying
-alertSchema.index({ entityRole: 1, entityCode: 1 });
-alertSchema.index({ alertIssuedBy: 1 });
+alertSchema.index({ sender: 1, receiver: 1 });
+alertSchema.index({ sender: 1 });
+alertSchema.index({ receiver: 1 });
 
 export const Alert = model<IAlert>("Alert", alertSchema);

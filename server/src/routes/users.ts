@@ -19,11 +19,11 @@ router.get("/", checkAdminRole, UserController.getAllUsers);
 // GET method to retrieve a user by ID
 router.get("/:id", checkAgentOrAdminOrClientRole, UserController.getUserById);
 
-// GET method to retrieve linked entities for a user
-router.get(
-  "/linked-entities",
+// POST method to retrieve users by batch of IDs
+router.post(
+  "/batch",
   checkAgentOrAdminOrClientRole,
-  UserController.getUserLinkedEntities
+  UserController.getUsersByBatchIds
 );
 
 // PUT method to replace a user (Admin only)

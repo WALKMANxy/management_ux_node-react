@@ -13,35 +13,48 @@ export class AlertController {
     this.emitAlert = emitAlert;
   }
 
-  fetchAllAlerts = async (req: Request, res: Response) => {
+  fetchAlertsBySender = async (req: Request, res: Response) => {
     try {
-      const alerts = await AlertService.getAllAlerts();
+      const { senderId } = req.params;
+      const alerts = await AlertService.getAlertsBySender(senderId);
       res.json(alerts);
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
     }
   };
 
-  fetchAlertsByEntity = async (req: Request, res: Response) => {
+  fetchAlertsByReceiver = async (req: Request, res: Response) => {
     try {
-      const { entityRole, entityCode } = req.params;
-      const alerts = await AlertService.getAlertsByEntity(
-        entityRole,
-        entityCode
+      const { receiverId } = req.params;
+      const alerts = await AlertService.getAlertsByReceiver(receiverId);
+      res.json(alerts);
+    } catch (error) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  };
+
+  getConversation = async (req: Request, res: Response) => {
+    try {
+      const { userId1, userId2, page, limit } = req.query;
+
+      if (!userId1 || !userId2) {
+        res.status(400).json({ message: "User IDs are required." });
+        return;
+      }
+
+      const conversation = await AlertService.getConversationBetweenUsers(
+        String(userId1),
+        String(userId2),
+        Number(page) || 1,
+        Number(limit) || 20
       );
-      res.json(alerts);
-    } catch (error) {
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-  };
 
-  fetchAlertsByIssuer = async (req: Request, res: Response) => {
-    try {
-      const { alertIssuedBy } = req.params;
-      const alerts = await AlertService.getAlertsByIssuer(alertIssuedBy);
-      res.json(alerts);
+      res.json(conversation);
     } catch (error) {
-      res.status(500).json({ message: "Internal Server Error" });
+      res.status(500).json({
+        message:
+          error instanceof Error ? error.message : "Internal Server Error",
+      });
     }
   };
 

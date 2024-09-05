@@ -9,8 +9,8 @@ import {
 } from "../../models/dataModels";
 import { Agent, Client } from "../../models/entityModels";
 import { DataSliceState } from "../../models/stateModels";
-import { dataApi } from "../../services/dataQueries";
-import { updateApi } from "../../services/promosVisitsQueries";
+import { dataApi } from "../../services/queries/dataQueries";
+import { updateApi } from "../../services/queries/promosVisitsQueries";
 
 const initialState: DataSliceState = {
   clients: {},

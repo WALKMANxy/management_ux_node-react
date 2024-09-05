@@ -1,10 +1,15 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { GlobalPromos, GlobalVisits, Promo, Visit } from "../models/dataModels";
-import { Admin, Agent, Client } from "../models/entityModels";
-import { DataSliceState } from "../models/stateModels";
-import { mapPromosToEntity, mapVisitsToEntity } from "../utils/dataLoader";
-import { generateErrorResponse } from "../utils/errorHandling";
-import { loadPromosData, loadVisitsData } from "./api/apiUtils";
+import {
+  GlobalPromos,
+  GlobalVisits,
+  Promo,
+  Visit,
+} from "../../models/dataModels";
+import { Admin, Agent, Client } from "../../models/entityModels";
+import { DataSliceState } from "../../models/stateModels";
+import { mapPromosToEntity, mapVisitsToEntity } from "../../utils/dataLoader";
+import { generateErrorResponse } from "../../utils/errorHandling";
+import { loadPromosData, loadVisitsData } from "../api/apiUtils";
 
 export const updateApi = createApi({
   reducerPath: "api",

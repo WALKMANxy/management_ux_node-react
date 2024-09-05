@@ -11,6 +11,7 @@ export type User = {
   passwordResetExpires?: Date; // Optional for password reset
   role: UserRole;
   entityCode: string; // Code linking to admin, agent, or client
+  entityName?: string;
   avatar?: string;
   createdAt?: Date;
   updatedAt?: Date;

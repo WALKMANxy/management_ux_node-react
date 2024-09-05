@@ -16,9 +16,7 @@ export const updateUserById = async (
   return apiCall<User>(`users/${id}`, "PATCH", updatedData);
 };
 
-// New function to fetch linked entities
-export const getLinkedEntities = async (): Promise<{
-  linkedEntities: string[];
-}> => {
-  return apiCall<{ linkedEntities: string[] }>("linked-entities", "GET");
+// New API call to fetch users by a batch of IDs
+export const getUsersByBatchIds = async (ids: string[]): Promise<Partial<User>[]> => {
+  return apiCall<Partial<User>[]>(`users/batch`, "POST", { ids });
 };

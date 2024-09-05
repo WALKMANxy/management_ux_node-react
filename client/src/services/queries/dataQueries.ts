@@ -6,29 +6,32 @@ import {
   GlobalVisits,
   Promo,
   Visit,
-} from "../models/dataModels";
-import { Admin, Agent, Client } from "../models/entityModels";
+} from "../../models/dataModels";
+import { Admin, Agent, Client } from "../../models/entityModels";
 import {
   mapDataToAgents,
   mapDataToModels,
   mapVisitsPromosToAdmin,
-} from "../utils/dataLoader";
-import { generateErrorResponse, handleApiError } from "../utils/errorHandling";
-import { getAdminById } from "./api/admins";
-import { getAgentById } from "./api/agents";
+} from "../../utils/dataLoader";
+import {
+  generateErrorResponse,
+  handleApiError,
+} from "../../utils/errorHandling";
+import { getAdminById } from "../api/admins";
+import { getAgentById } from "../api/agents";
 import {
   getAlertsByEntityRoleAndEntityCode,
   getAlertsByIssuer,
-} from "./api/alerts";
+} from "../api/alerts";
 import {
   loadAgentDetailsData,
   loadClientDetailsData,
   loadJsonData,
   loadPromosData,
   loadVisitsData,
-} from "./api/apiUtils";
-import { getClientByCodice, getClientsByAgent } from "./api/clients";
-import { getFilteredMovements } from "./api/movements";
+} from "../api/apiUtils";
+import { getClientByCodice, getClientsByAgent } from "../api/clients";
+import { getFilteredMovements } from "../api/movements";
 
 export const dataApi = createApi({
   reducerPath: "dataApi",
