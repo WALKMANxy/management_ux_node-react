@@ -9,6 +9,8 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
+import { selectAlerts } from "../../features/data/dataSelectors";
+import { Alert } from "../../models/dataModels";
 
 const AlertsList: React.FC = () => {
   const alerts = useSelector(selectAlerts);
