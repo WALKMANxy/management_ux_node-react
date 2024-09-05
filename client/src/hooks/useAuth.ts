@@ -6,7 +6,7 @@ import {
   authApi,
   useLoginUserMutation,
   useRegisterUserMutation,
-} from "../services/authQueries";
+} from "../services/queries/authQueries";
 import {
   FetchUserRoleError,
   LoginError,

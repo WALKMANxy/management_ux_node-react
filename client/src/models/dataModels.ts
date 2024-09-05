@@ -6,9 +6,8 @@ export interface Alert {
   message: string;
   severity: "low" | "medium" | "high";
   createdAt: Date;
-  alertIssuedBy: string;
-  entityRole: "admin" | "agent" | "client";
-  entityCode: string;
+  sender: string;
+  receiver: string;
   markedAsRead: boolean;
 }
 

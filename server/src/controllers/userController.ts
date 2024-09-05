@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../models/types";
-import { IUser } from "../models/User";
 import { UserService } from "../services/userService";
 
 export class UserController {
@@ -34,45 +33,6 @@ export class UserController {
     }
   }
 
-  static async getUserLinkedEntities(
-    req: AuthenticatedRequest,
-    res: Response
-  ): Promise<void> {
-    try {
-      const user = req.user;
-      if (!user) {
-        res.status(401).json({
-          message: "Unauthorized: User information is missing or incomplete.",
-        });
-        return;
-      }
-
-      const linkedEntities = await UserService.getUserLinkedEntities(
-        user as IUser
-      );
-      if (linkedEntities) {
-        user.linkedEntities = linkedEntities;
-        if (user.save) {
-          await user.save();
-        } else {
-          res.status(500).json({
-            message:
-              "Unable to save user data, the user is missing the 'user.save' method",
-          });
-          return;
-        }
-      }
-
-      res.status(200).json({ linkedEntities: user.linkedEntities });
-    } catch (err) {
-      if (err instanceof Error) {
-        res.status(500).json({ message: err.message });
-      } else {
-        res.status(500).json({ message: "Internal Server Error" });
-      }
-    }
-  }
-
   static async updateUser(
     req: AuthenticatedRequest,
     res: Response
@@ -84,6 +44,30 @@ export class UserController {
         return;
       }
       res.status(200).json({ message: "User updated successfully", user });
+    } catch (err) {
+      if (err instanceof Error) {
+        res.status(500).json({ message: err.message });
+      } else {
+        res.status(500).json({ message: "Internal Server Error" });
+      }
+    }
+  }
+  static async getUsersByBatchIds(req: Request, res: Response): Promise<void> {
+    try {
+      const { ids } = req.body; // Get user IDs from the request body
+      if (!Array.isArray(ids) || !ids.length) {
+        res.status(400).json({ message: "Invalid or missing IDs array" });
+        return;
+      }
+
+      const users = await UserService.getUsersByIds(ids);
+
+      if (!users.length) {
+        res.status(200).json({ message: "No users found" });
+        return;
+      }
+
+      res.json(users);
     } catch (err) {
       if (err instanceof Error) {
         res.status(500).json({ message: err.message });

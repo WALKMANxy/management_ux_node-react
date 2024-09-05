@@ -1,6 +1,4 @@
 import { IUser, User } from "../models/User";
-import { getAgentById } from "../utils/fetchAgentUtil";
-import { getClientById } from "../utils/fetchClientsUtil";
 
 export class UserService {
   static async getAllUsers(): Promise<IUser[]> {
@@ -27,38 +25,6 @@ export class UserService {
     }
   }
 
-  static async getUserLinkedEntities(user: IUser): Promise<string[] | null> {
-    try {
-      if (!user.role || !user.entityCode) {
-        throw new Error("User information is incomplete or missing");
-      }
-
-      if (user.role === "client") {
-        const clientData = getClientById(user.entityCode);
-        if (clientData) {
-          return [clientData.AG];
-        } else {
-          throw new Error("Linked agent for client not found.");
-        }
-      } else if (user.role === "agent") {
-        const agentData = getAgentById(user.entityCode);
-        if (agentData) {
-          return agentData.clients.map((client) => client.CODICE);
-        } else {
-          throw new Error("Agent data not found");
-        }
-      }
-
-      return null;
-    } catch (err) {
-      throw new Error(
-        `Error fetching linked entities: ${
-          err instanceof Error ? err.message : "Unknown error"
-        }`
-      );
-    }
-  }
-
   static async updateUser(
     id: string,
     userData: Partial<IUser>
@@ -71,6 +37,20 @@ export class UserService {
     } catch (err) {
       throw new Error(
         `Error updating user: ${
+          err instanceof Error ? err.message : "Unknown error"
+        }`
+      );
+    }
+  }
+  static async getUsersByIds(ids: string[]): Promise<Partial<IUser>[]> {
+    try {
+      // Find users by the provided IDs and select only the required fields
+      return await User.find({ _id: { $in: ids } })
+        .select("_id avatar role entityName") // Select only the fields needed
+        .exec();
+    } catch (err) {
+      throw new Error(
+        `Error retrieving users by IDs: ${
           err instanceof Error ? err.message : "Unknown error"
         }`
       );

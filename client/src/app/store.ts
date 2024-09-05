@@ -1,10 +1,11 @@
 //src/app/store.ts
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
-import { authApi } from "../services/authQueries";
-import { dataApi } from "../services/dataQueries";
+import { authApi } from "../services/queries/authQueries";
+import { dataApi } from "../services/queries/dataQueries";
 import { loadAuthState, saveAuthState } from "../utils/localStorage";
 import rootReducer from "./rootReducer";
+import { userApi } from "../services/queries/userQueries";
 
 const preloadedState: Partial<RootState> = {
   auth: loadAuthState(),
@@ -20,6 +21,7 @@ const store = configureStore({
       immutableCheck: false,
     })
       .concat(authApi.middleware)
+      .concat(userApi.middleware)
       .concat(dataApi.middleware), // Add dataApi middleware
 });
 
