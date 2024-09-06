@@ -20,25 +20,25 @@ export const setupAlertRoutes = (emitAlert: EmitAlertFunction) => {
   // Middleware to authenticate and authorize user
   router.use(authenticateUser);
 
-  // GET method to retrieve alerts by sender
+  // GET method to retrieve all alerts
   router.get(
-    "/sender/:senderId",
+    "/",
     checkAgentOrAdminOrClientRole,
-    alertController.fetchAlertsBySender
+    alertController.fetchAllAlerts
   );
 
-  // GET method to retrieve alerts by receiver
+  // GET method to retrieve alerts by entityRole and entityCode
   router.get(
-    "/receiver/:receiverId",
+    "/:entityRole/:entityCode",
     checkAgentOrAdminOrClientRole,
-    alertController.fetchAlertsByReceiver
+    alertController.fetchAlertsByEntity
   );
 
-  // GET method to retrieve a conversation between two users
+  // GET method to retrieve alerts by alertIssuedBy
   router.get(
-    "/conversation",
-    checkAgentOrAdminOrClientRole,
-    alertController.getConversation
+    "/issued-by/:alertIssuedBy",
+    checkAgentOrAdminRole,
+    alertController.fetchAlertsByIssuer
   );
 
   // POST method to create a new alert

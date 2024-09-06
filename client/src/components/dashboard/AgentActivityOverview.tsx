@@ -14,8 +14,7 @@ import { CardHeader, Paper, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
-import { selectAlerts } from "../../features/data/dataSelectors";
-import { Alert, GlobalVisits, Visit } from "../../models/dataModels";
+import {  GlobalVisits, Visit } from "../../models/dataModels";
 import { Agent } from "../../models/entityModels";
 import { generateActivityList } from "../../utils/activityUtils";
 
@@ -47,7 +46,6 @@ const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({
   const globalVisits: GlobalVisits = useAppSelector(
     (state: RootState) => state.data.currentUserVisits
   ) as Record<string, { Visits: Visit[] }>;
-  const alerts: Alert[] = useAppSelector(selectAlerts);
 
   // Generate activity list using the utility function
   const activityList: ActivityItem[] = useMemo(
@@ -56,9 +54,9 @@ const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({
         selectedAgent.clients,
         selectedAgent.id,
         globalVisits,
-        alerts
+
       ),
-    [selectedAgent, globalVisits, alerts]
+    [selectedAgent, globalVisits]
   );
 
   return (

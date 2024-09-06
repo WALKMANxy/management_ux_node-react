@@ -1,8 +1,8 @@
 import { io, Socket } from "socket.io-client";
 import { AppStore } from "../app/store";
 import { getApiUrl } from "../config/config";
-import { addAlert, updateAlert } from "../features/data/dataSlice"; // Assuming dataSlice is in features/data
-import { Alert } from "../models/dataModels";
+import { addMessage, updateReadStatus } from "../features/chat/chatSlice";
+import { IMessage } from "../models/dataModels";
 
 // Define a variable to hold the store reference
 let store: AppStore;
@@ -37,7 +37,8 @@ class WebSocketService {
 
     this.socket.on("connect", this.handleConnect);
     this.socket.on("disconnect", this.handleDisconnect);
-    this.socket.on("alerts:update", this.handleAlertUpdate);
+    this.socket.on("chat:newMessage", this.handleNewMessage);
+    this.socket.on("chat:messageRead", this.handleMessageRead);
     this.socket.on("connect_error", this.handleConnectError);
   }
 
@@ -51,23 +52,41 @@ class WebSocketService {
     this.tryReconnect();
   };
 
-  private handleAlertUpdate = (alert: Alert) => {
+  public handleNewMessage = ({
+    chatId,
+    message,
+  }: {
+    chatId: string;
+    message: IMessage;
+  }) => {
     // Check if the store has been injected before using it
     if (!store) {
       console.error("Store has not been injected into WebSocketService.");
       return;
     }
 
-    const state = store.getState().data;
-    const existingAlert = state.currentUserAlerts?.find(
-      (a) => a._id === alert._id
-    );
+    store.dispatch(addMessage({ chatId, message }));
 
-    if (existingAlert) {
-      store.dispatch(updateAlert(alert)); // Update the existing alert
-    } else {
-      store.dispatch(addAlert(alert)); // Add the new alert
+    // Optionally, you might want to fetch recent messages or perform additional checks
+    // store.dispatch(fetchMessages({ chatId }));
+  };
+
+  public handleMessageRead = ({
+    chatId,
+    messageId,
+    userId,
+  }: {
+    chatId: string;
+    messageId: string;
+    userId: string;
+  }) => {
+    // Update the read status of the message in the chat slice
+    if (!store) {
+      console.error("Store has not been injected into WebSocketService.");
+      return;
     }
+
+    store.dispatch(updateReadStatus({ chatId, messageId, userId }));
   };
 
   private handleConnectError = (error: Error) => {
@@ -93,11 +112,25 @@ class WebSocketService {
     if (this.socket) {
       this.socket.off("connect", this.handleConnect);
       this.socket.off("disconnect", this.handleDisconnect);
-      this.socket.off("alerts:update", this.handleAlertUpdate);
+      this.socket.off("chat:newMessage", this.handleNewMessage);
+      this.socket.off("chat:messageRead", this.handleMessageRead);
       this.socket.off("connect_error", this.handleConnectError);
       this.socket.disconnect();
       this.socket = null;
     }
+  }
+  // New public methods to add event listeners safely
+  onNewMessage(listener: (data: { chatId: string; message: IMessage }) => void) {
+    this.socket?.on("chat:newMessage", listener);
+  }
+  onMessageRead(
+    listener: (data: {
+      chatId: string;
+      messageId: string;
+      userId: string;
+    }) => void
+  ) {
+    this.socket?.on("chat:messageRead", listener);
   }
 }
 

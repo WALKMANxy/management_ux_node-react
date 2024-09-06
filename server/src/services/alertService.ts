@@ -4,7 +4,6 @@ import { FilterQuery } from "mongoose";
 import { Alert, IAlert } from "../models/Alert";
 
 export class AlertService {
-  // Fetch all alerts with optional filtering
   static async getAllAlerts(
     filter: FilterQuery<IAlert> = {}
   ): Promise<IAlert[]> {
@@ -16,55 +15,29 @@ export class AlertService {
     }
   }
 
-  // Fetch alerts by sender
-  static async getAlertsBySender(senderId: string): Promise<IAlert[]> {
-    try {
-      return await Alert.find({ sender: senderId }).sort({ createdAt: -1 });
-    } catch (error) {
-      console.error("Error fetching alerts by sender:", error);
-      throw new Error("Failed to fetch alerts by sender");
-    }
-  }
-
-  // Fetch alerts by receiver
-  static async getAlertsByReceiver(receiverId: string): Promise<IAlert[]> {
-    try {
-      return await Alert.find({ receiver: receiverId }).sort({ createdAt: -1 });
-    } catch (error) {
-      console.error("Error fetching alerts by receiver:", error);
-      throw new Error("Failed to fetch alerts by receiver");
-    }
-  }
-
-  // Fetch conversation between two users, paginated
-  static async getConversationBetweenUsers(
-    userId1: string,
-    userId2: string,
-    page: number = 1,
-    limit: number = 20
+  static async getAlertsByEntity(
+    entityRole: string,
+    entityCode: string
   ): Promise<IAlert[]> {
     try {
-      const skip = (page - 1) * limit;
-      return await Alert.find({
-        $or: [
-          { sender: userId1, receiver: userId2 },
-          { sender: userId2, receiver: userId1 },
-        ],
-      })
-        .sort({ createdAt: 1 }) // Sort by creation date in ascending order
-        .skip(skip)
-        .limit(limit)
-        .exec();
+      return await Alert.find({ entityRole, entityCode }).sort({
+        createdAt: -1,
+      });
     } catch (error) {
-      throw new Error(
-        `Error fetching conversation: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
+      console.error("Error fetching alerts by entity:", error);
+      throw new Error("Failed to fetch alerts by entity");
     }
   }
 
-  // Create a new alert
+  static async getAlertsByIssuer(alertIssuedBy: string): Promise<IAlert[]> {
+    try {
+      return await Alert.find({ alertIssuedBy }).sort({ createdAt: -1 });
+    } catch (error) {
+      console.error("Error fetching alerts by issuer:", error);
+      throw new Error("Failed to fetch alerts by issuer");
+    }
+  }
+
   static async createAlert(alertData: Partial<IAlert>): Promise<IAlert> {
     try {
       const alert = new Alert(alertData);
@@ -76,7 +49,6 @@ export class AlertService {
     }
   }
 
-  // Update an existing alert
   static async updateAlert(
     id: string,
     alertData: Partial<IAlert>
@@ -96,7 +68,6 @@ export class AlertService {
     }
   }
 
-  // Delete an alert
   static async deleteAlert(_id: string): Promise<void> {
     try {
       const result = await Alert.findByIdAndDelete(_id);
@@ -109,7 +80,6 @@ export class AlertService {
     }
   }
 
-  // Fetch an alert by its ID
   static async getAlertById(_id: string): Promise<IAlert | null> {
     try {
       const alert = await Alert.findById(_id);
@@ -117,37 +87,6 @@ export class AlertService {
     } catch (error) {
       console.error("Error fetching alert by ID:", error);
       throw new Error("Failed to fetch alert");
-    }
-  }
-
-  // Update read status for a specific message and user
-  static async updateReadStatus(
-    alertId: string,
-    userId: string
-  ): Promise<IAlert | null> {
-    try {
-      const alert = await Alert.findOneAndUpdate(
-        { _id: alertId, "markedAsRead.userId": userId },
-        { $set: { "markedAsRead.$.read": true } },
-        { new: true }
-      );
-
-      // If the user is not yet in the markedAsRead list, add them
-      if (!alert) {
-        return await Alert.findByIdAndUpdate(
-          alertId,
-          { $push: { markedAsRead: { userId, read: true } } },
-          { new: true }
-        );
-      }
-
-      return alert;
-    } catch (error) {
-      throw new Error(
-        `Error updating read status: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
     }
   }
 }

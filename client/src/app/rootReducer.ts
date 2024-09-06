@@ -7,9 +7,11 @@ import authReducer from "../features/auth/authSlice";
 import dataReducer from "../features/data/dataSlice";
 import searchReducer from "../features/search/searchSlice";
 import userReducer from "../features/users/userSlice";
+import chatReducer from "../features/chat/chatSlice";
 import { authApi } from "../services/queries/authQueries";
 import { dataApi } from "../services/queries/dataQueries";
 import { userApi } from "../services/queries/userQueries";
+import { chatApi } from "../services/queries/chatQueries";
 
 
 // Combine all your reducers
@@ -18,9 +20,11 @@ const appReducer = combineReducers({
   search: searchReducer,
   data: dataReducer,
   users: userReducer,
+  chats: chatReducer,
 
   [authApi.reducerPath]: authApi.reducer,
   [userApi.reducerPath]: userApi.reducer,
+  [chatApi.reducerPath]: chatApi.reducer,
   [dataApi.reducerPath]: dataApi.reducer, // Add the dataApi reducer here
 });
 

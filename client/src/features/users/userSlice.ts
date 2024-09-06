@@ -6,7 +6,7 @@ import { User } from "../../models/entityModels";
 import { userApi } from "../../services/queries/userQueries";
 
 // Define the initial state
-interface UserState {
+export interface UserState {
   users: Record<string, Partial<User>>; // Mapping of userId to user data
   currentUser: Partial<User> | null; // For logged-in user data
   status: "idle" | "loading" | "succeeded" | "failed";

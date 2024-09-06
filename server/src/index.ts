@@ -12,10 +12,12 @@ import { Server as SocketIOServer } from "socket.io";
 import { config } from "./config/config";
 import { authenticateUser } from "./middlewares/authentication";
 import { setupWebSocket } from "./middlewares/webSocket";
-import adminRoutes from "./routes/admins";
+/* import { setupWebSocket } from "./middlewares/oldWebSocket";
+ */ import adminRoutes from "./routes/admins";
 import agentRoutes from "./routes/agents";
-import setupAlertRoutes from "./routes/alerts";
-import authRoutes from "./routes/auth";
+/* import setupAlertRoutes from "./routes/alerts";
+ */ import authRoutes from "./routes/auth";
+import chatRoutes from "./routes/chats"; // Import chat routes
 import clientRoutes from "./routes/clients";
 import movementsRoutes from "./routes/movements";
 import oauthRoutes from "./routes/OAuth";
@@ -38,7 +40,7 @@ mongoose
 const appUrl = config.appUrl.split(",");
 
 const corsOptions: cors.CorsOptions = {
-  origin:[...appUrl],
+  origin: [...appUrl],
   credentials: true,
   optionsSuccessStatus: 200,
 };
@@ -71,6 +73,7 @@ app.use("/movements", movementsRoutes);
 app.use("/promos", promosRoutes);
 app.use("/visits", visitsRoutes);
 app.use("/users", usersRoutes);
+app.use("/chats", chatRoutes); // Add chat routes
 
 app.use(errorHandler);
 
@@ -88,13 +91,16 @@ const io = new SocketIOServer(server, {
   },
 });
 
-const { emitAlert } = setupWebSocket(io);
+// Set up WebSocket with chat functionality
+setupWebSocket(io);
+
+/* const { emitAlert } = setupWebSocket(io); */
 
 // Log when the WebSocket server starts
 logger.info("WebSocket server initialized");
 
-const alertRoutes = setupAlertRoutes(emitAlert);
-app.use("/alerts", alertRoutes);
+/* const alertRoutes = setupAlertRoutes(emitAlert);
+app.use("/alerts", alertRoutes); */
 
 server.listen(PORT, async () => {
   logger.info(`Server is running on port ${PORT}`, {
