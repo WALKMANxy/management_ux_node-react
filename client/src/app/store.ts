@@ -6,6 +6,7 @@ import { dataApi } from "../services/queries/dataQueries";
 import { loadAuthState, saveAuthState } from "../utils/localStorage";
 import rootReducer from "./rootReducer";
 import { userApi } from "../services/queries/userQueries";
+import { chatApi } from "../services/queries/chatQueries";
 
 const preloadedState: Partial<RootState> = {
   auth: loadAuthState(),
@@ -22,6 +23,7 @@ const store = configureStore({
     })
       .concat(authApi.middleware)
       .concat(userApi.middleware)
+      .concat(chatApi.middleware)
       .concat(dataApi.middleware), // Add dataApi middleware
 });
 

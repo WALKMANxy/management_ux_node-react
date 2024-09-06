@@ -13,48 +13,35 @@ export class AlertController {
     this.emitAlert = emitAlert;
   }
 
-  fetchAlertsBySender = async (req: Request, res: Response) => {
+  fetchAllAlerts = async (req: Request, res: Response) => {
     try {
-      const { senderId } = req.params;
-      const alerts = await AlertService.getAlertsBySender(senderId);
+      const alerts = await AlertService.getAllAlerts();
       res.json(alerts);
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
     }
   };
 
-  fetchAlertsByReceiver = async (req: Request, res: Response) => {
+  fetchAlertsByEntity = async (req: Request, res: Response) => {
     try {
-      const { receiverId } = req.params;
-      const alerts = await AlertService.getAlertsByReceiver(receiverId);
-      res.json(alerts);
-    } catch (error) {
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-  };
-
-  getConversation = async (req: Request, res: Response) => {
-    try {
-      const { userId1, userId2, page, limit } = req.query;
-
-      if (!userId1 || !userId2) {
-        res.status(400).json({ message: "User IDs are required." });
-        return;
-      }
-
-      const conversation = await AlertService.getConversationBetweenUsers(
-        String(userId1),
-        String(userId2),
-        Number(page) || 1,
-        Number(limit) || 20
+      const { entityRole, entityCode } = req.params;
+      const alerts = await AlertService.getAlertsByEntity(
+        entityRole,
+        entityCode
       );
-
-      res.json(conversation);
+      res.json(alerts);
     } catch (error) {
-      res.status(500).json({
-        message:
-          error instanceof Error ? error.message : "Internal Server Error",
-      });
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  };
+
+  fetchAlertsByIssuer = async (req: Request, res: Response) => {
+    try {
+      const { alertIssuedBy } = req.params;
+      const alerts = await AlertService.getAlertsByIssuer(alertIssuedBy);
+      res.json(alerts);
+    } catch (error) {
+      res.status(500).json({ message: "Internal Server Error" });
     }
   };
 

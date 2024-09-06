@@ -1,4 +1,4 @@
-import { Alert, GlobalPromos, GlobalVisits, Promo, Visit } from "./dataModels";
+import {  GlobalPromos, GlobalVisits, Promo, Visit } from "./dataModels";
 import { Admin, Agent, Client, UserRole } from "./entityModels";
 import { SearchResult } from "./searchModels";
 
@@ -42,7 +42,6 @@ export interface DataSliceState {
     userId: string;
   } | null;
   currentUserPromos: Promo[] | GlobalPromos | null;
-  currentUserAlerts: Alert[] | null;
   currentUserVisits: Visit[] | GlobalVisits | null;
   selectedClientId: string | null;
   selectedAgentId: string | null;

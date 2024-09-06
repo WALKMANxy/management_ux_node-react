@@ -2,7 +2,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import {
-  Alert,
   GlobalPromos,
   GlobalVisits,
   Promo,
@@ -66,12 +65,5 @@ export const selectPromos = createSelector(
       const globalPromos = currentUserPromos as GlobalPromos;
       return Object.values(globalPromos).flatMap(({ Promos }) => Promos);
     }
-  }
-);
-
-export const selectAlerts = createSelector(
-  [(state: RootState) => state.data.currentUserAlerts],
-  (currentUserAlerts): Alert[] => {
-    return currentUserAlerts || [];
   }
 );
