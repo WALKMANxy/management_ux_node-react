@@ -5,6 +5,7 @@ import { RootState } from "../app/store";
 import {
   fetchAllChats,
   fetchMessages,
+  markMessagesAsRead,
   sendMessage,
   setCurrentChat,
 } from "../features/chat/chatSlice";
@@ -27,24 +28,16 @@ const useChatLogic = () => {
       ) || []
   );
 
-  // Effect to set up WebSocket event listeners
   useEffect(() => {
     webSocketService.connect();
-
-    webSocketService.socket?.on(
-      "chat:newMessage",
-      webSocketService.handleNewMessage
-    );
-    webSocketService.socket?.on(
-      "chat:messageRead",
-      webSocketService.handleMessageRead
-    );
+    dispatch(fetchAllChats());
 
     return () => {
       webSocketService.disconnect();
     };
-  }, []);
+  }, [dispatch]);
 
+  
   // Effect to fetch all chats on component mount
   useEffect(() => {
     dispatch(fetchAllChats());
