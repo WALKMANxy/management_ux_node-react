@@ -5,7 +5,7 @@ import {
   generateErrorResponse,
   handleApiError,
 } from "../../utils/errorHandling";
-import { apiCall } from "../api/apiUtils";
+import { apiCall } from "../../utils/apiUtils";
 
 // Define the RTK Query slice
 export const userApi = createApi({

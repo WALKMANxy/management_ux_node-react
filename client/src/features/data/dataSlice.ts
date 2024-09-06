@@ -8,8 +8,8 @@ import {
 } from "../../models/dataModels";
 import { Agent, Client } from "../../models/entityModels";
 import { DataSliceState } from "../../models/stateModels";
-import { dataApi } from "../../services/queries/dataQueries";
-import { updateApi } from "../../services/queries/promosVisitsQueries";
+import { dataApi } from "./dataQueries";
+import { updateApi } from "./promosVisitsQueries";
 
 const initialState: DataSliceState = {
   clients: {},

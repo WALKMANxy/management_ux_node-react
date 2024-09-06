@@ -1,5 +1,5 @@
-import { Promo } from "../../models/dataModels";
-import { apiCall } from "./apiUtils";
+import { Promo } from "../../../models/dataModels";
+import { apiCall } from "../../../utils/apiUtils";
 
 export const createPromo = async (promoData: {
   clientsId: string[];

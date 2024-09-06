@@ -1,7 +1,8 @@
 // src/services/api/admins.ts
 
-import { Admin } from "../../models/entityModels";
-import { apiCall } from "./apiUtils"; // Assuming you have a utility file for common API call functions
+import { Admin } from "../../../models/entityModels";
+import { apiCall } from "../../../utils/apiUtils";
+
 
 export const loadAdminDetailsData = async (): Promise<Admin[]> => {
   return apiCall<Admin[]>("admins", "GET");

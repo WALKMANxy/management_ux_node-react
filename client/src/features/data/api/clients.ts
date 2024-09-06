@@ -1,5 +1,5 @@
-import { serverClient } from "../../models/dataSetTypes";
-import { apiCall } from "./apiUtils";
+import { serverClient } from "../../../models/dataSetTypes";
+import { apiCall } from "../../../utils/apiUtils";
 
 export const getClientByCodice = async (
   codice: string

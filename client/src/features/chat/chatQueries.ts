@@ -5,8 +5,8 @@ import {
   generateErrorResponse,
   handleApiError,
 } from "../../utils/errorHandling";
-import { apiCall } from "../api/apiUtils";
 import { IChat, IMessage } from "../../models/dataModels";
+import { apiCall } from "../../utils/apiUtils";
 
 // Define the RTK Query slice for chat-related endpoints
 export const chatApi = createApi({

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../store";
 
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { RootState } from "../app/store";
 import {
   fetchAllChats,
   fetchMessages,
@@ -12,15 +12,15 @@ import { IMessage } from "../models/dataModels";
 import { webSocketService } from "../services/webSocketService";
 
 const useChatLogic = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
 
   // Redux selectors
-  const chats = useSelector((state: RootState) => state.chats.chats);
-  const currentChat = useSelector(
+  const chats = useAppSelector((state: RootState) => state.chats.chats);
+  const currentChat = useAppSelector(
     (state: RootState) => state.chats.currentChat
   );
-  const messages = useSelector(
+  const messages = useAppSelector(
     (state: RootState) =>
       state.chats.messageIdsByChat[currentChatId || ""]?.map(
         (messageId: string) => state.chats.messages[messageId]
