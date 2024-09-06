@@ -1,7 +1,7 @@
 // src/api/chatApi.ts
 
-import { IChat, IMessage } from "../../models/dataModels";
-import { apiCall } from "./apiUtils";
+import { IChat, IMessage } from "../../../models/dataModels";
+import { apiCall } from "../../../utils/apiUtils";
 
 
 // Fetch all chats for the authenticated user

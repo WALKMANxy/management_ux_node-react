@@ -1,8 +1,8 @@
 // src/services/api/apiUtils.ts
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import {  Promo, Visit } from "../../models/dataModels";
-import { serverClient, serverMovement } from "../../models/dataSetTypes";
-import { Admin, Agent } from "../../models/entityModels";
+import { Promo, Visit } from "../models/dataModels";
+import { serverClient, serverMovement } from "../models/dataSetTypes";
+import { Admin, Agent } from "../models/entityModels";
 
 export const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
 

@@ -1,12 +1,14 @@
 import { useAppDispatch } from "../app/hooks";
 import store from "../app/store";
-import { handleLogin, handleLogout } from "../features/auth/authSlice";
-import { User } from "../models/entityModels";
 import {
   authApi,
   useLoginUserMutation,
   useRegisterUserMutation,
-} from "../services/queries/authQueries";
+} from "../features/auth/authQueries";
+import { handleLogin, handleLogout } from "../features/auth/authSlice";
+import { setCurrentUser } from "../features/users/userSlice";
+import { User } from "../models/entityModels";
+
 import {
   FetchUserRoleError,
   LoginError,
@@ -134,6 +136,9 @@ export const useAuth = () => {
               userId: user._id,
             })
           );
+
+          // Set the current user in the userSlice for consistent state management
+          dispatch(setCurrentUser(user));
 
           // Save auth state if 'Keep me signed in' is selected
           if (keepMeSignedIn) {

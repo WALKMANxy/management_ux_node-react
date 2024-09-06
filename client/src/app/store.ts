@@ -1,12 +1,13 @@
 //src/app/store.ts
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
-import { authApi } from "../services/queries/authQueries";
-import { dataApi } from "../services/queries/dataQueries";
+import { authApi } from "../features/auth/authQueries";
+import { chatApi } from "../features/chat/chatQueries";
+import { dataApi } from "../features/data/dataQueries";
+import { userApi } from "../features/users/userQueries";
 import { loadAuthState, saveAuthState } from "../utils/localStorage";
 import rootReducer from "./rootReducer";
-import { userApi } from "../services/queries/userQueries";
-import { chatApi } from "../services/queries/chatQueries";
+import listenerMiddleware from "./listeners";
 
 const preloadedState: Partial<RootState> = {
   auth: loadAuthState(),
@@ -24,7 +25,8 @@ const store = configureStore({
       .concat(authApi.middleware)
       .concat(userApi.middleware)
       .concat(chatApi.middleware)
-      .concat(dataApi.middleware), // Add dataApi middleware
+      .concat(dataApi.middleware)
+      .concat(listenerMiddleware.middleware), // Add dataApi middleware
 });
 
 store.subscribe(() => {

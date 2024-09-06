@@ -2,8 +2,8 @@
 
 import axios from "axios";
 import Cookies from "js-cookie";
-import { getUserAgent } from "../../utils/deviceUtils";
-import { authApiCall } from "./apiUtils";
+import { authApiCall } from "../../../utils/apiUtils";
+import { getUserAgent } from "../../../utils/deviceUtils";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";

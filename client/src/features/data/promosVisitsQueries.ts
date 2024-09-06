@@ -9,7 +9,7 @@ import { Admin, Agent, Client } from "../../models/entityModels";
 import { DataSliceState } from "../../models/stateModels";
 import { mapPromosToEntity, mapVisitsToEntity } from "../../utils/dataLoader";
 import { generateErrorResponse } from "../../utils/errorHandling";
-import { loadPromosData, loadVisitsData } from "../api/apiUtils";
+import { loadPromosData, loadVisitsData } from "../../utils/apiUtils";
 
 export const updateApi = createApi({
   reducerPath: "api",

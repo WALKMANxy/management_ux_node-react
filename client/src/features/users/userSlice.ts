@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WritableDraft } from "immer";
 import { RootState } from "../../app/store";
 import { User } from "../../models/entityModels";
-import { userApi } from "../../services/queries/userQueries";
+import { userApi } from "./userQueries";
 
 // Define the initial state
 export interface UserState {

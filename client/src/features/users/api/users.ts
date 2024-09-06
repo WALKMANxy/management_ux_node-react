@@ -1,5 +1,5 @@
-import { User } from "../../models/entityModels";
-import { apiCall } from "./apiUtils";
+import { User } from "../../../models/entityModels";
+import { apiCall } from "../../../utils/apiUtils";
 
 export const getUserById = async (id: string): Promise<User> => {
   return apiCall<User>(`users/${id}`, "GET");

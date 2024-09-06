@@ -2,15 +2,15 @@
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { User } from "../../models/entityModels";
+import { baseUrl } from "../../utils/apiUtils";
 import { generateErrorResponse } from "../../utils/errorHandling"; // Import error handling functions
-import { baseUrl } from "../api/apiUtils";
+import { getAllUsers, getUserById, updateUserById } from "../users/api/users";
 import {
   loginUser,
   registerUser,
   requestPasswordReset,
   resetPassword,
-} from "../api/auth";
-import { getAllUsers, getUserById, updateUserById } from "../api/users";
+} from "./api/auth";
 
 export const authApi = createApi({
   reducerPath: "authApi",

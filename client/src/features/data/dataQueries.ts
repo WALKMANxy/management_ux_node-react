@@ -8,6 +8,13 @@ import {
 } from "../../models/dataModels";
 import { Admin, Agent, Client } from "../../models/entityModels";
 import {
+  loadAgentDetailsData,
+  loadClientDetailsData,
+  loadJsonData,
+  loadPromosData,
+  loadVisitsData,
+} from "../../utils/apiUtils";
+import {
   mapDataToAgents,
   mapDataToModels,
   mapVisitsPromosToAdmin,
@@ -16,18 +23,10 @@ import {
   generateErrorResponse,
   handleApiError,
 } from "../../utils/errorHandling";
-import { getAdminById } from "../api/admins";
-import { getAgentById } from "../api/agents";
-
-import {
-  loadAgentDetailsData,
-  loadClientDetailsData,
-  loadJsonData,
-  loadPromosData,
-  loadVisitsData,
-} from "../api/apiUtils";
-import { getClientByCodice, getClientsByAgent } from "../api/clients";
-import { getFilteredMovements } from "../api/movements";
+import { getAdminById } from "./api/admins";
+import { getAgentById } from "./api/agents";
+import { getClientByCodice, getClientsByAgent } from "./api/clients";
+import { getFilteredMovements } from "./api/movements";
 
 export const dataApi = createApi({
   reducerPath: "dataApi",
