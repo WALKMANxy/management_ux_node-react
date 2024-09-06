@@ -1,5 +1,5 @@
-import { Agent } from "../../models/entityModels";
-import { apiCall } from "./apiUtils";
+import { Agent } from "../../../models/entityModels";
+import { apiCall } from "../../../utils/apiUtils";
 
 export const getAgentById = async (id: string): Promise<Agent> => {
   return apiCall<Agent>(`agents/${id}`, "GET");

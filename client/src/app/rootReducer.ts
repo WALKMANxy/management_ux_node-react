@@ -3,16 +3,15 @@
 /* console.log('Initializing rootReducer');
  */
 import { Action, combineReducers } from "@reduxjs/toolkit";
+import { authApi } from "../features/auth/authQueries";
 import authReducer from "../features/auth/authSlice";
+import { chatApi } from "../features/chat/chatQueries";
+import chatReducer from "../features/chat/chatSlice";
+import { dataApi } from "../features/data/dataQueries";
 import dataReducer from "../features/data/dataSlice";
 import searchReducer from "../features/search/searchSlice";
+import { userApi } from "../features/users/userQueries";
 import userReducer from "../features/users/userSlice";
-import chatReducer from "../features/chat/chatSlice";
-import { authApi } from "../services/queries/authQueries";
-import { dataApi } from "../services/queries/dataQueries";
-import { userApi } from "../services/queries/userQueries";
-import { chatApi } from "../services/queries/chatQueries";
-
 
 // Combine all your reducers
 const appReducer = combineReducers({

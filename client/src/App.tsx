@@ -10,6 +10,7 @@ import {
 import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { RootState } from "./app/store";
 import { handleLogout } from "./features/auth/authSlice";
+import { fetchUserById, setCurrentUser } from "./features/users/userSlice";
 import Layout from "./layout/Layout";
 import { UserRole } from "./models/entityModels";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -23,6 +24,7 @@ import { refreshSession } from "./services/sessionService";
 
 /* console.log("Vite mode:", import.meta.env.MODE);
  */
+
 // Enhanced ProtectedRoute to include role-based protection
 const ProtectedRoute: React.FC<{
   children: JSX.Element;
@@ -120,19 +122,32 @@ function App() {
 
   useEffect(() => {
     const initializeApp = async () => {
-      // Check if the auth state is present in the session storage
-      const sessionAuthState = sessionStorage.getItem("authState");
+      // Check if the auth state is present in the local storage
+      const localAuthState = localStorage.getItem("authState");
 
       // If the auth state is present and the user is logged in
-      if (sessionAuthState) {
-        const storedAuthState = JSON.parse(sessionAuthState);
+      if (localAuthState) {
+        const storedAuthState = JSON.parse(localAuthState);
 
         // Check if user is logged in and has a valid role (not "guest")
         if (storedAuthState.isLoggedIn && storedAuthState.role !== "guest") {
           // Attempt to refresh the session to validate and extend it on the server side
           const refreshSuccessful = await refreshSession();
 
-          if (!refreshSuccessful) {
+          if (refreshSuccessful) {
+            // Fetch current user data based on user ID stored in auth state
+            if (storedAuthState.userId) {
+              // Fetch the current user and update userSlice
+              try {
+                const user = await dispatch(
+                  fetchUserById(storedAuthState.userId)
+                ).unwrap();
+                dispatch(setCurrentUser(user)); // Update the userSlice with the fetched user
+              } catch (error) {
+                console.error("Failed to fetch current user:", error);
+              }
+            }
+          } else {
             console.warn("Session refresh failed or session expired.");
             dispatch(handleLogout());
           }
