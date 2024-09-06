@@ -1,7 +1,6 @@
 //src/features/data/dataSlice.ts
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
-  Alert,
   GlobalPromos,
   GlobalVisits,
   Promo,
@@ -18,7 +17,6 @@ const initialState: DataSliceState = {
   currentUserData: null,
   currentUserDetails: null,
   currentUserPromos: null,
-  currentUserAlerts: null,
   currentUserVisits: null,
   selectedClientId: null,
   selectedAgentId: null,
@@ -90,23 +88,7 @@ const dataSlice = createSlice({
       state.selectedAgentId = action.payload;
       state.selectedClientId = null;
     },
-    addAlert: (state, action: PayloadAction<Alert>) => {
-      const alert = action.payload;
-      if (state.currentUserAlerts) {
-        state.currentUserAlerts.push(alert);
-      }
-    },
-    updateAlert: (state, action: PayloadAction<Alert>) => {
-      const alert = action.payload;
-      if (state.currentUserAlerts) {
-        const index = state.currentUserAlerts.findIndex(
-          (a) => a._id === alert._id
-        );
-        if (index !== -1) {
-          state.currentUserAlerts[index] = alert;
-        }
-      }
-    },
+
   },
 
   extraReducers: (builder) => {
@@ -119,7 +101,7 @@ const dataSlice = createSlice({
         const { role, userData, userId /* , agentData */ } = action.payload;
 
         if (role === "client" && "clientData" in userData) {
-          const { clientData, visits, promos, alerts } = userData;
+          const { clientData, visits, promos } = userData;
           state.clients[clientData.id] = clientData;
           state.currentUserData = clientData;
           state.currentUserDetails = {
@@ -129,11 +111,10 @@ const dataSlice = createSlice({
             userId: userId,
           };
           state.currentUserPromos = promos;
-          state.currentUserAlerts = alerts;
           state.currentUserVisits = visits;
         } else if (role === "agent" && "agentData" in userData) {
           // Handle agent data
-          const { agentData, visits, promos, alerts } = userData;
+          const { agentData, visits, promos } = userData;
 
           // Populate agent and assign its clients
           state.agents[agentData.id] = agentData;
@@ -159,11 +140,10 @@ const dataSlice = createSlice({
             userId: userId,
           };
           state.currentUserPromos = promos;
-          state.currentUserAlerts = alerts;
           state.currentUserVisits = visits;
         } else if (role === "admin" && "adminData" in userData) {
           // Handle admin data
-          const { adminData, globalVisits, globalPromos, alerts } = userData;
+          const { adminData, globalVisits, globalPromos } = userData;
 
           // Populate the clients in the state
           adminData.clients.forEach((client: Client) => {
@@ -190,7 +170,6 @@ const dataSlice = createSlice({
             userId: userId,
           };
           state.currentUserPromos = globalPromos;
-          state.currentUserAlerts = alerts;
           state.currentUserVisits = globalVisits;
         } else {
           // Handle unexpected data structure
@@ -251,8 +230,6 @@ export const {
   clearSelection,
   selectClient,
   selectAgent,
-  addAlert,
-  updateAlert,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;

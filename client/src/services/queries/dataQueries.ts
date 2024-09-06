@@ -1,7 +1,6 @@
 // api.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import {
-  Alert,
   GlobalPromos,
   GlobalVisits,
   Promo,
@@ -19,10 +18,7 @@ import {
 } from "../../utils/errorHandling";
 import { getAdminById } from "../api/admins";
 import { getAgentById } from "../api/agents";
-import {
-  getAlertsByEntityRoleAndEntityCode,
-  getAlertsByIssuer,
-} from "../api/alerts";
+
 import {
   loadAgentDetailsData,
   loadClientDetailsData,
@@ -42,13 +38,10 @@ export const dataApi = createApi({
         adminData: Admin;
         globalVisits: GlobalVisits;
         globalPromos: GlobalPromos;
-        alerts: Alert[];
       },
       { entityCode: string; userId: string }
     >({
-      queryFn: async ({ entityCode, userId }) => {
-        const entityRole = "admin"; // Set the role to 'admin' for this query
-
+      queryFn: async ({ entityCode }) => {
         try {
           const [
             data,
@@ -57,8 +50,6 @@ export const dataApi = createApi({
             adminDetails,
             visits,
             promos,
-            roleBasedAlerts,
-            issuerAlerts,
           ] = await Promise.all([
             loadJsonData(),
             loadClientDetailsData(),
@@ -66,11 +57,7 @@ export const dataApi = createApi({
             getAdminById(entityCode),
             loadVisitsData(),
             loadPromosData(),
-            getAlertsByEntityRoleAndEntityCode({ entityRole, entityCode }),
-            getAlertsByIssuer(userId),
           ]);
-
-          const alerts = [...roleBasedAlerts, ...issuerAlerts];
 
           // Map clients and agents using the fetched data
           const { clients } = await mapDataToModels(
@@ -106,7 +93,6 @@ export const dataApi = createApi({
               adminData: adminDetailsWithData,
               globalVisits,
               globalPromos,
-              alerts, // Directly returning alerts as they're already filtered
             },
           };
         } catch (error) {
@@ -117,31 +103,17 @@ export const dataApi = createApi({
     }),
 
     getUserClientData: builder.query<
-      { clientData: Client; visits: Visit[]; promos: Promo[]; alerts: Alert[] },
+      { clientData: Client; visits: Visit[]; promos: Promo[] },
       { entityCode: string; userId: string }
     >({
-      queryFn: async ({ entityCode, userId }) => {
+      queryFn: async ({ entityCode }) => {
         try {
-          const [
-            data,
-            clientDetails,
-            visits,
-            promos,
-            roleBasedAlerts,
-            issuerAlerts,
-          ] = await Promise.all([
+          const [data, clientDetails, visits, promos] = await Promise.all([
             getFilteredMovements(),
             getClientByCodice(entityCode),
             loadVisitsData(),
             loadPromosData(),
-            getAlertsByEntityRoleAndEntityCode({
-              entityRole: "client",
-              entityCode,
-            }),
-            getAlertsByIssuer(userId),
           ]);
-
-          const alerts = [...roleBasedAlerts, ...issuerAlerts];
 
           // Updated to use the new return structure from mapDataToModels
           const {
@@ -163,7 +135,6 @@ export const dataApi = createApi({
               clientData,
               visits: filteredVisits,
               promos: filteredPromos,
-              alerts, // Directly returning alerts as they're already filtered
             },
           };
         } catch (error) {
@@ -174,33 +145,19 @@ export const dataApi = createApi({
     }),
 
     getUserAgentData: builder.query<
-      { agentData: Agent; visits: Visit[]; promos: Promo[]; alerts: Alert[] },
+      { agentData: Agent; visits: Visit[]; promos: Promo[] },
       { entityCode: string; userId: string }
     >({
-      queryFn: async ({ entityCode, userId }) => {
+      queryFn: async ({ entityCode }) => {
         try {
-          const [
-            data,
-            clientDetails,
-            agentDetails,
-            visits,
-            promos,
-            roleBasedAlerts,
-            issuerAlerts,
-          ] = await Promise.all([
-            getFilteredMovements(),
-            getClientsByAgent(),
-            getAgentById(entityCode),
-            loadVisitsData(),
-            loadPromosData(),
-            getAlertsByEntityRoleAndEntityCode({
-              entityRole: "agent",
-              entityCode,
-            }),
-            getAlertsByIssuer(userId),
-          ]);
-
-          const alerts = [...roleBasedAlerts, ...issuerAlerts];
+          const [data, clientDetails, agentDetails, visits, promos] =
+            await Promise.all([
+              getFilteredMovements(),
+              getClientsByAgent(),
+              getAgentById(entityCode),
+              loadVisitsData(),
+              loadPromosData(),
+            ]);
 
           // Extract clients from mapDataToModels
           const { clients } = await mapDataToModels(
@@ -233,7 +190,6 @@ export const dataApi = createApi({
               agentData,
               visits: aggregatedVisits,
               promos: aggregatedPromos,
-              alerts, // Directly returning alerts as they're already filtered
             },
           };
         } catch (error) {

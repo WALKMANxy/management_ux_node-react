@@ -1,6 +1,6 @@
 // src/utils/activityUtils.ts
 
-import { Alert, GlobalVisits } from "../models/dataModels";
+import {  GlobalVisits } from "../models/dataModels";
 import { Client } from "../models/entityModels";
 import { calculateRevenue, currencyFormatter } from "./dataUtils";
 
@@ -18,7 +18,6 @@ export const generateActivityList = (
   clients: Client[], // Accept clients directly from the selected agent
   agentId: string, // Accept agentId for filtering visits and alerts
   globalVisits: GlobalVisits,
-  alerts: Alert[]
 ): ActivityItem[] => {
   const activities: ActivityItem[] = [];
 
@@ -78,32 +77,7 @@ export const generateActivityList = (
     });
   });
 
-  // Initialize a counter for processed alerts
-  let alertCount = 0;
-/*   console.log("Initial alerts:", alerts);
- */
-  // Process alerts, limit to the first 5, and filter by agentId
-  for (const alert of alerts) {
-/*     console.log("Processing alert:", alert);
- */    // Update condition to check for matching agent ID and limit the count
-    if (
-      alert.entityRole === "agent" &&
-      alert.entityCode === agentId &&
-      alertCount < 5
-    ) {
-/*       console.log("Adding alert to activities:", alert);
- */      activities.push({
-        id: alert._id,
-        type: "alerts",
-        title: `Alert - agent: ${alert.entityCode}`,
-        time: new Date(alert.createdAt).toLocaleDateString(),
-        details: `${alert.alertReason} - Severity: ${alert.severity}`,
-        subDetails: alert.message.slice(0, 25) + "...",
-      });
-      alertCount++;
-    }
-    if (alertCount >= 5) break; // Limit to 5 alerts
-  }
+
 
   // Sort all activities by time (most recent first) and limit to 10 items
   const sortedActivities = activities

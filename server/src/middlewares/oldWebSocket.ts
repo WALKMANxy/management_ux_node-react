@@ -1,9 +1,7 @@
 import cookie from "cookie";
-import sanitizeHtml from "sanitize-html";
 import { Socket, Server as SocketIOServer } from "socket.io";
-import { Chat, IMessage } from "../models/Chat";
+import { IAlert } from "../models/Alert";
 import { User } from "../models/User";
-import { messageSchema } from "../utils/joiUtils";
 import { logger } from "../utils/logger";
 import { getSessionByToken } from "../utils/sessionUtils";
 
@@ -18,8 +16,11 @@ export const setupWebSocket = (io: SocketIOServer) => {
   const connectedClients = new Map<string, Set<AuthenticatedSocket>>();
 
   io.use(async (socket: AuthenticatedSocket, next) => {
+    // Extract session token exclusively from cookies
     const cookies = parseCookie(socket.handshake.headers.cookie || "");
     const sessionToken = cookies["sessionToken"];
+
+    console.log("Extracted session token from cookies:", sessionToken);
 
     if (!sessionToken) {
       const error = new Error(
@@ -40,8 +41,15 @@ export const setupWebSocket = (io: SocketIOServer) => {
         return next(error);
       }
 
-      const userId = session.userId.toString();
-      await authenticateSocket(socket, userId);
+      // Extract userId as a string from the session object
+      const userId = session.userId.toString(); // Correctly extract the userId from the session
+      console.log("User ID extracted from session:", userId);
+
+      await authenticateSocket(socket, session.userId.toString());
+      logger.info(`Socket authenticated`, {
+        userId: session.userId,
+        socketId: socket.id,
+      });
       next();
     } catch (error) {
       logger.error("Authentication error", { error, socketId: socket.id });
@@ -55,7 +63,7 @@ export const setupWebSocket = (io: SocketIOServer) => {
       socketId: socket.id,
     });
 
-    if (socket.userId) {
+    if (socket.userId && socket.userRole && socket.entityCode) {
       if (!connectedClients.has(socket.userId)) {
         connectedClients.set(socket.userId, new Set());
       }
@@ -81,91 +89,6 @@ export const setupWebSocket = (io: SocketIOServer) => {
       }
     });
 
-    socket.on(
-      "chat:message",
-      async ({
-        chatId,
-        message,
-      }: {
-        chatId: string;
-        message: Partial<IMessage>;
-      }) => {
-        // Validate chatId and message data
-        const { error, value } = messageSchema.validate({ chatId, message });
-        if (error) {
-          logger.warn("Validation error on chat:message", {
-            error: error.message,
-          });
-          return;
-        }
-
-        // Sanitize the message content to prevent XSS attacks
-        value.message.content = sanitizeHtml(value.message.content, {
-          allowedTags: [],
-          allowedAttributes: {},
-        });
-
-        try {
-          const updatedChat = await Chat.findByIdAndUpdate(
-            chatId,
-            { $push: { messages: message }, $set: { updatedAt: new Date() } },
-            { new: true }
-          );
-
-          if (!updatedChat) {
-            logger.error("Chat not found", { chatId });
-            return;
-          }
-
-          // Emit the new message to all connected participants
-          updatedChat.participants.forEach((participantId) => {
-            const sockets = connectedClients.get(participantId.toString());
-            if (sockets) {
-              sockets.forEach((clientSocket) => {
-                clientSocket.emit("chat:newMessage", { chatId, message });
-              });
-            }
-          });
-        } catch (error) {
-          logger.error("Error handling new message", { error });
-        }
-      }
-    );
-
-    socket.on(
-      "chat:read",
-      async ({ chatId, messageId }: { chatId: string; messageId: string }) => {
-        try {
-          const chat = await Chat.findOneAndUpdate(
-            { _id: chatId, "messages._id": messageId },
-            { $addToSet: { "messages.$.readBy": socket.userId } },
-            { new: true }
-          );
-
-          if (!chat) {
-            logger.error("Chat or message not found", { chatId, messageId });
-            return;
-          }
-
-          // Emit read receipt update to all participants
-          chat.participants.forEach((participantId) => {
-            const sockets = connectedClients.get(participantId.toString());
-            if (sockets) {
-              sockets.forEach((clientSocket) => {
-                clientSocket.emit("chat:messageRead", {
-                  chatId,
-                  messageId,
-                  userId: socket.userId,
-                });
-              });
-            }
-          });
-        } catch (error) {
-          logger.error("Error updating read status", { error });
-        }
-      }
-    );
-
     socket.on("logout", () => {
       logger.info("Client logout requested", {
         userId: socket.userId,
@@ -180,12 +103,36 @@ export const setupWebSocket = (io: SocketIOServer) => {
     logger.error("WebSocket connection error", { error });
   });
 
-  return { connectedClients };
+  const emitAlert = (alert: IAlert) => {
+    connectedClients.forEach((sockets, userId) => {
+      sockets.forEach((socket) => {
+        if (
+          socket.userRole === "admin" ||
+          socket.userRole === "agent" ||
+          (socket.userRole === alert.entityRole &&
+            socket.entityCode === alert.entityCode)
+        ) {
+          logger.debug("Emitting alert", {
+            alertId: alert.id,
+            userId,
+            socketId: socket.id,
+          });
+
+          socket.emit("alerts:update", alert);
+        }
+      });
+    });
+  };
+
+  return { emitAlert };
 };
 
 // Authenticate the socket based on the session token
 async function authenticateSocket(socket: AuthenticatedSocket, userId: string) {
   try {
+    console.log("Authenticating socket with userId:", userId);
+
+    // Retrieve the user from the database
     const user = await User.findById(userId);
 
     if (!user) {
@@ -194,6 +141,15 @@ async function authenticateSocket(socket: AuthenticatedSocket, userId: string) {
       throw error;
     }
 
+    // Log detailed information about the retrieved user
+    console.log("User details retrieved for socket authentication:", {
+      userId: user.id,
+      role: user.role,
+      entityCode: user.entityCode,
+      authType: user.authType,
+    });
+
+    // Set user information on the socket
     socket.userId = user.id.toString();
     socket.userRole = user.role;
     socket.entityCode = user.entityCode;
@@ -204,7 +160,7 @@ async function authenticateSocket(socket: AuthenticatedSocket, userId: string) {
     });
   } catch (error) {
     logger.error("Error during socket authentication", {
-      error,
+      error: error,
       userId,
       socketId: socket.id,
     });

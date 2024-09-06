@@ -9,8 +9,9 @@ import {
 } from "../features/data/dataSlice";
 import { Movement } from "../models/dataModels";
 import { TopArticleType } from "../models/dataSetTypes";
-import { Agent, Client } from "../models/entityModels";
+import { Agent, Client, User } from "../models/entityModels";
 import { DataSliceState } from "../models/stateModels";
+import { updateUserEntityNameIfMissing } from "../utils/checkUserName";
 import {
   calculateMonthlyData,
   calculateMonthlyRevenue,
@@ -48,6 +49,11 @@ const useStats = (isMobile: boolean) => {
     error, // Error message if data fetch fails
   } = useAppSelector<RootState, DataSliceState>((state) => state.data);
 
+  // Select currentUser from userSlice
+  const currentUser = useAppSelector<RootState, Partial<User> | null>(
+    (state) => state.users.currentUser
+  );
+
   // Extract the role from currentUserDetails
   const role = currentUserDetails?.role;
 
@@ -59,15 +65,19 @@ const useStats = (isMobile: boolean) => {
       try {
         setLoading(true);
         await dispatch(fetchInitialData()).unwrap();
-        setLocalError(null); // Clear any previous error
-        setRetryCount(0); // Reset retry count on success
+        setLocalError(null);
+        setRetryCount(0);
+
+        // Call the utility function to update entity name if missing
+        updateUserEntityNameIfMissing(
+          dispatch,
+          currentUser,
+          currentUserDetails
+        );
       } catch (err: unknown) {
-        // Narrow down the unknown type
         if (err instanceof Error) {
-          // err is an instance of Error, so it has a message property
           setLocalError(err.message);
         } else {
-          // Handle unexpected error structure
           setLocalError("An unknown error occurred while fetching data.");
         }
         if (retryCount < 5) {
@@ -79,7 +89,8 @@ const useStats = (isMobile: boolean) => {
     };
 
     fetchData();
-  }, [dispatch, retryCount]);
+  }, [dispatch, retryCount, currentUser, currentUserDetails]);
+
   // Retry mechanism: Automatically re-attempt fetching data if an error occurs
   useEffect(() => {
     if (retryCount > 0 && retryCount <= 5) {

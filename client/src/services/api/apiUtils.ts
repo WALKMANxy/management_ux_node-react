@@ -1,6 +1,6 @@
 // src/services/api/apiUtils.ts
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import { Alert, Promo, Visit } from "../../models/dataModels";
+import {  Promo, Visit } from "../../models/dataModels";
 import { serverClient, serverMovement } from "../../models/dataSetTypes";
 import { Admin, Agent } from "../../models/entityModels";
 
@@ -108,5 +108,3 @@ export const loadVisitsData = async (): Promise<Visit[]> =>
   apiCall<Visit[]>("visits", "GET");
 export const loadPromosData = async (): Promise<Promo[]> =>
   apiCall<Promo[]>("promos", "GET");
-export const loadAlertsData = async (): Promise<Alert[]> =>
-  apiCall<Alert[]>("alerts", "GET");
