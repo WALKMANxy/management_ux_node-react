@@ -82,41 +82,6 @@ export const createChat = createAsyncThunk(
   }
 );
 
-// Async thunk to send a message to a chat
-export const sendMessage = createAsyncThunk(
-  "chats/sendMessage",
-  async (
-    { chatId, messageData }: { chatId: string; messageData: Partial<IMessage> },
-    { dispatch, rejectWithValue }
-  ) => {
-    try {
-      // Optimistically add the message with a temporary ID to handle validation
-      const temporaryMessage = {
-        ...messageData,
-        _id: `temp-${Date.now()}`,
-        status: "pending", // Mark as pending for optimistic updates
-        timestamp: new Date(),
-      } as IMessage;
-
-      // Dispatch addMessage to update the state optimistically
-      dispatch(addMessage({ chatId, message: temporaryMessage }));
-
-      // Push the message to the server
-      const result = await dispatch(
-        chatApi.endpoints.sendMessage.initiate({ chatId, messageData })
-      ).unwrap();
-
-      // If successful, return the server response
-      return { chatId, message: result };
-    } catch (error) {
-      // On failure, reject the promise with an error
-      return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to send message"
-      );
-    }
-  }
-);
-
 // Define the chat slice
 const chatSlice = createSlice({
   name: "chats",
@@ -130,46 +95,112 @@ const chatSlice = createSlice({
       state.status = "idle";
       state.error = null;
     },
-    setCurrentChat: (state, action: PayloadAction<IChat>) => {
+    setCurrentChatReducer: (state, action: PayloadAction<IChat>) => {
       state.currentChat = action.payload;
     },
-    addMessage: (
+    addMessageReducer: (
       state,
       action: PayloadAction<{ chatId: string; message: IMessage }>
     ) => {
       const { chatId, message } = action.payload;
-      state.messages[message._id] = message; // Add the message to the flat structure
-      if (state.messageIdsByChat[chatId]) {
-        state.messageIdsByChat[chatId].push(message._id);
+
+      // Check if there's a matching local message using localId
+      const tempMessageId = Object.keys(state.messages).find(
+        (id) => state.messages[id].localId === message.localId
+      );
+
+      if (tempMessageId) {
+        // If a corresponding local message is found, update its fields
+        const existingMessage = state.messages[tempMessageId];
+
+        // Update the message properties without replacing the entire object
+        existingMessage._id = message._id;
+        existingMessage.status = message.status; // Update status to "sent" or appropriate value
+        existingMessage.readBy = message.readBy;
+
+        // No need to update messageIdsByChat as the message remains in the same position
       } else {
-        state.messageIdsByChat[chatId] = [message._id];
+        // Check if _id exists before proceeding
+        if (!message._id) {
+          // Handle the case where _id is missing
+          throw new Error(
+            "Message _id is missing. Cannot add message to the state."
+          );
+          // Alternatively, you could log the error or handle it gracefully depending on your needs
+        }
+
+        // If _id is present, proceed to add the message to the state
+        state.messages[message._id] = message;
+
+        // Add the confirmed message to the messageIdsByChat in the correct order
+        if (state.messageIdsByChat[chatId]) {
+          state.messageIdsByChat[chatId].push(message._id);
+        } else {
+          state.messageIdsByChat[chatId] = [message._id];
+        }
       }
     },
-    updateReadStatus: (
+    sendMessageReducer: (
+      state,
+      action: PayloadAction<{ chatId: string; messageData: IMessage }>
+    ) => {
+      const { chatId, messageData } = action.payload;
+
+      if (!messageData.localId) {
+        // Handle the case where _id is missing
+        throw new Error(
+          "Message _id is missing. Cannot add message to the state."
+        );
+      }
+
+      state.messages[messageData.localId] = messageData; // Use localId as the key
+      if (state.messageIdsByChat[chatId]) {
+        state.messageIdsByChat[chatId].push(messageData.localId);
+      } else {
+        state.messageIdsByChat[chatId] = [messageData.localId];
+      }
+    },
+    updateReadStatusReducer: (
       state,
       action: PayloadAction<{
         chatId: string;
-        messageId: string;
         userId: string;
       }>
     ) => {
-      const { messageId, userId } = action.payload;
-      const message = state.messages[messageId];
-      if (message && !message.readBy.includes(userId)) {
-        message.readBy.push(userId);
-      }
-    },
-    markMessagesAsRead: (
-      state,
-      action: PayloadAction<{ chatId: string; userId: string }>
-    ) => {
       const { chatId, userId } = action.payload;
+
+      // Retrieve all message IDs associated with the chat
       const messageIds = state.messageIdsByChat[chatId];
+
+      // Check if there are messages to update
       if (messageIds) {
+        // Iterate through each message ID and update the read status
         messageIds.forEach((messageId) => {
           const message = state.messages[messageId];
           if (message && !message.readBy.includes(userId)) {
+            // Add the userId to the readBy array if it's not already there
             message.readBy.push(userId);
+          }
+        });
+      }
+    },
+    markMessagesAsReadReducer: (
+      state,
+      action: PayloadAction<{ chatId: string; currentUserId: string }>
+    ) => {
+      const { chatId, currentUserId } = action.payload; // Extract currentUserId from the action payload
+      const messageIds = state.messageIdsByChat[chatId];
+
+      if (messageIds) {
+        messageIds.forEach((messageId) => {
+          const message = state.messages[messageId];
+
+          // Check if the message exists, is not sent by the current user, and hasn't been marked as read
+          if (
+            message &&
+            !message.readBy.includes(currentUserId) // Ensure the user hasn't already read the message
+          ) {
+            message.readBy.push(currentUserId); // Mark the message as read by the current user
           }
         });
       }
@@ -199,9 +230,14 @@ const chatSlice = createSlice({
       .addCase(fetchMessages.fulfilled, (state, action) => {
         state.status = "succeeded";
         const { chatId, messages } = action.payload;
-        state.messageIdsByChat[chatId] = messages.map((message: IMessage) => {
-          state.messages[message._id] = message;
-          return message._id;
+
+        messages.forEach((message: IMessage) => {
+          if (message._id) {
+            state.messages[message._id] = message;
+            state.messageIdsByChat[chatId]!.push(message._id);
+          } else {
+            console.error(`Message missing _id: ${JSON.stringify(message)}`);
+          }
         });
       })
       .addCase(fetchMessages.rejected, (state, action) => {
@@ -221,38 +257,17 @@ const chatSlice = createSlice({
       .addCase(createChat.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
-      })
-
-      .addCase(sendMessage.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(sendMessage.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        const { chatId, message } = action.payload;
-        // Validate and replace the temporary message with the server-confirmed message
-        state.messages[message._id] = message;
-        if (state.messageIdsByChat[chatId]) {
-          state.messageIdsByChat[chatId].push(message._id);
-        } else {
-          state.messageIdsByChat[chatId] = [message._id];
-        }
-      })
-      .addCase(sendMessage.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload as string;
-        // Optionally, handle the rejection of the message here
-        console.error("Failed to send message:", action.payload);
       });
   },
 });
 
 export const {
   clearChatData,
-  setCurrentChat,
-  addMessage,
-  updateReadStatus,
-  markMessagesAsRead,
+  setCurrentChatReducer,
+  addMessageReducer,
+  updateReadStatusReducer,
+  markMessagesAsReadReducer,
+  sendMessageReducer,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

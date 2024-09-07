@@ -1,4 +1,5 @@
 import cookie from "cookie";
+import mongoose from "mongoose";
 import sanitizeHtml from "sanitize-html";
 import { Socket, Server as SocketIOServer } from "socket.io";
 import { Chat, IMessage } from "../models/Chat";
@@ -106,9 +107,22 @@ export const setupWebSocket = (io: SocketIOServer) => {
         });
 
         try {
+          // Generate a unique ID before saving the message
+          const newMessageId = new mongoose.Types.ObjectId().toString(); // Generate unique MongoDB ID
+
+          // Update message to include server-side modifications
+          const messageToSave = {
+            ...message,
+            _id: newMessageId,
+            status: "sent",
+          };
+
           const updatedChat = await Chat.findByIdAndUpdate(
             chatId,
-            { $push: { messages: message }, $set: { updatedAt: new Date() } },
+            {
+              $push: { messages: messageToSave },
+              $set: { updatedAt: new Date() },
+            },
             { new: true }
           );
 
@@ -122,7 +136,10 @@ export const setupWebSocket = (io: SocketIOServer) => {
             const sockets = connectedClients.get(participantId.toString());
             if (sockets) {
               sockets.forEach((clientSocket) => {
-                clientSocket.emit("chat:newMessage", { chatId, message });
+                clientSocket.emit("chat:newMessage", {
+                  chatId,
+                  message: messageToSave,
+                });
               });
             }
           });
@@ -132,39 +149,37 @@ export const setupWebSocket = (io: SocketIOServer) => {
       }
     );
 
-    socket.on(
-      "chat:read",
-      async ({ chatId, messageId }: { chatId: string; messageId: string }) => {
-        try {
-          const chat = await Chat.findOneAndUpdate(
-            { _id: chatId, "messages._id": messageId },
-            { $addToSet: { "messages.$.readBy": socket.userId } },
-            { new: true }
-          );
+    socket.on("chat:read", async ({ chatId }: { chatId: string }) => {
+      try {
+        // Update all unread messages in the chat for the current user
+        const chat = await Chat.updateMany(
+          { _id: chatId, "messages.readBy": { $ne: socket.userId } },
+          { $addToSet: { "messages.$.readBy": socket.userId } },
+          { new: true }
+        );
 
-          if (!chat) {
-            logger.error("Chat or message not found", { chatId, messageId });
-            return;
-          }
-
-          // Emit read receipt update to all participants
-          chat.participants.forEach((participantId) => {
-            const sockets = connectedClients.get(participantId.toString());
-            if (sockets) {
-              sockets.forEach((clientSocket) => {
-                clientSocket.emit("chat:messageRead", {
-                  chatId,
-                  messageId,
-                  userId: socket.userId,
-                });
-              });
-            }
-          });
-        } catch (error) {
-          logger.error("Error updating read status", { error });
+        if (!chat) {
+          logger.error("Chat not found or no messages to update", { chatId });
+          return;
         }
+
+        // Emit read receipt update to all participants
+        const updatedChat = await Chat.findById(chatId); // Retrieve updated chat data
+        updatedChat?.participants.forEach((participantId) => {
+          const sockets = connectedClients.get(participantId.toString());
+          if (sockets) {
+            sockets.forEach((clientSocket) => {
+              clientSocket.emit("chat:messageRead", {
+                chatId,
+                userId: socket.userId,
+              });
+            });
+          }
+        });
+      } catch (error) {
+        logger.error("Error updating read status", { error });
       }
-    );
+    });
 
     socket.on("logout", () => {
       logger.info("Client logout requested", {
