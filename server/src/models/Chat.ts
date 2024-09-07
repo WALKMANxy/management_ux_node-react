@@ -3,14 +3,16 @@
 import { Document, Schema, Types, model } from "mongoose";
 
 export interface IMessage {
-    _id: string;
-    content: string;
-    sender: Types.ObjectId; // ID of the sender
-    timestamp: Date;
-    readBy: Types.ObjectId[]; // Array of user IDs who have read the message
-    messageType: "message" | "alert" | "promo" | "visit"; // To categorize the message type
-    attachments?: { url: string; type: "image" }[]; // Array to store image URLs and types
-  }
+  _id: string;
+  localId?: string; // Client-side generated ID for matching
+  content: string;
+  sender: Types.ObjectId; // ID of the sender
+  timestamp: Date;
+  readBy: Types.ObjectId[]; // Array of user IDs who have read the message
+  messageType: "message" | "alert" | "promo" | "visit"; // To categorize the message type
+  attachments?: { url: string; type: "image" }[]; // Array to store image URLs and types
+  status: "pending" | "sent" | "failed"; // Status indicating the message state
+}
 
 export interface IChat extends Document {
   _id: string;
@@ -26,38 +28,44 @@ export interface IChat extends Document {
 }
 
 const messageSchema = new Schema<IMessage>(
-    {
-      content: {
-        type: String,
-        required: function () {
-          // Content is required only if no attachments are present
-          return !(this.attachments && this.attachments.length > 0);
-        },
-        maxlength: 2000,
-        validate: {
-          validator: function (v: string) {
-            return Buffer.from(v).toString("utf8") === v;
-          },
-          message: "Message content must be valid UTF-8.",
-        },
+  {
+    localId: { type: String },
+    content: {
+      type: String,
+      required: function () {
+        // Content is required only if no attachments are present
+        return !(this.attachments && this.attachments.length > 0);
       },
-      sender: { type: Schema.Types.ObjectId, ref: "User", required: true },
-      timestamp: { type: Date, default: Date.now },
-      readBy: [{ type: Schema.Types.ObjectId, ref: "User" }],
-      messageType: {
-        type: String,
-        enum: ["message", "alert", "promo", "visit"],
-        required: true,
-      },
-      attachments: [
-        {
-          url: { type: String, required: true }, // URL of the stored image
-          type: { type: String, enum: ["image"], required: true }, // Define type as image
+      maxlength: 2000,
+      validate: {
+        validator: function (v: string) {
+          return Buffer.from(v).toString("utf8") === v;
         },
-      ],
+        message: "Message content must be valid UTF-8.",
+      },
     },
-    { _id: false }
-  );
+    sender: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    timestamp: { type: Date, default: Date.now },
+    readBy: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    messageType: {
+      type: String,
+      enum: ["message", "alert", "promo", "visit"],
+      required: true,
+    },
+    attachments: [
+      {
+        url: { type: String, required: true }, // URL of the stored image
+        type: { type: String, enum: ["image"], required: true }, // Define type as image
+      },
+    ],
+    status: {
+      type: String,
+      enum: ["pending", "sent", "failed"],
+      default: "pending",
+    },
+  },
+  { _id: false }
+);
 
 const chatSchema = new Schema<IChat>(
   {
@@ -68,7 +76,9 @@ const chatSchema = new Schema<IChat>(
     },
     name: { type: String }, // Used for groups and broadcasts
     description: { type: String }, // Optional, mainly for groups and broadcasts
-    participants: [{ type: Schema.Types.ObjectId, ref: "User", required: true }],
+    participants: [
+      { type: Schema.Types.ObjectId, ref: "User", required: true },
+    ],
     admins: [{ type: Schema.Types.ObjectId, ref: "User" }], // Only relevant for group and broadcast types
     messages: [messageSchema], // Array of message documents within the chat
     isBroadcast: { type: Boolean, default: false }, // Specific to broadcast types
@@ -83,8 +93,7 @@ chatSchema.index({ type: 1, participants: 1 });
 chatSchema.index({ isBroadcast: 1 });
 chatSchema.index({ "messages.timestamp": 1 });
 chatSchema.index({ participants: 1 });
-chatSchema.index({ 'messages._id': 1 });
+chatSchema.index({ "messages._id": 1 });
 chatSchema.index({ type: 1 });
-
 
 export const Chat = model<IChat>("Chat", chatSchema);
