@@ -428,3 +428,4 @@ export const calculateRevenue = (movements: Movement[]) =>
 
 export const calculatePercentage = (part: number, total: number): string =>
   total === 0 ? "0.00" : ((part / total) * 100).toFixed(2);
+

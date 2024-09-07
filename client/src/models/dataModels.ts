@@ -62,26 +62,30 @@ export interface GlobalPromos {
 // models/Message.ts
 
 export interface IMessage {
-  _id: string;
+  _id?: string;
+  localId: string;
   content: string;
   sender: string; // User ID of the sender
   timestamp: Date;
   readBy: string[]; // Array of user IDs who have read the message
   messageType: "message" | "alert" | "promo" | "visit"; // Categorize the message type
-  mediaUrl?: string; // Optional, in case of media attachments like images (future-proofing)
+  attachments: { url: string; type: "image" }[]; // Array to store image URLs and types
+  status: "pending" | "sent" | "failed"; // Status indicating the message state
+
 }
 
 // models/Chat.ts
 
 export interface IChat {
   _id: string;
+  localId: string,
   type: "simple" | "group" | "broadcast"; // Type of chat
-  name?: string; // Optional, mainly for group chats
-  description?: string; // Optional, mainly for groups and broadcasts
+  name: string; // Optional, mainly for group chats
+  description: string; // Optional, mainly for groups and broadcasts
   participants: string[]; // List of participant user IDs
-  admins?: string[]; // Admins, mainly for group and broadcast chats
+  admins: string[]; // Admins, mainly for group and broadcast chats
   messages: IMessage[]; // Array of messages within the chat
-  isBroadcast?: boolean; // Specific to broadcasts
+  isBroadcast: boolean; // Specific to broadcasts
   createdAt: Date;
   updatedAt: Date;
 }
