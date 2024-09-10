@@ -3,6 +3,7 @@
 import {
   BarChart as BarChartIcon,
   Category as CategoryIcon,
+  Chat as ChatIcon,
   Close as CloseIcon,
   EventNote as EventNoteIcon,
   History as HistoryIcon,
@@ -12,7 +13,6 @@ import {
   Menu as MenuIcon,
   Notifications as NotificationsIcon,
   People as PeopleIcon,
-  Warning as WarningIcon,
 } from "@mui/icons-material";
 import {
   AppBar,
@@ -156,11 +156,11 @@ const Header: React.FC = () => {
           </ListItemIcon>
           <ListItemText primary={t("promos")} />
         </ListItem>
-        <ListItem button component={Link} to="/alerts" onClick={toggleDrawer}>
+        <ListItem button component={Link} to="/messages" onClick={toggleDrawer}>
           <ListItemIcon sx={{ color: "white" }}>
-            <WarningIcon />
+            <ChatIcon />
           </ListItemIcon>
-          <ListItemText primary={t("alerts")} />
+          <ListItemText primary={t("messages")} />
         </ListItem>
       </>
     );
@@ -188,10 +188,16 @@ const Header: React.FC = () => {
     <>
       <AppBar
         position="fixed"
-        sx={{ backgroundColor: "black", color: "black", width: "100%", right: "auto", left: "auto",     maxWidth: '100vw', // Prevents overflowing past the viewport width
+        sx={{
+          backgroundColor: "black",
+          color: "black",
+          width: "100%",
+          right: "auto",
+          left: "auto",
+          maxWidth: "100vw", // Prevents overflowing past the viewport width
         }}
       >
-         <Toolbar
+        <Toolbar
           sx={{
             display: "flex",
           }}
@@ -232,7 +238,7 @@ const Header: React.FC = () => {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <Toolbar/>
+      <Toolbar />
       {/* This Toolbar component is added to push the content down */}
       {/* Blur backdrop */}
       {drawerOpen && (

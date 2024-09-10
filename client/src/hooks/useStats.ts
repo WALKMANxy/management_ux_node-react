@@ -62,11 +62,14 @@ const useStats = (isMobile: boolean) => {
   // Fetch initial data
   useEffect(() => {
     const fetchData = async () => {
+      console.log("fetchData called"); // Debug: Function call
       try {
         setLoading(true);
+        console.log("Dispatching fetchInitialData"); // Debug: Dispatch action
         await dispatch(fetchInitialData()).unwrap();
+        console.log("fetchInitialData successful"); // Debug: Success case
         setLocalError(null);
-        setRetryCount(0);
+        setRetryCount(0); // Reset retryCount only when data fetch is successful
 
         // Call the utility function to update entity name if missing
         updateUserEntityNameIfMissing(
@@ -75,32 +78,46 @@ const useStats = (isMobile: boolean) => {
           currentUserDetails
         );
       } catch (err: unknown) {
+        console.error("Error fetching initial data:", err); // Debug: Error case
         if (err instanceof Error) {
           setLocalError(err.message);
+          console.log(`Error message: ${err.message}`); // Debug: Specific error message
         } else {
           setLocalError("An unknown error occurred while fetching data.");
+          console.log("Unknown error occurred while fetching data."); // Debug: Unknown error
         }
         if (retryCount < 5) {
           setRetryCount((prevCount) => prevCount + 1);
+          console.log(`Retry count incremented: ${retryCount + 1}`); // Debug: Retry count update
         }
       } finally {
         setLoading(false);
+        console.log("Loading state set to false"); // Debug: Loading state reset
       }
     };
 
+    console.log("Calling fetchData in useEffect"); // Debug: useEffect call
     fetchData();
-  }, [dispatch, retryCount, currentUser, currentUserDetails]);
+    // Remove dependencies that cause the fetchData to re-run unnecessarily
+    // retryCount will be handled separately to avoid loops
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, retryCount]); // Removed retryCount, currentUser, currentUserDetails from dependencies
 
   // Retry mechanism: Automatically re-attempt fetching data if an error occurs
   useEffect(() => {
     if (retryCount > 0 && retryCount <= 5) {
+      console.log(`Retry attempt #${retryCount}`); // Debug: Retry attempt
       const retryTimeout = setTimeout(() => {
-        dispatch(fetchInitialData());
+        console.log("Retrying fetchInitialData"); // Debug: Retrying action
+        fetchInitialData(); // Explicitly call fetchData instead of dispatching again
       }, 5000); // Retry after 5 seconds
 
-      return () => clearTimeout(retryTimeout); // Cleanup timeout on unmount or retryCount change
+      return () => {
+        console.log("Clearing retry timeout"); // Debug: Clearing timeout
+        clearTimeout(retryTimeout); // Cleanup timeout on unmount or retryCount change
+      };
     }
-  }, [retryCount, dispatch]);
+  }, [retryCount]); // Only retryCount should trigger this effect
 
   // Create memoized selectors for selectedClient and selectedAgent
   const selectedClient = useMemo(
