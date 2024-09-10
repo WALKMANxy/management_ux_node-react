@@ -2,34 +2,39 @@
 
 import { Document, Schema, Types, model } from "mongoose";
 
+// Define the IMessage interface with server and client IDs
 export interface IMessage {
-  _id: string;
-  localId?: string; // Client-side generated ID for matching
+  _id: Types.ObjectId; // Server-generated unique identifier
+  local_id?: string; // Optional client-generated identifier for matching
   content: string;
   sender: Types.ObjectId; // ID of the sender
   timestamp: Date;
   readBy: Types.ObjectId[]; // Array of user IDs who have read the message
-  messageType: "message" | "alert" | "promo" | "visit"; // To categorize the message type
+  messageType: "message" | "alert" | "promo" | "visit"; // Categorizes the message type
   attachments?: { url: string; type: "image" }[]; // Array to store image URLs and types
   status: "pending" | "sent" | "failed"; // Status indicating the message state
 }
 
+// Define the IChat interface with server and client IDs
 export interface IChat extends Document {
-  _id: string;
+  _id: Types.ObjectId; // Server-generated unique identifier
+  local_id?: string; // Optional client-generated identifier for matching
   type: "simple" | "group" | "broadcast"; // Type of chat
   name?: string; // Optional, mainly for group chats
   description?: string; // Optional, mainly for groups and broadcasts
-  participants: Types.ObjectId[]; // List of participants, relevant for all chat types
+  participants: Types.ObjectId[]; // List of participant user IDs
   admins?: Types.ObjectId[]; // Admins, mainly for group and broadcast chats
   messages: IMessage[]; // Array of messages within the chat
-  isBroadcast?: boolean; // Optional, specifically for broadcasts
   createdAt: Date;
   updatedAt: Date;
+  status: "pending" | "created" | "failed"; // Status indicating the chat state
 }
 
+// Define the schema for Message with client and server IDs
 const messageSchema = new Schema<IMessage>(
   {
-    localId: { type: String },
+    _id: { type: Schema.Types.ObjectId, auto: true }, // Auto-generated server-side
+    local_id: { type: String }, // Client-side generated ID
     content: {
       type: String,
       required: function () {
@@ -54,8 +59,8 @@ const messageSchema = new Schema<IMessage>(
     },
     attachments: [
       {
-        url: { type: String, required: true }, // URL of the stored image
-        type: { type: String, enum: ["image"], required: true }, // Define type as image
+        url: { type: String, required: true },
+        type: { type: String, enum: ["image"], required: true },
       },
     ],
     status: {
@@ -64,33 +69,44 @@ const messageSchema = new Schema<IMessage>(
       default: "pending",
     },
   },
-  { _id: false }
+  { _id: false } // Do not override _id behavior
 );
 
+// Define the schema for Chat with client and server IDs
 const chatSchema = new Schema<IChat>(
   {
+    _id: { type: Schema.Types.ObjectId, auto: true }, // Auto-generated server-side
+    local_id: { type: String }, // Client-side generated ID
     type: {
       type: String,
       enum: ["simple", "group", "broadcast"],
       required: true,
     },
-    name: { type: String }, // Used for groups and broadcasts
-    description: { type: String }, // Optional, mainly for groups and broadcasts
+    name: { type: String },
+    description: { type: String },
     participants: [
       { type: Schema.Types.ObjectId, ref: "User", required: true },
     ],
-    admins: [{ type: Schema.Types.ObjectId, ref: "User" }], // Only relevant for group and broadcast types
-    messages: [messageSchema], // Array of message documents within the chat
-    isBroadcast: { type: Boolean, default: false }, // Specific to broadcast types
+    admins: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    messages: [messageSchema],
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
+    status: {
+      type: String,
+      enum: ["pending", "created", "failed"],
+      default: "pending",
+    },
   },
   { timestamps: true }
 );
 
-// Indexes for optimized querying
-chatSchema.index({ type: 1, participants: 1 });
-chatSchema.index({ isBroadcast: 1 });
+// Create a unique compound index on participants and type for simple chats
+chatSchema.index(
+  { type: 1, participants: 1 },
+  { unique: true, partialFilterExpression: { type: "simple" } }
+);
+
+// Additional indexes for optimized querying
 chatSchema.index({ "messages.timestamp": 1 });
 chatSchema.index({ participants: 1 });
 chatSchema.index({ "messages._id": 1 });

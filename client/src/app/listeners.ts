@@ -1,17 +1,17 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import {
-  fetchAllChats,
-  markMessagesAsReadReducer,
-  sendMessageReducer,
+  addMessageReducer,
+  fetchAllChatsThunk,
+  updateReadStatusReducer,
 } from "../features/chat/chatSlice";
-import { IMessage } from "../models/dataModels";
-import { webSocketService } from "../services/webSocketService"; // Correct the import path
 import { fetchUsersByIds } from "../features/users/userSlice";
+import { IChat, IMessage } from "../models/dataModels";
+import { webSocketService } from "../services/webSocketService";
 
 const listenerMiddleware = createListenerMiddleware();
 
-// Queue to batch read status updates
-let readStatusQueue: Array<{ chatId: string }> = [];
+// Queues to batch updates
+let readStatusQueue: Array<{ chatId: string; messageIds: string[] }> = [];
 let messageQueue: Array<{ chatId: string; messageData: IMessage }> = [];
 
 // Timers for debouncing
@@ -22,23 +22,18 @@ let messageTimer: NodeJS.Timeout | null = null;
 const DEBOUNCE_TIME = 100;
 
 // Function to process read status updates in batches
-// Function to process read status updates in batches
 const processReadStatusQueue = () => {
   if (readStatusQueue.length > 0) {
-    // Get unique chat IDs to avoid redundant emits for the same chat
-    const uniqueChatIds = Array.from(
-      new Set(readStatusQueue.map((item) => item.chatId))
-    );
-
-    // Emit read status updates per chat
-    uniqueChatIds.forEach((chatId) => {
-      webSocketService.emitMessageRead(chatId);
+    // Directly emit each read status update without grouping
+    readStatusQueue.forEach(({ chatId, messageIds }) => {
+      webSocketService.emitMessageRead(chatId, messageIds);
     });
 
     // Clear the queue after processing
     readStatusQueue = [];
   }
 };
+
 // Function to process outgoing messages in batches
 const processMessageQueue = () => {
   if (messageQueue.length > 0) {
@@ -46,53 +41,49 @@ const processMessageQueue = () => {
       webSocketService.emitNewMessage(chatId, messageData);
     });
 
-    // Clear the queue after processing
     messageQueue = [];
   }
 };
 
-// Listener for sendMessage action
+// Listener for updateReadStatusReducer
 listenerMiddleware.startListening({
-  actionCreator: sendMessageReducer, // Listen for the reducer action
+  actionCreator: updateReadStatusReducer,
   effect: async (action) => {
-    const { chatId, messageData } = action.payload;
+    const { chatId, messageIds, fromServer } = action.payload;
+    if (fromServer) return; // Skip WebSocket emission if action is from the server
 
-    // Add message to queue
-    messageQueue.push({ chatId, messageData });
+    readStatusQueue.push({ chatId, messageIds });
 
-    // Clear existing timer if any and set a new debounce timer
-    if (messageTimer) clearTimeout(messageTimer);
-    messageTimer = setTimeout(processMessageQueue, DEBOUNCE_TIME);
-  },
-});
-
-// Listener for markMessagesAsReadReducer
-listenerMiddleware.startListening({
-  actionCreator: markMessagesAsReadReducer,
-  effect: async (action) => {
-    const { chatId } = action.payload;
-
-    // Add chatId to the queue
-    readStatusQueue.push({ chatId });
-
-    // Clear existing timer if any and set a new debounce timer
     if (readStatusTimer) clearTimeout(readStatusTimer);
     readStatusTimer = setTimeout(processReadStatusQueue, DEBOUNCE_TIME);
   },
 });
 
+// Listener for addMessageReducer
 listenerMiddleware.startListening({
-  actionCreator: fetchAllChats.fulfilled,
+  actionCreator: addMessageReducer,
+  effect: async (action) => {
+    const { chatId, message, fromServer } = action.payload;
+    if (fromServer) return; // Skip WebSocket emission if action is from the server
+
+    messageQueue.push({ chatId, messageData: message });
+
+    if (messageTimer) clearTimeout(messageTimer);
+    messageTimer = setTimeout(processMessageQueue, DEBOUNCE_TIME);
+  },
+});
+
+// Listener for fetchAllChats to fetch users data
+listenerMiddleware.startListening({
+  actionCreator: fetchAllChatsThunk.fulfilled,
   effect: async (action, listenerApi) => {
     const chats = action.payload;
 
-    // Extract all unique participant IDs from chats
     const participantIds = new Set<string>();
-    chats.forEach((chat) => {
+    chats.forEach((chat: IChat) => {
       chat.participants.forEach((userId) => participantIds.add(userId));
     });
 
-    // Dispatch an action to fetch details of all participants
     if (participantIds.size > 0) {
       listenerApi.dispatch(fetchUsersByIds(Array.from(participantIds)));
     }

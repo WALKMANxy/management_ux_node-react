@@ -74,6 +74,24 @@ export const updateUserById = createAsyncThunk(
   }
 );
 
+// Thunk to fetch all users
+export const getAllUsersThunk = createAsyncThunk<User[], void>(
+  "users/getAllUsersThunk",
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      // Call the getAllUsers endpoint of the userApi directly, and await its response
+      const result = await dispatch(
+        userApi.endpoints.getAllUsers.initiate() // Corrected the endpoint and removed `.unwrap()`
+      ).unwrap(); // Unwraps the response for direct access to the data
+      return result; // Return the array of users directly
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to fetch users"
+      );
+    }
+  }
+);
+
 // Define the user slice
 const userSlice = createSlice({
   name: "users",
@@ -97,6 +115,46 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(getAllUsersThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      // Updated fulfilled case for getAllUsersThunk
+      .addCase(
+        getAllUsersThunk.fulfilled,
+        (state, action: PayloadAction<User[]>) => {
+          console.log(
+            "getAllUsersThunk fulfilled with payload:",
+            action.payload
+          ); // Debug: Log the payload
+
+          state.status = "succeeded";
+
+          // Transform the array of users into a Record<string, Partial<User>>
+          state.users = action.payload.reduce(
+            (acc: Record<string, Partial<User>>, user: User) => {
+              if (user._id) {
+                acc[user._id] = user;
+              }
+              return acc;
+            },
+            {}
+          );
+
+          console.log("Updated users in state:", state.users); // Debug: Log the transformed users object
+          console.log("Updated current user in state:", state.currentUser); // Debug: Log the transformed users object
+
+          console.log(
+            "Current state after fulfilling getAllUsersThunk:",
+            state
+          ); // Debug: Log the complete state
+        }
+      )
+
+      .addCase(getAllUsersThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      })
       // Handle fetchUsersByIds
       .addCase(fetchUsersByIds.pending, (state) => {
         state.status = "loading";
