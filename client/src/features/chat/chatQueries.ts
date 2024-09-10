@@ -1,12 +1,19 @@
 // src/store/queries/chatQueries.ts
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { IChat, IMessage } from "../../models/dataModels";
 import {
   generateErrorResponse,
   handleApiError,
 } from "../../utils/errorHandling";
-import { IChat, IMessage } from "../../models/dataModels";
-import { apiCall } from "../../utils/apiUtils";
+import {
+  createChat,
+  fetchAllChats,
+  fetchMessages,
+  fetchMessagesFromMultipleChats,
+  sendMessage,
+  updateReadStatus,
+} from "./api/chats";
 
 // Define the RTK Query slice for chat-related endpoints
 export const chatApi = createApi({
@@ -18,7 +25,7 @@ export const chatApi = createApi({
     fetchAllChats: builder.query<IChat[], void>({
       queryFn: async () => {
         try {
-          const chats = await apiCall<IChat[]>(`chats`, "GET");
+          const chats = await fetchAllChats();
           return { data: chats };
         } catch (error) {
           handleApiError(error, "fetchAllChats");
@@ -28,14 +35,13 @@ export const chatApi = createApi({
       providesTags: ["Chat"],
     }),
 
-    // Endpoint to fetch messages for a specific chat with pagination
-    fetchMessages: builder.query<IMessage[], { chatId: string; page?: number; limit?: number }>({
+    fetchMessages: builder.query<
+      IMessage[],
+      { chatId: string; page?: number; limit?: number }
+    >({
       queryFn: async ({ chatId, page = 1, limit = 20 }) => {
         try {
-          const messages = await apiCall<IMessage[]>(
-            `chats/${chatId}/messages?page=${page}&limit=${limit}`,
-            "GET"
-          );
+          const messages = await fetchMessages(chatId, page, limit);
           return { data: messages };
         } catch (error) {
           handleApiError(error, "fetchMessages");
@@ -44,15 +50,50 @@ export const chatApi = createApi({
       },
       providesTags: (result, _error, { chatId }) =>
         result
-          ? result.map(({ _id }) => ({ type: "Message", id: _id }))
-          : [{ type: "Message", id: chatId }],
+          ? [
+              ...result.map(({ _id }) => ({
+                type: "Message" as const,
+                id: _id,
+              })),
+              { type: "Chat" as const, id: chatId },
+            ]
+          : [{ type: "Message" as const, id: chatId }],
+    }),
+
+    fetchMessagesFromMultipleChats: builder.query<
+      { chatId: string; messages: IMessage[] }[],
+      string[]
+    >({
+      queryFn: async (chatIds) => {
+        try {
+          const messagesFromChats = await fetchMessagesFromMultipleChats(
+            chatIds
+          );
+          return { data: messagesFromChats };
+        } catch (error) {
+          handleApiError(error, "fetchMessagesFromMultipleChats");
+          return generateErrorResponse(error);
+        }
+      },
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.flatMap(({ chatId, messages }) => [
+                { type: "Chat" as const, id: chatId },
+                ...messages.map(({ _id }) => ({
+                  type: "Message" as const,
+                  id: _id,
+                })),
+              ]),
+            ]
+          : [],
     }),
 
     // Endpoint to create a new chat
     createChat: builder.mutation<IChat, Partial<IChat>>({
       queryFn: async (chatData) => {
         try {
-          const newChat = await apiCall<IChat>(`chats`, "POST", chatData);
+          const newChat = await createChat(chatData);
           return { data: newChat };
         } catch (error) {
           handleApiError(error, "createChat");
@@ -63,14 +104,13 @@ export const chatApi = createApi({
     }),
 
     // Endpoint to send a new message to a chat
-    sendMessage: builder.mutation<IMessage, { chatId: string; messageData: Partial<IMessage> }>({
+    sendMessage: builder.mutation<
+      IMessage,
+      { chatId: string; messageData: Partial<IMessage> }
+    >({
       queryFn: async ({ chatId, messageData }) => {
         try {
-          const message = await apiCall<IMessage>(
-            `chats/${chatId}/messages`,
-            "POST",
-            messageData
-          );
+          const message = await sendMessage(chatId, messageData);
           return { data: message };
         } catch (error) {
           handleApiError(error, "sendMessage");
@@ -78,28 +118,33 @@ export const chatApi = createApi({
         }
       },
       invalidatesTags: (result, _error, { chatId }) =>
-        result ? [{ type: "Message", id: result._id }, { type: "Chat", id: chatId }] : [],
+        result
+          ? [
+              { type: "Message" as const, id: result._id },
+              { type: "Chat" as const, id: chatId },
+            ]
+          : [],
     }),
 
     // Endpoint to update read status of a message
-    updateReadStatus: builder.mutation<IChat, { chatId: string; messageId: string }>({
-      queryFn: async ({ chatId, messageId }) => {
+    updateReadStatus: builder.mutation<
+      IChat,
+      { chatId: string; messageIds: string[] }
+    >({
+      queryFn: async ({ chatId, messageIds }) => {
         try {
-          const updatedChat = await apiCall<IChat>(
-            `chats/${chatId}/messages/${messageId}/read`,
-            "PATCH"
-          );
+          const updatedChat = await updateReadStatus(chatId, messageIds);
           return { data: updatedChat };
         } catch (error) {
           handleApiError(error, "updateReadStatus");
           return generateErrorResponse(error);
         }
       },
-      invalidatesTags: (result, _error, { chatId, messageId }) =>
+      invalidatesTags: (result, _error, { chatId, messageIds }) =>
         result
           ? [
-              { type: "Chat", id: chatId },
-              { type: "Message", id: messageId },
+              { type: "Chat" as const, id: chatId },
+              ...messageIds.map((id) => ({ type: "Message" as const, id })),
             ]
           : [],
     }),
@@ -109,6 +154,7 @@ export const chatApi = createApi({
 export const {
   useFetchAllChatsQuery,
   useFetchMessagesQuery,
+  useFetchMessagesFromMultipleChatsQuery,
   useCreateChatMutation,
   useSendMessageMutation,
   useUpdateReadStatusMutation,

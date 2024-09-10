@@ -1,11 +1,13 @@
 import { io, Socket } from "socket.io-client";
 import { AppStore } from "../app/store";
 import { getApiUrl } from "../config/config";
+import { fetchChatById } from "../features/chat/api/chats";
 import {
+  addChatReducer,
   addMessageReducer,
   updateReadStatusReducer,
 } from "../features/chat/chatSlice";
-import { IMessage } from "../models/dataModels";
+import { IChat, IMessage } from "../models/dataModels";
 
 // Define a variable to hold the store reference
 let store: AppStore;
@@ -22,9 +24,13 @@ class WebSocketService {
   private maxReconnectAttempts = 5;
 
   // Queues to handle offline updates
-  private offlineReadStatusQueue: Array<{ chatId: string }> = [];
+  private offlineReadStatusQueue: Array<{
+    chatId: string;
+    messageIds: string[];
+  }> = [];
   private offlineMessageQueue: Array<{ chatId: string; message: IMessage }> =
     [];
+  private offlineChatQueue: Array<{ chat: IChat }> = [];
 
   // Inject the store reference at runtime
   injectStore(_store: AppStore) {
@@ -60,14 +66,20 @@ class WebSocketService {
 
     // Flush read status updates
     while (this.offlineReadStatusQueue.length > 0) {
-      const { chatId } = this.offlineReadStatusQueue.shift()!;
-      this.emitMessageRead(chatId);
+      const { chatId, messageIds } = this.offlineReadStatusQueue.shift()!;
+      this.emitMessageRead(chatId, messageIds);
     }
 
     // Flush queued messages
     while (this.offlineMessageQueue.length > 0) {
       const { chatId, message } = this.offlineMessageQueue.shift()!;
       this.emitNewMessage(chatId, message);
+    }
+
+    // Flush queued chat creations
+    while (this.offlineChatQueue.length > 0) {
+      const { chat } = this.offlineChatQueue.shift()!;
+      this.emitNewChat(chat);
     }
   };
 
@@ -96,7 +108,7 @@ class WebSocketService {
   }
 
   // Handle incoming new message event
-  public handleNewMessage = ({
+  public handleNewMessage = async ({
     chatId,
     message,
   }: {
@@ -108,25 +120,55 @@ class WebSocketService {
       return;
     }
 
-    // Dispatch the action to update local state
-    store.dispatch(addMessageReducer({ chatId, message }));
+    // Access the current state to check if the chat exists
+    const state = store.getState();
+    const chatExists = state.chats.chats[chatId];
+
+    if (!chatExists) {
+      // Chat does not exist, fetch the entire chat data
+      console.log(`Chat with ID ${chatId} not found. Fetching chat data...`);
+
+      try {
+        const chat = await fetchChatById(chatId);
+        store.dispatch(addChatReducer(chat));
+        console.log("Chat fetched and added successfully.");
+      } catch (error) {
+        console.error("Failed to fetch and add chat:", error);
+      }
+    } else {
+      // Chat exists, dispatch the action to add the message as usual
+      store.dispatch(addMessageReducer({ chatId, message, fromServer: true }));
+    }
   };
 
   // Handle incoming message read event
   public handleMessageRead = ({
     chatId,
     userId,
+    messageIds,
   }: {
     chatId: string;
     userId: string;
+    messageIds: string[];
   }) => {
     if (!store) {
       console.error("Store has not been injected into WebSocketService.");
       return;
     }
 
-    // Dispatch the action to update the read status in local state
-    store.dispatch(updateReadStatusReducer({ chatId, userId }));
+    // Dispatch the action to update the read status in local state with message IDs
+    updateReadStatusReducer({ chatId, userId, messageIds, fromServer: true });
+  };
+
+  // Handle incoming new chat event from the server
+  public handleNewChat = ({ chat }: { chat: IChat }) => {
+    if (!store) {
+      console.error("Store has not been injected into WebSocketService.");
+      return;
+    }
+
+    // Use the server-validated chat data to update local state
+    store.dispatch(addChatReducer(chat));
   };
 
   // Emit a new message to the server
@@ -141,14 +183,26 @@ class WebSocketService {
   }
 
   // Emit a message read event to the server
-  public emitMessageRead(chatId: string) {
+  public emitMessageRead(chatId: string, messageIds: string[]) {
     if (!this.socket || !this.socket.connected) {
       console.warn("Socket disconnected. Queuing read status update.");
-      this.offlineReadStatusQueue.push({ chatId });
+      this.offlineReadStatusQueue.push({ chatId, messageIds });
       return;
     }
 
-    this.socket.emit("chat:read", { chatId });
+    this.socket.emit("chat:read", { chatId, messageIds });
+  }
+
+  // Emit a new chat creation event to the server
+  public emitNewChat(chat: IChat) {
+    if (!this.socket || !this.socket.connected) {
+      console.warn("Socket disconnected. Queuing new chat creation.");
+      this.offlineChatQueue.push({ chat });
+      return;
+    }
+
+    // Emit the chat creation event to the server
+    this.socket.emit("chat:create", { chat });
   }
 
   // Clean up and disconnect

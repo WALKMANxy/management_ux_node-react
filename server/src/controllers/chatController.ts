@@ -29,6 +29,41 @@ export class ChatController {
     }
   }
 
+  // Fetch a specific chat by its ID
+  static async fetchChatById(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
+    try {
+      const { chatId } = req.params;
+
+      // Validate chat ID format
+      if (!mongoose.Types.ObjectId.isValid(chatId)) {
+        res.status(400).json({ message: "Invalid chat ID format." });
+        return;
+      }
+
+      // Check if the user is authenticated
+      if (!req.user) {
+        res.status(401).json({ message: "User not authenticated" });
+        return;
+      }
+
+      // Fetch the chat using the service
+      const chat = await ChatService.getChatById(chatId, req.user.id);
+
+      if (!chat) {
+        res.status(404).json({ message: "Chat not found" });
+        return;
+      }
+
+      res.status(200).json(chat);
+    } catch (error) {
+      console.error("Error fetching chat:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+
   // Fetch messages for a specific chat with pagination
   static async fetchMessages(
     req: AuthenticatedRequest,
@@ -74,18 +109,50 @@ export class ChatController {
     }
   }
 
-  // Create a new chat (simple, group, or broadcast)
+  static async fetchMessagesFromMultipleChats(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
+    try {
+      const chatIds = req.query.chatIds as string[]; // Expect chatIds as query parameters
+
+      if (!chatIds || !Array.isArray(chatIds)) {
+        res.status(400).json({ message: "chatIds must be an array of IDs." });
+        return;
+      }
+
+      if (!req.user) {
+        res.status(401).json({ message: "User not authenticated" });
+        return;
+      }
+
+      // Fetch messages grouped by chat ID
+      const messagesGroupedByChat =
+        await ChatService.getMessagesFromMultipleChats(chatIds, req.user.id);
+
+      if (!messagesGroupedByChat || messagesGroupedByChat.length === 0) {
+        res.status(200).json({ message: "No messages found." });
+      } else {
+        res.status(200).json(messagesGroupedByChat);
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+
+  // Create a new chat (simple, group, or broadcast) // Create a new chat (simple, group, or broadcast)
   static async createChat(req: Request, res: Response): Promise<void> {
     try {
       const chatData = req.body;
 
-      // Validate required chat fields
       if (
         !chatData.type ||
         !["simple", "group", "broadcast"].includes(chatData.type)
       ) {
         res.status(400).json({ message: "Invalid chat type." });
       }
+
       if (
         chatData.type === "group" &&
         (!chatData.name || !chatData.participants)
@@ -95,8 +162,14 @@ export class ChatController {
           .json({ message: "Group chats must have a name and participants." });
       }
 
-      const newChat = await ChatService.createChat(chatData);
-      res.status(201).json(newChat);
+      if (!chatData.local_id) {
+        res
+          .status(400)
+          .json({ message: "local_id is required for chat creation." });
+      }
+
+      await ChatService.createChat(chatData);
+      res.status(201);
     } catch (error) {
       console.error("Error creating chat:", error);
       res.status(400).json({ message: "Failed to create chat." });
@@ -109,16 +182,16 @@ export class ChatController {
       const { chatId } = req.params;
       const messageData = req.body;
 
-      const { error, value } = messageSchema.validate({ chatId, messageData });
+      const { error } = messageSchema.validate({ chatId, messageData });
       if (error) {
         logger.warn("Validation error on chat:message", {
           error: error.message,
         });
-        return;
+        res.status(400).json({ message: error.message });
       }
 
       // Sanitize the message content to prevent XSS attacks
-      value.message.content = sanitizeHtml(value.message.content, {
+      messageData.content = sanitizeHtml(messageData.content, {
         allowedTags: [],
         allowedAttributes: {},
       });
@@ -128,43 +201,39 @@ export class ChatController {
         res.status(404).json({ message: "Chat not found." });
       }
 
-      res.status(200).json(updatedChat);
+      res.status(201);
     } catch (error) {
       console.error("Error adding message:", error);
       res.status(400).json({ message: "Failed to add message." });
     }
   }
 
-  // Update read status for a message in a chat
+  // Update read status for multiple messages in a chat
   static async updateReadStatus(
     req: AuthenticatedRequest,
     res: Response
   ): Promise<void> {
     try {
-      const { chatId, messageId } = req.params;
+      const { chatId } = req.params;
+      const { messageIds } = req.body; // Accept message IDs as an array in the request body
+
       if (!req.user) {
         res.status(401).json({ message: "User not authenticated" });
       } else {
         const userId = req.user.id;
 
-        // Validate IDs
-        if (
-          !mongoose.Types.ObjectId.isValid(chatId) ||
-          !mongoose.Types.ObjectId.isValid(messageId)
-        ) {
-          res.status(400).json({ message: "Invalid ID format." });
-        }
-
+        // Call the service to update the read status
         const updatedChat = await ChatService.updateReadStatus(
           chatId,
-          messageId,
+          messageIds,
           userId
         );
+
         if (!updatedChat) {
-          res.status(404).json({ message: "Chat or message not found." });
+          res.status(404).json({ message: "Chat or messages not found." });
         }
 
-        res.status(200).json(updatedChat);
+        res.status(201);
       }
     } catch (error) {
       console.error("Error updating read status:", error);
@@ -172,6 +241,7 @@ export class ChatController {
     }
   }
 }
+
 function sanitizeHtml(
   content: any,
   arg1: { allowedTags: never[]; allowedAttributes: {} }

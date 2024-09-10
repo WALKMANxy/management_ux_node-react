@@ -1,10 +1,9 @@
 import cookie from "cookie";
 import mongoose from "mongoose";
-import sanitizeHtml from "sanitize-html";
 import { Socket, Server as SocketIOServer } from "socket.io";
-import { Chat, IMessage } from "../models/Chat";
+import { IChat, IMessage } from "../models/Chat";
 import { User } from "../models/User";
-import { messageSchema } from "../utils/joiUtils";
+import { ChatService } from "../services/chatService";
 import { logger } from "../utils/logger";
 import { getSessionByToken } from "../utils/sessionUtils";
 
@@ -82,6 +81,7 @@ export const setupWebSocket = (io: SocketIOServer) => {
       }
     });
 
+    // Handle incoming message with client-generated local_id and server-generated _id
     socket.on(
       "chat:message",
       async ({
@@ -91,43 +91,14 @@ export const setupWebSocket = (io: SocketIOServer) => {
         chatId: string;
         message: Partial<IMessage>;
       }) => {
-        // Validate chatId and message data
-        const { error, value } = messageSchema.validate({ chatId, message });
-        if (error) {
-          logger.warn("Validation error on chat:message", {
-            error: error.message,
-          });
-          return;
-        }
-
-        // Sanitize the message content to prevent XSS attacks
-        value.message.content = sanitizeHtml(value.message.content, {
-          allowedTags: [],
-          allowedAttributes: {},
-        });
-
         try {
-          // Generate a unique ID before saving the message
-          const newMessageId = new mongoose.Types.ObjectId().toString(); // Generate unique MongoDB ID
-
-          // Update message to include server-side modifications
-          const messageToSave = {
-            ...message,
-            _id: newMessageId,
-            status: "sent",
-          };
-
-          const updatedChat = await Chat.findByIdAndUpdate(
-            chatId,
-            {
-              $push: { messages: messageToSave },
-              $set: { updatedAt: new Date() },
-            },
-            { new: true }
-          );
+          // Add the message using the service, which handles validation and updates
+          const updatedChat = await ChatService.addMessage(chatId, message);
 
           if (!updatedChat) {
-            logger.error("Chat not found", { chatId });
+            logger.error("Chat not found or message could not be added", {
+              chatId,
+            });
             return;
           }
 
@@ -138,7 +109,8 @@ export const setupWebSocket = (io: SocketIOServer) => {
               sockets.forEach((clientSocket) => {
                 clientSocket.emit("chat:newMessage", {
                   chatId,
-                  message: messageToSave,
+                  message:
+                    updatedChat.messages[updatedChat.messages.length - 1], // Send the latest message
                 });
               });
             }
@@ -148,38 +120,79 @@ export const setupWebSocket = (io: SocketIOServer) => {
         }
       }
     );
-
-    socket.on("chat:read", async ({ chatId }: { chatId: string }) => {
+    // Handle new chat creation with local_id from client and _id from server
+    socket.on("chat:create", async ({ chat }: { chat: Partial<IChat> }) => {
       try {
-        // Update all unread messages in the chat for the current user
-        const chat = await Chat.updateMany(
-          { _id: chatId, "messages.readBy": { $ne: socket.userId } },
-          { $addToSet: { "messages.$.readBy": socket.userId } },
-          { new: true }
-        );
+        // Use the createChat service method to handle chat creation
+        const createdChat = await ChatService.createChat(chat);
 
-        if (!chat) {
-          logger.error("Chat not found or no messages to update", { chatId });
-          return;
-        }
-
-        // Emit read receipt update to all participants
-        const updatedChat = await Chat.findById(chatId); // Retrieve updated chat data
-        updatedChat?.participants.forEach((participantId) => {
+        // Emit the chat (either existing or newly created) to all participants
+        createdChat.participants.forEach((participantId) => {
           const sockets = connectedClients.get(participantId.toString());
           if (sockets) {
             sockets.forEach((clientSocket) => {
-              clientSocket.emit("chat:messageRead", {
-                chatId,
-                userId: socket.userId,
+              clientSocket.emit("chat:newChat", {
+                chat: createdChat, // Send the chat object with the correct server-assigned _id
               });
             });
           }
         });
       } catch (error) {
-        logger.error("Error updating read status", { error });
+        logger.error("Error handling new chat creation", { error });
       }
     });
+
+    // Update read status for multiple messages within a chat
+    socket.on(
+      "chat:read",
+      async ({
+        chatId,
+        messageIds,
+      }: {
+        chatId: string;
+        messageIds: string[];
+      }) => {
+        // Ensure userId exists and convert it to ObjectId
+        if (!socket.userId) {
+          logger.warn("User ID is missing in the chat:read event", {
+            socketId: socket.id,
+          });
+          return;
+        }
+
+        const userObjectId = new mongoose.Types.ObjectId(socket.userId);
+
+        try {
+          // Use the service to update the read status of the specified messages
+          const updatedChat = await ChatService.updateReadStatus(
+            chatId,
+            messageIds,
+            userObjectId.toString()
+          );
+
+          if (!updatedChat) {
+            logger.error("Chat not found or no messages to update", { chatId });
+            return;
+          }
+
+          // Emit the read status update to all participants
+          updatedChat.participants.forEach((participantId) => {
+            const sockets = connectedClients.get(participantId.toString());
+            if (sockets) {
+              sockets.forEach((clientSocket) => {
+                clientSocket.emit("chat:messageRead", {
+                  chatId,
+                  userId: socket.userId,
+                  messageIds, // Send back the read message IDs
+                });
+              });
+            }
+          });
+        } catch (error) {
+          logger.error("Error updating read status", { error });
+        }
+      }
+    );
 
     socket.on("logout", () => {
       logger.info("Client logout requested", {
