@@ -1,6 +1,4 @@
 //src/features/auth/authSlice.ts
-/* console.log('Initializing authSlice');
- */
 
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
@@ -86,9 +84,16 @@ export const { login, logout } = authSlice.actions;
 
 export default authSlice.reducer;
 
-// Selectors
+// Memoized selectors using reselect
+
+// Selector to get the logged-in state
 export const selectIsLoggedIn = (state: { auth: AuthState }) =>
   state.auth.isLoggedIn;
+
+// Selector to get the user role
 export const selectUserRole = (state: { auth: AuthState }) => state.auth.role;
+
+// Selector to get the user ID
 export const selectUserId = (state: { auth: AuthState }) => state.auth.userId;
+
 export const selectId = (state: { auth: AuthState }) => state.auth.id;

@@ -5,8 +5,10 @@ export const fetchAllAdmins = (req: Request, res: Response) => {
   try {
     const admins = getAllAdmins();
     res.json(admins);
+    return;
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
+    return;
   }
 };
 
@@ -19,5 +21,6 @@ export const fetchAdminById = (req: Request, res: Response) => {
     res.json(admin);
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
+    return;
   }
 };

@@ -18,14 +18,17 @@ export class ChatController {
         const userId = req.user.id; // Assuming user ID is available in the request object after authentication
         const chats = await ChatService.getAllChats(userId);
         res.status(200).json(chats);
+        return;
       } else {
         res.status(401).json({ message: "User not authenticated" });
+        return;
       }
     } catch (error) {
       res.status(500).json({
         message:
           error instanceof Error ? error.message : "Internal Server Error",
       });
+      return;
     }
   }
 
@@ -61,6 +64,7 @@ export class ChatController {
     } catch (error) {
       console.error("Error fetching chat:", error);
       res.status(500).json({ message: "Internal Server Error" });
+      return;
     }
   }
 
@@ -77,15 +81,18 @@ export class ChatController {
       // Validate chatId format
       if (!mongoose.Types.ObjectId.isValid(chatId)) {
         res.status(400).json({ message: "Invalid chat ID format." });
+        return;
       }
 
       // Validate pagination parameters
       if (page < 1 || limit < 1) {
         res.status(400).json({ message: "Invalid pagination parameters." });
+        return;
       }
 
       if (!req.user) {
         res.status(401).json({ message: "User not authenticated" });
+        return;
       } else {
         // Fetch messages using the service, including the participant check
         const messages = await ChatService.getMessages(
@@ -95,17 +102,16 @@ export class ChatController {
           limit
         );
 
-        // Check if messages are returned and respond appropriately
-        if (!messages || messages.length === 0) {
-          res.status(200).json({ message: "No messages found." });
-        }
-
         // Return the messages if found
         res.status(200).json(messages);
+        return;
       }
     } catch (error) {
       console.error("Error fetching messages:", error);
-      res.status(500).json({ message: "Internal Server Error" });
+      if (!res.headersSent) {
+        // Check to prevent double response
+        res.status(500).json({ message: "Internal Server Error" });
+      }
     }
   }
 
@@ -130,11 +136,8 @@ export class ChatController {
       const messagesGroupedByChat =
         await ChatService.getMessagesFromMultipleChats(chatIds, req.user.id);
 
-      if (!messagesGroupedByChat || messagesGroupedByChat.length === 0) {
-        res.status(200).json({ message: "No messages found." });
-      } else {
-        res.status(200).json(messagesGroupedByChat);
-      }
+      res.status(200).json(messagesGroupedByChat);
+      return;
     } catch (error) {
       console.error("Error fetching messages:", error);
       res.status(500).json({ message: "Internal Server Error" });
@@ -151,6 +154,7 @@ export class ChatController {
         !["simple", "group", "broadcast"].includes(chatData.type)
       ) {
         res.status(400).json({ message: "Invalid chat type." });
+        return;
       }
 
       if (
@@ -160,16 +164,19 @@ export class ChatController {
         res
           .status(400)
           .json({ message: "Group chats must have a name and participants." });
+        return;
       }
 
       if (!chatData.local_id) {
         res
           .status(400)
           .json({ message: "local_id is required for chat creation." });
+        return;
       }
 
       await ChatService.createChat(chatData);
       res.status(201);
+      return;
     } catch (error) {
       console.error("Error creating chat:", error);
       res.status(400).json({ message: "Failed to create chat." });
@@ -188,6 +195,7 @@ export class ChatController {
           error: error.message,
         });
         res.status(400).json({ message: error.message });
+        return;
       }
 
       // Sanitize the message content to prevent XSS attacks
@@ -199,12 +207,15 @@ export class ChatController {
       const updatedChat = await ChatService.addMessage(chatId, messageData);
       if (!updatedChat) {
         res.status(404).json({ message: "Chat not found." });
+        return;
       }
 
       res.status(201);
+      return;
     } catch (error) {
       console.error("Error adding message:", error);
       res.status(400).json({ message: "Failed to add message." });
+      return;
     }
   }
 
@@ -219,6 +230,7 @@ export class ChatController {
 
       if (!req.user) {
         res.status(401).json({ message: "User not authenticated" });
+        return;
       } else {
         const userId = req.user.id;
 
@@ -231,13 +243,16 @@ export class ChatController {
 
         if (!updatedChat) {
           res.status(404).json({ message: "Chat or messages not found." });
+          return;
         }
 
         res.status(201);
+        return;
       }
     } catch (error) {
       console.error("Error updating read status:", error);
       res.status(400).json({ message: "Failed to update read status." });
+      return;
     }
   }
 }

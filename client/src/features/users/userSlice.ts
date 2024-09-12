@@ -1,6 +1,7 @@
 // src/store/slices/userSlice.ts
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WritableDraft } from "immer";
+import { createSelector } from "reselect";
 import { RootState } from "../../app/store";
 import { User } from "../../models/entityModels";
 import { userApi } from "./userQueries";
@@ -217,9 +218,35 @@ export const { clearUserData, setCurrentUser, updateUser } = userSlice.actions;
 
 export default userSlice.reducer;
 
-// Selectors
-export const selectUserById = (state: RootState, userId: string) =>
-  state.users.users[userId];
-export const selectUsersStatus = (state: RootState) => state.users.status;
-export const selectUsersError = (state: RootState) => state.users.error;
-export const selectCurrentUser = (state: RootState) => state.users.currentUser;
+// Memoized selector to select a user by ID
+export const selectUserById = createSelector(
+  [
+    (state: RootState) => state.users.users,
+    (_: RootState, userId: string) => userId,
+  ],
+  (users, userId) => users[userId]
+);
+
+// Memoized selector to get all users as an array
+export const selectAllUsers = createSelector(
+  (state: RootState) => state.users.users,
+  (users) => Object.values(users)
+);
+
+// Memoized selector to select the status of user operations
+export const selectUsersStatus = createSelector(
+  (state: RootState) => state.users.status,
+  (status) => status
+);
+
+// Memoized selector to select the error state for user operations
+export const selectUsersError = createSelector(
+  (state: RootState) => state.users.error,
+  (error) => error
+);
+
+// Memoized selector to select the current user
+export const selectCurrentUser = createSelector(
+  (state: RootState) => state.users.currentUser,
+  (currentUser) => currentUser
+);
