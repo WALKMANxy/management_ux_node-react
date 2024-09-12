@@ -4,29 +4,46 @@ import {
   Avatar,
   Badge,
   Box,
+  Divider,
   IconButton,
   Menu,
   MenuItem,
+  Paper,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import useChatLogic from "../../hooks/useChatsLogic";
 import { IMessage } from "../../models/dataModels";
 import InputBox from "./InputBox";
 import MessageBubble from "./MessageBubble";
 
 const ChatView: React.FC = () => {
-  const { messages } = useChatLogic();
-  const currentChat = useSelector(
-    (state: RootState) => state.chats.currentChat
+  // First, get the currentChatId from the currentChat state
+  const currentChatId = useSelector(
+    (state: RootState) => state.chats.currentChat?._id
   );
+
+  // Get the correct chat from the chats state
+  const currentChat = useSelector((state: RootState) =>
+    currentChatId ? state.chats.chats[currentChatId] : null
+  );
+
+  // Sort messages by timestamp before rendering
+  const sortedMessages = useMemo(() => {
+    return currentChat?.messages
+      ? [...currentChat.messages].sort(
+          (a, b) =>
+            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        )
+      : [];
+  }, [currentChat?.messages]);
+
   const currentUserId = useSelector((state: RootState) => state.auth.userId);
   const users = useSelector((state: RootState) => state.users.users);
-
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(menuAnchorEl);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null); // Ref to scroll to the latest message
 
   // Handler for opening the options menu
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -38,9 +55,32 @@ const ChatView: React.FC = () => {
     setMenuAnchorEl(null);
   };
 
+  // Extracted layout logic for individual messages based on sender and chat type
+  const renderMessage = (message: IMessage) => {
+    const isOwnMessage = message.sender === currentUserId;
+
+    return (
+      <Box
+        key={message._id}
+        sx={{
+          display: "flex",
+          justifyContent: isOwnMessage ? "flex-end" : "flex-start", // Anchor to the correct side
+          mb: 2,
+        }}
+      >
+        {/* Render the MessageBubble with correct layout */}
+        <MessageBubble
+          message={message}
+          participantsData={participantsData}
+          chatType={currentChat?.type || "simple"}
+        />
+      </Box>
+    );
+  };
+
   // Dynamic participants avatar rendering based on chat type
   const renderParticipantsAvatars = () => {
-    if (currentChat?.type === "simple") return null;
+    if (!currentChat || currentChat.type === "simple") return null;
 
     const participantsData =
       currentChat?.participants?.map((participantId) => users[participantId]) ||
@@ -108,7 +148,9 @@ const ChatView: React.FC = () => {
 
   // Determine the chat title and admin avatar based on chat type
   const getChatTitle = () => {
-    if (currentChat?.type === "simple" && currentChat.participants) {
+    if (!currentChat) return "Chat";
+
+    if (currentChat.type === "simple" && currentChat.participants) {
       const participantId = currentChat.participants.find(
         (id) => id !== currentUserId
       );
@@ -131,15 +173,42 @@ const ChatView: React.FC = () => {
     }
     return null;
   };
+
+  // Scroll to the latest message whenever a new message is added
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [sortedMessages]);
+
+  // Fallback if currentChat is not set
+  if (!currentChat) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          bgcolor: "#ffffff",
+        }}
+      >
+        <Typography variant="h6" color="textSecondary">
+          No chat selected. Please select a chat to view.
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box
       className="animate__animated animate__fadeInRight animate__faster"
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: "100vh",
+        height: "100%", // Fill the available height
         p: 2,
         bgcolor: "#ffffff",
+        borderTopRightRadius: 12, // Apply radius to the top-left corner
+        borderBottomRightRadius: 12, // Apply radius to the bottom-left corner
       }}
     >
       {/* Chat Header */}
@@ -149,6 +218,7 @@ const ChatView: React.FC = () => {
           alignItems: "center",
           justifyContent: "space-between",
           mb: 2,
+          flexShrink: 0, // Prevent shrinking of the header
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -182,29 +252,48 @@ const ChatView: React.FC = () => {
           ))}
         </Menu>
       </Box>
-
+      <Divider sx={{ mb: 2 }} />
       {/* Messages Display */}
-      <Box
+
+      <Paper
+        elevation={1}
         sx={{
-          flexGrow: 1,
-          overflowY: "auto",
-          p: 2,
-          bgcolor: "#f9f9f9",
-          borderRadius: 2,
+          borderRadius: "1.5em", // Rounded corners for the paper
+          flexGrow: 1, // Allows this section to take the available space
+          overflowY: "auto", // Enable scrolling for messages
+          "&::-webkit-scrollbar": {
+            display: "none", // Hide the scrollbar
+          },
         }}
       >
-        {messages.map((message: IMessage) => (
-          <MessageBubble
-            key={message._id}
-            message={message}
-            participantsData={participantsData}
-            chatType={currentChat?.type || "simple"} // Pass the chat type
-          />
-        ))}
-      </Box>
-
+        <Box
+          sx={{
+            flexGrow: 1, // Allows this section to take the available space
+            overflowY: "auto", // Enable scrolling for messages
+            p: 1,
+            bgcolor: "#f9f9f9",
+            borderRadius: 6,
+            "&::-webkit-scrollbar": {
+              display: "none", // Hide the scrollbar
+            },
+          }}
+        >
+          {sortedMessages.map((message: IMessage) => renderMessage(message))}
+          <div ref={messagesEndRef} />
+        </Box>
+      </Paper>
       {/* Message Input Box */}
-      <InputBox />
+      <Box
+        sx={{
+          mt: 2,
+          flexShrink: 0, // Prevent shrinking of the input box
+          borderRadius: "25px", // Rounded corners for the input box
+        }}
+      >
+        <InputBox
+        // Optional props to handle input focus when sending a message, depending on InputBox's implementation
+        />
+      </Box>
     </Box>
   );
 };

@@ -6,8 +6,8 @@ import { chatApi } from "../features/chat/chatQueries";
 import { dataApi } from "../features/data/dataQueries";
 import { userApi } from "../features/users/userQueries";
 import { loadAuthState, saveAuthState } from "../utils/localStorage";
-import rootReducer from "./rootReducer";
 import listenerMiddleware from "./listeners";
+import rootReducer from "./rootReducer";
 
 const preloadedState: Partial<RootState> = {
   auth: loadAuthState(),

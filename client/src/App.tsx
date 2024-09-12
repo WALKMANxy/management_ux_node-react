@@ -131,46 +131,47 @@ function App() {
 
   useEffect(() => {
     const initializeApp = async () => {
-      console.debug("Initializing app...");
-
+      /*       console.debug("Initializing app...");
+       */
       // Check if the auth state is present in the local storage
       const localAuthState = localStorage.getItem("authState");
-      console.debug("Local auth state:", localAuthState);
-
+      /*       console.debug("Local auth state:", localAuthState);
+       */
       // If the auth state is present and the user is logged in
       if (localAuthState) {
         const storedAuthState = JSON.parse(localAuthState);
-        console.debug("Parsed auth state:", storedAuthState);
-
+        /*         console.debug("Parsed auth state:", storedAuthState);
+         */
         // Check if user is logged in and has a valid role (not "guest")
         if (storedAuthState.isLoggedIn && storedAuthState.role !== "guest") {
-          console.debug("User is logged in with role:", storedAuthState.role);
-
+          /*           console.debug("User is logged in with role:", storedAuthState.role);
+           */
           // Attempt to refresh the session to validate and extend it on the server side
           const refreshSuccessful = await refreshSession();
-          console.debug("Session refresh result:", refreshSuccessful);
-
+          /*           console.debug("Session refresh result:", refreshSuccessful);
+           */
           if (refreshSuccessful) {
             // Fetch current user data based on user ID stored in auth state
             if (storedAuthState.userId) {
-              console.debug(
+              /* console.debug(
                 "Fetching user data for user ID:",
                 storedAuthState.userId
               );
-
+ */
               // Fetch the current user and update userSlice
               try {
                 const user = await dispatch(
                   fetchUserById(storedAuthState.userId)
                 ).unwrap();
-                console.debug("Fetched user data:", user);
-
+                /*                 console.debug("Fetched user data:", user);
+                 */
                 dispatch(setCurrentUser(user)); // Update the userSlice with the fetched user
               } catch (error) {
                 console.error("Failed to fetch current user:", error);
               }
             } else {
-              console.warn("User ID not found in stored auth state.");
+              /*               console.warn("User ID not found in stored auth state.");
+               */
             }
           } else {
             console.warn("Session refresh failed or session expired.");
@@ -182,7 +183,8 @@ function App() {
           );
         }
       } else {
-        console.warn("No auth state found in session storage.");
+        /*         console.warn("No auth state found in session storage.");
+         */
         // Optionally handle redirect to login or other logic here
       }
     };
