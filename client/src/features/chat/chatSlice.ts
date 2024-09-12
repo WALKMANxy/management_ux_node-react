@@ -1,38 +1,42 @@
 // src/store/slices/chatSlice.ts
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WritableDraft } from "immer";
+import { createSelector } from "reselect";
 import { RootState } from "../../app/store";
 import { IChat, IMessage } from "../../models/dataModels";
-import { chatApi } from "./chatQueries";
+import {
+  createChat,
+  fetchAllChats,
+  fetchMessages,
+  fetchMessagesFromMultipleChats,
+  sendMessage,
+  updateReadStatus,
+} from "./api/chats";
 
-// Define the initial state
+// Define the simplified ChatState without the messages field
 interface ChatState {
-  chats: Record<string, IChat>;
-  messages: Record<string, IMessage>; // Flat structure
-  messageIdsByChat: Record<string, string[]>; // Mapping chatId to message IDs
-  currentChat: IChat | null;
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error: string | null;
+  chats: Record<string, IChat>; // Store chats by their IDs
+  currentChat: IChat | null; // Currently selected chat
+  status: "idle" | "loading" | "succeeded" | "failed"; // Status of the chat fetching/operations
+  error: string | null; // To store any errors
 }
 
+// Define the initial state without the messages field
 const initialState: ChatState = {
-  chats: {},
-  messages: {},
-  messageIdsByChat: {},
-  currentChat: null,
-  status: "idle",
-  error: null,
+  chats: {}, // Chats stored by chat ID
+  currentChat: null, // No chat selected initially
+  status: "idle", // Initial status
+  error: null, // No errors initially
 };
 
 // Async thunk to fetch all chats for the user
+// Refactored async thunk to fetch all chats for the user
 export const fetchAllChatsThunk = createAsyncThunk(
   "chats/fetchAllChatsThunk",
-  async (_, { dispatch, rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const result = await dispatch(
-        chatApi.endpoints.fetchAllChats.initiate()
-      ).unwrap();
-      return result;
+      const result = await fetchAllChats(); // Direct API call
+      return result; // Return the fetched chats
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : "Failed to fetch chats"
@@ -40,22 +44,21 @@ export const fetchAllChatsThunk = createAsyncThunk(
     }
   }
 );
-// Async thunk to fetch messages for a specific chat
+
+// Refactored async thunk to fetch messages for a specific chat
 export const fetchMessagesThunk = createAsyncThunk(
   "chats/fetchMessagesThunk",
   async (
     {
       chatId,
       page = 1,
-      limit = 20,
+      limit = 100,
     }: { chatId: string; page?: number; limit?: number },
-    { dispatch, rejectWithValue }
+    { rejectWithValue }
   ) => {
     try {
-      const result = await dispatch(
-        chatApi.endpoints.fetchMessages.initiate({ chatId, page, limit })
-      ).unwrap();
-      return { chatId, messages: result };
+      const messages = await fetchMessages(chatId, page, limit); // Direct API call
+      return { chatId, messages }; // Return the chatId and fetched messages
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : "Failed to fetch messages"
@@ -64,14 +67,13 @@ export const fetchMessagesThunk = createAsyncThunk(
   }
 );
 
+// Refactored async thunk to fetch messages from multiple chats
 export const fetchMessagesFromMultipleChatsThunk = createAsyncThunk(
   "chats/fetchMessagesFromMultipleChatsThunk",
-  async (chatIds: string[], { dispatch, rejectWithValue }) => {
+  async (chatIds: string[], { rejectWithValue }) => {
     try {
-      const result = await dispatch(
-        chatApi.endpoints.fetchMessagesFromMultipleChats.initiate(chatIds)
-      ).unwrap();
-      return result;
+      const result = await fetchMessagesFromMultipleChats(chatIds); // Direct API call
+      return result; // Return the fetched messages from multiple chats
     } catch (error) {
       return rejectWithValue(
         error instanceof Error
@@ -83,14 +85,13 @@ export const fetchMessagesFromMultipleChatsThunk = createAsyncThunk(
 );
 
 // Async thunk to create a new chat
+// Refactored async thunk to create a new chat
 export const createChatThunk = createAsyncThunk(
   "chats/createChatThunk",
-  async (chatData: Partial<IChat>, { dispatch, rejectWithValue }) => {
+  async (chatData: Partial<IChat>, { rejectWithValue }) => {
     try {
-      const result = await dispatch(
-        chatApi.endpoints.createChat.initiate(chatData)
-      ).unwrap();
-      return result;
+      const result = await createChat(chatData); // Direct API call
+      return result; // Return the created chat
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : "Failed to create chat"
@@ -100,17 +101,16 @@ export const createChatThunk = createAsyncThunk(
 );
 
 // Async thunk to create a new message
+// Refactored async thunk to create a new message
 export const createMessageThunk = createAsyncThunk(
   "messages/createMessageThunk",
   async (
     { chatId, messageData }: { chatId: string; messageData: Partial<IMessage> },
-    { dispatch, rejectWithValue }
+    { rejectWithValue }
   ) => {
     try {
-      const result = await dispatch(
-        chatApi.endpoints.sendMessage.initiate({ chatId, messageData })
-      ).unwrap();
-      return { chatId, message: result };
+      const message = await sendMessage(chatId, messageData); // Direct API call
+      return { chatId, message }; // Return the chatId and created message
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : "Failed to send message"
@@ -120,17 +120,16 @@ export const createMessageThunk = createAsyncThunk(
 );
 
 // New async thunk to update read status for multiple messages
+// Refactored async thunk to update read status for multiple messages
 export const updateReadStatusThunk = createAsyncThunk(
   "chats/updateReadStatusThunk",
   async (
     { chatId, messageIds }: { chatId: string; messageIds: string[] },
-    { dispatch, rejectWithValue }
+    { rejectWithValue }
   ) => {
     try {
-      const result = await dispatch(
-        chatApi.endpoints.updateReadStatus.initiate({ chatId, messageIds })
-      ).unwrap();
-      return result;
+      const result = await updateReadStatus(chatId, messageIds); // Direct API call
+      return result; // Return the updated chat with read statuses
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : "Failed to update read status"
@@ -146,8 +145,6 @@ const chatSlice = createSlice({
   reducers: {
     clearChatData: (state) => {
       state.chats = {};
-      state.messages = {};
-      state.messageIdsByChat = {};
       state.currentChat = null;
       state.status = "idle";
       state.error = null;
@@ -155,101 +152,171 @@ const chatSlice = createSlice({
     setCurrentChatReducer: (state, action: PayloadAction<IChat>) => {
       state.currentChat = action.payload;
     },
+    // New reducer to clear currentChat
+    clearCurrentChatReducer: (state) => {
+      state.currentChat = null;
+    },
     addMessageReducer: (
       state,
       action: PayloadAction<{
         chatId: string;
         message: IMessage;
-        fromServer?: boolean; // New flag to distinguish server-originated actions
+        fromServer?: boolean; // Flag to distinguish server-originated actions
       }>
     ) => {
-      const { chatId, message, fromServer } = action.payload;
+      const { chatId, message } = action.payload;
 
-      if (fromServer) return; // Skip processing if the action is from the server
+      // Retrieve the chat from the state
+      const chat = state.chats[chatId];
 
-      // Ensure the chat exists
-      if (!state.chats[chatId]) {
+      // Check if the chat exists
+      if (!chat) {
         console.error("Chat does not exist in the state.");
-        return;
+        return state; // Return the existing state if chat doesn't exist
       }
 
-      // Determine the message ID
-      const messageId = message.local_id;
+      // Create a new messages array with the updated message
+      const updatedMessages = [...chat.messages];
+      const existingMessageIndex = updatedMessages.findIndex(
+        (msg) => msg.local_id === message.local_id
+      );
 
-      // If the message already exists, update status and _id
-      if (messageId && state.messages[messageId]) {
-        const existingMessage = state.messages[messageId];
-        existingMessage.status = message.status;
-        existingMessage._id = message._id;
-        return;
+      if (existingMessageIndex !== -1) {
+        // Update the existing message
+        updatedMessages[existingMessageIndex] = {
+          ...updatedMessages[existingMessageIndex],
+          ...message,
+        };
+      } else {
+        // Add the new message
+        updatedMessages.push(message);
       }
 
-      // Add the new message to the state using local_id if available
-      if (messageId) {
-        state.messages[messageId] = message;
+      // Sort the updated messages by timestamp
+      updatedMessages.sort(
+        (a, b) =>
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
 
-        // Update the message IDs for the corresponding chat
-        if (!state.messageIdsByChat[chatId]) {
-          state.messageIdsByChat[chatId] = [];
-        }
-        state.messageIdsByChat[chatId].push(messageId);
-      }
+      // Return a new state object with the updated chat, ensuring immutability
+      return {
+        ...state,
+        chats: {
+          ...state.chats,
+          [chatId]: {
+            ...chat,
+            messages: updatedMessages,
+            updatedAt: new Date(),
+          },
+        },
+      };
     },
 
     updateReadStatusReducer: (
       state,
       action: PayloadAction<{
-        chatId: string; // Required for other components;
+        chatId: string; // Required for other components
         userId: string;
         messageIds: string[];
-        fromServer?: boolean; // New flag to distinguish server-originated actions
+        fromServer?: boolean; // Flag to distinguish server-originated actions
       }>
     ) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { chatId, userId, messageIds, fromServer } = action.payload;
+      const { chatId, userId, messageIds } = action.payload;
 
-      if (fromServer) return; // Skip processing if the action is from the server
+      // Retrieve the chat from the state
+      const chat = state.chats[chatId];
 
-      // Optional: Use `chatId` in a way that does not affect the reducer logic
-      // console.log(`Updating read status for chat: ${chatId}`); // Uncomment if logging helps
+      // Check if the chat exists
+      if (!chat) {
+        console.error(`Chat with ID ${chatId} does not exist in the state.`);
+        return state; // Return the existing state if chat doesn't exist
+      }
 
-      // Update the read status for the specified message IDs
-      messageIds.forEach((messageId) => {
-        const message = state.messages[messageId];
-        if (message && !message.readBy.includes(userId)) {
-          message.readBy.push(userId);
+      // Create a new array of messages with updated read statuses
+      const updatedMessages = chat.messages.map((message) => {
+        if (messageIds.includes(message.local_id || message._id)) {
+          // Create a new message object with updated readBy array if userId is not already included
+          return {
+            ...message,
+            readBy: message.readBy.includes(userId)
+              ? message.readBy
+              : [...message.readBy, userId],
+          };
         }
+        return message;
       });
+
+      // Return a new state object with the updated chat, ensuring immutability
+      return {
+        ...state,
+        chats: {
+          ...state.chats,
+          [chatId]: {
+            ...chat,
+            messages: updatedMessages,
+            updatedAt: new Date(),
+          },
+        },
+      };
     },
 
     markMessagesAsReadReducer: (
       state,
       action: PayloadAction<{ chatId: string; currentUserId: string }>
     ) => {
-      const { chatId, currentUserId } = action.payload; // Extract currentUserId from the action payload
-      const messageIds = state.messageIdsByChat[chatId];
+      const { chatId, currentUserId } = action.payload;
 
-      if (messageIds) {
-        messageIds.forEach((messageId) => {
-          const message = state.messages[messageId];
+      // Retrieve the chat by its ID
+      const chat = state.chats[chatId];
 
-          // Check if the message exists, is not sent by the current user, and hasn't been marked as read
-          if (
-            message &&
-            !message.readBy.includes(currentUserId) // Ensure the user hasn't already read the message
-          ) {
-            message.readBy.push(currentUserId); // Mark the message as read by the current user
-          }
-        });
+      // Check if the chat exists
+      if (!chat) {
+        console.error(`Chat with ID ${chatId} does not exist in the state.`);
+        return state; // Return the existing state if chat doesn't exist
       }
+
+      // Create a new array of messages with updated read statuses
+      const updatedMessages = chat.messages.map((message) => {
+        // Ensure the message is not sent by the current user and hasn't been marked as read by them
+        if (
+          message.sender !== currentUserId &&
+          !message.readBy.includes(currentUserId)
+        ) {
+          // Return a new message object with updated readBy array
+          return {
+            ...message,
+            readBy: [...message.readBy, currentUserId],
+          };
+        }
+        return message;
+      });
+
+      // Return a new state object with the updated chat, ensuring immutability
+      return {
+        ...state,
+        chats: {
+          ...state.chats,
+          [chatId]: {
+            ...chat,
+            messages: updatedMessages,
+            updatedAt: new Date(),
+          },
+        },
+      };
     },
+
     addChatReducer: (state, action: PayloadAction<IChat>) => {
       const chat = action.payload;
-      state.chats[chat._id] = chat;
-      state.messageIdsByChat[chat._id] = chat.messages.map((msg) => msg._id);
-      chat.messages.forEach((msg) => {
-        state.messages[msg._id] = msg;
-      });
+
+      // Return a new state object with the added chat, ensuring immutability
+      return {
+        ...state,
+        chats: {
+          ...state.chats,
+          [chat._id]: chat, // Add the new chat using its _id as the key
+        },
+        status: "succeeded", // Update status to reflect successful addition
+      };
     },
   },
   extraReducers: (builder) => {
@@ -258,12 +325,14 @@ const chatSlice = createSlice({
         state.status = "loading";
         state.error = null;
       })
+
       .addCase(fetchAllChatsThunk.fulfilled, (state, action) => {
         state.status = "succeeded";
         action.payload.forEach((chat: WritableDraft<IChat>) => {
           state.chats[chat._id] = chat;
         });
       })
+
       .addCase(fetchAllChatsThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
@@ -274,25 +343,45 @@ const chatSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchMessagesThunk.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.status = "succeeded"; // Update the status to reflect success
         const { chatId, messages } = action.payload;
 
-        messages.forEach((message: IMessage) => {
-          // Prefer local_id for state consistency
-          const messageId = message.local_id;
-          if (messageId) {
-            state.messages[messageId] = message;
-            // Avoid pushing duplicate message IDs
-            if (!state.messageIdsByChat[chatId]) {
-              state.messageIdsByChat[chatId] = [];
-            }
-            if (!state.messageIdsByChat[chatId].includes(messageId)) {
-              state.messageIdsByChat[chatId].push(messageId);
-            }
-          } else {
-            console.error(`Message missing _id: ${JSON.stringify(message)}`);
-          }
+        // Ensure the chat exists in the state
+        const chat = state.chats[chatId];
+        if (!chat) {
+          console.error(`Chat with ID ${chatId} does not exist in the state.`);
+          return;
+        }
+
+        // Combine existing messages with the newly fetched messages
+        const combinedMessages = [...chat.messages, ...messages];
+
+        // Create a map to eliminate duplicates, using local_id as the key
+        const messageMap = new Map();
+        combinedMessages.forEach((message) => {
+          messageMap.set(message.local_id, message);
         });
+
+        // Convert the map back to an array and sort by timestamp
+        const sortedMessages = Array.from(messageMap.values()).sort(
+          (a, b) =>
+            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        );
+
+        // Update the state immutably
+        state.chats = {
+          ...state.chats,
+          [chatId]: {
+            ...chat,
+            messages: sortedMessages, // Ensure a new reference for the messages array
+          },
+        };
+
+        // Optional: Log the updated chat object for debugging purposes
+        console.log(
+          `Messages updated for chat with ID: ${chatId}`,
+          sortedMessages
+        );
       })
 
       .addCase(fetchMessagesThunk.rejected, (state, action) => {
@@ -301,29 +390,56 @@ const chatSlice = createSlice({
       })
 
       // Handle fetchMessagesFromMultipleChatsThunk
-      .addCase(fetchMessagesFromMultipleChatsThunk.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
       .addCase(
         fetchMessagesFromMultipleChatsThunk.fulfilled,
         (state, action) => {
-          state.status = "succeeded";
+          state.status = "succeeded"; // Update status to indicate success
+
+          // Create a copy of the chats to avoid direct mutations
+          const updatedChats = { ...state.chats };
+
+          // Iterate over each chat's messages from the payload
           action.payload.forEach(({ chatId, messages }) => {
-            // Add messages to state ensuring that each chat's messages are up-to-date
+            // Ensure the chat exists in the copied state
+            const chat = updatedChats[chatId];
+            if (!chat) {
+              console.error(
+                `Chat with ID ${chatId} does not exist in the state.`
+              );
+              return;
+            }
+
+            // Create a map of existing messages for quick lookups by local_id
+            const existingMessagesMap = new Map(
+              chat.messages.map((msg) => [msg.local_id, msg])
+            );
+
+            // Merge or update the fetched messages
             messages.forEach((message) => {
-              const messageId = message.local_id || message._id;
-              if (messageId) {
-                state.messages[messageId] = message;
-                if (!state.messageIdsByChat[chatId]) {
-                  state.messageIdsByChat[chatId] = [];
-                }
-                if (!state.messageIdsByChat[chatId].includes(messageId)) {
-                  state.messageIdsByChat[chatId].push(messageId);
-                }
-              }
+              existingMessagesMap.set(message.local_id, {
+                ...existingMessagesMap.get(message.local_id),
+                ...message,
+              });
             });
+
+            // Update the chat messages by converting the map back to an array
+            updatedChats[chatId] = {
+              ...chat,
+              messages: Array.from(existingMessagesMap.values()).sort(
+                (a, b) =>
+                  new Date(a.timestamp).getTime() -
+                  new Date(b.timestamp).getTime()
+              ),
+            };
+
+            // Optional: Log the updated state for debugging purposes
+            console.log(
+              `Updated chat with ID: ${chatId} - Messages count: ${updatedChats[chatId].messages.length}`
+            );
           });
+
+          // Assign the updated chats back to the state
+          state.chats = updatedChats;
         }
       )
 
@@ -353,30 +469,35 @@ const chatSlice = createSlice({
         state.error = null;
       })
       .addCase(createMessageThunk.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.status = "succeeded"; // Update status to indicate the action was successful
         const { chatId, message } = action.payload;
 
-        // Ensure the chat exists
-        if (!state.chats[chatId]) {
-          console.error(`Chat with id ${chatId} does not exist.`);
+        // Find the chat by its ID
+        const chat = state.chats[chatId];
+        if (!chat) {
+          console.error(`Chat with ID ${chatId} does not exist.`);
           return;
         }
 
-        // Use local_id
-        const messageId = message.local_id;
-        if (messageId) {
-          state.messages[messageId] = message;
+        // Use local_id for consistency and prevent duplicates
+        const existingMessageIndex = chat.messages.findIndex(
+          (msg) => msg.local_id === message.local_id
+        );
 
-          // Add the message ID to the corresponding chat
-          if (!state.messageIdsByChat[chatId]) {
-            state.messageIdsByChat[chatId] = [];
-          }
-          if (!state.messageIdsByChat[chatId].includes(messageId)) {
-            state.messageIdsByChat[chatId].push(messageId);
-          }
+        if (existingMessageIndex === -1) {
+          // If the message does not exist, add it to the chat's messages array
+          chat.messages.push(message);
+          console.log(`Message added to chat ${chatId}`);
         } else {
-          console.error(`Message missing _id: ${JSON.stringify(message)}`);
+          // If the message exists, update the existing message
+          chat.messages[existingMessageIndex] = message;
+          console.log(`Message updated in chat ${chatId}`);
         }
+
+        // Optional: Log the updated state for debugging purposes
+        console.log(
+          `Updated chat with ID: ${chatId} - Messages count: ${chat.messages.length}`
+        );
       })
 
       .addCase(createMessageThunk.rejected, (state, action) => {
@@ -389,6 +510,7 @@ const chatSlice = createSlice({
 export const {
   clearChatData,
   setCurrentChatReducer,
+  clearCurrentChatReducer,
   addMessageReducer,
   updateReadStatusReducer,
   markMessagesAsReadReducer,
@@ -397,15 +519,59 @@ export const {
 
 export default chatSlice.reducer;
 
-// Selectors
-export const selectChatById = (state: RootState, chatId: string) =>
-  state.chats.chats[chatId];
+// Memoized selector for all chats
+export const selectAllChats = createSelector(
+  (state: RootState) => state.chats.chats,
+  (chats) => Object.values(chats)
+);
 
-export const selectMessagesByChatId = (state: RootState, chatId: string) =>
-  state.chats.messageIdsByChat[chatId]?.map(
-    (messageId: string) => state.chats.messages[messageId]
-  ) || [];
+// Memoized selector for a specific chat by ID
+export const selectChatById = createSelector(
+  [
+    (state: RootState) => state.chats.chats,
+    (_: RootState, chatId: string) => chatId,
+  ],
+  (chats, chatId) => chats[chatId]
+);
 
-export const selectChatsStatus = (state: RootState) => state.chats.status;
-export const selectChatsError = (state: RootState) => state.chats.error;
-export const selectCurrentChat = (state: RootState) => state.chats.currentChat;
+// Memoized selector for the current chat
+export const selectCurrentChat = createSelector(
+  (state: RootState) => state.chats.currentChat,
+  (currentChat) => currentChat
+);
+
+// Memoized selector for messages from the current chat
+export const selectMessagesFromCurrentChat = createSelector(
+  selectCurrentChat,
+  (currentChat) => currentChat?.messages || []
+);
+
+// Memoized selector for the chat operation status (loading, succeeded, failed)
+export const selectChatsStatus = createSelector(
+  (state: RootState) => state.chats.status,
+  (status) => status
+);
+
+// Memoized selector for the error state
+export const selectChatsError = createSelector(
+  (state: RootState) => state.chats.error,
+  (error) => error
+);
+
+// Memoized selector for messages by chat ID
+export const selectMessagesByChatId = createSelector(
+  [
+    (state: RootState) => state.chats.chats,
+    (_: RootState, chatId: string) => chatId,
+  ],
+  (chats, chatId) => chats[chatId]?.messages || []
+);
+
+// Memoized selector for unread messages for a specific user in the current chat
+export const selectUnreadMessages = createSelector(
+  [selectCurrentChat, (_: RootState, userId: string) => userId],
+  (currentChat, userId) =>
+    currentChat?.messages.filter(
+      (message) => !message.readBy.includes(userId) && message.sender !== userId
+    ) || []
+);

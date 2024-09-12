@@ -107,39 +107,43 @@ class WebSocketService {
     }
   }
 
-  // Handle incoming new message event
-  public handleNewMessage = async ({
-    chatId,
-    message,
-  }: {
-    chatId: string;
-    message: IMessage;
-  }) => {
-    if (!store) {
-      console.error("Store has not been injected into WebSocketService.");
-      return;
+ // Handle incoming new message event
+public handleNewMessage = async ({
+  chatId,
+  message,
+}: {
+  chatId: string;
+  message: IMessage;
+}) => {
+  if (!store) {
+    console.error("Store has not been injected into WebSocketService.");
+    return;
+  }
+
+  // Access the current state to check if the chat exists
+  const state = store.getState();
+  const chatExists = state.chats.chats[chatId];
+
+  if (!chatExists) {
+    // Chat does not exist, fetch the entire chat data
+    console.log(`Chat with ID ${chatId} not found. Fetching chat data...`);
+
+    try {
+      const chat = await fetchChatById(chatId);
+      store.dispatch(addChatReducer(chat));
+      console.log("Chat fetched and added successfully.");
+    } catch (error) {
+      console.error("Failed to fetch and add chat:", error);
     }
-
-    // Access the current state to check if the chat exists
-    const state = store.getState();
-    const chatExists = state.chats.chats[chatId];
-
-    if (!chatExists) {
-      // Chat does not exist, fetch the entire chat data
-      console.log(`Chat with ID ${chatId} not found. Fetching chat data...`);
-
-      try {
-        const chat = await fetchChatById(chatId);
-        store.dispatch(addChatReducer(chat));
-        console.log("Chat fetched and added successfully.");
-      } catch (error) {
-        console.error("Failed to fetch and add chat:", error);
-      }
-    } else {
+  } else {
+    // Add a slight delay before dispatching the server-confirmed message
+    setTimeout(() => {
       // Chat exists, dispatch the action to add the message as usual
       store.dispatch(addMessageReducer({ chatId, message, fromServer: true }));
-    }
-  };
+    }, 100); // Adjust the delay time if necessary
+  }
+};
+
 
   // Handle incoming message read event
   public handleMessageRead = ({

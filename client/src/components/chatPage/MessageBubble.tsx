@@ -5,6 +5,9 @@ import { Avatar, Box, Typography } from "@mui/material";
 import React from "react";
 import { IMessage } from "../../models/dataModels";
 import { User } from "../../models/entityModels";
+import { useAppSelector } from "../../app/hooks";
+import { RootState } from "../../app/store";
+import { selectCurrentChat } from "../../features/chat/chatSlice";
 
 interface MessageBubbleProps {
   message: IMessage;
@@ -17,8 +20,10 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   participantsData,
   chatType,
 }) => {
-  const currentUserId = localStorage.getItem("currentUserId");
+  const currentUserId = useAppSelector((state: RootState) => state.auth.userId);
   const isOwnMessage = message.sender === currentUserId;
+  const currentChat = useAppSelector(selectCurrentChat);
+  const currentChatType = currentChat?.type;
 
   // Find the sender's details from the participants data
   const sender = participantsData.find((user) => user._id === message.sender);
@@ -35,10 +40,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
     );
 
   const getMessageStatusIcon = () => {
-    if (message.status === "pending")
-      return <DoneIcon sx={{ color: "gray" }} />;
-    if (message.status === "sent")
-      return <DoneAllIcon sx={{ color: "gray" }} />;
+    if (message.status === "pending") return <DoneIcon sx={{ color: "gray", fontSize: "0.8rem" }} />;
+    if (message.status === "sent") return <DoneAllIcon sx={{ color: "gray", fontSize: "1.2rem" }} />;
     if (chatType === "simple" && isSimpleChatRead)
       return <DoneAllIcon sx={{ color: "turquoise" }} />;
     if (chatType !== "simple" && isGroupRead)
@@ -64,23 +67,27 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
       className="animate__animated animate__fadeInUp animate__faster"
       sx={{
         display: "flex",
-        flexDirection: isOwnMessage ? "row-reverse" : "row",
-        mb: 2,
+        flexDirection: isOwnMessage ? "row-reverse" : "row", // Control the message direction
         alignItems: "flex-end",
+        justifyContent: isOwnMessage ? "flex-end" : "flex-start",
+        mb: 1,
+        maxWidth: "75%", // Control bubble width without making it float away from its anchor
       }}
     >
-      {/* Show sender avatar only if the message is not from the current user */}
-      {!isOwnMessage && <Avatar src={senderAvatar} sx={{ mr: 2 }} />}
+      {/* Show sender avatar only if the message is not from the current user and in group chats */}
+      {!isOwnMessage && currentChatType === "group" && (
+        <Avatar src={senderAvatar} sx={{ width: 32, height: 32, mr: 1 }} />
+      )}
 
       {/* Message Bubble */}
       <Box
         sx={{
-          maxWidth: "60%",
           p: 1.5,
           bgcolor: getBackgroundColor(),
-          color: isOwnMessage ? "#000000" : "#000000",
-          borderRadius: 2,
-          position: "relative",
+          borderRadius: "1em",
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
+          maxWidth: "100%", // Ensure the bubble doesn’t exceed the parent width
+          textAlign: "left", // Align text based on the message direction
         }}
       >
         <Typography variant="body2">{message.content}</Typography>
@@ -94,6 +101,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
             alignItems: "center",
             mt: 0.5,
             justifyContent: isOwnMessage ? "flex-end" : "flex-start",
+            gap: 0.5, // Add margin between timestamp and status icon
           }}
         >
           {new Date(message.timestamp).toLocaleTimeString([], {

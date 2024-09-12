@@ -23,7 +23,7 @@ export const register = async (req: Request, res: Response) => {
 
   try {
     await registerUser(email, password);
-    res.status(201).json({
+    return res.status(201).json({
       message: "User registered successfully. Please verify your email.",
     });
   } catch (error: unknown) {
@@ -32,11 +32,13 @@ export const register = async (req: Request, res: Response) => {
       res
         .status(500)
         .json({ message: "Registration failed", error: error.message });
+      return;
     } else {
       logger.error("Unexpected registration error:", { error: String(error) });
       res
         .status(500)
         .json({ message: "Registration failed", error: String(error) });
+      return;
     }
   }
 };
@@ -105,7 +107,7 @@ export const login = async (req: Request, res: Response) => {
 
     // Redirect URL based on user role
     let redirectUrl = `${config.appUrl}/${user.role}-dashboard`;
-    res.status(200).json({
+    return res.status(200).json({
       message: "Login successful",
       redirectUrl,
       id: user.id,

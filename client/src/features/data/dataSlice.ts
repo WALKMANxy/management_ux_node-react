@@ -10,6 +10,9 @@ import { Agent, Client } from "../../models/entityModels";
 import { DataSliceState } from "../../models/stateModels";
 import { dataApi } from "./dataQueries";
 import { updateApi } from "./promosVisitsQueries";
+import { createSelector } from "reselect";
+import { RootState } from "../../app/store";
+
 
 const initialState: DataSliceState = {
   clients: {},
@@ -233,3 +236,9 @@ export const {
 } = dataSlice.actions;
 
 export default dataSlice.reducer;
+
+// Memoized selector to get all client IDs from the state
+export const selectClientIds = createSelector(
+  (state: RootState) => state.data.clients,
+  (clients) => Object.keys(clients)
+);

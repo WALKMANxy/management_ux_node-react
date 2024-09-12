@@ -62,13 +62,13 @@ const useStats = (isMobile: boolean) => {
   // Fetch initial data
   useEffect(() => {
     const fetchData = async () => {
-      console.log("fetchData called"); // Debug: Function call
-      try {
+/*       console.log("fetchData called"); // Debug: Function call
+ */      try {
         setLoading(true);
-        console.log("Dispatching fetchInitialData"); // Debug: Dispatch action
-        await dispatch(fetchInitialData()).unwrap();
-        console.log("fetchInitialData successful"); // Debug: Success case
-        setLocalError(null);
+/*         console.log("Dispatching fetchInitialData"); // Debug: Dispatch action
+ */        await dispatch(fetchInitialData()).unwrap();
+/*         console.log("fetchInitialData successful"); // Debug: Success case
+ */        setLocalError(null);
         setRetryCount(0); // Reset retryCount only when data fetch is successful
 
         // Call the utility function to update entity name if missing
@@ -92,12 +92,12 @@ const useStats = (isMobile: boolean) => {
         }
       } finally {
         setLoading(false);
-        console.log("Loading state set to false"); // Debug: Loading state reset
-      }
+/*         console.log("Loading state set to false"); // Debug: Loading state reset
+ */      }
     };
 
-    console.log("Calling fetchData in useEffect"); // Debug: useEffect call
-    fetchData();
+/*     console.log("Calling fetchData in useEffect"); // Debug: useEffect call
+ */    fetchData();
     // Remove dependencies that cause the fetchData to re-run unnecessarily
     // retryCount will be handled separately to avoid loops
     // eslint-disable-next-line react-hooks/exhaustive-deps

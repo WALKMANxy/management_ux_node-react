@@ -13,8 +13,10 @@ export const fetchAllAgents = (req: Request, res: Response) => {
   try {
     const agents = getAgentsFromFile();
     res.json(agents);
+    return;
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
+    return;
   }
 };
 
@@ -27,6 +29,7 @@ export const fetchAgentById = (req: Request, res: Response) => {
     res.json(agent);
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
+    return;
   }
 };
 
@@ -52,8 +55,10 @@ export const fetchAgentByClientEntityCode = (
     }
 
     res.json(agent);
+    return;
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
+    return;
   }
 };
 
@@ -66,8 +71,10 @@ export const updateAgent = (req: Request, res: Response) => {
     res
       .status(200)
       .json({ message: "Agent updated successfully", updatedAgent });
+    return;
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
+    return;
   }
 };
 
@@ -87,7 +94,9 @@ export const replaceAgent = (req: Request, res: Response) => {
     res
       .status(200)
       .json({ message: "Agent replaced successfully", replacedAgent });
+    return;
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
+    return;
   }
 };

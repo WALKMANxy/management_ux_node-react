@@ -17,7 +17,6 @@ const Layout: React.FC = () => {
       <Box
         component="main"
         sx={{
-          flexGrow: 1,
           p: isClientsPage && isMobile ? 0 : 3, // Remove padding for clients page on mobile
         }}
       >
