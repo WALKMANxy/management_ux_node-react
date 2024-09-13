@@ -115,6 +115,65 @@ export class ChatController {
     }
   }
 
+  static async fetchOlderMessages (
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void>  {
+    try {
+      const { chatId } = req.params;
+      const { oldestTimestamp, limit } = req.query as {
+        oldestTimestamp: string;
+        limit: string; // Parse limit as a string initially
+      };
+
+
+    console.log("Received Request with Parameters:", {
+      chatId,
+      oldestTimestamp,
+      limit,
+    });
+
+
+
+      if (!oldestTimestamp || isNaN(Date.parse(oldestTimestamp))) {
+        res.status(400).json({ message: "Invalid timestamp format." });
+        return;
+      }
+
+       // Parse and validate limit
+        const limitNumber = parseInt(limit, 10);
+       if (isNaN(limitNumber) || limitNumber <= 0) {
+      res.status(400).json({ message: "Invalid limit parameter." });
+      return;
+    }
+
+      // Check user authentication
+      if (!req.user) {
+        res.status(401).json({ message: "User not authenticated" });
+        return;
+      }
+
+      // Fetch older messages using the service
+      const messages = await ChatService.getOlderMessages(
+        chatId,
+        req.user.id,
+        oldestTimestamp,
+        limitNumber
+      );
+
+      // Debug: Log the messages received from the service
+    console.log("Messages Received from Service:", messages);
+
+      // Return the fetched messages
+      res.status(200).json(messages);
+    } catch (error) {
+      console.error("Error fetching older messages:", error);
+      if (!res.headersSent) {
+        res.status(500).json({ message: "Internal Server Error" });
+      }
+    }
+  };
+
   static async fetchMessagesFromMultipleChats(
     req: AuthenticatedRequest,
     res: Response

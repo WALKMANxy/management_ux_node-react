@@ -1,17 +1,17 @@
 // src/store/slices/chatSlice.ts
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WritableDraft } from "immer";
 import { createSelector } from "reselect";
 import { RootState } from "../../app/store";
 import { IChat, IMessage } from "../../models/dataModels";
 import {
-  createChat,
-  fetchAllChats,
-  fetchMessages,
-  fetchMessagesFromMultipleChats,
-  sendMessage,
-  updateReadStatus,
-} from "./api/chats";
+  createChatThunk,
+  createMessageThunk,
+  fetchAllChatsThunk,
+  fetchMessagesFromMultipleChatsThunk,
+  fetchMessagesThunk,
+  fetchOlderMessagesThunk,
+} from "./chatThunks";
 
 // Define the simplified ChatState without the messages field
 interface ChatState {
@@ -28,115 +28,6 @@ const initialState: ChatState = {
   status: "idle", // Initial status
   error: null, // No errors initially
 };
-
-// Async thunk to fetch all chats for the user
-// Refactored async thunk to fetch all chats for the user
-export const fetchAllChatsThunk = createAsyncThunk(
-  "chats/fetchAllChatsThunk",
-  async (_, { rejectWithValue }) => {
-    try {
-      const result = await fetchAllChats(); // Direct API call
-      return result; // Return the fetched chats
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to fetch chats"
-      );
-    }
-  }
-);
-
-// Refactored async thunk to fetch messages for a specific chat
-export const fetchMessagesThunk = createAsyncThunk(
-  "chats/fetchMessagesThunk",
-  async (
-    {
-      chatId,
-      page = 1,
-      limit = 100,
-    }: { chatId: string; page?: number; limit?: number },
-    { rejectWithValue }
-  ) => {
-    try {
-      const messages = await fetchMessages(chatId, page, limit); // Direct API call
-      return { chatId, messages }; // Return the chatId and fetched messages
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to fetch messages"
-      );
-    }
-  }
-);
-
-// Refactored async thunk to fetch messages from multiple chats
-export const fetchMessagesFromMultipleChatsThunk = createAsyncThunk(
-  "chats/fetchMessagesFromMultipleChatsThunk",
-  async (chatIds: string[], { rejectWithValue }) => {
-    try {
-      const result = await fetchMessagesFromMultipleChats(chatIds); // Direct API call
-      return result; // Return the fetched messages from multiple chats
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error
-          ? error.message
-          : "Failed to fetch messages from multiple chats"
-      );
-    }
-  }
-);
-
-// Async thunk to create a new chat
-// Refactored async thunk to create a new chat
-export const createChatThunk = createAsyncThunk(
-  "chats/createChatThunk",
-  async (chatData: Partial<IChat>, { rejectWithValue }) => {
-    try {
-      const result = await createChat(chatData); // Direct API call
-      return result; // Return the created chat
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to create chat"
-      );
-    }
-  }
-);
-
-// Async thunk to create a new message
-// Refactored async thunk to create a new message
-export const createMessageThunk = createAsyncThunk(
-  "messages/createMessageThunk",
-  async (
-    { chatId, messageData }: { chatId: string; messageData: Partial<IMessage> },
-    { rejectWithValue }
-  ) => {
-    try {
-      const message = await sendMessage(chatId, messageData); // Direct API call
-      return { chatId, message }; // Return the chatId and created message
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to send message"
-      );
-    }
-  }
-);
-
-// New async thunk to update read status for multiple messages
-// Refactored async thunk to update read status for multiple messages
-export const updateReadStatusThunk = createAsyncThunk(
-  "chats/updateReadStatusThunk",
-  async (
-    { chatId, messageIds }: { chatId: string; messageIds: string[] },
-    { rejectWithValue }
-  ) => {
-    try {
-      const result = await updateReadStatus(chatId, messageIds); // Direct API call
-      return result; // Return the updated chat with read statuses
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to update read status"
-      );
-    }
-  }
-);
 
 // Define the chat slice
 const chatSlice = createSlice({
@@ -440,6 +331,44 @@ const chatSlice = createSlice({
 
           // Assign the updated chats back to the state
           state.chats = updatedChats;
+        }
+      )
+
+      .addCase(fetchOlderMessagesThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+
+      .addCase(fetchOlderMessagesThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      })
+      .addCase(
+        fetchOlderMessagesThunk.fulfilled,
+        (
+          state,
+          action: PayloadAction<{ chatId: string; messages: IMessage[] }>
+        ) => {
+          const { chatId, messages } = action.payload;
+
+          if (!state.chats[chatId]) return;
+
+          // Filter out duplicates before adding new messages
+          const existingMessageIds = new Set(
+            state.chats[chatId].messages.map((msg) => msg._id.toString())
+          );
+          const newMessages = messages.filter(
+            (msg) => !existingMessageIds.has(msg._id.toString())
+          );
+
+          // Add new messages and sort by timestamp to maintain order
+          state.chats[chatId].messages = [
+            ...newMessages.reverse(), // Reverse the new messages to maintain chronological display
+            ...state.chats[chatId].messages,
+          ].sort(
+            (a, b) =>
+              new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+          ); // Sort by timestamp
         }
       )
 

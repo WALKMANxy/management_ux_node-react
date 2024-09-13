@@ -111,5 +111,6 @@ chatSchema.index({ "messages.timestamp": 1 });
 chatSchema.index({ participants: 1 });
 chatSchema.index({ "messages._id": 1 });
 chatSchema.index({ type: 1 });
+chatSchema.index({ chatId: 1 });
 
 export const Chat = model<IChat>("Chat", chatSchema);

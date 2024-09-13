@@ -1,3 +1,4 @@
+//Src/components/chatPage/ContactsList.tsx
 import {
   Avatar,
   Badge,
@@ -29,11 +30,12 @@ const ContactsList: React.FC<ContactsListProps> = ({
   handleContactSelect,
   loading,
 }) => {
+  console.log("ContactsList rendering now");
 
-   // Log the props to understand what's being passed
-   console.log("Contacts received:", contacts);
-   console.log("Search term:", searchTerm);
-   console.log("Loading state:", loading);
+  // Log the props to understand what's being passed
+  console.log("Contacts received:", contacts);
+  console.log("Search term:", searchTerm);
+  console.log("Loading state:", loading);
 
   const sanitizedTerm = sanitizeSearchTerm(searchTerm);
 
@@ -91,4 +93,4 @@ const ContactsList: React.FC<ContactsListProps> = ({
   );
 };
 
-export default ContactsList;
+export default React.memo(ContactsList);
