@@ -1,3 +1,4 @@
+import { SerializedError } from "@reduxjs/toolkit";
 import { debounce } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
@@ -5,14 +6,17 @@ import { useAppDispatch } from "../app/hooks";
 import { selectUserId, selectUserRole } from "../features/auth/authSlice";
 import {
   addMessageReducer,
-  fetchAllChatsThunk,
-  fetchMessagesThunk,
+  clearCurrentChatReducer,
   selectAllChats,
   selectCurrentChat,
   selectMessagesFromCurrentChat,
   setCurrentChatReducer,
   updateReadStatusReducer,
 } from "../features/chat/chatSlice"; // Ensure correct selectors are imported
+import {
+  fetchAllChatsThunk,
+  fetchMessagesThunk,
+} from "../features/chat/chatThunks";
 import { selectClientIds } from "../features/data/dataSlice";
 import { getAllUsersThunk, selectAllUsers } from "../features/users/userSlice";
 import { IChat, IMessage } from "../models/dataModels";
@@ -108,48 +112,51 @@ const useChatLogic = () => {
     [currentUserId, dispatch]
   );
 
- // Debounced fetch handler to avoid multiple requests
-const handleLoadMoreMessages = debounce(() => {
-  if (currentChat?._id) {
-    console.log(`Fetching more messages for chat: ${currentChat._id}`); // Debug: Log chat ID
-    console.log(`Current page: ${page}, limit: 20`); // Debug: Log the current page and limit
+  // Debounced fetch handler to avoid multiple requests
+  const handleLoadMoreMessages = debounce(() => {
+    if (currentChat?._id) {
+      console.log(`Fetching more messages for chat: ${currentChat._id}`); // Debug: Log chat ID
+      console.log(`Current page: ${page}, limit: 20`); // Debug: Log the current page and limit
 
-    // Dispatch the fetchMessagesThunk to load more messages, incrementing the page
-    dispatch(
-      fetchMessagesThunk({
-        chatId: currentChat._id,
-        page: page, // Use the current page
-        limit: 100, // Adjust the limit as needed
-      })
-    )
-      .unwrap()
-      .then(() => {
-        console.log(`Fetched messages successfully for page: ${page}`); // Debug: Log success for current page
-        setPage((prevPage) => {
-          console.log(`Incrementing page to: ${prevPage + 1}`); // Debug: Log next page number
-          return prevPage + 1; // Increment page on successful fetch
+      // Dispatch the fetchMessagesThunk to load more messages, incrementing the page
+      dispatch(
+        fetchMessagesThunk({
+          chatId: currentChat._id,
+          page: page, // Use the current page
+          limit: 100, // Adjust the limit as needed
+        })
+      )
+        .unwrap()
+        .then(() => {
+          console.log(`Fetched messages successfully for page: ${page}`); // Debug: Log success for current page
+          setPage((prevPage) => {
+            console.log(`Incrementing page to: ${prevPage + 1}`); // Debug: Log next page number
+            return prevPage + 1; // Increment page on successful fetch
+          });
+        })
+        .catch((error: SerializedError) => {
+          console.error("Error loading more messages:", error); // Debug: Log any errors during fetch
         });
-      })
-      .catch((error) => {
-        console.error("Error loading more messages:", error); // Debug: Log any errors during fetch
-      });
-  } else {
-    console.log("No current chat selected, skipping message fetch."); // Debug: Log when no chat is selected
-  }
-}, 50);
-
+    } else {
+      console.log("No current chat selected, skipping message fetch."); // Debug: Log when no chat is selected
+    }
+  }, 50);
 
   // Fetch contacts when needed
-  const fetchContacts = async () => {
-    setLoadingContacts(true);
-    try {
-      await dispatch(getAllUsersThunk()).unwrap();
-    } catch (error) {
-      console.error("Failed to fetch contacts:", error);
-    } finally {
-      setLoadingContacts(false);
-    }
-  };
+  const fetchContacts = useCallback(
+    async () => {
+      setLoadingContacts(true);
+      try {
+        await dispatch(getAllUsersThunk()).unwrap();
+      } catch (error) {
+        console.error("Failed to fetch contacts:", error);
+      } finally {
+        setLoadingContacts(false);
+      }
+    },
+    [dispatch]
+  );
+
 
   // Send a new message in the current chat
   const handleSendMessage = useCallback(
@@ -191,57 +198,64 @@ const handleLoadMoreMessages = debounce(() => {
   );
 
   // Chat creation handler using createChatThunk
-  const handleCreateChat = async (
-    participants: string[],
-    chatType: "simple" | "group" | "broadcast",
-    name?: string,
-    description?: string
-  ) => {
-    if (!participants.length) return;
+  const handleCreateChat = useCallback(
+    async (
+      participants: string[],
+      chatType: "simple" | "group" | "broadcast",
+      name?: string,
+      description?: string
+    ) => {
+      if (!participants.length) return;
 
-    const localId = generateId();
+      const localId = generateId();
 
-    const chatData: IChat = {
-      _id: localId,
-      local_id: localId,
-      type: chatType,
-      participants,
-      name,
-      description,
-      messages: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      status: "pending",
-    };
+      const chatData: IChat = {
+        _id: localId,
+        local_id: localId,
+        type: chatType,
+        participants,
+        name,
+        description,
+        messages: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        status: "pending",
+      };
 
-    try {
-      // Emit the new chat creation request to the server via WebSocket
-      webSocketService.emitNewChat(chatData);
-      // Alternatively, if using thunks directly:
-      // const createdChat = await dispatch(createChatThunk(chatData)).unwrap();
-    } catch (error) {
-      console.error("Failed to create chat:", error);
-    }
-  };
+      try {
+        // Emit the new chat creation request to the server via WebSocket
+        webSocketService.emitNewChat(chatData);
+        // Alternatively, if using thunks directly:
+        // const createdChat = await dispatch(createChatThunk(chatData)).unwrap();
+      } catch (error) {
+        console.error("Failed to create chat:", error);
+      }
+    },
+    []
+  );
 
   // Handle selecting a contact to open or create a chat
-  const handleContactSelect = (contactId: string) => {
-    // Check if there's an existing chat with this contact
-    const existingChat = Object.values(chats).find(
-      (chat) =>
-        chat.type === "simple" &&
-        chat.participants.includes(contactId) &&
-        chat.participants.includes(currentUserId)
-    );
+  const handleContactSelect = useCallback(
+    (contactId: string) => {
+      // Check if there's an existing chat with this contact
+      const existingChat = Object.values(chats).find(
+        (chat) =>
+          chat.type === "simple" &&
+          chat.participants.includes(contactId) &&
+          chat.participants.includes(currentUserId)
+      );
 
-    if (existingChat) {
-      // If chat exists, select it
-      selectChat(existingChat);
-    } else {
-      // If no chat exists, create a new one
-      handleCreateChat([currentUserId, contactId], "simple");
-    }
-  };
+      if (existingChat) {
+        // If chat exists, select it
+        selectChat(existingChat);
+      } else {
+        // If no chat exists, create a new one
+        handleCreateChat([currentUserId, contactId], "simple");
+      }
+    },
+    [chats, currentUserId, handleCreateChat, selectChat]
+  );
+
 
   const filteredContacts = useMemo(() => {
     // Log the current user ID for reference
@@ -339,6 +353,11 @@ const handleLoadMoreMessages = debounce(() => {
     [currentUserId]
   );
 
+   // Function to handle returning to the sidebar on mobile
+   const handleBackToChats = () => {
+    dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
+  };
+
   return {
     chats: Object.values(chats),
     loadingChats,
@@ -357,6 +376,7 @@ const handleLoadMoreMessages = debounce(() => {
     getChatTitle,
     getUnreadCount,
     handleLoadMoreMessages,
+    handleBackToChats,
   };
 };
 

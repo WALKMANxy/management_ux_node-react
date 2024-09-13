@@ -1,16 +1,13 @@
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Box, Grid, IconButton, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Grid, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import {  useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
 import ChatSidebar from "../../components/chatPage/ChatSidebar";
 import ChatView from "../../components/chatPage/ChatView";
-import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 
 const ChatPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const dispatch = useAppDispatch();
 
   // Get currentChat from Redux state
   const currentChat = useAppSelector(
@@ -18,16 +15,16 @@ const ChatPage: React.FC = () => {
   );
 
   // Function to handle returning to the sidebar on mobile
-  const handleBackToChats = () => {
+  /* const handleBackToChats = () => {
     dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
   };
-
+ */
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: "calc(100vh - 120px)", // Adjust height to subtract the header height (adjust '64px' to your header's actual height)
+        height: isMobile ? "94vh" : "calc(100vh - 120px)", // Use 95vh when isMobile is true, otherwise subtract the header height
         bgcolor: "#f4f5f7",
         overflow: "hidden",
       }}
@@ -68,13 +65,7 @@ const ChatPage: React.FC = () => {
                 alignItems: "center",
                 flexShrink: 0, // Prevent the header from shrinking
               }}
-            >
-              {isMobile && (
-                <IconButton onClick={handleBackToChats}>
-                  <ArrowBackIcon />
-                </IconButton>
-              )}
-            </Box>
+            ></Box>
             <Box
               sx={{
                 flexGrow: 1, // Take the remaining space

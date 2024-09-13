@@ -1,8 +1,9 @@
 // ChatView.tsx
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
   Avatar,
-  Badge,
   Box,
   Divider,
   IconButton,
@@ -10,174 +11,48 @@ import {
   MenuItem,
   Paper,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../app/store";
-import { IMessage } from "../../models/dataModels";
+import React from "react";
+import { useAppDispatch } from "../../app/hooks";
+import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
+import useLoadOlderMessages from "../../hooks/useChatLoadOlderMessages";
+import useChatView from "../../hooks/useChatView"; // Import the custom hook
 import InputBox from "./InputBox";
-import MessageBubble from "./MessageBubble";
+import RenderMessage from "./RenderMessage"; // Import the RenderMessage component
+import RenderParticipantsAvatars from "./RenderParticipantsAvatars"; // Import the RenderParticipantsAvatars component
 
 const ChatView: React.FC = () => {
-  // First, get the currentChatId from the currentChat state
-  const currentChatId = useSelector(
-    (state: RootState) => state.chats.currentChat?._id
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const dispatch = useAppDispatch();
+
+  const {
+    currentChat,
+    sortedMessages,
+    menuAnchorEl,
+    isMenuOpen,
+    handleMenuOpen,
+    handleMenuClose,
+    getChatOptions,
+    getChatTitle,
+    getAdminAvatar,
+    participantsData,
+    currentUserId,
+  } = useChatView(); // Destructure the hook values
+
+  // Hook for loading older messages
+  const { messagesContainerRef } = useLoadOlderMessages(
+    currentChat?._id || null
   );
 
-  // Get the correct chat from the chats state
-  const currentChat = useSelector((state: RootState) =>
-    currentChatId ? state.chats.chats[currentChatId] : null
-  );
-
-  // Sort messages by timestamp before rendering
-  const sortedMessages = useMemo(() => {
-    return currentChat?.messages
-      ? [...currentChat.messages].sort(
-          (a, b) =>
-            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-        )
-      : [];
-  }, [currentChat?.messages]);
-
-  const currentUserId = useSelector((state: RootState) => state.auth.userId);
-  const users = useSelector((state: RootState) => state.users.users);
-  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const isMenuOpen = Boolean(menuAnchorEl);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null); // Ref to scroll to the latest message
-
-  // Handler for opening the options menu
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setMenuAnchorEl(event.currentTarget);
+  // Function to handle returning to the sidebar on mobile
+  const handleBackToChats = () => {
+    dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
   };
 
-  // Handler for closing the options menu
-  const handleMenuClose = () => {
-    setMenuAnchorEl(null);
-  };
-
-  // Extracted layout logic for individual messages based on sender and chat type
-  const renderMessage = (message: IMessage) => {
-    const isOwnMessage = message.sender === currentUserId;
-
-    return (
-      <Box
-        key={message._id}
-        sx={{
-          display: "flex",
-          justifyContent: isOwnMessage ? "flex-end" : "flex-start", // Anchor to the correct side
-          mb: 2,
-        }}
-      >
-        {/* Render the MessageBubble with correct layout */}
-        <MessageBubble
-          message={message}
-          participantsData={participantsData}
-          chatType={currentChat?.type || "simple"}
-        />
-      </Box>
-    );
-  };
-
-  // Dynamic participants avatar rendering based on chat type
-  const renderParticipantsAvatars = () => {
-    if (!currentChat || currentChat.type === "simple") return null;
-
-    const participantsData =
-      currentChat?.participants?.map((participantId) => users[participantId]) ||
-      [];
-
-    const limitedParticipants = participantsData.slice(0, 3);
-
-    const participantAvatars = limitedParticipants.map((participant) => (
-      <Avatar
-        key={participant?._id}
-        src={participant?.avatar}
-        sx={{ width: 30, height: 30, ml: -1 }}
-      />
-    ));
-
-    const remainingParticipants = participantsData.length - 3;
-
-    return (
-      <>
-        {participantAvatars}
-        {remainingParticipants > 0 && (
-          <Badge
-            badgeContent={`+${remainingParticipants}`}
-            color="primary"
-            sx={{ ml: -1 }}
-          />
-        )}
-      </>
-    );
-  };
-
-  // Get participants data by mapping the user IDs in currentChat to user details
-  const participantsData =
-    currentChat?.participants.map((participantId) => users[participantId]) ||
-    [];
-
-  // Define mock options based on chat type and user role
-  const getChatOptions = () => {
-    if (!currentChat) return [];
-
-    if (
-      currentChat.type === "group" &&
-      currentChat.admins &&
-      currentChat.admins.includes(currentUserId)
-    ) {
-      return ["Edit group name", "Edit group members", "Delete chat"];
-    } else if (currentChat.type === "group") {
-      return ["Archive chat"];
-    } else if (
-      currentChat.type === "broadcast" &&
-      currentChat.admins &&
-      currentChat.admins.includes(currentUserId)
-    ) {
-      return [
-        "Edit broadcast name",
-        "Edit broadcast members",
-        "Delete broadcast",
-      ];
-    } else if (currentChat.type === "broadcast") {
-      return ["Archive chat"];
-    } else {
-      return ["Archive chat"];
-    }
-  };
-
-  // Determine the chat title and admin avatar based on chat type
-  const getChatTitle = () => {
-    if (!currentChat) return "Chat";
-
-    if (currentChat.type === "simple" && currentChat.participants) {
-      const participantId = currentChat.participants.find(
-        (id) => id !== currentUserId
-      );
-      if (participantId !== undefined) {
-        const participant = users[participantId];
-        return participant?.entityName || "Chat";
-      }
-    }
-    return currentChat?.name || "Group Chat";
-  };
-
-  const getAdminAvatar = () => {
-    if (
-      currentChat &&
-      currentChat.type !== "simple" &&
-      currentChat.admins?.length
-    ) {
-      const admin = users[currentChat.admins[0]];
-      return admin?.avatar;
-    }
-    return null;
-  };
-
-  // Scroll to the latest message whenever a new message is added
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [sortedMessages]);
+  console.log("ChatView rendering now");
 
   // Fallback if currentChat is not set
   if (!currentChat) {
@@ -205,7 +80,8 @@ const ChatView: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         height: "100%", // Fill the available height
-        p: 2,
+        p: isMobile ? 0 : 2, // Remove padding on mobile
+        paddingTop: isMobile ? 2 : 0,
         bgcolor: "#ffffff",
         borderTopRightRadius: 12, // Apply radius to the top-left corner
         borderBottomRightRadius: 12, // Apply radius to the bottom-left corner
@@ -222,20 +98,27 @@ const ChatView: React.FC = () => {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
+          {isMobile && (
+            <IconButton onClick={handleBackToChats}>
+              <ArrowBackIcon />
+            </IconButton>
+          )}
           <Avatar
             src={
               currentChat?.type === "simple"
-                ? users[currentChat?.participants[0]]?.avatar ?? ""
+                ? participantsData[0]?.avatar ?? ""
                 : getAdminAvatar() ?? ""
             }
           />
-
           <Typography variant="h6" sx={{ ml: 2 }}>
             {getChatTitle()}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {renderParticipantsAvatars()}
+          <RenderParticipantsAvatars
+            participantsData={participantsData}
+            chatType={currentChat.type}
+          />
           <IconButton onClick={handleMenuOpen}>
             <MoreVertIcon />
           </IconButton>
@@ -253,49 +136,59 @@ const ChatView: React.FC = () => {
         </Menu>
       </Box>
       <Divider sx={{ mb: 2 }} />
-      {/* Messages Display */}
 
+      {/* Messages Display */}
       <Paper
         elevation={1}
         sx={{
           borderRadius: "1.5em", // Rounded corners for the paper
           flexGrow: 1, // Allows this section to take the available space
           overflowY: "auto", // Enable scrolling for messages
+          display: "flex", // Add this line
+          flexDirection: "column", // Add this line
           "&::-webkit-scrollbar": {
-            display: "none", // Hide the scrollbar
+            display: "none",
           },
+          position: "relative",
         }}
       >
         <Box
           sx={{
-            flexGrow: 1, // Allows this section to take the available space
-            overflowY: "auto", // Enable scrolling for messages
             p: 1,
             bgcolor: "#f9f9f9",
             borderRadius: 6,
+            overflowY: "auto", // Enable scrolling for messages
+            display: "flex", // Add this line
+            flexDirection: "column", // Add this line
             "&::-webkit-scrollbar": {
-              display: "none", // Hide the scrollbar
+              display: "none",
             },
+            position: "relative",
           }}
+          ref={messagesContainerRef} // Attach the ref from useLoadOlderMessages
         >
-          {sortedMessages.map((message: IMessage) => renderMessage(message))}
-          <div ref={messagesEndRef} />
+          <RenderMessage
+            messages={sortedMessages}
+            currentUserId={currentUserId}
+            chatType={currentChat?.type || "simple"}
+            participantsData={participantsData}
+          />
         </Box>
       </Paper>
+
       {/* Message Input Box */}
       <Box
         sx={{
-          mt: 2,
+          mt: isMobile ? 0 : 2,
+          mb: isMobile ? 0.6 : 0,
           flexShrink: 0, // Prevent shrinking of the input box
           borderRadius: "25px", // Rounded corners for the input box
         }}
       >
-        <InputBox
-        // Optional props to handle input focus when sending a message, depending on InputBox's implementation
-        />
+        <InputBox />
       </Box>
     </Box>
   );
 };
 
-export default ChatView;
+export default React.memo(ChatView);

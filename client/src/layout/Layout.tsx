@@ -9,7 +9,8 @@ const Layout: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const isClientsPage = location.pathname === "/clients"; // Adjust the path if necessary
+  const isClientsOrMessagesPage =
+    location.pathname === "/clients" || location.pathname === "/messages"; // Adjust the paths if necessary
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -17,7 +18,7 @@ const Layout: React.FC = () => {
       <Box
         component="main"
         sx={{
-          p: isClientsPage && isMobile ? 0 : 3, // Remove padding for clients page on mobile
+          p: isClientsOrMessagesPage && isMobile ? 0 : 3, // Remove padding for clients and messages pages on mobile
         }}
       >
         <Outlet />

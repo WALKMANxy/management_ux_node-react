@@ -1,12 +1,12 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import {
   addMessageReducer,
-  fetchAllChatsThunk,
   updateReadStatusReducer,
 } from "../features/chat/chatSlice";
 import { fetchUsersByIds } from "../features/users/userSlice";
 import { IChat, IMessage } from "../models/dataModels";
 import { webSocketService } from "../services/webSocketService";
+import { fetchAllChatsThunk } from "../features/chat/chatThunks";
 
 const listenerMiddleware = createListenerMiddleware();
 

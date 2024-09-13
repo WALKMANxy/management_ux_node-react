@@ -20,6 +20,8 @@ router.get("/:chatId", ChatController.fetchChatById);
 // Route to fetch messages for a specific chat
 router.get("/:chatId/messages", ChatController.fetchMessages);
 
+router.get("/:chatId/older-messages", ChatController.fetchOlderMessages);
+
 // Route to fetch messages for multiple chats
 router.get("/chats/messages", ChatController.fetchMessagesFromMultipleChats);
 
