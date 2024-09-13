@@ -1,3 +1,4 @@
+//Src/components/chatPage/ChatSidebar.tsx
 import ChatIcon from "@mui/icons-material/Chat";
 import ContactsIcon from "@mui/icons-material/Contacts";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -17,10 +18,10 @@ import React, {
   useState,
 } from "react";
 import { useAppDispatch } from "../../app/hooks";
-import { fetchMessagesFromMultipleChatsThunk } from "../../features/chat/chatSlice";
 import useChatLogic from "../../hooks/useChatsLogic"; // Hook to manage chat logic
 import ChatList from "./ChatList"; // ChatList Component
 import ContactsList from "./ContactsList";
+import { fetchMessagesFromMultipleChatsThunk } from "../../features/chat/chatThunks";
 
 const ChatSidebar: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -37,6 +38,9 @@ const ChatSidebar: React.FC = () => {
   const contactsFetched = useRef(false); // Ref to track if contacts have been fetched
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
+
+  console.log("ChatSidebar rendering now")
+
 
   // Handle toggling between contacts and chats with animations
   const handleToggleContacts = useCallback(() => {
@@ -204,4 +208,4 @@ const ChatSidebar: React.FC = () => {
   );
 };
 
-export default ChatSidebar;
+export default React.memo(ChatSidebar);

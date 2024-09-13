@@ -11,13 +11,10 @@ import {
   LocalOffer as LocalOfferIcon,
   Logout as LogoutIcon,
   Menu as MenuIcon,
-  Notifications as NotificationsIcon,
   People as PeopleIcon,
 } from "@mui/icons-material";
 import {
   AppBar,
-  Avatar,
-  Badge,
   Box,
   Drawer,
   Fade,
@@ -26,9 +23,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Modal,
   Toolbar,
-  Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -40,13 +35,14 @@ import { useAppDispatch } from "../../app/hooks";
 import { RootState } from "../../app/store";
 import { handleLogout } from "../../features/auth/authSlice";
 import GlobalSearch from "./GlobalSearch";
+import NotificationBell from "./NotificationBell";
+import UserAvatar from "./UserAvatar";
 
 const Header: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
   const [iconChange, setIconChange] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -224,18 +220,8 @@ const Header: React.FC = () => {
             placeholder={t("search")}
             isHeaderSearch={true}
           />
-          <IconButton
-            color="inherit"
-            onClick={() => setModalOpen(true)}
-            sx={{ color: "white" }}
-          >
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <IconButton color="inherit" sx={{ color: "white" }}>
-            <Avatar alt="Agent Name" src="/path-to-avatar.jpg" />
-          </IconButton>
+          <NotificationBell /> {/* Render the NotificationBell component */}
+          <UserAvatar /> {/* Render the UserAvatar component */}
         </Toolbar>
       </AppBar>
       <Toolbar />
@@ -296,32 +282,6 @@ const Header: React.FC = () => {
           <Box sx={{ mt: "auto" }}>{renderLogoutLink()}</Box>
         </Box>
       </Drawer>
-      <Modal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        aria-labelledby="notification-modal-title"
-        aria-describedby="notification-modal-description"
-      >
-        <Box
-          sx={{
-            position: "relative",
-            top: "7%",
-            right: "2%",
-            width: 250,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 2,
-          }}
-        >
-          <Typography id="notification-modal-title" variant="h6" component="h2">
-            {t("notifications")}
-          </Typography>
-          <Typography id="notification-modal-description" sx={{ mt: 2 }}>
-            {t("no_notifications")}
-          </Typography>
-        </Box>
-      </Modal>
     </>
   );
 };

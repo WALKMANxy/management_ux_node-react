@@ -65,7 +65,7 @@ export class ChatService {
       const chat = await Chat.findById(chatId, {
         participants: 1,
         messages: { $slice: [skip, limit] },
-      })
+      });
 
       if (!chat) {
         throw new Error("Chat not found");
@@ -97,6 +97,78 @@ export class ChatService {
       } else {
         console.error("Unexpected error fetching messages:", error);
         throw new Error("Failed to fetch messages");
+      }
+    }
+  }
+
+  // Service: chatService.js
+
+  // Fetch messages older than the provided timestamp
+  static async getOlderMessages(
+    chatId: string,
+    userId: string,
+    oldestTimestamp: string,
+    limit: number // Include limit parameter
+  ) {
+    try {
+      console.log("Fetching older messages for:", {
+        chatId,
+        userId,
+        oldestTimestamp,
+        limit,
+      });
+
+      const chatObjectId = new Types.ObjectId(chatId);
+
+      const oldestTimestampDate = new Date(oldestTimestamp);
+
+      // Fetch the chat including messages older than the provided timestamp
+      const chat = await Chat.findById(chatObjectId, {
+        participants: 1,
+        messages: 1,
+      });
+
+      if (!chat) {
+        throw new Error("Chat not found or access denied.");
+      }
+
+      console.log("Chat found:", chat);
+
+      const userObjectId = new Types.ObjectId(userId);
+
+      // Check if the user is a participant in the chat
+      if (
+        !chat.participants.some((participant) =>
+          participant.equals(userObjectId)
+        )
+      ) {
+        throw new Error(
+          "Access forbidden: You are not a participant in this chat."
+        );
+      }
+
+      // Use aggregation pipeline to fetch messages efficiently
+      const olderMessages = await Chat.aggregate([
+        { $match: { _id: chatObjectId } },
+        { $unwind: "$messages" },
+        { $match: { "messages.timestamp": { $lt: oldestTimestampDate } } },
+        { $sort: { "messages.timestamp": -1 } }, // Sort messages in descending order by timestamp
+        { $limit: limit }, // Limit to the next 25 messages older than the timestamp
+        { $project: { messages: 1 } },
+      ]).exec();
+
+      // Extract messages from the aggregation result
+      const messages = olderMessages.map((chat) => chat.messages);
+
+      console.log("Fetched Older Messages:", messages);
+
+      return messages;
+    } catch (error) {
+      console.error("Error fetching older messages:", error);
+      if (error instanceof Error) {
+        throw new Error(error.message || "Failed to fetch older messages");
+      } else {
+        throw new Error("Failed to fetch older messages");
       }
     }
   }
@@ -295,21 +367,23 @@ export class ChatService {
     userId: string
   ): Promise<IChat | null> {
     try {
-      const chat = await Chat.findOne({ _id: chatId });
+      const chatObjectId = new Types.ObjectId(chatId);
+
+      const chat = await Chat.findOne({ _id: chatObjectId });
 
       if (!chat) {
         throw new Error("Chat not found");
       }
 
       // Convert userId to ObjectId
-      const userObjectId = new mongoose.Types.ObjectId(userId);
+      const userObjectId = new Types.ObjectId(userId);
+
 
       // Iterate over each message ID and update its read status
       messageIds.forEach((messageId) => {
         const message = chat.messages.find(
           (msg) =>
-            msg._id.toString() ===
-            new mongoose.Types.ObjectId(messageId).toString()
+            msg.local_id === messageId
         );
         if (message && !message.readBy.some((id) => id.equals(userObjectId))) {
           message.readBy.push(userObjectId); // Add user to the readBy array if not already present

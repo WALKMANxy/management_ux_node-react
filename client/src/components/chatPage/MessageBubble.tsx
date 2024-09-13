@@ -1,13 +1,12 @@
 // MessageBubble.tsx
-import DoneIcon from "@mui/icons-material/Done";
-import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { Avatar, Box, Typography } from "@mui/material";
-import React from "react";
-import { IMessage } from "../../models/dataModels";
-import { User } from "../../models/entityModels";
+import React, { useEffect, useRef } from "react";
 import { useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
 import { selectCurrentChat } from "../../features/chat/chatSlice";
+import { IMessage } from "../../models/dataModels";
+import { User } from "../../models/entityModels";
+import MessageStatusIcon from "./MessageStatusIcon";
 
 interface MessageBubbleProps {
   message: IMessage;
@@ -31,6 +30,19 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 
   // Determine if the message is read by all participants (relevant for group chats)
   const isGroupRead = message.readBy.length === participantsData.length;
+  // Ref to track if the component has mounted
+  const hasMountedRef = useRef(false);
+
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+    }
+  }, []);
+
+  // Conditionally apply animation class
+  const animationClass = hasMountedRef.current
+    ? ""
+    : "animate__animated animate__fadeInUp animate__faster";
 
   // Determine if the message is read by the other participant in a simple chat
   const isSimpleChatRead =
@@ -38,16 +50,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
     message.readBy.includes(
       participantsData.find((user) => user._id !== currentUserId)?._id || ""
     );
-
-  const getMessageStatusIcon = () => {
-    if (message.status === "pending") return <DoneIcon sx={{ color: "gray", fontSize: "0.8rem" }} />;
-    if (message.status === "sent") return <DoneAllIcon sx={{ color: "gray", fontSize: "1.2rem" }} />;
-    if (chatType === "simple" && isSimpleChatRead)
-      return <DoneAllIcon sx={{ color: "turquoise" }} />;
-    if (chatType !== "simple" && isGroupRead)
-      return <DoneAllIcon sx={{ color: "turquoise" }} />;
-    return null;
-  };
 
   const getBackgroundColor = () => {
     switch (message.messageType) {
@@ -64,7 +66,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 
   return (
     <Box
-      className="animate__animated animate__fadeInUp animate__faster"
+      className={animationClass}
       sx={{
         display: "flex",
         flexDirection: isOwnMessage ? "row-reverse" : "row", // Control the message direction
@@ -90,7 +92,15 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
           textAlign: "left", // Align text based on the message direction
         }}
       >
-        <Typography variant="body2">{message.content}</Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            wordBreak: "break-word", // Allows long words to break and wrap to the next line
+            overflowWrap: "break-word", // Ensures text wraps within the container
+          }}
+        >
+          {message.content}
+        </Typography>
 
         {/* Timestamp and Status Icon */}
         <Typography
@@ -108,11 +118,19 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
             hour: "2-digit",
             minute: "2-digit",
           })}
-          {isOwnMessage && getMessageStatusIcon()}
+          <MessageStatusIcon
+            message={message}
+            chatType={chatType}
+            participantsData={participantsData}
+            isOwnMessage={isOwnMessage}
+            isSimpleChatRead={isSimpleChatRead}
+            isGroupRead={isGroupRead}
+          />
         </Typography>
       </Box>
     </Box>
   );
 };
 
-export default MessageBubble;
+export default React.memo(MessageBubble)
+

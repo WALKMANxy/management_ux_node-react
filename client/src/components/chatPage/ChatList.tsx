@@ -1,3 +1,4 @@
+//src/components/chatPage/ChatList.tsx
 import {
   Avatar,
   Badge,
@@ -28,6 +29,8 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm = "" }) => {
   } = useChatLogic(); // Destructure the required functions from the hook  const currentUserId = useAppSelector((state: RootState) => state.auth.userId);
 
   const sortedChats = getFilteredAndSortedChats(searchTerm);
+
+  console.log("ChatList rendering now")
 
   return (
     <List>

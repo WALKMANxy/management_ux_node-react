@@ -46,6 +46,26 @@ export const fetchMessages = async (
   }
 };
 
+// Fetch older messages for a specific chat
+export const fetchOlderMessages = async (
+  chatId: string,
+  oldestTimestamp: Date,
+  limit: number // Include limit parameter
+): Promise<IMessage[]> => {
+  try {
+    const response = await apiCall<IMessage[]>(
+      `chats/${chatId}/older-messages?oldestTimestamp=${encodeURIComponent(
+        oldestTimestamp.toISOString()
+      )}&limit=${limit}`, // Pass limit in the query string
+      "GET"
+    );
+    return response;
+  } catch (error) {
+    console.error(`Error fetching older messages for chat ${chatId}:`, error);
+    throw error;
+  }
+};
+
 // Fetch messages across multiple chats
 export const fetchMessagesFromMultipleChats = async (
   chatIds: string[]
