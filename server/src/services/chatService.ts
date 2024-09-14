@@ -11,7 +11,7 @@ export class ChatService {
         participants: userId,
       })
         .sort({ updatedAt: -1 }) // Sort by the most recently updated chats
-        .select({ messages: { $slice: -20 } }) // Only fetch the latest message for preview
+        .select({ messages: { $slice: -25 } }) // Only fetch the latest message for preview
         .lean(); // Use lean for faster reads as we're not modifying the data
 
       return chats;
@@ -361,6 +361,7 @@ export class ChatService {
   }
 
   // Update read status for multiple messages in a chat
+  // Function to update read status of messages using findOneAndUpdate
   static async updateReadStatus(
     chatId: string,
     messageIds: string[],
@@ -368,31 +369,27 @@ export class ChatService {
   ): Promise<IChat | null> {
     try {
       const chatObjectId = new Types.ObjectId(chatId);
-
-      const chat = await Chat.findOne({ _id: chatObjectId });
-
-      if (!chat) {
-        throw new Error("Chat not found");
-      }
-
-      // Convert userId to ObjectId
       const userObjectId = new Types.ObjectId(userId);
 
-
-      // Iterate over each message ID and update its read status
-      messageIds.forEach((messageId) => {
-        const message = chat.messages.find(
-          (msg) =>
-            msg.local_id === messageId
-        );
-        if (message && !message.readBy.some((id) => id.equals(userObjectId))) {
-          message.readBy.push(userObjectId); // Add user to the readBy array if not already present
+      // Update the readBy array for each message without loading the whole document
+      const updateResult = await Chat.findOneAndUpdate(
+        { _id: chatObjectId, "messages.local_id": { $in: messageIds } }, // Match chat and messages
+        {
+          $addToSet: {
+            "messages.$.readBy": userObjectId, // Add the userObjectId to the readBy array if not already present
+          },
+        },
+        {
+          new: true, // Return the updated document
+          runValidators: true, // Ensure validation rules are respected
         }
-      });
+      ).exec();
 
-      await chat.save(); // Save the updated chat document
+      if (!updateResult) {
+        throw new Error("Chat not found or no matching messages to update");
+      }
 
-      return chat.toObject();
+      return updateResult.toObject();
     } catch (error) {
       console.error("Error updating read status:", error);
       throw new Error("Failed to update read status");

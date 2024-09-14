@@ -107,43 +107,71 @@ class WebSocketService {
     }
   }
 
- // Handle incoming new message event
-public handleNewMessage = async ({
-  chatId,
-  message,
-}: {
-  chatId: string;
-  message: IMessage;
-}) => {
-  if (!store) {
-    console.error("Store has not been injected into WebSocketService.");
-    return;
-  }
+  // WebSocketService.js
 
-  // Access the current state to check if the chat exists
-  const state = store.getState();
-  const chatExists = state.chats.chats[chatId];
-
-  if (!chatExists) {
-    // Chat does not exist, fetch the entire chat data
-    console.log(`Chat with ID ${chatId} not found. Fetching chat data...`);
-
-    try {
-      const chat = await fetchChatById(chatId);
-      store.dispatch(addChatReducer(chat));
-      console.log("Chat fetched and added successfully.");
-    } catch (error) {
-      console.error("Failed to fetch and add chat:", error);
+  // Handle incoming new message event
+  public handleNewMessage = async ({
+    chatId,
+    message,
+  }: {
+    chatId: string;
+    message: IMessage;
+  }) => {
+    if (!store) {
+      console.error("Store has not been injected into WebSocketService.");
+      return;
     }
-  } else {
-    // Add a slight delay before dispatching the server-confirmed message
-    setTimeout(() => {
-      // Chat exists, dispatch the action to add the message as usual
-      store.dispatch(addMessageReducer({ chatId, message, fromServer: true }));
-    }, 100); // Adjust the delay time if necessary
-  }
-};
 
+    // Access the current state to check if the chat exists
+    const state = store.getState();
+    const chatExists = state.chats.chats[chatId];
+    const currentChatId = state.chats.currentChat?._id; // Access the currently opened chat ID
+    const currentUserId = state.auth.userId; // Access the current user ID
+
+    if (!chatExists) {
+      // Chat does not exist, fetch the entire chat data
+      console.log(`Chat with ID ${chatId} not found. Fetching chat data...`);
+
+      try {
+        const chat = await fetchChatById(chatId);
+        store.dispatch(addChatReducer(chat));
+        console.log("Chat fetched and added successfully.");
+      } catch (error) {
+        console.error("Failed to fetch and add chat:", error);
+      }
+    } else {
+      // Add a slight delay before dispatching the server-confirmed message
+      setTimeout(() => {
+        console.log(`Received message for chat ID: ${chatId}`, message);
+
+        // Chat exists, dispatch the action to add the message as usual
+        store.dispatch(
+          addMessageReducer({ chatId, message, fromServer: true })
+        );
+
+        // Wait for the message to be fully added to the server
+        setTimeout(() => {
+          // Check if the message is part of the currently opened chat and hasn't been read
+          if (
+            currentChatId === chatId && // Check if the message belongs to the current chat
+            message.sender !== currentUserId && // Ensure it's a received message
+            !message.readBy.includes(currentUserId) // Check if it hasn't been read by the current user
+          ) {
+            // Dispatch the read status update
+            store.dispatch(
+              updateReadStatusReducer({
+                chatId,
+                userId: currentUserId,
+                messageIds: [message.local_id || message._id], // Update the read status of the new message
+              })
+            );
+
+            console.log(`Read status updated for message ID: ${message._id}`);
+          }
+        }, 2000); // Add an additional delay to ensure the server processes the message
+      }, 50); // Initial delay for adding the message
+    }
+  };
 
   // Handle incoming message read event
   public handleMessageRead = ({
@@ -161,7 +189,9 @@ public handleNewMessage = async ({
     }
 
     // Dispatch the action to update the read status in local state with message IDs
-    updateReadStatusReducer({ chatId, userId, messageIds, fromServer: true });
+    store.dispatch(
+      updateReadStatusReducer({ chatId, userId, messageIds, fromServer: true })
+    );
   };
 
   // Handle incoming new chat event from the server
