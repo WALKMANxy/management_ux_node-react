@@ -28,9 +28,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   const sender = participantsData.find((user) => user._id === message.sender);
   const senderAvatar = sender?.avatar || ""; // Fallback to empty string if no avatar
 
-  // Determine if the message is read by all participants (relevant for group chats)
-  const isGroupRead = message.readBy.length === participantsData.length;
-  // Ref to track if the component has mounted
   const hasMountedRef = useRef(false);
 
   useEffect(() => {
@@ -43,13 +40,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   const animationClass = hasMountedRef.current
     ? ""
     : "animate__animated animate__fadeInUp animate__faster";
-
-  // Determine if the message is read by the other participant in a simple chat
-  const isSimpleChatRead =
-    chatType === "simple" &&
-    message.readBy.includes(
-      participantsData.find((user) => user._id !== currentUserId)?._id || ""
-    );
 
   const getBackgroundColor = () => {
     switch (message.messageType) {
@@ -123,8 +113,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
             chatType={chatType}
             participantsData={participantsData}
             isOwnMessage={isOwnMessage}
-            isSimpleChatRead={isSimpleChatRead}
-            isGroupRead={isGroupRead}
           />
         </Typography>
       </Box>
@@ -132,5 +120,11 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   );
 };
 
-export default React.memo(MessageBubble)
-
+export default React.memo(MessageBubble, (prevProps, nextProps) => {
+  return (
+    prevProps.message.readBy.length === nextProps.message.readBy.length &&
+    prevProps.message.readBy.every(
+      (value, index) => value === nextProps.message.readBy[index]
+    )
+  );
+});

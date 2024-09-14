@@ -1,51 +1,115 @@
 // NotificationBell.tsx
 import { Notifications as NotificationsIcon } from "@mui/icons-material";
-import { Badge, Box, IconButton, Modal, Typography } from "@mui/material";
+import {
+  Badge,
+  Box,
+  Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Popover,
+  Typography,
+} from "@mui/material";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import useChatLogic from "../../hooks/useChatsLogic"; // Import the custom hook
+import { formatDateForDivider } from "../../utils/chatUtils";
 
 const NotificationBell: React.FC = () => {
   const { t } = useTranslation();
-  const [modalOpen, setModalOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const navigate = useNavigate();
+  const { getUnreadChats, getChatTitle, handleSelectChat, currentChat } =
+    useChatLogic();
+
+  // Get sorted unread chats and filter out the current chat
+  const unreadChats = getUnreadChats().filter(
+    (chat) => chat._id !== currentChat?._id
+  );
+  const handleBellClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget); // Anchor the popover to the bell icon
+  };
+
+  const handleChatClick = (chatId: string) => {
+    handleSelectChat(chatId); // Select chat using the handler from the hook
+    setAnchorEl(null);
+    navigate("/messages"); // Navigate to the chat view page
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <>
       <IconButton
         color="inherit"
-        onClick={() => setModalOpen(true)}
+        onClick={handleBellClick}
         sx={{ color: "white" }}
       >
-        <Badge badgeContent={4} color="secondary">
+        <Badge badgeContent={unreadChats.length} color="secondary">
           <NotificationsIcon />
         </Badge>
       </IconButton>
 
-      <Modal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        aria-labelledby="notification-modal-title"
-        aria-describedby="notification-modal-description"
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        disableScrollLock={true} // Prevent scroll lock issues
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
       >
-        <Box
-          sx={{
-            position: "relative",
-            top: "7%",
-            right: "2%",
-            width: 250,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 2,
-          }}
-        >
-          <Typography id="notification-modal-title" variant="h6" component="h2">
+        <Box sx={{ p: 2 }}>
+          <Typography variant="h6" component="h2">
             {t("notifications")}
           </Typography>
-          <Typography id="notification-modal-description" sx={{ mt: 2 }}>
-            {t("no_notifications")}
-          </Typography>
+          {unreadChats.length > 0 ? (
+            <List>
+              {unreadChats.map((chat, index) => (
+                <React.Fragment key={chat._id}>
+                  <ListItem
+                    button
+                    onClick={() => handleChatClick(chat._id)}
+                    sx={{ display: "flex", alignItems: "flex-start" }}
+                  >
+                    <ListItemText
+                      primary={getChatTitle(chat)}
+                      secondary={
+                        chat.messages[chat.messages.length - 1]?.content.slice(
+                          0,
+                          50
+                        ) || t("no_messages")
+                      }
+                      sx={{ flex: 1 }}
+                    />
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      sx={{ minWidth: "100px", textAlign: "right", ml: 1 }}
+                    >
+                      {formatDateForDivider(
+                        chat.messages[chat.messages.length - 1]?.timestamp
+                      )}
+                    </Typography>
+                  </ListItem>
+                  {index < unreadChats.length - 1 && <Divider />}
+                </React.Fragment>
+              ))}
+            </List>
+          ) : (
+            <Typography sx={{ mt: 2 }}>{t("no_notifications")}</Typography>
+          )}
         </Box>
-      </Modal>
+      </Popover>
     </>
   );
 };
