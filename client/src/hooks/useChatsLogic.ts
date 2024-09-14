@@ -2,7 +2,7 @@ import { SerializedError } from "@reduxjs/toolkit";
 import { debounce } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { useAppDispatch } from "../app/hooks";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { selectUserId, selectUserRole } from "../features/auth/authSlice";
 import {
   addMessageReducer,
@@ -358,6 +358,55 @@ const useChatLogic = () => {
     dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
   };
 
+  // New function to get unread chats, sorted by the latest message timestamp
+  const getUnreadChats = useCallback(() => {
+    const unreadChats = chats.filter((chat) => getUnreadCount(chat) > 0);
+
+    // Sort chats by the timestamp of the latest message
+    return [...unreadChats].sort((a, b) => {
+      const lastMessageA = a.messages[a.messages.length - 1];
+      const lastMessageB = b.messages[b.messages.length - 1];
+      if (!lastMessageA || !lastMessageB) return 0;
+      return (
+        new Date(lastMessageB.timestamp).getTime() -
+        new Date(lastMessageA.timestamp).getTime()
+      );
+    });
+  }, [chats, getUnreadCount]);
+
+
+
+  // Function to select a chat and update the currentChat state
+  const handleSelectChat = (chatId: string) => {
+    const selectedChat = chats.find((chat) => chat._id === chatId);
+    if (selectedChat) {
+      selectChat(selectedChat); // Pass the entire chat object to the state
+    }
+  };
+
+   // Custom hook to find the message inside the state by local_id
+const useStateMessage = (chatId: string | undefined, localId: string | undefined): IMessage | undefined => {
+  return useAppSelector((state) => {
+    if (!chatId || !localId) return undefined;
+
+    const chat = state.chats.chats[chatId];
+    if (!chat) {
+      console.error(`Chat with ID ${chatId} does not exist in the state.`);
+      return undefined;
+    }
+
+    // Find the message by matching local_id
+    const stateMessage = chat.messages.find(
+      (message) => message.local_id === localId
+    );
+
+    if (!stateMessage) {
+      console.error(`Message with local_id ${localId} not found in chat ${chatId}.`);
+    }
+
+  });
+};
+
   return {
     chats: Object.values(chats),
     loadingChats,
@@ -377,6 +426,9 @@ const useChatLogic = () => {
     getUnreadCount,
     handleLoadMoreMessages,
     handleBackToChats,
+    getUnreadChats,
+    handleSelectChat,
+    useStateMessage
   };
 };
 

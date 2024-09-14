@@ -23,6 +23,8 @@ import InputBox from "./InputBox";
 import RenderMessage from "./RenderMessage"; // Import the RenderMessage component
 import RenderParticipantsAvatars from "./RenderParticipantsAvatars"; // Import the RenderParticipantsAvatars component
 
+
+
 const ChatView: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
