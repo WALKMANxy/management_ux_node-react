@@ -107,10 +107,8 @@ export const login = async (req: Request, res: Response) => {
     });
 
     // Redirect URL based on user role
-    let redirectUrl = `${config.appUrl}/${user.role}-dashboard`;
     return res.status(200).json({
       message: "Login successful",
-      redirectUrl,
       id: user.id,
       sessionId: session._id,
     });

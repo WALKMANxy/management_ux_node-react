@@ -1,13 +1,9 @@
 import { Request, Response } from "express";
-import { config } from "../config/config";
 import { AuthenticatedRequest } from "../models/types";
 import { IUser } from "../models/User";
 import { OAuthService } from "../services/OAuthService";
-import {
-  createSession,
-  renewSession,
-} from "../utils/sessionUtils";
 import { generateSessionToken } from "../utils/jwtUtils";
+import { createSession, renewSession } from "../utils/sessionUtils";
 
 export class OAuthController {
   static async handleOAuthCallback(req: Request, res: Response) {
@@ -37,9 +33,6 @@ export class OAuthController {
         secure: true,
         sameSite: "none",
       });
-
-      const redirectUrl = `${config.appUrl}/${user.role}-dashboard`;
-      res.redirect(redirectUrl);
     } catch (error) {
       console.error("Error during OAuth callback", error);
       res.status(500).send("Authentication failed");

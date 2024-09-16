@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { logger } from "../utils/logger";
 
-const nodeEnv = process.env.NODE_ENV || "development";
+const nodeEnv = process.env.NODE_ENV
 
 // Function to load environment-specific .env file
 const loadEnvFile = () => {
