@@ -32,7 +32,6 @@ const Layout: React.FC = () => {
           p: isClientsOrMessagesPage && isMobile ? 0 : 3, // Adjust padding for clients and messages pages
           pl: isSettingsPage ? 0 : undefined, // Remove left padding for settings page
           pr: isSettingsPage ? 0 : undefined,
-          overflow: "show", // Prevent content from overflowing
 
         }}
       >

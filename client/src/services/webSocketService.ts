@@ -62,8 +62,8 @@ class WebSocketService {
 
   // On connect, flush the offline queues
   private handleConnect = () => {
-    console.log("WebSocket connected");
-    this.reconnectAttempts = 0;
+/*     console.log("WebSocket connected");
+ */    this.reconnectAttempts = 0;
 
     // Flush read status updates
     while (this.offlineReadStatusQueue.length > 0) {
@@ -84,9 +84,9 @@ class WebSocketService {
     }
   };
 
-  private handleDisconnect = (reason: Socket.DisconnectReason) => {
-    console.log(`WebSocket disconnected: ${reason}`);
-    this.tryReconnect();
+  private handleDisconnect = () => {
+/*     console.log(`WebSocket disconnected: ${reason}`);
+ */    this.tryReconnect();
   };
 
   private handleConnectError = (error: Error) => {
@@ -97,9 +97,9 @@ class WebSocketService {
   private tryReconnect() {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
-      console.log(
+     /*  console.log(
         `Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})`
-      );
+      ); */
       setTimeout(() => this.socket?.connect(), 5000 * this.reconnectAttempts);
     } else {
       console.error(
@@ -131,20 +131,20 @@ class WebSocketService {
 
     if (!chatExists) {
       // Chat does not exist, fetch the entire chat data
-      console.log(`Chat with ID ${chatId} not found. Fetching chat data...`);
-
+/*       console.log(`Chat with ID ${chatId} not found. Fetching chat data...`);
+ */
       try {
         const chat = await fetchChatById(chatId);
         store.dispatch(addChatReducer(chat));
-        console.log("Chat fetched and added successfully.");
-      } catch (error) {
+/*         console.log("Chat fetched and added successfully.");
+ */      } catch (error) {
         console.error("Failed to fetch and add chat:", error);
       }
     } else {
       // Add a slight delay before dispatching the server-confirmed message
       setTimeout(() => {
-        console.log(`Received message for chat ID: ${chatId}`, message);
-
+/*         console.log(`Received message for chat ID: ${chatId}`, message);
+ */
         // Chat exists, dispatch the action to add the message as usual
         store.dispatch(
           addMessageReducer({ chatId, message, fromServer: true })

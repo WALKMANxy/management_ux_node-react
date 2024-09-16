@@ -123,10 +123,10 @@ const userSlice = createSlice({
       .addCase(
         getAllUsersThunk.fulfilled,
         (state, action: PayloadAction<User[]>) => {
-          console.log(
+          /* console.log(
             "getAllUsersThunk fulfilled with payload:",
             action.payload
-          ); // Debug: Log the payload
+          ); // Debug: Log the payload */
 
           state.status = "succeeded";
 
@@ -139,15 +139,15 @@ const userSlice = createSlice({
               return acc;
             },
             {}
-          );
+          ); /*  console.log("Updated current user in state:", state.currentUser); // Debug: Log the transformed users object */
 
-          console.log("Updated users in state:", state.users); // Debug: Log the transformed users object
-          console.log("Updated current user in state:", state.currentUser); // Debug: Log the transformed users object
+          /*           console.log("Updated users in state:", state.users); // Debug: Log the transformed users object
+           */
 
-          console.log(
+          /*  console.log(
             "Current state after fulfilling getAllUsersThunk:",
             state
-          ); // Debug: Log the complete state
+          ); // Debug: Log the complete state */
         }
       )
 
@@ -232,20 +232,11 @@ export const selectAllUsers = createSelector(
   (users) => Object.values(users)
 );
 
-// Memoized selector to select the status of user operations
-export const selectUsersStatus = createSelector(
-  (state: RootState) => state.users.status,
-  (status) => status
-);
+// Replace with a simple selector
+export const selectUsersStatus = (state: RootState) => state.users.status;
 
-// Memoized selector to select the error state for user operations
-export const selectUsersError = createSelector(
-  (state: RootState) => state.users.error,
-  (error) => error
-);
+// Replace with a simple selector
+export const selectUsersError = (state: RootState) => state.users.error;
 
-// Memoized selector to select the current user
-export const selectCurrentUser = createSelector(
-  (state: RootState) => state.users.currentUser,
-  (currentUser) => currentUser
-);
+// Selector to select the current user
+export const selectCurrentUser = (state: RootState) => state.users.currentUser;

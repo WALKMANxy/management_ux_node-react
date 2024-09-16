@@ -54,13 +54,14 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
           <FontAwesomeIcon icon={faSearch} className="search-icon" />
         </div>
         <input
-          type="text"
+          type="search" // Ensures minimal autofill interference
           className="form-control search-bar"
           placeholder={placeholder || t("globalSearch.placeholder")}
           value={input}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
+          autoComplete="off" // Prevents autofill suggestions
         />
       </div>
       {showResults && (

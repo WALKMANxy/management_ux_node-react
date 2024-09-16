@@ -307,7 +307,7 @@ const dataSlice = createSlice({
           }
         }
       })
-      .addCase(createVisitAsync.rejected, (state, action) => {
+      .addCase(createVisitAsync.rejected, (_state, action) => {
         // Optionally handle errors globally
         // You can set a global error state or manage it locally in the component
         console.error("Create visit failed:", action.payload);

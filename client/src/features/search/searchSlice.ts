@@ -177,11 +177,11 @@ export const searchItems = createAsyncThunk<
             .flatMap(([agentId, { Visits }]) =>
               Visits.filter(
                 (visit) =>
-                  visit.reason?.toLowerCase().includes(sanitizedQuery) ||
+                  visit.visitReason?.toLowerCase().includes(sanitizedQuery) ||
                   visit.notePublic?.toLowerCase().includes(sanitizedQuery)
               ).map((visit) => ({
-                id: visit.id,
-                name: visit.reason,
+                id: visit._id ?? '', // Use the nullish coalescing operator to default to an empty string if _id is null or undefined
+                name: visit.visitReason,
                 type: "visit" as SearchResult["type"],
                 date: visit.date,
                 pending: visit.pending,
@@ -202,13 +202,13 @@ export const searchItems = createAsyncThunk<
           ? (visits as Visit[]) // Explicitly assert the type as an array of Visit
               .filter(
                 (visit) =>
-                  visit.reason.toLowerCase().includes(sanitizedQuery) ||
+                  visit.visitReason.toLowerCase().includes(sanitizedQuery) ||
                   visit.notePublic?.toLowerCase().includes(sanitizedQuery) ||
                   visit.date.toISOString().slice(0, 10).includes(sanitizedQuery)
               )
               .map((visit) => ({
-                id: visit.id,
-                name: visit.reason,
+                id: visit._id ?? '', // Use the nullish coalescing operator to default to an empty string if _id is null or undefined
+                name: visit.visitReason,
                 type: "visit" as SearchResult["type"],
                 date: visit.date,
                 pending: visit.pending,
