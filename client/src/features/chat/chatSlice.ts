@@ -125,7 +125,8 @@ const chatSlice = createSlice({
 
       // Create a new array of messages with updated read statuses
       const updatedMessages = chat.messages.map((message) => {
-        if (messageIds.includes(message.local_id ?? '')) {          // Create a new message object with updated readBy array if userId is not already included
+        if (messageIds.includes(message.local_id ?? "")) {
+          // Create a new message object with updated readBy array if userId is not already included
           return {
             ...message,
             readBy: message.readBy.includes(userId)

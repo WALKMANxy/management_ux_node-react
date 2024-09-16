@@ -64,13 +64,25 @@ const AgentDashboard: React.FC = () => {
       className="agent-dashboard"
       sx={{ p: isMobile ? 0 : 4, bgcolor: "#f4f5f7" }}
     >
-      <Typography variant="h4" gutterBottom>
-        {details && "name" in details ? (
-          <>{t("agentDashboard.welcomeBack", { name: details.name })}</>
-        ) : (
-          <Skeleton animation="wave" width="30%" />
-        )}
-      </Typography>
+      {" "}
+      {isLoading ? (
+        <Skeleton
+          animation="wave"
+          variant="text"
+          width="50%"
+          height={30}
+          sx={{ borderRadius: "4px" }}
+          aria-label="loading-statistics"
+        />
+      ) : (
+        <Typography variant="h4" gutterBottom>
+          {details && "name" in details ? (
+            <>{t("agentDashboard.welcomeBack", { name: details.name })}</>
+          ) : (
+            <Skeleton animation="wave" width="30%" />
+          )}
+        </Typography>
+      )}
       {details && "clients" in details ? (
         <GlobalSearch filter="client" onSelect={handleSelect} />
       ) : (
@@ -167,13 +179,24 @@ const AgentDashboard: React.FC = () => {
             </Box>
           ) : (
             <Box mb={4}>
-              <Typography variant="h5" gutterBottom>
-                {details && "name" in details ? (
-                  t("agentDashboard.yourStatistics")
-                ) : (
-                  <Skeleton animation="wave" width="40%" />
-                )}
-              </Typography>
+              {isLoading ? (
+                <Skeleton
+                  animation="wave"
+                  variant="text"
+                  width="50%"
+                  height={30}
+                  sx={{ borderRadius: "4px" }}
+                  aria-label="loading-statistics"
+                />
+              ) : (
+                <Typography variant="h5" gutterBottom>
+                  {details && "name" in details ? (
+                    t("agentDashboard.yourStatistics")
+                  ) : (
+                    <Skeleton animation="wave" width="40%" />
+                  )}
+                </Typography>
+              )}
 
               <Divider sx={{ my: 2, borderRadius: "12px" }} />
               <Grid container spacing={2}>

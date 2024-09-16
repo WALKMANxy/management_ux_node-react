@@ -86,6 +86,9 @@ export const logRequestsIp = async (
     ? `[${ipInfo.ip}, country: ${ipInfo.country}, org: ${ipInfo.org}, timezone: ${ipInfo.timezone}]`
     : `[${clientIp}]`;
 
+  // Attach IP info to the request object
+  req.ipInfo = ipInfo || { ip: clientIp, country: '', region: '', city: '', latitude: 0, longitude: 0 };
+  
   logger.info(
     `Incoming request ${req.method}${req.url} : from: ${logData.userEmail}, ${logData.userRole}, ${logData.entityCode} | ipInfo: ${ipInfoString}`
   );

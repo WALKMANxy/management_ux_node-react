@@ -10,13 +10,16 @@ export const createVisit = async (visitData: {
   notePublic?: string;
   notePrivate?: string;
   visitIssuedBy: string;
+  pending: true;
+  completed: false;
 }): Promise<Visit> => {
+  // No change required here; ensure apiCall is correctly set up.
   return apiCall<Visit>("visits", "POST", visitData);
 };
 
 export const updateVisitById = async (
-  id: string,
+  _id: string,
   visitData: Partial<Visit>
 ): Promise<Visit> => {
-  return apiCall<Visit>(`visits/${id}`, "PATCH", visitData);
+  return apiCall<Visit>(`visits/${_id}`, "PATCH", visitData);
 };

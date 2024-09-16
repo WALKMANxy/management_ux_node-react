@@ -6,8 +6,8 @@ import { RootState } from "../../app/store";
 import { selectCurrentChat } from "../../features/chat/chatSlice";
 import { IMessage } from "../../models/dataModels";
 import { User } from "../../models/entityModels";
+import "../../Styles/animatecss.css";
 import MessageStatusIcon from "./MessageStatusIcon";
-
 interface MessageBubbleProps {
   message: IMessage;
   participantsData: Partial<User>[]; // Array of participants data passed from ChatView
@@ -36,10 +36,12 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
     }
   }, []);
 
-  // Conditionally apply animation class
-  const animationClass = hasMountedRef.current
-    ? ""
-    : "animate__animated animate__fadeInUp animate__faster";
+  // Conditionally apply animation class based on whether the message is the user's own
+  const animationClass = isOwnMessage
+    ? hasMountedRef.current
+      ? ""
+      : "animate__animated animate__fadeInUp"
+    : "animate__animated animate__fadeInUp";
 
   const getBackgroundColor = () => {
     switch (message.messageType) {
@@ -50,7 +52,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
       case "visit":
         return "rgba(255, 165, 0, 0.1)";
       default:
-        return isOwnMessage ? "rgba(0, 123, 255, 0.1)" : "#ffffff";
+        return isOwnMessage ? "rgba(33,138,255, 0.3)" : "#ffffff";
     }
   };
 
@@ -125,6 +127,7 @@ export default React.memo(MessageBubble, (prevProps, nextProps) => {
     prevProps.message.readBy.length === nextProps.message.readBy.length &&
     prevProps.message.readBy.every(
       (value, index) => value === nextProps.message.readBy[index]
-    )
+    ) &&
+    prevProps.message.status === nextProps.message.status // Include status in comparison
   );
 });

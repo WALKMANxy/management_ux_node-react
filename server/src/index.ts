@@ -6,6 +6,7 @@ import rateLimit from "express-rate-limit";
 import fs from "fs";
 import helmet from "helmet";
 import https from "https";
+import localtunnel from "localtunnel";
 /* import localtunnel from "localtunnel";
  */ import mongoose from "mongoose";
 import { Server as SocketIOServer } from "socket.io";
@@ -26,7 +27,6 @@ import usersRoutes from "./routes/users";
 import visitsRoutes from "./routes/visits";
 import { errorHandler } from "./utils/errorHandler";
 import { logger, logRequestsIp } from "./utils/logger";
-import localtunnel from "localtunnel";
 
 const app = express();
 const PORT = config.port || "3000";
@@ -109,7 +109,7 @@ server.listen(PORT, async () => {
     environment: process.env.NODE_ENV || "development",
   });
 
- if (process.env.NODE_ENV === "local") {
+  if (process.env.NODE_ENV === "local") {
     try {
       const tunnel = await localtunnel({
         port: parseInt(PORT),

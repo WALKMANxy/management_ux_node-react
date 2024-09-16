@@ -23,8 +23,6 @@ import InputBox from "./InputBox";
 import RenderMessage from "./RenderMessage"; // Import the RenderMessage component
 import RenderParticipantsAvatars from "./RenderParticipantsAvatars"; // Import the RenderParticipantsAvatars component
 
-
-
 const ChatView: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -45,7 +43,7 @@ const ChatView: React.FC = () => {
   } = useChatView(); // Destructure the hook values
 
   // Hook for loading older messages
-  const { messagesContainerRef } = useLoadOlderMessages(
+  const { messagesContainerRef, topRef } = useLoadOlderMessages(
     currentChat?._id || null
   );
 
@@ -96,6 +94,7 @@ const ChatView: React.FC = () => {
           alignItems: "center",
           justifyContent: "space-between",
           mb: 2,
+          mt: 2,
           flexShrink: 0, // Prevent shrinking of the header
         }}
       >
@@ -169,6 +168,7 @@ const ChatView: React.FC = () => {
           }}
           ref={messagesContainerRef} // Attach the ref from useLoadOlderMessages
         >
+          <div ref={topRef} style={{ height: 1 }}></div> {/* Add this line */}
           <RenderMessage
             messages={sortedMessages}
             currentUserId={currentUserId}

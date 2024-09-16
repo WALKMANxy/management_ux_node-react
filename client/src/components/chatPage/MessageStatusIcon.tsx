@@ -22,23 +22,25 @@ const MessageStatusIcon: React.FC<MessageStatusIconProps> = ({
   const getMessageStatusIcon = () => {
     // Check read statuses first to avoid early returns from status checks
     if (chatType === "simple" && message.readBy.length === 2) {
-      return <DoneAllIcon sx={{ color: "turquoise" }} />;
+      return <DoneAllIcon sx={{ color: "deepskyblue",  fontSize: "1.2rem" }} />;
     }
 
     if (
       chatType === "group" &&
       message.readBy.length === participantsData.length - 1
     ) {
-      return <DoneAllIcon sx={{ color: "turquoise" }} />;
+      return <DoneAllIcon sx={{ color: "deepskyblue",  fontSize: "1.2rem" }} />;
     }
 
-    // Check message statuses after read status checks
-    if (message.status === "pending") {
-      return <DoneIcon sx={{ color: "gray", fontSize: "1.2rem" }} />;
-    }
+
 
     if (message.status === "sent") {
       return <DoneAllIcon sx={{ color: "gray", fontSize: "1.2rem" }} />;
+    }
+
+     // Check message statuses after read status checks
+     if (message.status === "pending") {
+      return <DoneIcon sx={{ color: "gray", fontSize: "1.2rem" }} />;
     }
 
     return null;

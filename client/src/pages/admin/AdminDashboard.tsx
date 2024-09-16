@@ -111,9 +111,20 @@ const AdminDashboard: React.FC = () => {
       className="admin-dashboard"
       sx={{ p: isMobile ? 0 : 4, bgcolor: "#f4f5f7" }}
     >
-      <Typography variant="h4" gutterBottom>
-        {t("adminDashboard.welcomeBack", { name: "Admin" })}
-      </Typography>
+      {loadingState ? (
+        <Skeleton
+          animation="wave"
+          variant="text"
+          width="60%"
+          height={40}
+          sx={{ borderRadius: "4px" }}
+          aria-label="loading-welcome"
+        />
+      ) : (
+        <Typography variant="h4" gutterBottom>
+          {t("adminDashboard.welcomeBack", { name: "Admin" })}
+        </Typography>
+      )}
       {loadingState ? (
         <Skeleton
           animation="wave"
@@ -127,9 +138,8 @@ const AdminDashboard: React.FC = () => {
         <GlobalSearch filter="admin" onSelect={handleSelect} />
       )}
 
-      <Grid container spacing={6} mt={ 2}>
-        <Grid  item xs={!isTablet ? 12 : 0} md={!isTablet ? 9 : 0}>
-
+      <Grid container spacing={6} mt={2}>
+        <Grid item xs={!isTablet ? 12 : 0} md={!isTablet ? 9 : 0}>
           {selectedAgentData ? (
             <Box mb={4}>
               <Box
@@ -355,9 +365,20 @@ const AdminDashboard: React.FC = () => {
                   mb: 2,
                 }}
               >
-                <Typography variant="h5" gutterBottom>
-                  {t("adminDashboard.yourStatistics")}
-                </Typography>
+                {loadingState ? (
+                  <Skeleton
+                    animation="wave"
+                    variant="text"
+                    width="50%"
+                    height={30}
+                    sx={{ borderRadius: "4px" }}
+                    aria-label="loading-statistics"
+                  />
+                ) : (
+                  <Typography variant="h5" gutterBottom>
+                    {t("adminDashboard.yourStatistics")}
+                  </Typography>
+                )}
                 {isTablet && (
                   <Fab
                     color="primary"
