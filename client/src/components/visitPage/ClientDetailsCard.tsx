@@ -1,5 +1,13 @@
+import AddIcon from "@mui/icons-material/Add";
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Typography,
+} from "@mui/material";
 import React from "react";
-import { Avatar, Box, Card, CardContent, Typography } from "@mui/material";
 import { useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
 
@@ -27,11 +35,16 @@ const infoStyles = {
   },
 };
 
+// src/components/visitPage/ClientDetailsCard.tsx
 interface ClientDetailsCardProps {
   clientId: string;
+  onCreateVisit: () => void; // New prop
 }
 
-const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({ clientId }) => {
+const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({
+  clientId,
+  onCreateVisit,
+}) => {
   const client = useAppSelector(
     (state: RootState) => state.data.clients[clientId]
   );
@@ -49,15 +62,25 @@ const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({ clientId }) => {
   );
 
   return (
-    <Card sx={{ m: 2, p: 2, borderRadius: 4, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)" }}>
+    <Card sx={{ m: 2, p: 2, borderRadius: 4, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", position: "relative" }}>
+      {/* Create Visit Button */}
+      <Button
+        variant="contained"
+        color="secondary"
+        startIcon={<AddIcon />}
+        onClick={onCreateVisit}
+        sx={{ position: "absolute", top: 16, right: 16 }}
+      >
+        Create Visit
+      </Button>
+
       <CardContent>
         <Box display="flex" alignItems="center" gap={2}>
-          {/* Placeholder Avatar with First Letter of Name */}
+          {/* Existing Avatar and Client Information */}
           <Avatar sx={{ width: 48, height: 48 }}>
             {client.name.charAt(0).toUpperCase()}
           </Avatar>
 
-          {/* Client Information */}
           <Box>
             <Typography sx={infoStyles.title}>{client.name}</Typography>
             <Typography sx={infoStyles.subtitle}>Code: {client.id}</Typography>

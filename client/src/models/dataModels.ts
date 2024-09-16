@@ -23,9 +23,9 @@ export type Movement = {
 
 export type Visit = {
   _id?: string;
-  clientId: string; // Unique association with a client
+  clientId: string; // Client associated with this visit
   type: string;
-  reason: string;
+  visitReason: string;
   createdAt: Date;
   date: Date;
   notePublic?: string;
