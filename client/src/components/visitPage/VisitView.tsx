@@ -18,7 +18,7 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId }) => {
     <Card sx={{ m: 2 }}>
       <CardContent>
         <Typography variant="h5">
-          {visit.reason} | {visit.clientId}
+          {visit.visitReason} | {visit.clientId}
         </Typography>
         <Typography variant="subtitle1" color="textSecondary">
           Agent: {visit.agentName || "N/A"}

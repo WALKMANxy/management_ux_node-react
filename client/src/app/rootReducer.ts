@@ -12,6 +12,7 @@ import dataReducer from "../features/data/dataSlice";
 import searchReducer from "../features/search/searchSlice";
 import { userApi } from "../features/users/userQueries";
 import userReducer from "../features/users/userSlice";
+import { updateApi } from "../features/data/promosVisitsQueries";
 
 // Combine all your reducers
 const appReducer = combineReducers({
@@ -25,6 +26,8 @@ const appReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
   [chatApi.reducerPath]: chatApi.reducer,
   [dataApi.reducerPath]: dataApi.reducer, // Add the dataApi reducer here
+  [updateApi.reducerPath]: updateApi.reducer,
+
 });
 
 // Root reducer that handles resetting state on logout

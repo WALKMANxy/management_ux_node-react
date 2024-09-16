@@ -77,6 +77,45 @@ export const updatePromos = createAsyncThunk(
   }
 );
 
+// Thunk to create a new visit
+export const createVisitAsync = createAsyncThunk(
+  "data/createVisit",
+  async (
+    visitData: {
+      clientId: string;
+      type: string;
+      visitReason: string;
+      date: string;
+      notePublic?: string;
+      notePrivate?: string;
+      visitIssuedBy: string;
+      pending: boolean;
+      completed: boolean;
+    },
+    { dispatch, rejectWithValue }
+  ) => {
+    try {
+      // Dispatch the mutation and unwrap the response
+      const response = await dispatch(
+        updateApi.endpoints.createVisit.initiate(visitData)
+      ).unwrap();
+      return response;
+    } catch (err: unknown) {
+      // Safely handle and type the error
+      if (err instanceof Error && 'data' in err) {
+        // Handle errors with a 'data' property (like RTK Query errors)
+        return rejectWithValue((err as { data: string }).data);
+      } else if (err instanceof Error) {
+        // Generic error handling
+        return rejectWithValue(err.message);
+      } else {
+        // Fallback in case the error is of an unknown structure
+        return rejectWithValue("Failed to create visit.");
+      }
+    }
+  }
+);
+
 const dataSlice = createSlice({
   name: "data",
   initialState,
@@ -234,6 +273,44 @@ const dataSlice = createSlice({
         } else if (state.currentUserDetails?.role === "admin") {
           state.currentUserPromos = updatedPromos as GlobalPromos;
         }
+      })
+      .addCase(createVisitAsync.fulfilled, (state, action: PayloadAction<Visit>) => {
+        const newVisit = action.payload;
+
+        // Determine how to add the new visit based on user role
+        const role = state.currentUserDetails?.role;
+
+        if (role === "client" || role === "agent") {
+          // For clients and agents, currentUserVisits is an array
+          if (Array.isArray(state.currentUserVisits)) {
+            state.currentUserVisits.push(newVisit);
+          }
+        } else if (role === "admin") {
+          // For admin, currentUserVisits is GlobalVisits
+          if (typeof state.currentUserVisits !== "object" || Array.isArray(state.currentUserVisits)) {
+            // Initialize currentUserVisits as GlobalVisits if it's not already
+            state.currentUserVisits = {} as GlobalVisits;
+          }
+
+          // Find the agent associated with the client
+          const agent = Object.values(state.agents).find((agent) =>
+            agent.clients.some((client) => client.id === newVisit.clientId)
+          );
+
+          if (agent) {
+            // Ensure the agent exists in currentUserVisits
+            const agentVisits = state.currentUserVisits as GlobalVisits;
+            if (!agentVisits[agent.id]) {
+              agentVisits[agent.id] = { Visits: [] };
+            }
+            agentVisits[agent.id].Visits.push(newVisit);
+          }
+        }
+      })
+      .addCase(createVisitAsync.rejected, (state, action) => {
+        // Optionally handle errors globally
+        // You can set a global error state or manage it locally in the component
+        console.error("Create visit failed:", action.payload);
       });
   },
 });

@@ -1,7 +1,7 @@
-import { Document, Schema, Types, model } from "mongoose";
+import { Document, Schema, model } from "mongoose";
 
 export interface IVisit extends Document {
-  clientId: Types.ObjectId; // Client associated with this visit
+  clientId: string; // Client associated with this visit
   type: string;
   visitReason: string;
   createdAt: Date;
@@ -15,7 +15,7 @@ export interface IVisit extends Document {
 
 const visitSchema = new Schema<IVisit>(
   {
-    clientId: { type: Schema.Types.ObjectId, ref: "Client", required: true }, // Reference to the Client collection
+    clientId: { type: String }, // Reference to the Client collection
     type: { type: String, required: true },
     visitReason: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
@@ -30,7 +30,5 @@ const visitSchema = new Schema<IVisit>(
 );
 
 visitSchema.index({ visitIssuedBy: 1 });
-
-
 
 export const Visit = model<IVisit>("Visit", visitSchema);
