@@ -1,10 +1,12 @@
 // src/components/visitPage/CreateVisitForm.tsx
+import CloseIcon from "@mui/icons-material/Close";
+import SendIcon from "@mui/icons-material/Send";
 import {
   Alert,
   Box,
-  Button,
   FormControl,
   Grid,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
@@ -13,8 +15,9 @@ import {
   Typography,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { StaticDateTimePicker } from "@mui/x-date-pickers/StaticDateTimePicker";
+import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
 import dayjs, { Dayjs } from "dayjs";
 import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
@@ -35,14 +38,11 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
     (state: RootState) => state.data.currentUserDetails
   );
 
-  // Form state
   const [type, setType] = useState<string>("");
   const [reason, setReason] = useState<string>("");
   const [date, setDate] = useState<Dayjs | null>(dayjs());
   const [notePublic, setNotePublic] = useState<string>("");
-  const [notePrivate, setNotePrivate] = useState<string>("");
 
-  // Snackbar state for success/error messages
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
@@ -52,7 +52,6 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Basic validation
     if (!type || !reason || !date) {
       setSnackbarMessage("Please fill in all required fields.");
       setSnackbarSeverity("error");
@@ -60,42 +59,31 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
       return;
     }
 
-    // Prepare visit data
     const visitData = {
       clientId,
       type,
       visitReason: reason,
       date: date.toISOString(),
       notePublic: notePublic.trim() === "" ? undefined : notePublic.trim(),
-      notePrivate: notePrivate.trim() === "" ? undefined : notePrivate.trim(),
       visitIssuedBy: currentUser?.id || "unknown",
       pending: true,
       completed: false,
     };
 
     try {
-      // Dispatch the createVisit thunk
       await dispatch(createVisitAsync(visitData)).unwrap();
-
       setSnackbarMessage("Visit created successfully!");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
-
-      // Reset form fields
       setType("");
       setReason("");
       setDate(dayjs());
       setNotePublic("");
-      setNotePrivate("");
-
-      // Close the form
       onClose();
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        setSnackbarMessage(error.message);
-      } else {
-        setSnackbarMessage("Failed to create visit.");
-      }
+      setSnackbarMessage(
+        error instanceof Error ? error.message : "Failed to create visit."
+      );
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
     }
@@ -130,7 +118,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
         <Grid container spacing={2}>
           {/* Type Field */}
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth required>
+            <FormControl fullWidth required variant="filled">
               <InputLabel id="visit-type-label">Type</InputLabel>
               <Select
                 labelId="visit-type-label"
@@ -138,6 +126,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
                 value={type}
                 label="Type *"
                 onChange={(e) => setType(e.target.value)}
+                sx={{ backgroundColor: "#f3e5f5" }} // Faint purple
               >
                 <MenuItem value="Regular">Regular</MenuItem>
                 <MenuItem value="Urgent">Urgent</MenuItem>
@@ -147,7 +136,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
 
           {/* Reason Field */}
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth required>
+            <FormControl fullWidth required variant="filled">
               <InputLabel id="visit-reason-label">Reason</InputLabel>
               <Select
                 labelId="visit-reason-label"
@@ -155,6 +144,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
                 value={reason}
                 label="Reason *"
                 onChange={(e) => setReason(e.target.value)}
+                sx={{ backgroundColor: "#f3e5f5" }} // Faint purple
               >
                 <MenuItem value="Issue">Issue</MenuItem>
                 <MenuItem value="Routine">Routine</MenuItem>
@@ -163,15 +153,17 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
             </FormControl>
           </Grid>
 
-          {/* Date Field */}
+          {/* Date and Time Field */}
           <Grid item xs={12} sm={6}>
-            <DatePicker
-              label="Date *"
+            <StaticDateTimePicker
               value={date}
               onChange={(newValue: Dayjs | null) => {
                 setDate(newValue);
               }}
-              slotProps={{ textField: { fullWidth: true, required: true } }}
+              viewRenderers={{
+                hours: renderTimeViewClock,
+                minutes: renderTimeViewClock,
+              }}
             />
           </Grid>
 
@@ -184,29 +176,35 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
               fullWidth
               multiline
               rows={2}
-            />
-          </Grid>
-
-          {/* Private Note */}
-          <Grid item xs={12}>
-            <TextField
-              label="Private Note"
-              value={notePrivate}
-              onChange={(e) => setNotePrivate(e.target.value)}
-              fullWidth
-              multiline
-              rows={3}
+              variant="filled"
+              sx={{ backgroundColor: "#e3f2fd" }} // Faint blue
             />
           </Grid>
 
           {/* Submit and Cancel Buttons */}
           <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
-            <Button variant="outlined" color="secondary" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="contained" color="primary">
-              Create Visit
-            </Button>
+            <IconButton
+              color="secondary"
+              onClick={onClose}
+              sx={{
+                backgroundColor: "#FFCDD2", // Light red for cancel
+                "&:hover": { backgroundColor: "#EF9A9A" },
+                borderRadius: "50%",
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+            <IconButton
+              type="submit"
+              color="primary"
+              sx={{
+                backgroundColor: "#B2DFDB", // Light green for submit
+                "&:hover": { backgroundColor: "#80CBC4" },
+                borderRadius: "50%",
+              }}
+            >
+              <SendIcon />
+            </IconButton>
           </Grid>
         </Grid>
 

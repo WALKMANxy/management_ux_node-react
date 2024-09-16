@@ -1,8 +1,8 @@
 // Header.tsx
 
 import {
-  BarChart as BarChartIcon,
-  Category as CategoryIcon,
+/*   BarChart as BarChartIcon,
+ */  Category as CategoryIcon,
   Close as CloseIcon,
   EventNote as EventNoteIcon,
   History as HistoryIcon,
@@ -134,7 +134,7 @@ const Header: React.FC = () => {
           </ListItemIcon>
           <ListItemText primary={t("visits")} />
         </ListItem>
-        <ListItem
+        {/* <ListItem
           button
           component={Link}
           to="/statistics"
@@ -144,7 +144,7 @@ const Header: React.FC = () => {
             <BarChartIcon />
           </ListItemIcon>
           <ListItemText primary={t("statistics")} />
-        </ListItem>
+        </ListItem> */}
         <ListItem button component={Link} to="/promos" onClick={toggleDrawer}>
           <ListItemIcon sx={{ color: "white" }}>
             <LocalOfferIcon />

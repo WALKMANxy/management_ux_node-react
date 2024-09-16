@@ -49,11 +49,11 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
     return (
       <List>
         {upcomingVisits.map((visit: VisitWithAgent) => (
-          <ListItem key={visit.id}>
+          <ListItem key={visit._id}>
             <ListItemText
               primary={t("upcomingVisits.visitDetails", {
                 type: visit.type,
-                reason: visit.reason,
+                reason: visit.visitReason,
                 clientId: visit.clientId,
                 agentName: visit.agentName,
               })}

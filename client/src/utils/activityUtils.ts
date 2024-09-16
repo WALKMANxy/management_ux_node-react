@@ -1,6 +1,6 @@
 // src/utils/activityUtils.ts
 
-import {  GlobalVisits } from "../models/dataModels";
+import { GlobalVisits } from "../models/dataModels";
 import { Client } from "../models/entityModels";
 import { calculateRevenue, currencyFormatter } from "./dataUtils";
 
@@ -17,28 +17,28 @@ interface ActivityItem {
 export const generateActivityList = (
   clients: Client[], // Accept clients directly from the selected agent
   agentId: string, // Accept agentId for filtering visits and alerts
-  globalVisits: GlobalVisits,
+  globalVisits: GlobalVisits
 ): ActivityItem[] => {
   const activities: ActivityItem[] = [];
 
   // Process completed visits, limit to the first 5
   let visitCount = 0;
-/*   console.log("Initial globalVisits:", globalVisits);
- */  Object.entries(globalVisits).forEach(([visitAgentId, { Visits }]) => {
+  /*   console.log("Initial globalVisits:", globalVisits);
+   */ Object.entries(globalVisits).forEach(([visitAgentId, { Visits }]) => {
     // Filter visits to include only those with the selected agentId
     if (visitAgentId === agentId) {
-/*       console.log(`Processing visits for agent ${visitAgentId}:`, Visits);
- */      for (const visit of Visits.filter((v) => v.completed).sort(
+      /*       console.log(`Processing visits for agent ${visitAgentId}:`, Visits);
+       */ for (const visit of Visits.filter((v) => v.completed).sort(
         (a, b) => b.date.getTime() - a.date.getTime()
       )) {
         if (visitCount >= 5) break; // Limit to 5 visits
-/*         console.log("Adding visit to activities:", visit);
- */        activities.push({
-          id: visit.id,
+        /*         console.log("Adding visit to activities:", visit);
+         */ activities.push({
+          id: visit._id !== undefined ? visit._id : "",
           type: "visits",
           title: `Visit - agent: ${visitAgentId}`,
           time: visit.date.toLocaleDateString(),
-          details: `${visit.reason} - Client: ${visit.clientId}`,
+          details: `${visit.visitReason} - Client: ${visit.clientId}`,
           subDetails: visit.notePublic
             ? visit.notePublic.slice(0, 50) + "..."
             : "",
@@ -72,18 +72,18 @@ export const generateActivityList = (
       type: "sales",
       title: "Sale",
       time: movement.dateOfOrder,
-      details: `Client: ${movement.client.id}, ${movement.client.name}  - Revenue: ${currencyFormatter(revenue)}`,
+      details: `Client: ${movement.client.id}, ${
+        movement.client.name
+      }  - Revenue: ${currencyFormatter(revenue)}`,
       subDetails: `Order Date: ${movement.dateOfOrder}`,
     });
   });
-
-
 
   // Sort all activities by time (most recent first) and limit to 10 items
   const sortedActivities = activities
     .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
     .slice(0, 10);
 
-/*   console.log("Final sorted activities:", sortedActivities);
- */  return sortedActivities;
+  /*   console.log("Final sorted activities:", sortedActivities);
+   */ return sortedActivities;
 };

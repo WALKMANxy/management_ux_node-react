@@ -39,8 +39,8 @@ const ChatSidebar: React.FC = () => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
 
-  console.log("ChatSidebar rendering now")
-
+/*   console.log("ChatSidebar rendering now")
+ */
 
   // Handle toggling between contacts and chats with animations
   const handleToggleContacts = useCallback(() => {
@@ -154,6 +154,8 @@ const ChatSidebar: React.FC = () => {
         placeholder={`Search ${showContacts ? "contacts" : "chats"}`}
         fullWidth
         value={searchTerm}
+        autoComplete="off" // Prevents autofill suggestions
+        type="search" // Ensures minimal autofill interference
         onChange={handleSearchChange}
         onFocus={() => {
           if (!showContacts && chats.length > 0 && !messagesFetched.current) {

@@ -30,8 +30,8 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm = "" }) => {
 
   const sortedChats = getFilteredAndSortedChats(searchTerm);
 
-  console.log("ChatList rendering now")
-
+/*   console.log("ChatList rendering now")
+ */
   return (
     <List>
       {loadingChats ? (
@@ -59,8 +59,8 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm = "" }) => {
               button
               key={chat._id}
               onClick={() => {
-                console.log("Chat selected with ID:", chat._id); // Debug: Check if the click event fires with the correct chat ID
-                selectChat(chat); // Call selectChat to update the current chat state
+/*                 console.log("Chat selected with ID:", chat._id); // Debug: Check if the click event fires with the correct chat ID
+ */                selectChat(chat); // Call selectChat to update the current chat state
               }}
               sx={{ borderBottom: "1px solid #e0e0e0" }}
             >

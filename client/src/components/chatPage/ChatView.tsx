@@ -52,8 +52,8 @@ const ChatView: React.FC = () => {
     dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
   };
 
-  console.log("ChatView rendering now");
-
+/*   console.log("ChatView rendering now");
+ */
   // Fallback if currentChat is not set
   if (!currentChat) {
     return (
@@ -79,7 +79,7 @@ const ChatView: React.FC = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: "100dvh", // Fill the available height
+        height: isMobile ? "100dvh" : "100%", // Fill the available height
         p: isMobile ? 0 : 2, // Remove padding on mobile
         paddingTop: isMobile ? 2 : 0,
         bgcolor: "#ffffff",

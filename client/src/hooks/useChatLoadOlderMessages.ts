@@ -1,8 +1,8 @@
 // useLoadOlderMessages.ts
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useInView } from "react-intersection-observer";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { fetchOlderMessagesThunk } from "../features/chat/chatThunks";
-import { useInView } from "react-intersection-observer";
 
 const useLoadOlderMessages = (currentChatId: string | null) => {
   const dispatch = useAppDispatch();
@@ -33,15 +33,15 @@ const useLoadOlderMessages = (currentChatId: string | null) => {
 
   // Scroll to bottom when new message is sent or received
 
+  const prevMessagesLength = useRef(messages.length);
+
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
 
-    const lastMessage = messages[messages.length - 1];
-
-    if (lastMessage) {
+    if (messages.length > prevMessagesLength.current) {
+      const lastMessage = messages[messages.length - 1];
       if (lastMessage.sender === currentUserId) {
-        // Use requestAnimationFrame to ensure the DOM has updated
         requestAnimationFrame(() => {
           container.scrollTop = container.scrollHeight;
         });
@@ -56,8 +56,11 @@ const useLoadOlderMessages = (currentChatId: string | null) => {
         }
       }
     }
+
+    prevMessagesLength.current = messages.length;
   }, [messages, currentUserId]);
 
+  const oldestMessage = useMemo(() => messages[0], [messages]);
 
   const handleLoadOlderMessages = useCallback(async () => {
     if (!currentChatId || loading || !hasMoreMessages) return;
@@ -67,7 +70,6 @@ const useLoadOlderMessages = (currentChatId: string | null) => {
       const scrollHeightBeforeFetch = container.scrollHeight;
       const scrollTopBeforeFetch = container.scrollTop;
 
-      const oldestMessage = messages[0];
       const oldestTimestamp = new Date(oldestMessage.timestamp);
 
       setLoading(true);
@@ -98,19 +100,27 @@ const useLoadOlderMessages = (currentChatId: string | null) => {
         setLoading(false);
       }
     }
-  }, [currentChatId, loading, hasMoreMessages, messages, dispatch]);
+  }, [
+    currentChatId,
+    loading,
+    hasMoreMessages,
+    oldestMessage.timestamp,
+    dispatch,
+  ]);
 
-   // Use useInView to detect when the top element is in view
-   const { ref: topRef, inView } = useInView();
+  // Use useInView to detect when the top element is in view
+  const { ref: topRef, inView } = useInView({
+    threshold: 0.1,
+    rootMargin: '100px', // Adjust as needed
+  });
+  // Load older messages when the top element comes into view
+  useEffect(() => {
+    if (inView && hasMoreMessages && !loading) {
+      handleLoadOlderMessages();
+    }
+  }, [inView, hasMoreMessages, loading, handleLoadOlderMessages]);
 
-   // Load older messages when the top element comes into view
-   useEffect(() => {
-     if (inView && hasMoreMessages && !loading) {
-       handleLoadOlderMessages();
-     }
-   }, [inView, hasMoreMessages, loading, handleLoadOlderMessages]);
-
-   return { messagesContainerRef, topRef };
- };
+  return { messagesContainerRef, topRef };
+};
 
 export default useLoadOlderMessages;
