@@ -53,7 +53,7 @@ export const selectVisits = createSelector(
 // Selector to get a single visit by ID
 export const selectVisitById = (visitId: string) =>
   createSelector([selectVisits], (visits) =>
-    visits.find((visit) => visit.id === visitId)
+    visits.find((visit) => visit._id === visitId)
   );
 
 export const selectPromos = createSelector(

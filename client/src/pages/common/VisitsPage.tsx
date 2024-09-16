@@ -1,28 +1,44 @@
 // src/pages/VisitsPage.tsx
-import React, { useEffect } from "react";
-import { Box, Grid, useMediaQuery, useTheme, CircularProgress, Typography } from "@mui/material";
-import { useAppSelector, useAppDispatch } from "../../app/hooks";
+import {
+  Box,
+  CircularProgress,
+  Grid,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
-import { selectClient } from "../../features/data/dataSlice";
-import VisitsSidebar from "../../components/visitPage/VisitsSidebar";
 import ClientDetailsCard from "../../components/visitPage/ClientDetailsCard";
+import VisitsSidebar from "../../components/visitPage/VisitsSidebar";
 import VisitsTable from "../../components/visitPage/VisitsTable";
 import VisitView from "../../components/visitPage/VisitView";
+import { selectClient } from "../../features/data/dataSlice";
+import CreateVisitForm from "../../components/visitPage/CreateVisitForm";
 
 const VisitsPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const dispatch = useAppDispatch();
 
+  const [isCreatingVisit, setIsCreatingVisit] = useState(false);
+
   // Get currentUser from Redux state
-  const currentUser = useAppSelector((state: RootState) => state.data.currentUserDetails);
+  const currentUser = useAppSelector(
+    (state: RootState) => state.data.currentUserDetails
+  );
   const userRole = currentUser?.role;
 
   // Get selectedClientId from Redux state
-  const selectedClientId = useAppSelector((state: RootState) => state.data.selectedClientId);
+  const selectedClientId = useAppSelector(
+    (state: RootState) => state.data.selectedClientId
+  );
 
   // Get selectedVisitId from Redux state
-  const selectedVisitId = useAppSelector((state: RootState) => state.data.selectedVisitId);
+  const selectedVisitId = useAppSelector(
+    (state: RootState) => state.data.selectedVisitId
+  );
 
   // Get data fetching status and error
   const status = useAppSelector((state: RootState) => state.data.status);
@@ -34,6 +50,14 @@ const VisitsPage: React.FC = () => {
       dispatch(selectClient(currentUser.id));
     }
   }, [userRole, currentUser, dispatch]);
+
+  const handleOpenCreateVisit = () => {
+    setIsCreatingVisit(true);
+  };
+
+  const handleCloseCreateVisit = () => {
+    setIsCreatingVisit(false);
+  };
 
   // Handle loading state
   if (status === "loading") {
@@ -113,13 +137,23 @@ const VisitsPage: React.FC = () => {
             }}
           >
             {/* Client Details */}
-            <ClientDetailsCard clientId={selectedClientId} />
+            <ClientDetailsCard
+              clientId={selectedClientId}
+              onCreateVisit={handleOpenCreateVisit}
+            />
 
             {/* Visits Table */}
             <VisitsTable clientId={selectedClientId} />
 
             {/* Visit View (conditionally rendered) */}
             {selectedVisitId && <VisitView visitId={selectedVisitId} />}
+            {/* Create Visit Form (conditionally rendered) */}
+            {isCreatingVisit && (
+              <CreateVisitForm
+                clientId={selectedClientId}
+                onClose={handleCloseCreateVisit}
+              />
+            )}
           </Grid>
         )}
       </Grid>

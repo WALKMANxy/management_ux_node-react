@@ -15,6 +15,11 @@ export class VisitService {
 
   static async createVisit(visitData: Partial<IVisit>): Promise<IVisit> {
     try {
+      // Ensure date is a Date object before saving
+      if (typeof visitData.date === "string") {
+        visitData.date = new Date(visitData.date);
+      }
+
       const visit = new Visit(visitData);
       return await visit.save();
     } catch (err) {

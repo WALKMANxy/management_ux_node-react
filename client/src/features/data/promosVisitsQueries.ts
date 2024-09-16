@@ -63,7 +63,28 @@ export const updateApi = createApi({
       providesTags: ["Promo"],
       keepUnusedDataFor: 60, // Keeps data in cache for 1 minute (60 seconds)
     }),
+    // Create Visit Endpoint
+    createVisit: builder.mutation<
+      Visit,
+      {
+        clientId: string;
+        type: string;
+        visitReason: string;
+        date: string;
+        notePublic?: string;
+        notePrivate?: string;
+        visitIssuedBy: string;
+        pending: boolean;
+        completed: boolean;
+      }
+    >({
+      query: (visitData) => ({
+        url: "visits",
+        method: "POST",
+        body: visitData,
+      }),
+    }),
   }),
 });
 
-export const { useUpdateVisitsQuery, useUpdatePromosQuery } = updateApi;
+export const { useUpdateVisitsQuery, useUpdatePromosQuery, useCreateVisitMutation } = updateApi;

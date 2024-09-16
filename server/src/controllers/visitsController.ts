@@ -21,7 +21,13 @@ export class VisitController {
     res: Response
   ): Promise<void> {
     try {
-      const visit = await VisitService.createVisit(req.body);
+      // Convert date string to Date object
+      const visitData = {
+        ...req.body,
+        date: req.body.date ? new Date(req.body.date) : null, // Ensure the date is a Date object
+      };
+
+      const visit = await VisitService.createVisit(visitData);
       res.status(201).json({ message: "Visit created successfully", visit });
     } catch (err) {
       if (err instanceof Error) {
@@ -31,6 +37,7 @@ export class VisitController {
       }
     }
   }
+
 
   static async replaceVisit(
     req: AuthenticatedRequest,
