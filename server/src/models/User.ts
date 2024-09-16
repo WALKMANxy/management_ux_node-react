@@ -33,7 +33,7 @@ const userSchema = new Schema<IUser>(
       default: "guest",
     },
     entityCode: { type: String },
-    entityName: {type: String},
+    entityName: { type: String },
     avatar: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
@@ -66,6 +66,21 @@ userSchema.methods.comparePassword = function (
   candidatePassword: string
 ): Promise<boolean> {
   return bcrypt.compare(candidatePassword, this.password);
+};
+
+// Method to validate the reset code
+userSchema.methods.validateResetCode = async function (
+  code: string
+): Promise<boolean> {
+  const user = this as IUser;
+
+  // Check if the code is still valid (not expired)
+  if (!user.passwordResetExpires || user.passwordResetExpires < new Date()) {
+    return false;
+  }
+
+  // Compare the provided code with the stored hashed reset token
+  return bcrypt.compare(code, user.passwordResetToken || "");
 };
 
 // Indexes

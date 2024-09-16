@@ -4,6 +4,7 @@ import { WritableDraft } from "immer";
 import { createSelector } from "reselect";
 import { RootState } from "../../app/store";
 import { User } from "../../models/entityModels";
+import { getAllUsers } from "./api/users";
 import { userApi } from "./userQueries";
 
 // Define the initial state
@@ -78,12 +79,10 @@ export const updateUserById = createAsyncThunk(
 // Thunk to fetch all users
 export const getAllUsersThunk = createAsyncThunk<User[], void>(
   "users/getAllUsersThunk",
-  async (_, { dispatch, rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      // Call the getAllUsers endpoint of the userApi directly, and await its response
-      const result = await dispatch(
-        userApi.endpoints.getAllUsers.initiate() // Corrected the endpoint and removed `.unwrap()`
-      ).unwrap(); // Unwraps the response for direct access to the data
+      // Call the getAllUsers function directly
+      const result = await getAllUsers();
       return result; // Return the array of users directly
     } catch (error) {
       return rejectWithValue(

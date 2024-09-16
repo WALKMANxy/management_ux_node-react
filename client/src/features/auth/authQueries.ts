@@ -8,8 +8,6 @@ import { getAllUsers, getUserById, updateUserById } from "../users/api/users";
 import {
   loginUser,
   registerUser,
-  requestPasswordReset,
-  resetPassword,
 } from "./api/auth";
 
 export const authApi = createApi({
@@ -82,37 +80,7 @@ export const authApi = createApi({
       },
     }),
 
-    requestPasswordReset: builder.mutation<
-      { message: string; statusCode: number },
-      string
-    >({
-      queryFn: async (email) => {
-        try {
-          const { message, statusCode } = await requestPasswordReset(email);
-          return { data: { message, statusCode } };
-        } catch (error) {
-          return generateErrorResponse(error);
-        }
-      },
-    }),
 
-    resetPassword: builder.mutation<
-      { message: string; statusCode: number },
-      { token: string; passcode: string; newPassword: string }
-    >({
-      queryFn: async ({ token, passcode, newPassword }) => {
-        try {
-          const { message, statusCode } = await resetPassword(
-            token,
-            passcode,
-            newPassword
-          );
-          return { data: { message, statusCode } };
-        } catch (error) {
-          return generateErrorResponse(error);
-        }
-      },
-    }),
 
     getUserRoleById: builder.query<User, string>({
       queryFn: async (id) => {
@@ -128,8 +96,6 @@ export const authApi = createApi({
 });
 
 export const {
-  useRequestPasswordResetMutation,
-  useResetPasswordMutation,
   useGetUserByIdQuery,
   useGetAllUsersQuery,
   useUpdateUserByIdMutation,

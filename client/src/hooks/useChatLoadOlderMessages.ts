@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { fetchOlderMessagesThunk } from "../features/chat/chatThunks";
+import { useInView } from "react-intersection-observer";
 
 const useLoadOlderMessages = (currentChatId: string | null) => {
   const dispatch = useAppDispatch();
@@ -99,28 +100,17 @@ const useLoadOlderMessages = (currentChatId: string | null) => {
     }
   }, [currentChatId, loading, hasMoreMessages, messages, dispatch]);
 
-  const handleScroll = useCallback(() => {
-    const container = messagesContainerRef.current;
-    if (!container) return;
+   // Use useInView to detect when the top element is in view
+   const { ref: topRef, inView } = useInView();
 
-    const { scrollTop, scrollHeight, clientHeight } = container;
-    const scrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100;
+   // Load older messages when the top element comes into view
+   useEffect(() => {
+     if (inView && hasMoreMessages && !loading) {
+       handleLoadOlderMessages();
+     }
+   }, [inView, hasMoreMessages, loading, handleLoadOlderMessages]);
 
-    // Trigger fetch when the scroll is within the top 20% of the container
-    if (scrollPercentage < 20 && hasMoreMessages && !loading) {
-      handleLoadOlderMessages();
-    }
-  }, [handleLoadOlderMessages, hasMoreMessages, loading]);
-
-  useEffect(() => {
-    const container = messagesContainerRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
-      return () => container.removeEventListener("scroll", handleScroll);
-    }
-  }, [handleScroll]);
-
-  return { messagesContainerRef };
-};
+   return { messagesContainerRef, topRef };
+ };
 
 export default useLoadOlderMessages;

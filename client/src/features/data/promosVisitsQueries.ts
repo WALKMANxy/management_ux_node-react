@@ -7,9 +7,9 @@ import {
 } from "../../models/dataModels";
 import { Admin, Agent, Client } from "../../models/entityModels";
 import { DataSliceState } from "../../models/stateModels";
+import { loadPromosData, loadVisitsData } from "../../utils/apiUtils";
 import { mapPromosToEntity, mapVisitsToEntity } from "../../utils/dataLoader";
 import { generateErrorResponse } from "../../utils/errorHandling";
-import { loadPromosData, loadVisitsData } from "../../utils/apiUtils";
 
 export const updateApi = createApi({
   reducerPath: "api",
@@ -37,6 +37,7 @@ export const updateApi = createApi({
         }
       },
       providesTags: ["Visit"],
+      keepUnusedDataFor: 60, // Keeps data in cache for 1 minute (60 seconds)
     }),
 
     updatePromos: builder.query<Promo[] | GlobalPromos, void>({
@@ -60,6 +61,7 @@ export const updateApi = createApi({
         }
       },
       providesTags: ["Promo"],
+      keepUnusedDataFor: 60, // Keeps data in cache for 1 minute (60 seconds)
     }),
   }),
 });

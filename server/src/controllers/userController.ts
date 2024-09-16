@@ -52,6 +52,7 @@ export class UserController {
       }
     }
   }
+
   static async getUsersByBatchIds(req: Request, res: Response): Promise<void> {
     try {
       const { ids } = req.body; // Get user IDs from the request body
@@ -68,6 +69,81 @@ export class UserController {
       }
 
       res.json(users);
+    } catch (err) {
+      if (err instanceof Error) {
+        res.status(500).json({ message: err.message });
+      } else {
+        res.status(500).json({ message: "Internal Server Error" });
+      }
+    }
+  }
+  // Controller action to update the user's email
+  static async updateUserEmail(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
+    try {
+      const { currentEmail, currentPassword, newEmail } = req.body;
+
+      if (!currentEmail || !currentPassword || !newEmail) {
+        res.status(400).json({ message: "Missing required fields" });
+        return;
+      }
+
+      const user = await UserService.updateUserEmail(
+        req.params.id,
+        currentEmail,
+        currentPassword,
+        newEmail
+      );
+
+      if (!user) {
+        res.status(404).json({ message: "User not found" });
+        return;
+      }
+
+      res.status(200).json({
+        message: "Email updated successfully. Please verify your new email.",
+        user,
+      });
+    } catch (err) {
+      if (err instanceof Error) {
+        res.status(500).json({ message: err.message });
+      } else {
+        res.status(500).json({ message: "Internal Server Error" });
+      }
+    }
+  }
+
+  // Controller action to update the user's password
+  static async updateUserPassword(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
+    try {
+      const { currentEmail, currentPassword, newPassword } = req.body;
+
+      if (!currentEmail || !currentPassword || !newPassword) {
+        res.status(400).json({ message: "Missing required fields" });
+        return;
+      }
+
+      const user = await UserService.updateUserPassword(
+        req.params.id,
+        currentEmail,
+        currentPassword,
+        newPassword
+      );
+
+      if (!user) {
+        res.status(404).json({ message: "User not found" });
+        return;
+      }
+
+      res.status(200).json({
+        message: "Password updated successfully. Please verify your email.",
+        user,
+      });
     } catch (err) {
       if (err instanceof Error) {
         res.status(500).json({ message: err.message });

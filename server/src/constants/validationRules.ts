@@ -106,6 +106,7 @@ export const promoValidationRules = [
     .isISO8601()
     .withMessage("End date must be a valid ISO 8601 date"),
   body("promoIssuedBy").notEmpty().withMessage("Promo issued by is required"),
+  
 ];
 
 export const userValidationRules = [
@@ -179,4 +180,3 @@ export const visitValidationRules = [
   body("date").isISO8601().withMessage("Date must be a valid ISO 8601 date"),
   body("visitIssuedBy").notEmpty().withMessage("Visit issued by is required"),
 ];
-

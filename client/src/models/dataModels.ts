@@ -22,7 +22,7 @@ export type Movement = {
 };
 
 export type Visit = {
-  id: string;
+  _id?: string;
   clientId: string; // Unique association with a client
   type: string;
   reason: string;

@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import Cookies from "js-cookie";
-import { authApiCall } from "../../../utils/apiUtils";
+import { apiCall, authApiCall } from "../../../utils/apiUtils";
 import { getUserAgent } from "../../../utils/deviceUtils";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
@@ -37,23 +37,6 @@ export const loginUser = async (credentials: {
       userAgent,
     }
   );
-};
-
-// Specific function to request a password reset
-export const requestPasswordReset = async (
-  email: string
-): Promise<{ message: string; statusCode: number }> => {
-  return authApiCall<void>("auth/request-password-reset", "POST", { email });
-};
-
-// Specific function to reset password
-export const resetPassword = async (
-  token: string,
-  passcode: string,
-  newPassword: string
-): Promise<{ message: string; statusCode: number }> => {
-  const data = { passcode, newPassword };
-  return authApiCall<void>(`auth/reset-password?token=${token}`, "POST", data);
 };
 
 // Function to initiate Google OAuth flow
@@ -99,4 +82,30 @@ export const handleOAuthCallback = async (code: string) => {
     console.error("Error handling OAuth callback:", error);
     throw new Error("Failed to process OAuth callback");
   }
+};
+
+// API to request a password reset by sending the user's email
+export const requestPasswordReset = async (email: string): Promise<void> => {
+  return apiCall<void>("auth/request-password-reset", "POST", { email });
+};
+
+// API to verify the reset code entered by the user
+export const verifyResetCode = async (
+  email: string,
+  code: string
+): Promise<void> => {
+  return apiCall<void>("auth/verify-reset-code", "POST", { email, code });
+};
+
+// API to update the user's password after successful code verification
+export const updatePassword = async (
+  email: string,
+  code: string,
+  newPassword: string
+): Promise<void> => {
+  return apiCall<void>("auth/update-password", "POST", {
+    email,
+    code,
+    newPassword,
+  });
 };

@@ -1,0 +1,4 @@
+/* In your CSS file, e.g., animations.css */
+.animate__animated.animate__fadeInUp {
+    animation-duration: 0.2s; /* Adjust to desired speed */
+  }

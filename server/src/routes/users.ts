@@ -44,4 +44,24 @@ router.patch(
   UserController.updateUser
 );
 
+// PATCH method to update user email
+router.patch(
+  "/:id/update-email",
+  checkAgentOrAdminOrClientRole, // Ensure the user is authorized
+  userValidationRules, // Specific validation rules for updating email
+  checkValidation,
+  UserController.updateUserEmail // Controller method to update email
+);
+
+// PATCH method to update user password
+router.patch(
+  "/:id/update-password",
+  checkAgentOrAdminOrClientRole, // Ensure the user is authorized
+  userValidationRules, // Specific validation rules for updating password
+  checkValidation,
+  UserController.updateUserPassword // Controller method to update password
+);
+
+
+
 export default router;

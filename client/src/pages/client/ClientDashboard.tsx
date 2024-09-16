@@ -1,3 +1,4 @@
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import {
   Box,
   Fab,
@@ -13,15 +14,13 @@ import ActivePromotions from "../../components/dashboard/ActivePromotions";
 import CalendarComponent from "../../components/dashboard/CalendarComponent";
 import SpentThisMonth from "../../components/dashboard/SpentThisMonth";
 import SpentThisYear from "../../components/dashboard/SpentThisYear";
+import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
 import TopArticleType from "../../components/dashboard/TopArticleType";
 import UpcomingVisits from "../../components/dashboard/UpcomingVisits";
 import MonthOverMonthSpendingTrend from "../../components/statistics/charts/MonthOverMonthSpendingTrend";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
 import useStats from "../../hooks/useStats"; // Use the new unified hook
 import { brandColors } from "../../utils/constants";
-import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-
 
 const ClientDashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -29,8 +28,6 @@ const ClientDashboard: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery("(min-width:600px) and (max-width:1250px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-
 
   const {
     details: clientDetails,
@@ -52,19 +49,43 @@ const ClientDashboard: React.FC = () => {
       className="client-dashboard"
       sx={{ p: isMobile ? 0 : 4, bgcolor: "#f4f5f7" }}
     >
-      <Typography variant="h4" gutterBottom>
-        {clientDetails && "name" in clientDetails ? (
-          <>{t("clientDashboard.welcomeBack", { name: clientDetails.name })}</>
-        ) : (
-          <Skeleton animation="wave" width="30%" />
-        )}
-      </Typography>
+      {isLoading ? (
+        <Skeleton
+          animation="wave"
+          variant="text"
+          width="50%"
+          height={30}
+          sx={{ borderRadius: "4px" }}
+          aria-label="loading-statistics"
+        />
+      ) : (
+        <Typography variant="h4" gutterBottom>
+          {clientDetails && "name" in clientDetails ? (
+            <>
+              {t("clientDashboard.welcomeBack", { name: clientDetails.name })}
+            </>
+          ) : (
+            <Skeleton animation="wave" width="30%" />
+          )}
+        </Typography>
+      )}
       <Grid container spacing={6} mt={2}>
         <Grid item xs={12} md={9}>
           <Box mb={4}>
-            <Typography variant="h5" gutterBottom>
-              {t("clientDashboard.yourStatistics")}
-            </Typography>
+            {isLoading ? (
+              <Skeleton
+                animation="wave"
+                variant="text"
+                width="50%"
+                height={30}
+                sx={{ borderRadius: "4px" }}
+                aria-label="loading-statistics"
+              />
+            ) : (
+              <Typography variant="h5" gutterBottom>
+                {t("clientDashboard.yourStatistics")}
+              </Typography>
+            )}
 
             <Grid container spacing={2}>
               <Grid item xs={12} md={4}>
@@ -160,8 +181,8 @@ const ClientDashboard: React.FC = () => {
             )}
           </Box>
         </Grid>
-       {/* Conditionally render CalendarComponent and UpcomingVisits based on screen size */}
-       {!isTablet && (
+        {/* Conditionally render CalendarComponent and UpcomingVisits based on screen size */}
+        {!isTablet && (
           <Grid item xs={12} md={3}>
             <Box mb={4}>
               <Typography variant="h5" gutterBottom>

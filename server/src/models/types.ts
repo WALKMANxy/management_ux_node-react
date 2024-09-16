@@ -12,6 +12,8 @@ export interface CustomUser {
 
 export interface AuthenticatedRequest extends Request {
   user?: Partial<IUser>; // Use Partial if you might not always have all properties
+  ipInfo?: IpInfo;
+
 }
 
 
