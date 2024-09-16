@@ -7,7 +7,7 @@
     "start": "cross-env NODE_ENV=production  tsc &&node dist/index.js",
     "build": "NODE_ENV=production tsc",
     "dev": "cross-env NODE_ENV=development  tsc && nodemon src/index.ts",
-    "dev-tunnel": "cross-env NODE_ENV=local  tsc && nodemon src/index.ts"
+    "dev-tunnel": "cross-env NODE_ENV=local tsc && cross-env NODE_ENV=local nodemon src/index.ts"
   },
   "keywords": [],
   "author": "",
