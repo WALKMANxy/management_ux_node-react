@@ -21,8 +21,8 @@ const RenderMessages: React.FC<RenderMessageProps> = ({
   participantsData,
 }) => {
 
-  console.log("RenderingMessages rendering now")
-
+/*   console.log("RenderingMessages rendering now")
+ */
   return (
     <Box>
       {messages.map((message, index) => {

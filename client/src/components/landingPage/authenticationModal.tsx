@@ -148,6 +148,12 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
                   className={
                     shakeEmail ? "animate__animated animate__shakeX" : ""
                   }
+                  type="email"
+                  aria-label="Email address"
+                  placeholder="Enter your email"
+                  inputProps={{
+                    autoComplete: "email",
+                  }}
                 />
 
                 <Typography
@@ -186,6 +192,11 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
                       </InputAdornment>
                     ),
                   }}
+                  aria-label="Password"
+                  placeholder="Enter your password"
+                  inputProps={{
+                    autoComplete: "current-password",
+                  }}
                 />
 
                 {!isLoginMode && (
@@ -212,6 +223,11 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
                           ? "animate__animated animate__shakeX"
                           : ""
                       }
+                      aria-label="Confirm password"
+                      placeholder="Confirm your password"
+                      inputProps={{
+                        autoComplete: "new-password",
+                      }}
                     />
                   </>
                 )}

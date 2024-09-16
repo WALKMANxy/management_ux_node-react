@@ -93,6 +93,8 @@ const VisitsSidebar: React.FC = () => {
         fullWidth
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
+        type="search" // Ensures minimal autofill interference
+        autoComplete="off" // Prevents autofill suggestions
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">

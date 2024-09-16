@@ -463,11 +463,8 @@ export const selectChatById = createSelector(
   (chats, chatId) => chats[chatId]
 );
 
-// Memoized selector for the current chat
-export const selectCurrentChat = createSelector(
-  (state: RootState) => state.chats.currentChat,
-  (currentChat) => currentChat
-);
+// Replace with a simple selector
+export const selectCurrentChat = (state: RootState) => state.chats.currentChat;
 
 // Memoized selector for messages from the current chat
 export const selectMessagesFromCurrentChat = createSelector(
@@ -475,17 +472,11 @@ export const selectMessagesFromCurrentChat = createSelector(
   (currentChat) => currentChat?.messages || []
 );
 
-// Memoized selector for the chat operation status (loading, succeeded, failed)
-export const selectChatsStatus = createSelector(
-  (state: RootState) => state.chats.status,
-  (status) => status
-);
+// Replace with a simple selector
+export const selectChatsStatus = (state: RootState) => state.chats.status;
 
-// Memoized selector for the error state
-export const selectChatsError = createSelector(
-  (state: RootState) => state.chats.error,
-  (error) => error
-);
+// Replace with a simple selector
+export const selectChatsError = (state: RootState) => state.chats.error;
 
 // Memoized selector for messages by chat ID
 export const selectMessagesByChatId = createSelector(

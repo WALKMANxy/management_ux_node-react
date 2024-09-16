@@ -39,50 +39,55 @@ const useChatLogic = () => {
   const currentChat: IChat | null = useSelector(selectCurrentChat); // Allow null values
   const messages = useSelector(selectMessagesFromCurrentChat); // Use selector to get messages of the current chat
   const [page, setPage] = useState(2); // Start from page 2 since page 1 is already loaded
+  const currentChatId = currentChat?._id;
+  const [contactsFetched, setContactsFetched] = useState(false);
+
 
   const agentClientIds = useSelector(selectClientIds);
 
+  const fetchChats = useCallback(async () => {
+    try {
+      setLoadingChats(true);
+      await dispatch(fetchAllChatsThunk()).unwrap();
+      setChatError(null); // Clear any previous errors if successful
+      setChatRetryCount(0); // Reset retry count on success
+    } catch (err: unknown) {
+      console.error("Error fetching chats:", err);
+      if (err instanceof Error) {
+        setChatError(err.message);
+      } else {
+        setChatError("An unknown error occurred while fetching chats.");
+      }
+      // Increment retry count only if it's less than the limit
+      if (chatRetryCount < 5) {
+        setChatRetryCount((prevCount) => prevCount + 1);
+      }
+    } finally {
+      setLoadingChats(false);
+    }
+  }, [dispatch, chatRetryCount]);
+
   // Fetch chats with retry mechanism
   useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        setLoadingChats(true);
-        await dispatch(fetchAllChatsThunk()).unwrap();
-        setChatError(null); // Clear any previous errors if successful
-        setChatRetryCount(0); // Reset retry count on success
-      } catch (err: unknown) {
-        console.error("Error fetching chats:", err);
-        if (err instanceof Error) {
-          setChatError(err.message);
-        } else {
-          setChatError("An unknown error occurred while fetching chats.");
-        }
-        // Increment retry count only if it's less than the limit
-        if (chatRetryCount < 5) {
-          setChatRetryCount((prevCount) => prevCount + 1);
-        }
-      } finally {
-        setLoadingChats(false);
-      }
-    };
-
     // Call fetchChats initially
     fetchChats();
-  }, [dispatch, chatRetryCount]);
+  }, [dispatch, chatRetryCount, fetchChats]);
 
   // Retry mechanism
   useEffect(() => {
     if (chatRetryCount > 0 && chatRetryCount <= 5) {
+      const retryDelay = Math.min(32000, 1000 * 2 ** chatRetryCount); // Exponential backoff
+
       const retryTimeout = setTimeout(() => {
         console.log(`Retry attempt #${chatRetryCount}`);
-        dispatch(fetchAllChatsThunk()); // Retry fetching chats
-      }, 5000); // Retry after 5 seconds
+        fetchChats();
+      }, retryDelay);
 
       return () => {
-        clearTimeout(retryTimeout); // Cleanup timeout on unmount or retryCount change
+        clearTimeout(retryTimeout);
       };
     }
-  }, [chatRetryCount, dispatch]);
+  }, [chatRetryCount, fetchChats]);
 
   // Select a chat
   const selectChat = useCallback(
@@ -143,20 +148,18 @@ const useChatLogic = () => {
   }, 50);
 
   // Fetch contacts when needed
-  const fetchContacts = useCallback(
-    async () => {
-      setLoadingContacts(true);
-      try {
-        await dispatch(getAllUsersThunk()).unwrap();
-      } catch (error) {
-        console.error("Failed to fetch contacts:", error);
-      } finally {
-        setLoadingContacts(false);
-      }
-    },
-    [dispatch]
-  );
-
+  const fetchContacts = useCallback(async () => {
+    if (contactsFetched) return;
+    setLoadingContacts(true);
+    try {
+      await dispatch(getAllUsersThunk()).unwrap();
+      setContactsFetched(true);
+    } catch (error) {
+      console.error("Failed to fetch contacts:", error);
+    } finally {
+      setLoadingContacts(false);
+    }
+  }, [dispatch, contactsFetched]);
 
   // Send a new message in the current chat
   const handleSendMessage = useCallback(
@@ -164,11 +167,8 @@ const useChatLogic = () => {
       content: string,
       messageType: "message" | "alert" | "promo" | "visit"
     ) => {
-      if (!currentChat?._id || !currentUserId) {
-        console.error("Missing currentChat or currentUserId:", {
-          currentChatId: currentChat?._id,
-          currentUserId,
-        });
+      if (!currentChatId || !currentUserId) {
+        console.error("Missing currentChatId or currentUserId");
         return;
       }
 
@@ -188,13 +188,13 @@ const useChatLogic = () => {
 
       try {
         dispatch(
-          addMessageReducer({ chatId: currentChat._id, message: messageData })
+          addMessageReducer({ chatId: currentChatId, message: messageData })
         );
       } catch (error) {
         console.error("Failed to send message:", error);
       }
     },
-    [currentChat, currentUserId, dispatch]
+    [currentChatId, currentUserId, dispatch]
   );
 
   // Chat creation handler using createChatThunk
@@ -255,7 +255,6 @@ const useChatLogic = () => {
     },
     [chats, currentUserId, handleCreateChat, selectChat]
   );
-
 
   const filteredContacts = useMemo(() => {
     // Log the current user ID for reference
@@ -353,8 +352,8 @@ const useChatLogic = () => {
     [currentUserId]
   );
 
-   // Function to handle returning to the sidebar on mobile
-   const handleBackToChats = () => {
+  // Function to handle returning to the sidebar on mobile
+  const handleBackToChats = () => {
     dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
   };
 
@@ -374,8 +373,6 @@ const useChatLogic = () => {
     });
   }, [chats, getUnreadCount]);
 
-
-
   // Function to select a chat and update the currentChat state
   const handleSelectChat = (chatId: string) => {
     const selectedChat = chats.find((chat) => chat._id === chatId);
@@ -384,28 +381,32 @@ const useChatLogic = () => {
     }
   };
 
-   // Custom hook to find the message inside the state by local_id
-const useStateMessage = (chatId: string | undefined, localId: string | undefined): IMessage | undefined => {
-  return useAppSelector((state) => {
-    if (!chatId || !localId) return undefined;
+  // Custom hook to find the message inside the state by local_id
+  const useStateMessage = (
+    chatId: string | undefined,
+    localId: string | undefined
+  ): IMessage | undefined => {
+    return useAppSelector((state) => {
+      if (!chatId || !localId) return undefined;
 
-    const chat = state.chats.chats[chatId];
-    if (!chat) {
-      console.error(`Chat with ID ${chatId} does not exist in the state.`);
-      return undefined;
-    }
+      const chat = state.chats.chats[chatId];
+      if (!chat) {
+        console.error(`Chat with ID ${chatId} does not exist in the state.`);
+        return undefined;
+      }
 
-    // Find the message by matching local_id
-    const stateMessage = chat.messages.find(
-      (message) => message.local_id === localId
-    );
+      // Find the message by matching local_id
+      const stateMessage = chat.messages.find(
+        (message) => message.local_id === localId
+      );
 
-    if (!stateMessage) {
-      console.error(`Message with local_id ${localId} not found in chat ${chatId}.`);
-    }
-
-  });
-};
+      if (!stateMessage) {
+        console.error(
+          `Message with local_id ${localId} not found in chat ${chatId}.`
+        );
+      }
+    });
+  };
 
   return {
     chats: Object.values(chats),
@@ -428,7 +429,7 @@ const useStateMessage = (chatId: string | undefined, localId: string | undefined
     handleBackToChats,
     getUnreadChats,
     handleSelectChat,
-    useStateMessage
+    useStateMessage,
   };
 };
 

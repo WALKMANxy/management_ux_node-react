@@ -1,17 +1,16 @@
-import React from "react";
 import {
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
 } from "@mui/material";
+import React from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectVisits } from "../../features/data/dataSelectors";
 import { selectVisit } from "../../features/data/dataSlice";
-
 
 interface VisitsTableProps {
   clientId: string;
@@ -44,14 +43,14 @@ const VisitsTable: React.FC<VisitsTableProps> = ({ clientId }) => {
         <TableBody>
           {clientVisits.map((visit) => (
             <TableRow
-              key={visit.id}
+              key={visit._id}
               hover
-              onClick={() => handleRowClick(visit.id)}
+              onClick={() => handleRowClick(visit._id ?? "")}
               sx={{ cursor: "pointer" }}
             >
               <TableCell>{visit.clientId}</TableCell>
               <TableCell>{visit.type}</TableCell>
-              <TableCell>{visit.reason}</TableCell>
+              <TableCell>{visit.visitReason}</TableCell>
               <TableCell>
                 {new Date(visit.createdAt).toLocaleString()}
               </TableCell>
