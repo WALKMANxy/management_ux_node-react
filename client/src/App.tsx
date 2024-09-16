@@ -200,11 +200,7 @@ function App() {
             "User is either not logged in or has an invalid role ('guest')."
           );
         }
-      } else {
-        /*         console.warn("No auth state found in session storage.");
-         */
-        // Optionally handle redirect to login or other logic here
-      }
+      } 
     };
 
     initializeApp();

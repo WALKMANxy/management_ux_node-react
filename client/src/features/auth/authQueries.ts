@@ -65,15 +65,15 @@ export const authApi = createApi({
     }),
 
     loginUser: builder.mutation<
-      { redirectUrl: string; id: string; message: string; statusCode: number },
+      {  id: string; message: string; statusCode: number },
       { email: string; password: string }
     >({
       queryFn: async (credentials) => {
         try {
-          const { redirectUrl, id, message, statusCode } = await loginUser(
+          const { id, message, statusCode } = await loginUser(
             credentials
           );
-          return { data: { redirectUrl, id, message, statusCode } };
+          return { data: { id, message, statusCode } };
         } catch (error) {
           return generateErrorResponse(error);
         }

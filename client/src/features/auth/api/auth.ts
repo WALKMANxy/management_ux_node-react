@@ -22,14 +22,13 @@ export const loginUser = async (credentials: {
   email: string;
   password: string;
 }): Promise<{
-  redirectUrl: string;
   id: string;
   message: string;
   statusCode: number;
 }> => {
   const userAgent = getUserAgent();
 
-  return authApiCall<{ redirectUrl: string; id: string }>(
+  return authApiCall<{  id: string }>(
     "auth/login",
     "POST",
     {

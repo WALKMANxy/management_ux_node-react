@@ -51,7 +51,7 @@ export const apiCall = async <T>(
   }
 };
 
-interface AuthApiResponse {
+export interface AuthApiResponse {
   message: string;
   statusCode: number;
 }

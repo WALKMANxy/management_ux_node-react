@@ -62,14 +62,13 @@ export const useAuth = () => {
       /*       console.log("Attempting to log in user with email:", email);
        */
       // Attempt to log in the user
-      const { redirectUrl, id, message, statusCode } = await loginUser({
+      const { id, message, statusCode } = await loginUser({
         email,
         password,
       }).unwrap();
 
       // Logging the response from loginUser API
       /* console.log("Login response received:", {
-        redirectUrl,
         id,
         message,
         statusCode,
@@ -152,9 +151,7 @@ export const useAuth = () => {
           /* const state = store.getState();
           console.log("Updated auth state after handleLogin:", state.auth);
  */
-          // Redirect to the URL specified by the server after successful login
-          /*           console.log("Redirecting to:", redirectUrl);
-           */ window.location.href = redirectUrl;
+         
           onClose();
         } else if ("error" in result) {
           // Handle the error when fetching the user role
