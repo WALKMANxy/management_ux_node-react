@@ -9,6 +9,8 @@ import {
   MenuItem,
   Paper,
   TextField,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import React, { useRef, useState } from "react";
 import { useSelector } from "react-redux";
@@ -26,6 +28,8 @@ const InputBox: React.FC = () => {
   const userRole = useSelector(selectUserRole); // Get the user role from Redux
 
   const inputRef = useRef<HTMLInputElement | null>(null); // Ref for the input to retain focus
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleSend = () => {
     if (messageInput.trim()) {
@@ -52,7 +56,7 @@ const InputBox: React.FC = () => {
         display: "flex",
         alignItems: "center",
         p: 1,
-        borderRadius: "1.5em", // Rounded corners for the paper
+        borderRadius: isMobile  ? "0px" : "1.5em", // Rounded corners for the paper
         mt: 0,
       }}
     >
@@ -64,15 +68,31 @@ const InputBox: React.FC = () => {
         inputRef={inputRef} // Attach the ref to keep focus
         onChange={(e) => setMessageInput(e.target.value)}
         onKeyUp={(e) => e.key === "Enter" && handleSend()}
-        autoComplete="off" // Disable browser autocomplete
+        autoComplete="off" // Keep this for desktop browsers
+        type="search"
+        aria-label="Chat input box"
+        role="textbox"
+        inputProps={{
+          type: "search",
+          //WE HAVE TO FUCKING USE THE SEARCH TYPE BECAUSE SOME CUNT AT FUCKING GOOGLE DECIDED TO SHOW CREDIT CARD, ADDRESS AND PASSWORD AUTOFILL INSIDE OF GBOARD FOR LITERALLY EVERY FUCKING INPUT TYPE EXCEPT SEARCH, JESUS FUCKING CHRIST
+          inputMode: "text",
+          enterKeyHint: "send",
+          autoCorrect: "on",
+          autoCapitalize: "on",
+          spellCheck: "true",
+          "data-form-type": "other",
+        }}
         sx={{
           "& .MuiOutlinedInput-root": {
-            borderRadius: "1.5em", // Rounded corners with relative measure
-            height: "2.9em", // Adjust the height with relative units
-            padding: "0.5em 0.875em", // Adjust padding to control the inner input height
+            borderRadius: "1.5em",
+            height: "2.9em",
+            padding: "0.5em 0.875em",
           },
           "& .MuiInputBase-input": {
-            height: "1.25em", // Control the text input area height using relative units
+            height: "1.25em",
+            // Add appearance styles properly within the input selector
+            WebkitAppearance: "none", // Safari and Chrome
+            MozAppearance: "none", // Firefox
           },
         }}
       />

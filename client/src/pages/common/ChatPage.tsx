@@ -24,7 +24,7 @@ const ChatPage: React.FC = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: isMobile ? "94vh" : "calc(100vh - 120px)", // Use 95vh when isMobile is true, otherwise subtract the header height
+        height: isMobile ? "94dvh" : "calc(100vh - 120px)", // Use 95vh when isMobile is true, otherwise subtract the header height
         bgcolor: "#f4f5f7",
         overflow: "hidden",
       }}
@@ -59,23 +59,7 @@ const ChatPage: React.FC = () => {
               height: "100%", // Ensure chat view fills available height
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                flexShrink: 0, // Prevent the header from shrinking
-              }}
-            ></Box>
-            <Box
-              sx={{
-                flexGrow: 1, // Take the remaining space
-                height: "100vh",
-
-                overflowY: "auto", // Enable scrolling within the chat messages area
-              }}
-            >
-              <ChatView />
-            </Box>
+            <ChatView />
           </Grid>
         )}
       </Grid>

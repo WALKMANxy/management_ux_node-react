@@ -79,7 +79,7 @@ const ChatView: React.FC = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: "100%", // Fill the available height
+        height: "100dvh", // Fill the available height
         p: isMobile ? 0 : 2, // Remove padding on mobile
         paddingTop: isMobile ? 2 : 0,
         bgcolor: "#ffffff",
@@ -93,9 +93,13 @@ const ChatView: React.FC = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          mb: 2,
-          mt: 2,
-          flexShrink: 0, // Prevent shrinking of the header
+          position: "sticky", // Keeps the header at the top
+          top: 0,
+          zIndex: 10,
+          bgcolor: "#ffffff",
+          flexShrink: 0, // Prevent shrinking
+          p: isMobile ? 1 : 2,
+          borderBottom: "1px solid #e0e0e0", // Optional: a border for separation
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -143,7 +147,6 @@ const ChatView: React.FC = () => {
         elevation={1}
         sx={{
           borderRadius: "1.5em", // Rounded corners for the paper
-          flexGrow: 1, // Allows this section to take the available space
           overflowY: "auto", // Enable scrolling for messages
           display: "flex", // Add this line
           flexDirection: "column", // Add this line
@@ -151,6 +154,7 @@ const ChatView: React.FC = () => {
             display: "none",
           },
           position: "relative",
+          height: "79dvh"
         }}
       >
         <Box
@@ -165,6 +169,7 @@ const ChatView: React.FC = () => {
               display: "none",
             },
             position: "relative",
+            flexGrow: 1,
           }}
           ref={messagesContainerRef} // Attach the ref from useLoadOlderMessages
         >
@@ -181,10 +186,12 @@ const ChatView: React.FC = () => {
       {/* Message Input Box */}
       <Box
         sx={{
-          mt: isMobile ? 0 : 2,
-          mb: isMobile ? 0.6 : 0,
+          mt: isMobile ? 3 : 2,
           flexShrink: 0, // Prevent shrinking of the input box
-          borderRadius: "25px", // Rounded corners for the input box
+          borderRadius: isMobile ? "0px" : "25px", // Rounded corners for the input box
+          position: "sticky", // Keep the input box sticky at the bottom
+          bottom: 0,
+          zIndex: 10,
         }}
       >
         <InputBox />

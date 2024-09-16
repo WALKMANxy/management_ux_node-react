@@ -15,14 +15,25 @@ const Layout: React.FC = () => {
   const isSettingsPage = location.pathname === "/settings"; // Check if on the /settings page
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flex: 1, // Let main content grow to fill available space
+
+        flexDirection: "column",
+        height: "100dvh"
+      }}
+    >
       <Header />
       <Box
         component="main"
         sx={{
+          flex: 1, // Let main content grow to fill available space
           p: isClientsOrMessagesPage && isMobile ? 0 : 3, // Adjust padding for clients and messages pages
-          pl: isSettingsPage ? 0 : 3, // Remove left padding for settings page
-          pr: isSettingsPage ? 0 : 3,
+          pl: isSettingsPage ? 0 : undefined, // Remove left padding for settings page
+          pr: isSettingsPage ? 0 : undefined,
+          overflow: "show", // Prevent content from overflowing
+
         }}
       >
         <Outlet />
