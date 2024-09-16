@@ -23,6 +23,8 @@ const initialState: DataSliceState = {
   currentUserVisits: null,
   selectedClientId: null,
   selectedAgentId: null,
+  selectedVisitId: null,
+  selectedPromoId: null,
   status: "idle",
   error: null,
 };
@@ -83,13 +85,20 @@ const dataSlice = createSlice({
       state.selectedClientId = null;
       state.selectedAgentId = null;
     },
-    selectClient: (state, action: PayloadAction<string>) => {
+    selectClient(state, action: PayloadAction<string>) {
       state.selectedClientId = action.payload;
-      state.selectedAgentId = null;
+      state.selectedVisitId = null; // Reset selected visit when client changes
     },
-    selectAgent: (state, action: PayloadAction<string>) => {
+    selectAgent(state, action: PayloadAction<string>) {
       state.selectedAgentId = action.payload;
-      state.selectedClientId = null;
+      state.selectedClientId = null; // Reset selected client when agent changes
+      state.selectedVisitId = null; // Reset selected visit
+    },
+    selectVisit(state, action: PayloadAction<string>) {
+      state.selectedVisitId = action.payload;
+    },
+    selectPromo(state, action: PayloadAction<string>) {
+      state.selectedPromoId = action.payload;
     },
 
   },
@@ -233,6 +242,8 @@ export const {
   clearSelection,
   selectClient,
   selectAgent,
+  selectPromo,
+  selectVisit,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;

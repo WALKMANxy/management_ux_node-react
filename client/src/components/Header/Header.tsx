@@ -3,7 +3,6 @@
 import {
   BarChart as BarChartIcon,
   Category as CategoryIcon,
-  Chat as ChatIcon,
   Close as CloseIcon,
   EventNote as EventNoteIcon,
   History as HistoryIcon,
@@ -152,12 +151,7 @@ const Header: React.FC = () => {
           </ListItemIcon>
           <ListItemText primary={t("promos")} />
         </ListItem>
-        <ListItem button component={Link} to="/messages" onClick={toggleDrawer}>
-          <ListItemIcon sx={{ color: "white" }}>
-            <ChatIcon />
-          </ListItemIcon>
-          <ListItemText primary={t("messages")} />
-        </ListItem>
+
       </>
     );
   };

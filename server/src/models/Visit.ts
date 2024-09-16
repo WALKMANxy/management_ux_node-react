@@ -29,11 +29,8 @@ const visitSchema = new Schema<IVisit>(
   { timestamps: true }
 );
 
-// Optional: Create a virtual to use `id` in place of `_id`
-visitSchema.virtual("id").get(function () {
-  return (this._id as Types.ObjectId).toHexString();
-});
+visitSchema.index({ visitIssuedBy: 1 });
 
-visitSchema.set("toJSON", { virtuals: true });
+
 
 export const Visit = model<IVisit>("Visit", visitSchema);

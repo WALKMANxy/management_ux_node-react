@@ -22,6 +22,8 @@ import ClientsPage from "./pages/common/ClientsPage";
 import MovementsPage from "./pages/common/MovementsPage";
 import LandingPage from "./pages/landing/LandingPage";
 import { refreshSession } from "./services/sessionService";
+import UserPage from "./pages/common/UserPage";
+import VisitsPage from "./pages/common/VisitsPage";
 
 /* console.log("Vite mode:", import.meta.env.MODE);
  */
@@ -110,6 +112,22 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <ChatPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "settings",
+        element: (
+          <ProtectedRoute>
+            <UserPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "visits",
+        element: (
+          <ProtectedRoute>
+            <VisitsPage />
           </ProtectedRoute>
         ),
       },

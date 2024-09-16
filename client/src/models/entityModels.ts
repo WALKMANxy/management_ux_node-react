@@ -13,6 +13,10 @@ export type User = {
   entityCode: string; // Code linking to admin, agent, or client
   entityName?: string;
   avatar?: string;
+
+  authType: "email" | "google"; // New field to distinguish authentication type
+  isEmailVerified?: boolean;
+
   createdAt?: Date;
   updatedAt?: Date;
 };

@@ -8,6 +8,7 @@ import {
   updateReadStatusReducer,
 } from "../features/chat/chatSlice";
 import { IChat, IMessage } from "../models/dataModels";
+import { handleNewNotification } from "./notifications";
 
 // Define a variable to hold the store reference
 let store: AppStore;
@@ -148,6 +149,9 @@ class WebSocketService {
         store.dispatch(
           addMessageReducer({ chatId, message, fromServer: true })
         );
+        if (message.sender !== currentUserId) {
+          handleNewNotification(message.sender, message.content, state); // Call the notification handler
+        }
 
         // Wait for the message to be fully added to the server
         setTimeout(() => {
@@ -166,9 +170,9 @@ class WebSocketService {
               })
             );
 
-            console.log(`Read status updated for message ID: ${message._id}`);
+            // Show notification if the sender is not the current user
           }
-        }, 2000); // Add an additional delay to ensure the server processes the message
+        }, 50); // Add an additional delay to ensure the server processes the message
       }, 50); // Initial delay for adding the message
     }
   };

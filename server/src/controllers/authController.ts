@@ -2,11 +2,12 @@ import { Request, Response } from "express";
 import { config } from "../config/config";
 import { AuthenticatedRequest } from "../models/types";
 import {
-  loginUser,
-  registerUser,
-  requestPasswordReset,
-  resetPassword,
-  verifyUserEmail,
+  generateResetCodeService,
+  loginUserService,
+  registerUserService,
+  updatePasswordService,
+  verifyResetCodeService,
+  verifyUserEmailService,
 } from "../services/authService";
 import { generateSessionToken, verifySessionToken } from "../utils/jwtUtils";
 import { logger } from "../utils/logger";
@@ -22,7 +23,7 @@ export const register = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
-    await registerUser(email, password);
+    await registerUserService(email, password);
     return res.status(201).json({
       message: "User registered successfully. Please verify your email.",
     });
@@ -49,7 +50,7 @@ export const login = async (req: Request, res: Response) => {
 
   try {
     // Attempt to log in the user with the provided credentials
-    const user = await loginUser(email, password);
+    const user = await loginUserService(email, password);
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials." });
     }
@@ -181,42 +182,11 @@ export const verifyEmail = async (req: Request, res: Response) => {
   const { token } = req.query;
 
   try {
-    await verifyUserEmail(token as string);
+    await verifyUserEmailService(token as string);
     res.redirect(config.appUrl);
   } catch (error) {
     logger.error("Email verification error:", { error });
     res.status(500).json({ message: "Email verification failed", error });
-  }
-};
-
-export const requestPasswordResetHandler = async (
-  req: Request,
-  res: Response
-) => {
-  const { email } = req.body;
-
-  try {
-    await requestPasswordReset(email);
-    res.status(200).json({
-      message:
-        "If that email address is in our database, we will send you an email to reset your password.",
-    });
-  } catch (error) {
-    logger.error("Password reset request failed", { error });
-    res.status(500).json({ message: "Password reset request failed", error });
-  }
-};
-
-export const resetPasswordHandler = async (req: Request, res: Response) => {
-  const { token } = req.query;
-  const { passcode, newPassword } = req.body;
-
-  try {
-    await resetPassword(token as string, passcode, newPassword);
-    res.redirect(config.appUrl);
-  } catch (error) {
-    logger.error("Password reset failed", { error });
-    res.status(500).json({ message: "Password reset failed", error });
   }
 };
 
@@ -252,5 +222,70 @@ export const refreshSession = async (
   } catch (error) {
     console.error("Error renewing session:", error);
     return res.status(500).json({ message: "Failed to renew session" });
+  }
+};
+
+// Request password reset
+export const requestPasswordReset = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  const { email } = req.body;
+
+  try {
+    const ipInfo = req.ipInfo || {
+      ip: req.ip ? req.ip.replace("::ffff:", "") : "",
+      country: "",
+      region: "",
+      city: "",
+      latitude: 0,
+      longitude: 0,
+    };
+
+    await generateResetCodeService(email, ipInfo);
+    res
+      .status(200)
+      .json({
+        message:
+          "If an account with that email exists, a reset code will be sent.",
+      });
+  } catch (err) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// Verify reset code
+export const verifyResetCode = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { email, code } = req.body;
+  try {
+    await verifyResetCodeService(email, code);
+    res.status(200).json({ message: "Code verified." });
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ message: err.message });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+};
+
+// Update password
+export const updatePassword = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { email, code, newPassword } = req.body;
+  try {
+    await updatePasswordService(email, code, newPassword);
+    res.status(200).json({ message: "Password updated successfully." });
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(400).json({ message: err.message });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 };

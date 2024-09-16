@@ -45,6 +45,8 @@ export interface DataSliceState {
   currentUserVisits: Visit[] | GlobalVisits | null;
   selectedClientId: string | null;
   selectedAgentId: string | null;
+  selectedVisitId: string | null,
+  selectedPromoId: string | null,
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }

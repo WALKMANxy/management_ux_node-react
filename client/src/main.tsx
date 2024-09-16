@@ -14,6 +14,9 @@ import "./utils/tokenIntercept";
 
 webSocketService.injectStore(store);
 
+registerPWA();
+
+
 const container = document.getElementById("root");
 const root = ReactDOM.createRoot(container!);
 
@@ -28,5 +31,3 @@ root.render(
     </ErrorBoundary>
   </React.StrictMode>
 );
-
-registerPWA();

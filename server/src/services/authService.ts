@@ -1,23 +1,38 @@
-import crypto from "crypto";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config";
 import { Passcode } from "../models/Passcode";
+import { IpInfo } from "../models/types";
 import { IUser, User } from "../models/User";
+import { generatePasscode } from "../utils/cryptoUtils";
+import { logger } from "../utils/logger";
 import { logRegisteredUser } from "../utils/logRegisteredUsers";
 import {
   sendPasswordResetEmail,
   sendVerificationEmail,
 } from "../utils/sendEmail";
 import { invalidateAllUserSessions } from "../utils/sessionUtils";
-import { logger } from "../utils/logger";
 
 const JWT_SECRET = config.jwtSecret || "";
 
-const generatePasscode = () => {
-  return crypto.randomBytes(3).toString("hex").toUpperCase();
+// Function to validate password
+const validatePassword = (password: string): string | null => {
+  const errors = [];
+  if (password.length < 8)
+    errors.push("Password must be at least 8 characters long.");
+  if (!/[A-Z]/.test(password))
+    errors.push("Password must contain at least one uppercase letter.");
+  if (!/[a-z]/.test(password))
+    errors.push("Password must contain at least one lowercase letter.");
+  if (!/[0-9]/.test(password))
+    errors.push("Password must contain at least one number.");
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password))
+    errors.push("Password must contain at least one special character.");
+
+  return errors.length > 0 ? errors.join(" ") : null;
 };
 
-export const registerUser = async (
+export const registerUserService = async (
   email: string,
   password: string
 ): Promise<IUser> => {
@@ -51,7 +66,7 @@ export const registerUser = async (
   return user;
 };
 
-export const verifyUserEmail = async (token: string): Promise<void> => {
+export const verifyUserEmailService = async (token: string): Promise<void> => {
   const decoded: any = jwt.verify(token, JWT_SECRET);
   const user = await User.findById(decoded.id);
 
@@ -64,7 +79,7 @@ export const verifyUserEmail = async (token: string): Promise<void> => {
   await user.save();
 };
 
-export const loginUser = async (
+export const loginUserService = async (
   email: string,
   password: string
 ): Promise<IUser | null> => {
@@ -81,35 +96,7 @@ export const loginUser = async (
   return user;
 };
 
-export const requestPasswordReset = async (email: string): Promise<void> => {
-  const user = await User.findOne({ email });
-  if (!user) {
-    logger.warn(`Password reset request for non-existent email: ${email}`);
-    return;
-  }
-
-  const resetToken = jwt.sign({ id: user._id }, JWT_SECRET, {
-    expiresIn: "1h",
-  });
-
-  const passcode = generatePasscode();
-  const passcodeExpiration = new Date();
-  passcodeExpiration.setHours(passcodeExpiration.getHours() + 1);
-
-  const newPasscode = new Passcode({
-    userId: user._id,
-    passcode,
-    expiresAt: passcodeExpiration,
-    used: false,
-  });
-
-  await newPasscode.save();
-
-  await sendPasswordResetEmail(email, resetToken, passcode);
-  logger.info(`Password reset email sent to ${email}.`);
-};
-
-export const resetPassword = async (
+export const resetPasswordService = async (
   token: string,
   passcode: string,
   newPassword: string
@@ -142,8 +129,72 @@ export const resetPassword = async (
   validPasscode.used = true;
   await validPasscode.save();
 
-   // Invalidate all sessions for the user
-   await invalidateAllUserSessions(user.id);
+  // Invalidate all sessions for the user
+  await invalidateAllUserSessions(user.id);
 
   logger.info(`Password reset successful for user: ${user.email}.`);
+};
+
+// Generate reset code
+export const generateResetCodeService = async (
+  email: string,
+  ipInfo: IpInfo | null
+): Promise<void> => {
+  const user = await User.findOne({ email });
+  if (!user) return;
+
+  const resetCode = generatePasscode();
+  user.passwordResetToken = await bcrypt.hash(resetCode, 10);
+  user.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000);
+  await user.save();
+
+  await sendPasswordResetEmail(user.email, resetCode, ipInfo);
+};
+
+// Verify reset code
+export const verifyResetCodeService = async (
+  email: string,
+  code: string
+): Promise<void> => {
+  const user = await User.findOne({ email });
+  if (!user || !user.passwordResetToken || !user.passwordResetExpires) {
+    throw new Error("Invalid or expired reset code.");
+  }
+
+  if (user.passwordResetExpires < new Date()) {
+    throw new Error("Reset code has expired.");
+  }
+
+  const isMatch = await bcrypt.compare(code, user.passwordResetToken);
+  if (!isMatch) throw new Error("Invalid reset code.");
+};
+
+// Update password
+export const updatePasswordService = async (
+  email: string,
+  code: string,
+  newPassword: string
+): Promise<void> => {
+  const user = await User.findOne({ email });
+  if (!user) throw new Error("Invalid or expired reset code.");
+
+  if (!user.passwordResetToken || !user.passwordResetExpires) {
+    throw new Error("Invalid or expired reset code.");
+  }
+
+  if (user.passwordResetExpires < new Date()) {
+    throw new Error("Reset code has expired.");
+  }
+
+  const isMatch = await bcrypt.compare(code, user.passwordResetToken);
+  if (!isMatch) throw new Error("Invalid reset code.");
+
+  // Validate password
+  const validationError = validatePassword(newPassword);
+  if (validationError) throw new Error(validationError);
+
+  user.password = newPassword;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
 };
