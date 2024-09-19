@@ -1,5 +1,6 @@
 export type SearchResult = {
   id: string;
+  _id?:string;
   name: string;
   type: "client" | "agent" | "article" | "promo" | "visit" | "alert";
 
