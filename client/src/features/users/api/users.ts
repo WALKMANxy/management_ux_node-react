@@ -18,7 +18,7 @@ export const updateUserById = async (
 
 // New API call to fetch users by a batch of IDs
 export const getUsersByBatchIds = async (ids: string[]): Promise<Partial<User>[]> => {
-  return apiCall<Partial<User>[]>(`users/batch`, "POST", { ids });
+  return apiCall<Partial<User>[]>(`users/batch`, "GET", { ids });
 };
 
 // API call to update the user's email
@@ -47,4 +47,3 @@ export const updateUserPassword = async (
     newPassword,
   });
 };
-

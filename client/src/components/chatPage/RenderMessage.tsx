@@ -3,9 +3,9 @@ import { Box } from "@mui/material";
 import React from "react";
 import { IMessage } from "../../models/dataModels";
 import { User } from "../../models/entityModels";
-import MessageBubble from "./MessageBubble";
 import { isDifferentDay } from "../../utils/chatUtils";
 import DateDivider from "./DateDivider";
+import MessageBubble from "./MessageBubble";
 
 interface RenderMessageProps {
   messages: IMessage[];
@@ -14,29 +14,38 @@ interface RenderMessageProps {
   participantsData: Partial<User>[];
 }
 
+/*   console.log("RenderingMessages rendering now")
+ */
+// RenderMessage.tsx
 const RenderMessages: React.FC<RenderMessageProps> = ({
-  messages,
+  messages = [],
   currentUserId,
   chatType,
   participantsData,
 }) => {
-
-/*   console.log("RenderingMessages rendering now")
- */
   return (
     <Box>
       {messages.map((message, index) => {
+        const previousMessage = messages[index - 1];
+
         const showDivider =
           index === 0 ||
-          isDifferentDay(new Date(message.timestamp), new Date(messages[index - 1].timestamp));
+          (previousMessage &&
+            isDifferentDay(
+              new Date(message.timestamp),
+              new Date(previousMessage.timestamp)
+            ));
 
         return (
           <React.Fragment key={message.local_id || message._id}>
-            {showDivider && <DateDivider date={new Date(message.timestamp)} />}
+            {showDivider && message.timestamp && (
+              <DateDivider date={new Date(message.timestamp)} />
+            )}
             <Box
               sx={{
                 display: "flex",
-                justifyContent: message.sender === currentUserId ? "flex-end" : "flex-start",
+                justifyContent:
+                  message.sender === currentUserId ? "flex-end" : "flex-start",
                 mb: 2,
               }}
             >
