@@ -36,7 +36,7 @@ const ActivePromotions: React.FC<ActivePromotionsProps> = ({ isLoading }) => {
         ) : promos.length > 0 ? (
           <List>
             {promos.map((promo) => (
-              <ListItem key={promo.id}>
+              <ListItem key={promo._id}>
                 <ListItemText primary={promo.name} />
               </ListItem>
             ))}

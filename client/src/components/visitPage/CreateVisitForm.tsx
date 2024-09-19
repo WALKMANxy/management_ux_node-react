@@ -4,6 +4,12 @@ import SendIcon from "@mui/icons-material/Send";
 import {
   Alert,
   Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   Grid,
   IconButton,
@@ -12,6 +18,7 @@ import {
   Select,
   Snackbar,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -22,7 +29,8 @@ import dayjs, { Dayjs } from "dayjs";
 import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
-import { createVisitAsync } from "../../features/data/dataSlice";
+import { createVisitAsync } from "../../features/data/dataThunks";
+import VisitCard from "./VisitCard"; // Import the VisitCard component
 
 interface CreateVisitFormProps {
   clientId: string;
@@ -42,12 +50,15 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
   const [reason, setReason] = useState<string>("");
   const [date, setDate] = useState<Dayjs | null>(dayjs());
   const [notePublic, setNotePublic] = useState<string>("");
+  const [notePrivate, setNotePrivate] = useState<string>(""); // New private note field
 
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success"
   );
+
+  const [openConfirm, setOpenConfirm] = useState<boolean>(false); // State for confirmation dialog
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,9 +74,12 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
       clientId,
       type,
       visitReason: reason,
-      date: date.toISOString(),
+      date: dayjs(date).toDate(),
+      createdAt: new Date(), // Add the current date here
+
       notePublic: notePublic.trim() === "" ? undefined : notePublic.trim(),
-      visitIssuedBy: currentUser?.id || "unknown",
+      notePrivate: notePrivate.trim() === "" ? undefined : notePrivate.trim(), // Handle private note
+      visitIssuedBy: currentUser?.userId || "unknown",
       pending: true,
       completed: false,
     };
@@ -79,6 +93,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
       setReason("");
       setDate(dayjs());
       setNotePublic("");
+      setNotePrivate(""); // Reset private note
       onClose();
     } catch (error: unknown) {
       setSnackbarMessage(
@@ -99,6 +114,19 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
     setSnackbarOpen(false);
   };
 
+  const handleCancelClick = () => {
+    setOpenConfirm(true);
+  };
+
+  const handleConfirmCancel = () => {
+    setOpenConfirm(false);
+    onClose();
+  };
+
+  const handleDenyCancel = () => {
+    setOpenConfirm(false);
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box
@@ -110,15 +138,22 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
           borderRadius: 2,
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
           backgroundColor: "#fff",
+          display: "flex",
+          flexDirection: "column",
+          height: "100%", // Ensures the form takes full height
         }}
       >
-        <Typography variant="h6" gutterBottom>
+        <Typography
+          variant="h5"
+          gutterBottom
+          sx={{ fontWeight: 600, mb: 2, color: "#4d4b5f" }}
+        >
           Create New Visit
         </Typography>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} sx={{ flexGrow: 1 }}>
           {/* Type Field */}
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth required variant="filled">
+            <FormControl fullWidth required variant="outlined">
               <InputLabel id="visit-type-label">Type</InputLabel>
               <Select
                 labelId="visit-type-label"
@@ -126,7 +161,9 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
                 value={type}
                 label="Type *"
                 onChange={(e) => setType(e.target.value)}
-                sx={{ backgroundColor: "#f3e5f5" }} // Faint purple
+                sx={{
+                  borderRadius: 2,
+                }}
               >
                 <MenuItem value="Regular">Regular</MenuItem>
                 <MenuItem value="Urgent">Urgent</MenuItem>
@@ -136,7 +173,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
 
           {/* Reason Field */}
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth required variant="filled">
+            <FormControl fullWidth required variant="outlined">
               <InputLabel id="visit-reason-label">Reason</InputLabel>
               <Select
                 labelId="visit-reason-label"
@@ -144,7 +181,9 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
                 value={reason}
                 label="Reason *"
                 onChange={(e) => setReason(e.target.value)}
-                sx={{ backgroundColor: "#f3e5f5" }} // Faint purple
+                sx={{
+                  borderRadius: 2,
+                }}
               >
                 <MenuItem value="Issue">Issue</MenuItem>
                 <MenuItem value="Routine">Routine</MenuItem>
@@ -157,6 +196,10 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
           <Grid item xs={12} sm={6}>
             <StaticDateTimePicker
               value={date}
+              disablePast={true}
+              onAccept={(newValue: Dayjs | null) => {
+                setDate(newValue);
+              }}
               onChange={(newValue: Dayjs | null) => {
                 setDate(newValue);
               }}
@@ -167,7 +210,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
             />
           </Grid>
 
-          {/* Public Note */}
+          {/* Public Note - Expandable TextArea */}
           <Grid item xs={12} sm={6}>
             <TextField
               label="Public Note"
@@ -175,38 +218,93 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
               onChange={(e) => setNotePublic(e.target.value)}
               fullWidth
               multiline
-              rows={2}
-              variant="filled"
-              sx={{ backgroundColor: "#e3f2fd" }} // Faint blue
+              minRows={2}
+              maxRows={10} // Allow expansion up to 10 rows
+              variant="outlined"
+              sx={{
+                borderRadius: 2,
+              }}
             />
           </Grid>
 
-          {/* Submit and Cancel Buttons */}
-          <Grid item xs={12} display="flex" justifyContent="flex-end" gap={2}>
-            <IconButton
-              color="secondary"
-              onClick={onClose}
+          {/* Private Note - Expandable TextArea */}
+          <Grid item xs={12}>
+            <TextField
+              label="Private Note"
+              value={notePrivate}
+              onChange={(e) => setNotePrivate(e.target.value)}
+              fullWidth
+              multiline
+              minRows={2}
+              maxRows={10}
+              variant="outlined"
               sx={{
-                backgroundColor: "#FFCDD2", // Light red for cancel
-                "&:hover": { backgroundColor: "#EF9A9A" },
-                borderRadius: "50%",
+                borderRadius: 2,
               }}
-            >
-              <CloseIcon />
-            </IconButton>
+            />
+          </Grid>
+
+          {/* Visit Preview Card */}
+          <Grid item xs={12}>
+            <VisitCard
+              clientId={clientId}
+              type={type}
+              reason={reason}
+              date={date}
+              notePublic={notePublic}
+              notePrivate={notePrivate} // Pass private note
+              pending={true}
+              completed={false}
+              visitIssuedBy={currentUser?.name || "unknown"}
+              isNew={true}
+            />
+          </Grid>
+        </Grid>
+
+        {/* Action Buttons */}
+        <Box
+          sx={{
+            mt: 2,
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 2,
+          }}
+        >
+          <Tooltip title="Send Visit">
             <IconButton
               type="submit"
-              color="primary"
+              color="success"
               sx={{
-                backgroundColor: "#B2DFDB", // Light green for submit
-                "&:hover": { backgroundColor: "#80CBC4" },
+                backgroundColor: "green",
+                color: "white",
+                "&:hover": { backgroundColor: "darkgreen" },
                 borderRadius: "50%",
+                width: 48,
+                height: 48,
               }}
+              aria-label="Send Visit"
             >
               <SendIcon />
             </IconButton>
-          </Grid>
-        </Grid>
+          </Tooltip>
+          <Tooltip title="Cancel">
+            <IconButton
+              color="error"
+              onClick={handleCancelClick}
+              sx={{
+                backgroundColor: "red",
+                color: "white",
+                "&:hover": { backgroundColor: "darkred" },
+                borderRadius: "50%",
+                width: 48,
+                height: 48,
+              }}
+              aria-label="Cancel"
+            >
+              <CloseIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
 
         {/* Snackbar for feedback */}
         <Snackbar
@@ -223,6 +321,32 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
             {snackbarMessage}
           </Alert>
         </Snackbar>
+
+        {/* Confirmation Dialog */}
+        <Dialog
+          open={openConfirm}
+          onClose={handleDenyCancel}
+          aria-labelledby="confirm-cancel-title"
+          aria-describedby="confirm-cancel-description"
+        >
+          <DialogTitle id="confirm-cancel-title">
+            Cancel Visit Creation
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="confirm-cancel-description">
+              Are you sure you want to cancel creating this visit? All entered
+              information will be lost.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDenyCancel} color="primary">
+              No
+            </Button>
+            <Button onClick={handleConfirmCancel} color="error" autoFocus>
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </LocalizationProvider>
   );

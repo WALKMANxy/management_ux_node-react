@@ -1,24 +1,18 @@
-// api.ts
+//src/features/data/dataQueries.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import {
-  GlobalPromos,
+/* import {
+   GlobalPromos,
   GlobalVisits,
-  Promo,
+   Promo,
   Visit,
-} from "../../models/dataModels";
+} from "../../models/dataModels"; */
 import { Admin, Agent, Client } from "../../models/entityModels";
 import {
   loadAgentDetailsData,
   loadClientDetailsData,
   loadJsonData,
-  loadPromosData,
-  loadVisitsData,
 } from "../../utils/apiUtils";
-import {
-  mapDataToAgents,
-  mapDataToModels,
-  mapVisitsPromosToAdmin,
-} from "../../utils/dataLoader";
+import { mapDataToAgents, mapDataToModels } from "../../utils/dataLoader";
 import {
   generateErrorResponse,
   handleApiError,
@@ -35,8 +29,8 @@ export const dataApi = createApi({
     getUserAdminData: builder.query<
       {
         adminData: Admin;
-        globalVisits: GlobalVisits;
-        globalPromos: GlobalPromos;
+        /*    globalVisits: GlobalVisits;
+        globalPromos: GlobalPromos; */
       },
       { entityCode: string; userId: string }
     >({
@@ -47,37 +41,40 @@ export const dataApi = createApi({
             clientDetails,
             agentDetails,
             adminDetails,
-            visits,
-            promos,
+            /*    visits,
+            promos, */
           ] = await Promise.all([
             loadJsonData(),
             loadClientDetailsData(),
             loadAgentDetailsData(),
             getAdminById(entityCode),
-            loadVisitsData(),
-            loadPromosData(),
+            /*  loadVisitsData(),
+            loadPromosData(), */
           ]);
 
           // Map clients and agents using the fetched data
           const { clients } = await mapDataToModels(
             data,
-            clientDetails,
-            visits,
-            promos
+            clientDetails
+            /* visits,
+            promos */
           );
 
           const {
             agents,
-            visits: aggregatedVisits,
-            promos: aggregatedPromos,
-          } = await mapDataToAgents(clients, agentDetails, visits, promos);
+            /*   visits: aggregatedVisits,
+            promos: aggregatedPromos, */
+          } = await mapDataToAgents(
+            clients,
+            agentDetails /*  visits, promos */
+          );
 
-          // Use mapVisitsPromosToAdmin to aggregate visits and promos for admin
+          /*  // Use mapVisitsPromosToAdmin to aggregate visits and promos for admin
           const { globalVisits, globalPromos } = mapVisitsPromosToAdmin(
             agents,
             aggregatedVisits,
             aggregatedPromos
-          );
+          ); */
 
           // Construct the admin details with additional data
           const adminDetailsWithData: Admin = {
@@ -90,8 +87,8 @@ export const dataApi = createApi({
           return {
             data: {
               adminData: adminDetailsWithData,
-              globalVisits,
-              globalPromos,
+              /*   globalVisits,
+              globalPromos, */
             },
           };
         } catch (error) {
@@ -102,24 +99,29 @@ export const dataApi = createApi({
     }),
 
     getUserClientData: builder.query<
-      { clientData: Client; visits: Visit[]; promos: Promo[] },
+      { clientData: Client /*  visits: Visit[]; promos: Promo[] */ },
       { entityCode: string; userId: string }
     >({
       queryFn: async ({ entityCode }) => {
         try {
-          const [data, clientDetails, visits, promos] = await Promise.all([
-            getFilteredMovements(),
-            getClientByCodice(entityCode),
-            loadVisitsData(),
-            loadPromosData(),
-          ]);
+          const [data, clientDetails /*  visits, promos */] = await Promise.all(
+            [
+              getFilteredMovements(),
+              getClientByCodice(entityCode),
+              /* loadVisitsData(),
+            loadPromosData(), */
+            ]
+          );
 
           // Updated to use the new return structure from mapDataToModels
           const {
             clients,
-            visits: filteredVisits,
-            promos: filteredPromos,
-          } = await mapDataToModels(data, [clientDetails], visits, promos);
+            /* visits: filteredVisits,
+            promos: filteredPromos, */
+          } = await mapDataToModels(
+            data,
+            [clientDetails] /*  visits, promos */
+          );
 
           if (clients.length === 0) {
             throw new Error("Client not found");
@@ -132,8 +134,8 @@ export const dataApi = createApi({
           return {
             data: {
               clientData,
-              visits: filteredVisits,
-              promos: filteredPromos,
+              /*  visits: filteredVisits,
+              promos: filteredPromos, */
             },
           };
         } catch (error) {
@@ -144,34 +146,37 @@ export const dataApi = createApi({
     }),
 
     getUserAgentData: builder.query<
-      { agentData: Agent; visits: Visit[]; promos: Promo[] },
+      { agentData: Agent /* visits: Visit[]; promos: Promo[] */ },
       { entityCode: string; userId: string }
     >({
       queryFn: async ({ entityCode }) => {
         try {
-          const [data, clientDetails, agentDetails, visits, promos] =
+          const [data, clientDetails, agentDetails /*  visits, promos */] =
             await Promise.all([
               getFilteredMovements(),
               getClientsByAgent(),
               getAgentById(entityCode),
-              loadVisitsData(),
-              loadPromosData(),
+              /*  loadVisitsData(),
+              loadPromosData(), */
             ]);
 
           // Extract clients from mapDataToModels
           const { clients } = await mapDataToModels(
             data,
-            clientDetails,
-            visits,
-            promos
+            clientDetails
+            /*  visits,
+            promos */
           );
 
           // Extract agents, visits, and promos from mapDataToAgents
           const {
             agents,
-            visits: aggregatedVisits,
-            promos: aggregatedPromos,
-          } = await mapDataToAgents(clients, [agentDetails], visits, promos);
+            /*   visits: aggregatedVisits,
+            promos: aggregatedPromos, */
+          } = await mapDataToAgents(
+            clients,
+            [agentDetails] /* visits, promos */
+          );
 
           if (agents.length === 0) {
             throw new Error("Agent not found");
@@ -187,8 +192,8 @@ export const dataApi = createApi({
           return {
             data: {
               agentData,
-              visits: aggregatedVisits,
-              promos: aggregatedPromos,
+              /* visits: aggregatedVisits,
+              promos: aggregatedPromos, */
             },
           };
         } catch (error) {

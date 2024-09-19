@@ -13,8 +13,7 @@ import {
 import { CardHeader, Paper, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useAppSelector } from "../../app/hooks";
-import { RootState } from "../../app/store";
-import {  GlobalVisits, Visit } from "../../models/dataModels";
+import { selectVisits } from "../../features/data/dataSelectors";
 import { Agent } from "../../models/entityModels";
 import { generateActivityList } from "../../utils/activityUtils";
 
@@ -42,21 +41,13 @@ interface AgentActivityOverviewProps {
 const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({
   selectedAgent,
 }) => {
-  // Fetch global visits and alerts from the store
-  const globalVisits: GlobalVisits = useAppSelector(
-    (state: RootState) => state.data.currentUserVisits
-  ) as Record<string, { Visits: Visit[] }>;
+  // Fetch visits using the selectVisits selector
+  const visits = useAppSelector(selectVisits);
 
   // Generate activity list using the utility function
   const activityList: ActivityItem[] = useMemo(
-    () =>
-      generateActivityList(
-        selectedAgent.clients,
-        selectedAgent.id,
-        globalVisits,
-
-      ),
-    [selectedAgent, globalVisits]
+    () => generateActivityList(selectedAgent.clients, selectedAgent.id, visits),
+    [selectedAgent, visits]
   );
 
   return (
@@ -124,6 +115,20 @@ const OrderItem: React.FC<OrderItemProps> = ({ item, lastTimeline }) => {
     }
   };
 
+   // Function to format date and time in the desired format
+   const formatDateTime = (time: string): string => {
+    const date = new Date(time);
+    return date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }) + ' ' + date.toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  };
+
   return (
     <TimelineItem>
       <TimelineOppositeContent
@@ -132,8 +137,8 @@ const OrderItem: React.FC<OrderItemProps> = ({ item, lastTimeline }) => {
         variant="body2"
         color="text.secondary"
       >
-        {time}
-      </TimelineOppositeContent>
+        {formatDateTime(time)} {/* Format the time here */}
+        </TimelineOppositeContent>
       <TimelineSeparator>
         <TimelineDot color={getDotColor(type)} />
         {!lastTimeline && <TimelineConnector />}

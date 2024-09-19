@@ -2,7 +2,6 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
-  Button,
   Divider,
   Fab,
   Grid,
@@ -34,6 +33,8 @@ import {
   calculateMonthlyData,
   calculateTopBrandsData,
 } from "../../utils/dataUtils";
+import { useAppSelector } from "../../app/hooks";
+import { selectCurrentUser } from "../../features/users/userSlice";
 
 const AdminDashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -47,8 +48,6 @@ const AdminDashboard: React.FC = () => {
   };
 
   const {
-    selectedClient,
-    selectedAgent,
     handleSelect,
     clearSelection,
     clientComparativeStatistics,
@@ -58,6 +57,8 @@ const AdminDashboard: React.FC = () => {
   } = useSelectionState(isMobile);
 
   const {
+    selectedClient,
+    selectedAgent,
     calculateTotalSpentThisMonth,
     calculateTotalSpentThisYear,
     calculateTotalSpentThisYearForAgents,
@@ -77,10 +78,24 @@ const AdminDashboard: React.FC = () => {
 
   const [fakeLoading, setFakeLoading] = useState(true);
 
+  const user = useAppSelector(selectCurrentUser)
+
+  useEffect(() => {
+    if (selectedClient) {
+      console.log("Selected client:", selectedClient);
+    }
+  }, [selectedClient]);
+
+  useEffect(() => {
+    if (selectedAgent) {
+      console.log("Selected client:", selectedAgent);
+    }
+  }, [selectedAgent]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setFakeLoading(false);
-    }, 700); // Fake loading for 700ms
+    }, 400); // Fake loading for 700ms
 
     return () => clearTimeout(timer);
   }, []);
@@ -122,7 +137,7 @@ const AdminDashboard: React.FC = () => {
         />
       ) : (
         <Typography variant="h4" gutterBottom>
-          {t("adminDashboard.welcomeBack", { name: "Admin" })}
+          {t("adminDashboard.welcomeBack", { name: user?.entityName || "Admin" })}
         </Typography>
       )}
       {loadingState ? (
@@ -140,7 +155,7 @@ const AdminDashboard: React.FC = () => {
 
       <Grid container spacing={6} mt={2}>
         <Grid item xs={!isTablet ? 12 : 0} md={!isTablet ? 9 : 0}>
-          {selectedAgentData ? (
+          {selectedAgentData && selectedAgent ? (
             <Box mb={4}>
               <Box
                 sx={{
@@ -152,7 +167,7 @@ const AdminDashboard: React.FC = () => {
               >
                 <Typography variant="h5" gutterBottom>
                   {t("adminDashboard.statisticsFor", {
-                    name: selectedAgentData.name,
+                    name: selectedAgent.name,
                   })}
                 </Typography>
                 {isTablet && (
@@ -212,6 +227,7 @@ const AdminDashboard: React.FC = () => {
                         (client) => client.movements
                       )
                     )}
+                    isAgentSelected={true}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -224,6 +240,7 @@ const AdminDashboard: React.FC = () => {
                         .revenueData
                     }
                     userRole="admin"
+                    isAgentSelected={true}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -231,27 +248,28 @@ const AdminDashboard: React.FC = () => {
                     topBrandsData={topBrandsForSelectedAgent}
                     brandColors={brandColors}
                     isMobile={isMobile}
-                    userRole="admin"
+                    isAgentSelected={true}
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <AgentActivityOverview selectedAgent={selectedAgentData} />
                 </Grid>
               </Grid>
-              <Button
-                variant="contained"
-                color="primary"
-                sx={{ mt: 3, borderRadius: "8px" }}
-              >
-                {t("adminDashboard.viewMore")}
-              </Button>
+
+              {/* Updated Fab */}
               <Fab
                 color="secondary"
                 aria-label="close"
-                sx={{ position: "fixed", bottom: 16, right: 16 }}
+                sx={{
+                  position: "fixed",
+                  bottom: isMobile ? 20 : 16,
+                  right: isMobile ? 120 : 16,
+                  zIndex: 1300,
+                }}
                 onClick={() => clearSelection()}
               >
-                <CloseIcon />
+                <CloseIcon fontSize="small" />{" "}
+                {/* Optional: Adjust icon size */}
               </Fab>
             </Box>
           ) : selectedClient ? (
@@ -319,6 +337,7 @@ const AdminDashboard: React.FC = () => {
                 <Grid item xs={12} md={4}>
                   <TopArticleType
                     articles={calculateTopArticleType(selectedClient.movements)}
+                    isAgentSelected={false}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -328,6 +347,8 @@ const AdminDashboard: React.FC = () => {
                       calculateMonthlyData([selectedClient]).revenueData
                     }
                     userRole="admin"
+                    isAgentSelected={false}
+
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -335,24 +356,24 @@ const AdminDashboard: React.FC = () => {
                     topBrandsData={topBrandsData}
                     brandColors={brandColors}
                     isMobile={isMobile}
-                    userRole="admin"
+                    isAgentSelected={false}
                   />
                 </Grid>
               </Grid>
-              <Button
-                variant="contained"
-                color="primary"
-                sx={{ mt: 3, borderRadius: "8px" }}
-              >
-                {t("adminDashboard.viewMore")}
-              </Button>
+
               <Fab
                 color="secondary"
                 aria-label="close"
-                sx={{ position: "fixed", bottom: 16, right: 16 }}
+                sx={{
+                  position: "fixed",
+                  bottom: isMobile ? 20 : 16,
+                  right: isMobile ? 120 : 16,
+                  zIndex: 1300,
+                }}
                 onClick={() => clearSelection()}
               >
-                <CloseIcon />
+                <CloseIcon fontSize="small" />{" "}
+                {/* Optional: Adjust icon size */}
               </Fab>
             </Box>
           ) : (
@@ -448,6 +469,8 @@ const AdminDashboard: React.FC = () => {
                       months={months}
                       revenueData={revenueData}
                       userRole="admin"
+                      isAgentSelected={true}
+
                     />
                   )}
                 </Grid>
@@ -466,8 +489,8 @@ const AdminDashboard: React.FC = () => {
                       topBrandsData={topBrandsData}
                       isMobile={isMobile}
                       brandColors={brandColors}
-                      userRole="admin"
-                    />
+                      isAgentSelected={true}
+                      />
                   )}
                 </Grid>
                 <Grid item xs={12}>
@@ -500,9 +523,19 @@ const AdminDashboard: React.FC = () => {
         {!isTablet && (
           <Grid item xs={12} md={3}>
             <Box mb={4}>
-              <Typography variant="h5" gutterBottom>
-                {t("adminDashboard.calendar")}
-              </Typography>
+              {loadingState ? (
+                <Skeleton
+                  animation="wave"
+                  variant="text"
+                  height={30}
+                  sx={{ borderRadius: "4px" }}
+                  aria-label="loading-text"
+                />
+              ) : (
+                <Typography variant="h5" gutterBottom>
+                  {t("adminDashboard.calendar")}
+                </Typography>
+              )}
               <Divider sx={{ my: 2, borderRadius: "12px" }} />
               {loadingState ? (
                 <Skeleton
@@ -519,7 +552,18 @@ const AdminDashboard: React.FC = () => {
                 </Box>
               )}
             </Box>
-            <UpcomingVisits isLoading={isLoading} />
+            {loadingState ? (
+              <Skeleton
+                animation="wave"
+                variant="rectangular"
+                width="100%"
+                height={150}
+                sx={{ borderRadius: "12px" }}
+                aria-label="skeleton"
+              />
+            ) : (
+              <UpcomingVisits isLoading={isLoading} />
+            )}
           </Grid>
         )}
       </Grid>

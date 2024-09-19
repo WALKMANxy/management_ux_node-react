@@ -1,8 +1,10 @@
 // useVisitSidebar.ts
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { selectVisits } from "../features/data/dataSelectors";
+import { selectAgent, selectClient } from "../features/data/dataSlice";
+import { getVisits } from "../features/data/dataThunks";
 import { Agent, Client } from "../models/entityModels";
-import { selectAgent, selectClient, updateVisits } from "../features/data/dataSlice";
 
 export const useVisitSidebar = () => {
   const dispatch = useAppDispatch();
@@ -14,6 +16,64 @@ export const useVisitSidebar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredList, setFilteredList] = useState<Client[] | Agent[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
+
+  const visits = useAppSelector(selectVisits);
+
+  const selectedClientId = useAppSelector(
+    (state) => state.data.selectedClientId
+  );
+
+  // For agent counts
+  const agentVisitCounts = useMemo(() => {
+    const counts: Record<
+      string,
+      { hasPending: boolean; hasIncomplete: boolean }
+    > = {};
+
+    visits.forEach((visit) => {
+      const agentId = visit.agentId || "unknown";
+
+      if (!counts[agentId]) {
+        counts[agentId] = { hasPending: false, hasIncomplete: false };
+      }
+
+      if (visit.pending === true) {
+        counts[agentId].hasPending = true;
+      }
+
+      if (visit.pending === false && visit.completed === false) {
+        counts[agentId].hasIncomplete = true;
+      }
+    });
+
+    return counts;
+  }, [visits]);
+
+  // For client counts
+  const clientVisitCounts = useMemo(() => {
+    const counts: Record<
+      string,
+      { pendingCount: number; incompleteCount: number }
+    > = {};
+
+    visits.forEach((visit) => {
+      const clientId = visit.clientId;
+
+      if (!counts[clientId]) {
+        counts[clientId] = { pendingCount: 0, incompleteCount: 0 };
+      }
+
+      if (visit.pending === true) {
+        counts[clientId].pendingCount += 1;
+      }
+
+      if (visit.pending === false && visit.completed === false) {
+        counts[clientId].incompleteCount += 1;
+      }
+    });
+
+    return counts;
+  }, [visits]);
 
   useEffect(() => {
     let list: Client[] | Agent[] = [];
@@ -31,7 +91,8 @@ export const useVisitSidebar = () => {
       } else {
         list = Object.values(agents).filter(
           (agent) =>
-            agent.name.toLowerCase().includes(term) || agent.id.toLowerCase().includes(term)
+            agent.name.toLowerCase().includes(term) ||
+            agent.id.toLowerCase().includes(term)
         );
       }
     } else if (userRole === "agent") {
@@ -59,13 +120,12 @@ export const useVisitSidebar = () => {
     setSelectedAgentId(null);
   };
 
-  const handleCreateVisit = () => {
-  };
+  const handleCreateVisit = () => {};
 
   // New function to handle refreshing visits
   const handleVisitsRefresh = async () => {
     try {
-      await dispatch(updateVisits());
+      await dispatch(getVisits());
     } catch (error) {
       console.error("Failed to refresh visits:", error);
     }
@@ -82,5 +142,8 @@ export const useVisitSidebar = () => {
     handleCreateVisit,
     setSearchTerm,
     handleVisitsRefresh,
+    agentVisitCounts,
+    clientVisitCounts,
+    selectedClientId,
   };
 };

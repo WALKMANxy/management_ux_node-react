@@ -1,5 +1,7 @@
 //src/features/data/dataSlice.ts
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector } from "reselect";
+import { RootState } from "../../app/store";
 import {
   GlobalPromos,
   GlobalVisits,
@@ -8,11 +10,7 @@ import {
 } from "../../models/dataModels";
 import { Agent, Client } from "../../models/entityModels";
 import { DataSliceState } from "../../models/stateModels";
-import { dataApi } from "./dataQueries";
-import { updateApi } from "./promosVisitsQueries";
-import { createSelector } from "reselect";
-import { RootState } from "../../app/store";
-
+import { fetchInitialData } from "./dataThunks";
 
 const initialState: DataSliceState = {
   clients: {},
@@ -29,94 +27,7 @@ const initialState: DataSliceState = {
   error: null,
 };
 
-export const fetchInitialData = createAsyncThunk(
-  "data/fetchInitialData",
-  async (_, { getState, dispatch }) => {
-    const state = getState() as {
-      auth: { role: string; id: string; userId: string };
-    };
-    const { role, id, userId } = state.auth;
-
-    let userData;
-    /* let agentData = null; */
-    if (role === "client") {
-      userData = await dispatch(
-        dataApi.endpoints.getUserClientData.initiate({ entityCode: id, userId })
-      ).unwrap();
-    } else if (role === "agent") {
-      userData = await dispatch(
-        dataApi.endpoints.getUserAgentData.initiate({ entityCode: id, userId })
-      ).unwrap();
-    } else if (role === "admin") {
-      // Fetch clients, agents, and agent details using the CRA API endpoints
-
-      /* agentData = await dispatch(
-        superApi.endpoints.getAgentDetails.initiate()
-      ).unwrap(); */
-      userData = await dispatch(
-        dataApi.endpoints.getUserAdminData.initiate({ entityCode: id, userId })
-      ).unwrap();
-    } else {
-      throw new Error("Invalid user role");
-    }
-    return { role, userData, userId /* agentData */ };
-  }
-);
-
-export const updateVisits = createAsyncThunk(
-  "data/updateVisits",
-  async (_, { dispatch }) => {
-    return await dispatch(updateApi.endpoints.updateVisits.initiate()).unwrap();
-  }
-);
-
-export const updatePromos = createAsyncThunk(
-  "data/updatePromos",
-  async (_, { dispatch }) => {
-    return await dispatch(updateApi.endpoints.updatePromos.initiate()).unwrap();
-  }
-);
-
-// Thunk to create a new visit
-export const createVisitAsync = createAsyncThunk(
-  "data/createVisit",
-  async (
-    visitData: {
-      clientId: string;
-      type: string;
-      visitReason: string;
-      date: string;
-      notePublic?: string;
-      notePrivate?: string;
-      visitIssuedBy: string;
-      pending: boolean;
-      completed: boolean;
-    },
-    { dispatch, rejectWithValue }
-  ) => {
-    try {
-      // Dispatch the mutation and unwrap the response
-      const response = await dispatch(
-        updateApi.endpoints.createVisit.initiate(visitData)
-      ).unwrap();
-      return response;
-    } catch (err: unknown) {
-      // Safely handle and type the error
-      if (err instanceof Error && 'data' in err) {
-        // Handle errors with a 'data' property (like RTK Query errors)
-        return rejectWithValue((err as { data: string }).data);
-      } else if (err instanceof Error) {
-        // Generic error handling
-        return rejectWithValue(err.message);
-      } else {
-        // Fallback in case the error is of an unknown structure
-        return rejectWithValue("Failed to create visit.");
-      }
-    }
-  }
-);
-
-const dataSlice = createSlice({
+export const dataSlice = createSlice({
   name: "data",
   initialState,
   reducers: {
@@ -136,12 +47,119 @@ const dataSlice = createSlice({
     selectVisit(state, action: PayloadAction<string>) {
       state.selectedVisitId = action.payload;
     },
+    clearSelectedVisit(state) {
+      state.selectedVisitId = null;
+    },
     selectPromo(state, action: PayloadAction<string>) {
       state.selectedPromoId = action.payload;
     },
+    clearSelectedPromo(state) {
+      state.selectedPromoId = null;
+    },
+    setCurrentUserVisits(state, action: PayloadAction<Visit[] | GlobalVisits>) {
+      state.currentUserVisits = action.payload;
+    },
+    setCurrentUserPromos(state, action: PayloadAction<Promo[] | GlobalPromos>) {
+      state.currentUserPromos = action.payload;
+    },
+    addOrUpdateVisit(state, action: PayloadAction<Visit>) {
+      const newVisit = action.payload;
+      const role = state.currentUserDetails?.role;
 
+      if (role === "client" || role === "agent") {
+        if (Array.isArray(state.currentUserVisits)) {
+          const index = state.currentUserVisits.findIndex(
+            (visit) => visit._id === newVisit._id
+          );
+          if (index !== -1) {
+            state.currentUserVisits[index] = newVisit;
+          } else {
+            state.currentUserVisits.push(newVisit);
+          }
+        }
+      } else if (role === "admin") {
+        // Handle admin case
+        if (
+          typeof state.currentUserVisits !== "object" ||
+          Array.isArray(state.currentUserVisits) ||
+          state.currentUserVisits === null
+        ) {
+          // Initialize currentUserVisits as GlobalVisits if it's not already
+          state.currentUserVisits = {} as GlobalVisits;
+        }
+
+        // Find the agent associated with the client
+        const agent = Object.values(state.agents).find((agent) =>
+          agent.clients.some((client) => client.id === newVisit.clientId)
+        );
+
+        if (agent) {
+          if (!state.currentUserVisits[agent.id]) {
+            state.currentUserVisits[agent.id] = { Visits: [] };
+          }
+          const agentVisits = state.currentUserVisits[agent.id].Visits;
+          const index = agentVisits.findIndex(
+            (visit) => visit._id === newVisit._id
+          );
+          if (index !== -1) {
+            agentVisits[index] = newVisit;
+          } else {
+            agentVisits.push(newVisit);
+          }
+        }
+      }
+    },
+    addOrUpdatePromo(state, action: PayloadAction<Promo>) {
+      const newPromo = action.payload;
+      const role = state.currentUserDetails?.role;
+
+      if (role === "client" || role === "agent") {
+        if (Array.isArray(state.currentUserPromos)) {
+          const index = state.currentUserPromos.findIndex(
+            (promo) => promo._id === newPromo._id
+          );
+          if (index !== -1) {
+            state.currentUserPromos[index] = newPromo;
+          } else {
+            state.currentUserPromos.push(newPromo);
+          }
+        }
+      } else if (role === "admin") {
+        // Ensure currentUserPromos is initialized and of type GlobalPromos
+        if (
+          !state.currentUserPromos ||
+          Array.isArray(state.currentUserPromos)
+        ) {
+          // Initialize currentUserPromos as GlobalPromos
+          state.currentUserPromos = {};
+        }
+
+        // At this point, state.currentUserPromos is GlobalPromos
+        const currentUserPromos = state.currentUserPromos as GlobalPromos;
+
+        newPromo.clientsId.forEach((clientId) => {
+          const agent = Object.values(state.agents).find((agent) =>
+            agent.clients.some((client) => client.id === clientId)
+          );
+
+          if (agent) {
+            if (!currentUserPromos[agent.id]) {
+              currentUserPromos[agent.id] = { Promos: [] };
+            }
+            const agentPromos = currentUserPromos[agent.id].Promos;
+            const index = agentPromos.findIndex(
+              (promo) => promo._id === newPromo._id
+            );
+            if (index !== -1) {
+              agentPromos[index] = newPromo;
+            } else {
+              agentPromos.push(newPromo);
+            }
+          }
+        });
+      }
+    },
   },
-
   extraReducers: (builder) => {
     builder
       .addCase(fetchInitialData.pending, (state) => {
@@ -152,7 +170,7 @@ const dataSlice = createSlice({
         const { role, userData, userId /* , agentData */ } = action.payload;
 
         if (role === "client" && "clientData" in userData) {
-          const { clientData, visits, promos } = userData;
+          const { clientData /*  visits, promos */ } = userData;
           state.clients[clientData.id] = clientData;
           state.currentUserData = clientData;
           state.currentUserDetails = {
@@ -161,11 +179,11 @@ const dataSlice = createSlice({
             name: clientData.name,
             userId: userId,
           };
-          state.currentUserPromos = promos;
-          state.currentUserVisits = visits;
+          /* state.currentUserPromos = promos;
+          state.currentUserVisits = visits; */
         } else if (role === "agent" && "agentData" in userData) {
           // Handle agent data
-          const { agentData, visits, promos } = userData;
+          const { agentData /* visits, promos */ } = userData;
 
           // Populate agent and assign its clients
           state.agents[agentData.id] = agentData;
@@ -190,11 +208,11 @@ const dataSlice = createSlice({
             name: agentData.name,
             userId: userId,
           };
-          state.currentUserPromos = promos;
-          state.currentUserVisits = visits;
+          /*  state.currentUserPromos = promos;
+          state.currentUserVisits = visits; */
         } else if (role === "admin" && "adminData" in userData) {
           // Handle admin data
-          const { adminData, globalVisits, globalPromos } = userData;
+          const { adminData /*  globalVisits, globalPromos  */ } = userData;
 
           // Populate the clients in the state
           adminData.clients.forEach((client: Client) => {
@@ -220,8 +238,8 @@ const dataSlice = createSlice({
             name: adminData.name,
             userId: userId,
           };
-          state.currentUserPromos = globalPromos;
-          state.currentUserVisits = globalVisits;
+          /* state.currentUserPromos = globalPromos;
+          state.currentUserVisits = globalVisits; */
         } else {
           // Handle unexpected data structure
           console.error(
@@ -249,68 +267,6 @@ const dataSlice = createSlice({
         } else {
           state.error = "An unknown error occurred during data fetching.";
         }
-      })
-      .addCase(updateVisits.fulfilled, (state, action) => {
-        const updatedVisits = action.payload;
-
-        if (
-          state.currentUserDetails?.role === "client" ||
-          state.currentUserDetails?.role === "agent"
-        ) {
-          state.currentUserVisits = updatedVisits as Visit[];
-        } else if (state.currentUserDetails?.role === "admin") {
-          state.currentUserVisits = updatedVisits as GlobalVisits;
-        }
-      })
-      .addCase(updatePromos.fulfilled, (state, action) => {
-        const updatedPromos = action.payload;
-
-        if (
-          state.currentUserDetails?.role === "client" ||
-          state.currentUserDetails?.role === "agent"
-        ) {
-          state.currentUserPromos = updatedPromos as Promo[];
-        } else if (state.currentUserDetails?.role === "admin") {
-          state.currentUserPromos = updatedPromos as GlobalPromos;
-        }
-      })
-      .addCase(createVisitAsync.fulfilled, (state, action: PayloadAction<Visit>) => {
-        const newVisit = action.payload;
-
-        // Determine how to add the new visit based on user role
-        const role = state.currentUserDetails?.role;
-
-        if (role === "client" || role === "agent") {
-          // For clients and agents, currentUserVisits is an array
-          if (Array.isArray(state.currentUserVisits)) {
-            state.currentUserVisits.push(newVisit);
-          }
-        } else if (role === "admin") {
-          // For admin, currentUserVisits is GlobalVisits
-          if (typeof state.currentUserVisits !== "object" || Array.isArray(state.currentUserVisits)) {
-            // Initialize currentUserVisits as GlobalVisits if it's not already
-            state.currentUserVisits = {} as GlobalVisits;
-          }
-
-          // Find the agent associated with the client
-          const agent = Object.values(state.agents).find((agent) =>
-            agent.clients.some((client) => client.id === newVisit.clientId)
-          );
-
-          if (agent) {
-            // Ensure the agent exists in currentUserVisits
-            const agentVisits = state.currentUserVisits as GlobalVisits;
-            if (!agentVisits[agent.id]) {
-              agentVisits[agent.id] = { Visits: [] };
-            }
-            agentVisits[agent.id].Visits.push(newVisit);
-          }
-        }
-      })
-      .addCase(createVisitAsync.rejected, (_state, action) => {
-        // Optionally handle errors globally
-        // You can set a global error state or manage it locally in the component
-        console.error("Create visit failed:", action.payload);
       });
   },
 });
@@ -321,6 +277,12 @@ export const {
   selectAgent,
   selectPromo,
   selectVisit,
+  clearSelectedPromo,
+  clearSelectedVisit,
+  setCurrentUserVisits,
+  setCurrentUserPromos,
+  addOrUpdatePromo,
+  addOrUpdateVisit,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;

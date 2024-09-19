@@ -6,14 +6,14 @@ export const createVisit = async (visitData: {
   clientId: string;
   type: string;
   visitReason: string;
-  date: Date;
+  date: string;
+  createdAt: string;
   notePublic?: string;
   notePrivate?: string;
   visitIssuedBy: string;
   pending: boolean;
   completed: boolean;
 }): Promise<Visit> => {
-  // No change required here; ensure apiCall is correctly set up.
   return apiCall<Visit>("visits", "POST", visitData);
 };
 
