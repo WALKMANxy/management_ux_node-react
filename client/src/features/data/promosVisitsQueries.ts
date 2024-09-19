@@ -30,6 +30,7 @@ export const promoVisitApi = createApi({
         url: "/visits",
         method: "GET",
         headers: {
+          "bypass-tunnel-reminder": "true",
           "Content-Type": "application/json",
         },
       }),
