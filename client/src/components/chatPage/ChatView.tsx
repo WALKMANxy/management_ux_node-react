@@ -52,8 +52,8 @@ const ChatView: React.FC = () => {
     dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
   };
 
-/*   console.log("ChatView rendering now");
- */
+  /*   console.log("ChatView rendering now");
+   */
   // Fallback if currentChat is not set
   if (!currentChat) {
     return (
@@ -154,7 +154,7 @@ const ChatView: React.FC = () => {
             display: "none",
           },
           position: "relative",
-          height: "79dvh"
+          height: "79dvh",
         }}
       >
         <Box
@@ -175,7 +175,7 @@ const ChatView: React.FC = () => {
         >
           <div ref={topRef} style={{ height: 1 }}></div> {/* Add this line */}
           <RenderMessage
-            messages={sortedMessages}
+            messages={sortedMessages || []}
             currentUserId={currentUserId}
             chatType={currentChat?.type || "simple"}
             participantsData={participantsData}

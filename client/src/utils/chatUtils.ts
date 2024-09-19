@@ -24,7 +24,6 @@ export const formatDateForDivider = (date: Date) => {
     return "Yesterday";
   } else if (dayDifference > 1) {
     return dayjs(date).format("dddd");
-
   } else {
     return dayjs(date).format("MMM D");
   }
@@ -32,9 +31,20 @@ export const formatDateForDivider = (date: Date) => {
 
 // chatUtils.ts
 
-export const isDifferentDay = (date1: Date, date2: Date): boolean => {
-  return (
-    dayjs(date1).isBefore(dayjs(date2), "day") ||
-    dayjs(date2).isBefore(dayjs(date1), "day")
-  );
+export const isDifferentDay = (date1?: Date, date2?: Date): boolean => {
+  if (!date1 || !date2) {
+    return false;
+  }
+  if (isNaN(date1.getTime()) || isNaN(date2.getTime())) {
+    return false;
+  }
+
+  try {
+    return (
+      dayjs(date1).isBefore(dayjs(date2), "day") ||
+      dayjs(date2).isBefore(dayjs(date1), "day")
+    );
+  } catch {
+    return false;
+  }
 };

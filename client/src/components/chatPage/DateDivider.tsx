@@ -8,6 +8,10 @@ interface DateDividerProps {
 }
 
 const DateDivider: React.FC<DateDividerProps> = ({ date }) => {
+  if (isNaN(date.getTime())) {
+    // Skip rendering if date is invalid
+    return null;
+  }
   return (
     <Box
       sx={{
