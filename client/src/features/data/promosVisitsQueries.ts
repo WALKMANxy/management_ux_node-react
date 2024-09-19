@@ -65,6 +65,7 @@ export const promoVisitApi = createApi({
         url: "/promos",
         method: "GET",
         headers: {
+          "bypass-tunnel-reminder": "true",
           "Content-Type": "application/json",
         },
       }),
@@ -103,6 +104,7 @@ export const promoVisitApi = createApi({
         url: `/visits`,
         method: "POST",
         headers: {
+          "bypass-tunnel-reminder": "true",
           "Content-Type": "application/json",
         },
         body: {
@@ -143,6 +145,7 @@ export const promoVisitApi = createApi({
         url: `/visits/${_id}`,
         method: "PATCH",
         headers: {
+          "bypass-tunnel-reminder": "true",
           "Content-Type": "application/json",
         },
         body: {
@@ -182,6 +185,7 @@ export const promoVisitApi = createApi({
         url: `/promos`,
         method: "POST",
         headers: {
+          "bypass-tunnel-reminder": "true",
           "Content-Type": "application/json",
         },
         body: {
@@ -224,6 +228,7 @@ export const promoVisitApi = createApi({
         url: `/promos/${_id}`,
         method: "PATCH",
         headers: {
+          "bypass-tunnel-reminder": "true",
           "Content-Type": "application/json",
         },
         body: {
