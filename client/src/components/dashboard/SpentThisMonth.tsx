@@ -169,7 +169,7 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
           </Grid>
           <Grid item sx={{ mb: 1.25 }}>
             <Typography sx={styles.title}>
-              {t("spentThisMonth.title")}
+            {t(isAgentSelected ? "spentThisMonth.titleAgent" : "spentThisMonth.titleClient")}
             </Typography>
             {userRole !== "client" && comparisonResult && (
               <Typography

@@ -127,6 +127,7 @@ const ClientDashboard: React.FC = () => {
                 {clientDetails && "movements" in clientDetails ? (
                   <TopArticleType
                     articles={calculateTopArticleType(clientDetails.movements)}
+                    isAgentSelected={false}
                   />
                 ) : (
                   <Skeleton
@@ -144,6 +145,8 @@ const ClientDashboard: React.FC = () => {
                     months={months}
                     revenueData={revenueData}
                     userRole="client" // Pass the user role
+                    isAgentSelected={false}
+
                   />
                 ) : (
                   <Skeleton
@@ -161,7 +164,7 @@ const ClientDashboard: React.FC = () => {
                     topBrandsData={topBrandsData}
                     brandColors={brandColors}
                     isMobile={isMobile}
-                    userRole="client" // Pass the user role
+                    isAgentSelected={false}
                   />
                 ) : (
                   <Skeleton

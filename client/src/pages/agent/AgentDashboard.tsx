@@ -1,4 +1,6 @@
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CloseIcon from "@mui/icons-material/Close";
+
 import {
   Box,
   Button,
@@ -10,12 +12,13 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import ActivePromotions from "../../components/dashboard/ActivePromotions";
 import CalendarComponent from "../../components/dashboard/CalendarComponent";
 import SpentThisMonth from "../../components/dashboard/SpentThisMonth";
 import SpentThisYear from "../../components/dashboard/SpentThisYear";
+import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
 import TopArticleType from "../../components/dashboard/TopArticleType";
 import TotalOrder from "../../components/dashboard/TotalOrders";
 import TotalEarning from "../../components/dashboard/TotalRevenue";
@@ -33,6 +36,12 @@ const AgentDashboard: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery("(min-width:900px) and (max-width:1250px)");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const handleToggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
+  };
 
   const {
     selectedClient,
@@ -59,13 +68,25 @@ const AgentDashboard: React.FC = () => {
     isLoading,
   } = useStats(isMobile);
 
+  const [fakeLoading, setFakeLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFakeLoading(false);
+    }, 400); // Fake loading for 700ms
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const loadingState = isLoading || fakeLoading;
+
   return (
     <Box
       className="agent-dashboard"
       sx={{ p: isMobile ? 0 : 4, bgcolor: "#f4f5f7" }}
     >
       {" "}
-      {isLoading ? (
+      {loadingState ? (
         <Skeleton
           animation="wave"
           variant="text"
@@ -96,14 +117,35 @@ const AgentDashboard: React.FC = () => {
         />
       )}
       <Grid container spacing={6} mt={2}>
-        <Grid item xs={12} md={9}>
+        <Grid item xs={!isTablet ? 12 : 0} md={!isTablet ? 9 : 0}>
           {selectedClient ? (
             <Box mb={4}>
-              <Typography variant="h5" gutterBottom>
-                {t("agentDashboard.statisticsFor", {
-                  name: selectedClient.name,
-                })}
-              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 2,
+                }}
+              >
+                <Typography variant="h5" gutterBottom>
+                  {t("agentDashboard.statisticsFor", {
+                    name: selectedClient.name,
+                  })}
+                </Typography>
+                {isTablet && (
+                  <Fab
+                    color="primary"
+                    aria-label="calendar"
+                    onClick={handleToggleDrawer}
+                    sx={{
+                      zIndex: 1000,
+                    }}
+                  >
+                    <CalendarMonthIcon />
+                  </Fab>
+                )}
+              </Box>
 
               <Grid container spacing={2}>
                 <Grid item xs={12} md={4}>
@@ -141,6 +183,7 @@ const AgentDashboard: React.FC = () => {
                 <Grid item xs={12} md={4}>
                   <TopArticleType
                     articles={calculateTopArticleType(selectedClient.movements)}
+                    isAgentSelected={false}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -150,6 +193,7 @@ const AgentDashboard: React.FC = () => {
                       calculateMonthlyData([selectedClient]).revenueData
                     }
                     userRole="agent" // Pass the user role
+                    isAgentSelected={false}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -157,7 +201,7 @@ const AgentDashboard: React.FC = () => {
                     topBrandsData={topBrandsData}
                     brandColors={brandColors}
                     isMobile={isMobile}
-                    userRole="agent" // Pass the user role
+                    isAgentSelected={false}
                   />
                 </Grid>
               </Grid>
@@ -171,10 +215,15 @@ const AgentDashboard: React.FC = () => {
               <Fab
                 color="secondary"
                 aria-label="close"
-                sx={{ position: "fixed", bottom: 16, right: 16 }}
+                sx={{
+                  position: "fixed",
+                  bottom: isMobile ? 20 : 16,
+                  right: isMobile ? 120 : 16,
+                  zIndex: 1300,
+                }}
                 onClick={() => clearSelection()}
               >
-                <CloseIcon />
+                <CloseIcon fontSize="small" />{" "}
               </Fab>
             </Box>
           ) : (
@@ -244,6 +293,7 @@ const AgentDashboard: React.FC = () => {
                       months={months}
                       revenueData={revenueData}
                       userRole="agent" // Pass the user role
+                      isAgentSelected={true}
                     />
                   ) : (
                     <Skeleton
@@ -262,7 +312,7 @@ const AgentDashboard: React.FC = () => {
                       topBrandsData={topBrandsData}
                       isMobile={isMobile}
                       brandColors={brandColors}
-                      userRole="agent" // Pass the user role
+                      isAgentSelected={true}
                     />
                   ) : (
                     <Skeleton
@@ -300,37 +350,55 @@ const AgentDashboard: React.FC = () => {
             isLoading={isLoading} // Update this line
           />
         </Grid>
-        <Grid item xs={12} md={3}>
-          <Box mb={4}>
-            <Typography variant="h5" gutterBottom>
-              {details && "name" in details ? (
-                t("agentDashboard.calendar")
+        {/* Calendar and Upcoming Visits section */}
+        {!isTablet && (
+          <Grid item xs={12} md={3}>
+            <Box mb={4}>
+              {loadingState ? (
+                <Skeleton
+                  animation="wave"
+                  variant="text"
+                  height={30}
+                  sx={{ borderRadius: "4px" }}
+                  aria-label="loading-text"
+                />
               ) : (
-                <Skeleton animation="wave" width="30%" />
+                <Typography variant="h5" gutterBottom>
+                  {details && "name" in details ? (
+                    t("agentDashboard.calendar")
+                  ) : (
+                    <Skeleton animation="wave" width="30%" />
+                  )}
+                </Typography>
               )}
-            </Typography>
-
-            <Divider sx={{ my: 2, borderRadius: "12px" }} />
-            {details && "clients" in details ? (
-              <Box sx={{ maxWidth: "400px", margin: "0 auto" }}>
-                <CalendarComponent />
-              </Box>
-            ) : (
-              <Skeleton
-                animation="wave"
-                variant="rectangular"
-                width="100%"
-                height={300}
-                sx={{ borderRadius: "12px" }}
-                aria-label="skeleton"
-              />
-            )}
-          </Box>
-          <UpcomingVisits
-            isLoading={isLoading} // Update this line
-          />
-        </Grid>
+              <Divider sx={{ my: 2, borderRadius: "12px" }} />
+              {loadingState ? (
+                <Skeleton
+                  animation="wave"
+                  variant="rectangular"
+                  width="100%"
+                  height={300}
+                  sx={{ borderRadius: "12px" }}
+                  aria-label="skeleton"
+                />
+              ) : (
+                <Box sx={{ maxWidth: "400px", margin: "0 auto" }}>
+                  <CalendarComponent />
+                </Box>
+              )}
+            </Box>
+            <UpcomingVisits isLoading={isLoading} />
+          </Grid>
+        )}
       </Grid>
+      {/* Drawer Container for Calendar and Upcoming Visits */}
+      {isTablet && (
+        <DrawerContainer
+          open={drawerOpen}
+          onClose={handleToggleDrawer}
+          isLoading={isLoading}
+        />
+      )}
     </Box>
   );
 };

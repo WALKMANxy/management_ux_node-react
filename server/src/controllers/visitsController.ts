@@ -39,6 +39,7 @@ export class VisitController {
   }
 
 
+
   static async replaceVisit(
     req: AuthenticatedRequest,
     res: Response

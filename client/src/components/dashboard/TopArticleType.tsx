@@ -3,7 +3,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { TopArticleTypeProps } from "../../models/propsModels";
 
-const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {
+const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles, isAgentSelected }) => {
   const { t } = useTranslation();
 
   return (
@@ -17,9 +17,12 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {
         position: "relative",
         overflow: "hidden",
         height: "100%",
-        "&:after": {
+        "&:after, &:before": {
           content: '""',
           position: "absolute",
+          zIndex: 0, // Ensure the bubbles are behind
+        },
+        "&:after": {
           width: 210,
           height: 210,
           background: "#1e88e5", // Dark Blue
@@ -28,8 +31,6 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {
           right: -95,
         },
         "&:before": {
-          content: '""',
-          position: "absolute",
           width: 210,
           height: 210,
           background: "#90caf9", // Light Blue
@@ -48,9 +49,15 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles }) => {
                 fontSize: "1.605rem", // Increased by 7%
                 fontWeight: 500,
                 color: "#000",
+                zIndex: 1,
+                position: "relative",
               }}
             >
-              {t("topArticleType.title")}
+              {t(
+                isAgentSelected
+                  ? "topArticleType.titleAgent"
+                  : "topArticleType.titleClient"
+              )}
             </Typography>
           </Grid>
           <Divider sx={{ my: 2, borderRadius: "12px" }} />

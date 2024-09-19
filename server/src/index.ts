@@ -38,13 +38,17 @@ mongoose
   .then(() => logger.info("MongoDB connected"))
   .catch((err) => logger.error("MongoDB connection error:", { error: err }));
 
-const appUrl = config.appUrl.split(",");
 
-const corsOptions: cors.CorsOptions = {
-  origin: [...appUrl],
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
+  const corsOptions: cors.CorsOptions = {
+    origin: config.appUrl,
+    credentials: true,
+    optionsSuccessStatus: 200,
+  };
+
+  console.log("CORS Origin:", corsOptions.origin);
+
+
+
 
 app.use(helmet());
 app.use(cors(corsOptions));
@@ -95,13 +99,11 @@ const io = new SocketIOServer(server, {
 // Set up WebSocket with chat functionality
 setupWebSocket(io);
 
-/* const { emitAlert } = setupWebSocket(io); */
 
 // Log when the WebSocket server starts
 logger.info("WebSocket server initialized");
 
-/* const alertRoutes = setupAlertRoutes(emitAlert);
-app.use("/alerts", alertRoutes); */
+
 
 server.listen(PORT, async () => {
   logger.info(`Server is running on port ${PORT}`, {

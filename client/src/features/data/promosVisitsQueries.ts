@@ -1,90 +1,262 @@
+// src/features/data/promoVisitApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import {
-  GlobalPromos,
-  GlobalVisits,
-  Promo,
-  Visit,
-} from "../../models/dataModels";
+import { Promo, Visit } from "../../models/dataModels";
 import { Admin, Agent, Client } from "../../models/entityModels";
-import { DataSliceState } from "../../models/stateModels";
-import { loadPromosData, loadVisitsData } from "../../utils/apiUtils";
 import { mapPromosToEntity, mapVisitsToEntity } from "../../utils/dataLoader";
-import { generateErrorResponse } from "../../utils/errorHandling";
+import {
+  addOrUpdatePromo,
+  addOrUpdateVisit,
+  setCurrentUserPromos,
+  setCurrentUserVisits,
+} from "./dataSlice";
 
-export const updateApi = createApi({
-  reducerPath: "api",
-  baseQuery: fetchBaseQuery({ baseUrl: "/" }),
-  tagTypes: ["Client", "Agent", "Admin", "Visit", "Promo"],
+const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+
+// Unified API slice for handling visits and promos
+export const promoVisitApi = createApi({
+  reducerPath: "promoVisitApi",
+  baseQuery: fetchBaseQuery({
+    baseUrl,
+    credentials: "include", // Ensures credentials (cookies, etc.) are sent with each request
+  }),
+  tagTypes: ["Visit", "Promo", "Client", "Agent", "Admin"],
   endpoints: (builder) => ({
-    updateVisits: builder.query<Visit[] | GlobalVisits, void>({
-      queryFn: async (_, { getState }) => {
+    // Fetch Visits Query
+    getVisits: builder.query<
+      Visit[],
+      { entity: Client | Admin | Agent; role: "client" | "agent" | "admin" }
+    >({
+      query: () => ({
+        url: "/visits",
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
-          const visits = await loadVisitsData();
+          const { data } = await queryFulfilled;
+          const { entity, role } = arg;
 
-          const state = getState() as { data: DataSliceState };
-          const entity = state.data.currentUserData as Client | Agent | Admin;
-          const role = state.data.currentUserDetails?.role;
+          if (!entity || !role) {
+            throw new Error("No entity or role provided.");
+          }
 
-          if (!entity || !role)
-            throw new Error("No entity or role found in the state.");
+          // Transform the visits using the correct entity and role
+          const mappedVisits = mapVisitsToEntity(data, entity, role);
 
-          // Map visits based on role
-          const mappedVisits = mapVisitsToEntity(entity, visits, role);
-
-          return { data: mappedVisits };
+          // Dispatch an action to update the slice
+          dispatch(setCurrentUserVisits(mappedVisits));
         } catch (error) {
-          return generateErrorResponse(error);
+          // Handle error
+          console.error("Failed to fetch and map visits:", error);
         }
       },
-      providesTags: ["Visit"],
-      keepUnusedDataFor: 60, // Keeps data in cache for 1 minute (60 seconds)
+      providesTags: [{ type: "Visit", id: "LIST" }],
     }),
 
-    updatePromos: builder.query<Promo[] | GlobalPromos, void>({
-      queryFn: async (_, { getState }) => {
+    // Fetch Promos Query
+    getPromos: builder.query<
+      Promo[],
+      { entity: Client | Admin | Agent; role: "client" | "agent" | "admin" }
+    >({
+      query: () => ({
+        url: "/promos",
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
-          const promos = await loadPromosData();
+          const { data } = await queryFulfilled;
+          const { entity, role } = arg;
 
-          const state = getState() as { data: DataSliceState };
-          const entity = state.data.currentUserData as Client | Agent | Admin;
-          const role = state.data.currentUserDetails?.role;
+          if (!entity || !role) {
+            throw new Error("No entity or role provided.");
+          }
 
-          if (!entity || !role)
-            throw new Error("No entity or role found in the state.");
+          // Transform the promos using the correct entity and role
+          const mappedPromos = mapPromosToEntity(data, entity, role);
 
-          // Map promos based on role
-          const mappedPromos = mapPromosToEntity(entity, promos, role);
-
-          return { data: mappedPromos };
+          // Dispatch an action to update the slice
+          dispatch(setCurrentUserPromos(mappedPromos));
         } catch (error) {
-          return generateErrorResponse(error);
+          // Handle error
+          console.error("Failed to fetch and map promos:", error);
         }
       },
-      providesTags: ["Promo"],
-      keepUnusedDataFor: 60, // Keeps data in cache for 1 minute (60 seconds)
+      providesTags: [{ type: "Promo", id: "LIST" }],
     }),
-    // Create Visit Endpoint
+
+    // Create Visit Mutation
     createVisit: builder.mutation<
       Visit,
       {
-        clientId: string;
-        type: string;
-        visitReason: string;
-        date: string;
-        notePublic?: string;
-        notePrivate?: string;
-        visitIssuedBy: string;
-        pending: boolean;
-        completed: boolean;
+        visitData: Visit;
+        entity: Client | Admin | Agent;
+        role: "client" | "agent" | "admin";
       }
     >({
-      query: (visitData) => ({
-        url: "visits",
+      query: ({ visitData }) => ({
+        url: `/visits`,
         method: "POST",
-        body: visitData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: {
+          ...visitData,
+          date: visitData.date.toISOString(),
+          createdAt: visitData.createdAt.toISOString(),
+        },
       }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          const { entity, role } = arg;
+
+          if (!entity || !role) {
+            throw new Error("No entity or role provided.");
+          }
+
+          dispatch(addOrUpdateVisit(data));
+        } catch (error) {
+          // Handle error
+          console.error("Failed to create visit:", error);
+        }
+      },
+      invalidatesTags: [{ type: "Visit", id: "LIST" }],
+    }),
+
+    // Update Visit Mutation
+    updateVisit: builder.mutation<
+      Visit,
+      {
+        _id: string; // Visit ID to be updated
+        visitData: Visit; // Partial visit data to be updated
+        entity: Client | Admin | Agent;
+        role: "client" | "agent" | "admin";
+      }
+    >({
+      query: ({ _id, visitData }) => ({
+        url: `/visits/${_id}`,
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: {
+          ...visitData,
+          date: visitData.date.toISOString(),
+          createdAt: visitData.createdAt.toISOString(),
+        },
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          const { entity, role } = arg;
+
+          if (!entity || !role) {
+            throw new Error("No entity or role provided.");
+          }
+
+          dispatch(addOrUpdateVisit(data));
+        } catch (error) {
+          // Handle error
+          console.error("Failed to update visit:", error);
+        }
+      },
+      invalidatesTags: [{ type: "Visit", id: "LIST" }],
+    }),
+
+    // Create Promo Mutation
+    createPromo: builder.mutation<
+      Promo,
+      {
+        promoData: Promo;
+        entity: Client | Admin | Agent;
+        role: "client" | "agent" | "admin";
+      }
+    >({
+      query: ({ promoData }) => ({
+        url: `/promos`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: {
+          ...promoData,
+          startDate: promoData.startDate.toISOString(),
+          endDate: promoData.endDate.toISOString(),
+          createdAt: promoData.createdAt.toISOString(),
+        },
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          const { entity, role } = arg;
+
+          if (!entity || !role) {
+            throw new Error("No entity or role provided.");
+          }
+
+          dispatch(addOrUpdatePromo(data));
+        } catch (error) {
+          // Handle error
+          console.error("Failed to create promo:", error);
+        }
+      },
+
+      invalidatesTags: [{ type: "Promo", id: "LIST" }],
+    }),
+
+    // Update Promo Mutation
+    updatePromo: builder.mutation<
+      Promo,
+      {
+        _id: string; // Promo ID to be updated
+        promoData: Promo; // Partial promo data to be updated
+        entity: Client | Admin | Agent;
+        role: "client" | "agent" | "admin";
+      }
+    >({
+      query: ({ _id, promoData }) => ({
+        url: `/promos/${_id}`,
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: {
+          ...promoData,
+          startDate: promoData.startDate.toISOString(),
+          endDate: promoData.endDate.toISOString(),
+          createdAt: promoData.createdAt.toISOString(),
+        },
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          const { entity, role } = arg;
+
+          if (!entity || !role) {
+            throw new Error("No entity or role provided.");
+          }
+
+          dispatch(addOrUpdatePromo(data));
+        } catch (error) {
+          // Handle error
+          console.error("Failed to update promo:", error);
+        }
+      },
+      invalidatesTags: [{ type: "Promo", id: "LIST" }],
     }),
   }),
 });
 
-export const { useUpdateVisitsQuery, useUpdatePromosQuery, useCreateVisitMutation } = updateApi;
+export const {
+  useGetVisitsQuery,
+  useGetPromosQuery,
+  useCreateVisitMutation,
+  useUpdateVisitMutation,
+  useCreatePromoMutation,
+  useUpdatePromoMutation,
+} = promoVisitApi;

@@ -1,13 +1,23 @@
-import AddIcon from "@mui/icons-material/Add";
+// src/components/visitPage/ClientDetailsCard.tsx
+import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Avatar,
   Box,
+  Button,
   Card,
   CardContent,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   IconButton,
+  Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
 
@@ -43,15 +53,16 @@ const infoStyles = {
   },
 };
 
-// src/components/visitPage/ClientDetailsCard.tsx
 interface ClientDetailsCardProps {
   clientId: string;
   onCreateVisit: () => void; // New prop
+  onDeselectClient: () => void; // New prop
 }
 
 const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({
   clientId,
   onCreateVisit,
+  onDeselectClient,
 }) => {
   const client = useAppSelector(
     (state: RootState) => state.data.clients[clientId]
@@ -62,6 +73,8 @@ const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({
   );
   const userRole = currentUser?.role;
 
+  const [openConfirm, setOpenConfirm] = useState(false); // State for confirmation dialog
+
   if (!client) return null;
 
   // Find the agent for this client
@@ -70,73 +83,133 @@ const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({
   );
 
   return (
-    <Card
-      sx={{
-        m: 2,
-        p: 2,
-        borderRadius: 4,
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-        position: "relative",
-      }}
-    >
-      {/* Create Visit Button */}
-      {/* Updated Create Visit Button */}
-      <IconButton
-        color="secondary"
-        onClick={onCreateVisit}
+    <Box sx={{ m: 2 }}>
+      <Card
         sx={{
-          position: "absolute",
-          top: 16,
-          right: 16,
-          backgroundColor: "#FFA07A", // Pastel orange color
-          "&:hover": { backgroundColor: "#FF8C69" },
+          p: 2,
+          borderRadius: 4,
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+          display: "flex",
+          flexDirection: "column",
+          height: "100%", // Ensure the card takes full height to position buttons at the bottom
         }}
       >
-        <AddIcon />
-      </IconButton>
+        <CardContent sx={{ flexGrow: 1 }}>
+          <Box display="flex" alignItems="center" gap={2}>
+            {/* Avatar */}
+            <Avatar sx={{ width: 48, height: 48 }}>
+              {client.name.charAt(0).toUpperCase()}
+            </Avatar>
 
-      <CardContent>
-        <Box display="flex" alignItems="center" gap={2}>
-          {/* Existing Avatar and Client Information */}
-          <Avatar sx={{ width: 48, height: 48 }}>
-            {client.name.charAt(0).toUpperCase()}
-          </Avatar>
-
-          <Box>
-            <Typography sx={infoStyles.title}>{client.name}</Typography>
-            <Typography sx={infoStyles.subtitle}>Code: {client.id}</Typography>
-            {client.address && (
+            {/* Client Information */}
+            <Box>
+              <Typography sx={infoStyles.title}>{client.name}</Typography>
               <Typography sx={infoStyles.subtitle}>
-                Address: {client.address}
+                Code: {client.id}
               </Typography>
-            )}
-            <Typography sx={infoStyles.subtitle}>
-              Province: {client.province || "N/A"}
-            </Typography>
-            {client.email && (
+              {client.address && (
+                <Typography sx={infoStyles.subtitle}>
+                  Address: {client.address}
+                </Typography>
+              )}
               <Typography sx={infoStyles.subtitle}>
-                Email: {client.email}
+                Province: {client.province || "N/A"}
               </Typography>
-            )}
-            {client.phone && (
-              <Typography sx={infoStyles.subtitle}>
-                Phone: {client.phone}
-              </Typography>
-            )}
-            {client.paymentMethod && (
-              <Typography sx={infoStyles.subtitle}>
-                Payment Method: {client.paymentMethod}
-              </Typography>
-            )}
-            {userRole === "admin" && agent && (
-              <Typography sx={infoStyles.subtitle}>
-                Agent: {agent.name}
-              </Typography>
-            )}
+              {client.email && (
+                <Typography sx={infoStyles.subtitle}>
+                  Email: {client.email}
+                </Typography>
+              )}
+              {client.phone && (
+                <Typography sx={infoStyles.subtitle}>
+                  Phone: {client.phone}
+                </Typography>
+              )}
+              {client.paymentMethod && (
+                <Typography sx={infoStyles.subtitle}>
+                  Payment Method: {client.paymentMethod}
+                </Typography>
+              )}
+              {userRole === "admin" && agent && (
+                <Typography sx={infoStyles.subtitle}>
+                  Agent: {agent.name}
+                </Typography>
+              )}
+            </Box>
           </Box>
+        </CardContent>
+
+        {/* Action Buttons */}
+        <Box sx={{ p: 2 }}>
+          <Stack
+            direction={{ xs: "row", sm: "row" }}
+            spacing={2}
+            justifyContent="flex-end"
+          >
+            <Tooltip title="Create a new visit">
+              <IconButton
+                onClick={onCreateVisit}
+                sx={{
+                  backgroundColor: "green",
+                  color: "white",
+                  "&:hover": { backgroundColor: "darkgreen" },
+                  width: { xs: "auto", sm: "auto" }, // Full width on small screens
+                }}
+                aria-label="Create Visit"
+              >
+                <AirplaneTicketIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Deselect current client">
+              <IconButton
+                onClick={() => setOpenConfirm(true)} // Open confirmation dialog
+                sx={{
+                  backgroundColor: "red",
+                  color: "white",
+                  "&:hover": { backgroundColor: "darkred" },
+                  width: { xs: "auto", sm: "auto" }, // Full width on small screens
+                }}
+                aria-label="Deselect Client"
+              >
+                <CloseIcon />
+              </IconButton>
+            </Tooltip>
+          </Stack>
         </Box>
-      </CardContent>
-    </Card>
+
+        {/* Confirmation Dialog */}
+        <Dialog
+          open={openConfirm}
+          onClose={() => setOpenConfirm(false)}
+          aria-labelledby="confirm-deselect-title"
+          aria-describedby="confirm-deselect-description"
+        >
+          <DialogTitle id="confirm-deselect-title">Deselect Client</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="confirm-deselect-description">
+              Are you sure you want to deselect the current client? All unsaved
+              changes will be lost.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenConfirm(false)} color="primary">
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                setOpenConfirm(false);
+                onDeselectClient();
+              }}
+              color="error"
+              autoFocus
+            >
+              Deselect
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Card>
+    </Box>
   );
 };
 

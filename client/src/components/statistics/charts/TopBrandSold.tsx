@@ -1,4 +1,5 @@
-import PieChartIcon from '@mui/icons-material/PieChart';import {
+import PieChartIcon from "@mui/icons-material/PieChart";
+import {
   Avatar,
   Box,
   Divider,
@@ -16,8 +17,8 @@ const TopBrandsSold: React.FC<{
   topBrandsData: BrandData[];
   brandColors: string[];
   isMobile: boolean;
-  userRole: "agent" | "client" | "admin"; // New prop to determine user role
-}> = ({ topBrandsData, brandColors, isMobile, userRole }) => {
+  isAgentSelected: boolean;
+}> = ({ topBrandsData, brandColors, isMobile,  isAgentSelected }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const loading = topBrandsData.length === 0;
@@ -72,10 +73,10 @@ const TopBrandsSold: React.FC<{
             bgcolor: theme.palette.primary.main,
             color: "#fff",
             mt: 1,
-            left: 18
+            left: 18,
           }}
         >
-          <PieChartIcon fontSize="inherit"  />
+          <PieChartIcon fontSize="inherit" />
         </Avatar>
       </Box>
       <Box
@@ -91,9 +92,11 @@ const TopBrandsSold: React.FC<{
         }}
       >
         <Typography variant="h6" gutterBottom>
-          {userRole === "agent"
-            ? t("topBrandsSold.titleAgent")
-            : t("topBrandsSold.titleClient")}
+          {t(
+            isAgentSelected
+              ? "topBrandsSold.titleAgent"
+              : "topBrandsSold.titleClient"
+          )}
         </Typography>
       </Box>
 

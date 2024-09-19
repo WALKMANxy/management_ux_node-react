@@ -1,8 +1,8 @@
 // VisitsSidebar.tsx
-import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import SearchIcon from "@mui/icons-material/Search";
+import ExclamationIcon from "@mui/icons-material/ErrorOutline"; // You can choose an appropriate icon
 import RefreshIcon from "@mui/icons-material/Refresh"; // New import
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Avatar,
   Box,
@@ -29,9 +29,11 @@ const VisitsSidebar: React.FC = () => {
     handleAgentSelect,
     handleClientSelect,
     handleBackToAgents,
-    handleCreateVisit,
     setSearchTerm,
     handleVisitsRefresh,
+    agentVisitCounts,
+    clientVisitCounts,
+    selectedClientId,
   } = useVisitSidebar();
 
   // Type Guards
@@ -57,10 +59,12 @@ const VisitsSidebar: React.FC = () => {
       >
         <Box display="flex" alignItems="center">
           {userRole === "admin" && selectedAgentId && (
-            <IconButton onClick={handleBackToAgents} size="small"> {/* Makes the button smaller */}
-            <ArrowBackIosIcon fontSize="small" /> {/* Adjusts the icon size */}
-          </IconButton>
-
+            <IconButton onClick={handleBackToAgents} size="small">
+              {" "}
+              {/* Makes the button smaller */}
+              <ArrowBackIosIcon fontSize="small" />{" "}
+              {/* Adjusts the icon size */}
+            </IconButton>
           )}
           <Typography variant="h4">
             {userRole === "admin"
@@ -75,10 +79,6 @@ const VisitsSidebar: React.FC = () => {
             {/* Refresh Button */}
             <IconButton onClick={handleVisitsRefresh}>
               <RefreshIcon />
-            </IconButton>
-            {/* Create Visit Button */}
-            <IconButton onClick={handleCreateVisit}>
-              <AirplaneTicketIcon />
             </IconButton>
           </Box>
         )}
@@ -112,34 +112,162 @@ const VisitsSidebar: React.FC = () => {
 
       {/* List */}
       <List>
-        {filteredList.map((item, index) => (
-          <>
-            <ListItem
-              key={item.id}
-              button
-              onClick={() =>
-                userRole === "admin" && !selectedAgentId
-                  ? handleAgentSelect(item.id)
-                  : handleClientSelect(item.id)
-              }
-            >
-              <ListItemAvatar>
-                <Avatar>{item.name.charAt(0).toUpperCase()}</Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary={item.name}
-                secondary={
-                  isAgent(item)
-                    ? `ID: ${item.id}`
-                    : isClient(item)
-                    ? `Code: ${item.id} | Province: ${item.province || "N/A"}`
-                    : undefined
+        {filteredList.map((item, index) => {
+          const counts = isAgent(item)
+            ? agentVisitCounts[item.id]
+            : isClient(item)
+            ? clientVisitCounts[item.id]
+            : undefined;
+
+          return (
+            <React.Fragment key={item.id}>
+              <ListItem
+                button
+                selected={isClient(item) && item.id === selectedClientId}
+                onClick={() =>
+                  userRole === "admin" && !selectedAgentId
+                    ? handleAgentSelect(item.id)
+                    : handleClientSelect(item.id)
                 }
-              />
-            </ListItem>
-            {index < filteredList.length - 1 && <Divider />}
-          </>
-        ))}
+                sx={{ display: "flex", alignItems: "center" }} // Ensures alignment within the list item
+              >
+                <ListItemAvatar>
+                  <Avatar>{item.name.charAt(0).toUpperCase()}</Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={item.name}
+                  secondary={
+                    isAgent(item)
+                      ? `ID: ${item.id}`
+                      : isClient(item)
+                      ? `Code: ${item.id} | Province: ${item.province || "N/A"}`
+                      : undefined
+                  }
+                />
+                {/* Icons or counts */}
+                {counts && (
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    justifyContent="flex-end" // Aligns icons to the bottom
+                    alignItems="center"
+                    gap={1}
+                    sx={{ height: "100%" }} // Ensure it takes the full height of the parent container
+                  >
+                    {/* Agent: Check for hasPending and hasIncomplete */}
+                    {isAgent(item) &&
+                      (
+                        counts as {
+                          hasPending: boolean;
+                          hasIncomplete: boolean;
+                        }
+                      ).hasPending && (
+                        <Box
+                          sx={{
+                            width: 20,
+                            height: 20,
+                            borderRadius: "50%",
+                            backgroundColor: "lightgreen",
+                            color: "white",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <ExclamationIcon fontSize="small" />
+                        </Box>
+                      )}
+                    {isAgent(item) &&
+                      (
+                        counts as {
+                          hasPending: boolean;
+                          hasIncomplete: boolean;
+                        }
+                      ).hasIncomplete && (
+                        <Box
+                          sx={{
+                            width: 20,
+                            height: 20,
+                            borderRadius: "50%",
+                            backgroundColor: "lightcoral",
+                            color: "white",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <ExclamationIcon fontSize="small" />
+                        </Box>
+                      )}
+
+                    {/* Client: Check for pendingCount and incompleteCount */}
+                    {isClient(item) &&
+                      (
+                        counts as {
+                          pendingCount: number;
+                          incompleteCount: number;
+                        }
+                      ).pendingCount > 0 && (
+                        <Box
+                          sx={{
+                            width: 20,
+                            height: 20,
+                            borderRadius: "50%",
+                            backgroundColor: "lightgreen",
+                            color: "white",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          {
+                            (
+                              counts as {
+                                pendingCount: number;
+                                incompleteCount: number;
+                              }
+                            ).pendingCount
+                          }
+                        </Box>
+                      )}
+                    {isClient(item) &&
+                      (
+                        counts as {
+                          pendingCount: number;
+                          incompleteCount: number;
+                        }
+                      ).incompleteCount > 0 && (
+                        <Box
+                          sx={{
+                            width: 20,
+                            height: 20,
+                            borderRadius: "50%",
+                            backgroundColor: "lightcoral",
+                            color: "white",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          {
+                            (
+                              counts as {
+                                pendingCount: number;
+                                incompleteCount: number;
+                              }
+                            ).incompleteCount
+                          }
+                        </Box>
+                      )}
+                  </Box>
+                )}
+              </ListItem>
+              {index < filteredList.length - 1 && (
+                <Divider key={`divider-${item.id}`} />
+              )}
+            </React.Fragment>
+          );
+        })}
       </List>
     </Box>
   );

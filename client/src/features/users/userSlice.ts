@@ -220,10 +220,10 @@ export default userSlice.reducer;
 // Memoized selector to select a user by ID
 export const selectUserById = createSelector(
   [
-    (state: RootState) => state.users.users,
+    (state: RootState) => state.users.users, // Adjust based on your state structure
     (_: RootState, userId: string) => userId,
   ],
-  (users, userId) => users[userId]
+  (users, userId) => users[userId] as User | undefined
 );
 
 // Memoized selector to get all users as an array

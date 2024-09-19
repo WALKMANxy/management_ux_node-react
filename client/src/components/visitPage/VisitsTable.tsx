@@ -1,3 +1,4 @@
+// src/components/visitPage/VisitsTable.tsx
 import {
   Paper,
   Table,
@@ -21,23 +22,43 @@ const VisitsTable: React.FC<VisitsTableProps> = ({ clientId }) => {
   const visits = useAppSelector(selectVisits);
 
   // Filter visits for the selected client
-  const clientVisits = visits.filter((visit) => visit.clientId === clientId);
+  const clientVisits = visits
+    .filter((visit) => visit.clientId === clientId)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // Sort by date ascending
+
+  // Function to determine the row background color based on visit status
+  const getRowBackgroundColor = (
+    completed: boolean,
+    pending: boolean
+  ): string => {
+    if (completed && !pending) {
+      return "#e6f4ea"; // Faint Green
+    } else if (!completed && !pending) {
+      return "#fdecea"; // Faint Red
+    } else if (pending && !completed) {
+      return "#fff4e5"; // Faint Orange
+    } else {
+      return "inherit"; // Default
+    }
+  };
 
   const handleRowClick = (visitId: string) => {
     dispatch(selectVisit(visitId));
   };
+
   return (
-    <TableContainer component={Paper} sx={{ m: 2 }}>
+    <TableContainer component={Paper} sx={{ m: 0, p: 2, mt: 2, mb: 2 }}>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Client ID</TableCell>
+            {/* Removed Agent Name Column */}
             <TableCell>Type</TableCell>
             <TableCell>Reason</TableCell>
-            <TableCell>Created At</TableCell>
+            <TableCell>Date</TableCell>
             <TableCell>Completed</TableCell>
-            {/* If agentName is available, display it */}
-            <TableCell>Agent Name</TableCell>
+            {/* Added Pending Column */}
+            <TableCell>Pending</TableCell>
+            <TableCell>Created At</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -46,16 +67,26 @@ const VisitsTable: React.FC<VisitsTableProps> = ({ clientId }) => {
               key={visit._id}
               hover
               onClick={() => handleRowClick(visit._id ?? "")}
-              sx={{ cursor: "pointer" }}
+              sx={{
+                cursor: "pointer",
+                backgroundColor: getRowBackgroundColor(
+                  visit.completed,
+                  visit.pending
+                ),
+              }}
             >
-              <TableCell>{visit.clientId}</TableCell>
+              {/* Removed Agent Name Cell */}
               <TableCell>{visit.type}</TableCell>
               <TableCell>{visit.visitReason}</TableCell>
               <TableCell>
-                {new Date(visit.createdAt).toLocaleString()}
+                {new Date(visit.date).toLocaleString()}
               </TableCell>
               <TableCell>{visit.completed ? "Yes" : "No"}</TableCell>
-              <TableCell>{visit.agentName || "N/A"}</TableCell>
+              {/* Added Pending Cell */}
+              <TableCell>{visit.pending ? "Yes" : "No"}</TableCell>
+              <TableCell>
+                {new Date(visit.createdAt).toLocaleString()}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

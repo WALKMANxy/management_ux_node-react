@@ -42,14 +42,14 @@ export interface GlobalVisits {
 }
 
 export type Promo = {
-  id: string;
+  _id?: string;
   clientsId: string[]; // Array of client IDs this promo applies to
   promoType: string;
   name: string;
   discount: string;
   createdAt: Date;
   startDate: Date;
-  endDate: string;
+  endDate: Date;
   promoIssuedBy: string;
 };
 

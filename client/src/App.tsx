@@ -131,6 +131,14 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      /* {
+        path: "promos",
+        element: (
+          <ProtectedRoute>
+            <PromosPage />
+          </ProtectedRoute>
+        ),
+      }, */
     ],
   },
 ]);
@@ -200,7 +208,7 @@ function App() {
             "User is either not logged in or has an invalid role ('guest')."
           );
         }
-      } 
+      }
     };
 
     initializeApp();

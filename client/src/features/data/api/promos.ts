@@ -6,6 +6,7 @@ export const createPromo = async (promoData: {
   type: string;
   name: string;
   discount: string;
+  createdAt: string;
   startDate: string;
   endDate: string;
   promoIssuedBy: string;
@@ -14,8 +15,8 @@ export const createPromo = async (promoData: {
 };
 
 export const updatePromoById = async (
-  id: string,
+  _id: string,
   promoData: Partial<Promo>
 ): Promise<Promo> => {
-  return apiCall<Promo>(`promos/${id}`, "PATCH", promoData);
+  return apiCall<Promo>(`promos/${_id}`, "PATCH", promoData);
 };
