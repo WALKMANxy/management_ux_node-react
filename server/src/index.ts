@@ -39,6 +39,7 @@ mongoose
   .catch((err) => logger.error("MongoDB connection error:", { error: err }));
 
 
+
   const corsOptions: cors.CorsOptions = {
     origin: config.appUrl,
     credentials: true,

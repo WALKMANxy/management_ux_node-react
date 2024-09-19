@@ -7,9 +7,9 @@ import {
   Promo,
   Visit,
 } from "../../models/dataModels";
+import { Agent, Client } from "../../models/entityModels";
 import { SearchParams, SearchResult } from "../../models/searchModels";
 import { SearchState, ThunkError } from "../../models/stateModels";
-import { Agent, Client } from "../../models/entityModels";
 
 const initialState: SearchState = {
   query: "",
@@ -127,19 +127,21 @@ export const searchItems = createAsyncThunk<
             .flatMap(([agentId, { Promos }]) =>
               Promos.filter((promo) =>
                 promo.name?.toLowerCase().includes(sanitizedQuery)
-              ).map((promo) => ({
-                id: promo.id,
-                name: promo.name,
-                promoType: promo.promoType,
-                type: "promo" as SearchResult["type"],
-                startDate: new Date(promo.startDate),
-                endDate: new Date(promo.endDate),
-                issuedBy: promo.promoIssuedBy,
-                agentId, // Include the agentId if needed
-              }))
+              )
+                .map((promo) => ({
+                  id: promo._id || "",
+                  name: promo.name,
+                  promoType: promo.promoType,
+                  type: "promo" as SearchResult["type"],
+                  startDate: new Date(promo.startDate),
+                  endDate: new Date(promo.endDate),
+                  issuedBy: promo.promoIssuedBy,
+                  agentId, // Include the agentId if needed
+                }))
+                .filter((promo) => promo.id !== undefined && promo.id !== "")
             )
             .filter(
-              (result) => !seen.has(result.id) && seen.set(result.id, "")
+              (result) => !seen.has(result.id!) && seen.set(result.id!, "")
             );
 
           searchResults = searchResults.concat(globalPromoResults);
@@ -154,7 +156,7 @@ export const searchItems = createAsyncThunk<
                   promo.name.toLowerCase().includes(sanitizedQuery)
               )
               .map((promo) => ({
-                id: promo.id,
+                id: promo._id || "",
                 name: promo.name,
                 promoType: promo.promoType,
                 type: "promo" as SearchResult["type"],
@@ -162,6 +164,7 @@ export const searchItems = createAsyncThunk<
                 endDate: new Date(promo.endDate),
                 issuedBy: promo.promoIssuedBy,
               }))
+              .filter((promo) => promo.id !== undefined && promo.id !== "")
           : [];
         searchResults = searchResults.concat(promoResults);
       }
@@ -180,7 +183,7 @@ export const searchItems = createAsyncThunk<
                   visit.visitReason?.toLowerCase().includes(sanitizedQuery) ||
                   visit.notePublic?.toLowerCase().includes(sanitizedQuery)
               ).map((visit) => ({
-                id: visit._id ?? '', // Use the nullish coalescing operator to default to an empty string if _id is null or undefined
+                id: visit._id ?? "", // Use the nullish coalescing operator to default to an empty string if _id is null or undefined
                 name: visit.visitReason,
                 type: "visit" as SearchResult["type"],
                 date: visit.date,
@@ -207,7 +210,7 @@ export const searchItems = createAsyncThunk<
                   visit.date.toISOString().slice(0, 10).includes(sanitizedQuery)
               )
               .map((visit) => ({
-                id: visit._id ?? '', // Use the nullish coalescing operator to default to an empty string if _id is null or undefined
+                id: visit._id ?? "", // Use the nullish coalescing operator to default to an empty string if _id is null or undefined
                 name: visit.visitReason,
                 type: "visit" as SearchResult["type"],
                 date: visit.date,
