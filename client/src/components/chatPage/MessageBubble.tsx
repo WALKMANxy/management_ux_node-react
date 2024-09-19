@@ -16,7 +16,7 @@ interface MessageBubbleProps {
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({
   message,
-  participantsData,
+  participantsData = [],
   chatType,
 }) => {
   const currentUserId = useAppSelector((state: RootState) => state.auth.userId);
@@ -26,7 +26,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 
   // Find the sender's details from the participants data
   const sender = participantsData.find((user) => user._id === message.sender);
-  const senderAvatar = sender?.avatar || ""; // Fallback to empty string if no avatar
+  const senderAvatar = sender?.avatar || "";
 
   const hasMountedRef = useRef(false);
 
