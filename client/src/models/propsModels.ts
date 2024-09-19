@@ -222,6 +222,7 @@ export type MovementDetailsProps = {
 
 export type TopArticleTypeProps = {
   articles: { id: string; name: string; quantity: number }[];
+  isAgentSelected: boolean;
 };
 
 export type TotalEarningProps = {

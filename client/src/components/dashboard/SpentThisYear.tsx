@@ -126,6 +126,8 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
                     mr: 1,
                     mt: 1.75,
                     mb: 0.75,
+                    zIndex: 10,
+                    position: "relative"
                   }}
                 >
                   {formattedAmount}
@@ -138,6 +140,8 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
                       cursor: "pointer",
                       bgcolor: comparisonColor,
                       color: "#000",
+                      zIndex: 10,
+                    position: "relative"
                     }}
                   >
                     {comparisonIcon}
@@ -154,7 +158,11 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
                 color: "#000",
               }}
             >
-              {t("spentThisYear.title")}
+              {t(
+                isAgentSelected
+                  ? "spentThisYear.titleAgent"
+                  : "spentThisYear.titleClient"
+              )}
             </Typography>
             {userRole !== "client" && comparison && (
               <Typography

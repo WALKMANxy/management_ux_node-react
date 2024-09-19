@@ -1,5 +1,5 @@
 //src/features/utility/utilitySlice.ts
-import { createSelector } from "@reduxjs/toolkit";
+import { createSelector } from "reselect";
 import { RootState } from "../../app/store";
 import {
   GlobalPromos,
@@ -19,6 +19,8 @@ export const selectVisits = createSelector(
     (state: RootState) => state.data.currentUserDetails,
   ],
   (currentUserVisits, agents, currentUserDetails): VisitWithAgent[] => {
+    console.log("Recomputing selectVisits"); // Add this line
+
     if (!currentUserVisits || !currentUserDetails) return [];
 
     const findAgentForClient = (clientId: string): Agent | undefined => {
@@ -48,7 +50,6 @@ export const selectVisits = createSelector(
     }
   }
 );
-
 
 // Selector to get a single visit by ID
 export const selectVisitById = (visitId: string) =>

@@ -3,10 +3,10 @@ import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { RootState } from "../app/store";
 import {
   clearSelection,
-  fetchInitialData,
   selectAgent,
   selectClient,
 } from "../features/data/dataSlice";
+import { fetchInitialData, getPromos, getVisits } from "../features/data/dataThunks";
 import { Movement } from "../models/dataModels";
 import { TopArticleType } from "../models/dataSetTypes";
 import { Agent, Client, User } from "../models/entityModels";
@@ -34,7 +34,7 @@ const useStats = (isMobile: boolean) => {
   const dispatch = useAppDispatch();
 
   const [localError, setLocalError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [retryCount, setRetryCount] = useState<number>(0); // Track retry attempts
 
   // Get data from the dataSlice
@@ -59,16 +59,30 @@ const useStats = (isMobile: boolean) => {
 
   const agentDetails = agents;
 
-  // Fetch initial data
+  // Determine if data needs to be fetched
+  const shouldFetchData =
+    status !== "succeeded" &&
+    (Object.keys(clients).length === 0 ||
+      Object.keys(agents).length === 0 ||
+      !currentUserData ||
+      !currentUserDetails);
+
   useEffect(() => {
+    if (!shouldFetchData) {
+      return; // Data is already fetched; no need to refetch
+    }
+
     const fetchData = async () => {
-/*       console.log("fetchData called"); // Debug: Function call
- */      try {
+      try {
         setLoading(true);
-/*         console.log("Dispatching fetchInitialData"); // Debug: Dispatch action
- */        await dispatch(fetchInitialData()).unwrap();
-/*         console.log("fetchInitialData successful"); // Debug: Success case
- */        setLocalError(null);
+        await dispatch(fetchInitialData()).unwrap();
+
+
+        await Promise.all([
+          dispatch(getVisits()).unwrap(),
+          dispatch(getPromos()).unwrap(),
+        ]);
+        setLocalError(null);
         setRetryCount(0); // Reset retryCount only when data fetch is successful
 
         // Call the utility function to update entity name if missing
@@ -86,22 +100,18 @@ const useStats = (isMobile: boolean) => {
           setLocalError("An unknown error occurred while fetching data.");
           console.log("Unknown error occurred while fetching data."); // Debug: Unknown error
         }
+
         if (retryCount < 5) {
           setRetryCount((prevCount) => prevCount + 1);
           console.log(`Retry count incremented: ${retryCount + 1}`); // Debug: Retry count update
         }
       } finally {
         setLoading(false);
-/*         console.log("Loading state set to false"); // Debug: Loading state reset
- */      }
+      }
     };
 
-/*     console.log("Calling fetchData in useEffect"); // Debug: useEffect call
- */    fetchData();
-    // Remove dependencies that cause the fetchData to re-run unnecessarily
-    // retryCount will be handled separately to avoid loops
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, retryCount]); // Removed retryCount, currentUser, currentUserDetails from dependencies
+    fetchData();
+  }, );
 
   // Retry mechanism: Automatically re-attempt fetching data if an error occurs
   useEffect(() => {

@@ -4,7 +4,7 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 import { authApi } from "../features/auth/authQueries";
 import { chatApi } from "../features/chat/chatQueries";
 import { dataApi } from "../features/data/dataQueries";
-import { updateApi } from "../features/data/promosVisitsQueries";
+import { promoVisitApi } from "../features/data/promosVisitsQueries";
 import { userApi } from "../features/users/userQueries";
 import { loadAuthState, saveAuthState } from "../utils/localStorage";
 import listenerMiddleware from "./listeners";
@@ -27,8 +27,7 @@ const store = configureStore({
       .concat(userApi.middleware)
       .concat(chatApi.middleware)
       .concat(dataApi.middleware)
-      .concat(updateApi.middleware)
-
+      .concat(promoVisitApi.middleware)
       .concat(listenerMiddleware.middleware), // Add dataApi middleware
 });
 

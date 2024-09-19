@@ -1,5 +1,13 @@
-import ShowChartIcon from '@mui/icons-material/ShowChart'; // Import the ShowChart icon
-import { Box, Divider, Paper, Skeleton, Typography, Avatar, useTheme } from "@mui/material";
+import ShowChartIcon from "@mui/icons-material/ShowChart"; // Import the ShowChart icon
+import {
+  Avatar,
+  Box,
+  Divider,
+  Paper,
+  Skeleton,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { ApexOptions } from "apexcharts";
 import React, { useMemo } from "react";
 import Chart from "react-apexcharts";
@@ -10,8 +18,10 @@ import { currencyFormatter } from "../../../utils/dataUtils";
 const MonthOverMonthSpendingTrend: React.FC<{
   months: string[];
   revenueData: number[];
-  userRole: "agent" | "client" | "admin"; // New prop to determine user role
-}> = ({ months, revenueData, userRole }) => {
+  userRole: "agent" | "client" | "admin";
+  isAgentSelected: boolean;
+  // New prop to determine user role
+}> = ({ months, revenueData, userRole, isAgentSelected }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const loading = revenueData.length === 0;
@@ -135,7 +145,7 @@ const MonthOverMonthSpendingTrend: React.FC<{
           borderRadius: "50%",
           bottom: -125,
           left: -100,
-          opacity: 0.3
+          opacity: 0.3,
         },
       }}
     >
@@ -146,7 +156,6 @@ const MonthOverMonthSpendingTrend: React.FC<{
           justifyContent: "space-between",
           width: "100%",
           mb: 0,
-
         }}
       >
         <Avatar
@@ -156,7 +165,7 @@ const MonthOverMonthSpendingTrend: React.FC<{
             color: "#fff",
             mt: 1,
             left: 39,
-            top: 16
+            top: 16,
           }}
         >
           <ShowChartIcon fontSize="inherit" />
@@ -176,11 +185,18 @@ const MonthOverMonthSpendingTrend: React.FC<{
         }}
       >
         <Typography variant="h6" gutterBottom>
-          {t("monthOverMonthSpendingTrend.title")}
+
+          {t(
+                isAgentSelected
+                  ? "monthOverMonthSpendingTrend.titleAgent"
+                  : "monthOverMonthSpendingTrend.titleClient"
+              )}
         </Typography>
       </Box>
 
-      <Divider sx={{ width: "100%", mt: 2, zIndex: 1, position: "relative", top: 10 }} />
+      <Divider
+        sx={{ width: "100%", mt: 2, zIndex: 1, position: "relative", top: 10 }}
+      />
 
       <Box sx={{ width: "100%", height: "auto" }}>
         {loading ? (

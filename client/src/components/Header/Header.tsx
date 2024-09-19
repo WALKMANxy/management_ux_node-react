@@ -1,8 +1,8 @@
 // Header.tsx
 
 import {
-/*   BarChart as BarChartIcon,
- */  Category as CategoryIcon,
+  /*   BarChart as BarChartIcon,
+   */ Category as CategoryIcon,
   Close as CloseIcon,
   EventNote as EventNoteIcon,
   History as HistoryIcon,
@@ -26,13 +26,14 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../app/hooks";
 import { RootState } from "../../app/store";
 import { handleLogout } from "../../features/auth/authSlice";
+import { clearSelection } from "../../features/data/dataSlice";
 import GlobalSearch from "./GlobalSearch";
 import NotificationBell from "./NotificationBell";
 import UserAvatar from "./UserAvatar";
@@ -47,9 +48,25 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const userRole = useSelector((state: RootState) => state.auth.role);
 
+  const location = useLocation(); // Get current location
+  const prevLocationRef = useRef<string>(location.pathname); // Initialize previous location
+
   const initiateLogout = () => {
     dispatch(handleLogout());
   };
+
+  useEffect(() => {
+    // Check if navigating away from /visits
+    if (
+      prevLocationRef.current === "/visits" &&
+      location.pathname !== "/visits"
+    ) {
+      dispatch(clearSelection());
+    }
+
+    // Update the previous location to the current one
+    prevLocationRef.current = location.pathname;
+  });
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -151,7 +168,6 @@ const Header: React.FC = () => {
           </ListItemIcon>
           <ListItemText primary={t("promos")} />
         </ListItem>
-
       </>
     );
   };
