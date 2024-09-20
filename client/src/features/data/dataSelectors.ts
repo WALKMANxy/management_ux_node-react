@@ -1,12 +1,7 @@
 //src/features/utility/utilitySlice.ts
 import { createSelector } from "reselect";
 import { RootState } from "../../app/store";
-import {
-  GlobalPromos,
-  GlobalVisits,
-  Promo,
-  Visit,
-} from "../../models/dataModels";
+import { GlobalVisits, Promo, Visit } from "../../models/dataModels";
 import { Agent } from "../../models/entityModels";
 
 // Extend the Visit type to include agent information for admins
@@ -19,7 +14,6 @@ export const selectVisits = createSelector(
     (state: RootState) => state.data.currentUserDetails,
   ],
   (currentUserVisits, agents, currentUserDetails): VisitWithAgent[] => {
-
     if (!currentUserVisits || !currentUserDetails) return [];
 
     const findAgentForClient = (clientId: string): Agent | undefined => {
@@ -68,9 +62,7 @@ export const selectPromos = createSelector(
       // Client or Agent case
       return currentUserPromos;
     } else {
-      // Admin case
-      const globalPromos = currentUserPromos as GlobalPromos;
-      return Object.values(globalPromos).flatMap(({ Promos }) => Promos);
+      return []; // Fallback if for some reason the structure is incorrect
     }
   }
 );

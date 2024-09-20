@@ -12,8 +12,8 @@ import {
   InputLabel,
   MenuItem,
   OutlinedInput,
+  Paper,
   Select,
-  SelectChangeEvent,
   Snackbar,
   TextField,
   Tooltip,
@@ -70,7 +70,7 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
     const promoData: Promo = {
       name,
       promoType,
-      discount, // Only set discount if promoType is "Sale"
+      discount,
       clientsId: selectedClients,
       createdAt: new Date(),
       startDate: dayjs(startDate).set("hour", 8).set("minute", 0).toDate(), // Convert Dayjs to Date
@@ -126,11 +126,11 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
         }}
       >
         <Typography
-          variant="h5"
+          variant="h3"
           gutterBottom
-          sx={{ fontWeight: 600, mb: 2, color: "#4d4b5f" }}
+          sx={{ fontWeight: 600, mb: 4, color: "#4d4b5f", mt: 1, ml: 2 }}
         >
-          Create New Promo
+          Create New Promo:
         </Typography>
 
         <Grid container spacing={2}>
@@ -145,7 +145,7 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
                 label="Promo Type *"
                 onChange={(e) => setPromoType(e.target.value)}
                 sx={{
-                  borderRadius: 2,
+                  borderRadius: "20px",
                 }}
               >
                 <MenuItem value="Contract">Contract</MenuItem>
@@ -165,77 +165,87 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
               fullWidth
               required
               variant="outlined"
-              sx={{
-                borderRadius: 2,
+              InputProps={{
+                style: {
+                  borderRadius: "20px",
+                },
               }}
             />
           </Grid>
 
           {/* Start Date */}
-          <Grid item xs={12} sm={6}>
-            <Typography variant="body1">Start Date</Typography>
-
-            <StaticDatePicker
-              value={startDate}
-              disablePast={true}
-              onAccept={(newValue: Dayjs | null) => {
-                setStartDate(newValue);
-              }}
-              onChange={(newValue: Dayjs | null) => {
-                setStartDate(newValue);
-              }}
-              slotProps={{
-                toolbar: {
-                  hidden: true,
-                },
-              }}
-            />
+          <Grid item xs={10} sm={6}>
+            <Paper elevation={1} sx={{ p: 2, borderRadius: 6 }}>
+              <Typography variant="h4" gutterBottom sx={{ ml: 3, pt: 1 }}>
+                Start:
+              </Typography>
+              <StaticDatePicker
+                value={startDate}
+                disablePast={true}
+                onAccept={(newValue: Dayjs | null) => {
+                  setStartDate(newValue);
+                }}
+                onChange={(newValue: Dayjs | null) => {
+                  setStartDate(newValue);
+                }}
+                slotProps={{
+                  toolbar: {
+                    hidden: true,
+                  },
+                }}
+              />
+            </Paper>
           </Grid>
 
           {/* End Date */}
-          <Grid item xs={12} sm={6}>
-            <Typography variant="body1">End Date</Typography>
-            <StaticDatePicker
-              value={endDate}
-              disablePast={true}
-              onAccept={(newValue: Dayjs | null) => {
-                setEndDate(newValue);
-              }}
-              onChange={(newValue: Dayjs | null) => {
-                setEndDate(newValue);
-              }}
-              slotProps={{
-                toolbar: {
-                  hidden: true,
+          <Grid item xs={10} sm={6}>
+            <Paper elevation={1} sx={{ p: 2, borderRadius: 6 }}>
+              <Typography variant="h4" gutterBottom sx={{ ml: 3, pt: 1 }}>
+                End:
+              </Typography>
+              <StaticDatePicker
+                value={endDate}
+                disablePast={true}
+                onAccept={(newValue: Dayjs | null) => {
+                  setEndDate(newValue);
+                }}
+                onChange={(newValue: Dayjs | null) => {
+                  setEndDate(newValue);
+                }}
+                slotProps={{
+                  toolbar: {
+                    hidden: true,
+                  },
+                }}
+              />
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} sm={12}>
+            <TextField
+              label="Discount Description"
+              name="discount"
+              value={discount}
+              onChange={(e) => setDiscount(e.target.value)}
+              fullWidth
+              required
+              variant="outlined"
+              multiline
+              rows={3}
+              InputProps={{
+                style: {
+                  borderRadius: "20px",
+                  width: "100%",
+                  marginTop: 5,
                 },
               }}
+              helperText='e.g., "Every 100 euros spent, you get a 10 euros coupon"'
             />
           </Grid>
 
-          {/* Discount - Conditionally Rendered */}
-          {promoType === "Sale" && (
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Discount Description"
-                name="discount"
-                value={discount}
-                onChange={(e) => setDiscount(e.target.value)}
-                fullWidth
-                required
-                variant="outlined"
-                multiline
-                rows={3}
-                sx={{
-                  borderRadius: 2,
-                }}
-                helperText='e.g., "Every 100 euros spent, you get a 10 euros coupon"'
-              />
-            </Grid>
-          )}
-
-          {/* Eligible Clients Selection */}
+          {/* Eligible Clients Display - Read-Only Selector */}
           <Grid item xs={12}>
-            <FormControl fullWidth>
+            <FormControl fullWidth disabled variant="outlined">
               <InputLabel id="eligible-clients-label">
                 Eligible Clients
               </InputLabel>
@@ -244,14 +254,6 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
                 id="eligible-clients"
                 multiple
                 value={selectedClients}
-                onChange={(e: SelectChangeEvent<string[]>) => {
-                  const {
-                    target: { value },
-                  } = e;
-                  setSelectedClients(
-                    typeof value === "string" ? value.split(",") : value
-                  );
-                }}
                 input={<OutlinedInput label="Eligible Clients" />}
                 renderValue={(selected) => (
                   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
@@ -263,13 +265,10 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
                     ))}
                   </Box>
                 )}
-              >
-                {Object.values(clients).map((client) => (
-                  <MenuItem key={client.id} value={client.id}>
-                    {client.name}
-                  </MenuItem>
-                ))}
-              </Select>
+                sx={{
+                  borderRadius: "12px",
+                }}
+              ></Select>
             </FormControl>
           </Grid>
 
@@ -291,40 +290,58 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
             gap: 2,
           }}
         >
-          <Tooltip title="Create Promo">
-            <IconButton
-              type="submit"
-              color="primary"
-              sx={{
-                backgroundColor: "primary.main",
-                color: "white",
-                "&:hover": { backgroundColor: "primary.dark" },
-                borderRadius: "50%",
-                width: 56,
-                height: 56,
-              }}
-              aria-label="Create Promo"
-            >
-              <AddIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Cancel">
-            <IconButton
-              color="error"
-              onClick={onClose}
-              sx={{
-                backgroundColor: "error.main",
-                color: "white",
-                "&:hover": { backgroundColor: "error.dark" },
-                borderRadius: "50%",
-                width: 56,
-                height: 56,
-              }}
-              aria-label="Cancel"
-            >
-              <CloseIcon />
-            </IconButton>
-          </Tooltip>
+          <Paper
+            elevation={1}
+            sx={{
+              borderRadius: 2,
+              padding: 1
+            }}
+          >
+            <Tooltip title="Create Promo">
+              <IconButton
+                type="submit"
+                color="primary"
+                sx={{
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  "&:hover": { backgroundColor: "primary.dark" },
+                  borderRadius: "50%",
+                  width: 56,
+                  height: 56,
+                  transition: "transform 0.2s",
+                  "&:active": {
+                    transform: "scale(0.95)",
+                  },
+                }}
+
+                aria-label="Create Promo"
+              >
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Cancel">
+              <IconButton
+                color="error"
+                onClick={onClose}
+                sx={{
+                  backgroundColor: "error.main",
+                  color: "white",
+                  "&:hover": { backgroundColor: "error.dark" },
+                  borderRadius: "50%",
+                  width: 56,
+                  height: 56,
+                  transition: "transform 0.2s",
+                  "&:active": {
+                    transform: "scale(0.95)",
+                  },
+                }}
+                aria-label="Cancel"
+              >
+                <CloseIcon />
+              </IconButton>
+            </Tooltip>
+          </Paper>
         </Box>
 
         {/* Snackbar for feedback */}

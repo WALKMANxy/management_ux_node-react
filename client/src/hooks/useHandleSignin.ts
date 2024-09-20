@@ -10,9 +10,9 @@ export const useHandleSignin = (onClose: () => void) => {
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertOpen, setAlertOpen] = useState(false);
-  const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
-    "error"
-  );
+  const [alertSeverity, setAlertSeverity] = useState<
+    "success" | "error" | "info"
+  >("error");
   const [shakeEmail, setShakeEmail] = useState(false);
   const [shakePassword, setShakePassword] = useState(false);
   const [shakeConfirmPassword, setShakeConfirmPassword] = useState(false); // For confirming password shake effect
