@@ -21,6 +21,7 @@ const DetailComponent: React.FC<ClientProp> = ({ detail, isLoading }) => {
     "id",
     "movements",
     "agent",
+    "agentData",
   ];
   const keyMap: { [K in keyof ClientProp["detail"]]?: string } = {
     name: t("details.name"),

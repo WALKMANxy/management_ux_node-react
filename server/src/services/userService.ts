@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { config } from "../config/config";
 import { IUser, User } from "../models/User";
 import { sendUserChangesConfirmationEmail } from "../utils/sendEmail";
+import { Types } from "mongoose";
 
 export class UserService {
   static async getAllUsers(): Promise<IUser[]> {
@@ -49,9 +50,12 @@ export class UserService {
 
   static async getUsersByIds(ids: string[]): Promise<Partial<IUser>[]> {
     try {
-      // Find users by the provided IDs and select only the required fields
-      return await User.find({ _id: { $in: ids } })
-        .select("_id avatar role entityName") // Select only the fields needed
+      // Convert string IDs to ObjectId instances
+      const objectIds = ids.map(id => new Types.ObjectId(id));
+
+      // Find users by the provided ObjectId array and select only the required fields
+      return await User.find({ _id: { $in: objectIds } })
+        .select("_id avatar role entityName entityCode") // Select only the fields needed
         .exec();
     } catch (err) {
       throw new Error(

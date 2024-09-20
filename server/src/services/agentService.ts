@@ -18,9 +18,46 @@ export const getAgentByClientEntityCode = (
   clientEntityCode: string
 ): Agent | undefined => {
   const agents = getAgentsFromFile();
-  return agents.find((agent) =>
-    agent.clients.some((client) => client.CODICE === clientEntityCode)
+
+  // Convert clientEntityCode to a string to ensure consistent comparison
+  const entityCodeAsString = String(clientEntityCode);
+  console.log(
+    "getAgentByClientEntityCode called with entityCode:",
+    entityCodeAsString
+  ); // Debugging
+
+  // Find the agent whose clients array contains the given clientEntityCode
+  const agent = agents.find((agent) =>
+    agent.clients.some((client) => {
+      const clientCodeAsString = String(client.CODICE);
+      console.log(
+        "Comparing client.CODICE:",
+        clientCodeAsString,
+        "with entityCode:",
+        entityCodeAsString
+      ); // Debugging
+      return clientCodeAsString === entityCodeAsString;
+    })
   );
+
+  if (agent) {
+    // Filter the clients array to only include the client with the matching CODICE
+    const filteredClients = agent.clients.filter(
+      (client) => String(client.CODICE) === entityCodeAsString
+    );
+
+    console.log("Filtered clients for agent:", filteredClients); // Debugging
+    return {
+      ...agent,
+      clients: filteredClients,
+    };
+  }
+
+  console.warn(
+    "No agent found with the given client entity code:",
+    entityCodeAsString
+  ); // Debugging
+  return undefined; // Return undefined if no matching agent is found
 };
 
 export const updateAgentById = (

@@ -69,8 +69,24 @@ const ClientDashboard: React.FC = () => {
           )}
         </Typography>
       )}
+      {/* FAB Button for Calendar - Positioned Top Right */}
+      {isTablet && (
+        <Fab
+          color="primary"
+          aria-label="calendar"
+          onClick={handleToggleDrawer}
+          sx={{
+            position: "absolute",
+            top: 100, // Adjust as needed based on layout
+            right: 32, // Adjust as needed based on layout
+            zIndex: 1000,
+          }}
+        >
+          <CalendarMonthIcon />
+        </Fab>
+      )}
       <Grid container spacing={6} mt={2}>
-        <Grid item xs={12} md={9}>
+        <Grid item xs={!isTablet ? 12 : 0} md={!isTablet ? 9 : 0}>
           <Box mb={4}>
             {isLoading ? (
               <Skeleton
@@ -146,7 +162,6 @@ const ClientDashboard: React.FC = () => {
                     revenueData={revenueData}
                     userRole="client" // Pass the user role
                     isAgentSelected={false}
-
                   />
                 ) : (
                   <Skeleton
@@ -176,14 +191,23 @@ const ClientDashboard: React.FC = () => {
                   />
                 )}
               </Grid>
+              <Grid container item xs={12} md={6}>
+                {clientDetails ? (
+                  <ActivePromotions isLoading={isLoading} />
+                ) : (
+                  <Skeleton
+                    animation="wave"
+                    variant="rectangular"
+                    width="100%"
+                    height={300}
+                    sx={{ borderRadius: "12px" }}
+                  />
+                )}
+              </Grid>
             </Grid>
-            {clientDetails && "visits" in clientDetails && (
-              <ActivePromotions
-                isLoading={isLoading} // Update this line
-              />
-            )}
           </Box>
         </Grid>
+
         {/* Conditionally render CalendarComponent and UpcomingVisits based on screen size */}
         {!isTablet && (
           <Grid item xs={12} md={3}>
@@ -192,7 +216,7 @@ const ClientDashboard: React.FC = () => {
                 {t("clientDashboard.calendar")}
               </Typography>
 
-              <Box sx={{ maxWidth: "400px", margin: "0 auto" }}>
+              <Box sx={{ margin: "0 auto" }}>
                 {clientDetails ? (
                   <CalendarComponent />
                 ) : (
@@ -206,40 +230,18 @@ const ClientDashboard: React.FC = () => {
                 )}
               </Box>
             </Box>
-            {clientDetails && "promos" in clientDetails && (
-              <UpcomingVisits
-                isLoading={isLoading} // Update this line
-              />
-            )}
+
+            <UpcomingVisits isLoading={isLoading} />
           </Grid>
         )}
       </Grid>
 
-      {/* FAB Button to Toggle Drawer */}
-      {isTablet && (
-        <>
-          <Fab
-            color="primary"
-            aria-label="calendar"
-            onClick={handleToggleDrawer}
-            sx={{
-              position: "fixed",
-              bottom: 16,
-              left: 16,
-              zIndex: 1000,
-            }}
-          >
-            <CalendarMonthIcon />
-          </Fab>
-
-          {/* Drawer with CalendarComponent and UpcomingVisits */}
-          <DrawerContainer
-            open={drawerOpen}
-            onClose={handleToggleDrawer}
-            isLoading={isLoading}
-          />
-        </>
-      )}
+      {/* Drawer with CalendarComponent and UpcomingVisits */}
+      <DrawerContainer
+        open={drawerOpen}
+        onClose={handleToggleDrawer}
+        isLoading={isLoading}
+      />
     </Box>
   );
 };

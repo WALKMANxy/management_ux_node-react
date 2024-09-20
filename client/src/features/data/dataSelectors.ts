@@ -19,7 +19,6 @@ export const selectVisits = createSelector(
     (state: RootState) => state.data.currentUserDetails,
   ],
   (currentUserVisits, agents, currentUserDetails): VisitWithAgent[] => {
-    console.log("Recomputing selectVisits"); // Add this line
 
     if (!currentUserVisits || !currentUserDetails) return [];
 

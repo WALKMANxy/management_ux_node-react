@@ -49,6 +49,7 @@ export type Client = {
   agentName?: string;
   movements: Movement[];
   colour?: string;
+  agentData?: Agent[];
 };
 
 export type Agent = {

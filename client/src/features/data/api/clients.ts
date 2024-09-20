@@ -9,5 +9,13 @@ export const getClientByCodice = async (
 
 // New function to get clients associated with an agent
 export const getClientsByAgent = async (): Promise<serverClient[]> => {
-  return apiCall<serverClient[]>(`clients/by-agent`, "GET");
+  try {
+    console.log("getClientsByAgent: Initiating API call to clients/by-agent");
+    const response = await apiCall<serverClient[]>(`clients/by-agent`, "GET");
+    console.log("getClientsByAgent: API call successful", response);
+    return response;
+  } catch (error) {
+    console.error("getClientsByAgent: API call failed", error);
+    throw error; // Re-throw the error to be handled by the caller
+  }
 };

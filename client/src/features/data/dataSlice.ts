@@ -167,10 +167,18 @@ export const dataSlice = createSlice({
       })
       .addCase(fetchInitialData.fulfilled, (state, action) => {
         state.status = "succeeded";
-        const { role, userData, userId /* , agentData */ } = action.payload;
+        const { role, userData, userId } = action.payload;
+
+        console.log("fetchInitialData.fulfilled called with:", {
+          role,
+          userData,
+          userId,
+        }); // Debugging
 
         if (role === "client" && "clientData" in userData) {
-          const { clientData /*  visits, promos */ } = userData;
+          const { clientData } = userData;
+
+          // Store client data
           state.clients[clientData.id] = clientData;
           state.currentUserData = clientData;
           state.currentUserDetails = {
@@ -179,8 +187,12 @@ export const dataSlice = createSlice({
             name: clientData.name,
             userId: userId,
           };
-          /* state.currentUserPromos = promos;
-          state.currentUserVisits = visits; */
+          // Check if agentData exists within clientData and store it
+          if (clientData.agentData) {
+            clientData.agentData.forEach((agent) => {
+              state.agents[agent.id] = agent; // Store each agent in the state
+            });
+          }
         } else if (role === "agent" && "agentData" in userData) {
           // Handle agent data
           const { agentData /* visits, promos */ } = userData;
@@ -208,22 +220,14 @@ export const dataSlice = createSlice({
             name: agentData.name,
             userId: userId,
           };
-          /*  state.currentUserPromos = promos;
-          state.currentUserVisits = visits; */
         } else if (role === "admin" && "adminData" in userData) {
           // Handle admin data
-          const { adminData /*  globalVisits, globalPromos  */ } = userData;
+          const { adminData } = userData;
 
           // Populate the clients in the state
           adminData.clients.forEach((client: Client) => {
             state.clients[client.id] = client;
           });
-
-          /* if (agentData) {
-            agentData.forEach((agent: Agent) => {
-              state.agents[agent.id] = agent;
-            });
-          } */
 
           // Populate the agents in the state
           adminData.agents.forEach((agent: Agent) => {
@@ -238,8 +242,6 @@ export const dataSlice = createSlice({
             name: adminData.name,
             userId: userId,
           };
-          /* state.currentUserPromos = globalPromos;
-          state.currentUserVisits = globalVisits; */
         } else {
           // Handle unexpected data structure
           console.error(
