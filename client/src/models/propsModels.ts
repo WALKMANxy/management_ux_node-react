@@ -76,6 +76,7 @@ export type ClientProp = {
     agentName?: string;
     movements: Movement[];
     colour?: string;
+    agentData?: Agent[];
   };
   isLoading: boolean;
 };

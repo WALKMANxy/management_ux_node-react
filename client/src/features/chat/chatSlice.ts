@@ -196,20 +196,49 @@ const chatSlice = createSlice({
       };
     },
 
-    addChatReducer: (state, action: PayloadAction<IChat>) => {
-      const chat = action.payload;
+    addChatReducer: (
+      state,
+      action: PayloadAction<{
+        chat: IChat;
+        fromServer?: boolean; // Flag to distinguish server-originated actions
+      }>
+    ) => {
+      const { chat, fromServer } = action.payload;
 
-      // Return a new state object with the added chat, ensuring immutability
-      return {
-        ...state,
-        chats: {
-          ...state.chats,
-          [chat._id]: chat, // Add the new chat using its _id as the key
-        },
-        status: "succeeded", // Update status to reflect successful addition
-      };
+      // Check if the chat already exists in the state
+      const existingChat = state.chats[chat.local_id];
+
+      if (existingChat && fromServer) {
+        // If chat exists and is from the server, update the chat with server-confirmed data
+        return {
+          ...state,
+          chats: {
+            ...state.chats,
+            [chat._id]: {
+              ...existingChat,
+              ...chat, // Merge the existing chat with the server-confirmed data
+              local_id: chat.local_id, // Keep the local_id consistent
+              _id: chat._id, // Ensure the server ID is updated
+              status: chat.status, // Mark the status as succeeded
+            },
+          },
+        };
+      } else if (existingChat && !fromServer) {
+        // If the chat is from the client and already exists (e.g., was added optimistically), do nothing
+        return state;
+      } else {
+        // If the chat is new or doesn't exist in the state
+        return {
+          ...state,
+          chats: {
+            ...state.chats,
+            [chat.local_id]: chat, // Add the new chat with its local_id
+          },
+        };
+      }
     },
   },
+
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllChatsThunk.pending, (state) => {

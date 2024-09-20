@@ -2,8 +2,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Promo, Visit } from "../../models/dataModels";
 import { DataSliceState } from "../../models/stateModels";
-import { promoVisitApi } from "./promosVisitsQueries";
 import { dataApi } from "./dataQueries";
+import { promoVisitApi } from "./promosVisitsQueries";
 
 export const fetchInitialData = createAsyncThunk(
   "data/fetchInitialData",
@@ -14,7 +14,6 @@ export const fetchInitialData = createAsyncThunk(
     const { role, id, userId } = state.auth;
 
     let userData;
-    /* let agentData = null; */
     if (role === "client") {
       userData = await dispatch(
         dataApi.endpoints.getUserClientData.initiate({ entityCode: id, userId })
@@ -24,18 +23,13 @@ export const fetchInitialData = createAsyncThunk(
         dataApi.endpoints.getUserAgentData.initiate({ entityCode: id, userId })
       ).unwrap();
     } else if (role === "admin") {
-      // Fetch clients, agents, and agent details using the CRA API endpoints
-
-      /* agentData = await dispatch(
-        superApi.endpoints.getAgentDetails.initiate()
-      ).unwrap(); */
       userData = await dispatch(
         dataApi.endpoints.getUserAdminData.initiate({ entityCode: id, userId })
       ).unwrap();
     } else {
       throw new Error("Invalid user role");
     }
-    return { role, userData, userId /* agentData */ };
+    return { role, userData, userId  };
   }
 );
 // Thunk to update visits

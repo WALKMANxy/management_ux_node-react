@@ -17,7 +17,11 @@ import { useSelector } from "react-redux";
 import { selectUserRole } from "../../features/auth/authSlice"; // Assuming the selector is defined in the auth slice
 import useChatLogic from "../../hooks/useChatsLogic";
 
-const InputBox: React.FC = () => {
+interface InputBoxProps {
+  chatStatus: string | undefined; // Add chatStatus prop
+}
+
+const InputBox: React.FC<InputBoxProps> = ({ chatStatus }) => {
   const [messageInput, setMessageInput] = useState("");
   const [messageType, setMessageType] = useState<
     "message" | "alert" | "promo" | "visit"
@@ -56,7 +60,7 @@ const InputBox: React.FC = () => {
         display: "flex",
         alignItems: "center",
         p: 1,
-        borderRadius: isMobile  ? "0px" : "1.5em", // Rounded corners for the paper
+        borderRadius: isMobile ? "0px" : "1.5em", // Rounded corners for the paper
         mt: 0,
       }}
     >
@@ -90,11 +94,11 @@ const InputBox: React.FC = () => {
           },
           "& .MuiInputBase-input": {
             height: "1.25em",
-            // Add appearance styles properly within the input selector
-            WebkitAppearance: "none", // Safari and Chrome
-            MozAppearance: "none", // Firefox
+            WebkitAppearance: "none",
+            MozAppearance: "none",
           },
         }}
+        disabled={chatStatus === "pending"} // Disable input if chat is pending
       />
       <Divider
         sx={{ height: "1em", marginLeft: 1, marginRight: 1 }}

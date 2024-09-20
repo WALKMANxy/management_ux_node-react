@@ -1,59 +1,133 @@
-import {
-  Box,
-  Button,
-  List,
-  ListItem,
-  ListItemText,
-  Skeleton,
-  Typography,
-} from "@mui/material";
+// src/components/dashboard/ActivePromotions.tsx
+
+import LoyaltyIcon from "@mui/icons-material/Loyalty";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import Timeline from "@mui/lab/Timeline";
+import TimelineConnector from "@mui/lab/TimelineConnector";
+import TimelineContent from "@mui/lab/TimelineContent";
+import TimelineDot from "@mui/lab/TimelineDot";
+import TimelineItem from "@mui/lab/TimelineItem";
+import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
+import TimelineSeparator from "@mui/lab/TimelineSeparator";
+import { Box, IconButton, Skeleton, Typography } from "@mui/material";
+import dayjs from "dayjs";
 import React from "react";
-import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../app/hooks";
 import { selectPromos } from "../../features/data/dataSelectors";
-import { ActivePromotionsProps } from "../../models/propsModels";
+import { Promo } from "../../models/dataModels";
+
+interface ActivePromotionsProps {
+  isLoading: boolean;
+}
 
 const ActivePromotions: React.FC<ActivePromotionsProps> = ({ isLoading }) => {
-  const { t } = useTranslation();
-  const promos = useSelector(selectPromos);
+  const promos = useAppSelector(selectPromos);
+  const navigate = useNavigate();
 
-  // Debugging output
-  //console.log("Promos: ", promos);
+  // Function to format the end date
+  const formatEndDate = (date: Date | string) => {
+    return dayjs(date).format("DD/MM/YYYY HH:mm");
+  };
+
+  // Filter active promotions (non-expired)
+  const activePromos = promos.filter((promo: Promo) =>
+    dayjs(promo.endDate).isAfter(dayjs())
+  );
+
+  // Render Skeleton for Timeline
+  const renderSkeleton = () => (
+    <Timeline position="alternate">
+      {[...Array(3)].map((_, index) => (
+        <TimelineItem key={index}>
+          <TimelineOppositeContent>
+            <Skeleton variant="text" width={80} />
+          </TimelineOppositeContent>
+          <TimelineSeparator>
+            <TimelineConnector />
+            <TimelineDot>
+              <LoyaltyIcon />
+            </TimelineDot>
+            <TimelineConnector />
+          </TimelineSeparator>
+          <TimelineContent>
+            <Skeleton variant="text" width="60%" />
+            <Skeleton variant="text" width="40%" />
+          </TimelineContent>
+        </TimelineItem>
+      ))}
+    </Timeline>
+  );
+
+  // Render Actual Promotions
+  const renderPromotions = () => (
+    <Timeline position="alternate">
+      {activePromos.length === 0 ? (
+        <Typography variant="body1" color="text.secondary">
+          No active promotions.
+        </Typography>
+      ) : (
+        activePromos.map((promo: Promo) => (
+          <TimelineItem key={promo._id || promo.name}>
+            <TimelineOppositeContent
+              sx={{ m: "auto 0" }}
+              align="right"
+              variant="body2"
+              color="text.secondary"
+            >
+              Ends at {formatEndDate(promo.endDate)}
+            </TimelineOppositeContent>
+            <TimelineSeparator>
+              <TimelineConnector />
+              <TimelineDot color="primary">
+                <LoyaltyIcon />
+              </TimelineDot>
+              <TimelineConnector />
+            </TimelineSeparator>
+            <TimelineContent sx={{ py: "12px", px: 2 }}>
+              <Typography variant="h6" component="span">
+                {promo.promoType}
+              </Typography>
+              <Typography>{promo.discount}</Typography>
+            </TimelineContent>
+          </TimelineItem>
+        ))
+      )}
+    </Timeline>
+  );
 
   return (
-    <Box>
+    <Box
+      sx={{
+        pt: 4,
+        bgcolor: "background.paper",
+        p: 2,
+        borderRadius: "12px",
+        position: "relative",
+        minWidth: "100%",
+      }}
+    >
       <Typography variant="h5" gutterBottom>
-        {t("promotions.activePromotions")}
+        Active Promotions
       </Typography>
-      <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
-        {isLoading ? (
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height={200}
-            sx={{ borderRadius: "12px" }}
-          />
-        ) : promos.length > 0 ? (
-          <List>
-            {promos.map((promo) => (
-              <ListItem key={promo._id}>
-                <ListItemText primary={promo.name} />
-              </ListItem>
-            ))}
-          </List>
-        ) : (
-          <Typography variant="body1">
-            {t("promotions.noActivePromotions")}
-          </Typography>
-        )}
-      </Box>
-      <Button
-        variant="contained"
-        color="primary"
-        sx={{ mt: 3, borderRadius: "8px" }}
+      {isLoading ? renderSkeleton() : renderPromotions()}
+
+      <IconButton
+        onClick={() => navigate("/promos")}
+        sx={{
+          position: "absolute",
+          bottom: 16,
+          right: 16,
+          borderRadius: 2,
+          backgroundColor: "darkseagreen",
+          color: "#fff",
+          "&:hover": {
+            backgroundColor: "#c8e6c9",
+          },
+        }}
       >
-        {t("promotions.viewMore")}
-      </Button>
+        <MonetizationOnIcon />
+      </IconButton>
     </Box>
   );
 };

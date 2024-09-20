@@ -18,7 +18,7 @@ export const userApi = createApi({
       queryFn: async (ids) => {
         try {
           // Fetch users by a batch of IDs
-          const users = await apiCall<Partial<User>[]>(`users/batch`, "GET", { ids });
+          const users = await apiCall<Partial<User>[]>(`users/batch`, "POST", { ids });
           return { data: users };
         } catch (error) {
           handleApiError(error, "fetchUsersByIds");

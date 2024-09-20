@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useAppSelector } from "../../app/hooks";
 import GlobalSearch from "../../components/Header/GlobalSearch";
 import ActivePromotions from "../../components/dashboard/ActivePromotions";
 import AgentActivityOverview from "../../components/dashboard/AgentActivityOverview";
@@ -26,6 +27,7 @@ import DrawerContainer from "../../components/dashboard/tabletCalendarContainer"
 import MonthOverMonthSpendingTrend from "../../components/statistics/charts/MonthOverMonthSpendingTrend";
 import SalesDistribution from "../../components/statistics/charts/SalesDistribution";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
+import { selectCurrentUser } from "../../features/users/userSlice";
 import useSelectionState from "../../hooks/useSelectionState";
 import useStats from "../../hooks/useStats";
 import { brandColors } from "../../utils/constants";
@@ -33,8 +35,6 @@ import {
   calculateMonthlyData,
   calculateTopBrandsData,
 } from "../../utils/dataUtils";
-import { useAppSelector } from "../../app/hooks";
-import { selectCurrentUser } from "../../features/users/userSlice";
 
 const AdminDashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -78,7 +78,7 @@ const AdminDashboard: React.FC = () => {
 
   const [fakeLoading, setFakeLoading] = useState(true);
 
-  const user = useAppSelector(selectCurrentUser)
+  const user = useAppSelector(selectCurrentUser);
 
   useEffect(() => {
     if (selectedClient) {
@@ -137,7 +137,9 @@ const AdminDashboard: React.FC = () => {
         />
       ) : (
         <Typography variant="h4" gutterBottom>
-          {t("adminDashboard.welcomeBack", { name: user?.entityName || "Admin" })}
+          {t("adminDashboard.welcomeBack", {
+            name: user?.entityName || "Admin",
+          })}
         </Typography>
       )}
       {loadingState ? (
@@ -348,7 +350,6 @@ const AdminDashboard: React.FC = () => {
                     }
                     userRole="admin"
                     isAgentSelected={false}
-
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -373,7 +374,6 @@ const AdminDashboard: React.FC = () => {
                 onClick={() => clearSelection()}
               >
                 <CloseIcon fontSize="small" />{" "}
-                {/* Optional: Adjust icon size */}
               </Fab>
             </Box>
           ) : (
@@ -470,7 +470,6 @@ const AdminDashboard: React.FC = () => {
                       revenueData={revenueData}
                       userRole="admin"
                       isAgentSelected={true}
-
                     />
                   )}
                 </Grid>
@@ -490,7 +489,7 @@ const AdminDashboard: React.FC = () => {
                       isMobile={isMobile}
                       brandColors={brandColors}
                       isAgentSelected={true}
-                      />
+                    />
                   )}
                 </Grid>
                 <Grid item xs={12}>
@@ -547,7 +546,7 @@ const AdminDashboard: React.FC = () => {
                   aria-label="skeleton"
                 />
               ) : (
-                <Box sx={{ maxWidth: "400px", margin: "0 auto" }}>
+                <Box sx={{ margin: "0 auto" }}>
                   <CalendarComponent />
                 </Box>
               )}

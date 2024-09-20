@@ -1,5 +1,6 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import {
+  addChatReducer,
   addMessageReducer,
   updateReadStatusReducer,
 } from "../features/chat/chatSlice";
@@ -13,10 +14,14 @@ const listenerMiddleware = createListenerMiddleware();
 // Queues to batch updates
 let readStatusQueue: Array<{ chatId: string; messageIds: string[] }> = [];
 let messageQueue: Array<{ chatId: string; messageData: IMessage }> = [];
+let chatQueue: Array<IChat> = [];
+
 
 // Timers for debouncing
 let readStatusTimer: NodeJS.Timeout | null = null;
 let messageTimer: NodeJS.Timeout | null = null;
+let chatTimer: NodeJS.Timeout | null = null;
+
 
 // Debounce time in milliseconds
 const DEBOUNCE_TIME = 100;
@@ -42,6 +47,16 @@ const processMessageQueue = () => {
     });
 
     messageQueue = [];
+  }
+};
+
+const processChatQueue = () => {
+  if (chatQueue.length > 0) {
+    chatQueue.forEach((chatData) => {
+      webSocketService.emitNewChat(chatData);
+    });
+
+    chatQueue = [];
   }
 };
 
@@ -72,6 +87,21 @@ listenerMiddleware.startListening({
     messageTimer = setTimeout(processMessageQueue, DEBOUNCE_TIME);
   },
 });
+
+// Listener for addChatReducer
+listenerMiddleware.startListening({
+  actionCreator: addChatReducer,
+  effect: async (action) => {
+    const { chat, fromServer } = action.payload;
+    if (fromServer) return; // Skip WebSocket emission if action is from the server
+
+    chatQueue.push(chat);
+
+    if (chatTimer) clearTimeout(chatTimer);
+    chatTimer = setTimeout(processChatQueue, DEBOUNCE_TIME);
+  },
+});
+
 
 // Listener for fetchAllChats to fetch users data
 listenerMiddleware.startListening({
