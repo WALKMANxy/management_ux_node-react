@@ -14,7 +14,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { ColDef } from "ag-grid-community";
+import { ColDef, SelectionOptions } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
@@ -40,6 +40,13 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
   const [selectAllDialogOpen, setSelectAllDialogOpen] = useState(false);
   const [deselectAllDialogOpen, setDeselectAllDialogOpen] = useState(false);
 
+  const selection: SelectionOptions = {
+    mode: "multiRow",
+    headerCheckbox: true,
+    enableClickSelection: false,
+    selectAll: "filtered",
+  };
+
   // Define column definitions
   const columnDefs: ColDef[] = useMemo(() => {
     const baseColumns: ColDef[] = [
@@ -49,9 +56,6 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
         sortable: true,
         filter: "agTextColumnFilter",
         floatingFilter: true,
-        checkboxSelection: true, // Adds checkbox for row selection
-        headerCheckboxSelection: true, // Adds checkbox in header for select all
-        headerCheckboxSelectionFilteredOnly: true, // Select only filtered rows
       },
       {
         headerName: t("clientsPage.name"),
@@ -71,7 +75,7 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
         sortable: true,
         filter: "agTextColumnFilter",
       },
-     /*  {
+      /*  {
         headerName: t("clientsPage.totalOrders"),
         field: "totalOrders",
         sortable: true,
@@ -180,17 +184,14 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
 
       {/* AG Grid Table */}
       <div className="ag-theme-quartz" style={{ height: 600, width: "100%" }}>
-
         <AgGridReact
           ref={gridRef}
           rowData={rowData}
           columnDefs={columnDefs}
-          rowSelection="multiple"
           onSelectionChanged={onSelectionChanged}
-          suppressRowClickSelection={true} // Selection via checkboxes only
           pagination={true}
           paginationPageSize={100}
-
+          selection={selection}
           enableCellTextSelection={true}
           overlayNoRowsTemplate="<span style='padding: 10px; border: 1px solid #444; background: lightgoldenrodyellow;'>No clients to display</span>"
           defaultColDef={{

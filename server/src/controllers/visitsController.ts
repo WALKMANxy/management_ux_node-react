@@ -28,7 +28,7 @@ export class VisitController {
       };
 
       const visit = await VisitService.createVisit(visitData);
-      res.status(201).json({ message: "Visit created successfully", visit });
+      res.status(201).json(visit);
     } catch (err) {
       if (err instanceof Error) {
         res.status(500).json({ message: err.message });
@@ -37,8 +37,6 @@ export class VisitController {
       }
     }
   }
-
-
 
   static async replaceVisit(
     req: AuthenticatedRequest,
@@ -50,7 +48,7 @@ export class VisitController {
         res.status(200).json({ message: "Visit not found" });
         return;
       }
-      res.status(200).json({ message: "Visit updated successfully", visit });
+      res.status(200).json(visit);
     } catch (err) {
       if (err instanceof Error) {
         res.status(500).json({ message: err.message });
@@ -70,7 +68,7 @@ export class VisitController {
         res.status(200).json({ message: "Visit not found" });
         return;
       }
-      res.status(200).json({ message: "Visit updated successfully", visit });
+      res.status(200).json(visit);
     } catch (err) {
       if (err instanceof Error) {
         res.status(500).json({ message: err.message });
