@@ -2,7 +2,7 @@ import { Document, Schema, model } from "mongoose";
 
 export interface IPromo extends Document {
   clientsId: string[]; // Array of client IDs this promo applies to
-  type: string;
+  promoType: string;
   name: string;
   discount: string;
   createdAt: Date;
@@ -13,7 +13,7 @@ export interface IPromo extends Document {
 
 const promoSchema = new Schema<IPromo>({
   clientsId: { type: [String], required: true }, // Reference to client collection
-  type: { type: String, required: true },
+  promoType: { type: String, required: true },
   name: { type: String, required: true },
   discount: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },

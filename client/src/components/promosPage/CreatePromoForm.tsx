@@ -48,14 +48,6 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
     "success"
   );
 
-  const handlePromoTypeChange = (event: SelectChangeEvent<string>) => {
-    setPromoType(event.target.value);
-    // Clear discount if promo type does not require it
-    if (event.target.value !== "Sale") {
-      setDiscount("");
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -75,10 +67,10 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
     }
 
     // Prepare promo data
-    const promoData: Omit<Promo, "_id"> = {
+    const promoData: Promo = {
       name,
       promoType,
-      discount: promoType === "Sale" ? discount : "", // Only set discount if promoType is "Sale"
+      discount, // Only set discount if promoType is "Sale"
       clientsId: selectedClients,
       createdAt: new Date(),
       startDate: dayjs(startDate).set("hour", 8).set("minute", 0).toDate(), // Convert Dayjs to Date
@@ -151,7 +143,7 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
                 id="promo-type"
                 value={promoType}
                 label="Promo Type *"
-                onChange={handlePromoTypeChange}
+                onChange={(e) => setPromoType(e.target.value)}
                 sx={{
                   borderRadius: 2,
                 }}
@@ -178,26 +170,6 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
               }}
             />
           </Grid>
-
-          {/* Discount - Conditionally Rendered */}
-          {promoType === "Sale" && (
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Discount (%)"
-                name="discount"
-                value={discount}
-                onChange={(e) => setDiscount(e.target.value)}
-                fullWidth
-                required
-                variant="outlined"
-                type="number"
-                InputProps={{ inputProps: { min: 0, max: 100 } }}
-                sx={{
-                  borderRadius: 2,
-                }}
-              />
-            </Grid>
-          )}
 
           {/* Start Date */}
           <Grid item xs={12} sm={6}>
@@ -240,6 +212,27 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
             />
           </Grid>
 
+          {/* Discount - Conditionally Rendered */}
+          {promoType === "Sale" && (
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="Discount Description"
+                name="discount"
+                value={discount}
+                onChange={(e) => setDiscount(e.target.value)}
+                fullWidth
+                required
+                variant="outlined"
+                multiline
+                rows={3}
+                sx={{
+                  borderRadius: 2,
+                }}
+                helperText='e.g., "Every 100 euros spent, you get a 10 euros coupon"'
+              />
+            </Grid>
+          )}
+
           {/* Eligible Clients Selection */}
           <Grid item xs={12}>
             <FormControl fullWidth>
@@ -281,7 +274,7 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
           </Grid>
 
           {/* Eligible Clients Grid */}
-          <Grid item xs={12} >
+          <Grid item xs={12}>
             <EligibleClientsGrid
               selectedClients={selectedClients}
               setSelectedClients={setSelectedClients}

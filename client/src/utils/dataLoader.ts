@@ -204,20 +204,25 @@ export const mapPromosToEntity = (
         promo.clientsId.includes((entity as Client).id)
       );
 
-    case "agent":
-      // For agent, return promos for all the agent's clients
-      return (entity as Agent).clients.flatMap((client) =>
-        promos.filter((promo) => promo.clientsId.includes(client.id))
+    case "agent": {
+      // For agent, return unique promos for all the agent's clients
+      const agentClientIds = (entity as Agent).clients.map((client) => client.id);
+      const uniquePromos = promos.filter((promo) =>
+        promo.clientsId.some((clientId) => agentClientIds.includes(clientId))
       );
+      return uniquePromos;
+    }
 
     case "admin": {
-      // For admin, group promos by agent ID
+      // For admin, group promos by agent ID without duplicating promos
       const globalPromos: GlobalPromos = {};
       (entity as Admin).agents.forEach((agent) => {
+        const agentClientIds = agent.clients.map((client) => client.id);
+        const agentPromos = promos.filter((promo) =>
+          promo.clientsId.some((clientId) => agentClientIds.includes(clientId))
+        );
         globalPromos[agent.id] = {
-          Promos: agent.clients.flatMap((client) =>
-            promos.filter((promo) => promo.clientsId.includes(client.id))
-          ),
+          Promos: agentPromos,
         };
       });
       return globalPromos;
