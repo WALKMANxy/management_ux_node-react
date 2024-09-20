@@ -14,7 +14,7 @@ const router = express.Router();
 router.use(authenticateUser);
 
 // GET method to retrieve all users (Admin only)
-router.get("/", checkAdminRole, UserController.getAllUsers);
+router.get("/", checkAgentOrAdminOrClientRole, UserController.getAllUsers);
 
 // GET method to retrieve a user by ID
 router.get("/:id", checkAgentOrAdminOrClientRole, UserController.getUserById);

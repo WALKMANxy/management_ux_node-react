@@ -99,6 +99,8 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
           sx={{
             mt: 3,
             borderRadius: 2,
+            position: "relative",
+
             backgroundColor: "gray",
             color: "#fff",
             "&:hover": {

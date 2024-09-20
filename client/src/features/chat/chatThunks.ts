@@ -105,7 +105,6 @@ export const fetchMessagesFromMultipleChatsThunk = createAsyncThunk(
   }
 );
 
-// Async thunk to create a new chat
 // Refactored async thunk to create a new chat
 export const createChatThunk = createAsyncThunk(
   "chats/createChatThunk",

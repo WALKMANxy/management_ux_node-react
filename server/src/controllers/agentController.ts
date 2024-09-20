@@ -40,23 +40,36 @@ export const fetchAgentByClientEntityCode = (
 ) => {
   try {
     if (!req.user || !req.user.entityCode) {
+      console.error(
+        "Unauthorized access: User information is missing or incomplete."
+      );
       return res.status(401).json({
         message: "Unauthorized: User information is missing or incomplete.",
       });
     }
-
     const clientEntityCode = req.user.entityCode;
+    console.log(
+      "fetchAgentByClientEntityCode called with entityCode:",
+      clientEntityCode
+    ); // Debugging
+
     const agent = getAgentByClientEntityCode(clientEntityCode);
 
     if (!agent) {
+      console.warn(
+        "Agent not found for the given client entity code:",
+        clientEntityCode
+      ); // Debugging
       return res
         .status(404)
         .json({ message: "Agent not found for the given client" });
     }
 
+    console.log("Agent found:", agent); // Debugging
     res.json(agent);
     return;
   } catch (error) {
+    console.error("Error in fetchAgentByClientEntityCode:", error); // Debugging
     res.status(500).json({ message: "Internal Server Error" });
     return;
   }

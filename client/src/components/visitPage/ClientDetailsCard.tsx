@@ -140,43 +140,45 @@ const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({
         </CardContent>
 
         {/* Action Buttons */}
-        <Box sx={{ p: 2 }}>
-          <Stack
-            direction={{ xs: "row", sm: "row" }}
-            spacing={2}
-            justifyContent="flex-end"
-          >
-            <Tooltip title="Create a new visit">
-              <IconButton
-                onClick={onCreateVisit}
-                sx={{
-                  backgroundColor: "green",
-                  color: "white",
-                  "&:hover": { backgroundColor: "darkgreen" },
-                  width: { xs: "auto", sm: "auto" }, // Full width on small screens
-                }}
-                aria-label="Create Visit"
-              >
-                <AirplaneTicketIcon />
-              </IconButton>
-            </Tooltip>
+        {userRole !== "client" && (
+          <Box sx={{ p: 2 }}>
+            <Stack
+              direction={{ xs: "row", sm: "row" }}
+              spacing={2}
+              justifyContent="flex-end"
+            >
+              <Tooltip title="Create a new visit">
+                <IconButton
+                  onClick={onCreateVisit}
+                  sx={{
+                    backgroundColor: "green",
+                    color: "white",
+                    "&:hover": { backgroundColor: "darkgreen" },
+                    width: { xs: "auto", sm: "auto" },
+                  }}
+                  aria-label="Create Visit"
+                >
+                  <AirplaneTicketIcon />
+                </IconButton>
+              </Tooltip>
 
-            <Tooltip title="Deselect current client">
-              <IconButton
-                onClick={() => setOpenConfirm(true)} // Open confirmation dialog
-                sx={{
-                  backgroundColor: "red",
-                  color: "white",
-                  "&:hover": { backgroundColor: "darkred" },
-                  width: { xs: "auto", sm: "auto" }, // Full width on small screens
-                }}
-                aria-label="Deselect Client"
-              >
-                <CloseIcon />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-        </Box>
+              <Tooltip title="Deselect current client">
+                <IconButton
+                  onClick={() => setOpenConfirm(true)} // Open confirmation dialog
+                  sx={{
+                    backgroundColor: "red",
+                    color: "white",
+                    "&:hover": { backgroundColor: "darkred" },
+                    width: { xs: "auto", sm: "auto" },
+                  }}
+                  aria-label="Deselect Client"
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Tooltip>
+            </Stack>
+          </Box>
+        )}
 
         {/* Confirmation Dialog */}
         <Dialog

@@ -52,6 +52,8 @@ const ChatView: React.FC = () => {
     dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
   };
 
+  const currentChatStatus = currentChat?.status;
+
   /*   console.log("ChatView rendering now");
    */
   // Fallback if currentChat is not set
@@ -194,7 +196,7 @@ const ChatView: React.FC = () => {
           zIndex: 10,
         }}
       >
-        <InputBox />
+        <InputBox chatStatus={currentChatStatus}/>
       </Box>
     </Box>
   );

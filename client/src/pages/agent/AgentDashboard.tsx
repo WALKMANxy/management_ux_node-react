@@ -3,7 +3,6 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import {
   Box,
-  Button,
   Divider,
   Fab,
   Grid,
@@ -116,6 +115,22 @@ const AgentDashboard: React.FC = () => {
           aria-label="skeleton"
         />
       )}
+      {/* FAB Button for Calendar - Positioned Top Right */}
+      {isTablet && (
+        <Fab
+          color="primary"
+          aria-label="calendar"
+          onClick={handleToggleDrawer}
+          sx={{
+            position: "absolute",
+            top: 220, // Adjust as needed based on layout
+            right: 32, // Adjust as needed based on layout
+            zIndex: 1000,
+          }}
+        >
+          <CalendarMonthIcon />
+        </Fab>
+      )}
       <Grid container spacing={6} mt={2}>
         <Grid item xs={!isTablet ? 12 : 0} md={!isTablet ? 9 : 0}>
           {selectedClient ? (
@@ -133,18 +148,6 @@ const AgentDashboard: React.FC = () => {
                     name: selectedClient.name,
                   })}
                 </Typography>
-                {isTablet && (
-                  <Fab
-                    color="primary"
-                    aria-label="calendar"
-                    onClick={handleToggleDrawer}
-                    sx={{
-                      zIndex: 1000,
-                    }}
-                  >
-                    <CalendarMonthIcon />
-                  </Fab>
-                )}
               </Box>
 
               <Grid container spacing={2}>
@@ -205,20 +208,14 @@ const AgentDashboard: React.FC = () => {
                   />
                 </Grid>
               </Grid>
-              <Button
-                variant="contained"
-                color="primary"
-                sx={{ mt: 3, borderRadius: "8px" }}
-              >
-                {t("agentDashboard.viewMore")}
-              </Button>
+
               <Fab
                 color="secondary"
                 aria-label="close"
                 sx={{
                   position: "fixed",
                   bottom: isMobile ? 20 : 16,
-                  right: isMobile ? 120 : 16,
+                  right: isMobile ? 20 : 16,
                   zIndex: 1300,
                 }}
                 onClick={() => clearSelection()}
@@ -382,7 +379,7 @@ const AgentDashboard: React.FC = () => {
                   aria-label="skeleton"
                 />
               ) : (
-                <Box sx={{ maxWidth: "400px", margin: "0 auto" }}>
+                <Box sx={{ margin: "0 auto" }}>
                   <CalendarComponent />
                 </Box>
               )}

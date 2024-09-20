@@ -24,7 +24,11 @@ import {
   selectVisits,
   VisitWithAgent,
 } from "../../features/data/dataSelectors";
-import { selectAgent, selectClient, selectVisit } from "../../features/data/dataSlice";
+import {
+  selectAgent,
+  selectClient,
+  selectVisit,
+} from "../../features/data/dataSlice";
 import { ServerDayProps } from "../../models/propsModels";
 import { agentColorMap } from "../../utils/constants";
 import ServerDay from "./ServerDay";
@@ -39,7 +43,6 @@ const CalendarComponent: React.FC = () => {
   const navigate = useNavigate();
 
   const userRole = currentUserDetails?.role; // Extract userRole
-
 
   const [isLoading, setIsLoading] = useState(false);
   const [highlightedDays, setHighlightedDays] = useState<
@@ -172,12 +175,15 @@ const CalendarComponent: React.FC = () => {
     <Paper
       elevation={3}
       sx={{
-        p: 3,
+        p: 2,
         borderRadius: "12px",
         position: "relative",
         overflow: "hidden",
         background: "white",
-        height: "100%",
+        flexGrow: 1, // Allow the component to grow and shrink based on available space
+        display: "flex",
+        flexDirection: "column",
+        minHeight: 0, // Allow the component to shrink without constraints
         "&::before": {
           content: '""',
           position: "absolute",
@@ -211,8 +217,10 @@ const CalendarComponent: React.FC = () => {
               highlightedDays,
             } as ServerDayProps,
           }}
-          fixedWeekNumber={6}
-          displayWeekNumber
+          sx={{
+            flexGrow: 1, // Allow the calendar to grow and shrink based on available space
+            minHeight: 0, // Allow the calendar to shrink without constraints
+          }}
         />
       </LocalizationProvider>
 

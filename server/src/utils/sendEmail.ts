@@ -34,7 +34,7 @@ function handleEmailError(
 }
 
 export const sendVerificationEmail = async (email: string, token: string) => {
-  const verificationUrl = `${config.baseUrl}/auth/verify-email?token=${token}`;
+  const verificationUrl = `${config.baseUrl}/auth/verify-email?token=${token}&bypass-tunnel-reminder=true`;
   logger.debug("Preparing to send verification email", {
     email,
     verificationUrl,

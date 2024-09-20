@@ -6,6 +6,7 @@ export const getAgentById = async (id: string): Promise<Agent> => {
 };
 
 // New function to get an agent by client entity code
+// New function to get an agent by client entity code
 export const getAgentByClientEntityCode = async (): Promise<Agent> => {
-  return apiCall<Agent>(`agents/by-client`, "GET");
+  return apiCall<Agent>(`agents/by-client-entity-code`, "GET");
 };

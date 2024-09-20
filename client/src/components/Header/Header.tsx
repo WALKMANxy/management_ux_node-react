@@ -37,6 +37,7 @@ import { clearSelection } from "../../features/data/dataSlice";
 import GlobalSearch from "./GlobalSearch";
 import NotificationBell from "./NotificationBell";
 import UserAvatar from "./UserAvatar";
+import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 
 const Header: React.FC = () => {
   const theme = useTheme();
@@ -62,6 +63,19 @@ const Header: React.FC = () => {
       location.pathname !== "/visits"
     ) {
       dispatch(clearSelection());
+    }
+
+    // Update the previous location to the current one
+    prevLocationRef.current = location.pathname;
+  });
+
+  useEffect(() => {
+    // Check if navigating away from /visits
+    if (
+      prevLocationRef.current === "/messages" &&
+      location.pathname !== "/messages"
+    ) {
+      dispatch(clearCurrentChatReducer());
     }
 
     // Update the previous location to the current one

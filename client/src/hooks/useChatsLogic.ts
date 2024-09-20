@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { selectUserId, selectUserRole } from "../features/auth/authSlice";
 import {
+  addChatReducer,
   addMessageReducer,
   clearCurrentChatReducer,
   selectAllChats,
@@ -20,7 +21,6 @@ import {
 import { selectClientIds } from "../features/data/dataSlice";
 import { getAllUsersThunk, selectAllUsers } from "../features/users/userSlice";
 import { IChat, IMessage } from "../models/dataModels";
-import { webSocketService } from "../services/webSocketService";
 import { sanitizeSearchTerm } from "../utils/chatUtils";
 import { generateId } from "../utils/deviceUtils";
 
@@ -41,7 +41,6 @@ const useChatLogic = () => {
   const [page, setPage] = useState(2); // Start from page 2 since page 1 is already loaded
   const currentChatId = currentChat?._id;
   const [contactsFetched, setContactsFetched] = useState(false);
-
 
   const agentClientIds = useSelector(selectClientIds);
 
@@ -210,7 +209,7 @@ const useChatLogic = () => {
       const localId = generateId();
 
       const chatData: IChat = {
-        _id: localId,
+        _id: localId, // Temporary local ID
         local_id: localId,
         type: chatType,
         participants,
@@ -219,19 +218,16 @@ const useChatLogic = () => {
         messages: [],
         createdAt: new Date(),
         updatedAt: new Date(),
-        status: "pending",
+        status: "pending", // Indicate that the chat is pending confirmation
       };
 
       try {
-        // Emit the new chat creation request to the server via WebSocket
-        webSocketService.emitNewChat(chatData);
-        // Alternatively, if using thunks directly:
-        // const createdChat = await dispatch(createChatThunk(chatData)).unwrap();
+        dispatch(addChatReducer({ chat: chatData }));
       } catch (error) {
         console.error("Failed to create chat:", error);
       }
     },
-    []
+    [dispatch]
   );
 
   // Handle selecting a contact to open or create a chat
@@ -249,17 +245,31 @@ const useChatLogic = () => {
         // If chat exists, select it
         selectChat(existingChat);
       } else {
-        // If no chat exists, create a new one
-        handleCreateChat([currentUserId, contactId], "simple");
+        // If no chat exists, create a new one optimistically
+        const localId = generateId();
+
+        const newChat: IChat = {
+          _id: localId, // Temporary local ID
+          local_id: localId,
+          type: "simple",
+          participants: [currentUserId, contactId],
+          messages: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          status: "pending", // Indicate that the chat is pending confirmation
+        };
+
+        // Optimistically add the new chat to the state
+        dispatch(addChatReducer({ chat: newChat }));
+
+        // Immediately select the new optimistic chat
+        selectChat(newChat);
       }
     },
-    [chats, currentUserId, handleCreateChat, selectChat]
+    [chats, currentUserId, dispatch, selectChat]
   );
 
   const filteredContacts = useMemo(() => {
-    // Log the current user ID for reference
-    /*     console.log("Current User ID:", currentUserId);
-     */
     // Filter contacts based on the user role and exclude the current user
     if (userRole === "admin") {
       // Admin sees all users except themselves

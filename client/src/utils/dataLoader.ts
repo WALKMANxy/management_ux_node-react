@@ -15,9 +15,8 @@ const workerScriptPath = new URL("./worker.js", import.meta.url);
 export const mapDataToModels = async (
   data: serverMovement[],
   clientDetails: serverClient[],
- /*  visits: Visit[] = [],
-  promos: Promo[] = [] */
-): Promise<{ clients: Client[];/*  visits: Visit[]; promos: Promo[] */ }> => {
+
+): Promise<{ clients: Client[]; }> => {
   // Determine the number of workers based on hardware concurrency or default to 4
   const numWorkers = Math.min(navigator.hardwareConcurrency || 4, data.length);
   const chunkSize = Math.ceil(data.length / numWorkers);
@@ -86,18 +85,11 @@ export const mapDataToModels = async (
   // Convert the map back to an array
   const clients = Array.from(resultsMap.values());
 
- /*  // Filtering visits, promos, and alerts based on client associations
-  const filteredVisits = visits.filter((visit) =>
-    clients.some((client) => client.id === visit.clientId)
-  );
-  const filteredPromos = promos.filter((promo) =>
-    clients.some((client) => promo.clientsId.includes(client.id))
-  ); */
+
 
   return {
     clients,
-  /*   visits: filteredVisits,
-    promos: filteredPromos, */
+
   };
 };
 
@@ -105,12 +97,10 @@ export const mapDataToModels = async (
 export const mapDataToAgents = async (
   clients: Client[], // Accept clients already mapped with correct movements
   agentDetails: Agent[], // Array of agent details including clients' CODICE
-  /* visits: Visit[] = [],
-  promos: Promo[] = [] */
-): Promise<{ agents: Agent[];/*  visits: Visit[]; promos: Promo[] */ }> => {
+
+): Promise<{ agents: Agent[]; }> => {
   const agentsMap = new Map<string, Agent>();
- /*  const aggregatedVisits: Visit[] = [];
-  const aggregatedPromos: Promo[] = []; */
+
 
   // Populate agents map using agent details
   agentDetails.forEach((agentDetail) => {
@@ -138,16 +128,7 @@ export const mapDataToAgents = async (
       // Add client to the corresponding agent's clients array
       agent.clients.push(client);
 
-      /* // Aggregate client's visits and promos
-      const clientVisits = visits.filter(
-        (visit) => visit.clientId === client.id
-      );
-      const clientPromos = promos.filter((promo) =>
-        promo.clientsId.includes(client.id)
-      );
 
-      aggregatedVisits.push(...clientVisits);
-      aggregatedPromos.push(...clientPromos); */
     }
   });
 
@@ -156,38 +137,11 @@ export const mapDataToAgents = async (
 
   return {
     agents,
-   /*  visits: aggregatedVisits,
-    promos: aggregatedPromos, */
+
   };
 };
 
-/* export const mapVisitsPromosToAdmin = (
-  agents: Agent[],
-  visits: Visit[],
-  promos: Promo[]
-): { globalVisits: GlobalVisits; globalPromos: GlobalPromos } => {
-  const globalVisits: GlobalVisits = {};
-  const globalPromos: GlobalPromos = {};
 
-  agents.forEach((agent) => {
-    globalVisits[agent.id] = {
-      Visits: visits.filter((visit) =>
-        agent.clients.some((client) => client.id === visit.clientId)
-      ),
-    };
-
-    globalPromos[agent.id] = {
-      Promos: promos.filter((promo) =>
-        promo.clientsId.some((clientId) =>
-          agent.clients.some((client) => client.id === clientId)
-        )
-      ),
-    };
-  });
-
-  return { globalVisits, globalPromos };
-};
- */
 // Mapping function for movement details
 export const mapDataToMovementDetails = (
   data: serverMovement[]
