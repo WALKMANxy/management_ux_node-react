@@ -82,6 +82,20 @@ const Header: React.FC = () => {
     prevLocationRef.current = location.pathname;
   });
 
+  useEffect(() => {
+    // Check if navigating away from /visits
+    if (
+      prevLocationRef.current === "/promos" &&
+      location.pathname !== "/promos"
+    ) {
+      dispatch(clearSelection());
+    }
+
+    // Update the previous location to the current one
+    prevLocationRef.current = location.pathname;
+  });
+
+
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
     setTimeout(() => {

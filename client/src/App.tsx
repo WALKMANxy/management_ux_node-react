@@ -20,11 +20,12 @@ import ArticlesPage from "./pages/common/ArticlesPage";
 import ChatPage from "./pages/common/ChatPage";
 import ClientsPage from "./pages/common/ClientsPage";
 import MovementsPage from "./pages/common/MovementsPage";
-import LandingPage from "./pages/landing/LandingPage";
-import { refreshSession } from "./services/sessionService";
+import PromosPage from "./pages/common/PromosPage";
 import UserPage from "./pages/common/UserPage";
 import VisitsPage from "./pages/common/VisitsPage";
-
+import LandingPage from "./pages/landing/LandingPage";
+import { refreshSession } from "./services/sessionService";
+import "./components/statistics/grids/AGGridTable.css"; // Import the custom AG Grid CSS
 /* console.log("Vite mode:", import.meta.env.MODE);
  */
 
@@ -131,14 +132,14 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      /* {
+      {
         path: "promos",
         element: (
           <ProtectedRoute>
             <PromosPage />
           </ProtectedRoute>
         ),
-      }, */
+      },
     ],
   },
 ]);
@@ -157,47 +158,31 @@ function App() {
 
   useEffect(() => {
     const initializeApp = async () => {
-      /*       console.debug("Initializing app...");
-       */
       // Check if the auth state is present in the local storage
       const localAuthState = localStorage.getItem("authState");
-      /*       console.debug("Local auth state:", localAuthState);
-       */
+
       // If the auth state is present and the user is logged in
       if (localAuthState) {
         const storedAuthState = JSON.parse(localAuthState);
-        /*         console.debug("Parsed auth state:", storedAuthState);
-         */
+
         // Check if user is logged in and has a valid role (not "guest")
         if (storedAuthState.isLoggedIn && storedAuthState.role !== "guest") {
-          /*           console.debug("User is logged in with role:", storedAuthState.role);
-           */
           // Attempt to refresh the session to validate and extend it on the server side
           const refreshSuccessful = await refreshSession();
-          /*           console.debug("Session refresh result:", refreshSuccessful);
-           */
+
           if (refreshSuccessful) {
             // Fetch current user data based on user ID stored in auth state
             if (storedAuthState.userId) {
-              /* console.debug(
-                "Fetching user data for user ID:",
-                storedAuthState.userId
-              );
- */
               // Fetch the current user and update userSlice
               try {
                 const user = await dispatch(
                   fetchUserById(storedAuthState.userId)
                 ).unwrap();
-                /*                 console.debug("Fetched user data:", user);
-                 */
+
                 dispatch(setCurrentUser(user)); // Update the userSlice with the fetched user
               } catch (error) {
                 console.error("Failed to fetch current user:", error);
               }
-            } else {
-              /*               console.warn("User ID not found in stored auth state.");
-               */
             }
           } else {
             console.warn("Session refresh failed or session expired.");
