@@ -113,6 +113,9 @@ export const dataSlice = createSlice({
       const newPromo = action.payload;
       const role = state.currentUserDetails?.role;
 
+      console.log("addOrUpdatePromo called with:", action.payload); // Debugging
+
+
       if (role === "client" || role === "agent") {
         if (Array.isArray(state.currentUserPromos)) {
           const index = state.currentUserPromos.findIndex(

@@ -1,6 +1,5 @@
 // ChatView.tsx
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
   Avatar,
@@ -196,7 +195,7 @@ const ChatView: React.FC = () => {
           zIndex: 10,
         }}
       >
-        <InputBox chatStatus={currentChatStatus}/>
+        <InputBox chatStatus={currentChatStatus} />
       </Box>
     </Box>
   );
