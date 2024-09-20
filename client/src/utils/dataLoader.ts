@@ -1,5 +1,4 @@
 import {
-  GlobalPromos,
   GlobalVisits,
   MovementDetail,
   Promo,
@@ -14,9 +13,8 @@ const workerScriptPath = new URL("./worker.js", import.meta.url);
 // Mapping data to models including the new data types (Visits, Promos, Alerts)
 export const mapDataToModels = async (
   data: serverMovement[],
-  clientDetails: serverClient[],
-
-): Promise<{ clients: Client[]; }> => {
+  clientDetails: serverClient[]
+): Promise<{ clients: Client[] }> => {
   // Determine the number of workers based on hardware concurrency or default to 4
   const numWorkers = Math.min(navigator.hardwareConcurrency || 4, data.length);
   const chunkSize = Math.ceil(data.length / numWorkers);
@@ -85,22 +83,17 @@ export const mapDataToModels = async (
   // Convert the map back to an array
   const clients = Array.from(resultsMap.values());
 
-
-
   return {
     clients,
-
   };
 };
 
 // Mapping function for full agent data
 export const mapDataToAgents = async (
   clients: Client[], // Accept clients already mapped with correct movements
-  agentDetails: Agent[], // Array of agent details including clients' CODICE
-
-): Promise<{ agents: Agent[]; }> => {
+  agentDetails: Agent[] // Array of agent details including clients' CODICE
+): Promise<{ agents: Agent[] }> => {
   const agentsMap = new Map<string, Agent>();
-
 
   // Populate agents map using agent details
   agentDetails.forEach((agentDetail) => {
@@ -127,8 +120,6 @@ export const mapDataToAgents = async (
 
       // Add client to the corresponding agent's clients array
       agent.clients.push(client);
-
-
     }
   });
 
@@ -137,10 +128,8 @@ export const mapDataToAgents = async (
 
   return {
     agents,
-
   };
 };
-
 
 // Mapping function for movement details
 export const mapDataToMovementDetails = (
@@ -196,37 +185,28 @@ export const mapPromosToEntity = (
   promos: Promo[],
   entity: Client | Agent | Admin,
   role: "client" | "agent" | "admin"
-): Promo[] | GlobalPromos => {
+): Promo[] => {
   switch (role) {
     case "client":
-      // For client, return a flat array of promos
+      // For client, return a flat array of promos specific to the client
       return promos.filter((promo) =>
         promo.clientsId.includes((entity as Client).id)
       );
 
     case "agent": {
       // For agent, return unique promos for all the agent's clients
-      const agentClientIds = (entity as Agent).clients.map((client) => client.id);
+      const agentClientIds = (entity as Agent).clients.map(
+        (client) => client.id
+      );
       const uniquePromos = promos.filter((promo) =>
         promo.clientsId.some((clientId) => agentClientIds.includes(clientId))
       );
       return uniquePromos;
     }
 
-    case "admin": {
-      // For admin, group promos by agent ID without duplicating promos
-      const globalPromos: GlobalPromos = {};
-      (entity as Admin).agents.forEach((agent) => {
-        const agentClientIds = agent.clients.map((client) => client.id);
-        const agentPromos = promos.filter((promo) =>
-          promo.clientsId.some((clientId) => agentClientIds.includes(clientId))
-        );
-        globalPromos[agent.id] = {
-          Promos: agentPromos,
-        };
-      });
-      return globalPromos;
-    }
+    case "admin":
+      // For admin, simply return all promos since the admin has access to everything
+      return promos;
 
     default:
       throw new Error("Invalid user role");

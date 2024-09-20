@@ -44,6 +44,8 @@ export interface GlobalVisits {
 export type Promo = {
   _id?: string;
   clientsId: string[]; // Array of client IDs this promo applies to
+  global?: boolean;
+  excludedClientsId?: string[];
   promoType: string;
   name: string;
   discount: string;
@@ -52,12 +54,6 @@ export type Promo = {
   endDate: Date;
   promoIssuedBy: string;
 };
-
-export interface GlobalPromos {
-  [agentId: string]: {
-    Promos: Promo[];
-  };
-}
 
 export interface IMessage {
   _id: string; // Server-generated unique identifier

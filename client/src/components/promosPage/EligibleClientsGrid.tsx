@@ -20,6 +20,8 @@ import "ag-grid-community/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
 import React, { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useAppSelector } from "../../app/hooks";
+import { selectCurrentUser } from "../../features/users/userSlice";
 import usePromos from "../../hooks/usePromos";
 /* import { currencyFormatter, numberComparator } from "../../utils/dataUtils";
  */
@@ -35,6 +37,8 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
   const { clients } = usePromos();
   const { t } = useTranslation();
   const gridRef = useRef<AgGridReact>(null);
+
+  const userRole = useAppSelector(selectCurrentUser)?.role;
 
   // State for confirmation dialogs
   const [selectAllDialogOpen, setSelectAllDialogOpen] = useState(false);
@@ -98,8 +102,18 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
       },
     ];
 
+    // Conditionally add the 'agent' column if the userRole is 'admin'
+    if (userRole === "admin") {
+      baseColumns.push({
+        headerName: t("clientsPage.agent"),
+        field: "agent",
+        sortable: true,
+        filter: "agTextColumnFilter",
+      });
+    }
+
     return baseColumns;
-  }, [t]);
+  }, [t, userRole]); // Include userRole in dependency array
 
   // Prepare row data
   const rowData = useMemo(() => Object.values(clients), [clients]);
@@ -199,6 +213,10 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
             floatingFilter: true, // Enable floating filters
             suppressHeaderMenuButton: true,
           }}
+          suppressColumnVirtualisation={false}
+          suppressAggFuncInHeader={true}
+          animateRows={true}
+          suppressMovableColumns={true}
         />
       </div>
       {/* Confirmation Dialog for Select All */}

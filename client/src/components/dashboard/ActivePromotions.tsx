@@ -1,5 +1,3 @@
-// src/components/dashboard/ActivePromotions.tsx
-
 import LoyaltyIcon from "@mui/icons-material/Loyalty";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import Timeline from "@mui/lab/Timeline";
@@ -30,10 +28,11 @@ const ActivePromotions: React.FC<ActivePromotionsProps> = ({ isLoading }) => {
     return dayjs(date).format("DD/MM/YYYY HH:mm");
   };
 
-  // Filter active promotions (non-expired)
-  const activePromos = promos.filter((promo: Promo) =>
-    dayjs(promo.endDate).isAfter(dayjs())
-  );
+  // Filter and sort active promotions (non-expired, limited to 5 oldest based on createdAt)
+  const activePromos = promos
+    .filter((promo: Promo) => dayjs(promo.endDate).isAfter(dayjs()))
+    .sort((a, b) => dayjs(a.createdAt).diff(dayjs(b.createdAt))) // Sort from oldest to newest
+    .slice(0, 5); // Limit to 5 promos
 
   // Render Skeleton for Timeline
   const renderSkeleton = () => (
