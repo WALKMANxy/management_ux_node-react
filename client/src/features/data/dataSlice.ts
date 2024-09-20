@@ -169,11 +169,7 @@ export const dataSlice = createSlice({
         state.status = "succeeded";
         const { role, userData, userId } = action.payload;
 
-        console.log("fetchInitialData.fulfilled called with:", {
-          role,
-          userData,
-          userId,
-        }); // Debugging
+
 
         if (role === "client" && "clientData" in userData) {
           const { clientData } = userData;
