@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { loadAdminDetailsData } from "../features/data/api/admins";
 import { updateUserById } from "../features/users/userSlice";
 import { Admin, Agent, Client, User, UserRole } from "../models/entityModels";
+import { showToast } from "../utils/toastMessage";
 
 const useUserDetails = (user: Partial<User>) => {
   const clients = useAppSelector((state) => state.data.clients);
@@ -114,9 +115,18 @@ const useUserDetails = (user: Partial<User>) => {
         .then(() => {
           setAlertMessage("User updated successfully");
           setAlertSeverity("success");
+          showToast.success("User updated successfully.");
         })
-        .catch((error) => {
-          setAlertMessage("Failed to update user. Server error.");
+        .catch((error: unknown) => {
+          if (error instanceof Error) {
+            setAlertMessage("Failed to update user: " + error.message);
+            showToast.error("Failed to update user: " + error.message);
+          } else {
+            setAlertMessage("Failed to update user. Server error.");
+            showToast.error(
+              "Failed to update user: An unknown error occurred."
+            );
+          }
           setAlertSeverity("error");
           console.error("Error updating user:", error);
         })
@@ -126,6 +136,7 @@ const useUserDetails = (user: Partial<User>) => {
     } else {
       setAlertMessage("User ID is undefined");
       setAlertSeverity("error");
+      showToast.error("User ID is undefined.");
       console.error("User ID is undefined");
     }
   };

@@ -1,7 +1,7 @@
 // src/components/promosPage/EligibleClientsGrid.tsx
 
 import { Box, Button, Tooltip, Typography } from "@mui/material";
-import { ColDef, SelectionOptions } from "ag-grid-community";
+import { ColDef, SelectionOptions, SizeColumnsToContentStrategy } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css";
 import { AgGridReact } from "ag-grid-react";
 import React, { useMemo, useRef } from "react";
@@ -41,6 +41,12 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
     enableClickSelection: false,
     selectAll: "filtered",
   };
+
+  const autoSizeStrategy = useMemo<SizeColumnsToContentStrategy>(() => {
+    return {
+      type: "fitCellContents",
+    };
+  }, []);
 
   console.log("re rendering eligible clients grid");
 
@@ -215,7 +221,8 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
           pagination={true}
           paginationPageSize={100}
           enableCellTextSelection={true}
-          rowBuffer={0}
+          rowBuffer={5}
+          autoSizeStrategy={autoSizeStrategy}
           overlayNoRowsTemplate="<span style='padding: 10px; border: 1px solid #444; background: lightgoldenrodyellow;'>No clients to display</span>"
           defaultColDef={{
             flex: 1,

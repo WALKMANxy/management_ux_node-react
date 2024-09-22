@@ -1,7 +1,7 @@
 // src/components/UserPage/ModifyAccount.tsx
 
-import ConstructionIcon from "@mui/icons-material/Construction";
-import Visibility from "@mui/icons-material/Visibility";
+/* import ConstructionIcon from "@mui/icons-material/Construction";
+ */ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import {
@@ -103,107 +103,117 @@ const ModifyAccount: React.FC = () => {
           Modify Email
         </Typography>
         <Divider sx={{ mb: 2 }} />
-        <Grid container spacing={2}>
-          {emailErrors.length > 0 && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleUpdateEmail(
+              emailFields.currentEmail,
+              emailFields.currentPassword,
+              emailFields.newEmail
+            );
+          }}
+        >
+          <Grid container spacing={2}>
+            {emailErrors.length > 0 && (
+              <Grid item xs={12}>
+                {emailErrors.map((error, index) => (
+                  <Alert key={index} severity="error">
+                    {error}
+                  </Alert>
+                ))}
+              </Grid>
+            )}
             <Grid item xs={12}>
-              {emailErrors.map((error, index) => (
-                <Alert key={index} severity="error">
-                  {error}
-                </Alert>
-              ))}
+              <TextField
+                label="Current Email"
+                type="email"
+                variant="outlined"
+                fullWidth
+                value={emailFields.currentEmail}
+                onChange={(e) =>
+                  setEmailFields((prev) => ({
+                    ...prev,
+                    currentEmail: e.target.value,
+                  }))
+                }
+                autoComplete="off"
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderColor: "rgba(0, 0, 0, 0.5)",
+                  },
+                }}
+                aria-label="Current Email"
+              />
             </Grid>
-          )}
-          <Grid item xs={12}>
-            <TextField
-              label="Current Email"
-              variant="outlined"
-              fullWidth
-              value={emailFields.currentEmail}
-              onChange={(e) =>
-                setEmailFields((prev) => ({
-                  ...prev,
-                  currentEmail: e.target.value,
-                }))
-              }
-              autoComplete="off"
-              InputLabelProps={{ shrink: true }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderColor: "rgba(0, 0, 0, 0.5)",
-                },
-              }}
-            />
+            <Grid item xs={12}>
+              <TextField
+                label="Current Password"
+                type={showPassword ? "text" : "password"}
+                variant="outlined"
+                fullWidth
+                value={emailFields.currentPassword}
+                onChange={(e) =>
+                  setEmailFields((prev) => ({
+                    ...prev,
+                    currentPassword: e.target.value,
+                  }))
+                }
+                autoComplete="off"
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderColor: "rgba(0, 0, 0, 0.5)",
+                  },
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={toggleShowPassword}>
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                aria-label="Current Password"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="New Email"
+                type="email"
+                variant="outlined"
+                fullWidth
+                value={emailFields.newEmail}
+                onChange={(e) =>
+                  setEmailFields((prev) => ({
+                    ...prev,
+                    newEmail: e.target.value,
+                  }))
+                }
+                autoComplete="off"
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderColor: "rgba(0, 0, 0, 0.5)",
+                  },
+                }}
+                aria-label="New Email"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={loading}
+                sx={{ mt: 1, borderRadius: "20px", bgcolor: "black" }}
+              >
+                Update Email
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="Current Password"
-              type={showPassword ? "text" : "password"}
-              variant="outlined"
-              fullWidth
-              value={emailFields.currentPassword}
-              onChange={(e) =>
-                setEmailFields((prev) => ({
-                  ...prev,
-                  currentPassword: e.target.value,
-                }))
-              }
-              autoComplete="off"
-              InputLabelProps={{ shrink: true }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderColor: "rgba(0, 0, 0, 0.5)",
-                },
-              }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={toggleShowPassword}>
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="New Email"
-              variant="outlined"
-              fullWidth
-              value={emailFields.newEmail}
-              onChange={(e) =>
-                setEmailFields((prev) => ({
-                  ...prev,
-                  newEmail: e.target.value,
-                }))
-              }
-              autoComplete="off"
-              InputLabelProps={{ shrink: true }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderColor: "rgba(0, 0, 0, 0.5)",
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() =>
-                handleUpdateEmail(
-                  emailFields.currentEmail,
-                  emailFields.currentPassword,
-                  emailFields.newEmail
-                )
-              }
-              disabled={loading}
-              sx={{ mt: 1, borderRadius: "20px", bgcolor: "black" }}
-            >
-              Update Email
-            </Button>
-          </Grid>
-        </Grid>
+        </form>
       </Section>
 
       <Divider sx={{ my: 3 }} />
@@ -214,123 +224,132 @@ const ModifyAccount: React.FC = () => {
           Modify Password
         </Typography>
         <Divider sx={{ mb: 2 }} />
-        <Grid container spacing={2}>
-          {passwordErrors.length > 0 && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleUpdatePassword(
+              passwordFields.currentEmail,
+              passwordFields.currentPassword,
+              passwordFields.newPassword
+            );
+          }}
+        >
+          <Grid container spacing={2}>
+            {passwordErrors.length > 0 && (
+              <Grid item xs={12}>
+                {passwordErrors.map((error, index) => (
+                  <Alert key={index} severity="error">
+                    {error}
+                  </Alert>
+                ))}
+              </Grid>
+            )}
             <Grid item xs={12}>
-              {passwordErrors.map((error, index) => (
-                <Alert key={index} severity="error">
-                  {error}
-                </Alert>
-              ))}
+              <TextField
+                label="Current Email"
+                type="email"
+                variant="outlined"
+                fullWidth
+                value={passwordFields.currentEmail}
+                onChange={(e) =>
+                  setPasswordFields((prev) => ({
+                    ...prev,
+                    currentEmail: e.target.value,
+                  }))
+                }
+                autoComplete="off"
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderColor: "rgba(0, 0, 0, 0.5)",
+                  },
+                }}
+                aria-label="Current Email"
+              />
             </Grid>
-          )}
-          <Grid item xs={12}>
-            <TextField
-              label="Current Email"
-              variant="outlined"
-              fullWidth
-              value={passwordFields.currentEmail}
-              onChange={(e) =>
-                setPasswordFields((prev) => ({
-                  ...prev,
-                  currentEmail: e.target.value,
-                }))
-              }
-              autoComplete="off"
-              InputLabelProps={{ shrink: true }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderColor: "rgba(0, 0, 0, 0.5)",
-                },
-              }}
-            />
+            <Grid item xs={12}>
+              <TextField
+                label="Current Password"
+                type={showPassword ? "text" : "password"}
+                variant="outlined"
+                fullWidth
+                value={passwordFields.currentPassword}
+                onChange={(e) =>
+                  setPasswordFields((prev) => ({
+                    ...prev,
+                    currentPassword: e.target.value,
+                  }))
+                }
+                autoComplete="off"
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderColor: "rgba(0, 0, 0, 0.5)",
+                  },
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={toggleShowPassword}>
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                aria-label="Current Password"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="New Password"
+                type={showNewPassword ? "text" : "password"}
+                variant="outlined"
+                fullWidth
+                value={passwordFields.newPassword}
+                onChange={(e) =>
+                  setPasswordFields((prev) => ({
+                    ...prev,
+                    newPassword: e.target.value,
+                  }))
+                }
+                autoComplete="off"
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderColor: "rgba(0, 0, 0, 0.5)",
+                  },
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={toggleShowNewPassword}>
+                        {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                aria-label="New Password"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={loading}
+                sx={{ mt: 1, borderRadius: "20px", bgcolor: "black" }}
+              >
+                Update Password
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="Current Password"
-              type={showPassword ? "text" : "password"}
-              variant="outlined"
-              fullWidth
-              value={passwordFields.currentPassword}
-              onChange={(e) =>
-                setPasswordFields((prev) => ({
-                  ...prev,
-                  currentPassword: e.target.value,
-                }))
-              }
-              autoComplete="off"
-              InputLabelProps={{ shrink: true }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderColor: "rgba(0, 0, 0, 0.5)",
-                },
-              }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={toggleShowPassword}>
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="New Password"
-              type={showNewPassword ? "text" : "password"}
-              variant="outlined"
-              fullWidth
-              value={passwordFields.newPassword}
-              onChange={(e) =>
-                setPasswordFields((prev) => ({
-                  ...prev,
-                  newPassword: e.target.value,
-                }))
-              }
-              autoComplete="off"
-              InputLabelProps={{ shrink: true }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderColor: "rgba(0, 0, 0, 0.5)",
-                },
-              }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={toggleShowNewPassword}>
-                      {showNewPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() =>
-                handleUpdatePassword(
-                  passwordFields.currentEmail,
-                  passwordFields.currentPassword,
-                  passwordFields.newPassword
-                )
-              }
-              disabled={loading}
-              sx={{ mt: 1, borderRadius: "20px", bgcolor: "black" }}
-            >
-              Update Password
-            </Button>
-          </Grid>
-        </Grid>
+        </form>
       </Section>
 
       <Divider sx={{ my: 3 }} />
 
-      {/* Modify Avatar Section */}
-      <Section
+      {/* Modify Avatar Section (Disabled for now) */}
+      {/* <Section
         sx={{
           opacity: 0.5,
           pointerEvents: "none",
@@ -363,7 +382,7 @@ const ModifyAccount: React.FC = () => {
             <input type="file" hidden accept="image/*" />
           </Button>
         </Box>
-      </Section>
+      </Section> */}
 
       {/* Success/Error Alert Notification */}
       {alertMessage && (

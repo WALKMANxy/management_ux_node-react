@@ -5,6 +5,7 @@ import {
   Box,
   Divider,
   Paper,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -19,14 +20,18 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   getAllUsersThunk,
   selectAllUsers,
+  selectUsersLoading,
 } from "../../features/users/userSlice";
 import { User } from "../../models/entityModels";
+import { showToast } from "../../utils/toastMessage";
 import UserDetails from "./UserDetails";
 
 const ManageUsers: React.FC = () => {
   const dispatch = useAppDispatch();
   const users = useAppSelector(selectAllUsers);
   const [selectedUser, setSelectedUser] = useState<Partial<User> | null>(null);
+  const loading = useAppSelector(selectUsersLoading);
+
   const [visibleRows, setVisibleRows] = useState<number>(20); // Start with 20 rows visible
 
   // Fetch all users when the component mounts
@@ -49,11 +54,13 @@ const ManageUsers: React.FC = () => {
   // Handle row double click to select a user
   const handleRowDoubleClick = (user: Partial<User>) => {
     setSelectedUser(user);
+    showToast.success("Selected user: " + user.email);
   };
 
   // Reset selected user to null
   const handleBackToList = () => {
     setSelectedUser(null);
+    showToast.info("User deselected");
     dispatch(getAllUsersThunk());
   };
 
@@ -69,10 +76,15 @@ const ManageUsers: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h5" gutterBottom>
+      <Typography variant="h4" gutterBottom>
         Manage Users
       </Typography>
-      <Divider sx={{ mb: 2 }} />
+      <Divider
+        sx={{
+          height: 6,
+          borderRadius: 3,
+        }}
+      />
 
       {/* Show subtitle only if no user is selected */}
       {!selectedUser && (
@@ -106,36 +118,44 @@ const ManageUsers: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {users.slice(0, visibleRows).map((user) => (
-                  <TableRow
-                    hover
-                    role="checkbox"
-                    tabIndex={-1}
-                    key={user._id}
-                    onDoubleClick={() => handleRowDoubleClick(user)} // Double click to select user
-                  >
-                    <TableCell
-                      onTouchEnd={(e) => {
-                        // Detect double-tap on mobile devices
-                        if (e.detail === 2) {
-                          handleRowDoubleClick(user);
-                        }
-                      }}
-                    >
-                      {user.email}
-                    </TableCell>
-                    <TableCell>{user.authType}</TableCell>
-                    <TableCell>{user.isEmailVerified ? "Yes" : "No"}</TableCell>
-                    <TableCell>{user.role}</TableCell>
-                    <TableCell>{user.entityCode}</TableCell>
-                    <TableCell>{user.entityName || "N/A"}</TableCell>
-                    <TableCell>
-                      {user.createdAt
-                        ? new Date(user.createdAt).toLocaleDateString()
-                        : "N/A"}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {loading
+                  ? Array.from({ length: visibleRows }).map((_, index) => (
+                      <TableRow key={index}>
+                        {columns.map((column) => (
+                          <TableCell key={column.id}>
+                            <Skeleton variant="text" />
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  : users.slice(0, visibleRows).map((user) => (
+                      <TableRow
+                        hover
+                        role="checkbox"
+                        tabIndex={-1}
+                        key={user._id}
+                        onDoubleClick={() => handleRowDoubleClick(user)} // Double click to select user
+                      >
+                        <TableCell
+                          onClick={() => handleRowDoubleClick(user)}
+                          style={{ cursor: "pointer", color: "blue" }}
+                        >
+                          {user.email}
+                        </TableCell>
+                        <TableCell>{user.authType}</TableCell>
+                        <TableCell>
+                          {user.isEmailVerified ? "Yes" : "No"}
+                        </TableCell>
+                        <TableCell>{user.role}</TableCell>
+                        <TableCell>{user.entityCode}</TableCell>
+                        <TableCell>{user.entityName || "N/A"}</TableCell>
+                        <TableCell>
+                          {user.createdAt
+                            ? new Date(user.createdAt).toLocaleDateString()
+                            : "N/A"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 <TableRow ref={ref} />
               </TableBody>
             </Table>

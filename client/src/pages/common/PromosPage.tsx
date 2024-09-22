@@ -197,7 +197,7 @@ const PromosPage: React.FC = () => {
                 />
               </CollapsibleSection>
             </>
-          ) : (
+          ) : isMobile ? null : (
             <Typography variant="h6" sx={{ mt: 2 }}>
               Please select a promo from the sidebar or create a new one.
             </Typography>

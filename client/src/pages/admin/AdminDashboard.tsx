@@ -516,7 +516,18 @@ const AdminDashboard: React.FC = () => {
               </Grid>
             </Box>
           )}
-          <ActivePromotions isLoading={isLoading} />
+          {loadingState ? (
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width="100%"
+              height={300}
+              sx={{ borderRadius: "12px" }}
+              aria-label="skeleton"
+            />
+          ) : (
+            <ActivePromotions />
+          )}
         </Grid>
         {/* Calendar and Upcoming Visits section */}
         {!isTablet && (
