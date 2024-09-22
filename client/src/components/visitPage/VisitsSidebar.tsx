@@ -129,7 +129,11 @@ const VisitsSidebar: React.FC = () => {
                     ? handleAgentSelect(item.id)
                     : handleClientSelect(item.id)
                 }
-                sx={{ display: "flex", alignItems: "center" }} // Ensures alignment within the list item
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  borderRadius: "12px", // Add border radius for rounded corners
+                }} // Ensures alignment within the list item
               >
                 <ListItemAvatar>
                   <Avatar>{item.name.charAt(0).toUpperCase()}</Avatar>
@@ -263,7 +267,7 @@ const VisitsSidebar: React.FC = () => {
                 )}
               </ListItem>
               {index < filteredList.length - 1 && (
-                <Divider key={`divider-${item.id}`} />
+                <Divider sx={{ my: 1 }} key={`divider-${item.id}`} />
               )}
             </React.Fragment>
           );

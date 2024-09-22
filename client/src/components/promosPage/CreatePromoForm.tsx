@@ -2,8 +2,8 @@
 
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
 import {
-  Alert,
   Box,
   Chip,
   FormControl,
@@ -14,7 +14,6 @@ import {
   OutlinedInput,
   Paper,
   Select,
-  Snackbar,
   TextField,
   Tooltip,
   Typography,
@@ -22,96 +21,62 @@ import {
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
-import dayjs, { Dayjs } from "dayjs";
-import React, { useState } from "react";
-import usePromos from "../../hooks/usePromos";
-import { Promo } from "../../models/dataModels";
+import React from "react";
 import EligibleClientsGrid from "./EligibleClientsGrid";
+
+import { Controller } from "react-hook-form";
+import usePromoForm from "../../hooks/usePromoForm";
+import { Promo } from "../../models/dataModels";
 
 interface CreatePromoFormProps {
   onClose: () => void;
+  promoData?: Promo; // For editing
+  isCreating: boolean; // True for creation, false for editing
+  onSubmit: (promoData: Promo) => Promise<void>; // Submit handler
 }
 
-const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
-  const { clients, userId, handleCreatePromo } = usePromos();
+const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
+  onClose,
+  promoData,
+  isCreating,
+  onSubmit,
+}) => {
+  const {
+    handleSubmit,
+    watch,
+    control,
+    selectedLocale,
+    clients,
+    t,
+    errors,
+    setValue, // Destructure setValue from usePromoForm
+  } = usePromoForm({
+    promoData,
+    isCreating,
+    onSubmit,
+    onClose,
+  });
 
-  const [promoType, setPromoType] = useState<string>("");
-  const [name, setName] = useState<string>("");
-  const [discount, setDiscount] = useState<string>("");
-  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs());
-  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs());
-  const [selectedClients, setSelectedClients] = useState<string[]>([]);
+  // Extract form values using watch
+  const isGlobal = watch("global");
+  const selectedClients = watch("selectedClients");
+  const excludedClients = watch("excludedClients");
 
-  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
-  const [snackbarMessage, setSnackbarMessage] = useState<string>("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
-    "success"
-  );
+  // Setter functions to update the values
+  const setSelectedClients = (clients: string[]) =>
+    setValue("selectedClients", clients);
+  const setExcludedClients = (clients: string[]) =>
+    setValue("excludedClients", clients);
+  const setGlobal = (global: boolean) => setValue("global", global);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Validation
-    if (!promoType || !name || !startDate || !endDate) {
-      setSnackbarMessage("Please fill in all required fields.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-      return;
-    }
-
-    if (endDate.isBefore(startDate)) {
-      setSnackbarMessage("End Date cannot be before Start Date.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-      return;
-    }
-
-    // Prepare promo data
-    const promoData: Promo = {
-      name,
-      promoType,
-      discount,
-      clientsId: selectedClients,
-      createdAt: new Date(),
-      startDate: dayjs(startDate).set("hour", 8).set("minute", 0).toDate(), // Convert Dayjs to Date
-      endDate: dayjs(endDate).set("hour", 23).set("minute", 59).toDate(), // Convert Dayjs to Date
-      promoIssuedBy: userId || "unknown", // Use "unknown" as a fallback if userId is undefined
-    };
-
-    try {
-      await handleCreatePromo(promoData); // Use the hook function
-      setSnackbarMessage("Promo created successfully!");
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
-      // Reset form fields
-      setPromoType("");
-      setName("");
-      setDiscount("");
-      setStartDate(dayjs());
-      setEndDate(dayjs());
-      setSelectedClients([]);
-      onClose();
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to create promo.";
-      setSnackbarMessage(errorMessage);
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-    }
-  };
-
-  const handleSnackbarClose = (
-    _event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
+  console.log("re rendering component");
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider
+      dateAdapter={AdapterDayjs}
+      adapterLocale={selectedLocale.adapterLocale}
+      localeText={selectedLocale.localeText}
+    >
       <Box
         component="form"
         onSubmit={handleSubmit}
@@ -125,160 +90,230 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
           height: "100%",
         }}
       >
-        <Typography
-          variant="h3"
-          gutterBottom
-          sx={{ fontWeight: 600, mb: 4, color: "#4d4b5f", mt: 1, ml: 2 }}
-        >
-          Create New Promo:
-        </Typography>
+        {isCreating && (
+          <Typography
+            variant="h3"
+            gutterBottom
+            sx={{ fontWeight: 600, mb: 4, color: "#4d4b5f", mt: 1, ml: 2 }}
+          >
+            Create New Promo
+          </Typography>
+        )}
 
         <Grid container spacing={2}>
           {/* Promo Type Selector */}
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth required variant="outlined">
-              <InputLabel id="promo-type-label">Promo Type</InputLabel>
-              <Select
-                labelId="promo-type-label"
-                id="promo-type"
-                value={promoType}
-                label="Promo Type *"
-                onChange={(e) => setPromoType(e.target.value)}
-                sx={{
-                  borderRadius: "20px",
-                }}
-              >
-                <MenuItem value="Contract">Contract</MenuItem>
-                <MenuItem value="Sale">Sale</MenuItem>
-                <MenuItem value="Extra">Extra</MenuItem>
-              </Select>
-            </FormControl>
+            <Controller
+              name="promoType"
+              control={control}
+              rules={{ required: "Promo Type is required" }}
+              render={({ field }) => (
+                <FormControl fullWidth required variant="outlined">
+                  <InputLabel id="promo-type-label">Promo Type</InputLabel>
+                  <Select
+                    {...field}
+                    labelId="promo-type-label"
+                    id="promo-type"
+                    label="Promo Type *"
+                    sx={{
+                      borderRadius: "20px",
+                    }}
+                  >
+                    <MenuItem value="Contract">Contract</MenuItem>
+                    <MenuItem value="Sale">Sale</MenuItem>
+                    <MenuItem value="Extra">Extra</MenuItem>
+                  </Select>
+                </FormControl>
+              )}
+            />
+            {errors.promoType && (
+              <Typography color="error" variant="body2">
+                {errors.promoType.message}
+              </Typography>
+            )}
           </Grid>
 
           {/* Promo Name */}
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="Promo Name"
+            <Controller
               name="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              required
-              variant="outlined"
-              InputProps={{
-                style: {
-                  borderRadius: "20px",
-                },
-              }}
+              control={control}
+              rules={{ required: "Promo Name is required" }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Promo Name"
+                  fullWidth
+                  required
+                  variant="outlined"
+                  InputProps={{
+                    style: {
+                      borderRadius: "20px",
+                    },
+                  }}
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
+                />
+              )}
             />
           </Grid>
 
           {/* Start Date */}
           <Grid item xs={10} sm={6}>
-            <Paper elevation={1} sx={{ p: 2, borderRadius: 6 }}>
-              <Typography variant="h4" gutterBottom sx={{ ml: 3, pt: 1 }}>
-                Start:
+            <Controller
+              name="startDate"
+              control={control}
+              rules={{ required: "Start Date is required" }}
+              render={({ field }) => (
+                <Paper elevation={1} sx={{ p: 2, borderRadius: 6 }}>
+                  <StaticDatePicker
+                    {...field}
+                    value={field.value}
+                    disablePast={true}
+                    onChange={(date) => field.onChange(date)}
+                    slotProps={{
+                      toolbar: {
+                        hidden: false,
+                      },
+                      actionBar: {
+                        hidden: true,
+                      },
+                    }}
+                    localeText={{
+                      toolbarTitle: t("datePicker.startDateLabel"),
+                    }}
+                  />
+                </Paper>
+              )}
+            />
+            {errors.startDate && (
+              <Typography color="error" variant="body2">
+                {errors.startDate.message}
               </Typography>
-              <StaticDatePicker
-                value={startDate}
-                disablePast={true}
-                onAccept={(newValue: Dayjs | null) => {
-                  setStartDate(newValue);
-                }}
-                onChange={(newValue: Dayjs | null) => {
-                  setStartDate(newValue);
-                }}
-                slotProps={{
-                  toolbar: {
-                    hidden: true,
-                  },
-                }}
-              />
-            </Paper>
+            )}
           </Grid>
 
           {/* End Date */}
           <Grid item xs={10} sm={6}>
-            <Paper elevation={1} sx={{ p: 2, borderRadius: 6 }}>
-              <Typography variant="h4" gutterBottom sx={{ ml: 3, pt: 1 }}>
-                End:
-              </Typography>
-              <StaticDatePicker
-                value={endDate}
-                disablePast={true}
-                onAccept={(newValue: Dayjs | null) => {
-                  setEndDate(newValue);
-                }}
-                onChange={(newValue: Dayjs | null) => {
-                  setEndDate(newValue);
-                }}
-                slotProps={{
-                  toolbar: {
-                    hidden: true,
-                  },
-                }}
-              />
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} sm={12}>
-            <TextField
-              label="Discount Description"
-              name="discount"
-              value={discount}
-              onChange={(e) => setDiscount(e.target.value)}
-              fullWidth
-              required
-              variant="outlined"
-              multiline
-              rows={3}
-              InputProps={{
-                style: {
-                  borderRadius: "20px",
-                  width: "100%",
-                  marginTop: 5,
+            <Controller
+              name="endDate"
+              control={control}
+              rules={{
+                required: "End Date is required",
+                validate: (value) => {
+                  const startDate = watch("startDate");
+                  if (value && startDate && value.isBefore(startDate)) {
+                    return "End Date cannot be before Start Date.";
+                  }
+                  return true;
                 },
               }}
-              helperText='e.g., "Every 100 euros spent, you get a 10 euros coupon"'
+              render={({ field }) => (
+                <Paper elevation={1} sx={{ p: 2, borderRadius: 6 }}>
+                  <StaticDatePicker
+                    {...field}
+                    value={field.value}
+                    disablePast={true}
+                    onChange={(date) => field.onChange(date)}
+                    slotProps={{
+                      toolbar: {
+                        hidden: false,
+                      },
+                      actionBar: {
+                        hidden: true,
+                      },
+                    }}
+                    localeText={{
+                      toolbarTitle: t("datePicker.endDateLabel"),
+                    }}
+                  />
+                </Paper>
+              )}
             />
+            {errors.endDate && (
+              <Typography color="error" variant="body2">
+                {errors.endDate.message}
+              </Typography>
+            )}
           </Grid>
 
-          {/* Eligible Clients Display - Read-Only Selector */}
-          <Grid item xs={12}>
-            <FormControl fullWidth disabled variant="outlined">
-              <InputLabel id="eligible-clients-label">
-                Eligible Clients
-              </InputLabel>
-              <Select
-                labelId="eligible-clients-label"
-                id="eligible-clients"
-                multiple
-                value={selectedClients}
-                input={<OutlinedInput label="Eligible Clients" />}
-                renderValue={(selected) => (
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                    {selected.map((clientId) => (
-                      <Chip
-                        key={clientId}
-                        label={clients[clientId]?.name || clientId}
-                      />
-                    ))}
-                  </Box>
-                )}
-                sx={{
-                  borderRadius: "12px",
-                }}
-              ></Select>
-            </FormControl>
-          </Grid>
-
-          {/* Eligible Clients Grid */}
-          <Grid item xs={12}>
-            <EligibleClientsGrid
-              selectedClients={selectedClients}
-              setSelectedClients={setSelectedClients}
+          {/* Discount Description */}
+          <Grid item xs={12} sm={12} sx={{ mb: 2 }}>
+            <Controller
+              name="discount"
+              control={control}
+              rules={{ required: "Discount Description is required" }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Discount Description"
+                  fullWidth
+                  required
+                  variant="outlined"
+                  multiline
+                  rows={3}
+                  InputProps={{
+                    style: {
+                      borderRadius: "20px",
+                      width: "100%",
+                      marginTop: 5,
+                    },
+                  }}
+                  helperText={
+                    errors.discount
+                      ? errors.discount.message
+                      : 'e.g., "Every 100 euros spent, you get a 10 euros coupon"'
+                  }
+                  error={!!errors.discount}
+                />
+              )}
             />
           </Grid>
+        </Grid>
+
+        {/* Unified Clients Selector - Read-Only Selector */}
+        <Grid item xs={12}>
+          <FormControl fullWidth disabled variant="outlined">
+            <InputLabel id="clients-label">
+              {isGlobal ? "Excluded Clients" : "Eligible Clients"}
+            </InputLabel>
+            <Select
+              labelId="clients-label"
+              id="clients"
+              multiple
+              value={isGlobal ? excludedClients : selectedClients}
+              input={
+                <OutlinedInput
+                  label={isGlobal ? "Excluded Clients" : "Eligible Clients"}
+                />
+              }
+              renderValue={(selected) => (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {selected.map((clientId) => (
+                    <Chip
+                      key={clientId}
+                      label={clients[clientId]?.name || clientId}
+                    />
+                  ))}
+                </Box>
+              )}
+            >
+              {/* Empty, since this is read-only */}
+            </Select>
+          </FormControl>
+        </Grid>
+
+        {/* Eligible Clients Grid */}
+        <Grid item xs={12}>
+          <EligibleClientsGrid
+            selectedClients={selectedClients}
+            setSelectedClients={setSelectedClients}
+            global={isGlobal}
+            setGlobal={setGlobal}
+            excludedClients={excludedClients}
+            setExcludedClients={setExcludedClients}
+            isViewing={false}
+          />
         </Grid>
 
         {/* Action Buttons */}
@@ -290,14 +325,13 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
             gap: 2,
           }}
         >
-          <Paper
-            elevation={1}
+          <Box
             sx={{
-              borderRadius: 2,
-              padding: 1
+              display: "flex",
+              gap: 4,
             }}
           >
-            <Tooltip title="Create Promo">
+            <Tooltip title={isCreating ? "Create Promo" : "Update Promo"}>
               <IconButton
                 type="submit"
                 color="primary"
@@ -313,10 +347,9 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
                     transform: "scale(0.95)",
                   },
                 }}
-
-                aria-label="Create Promo"
+                aria-label={isCreating ? "Create Promo" : "Update Promo"}
               >
-                <AddIcon />
+                {isCreating ? <AddIcon /> : <EditIcon />}
               </IconButton>
             </Tooltip>
 
@@ -341,27 +374,11 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({ onClose }) => {
                 <CloseIcon />
               </IconButton>
             </Tooltip>
-          </Paper>
+          </Box>
         </Box>
-
-        {/* Snackbar for feedback */}
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={6000}
-          onClose={handleSnackbarClose}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <Alert
-            onClose={handleSnackbarClose}
-            severity={snackbarSeverity}
-            sx={{ width: "100%" }}
-          >
-            {snackbarMessage}
-          </Alert>
-        </Snackbar>
       </Box>
     </LocalizationProvider>
   );
 };
 
-export default CreatePromoForm;
+export default React.memo(CreatePromoForm);
