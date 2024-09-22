@@ -14,8 +14,10 @@ interface AuthenticatedSocket extends Socket {
   authType?: "email" | "google";
 }
 
+const connectedClients = new Map<string, Set<AuthenticatedSocket>>();
+
+
 export const setupWebSocket = (io: SocketIOServer) => {
-  const connectedClients = new Map<string, Set<AuthenticatedSocket>>();
 
   io.use(async (socket: AuthenticatedSocket, next) => {
     const cookies = parseCookie(socket.handshake.headers.cookie || "");
@@ -80,6 +82,8 @@ export const setupWebSocket = (io: SocketIOServer) => {
         }
       }
     });
+
+
 
     // Handle incoming message with client-generated local_id and server-generated _id
     socket.on(
@@ -210,6 +214,27 @@ export const setupWebSocket = (io: SocketIOServer) => {
 
   return { connectedClients };
 };
+
+// Function to emit events only to admins
+export function emitToAdmins(event: string, data: any) {
+  connectedClients.forEach((sockets) => {
+    sockets.forEach((clientSocket) => {
+      if (clientSocket.userRole === "admin") {
+        clientSocket.emit(event, data);
+      }
+    });
+  });
+}
+
+// Function to emit events only to a specific user
+export function emitToUser(userId: string, event: string, data: any) {
+  const sockets = connectedClients.get(userId);
+  if (sockets) {
+    sockets.forEach((clientSocket) => {
+      clientSocket.emit(event, data);
+    });
+  }
+}
 
 // Authenticate the socket based on the session token
 async function authenticateSocket(socket: AuthenticatedSocket, userId: string) {

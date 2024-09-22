@@ -24,6 +24,8 @@ import movementsRoutes from "./routes/movements";
 import oauthRoutes from "./routes/OAuth";
 import promosRoutes from "./routes/promos";
 import usersRoutes from "./routes/users";
+import dayOffRequestRoutes from "./routes/daysOff"; // Import the new day-off request routes
+
 import visitsRoutes from "./routes/visits";
 import { errorHandler } from "./utils/errorHandler";
 import { logger, logRequestsIp } from "./utils/logger";
@@ -60,7 +62,7 @@ app.use(logRequestsIp);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 99999999,
+  max: 1000,
   message: "Too many requests from this IP, please try again later.",
 });
 
@@ -79,6 +81,8 @@ app.use("/movements", movementsRoutes);
 app.use("/promos", promosRoutes);
 app.use("/visits", visitsRoutes);
 app.use("/users", usersRoutes);
+app.use("/dayoff", dayOffRequestRoutes); // Register the day-off request routes
+
 app.use("/chats", chatRoutes); // Add chat routes
 
 app.use(errorHandler);
