@@ -58,7 +58,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
       </Button>
 
       {/* Current User Details Card */}
-      <Box className="animate__animated animate__bounceIn">
+      <Box className="animate__animated animate__fadeInLeft">
         <UserCard
           email={user.email || "N/A"}
           avatar={user.avatar}

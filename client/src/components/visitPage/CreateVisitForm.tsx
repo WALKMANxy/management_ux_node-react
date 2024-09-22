@@ -30,6 +30,7 @@ import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
 import { createVisitAsync } from "../../features/data/dataThunks";
+import { showToast } from "../../utils/toastMessage";
 import VisitCard from "./VisitCard"; // Import the VisitCard component
 
 interface CreateVisitFormProps {
@@ -86,21 +87,25 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
 
     try {
       await dispatch(createVisitAsync(visitData)).unwrap();
-      setSnackbarMessage("Visit created successfully!");
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
       setType("");
       setReason("");
       setDate(dayjs());
       setNotePublic("");
       setNotePrivate(""); // Reset private note
       onClose();
+      showToast.success("Visit created successfully.");
     } catch (error: unknown) {
-      setSnackbarMessage(
-        error instanceof Error ? error.message : "Failed to create visit."
-      );
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+      if (error instanceof Error) {
+        showToast.error("Failed to create visit: " + error.message);
+        console.error("Failed to create visit:", error);
+      } else {
+        showToast.error("Failed to create visit: An unknown error occurred");
+        console.error(
+          "Failed to create visit: An unknown error occurred",
+          error
+        );
+      }
+      throw error; // Re-throw to handle in the component
     }
   };
 

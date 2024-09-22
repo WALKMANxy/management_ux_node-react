@@ -7,7 +7,7 @@ import TimelineDot from "@mui/lab/TimelineDot";
 import TimelineItem from "@mui/lab/TimelineItem";
 import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import TimelineSeparator from "@mui/lab/TimelineSeparator";
-import { Box, IconButton, Skeleton, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import React from "react";
 import { useNavigate } from "react-router-dom";
@@ -15,11 +15,7 @@ import { useAppSelector } from "../../app/hooks";
 import { selectPromos } from "../../features/data/dataSelectors";
 import { Promo } from "../../models/dataModels";
 
-interface ActivePromotionsProps {
-  isLoading: boolean;
-}
-
-const ActivePromotions: React.FC<ActivePromotionsProps> = ({ isLoading }) => {
+const ActivePromotions: React.FC = () => {
   const promos = useAppSelector(selectPromos);
   const navigate = useNavigate();
 
@@ -33,30 +29,6 @@ const ActivePromotions: React.FC<ActivePromotionsProps> = ({ isLoading }) => {
     .filter((promo: Promo) => dayjs(promo.endDate).isAfter(dayjs()))
     .sort((a, b) => dayjs(a.createdAt).diff(dayjs(b.createdAt))) // Sort from oldest to newest
     .slice(0, 5); // Limit to 5 promos
-
-  // Render Skeleton for Timeline
-  const renderSkeleton = () => (
-    <Timeline position="alternate">
-      {[...Array(3)].map((_, index) => (
-        <TimelineItem key={index}>
-          <TimelineOppositeContent>
-            <Skeleton variant="text" width={80} />
-          </TimelineOppositeContent>
-          <TimelineSeparator>
-            <TimelineConnector />
-            <TimelineDot>
-              <LoyaltyIcon />
-            </TimelineDot>
-            <TimelineConnector />
-          </TimelineSeparator>
-          <TimelineContent>
-            <Skeleton variant="text" width="60%" />
-            <Skeleton variant="text" width="40%" />
-          </TimelineContent>
-        </TimelineItem>
-      ))}
-    </Timeline>
-  );
 
   // Render Actual Promotions
   const renderPromotions = () => (
@@ -109,8 +81,7 @@ const ActivePromotions: React.FC<ActivePromotionsProps> = ({ isLoading }) => {
       <Typography variant="h5" gutterBottom>
         Active Promotions
       </Typography>
-      {isLoading ? renderSkeleton() : renderPromotions()}
-
+      {renderPromotions()}
       <IconButton
         onClick={() => navigate("/promos")}
         sx={{

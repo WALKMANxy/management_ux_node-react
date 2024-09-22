@@ -232,6 +232,9 @@ export const selectAllUsers = createSelector(
   (users) => Object.values(users)
 );
 
+export const selectUsersLoading = (state: RootState) => state.users.status === "loading";
+
+
 // Replace with a simple selector
 export const selectUsersStatus = (state: RootState) => state.users.status;
 

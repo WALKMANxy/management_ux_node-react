@@ -30,6 +30,7 @@ import React, { useState } from "react";
 import { useAppDispatch } from "../../app/hooks";
 import { updateVisitAsync } from "../../features/data/dataThunks";
 import { Visit } from "../../models/dataModels";
+import { showToast } from "../../utils/toastMessage";
 import VisitCard from "./VisitCard";
 
 interface EditVisitFormProps {
@@ -82,16 +83,17 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
           updateVisitAsync({ _id: updatedVisit._id, visitData: updatedVisit })
         ).unwrap();
       }
-      setSnackbarMessage("Visit updated successfully!");
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
+      showToast.success("Visit updated successfully.");
       onClose();
     } catch (error: unknown) {
-      setSnackbarMessage(
-        error instanceof Error ? error.message : "Failed to update visit."
-      );
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+      if (error instanceof Error) {
+        showToast.error("An error occurred: " + error.message);
+        console.error("An error occurred:", error);
+      } else {
+        showToast.error("An unknown error occurred");
+        console.error("An unknown error occurred", error);
+      }
+      throw error; // Re-throw to handle in the component
     }
   };
 

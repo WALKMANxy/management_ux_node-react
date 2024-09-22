@@ -3,12 +3,16 @@
 import { useState } from "react";
 import { useAppDispatch } from "../app/hooks";
 import { handleLogout } from "../features/auth/authSlice";
-import { updateUserEmail, updateUserPassword } from "../features/users/api/users";
+import {
+  updateUserEmail,
+  updateUserPassword,
+} from "../features/users/api/users";
+import { showToast } from "../utils/toastMessage";
 
 const useModifyAccount = () => {
   const dispatch = useAppDispatch();
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const [alertSeverity, setAlertSeverity] = useState<"success" | "error">("success");
+  const [alertSeverity] = useState<"success" | "error">("success");
   const [loading, setLoading] = useState(false);
   const [emailErrors, setEmailErrors] = useState<string[]>([]);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
@@ -48,7 +52,11 @@ const useModifyAccount = () => {
     return errors.length === 0;
   };
 
-  const handleUpdateEmail = async (currentEmail: string, currentPassword: string, newEmail: string) => {
+  const handleUpdateEmail = async (
+    currentEmail: string,
+    currentPassword: string,
+    newEmail: string
+  ) => {
     if (!validateEmail(newEmail)) {
       return; // Stop execution if validation fails
     }
@@ -56,18 +64,35 @@ const useModifyAccount = () => {
     setLoading(true);
     try {
       await updateUserEmail(currentEmail, currentPassword, newEmail);
-      setAlertMessage("Account information updated. You will now be logged out.");
-      setAlertSeverity("success");
+      showToast.info(
+        "Account information updated. You will now be logged out."
+      );
       setTimeout(initiateLogout, 3000); // Log out after 3 seconds
-    } catch  {
-      setAlertMessage("Failed to update email. Please check your credentials.");
-      setAlertSeverity("error");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        showToast.error(
+          "Failed to update account information: " + error.message
+        );
+        console.error("Failed to update account information:", error);
+      } else {
+        showToast.error(
+          "Failed to update account information: An unknown error occurred"
+        );
+        console.error(
+          "Failed to update account information: An unknown error occurred",
+          error
+        );
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleUpdatePassword = async (currentEmail: string, currentPassword: string, newPassword: string) => {
+  const handleUpdatePassword = async (
+    currentEmail: string,
+    currentPassword: string,
+    newPassword: string
+  ) => {
     if (!validatePassword(newPassword)) {
       return; // Stop execution if validation fails
     }
@@ -75,12 +100,19 @@ const useModifyAccount = () => {
     setLoading(true);
     try {
       await updateUserPassword(currentEmail, currentPassword, newPassword);
-      setAlertMessage("Account information updated. You will now be logged out.");
-      setAlertSeverity("success");
+      showToast.info("Password updated. You will now be logged out.");
       setTimeout(initiateLogout, 3000); // Log out after 3 seconds
-    } catch {
-      setAlertMessage("Failed to update password. Please check your credentials.");
-      setAlertSeverity("error");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        showToast.error("Failed to update password: " + error.message);
+        console.error("Failed to update password:", error);
+      } else {
+        showToast.error("Failed to update password: An unknown error occurred");
+        console.error(
+          "Failed to update password: An unknown error occurred",
+          error
+        );
+      }
     } finally {
       setLoading(false);
     }

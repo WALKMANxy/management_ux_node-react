@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import {
   GlobalVisits,
   MovementDetail,
@@ -189,19 +190,41 @@ export const mapPromosToEntity = (
   switch (role) {
     case "client":
       // For client, return a flat array of promos specific to the client
-      return promos.filter((promo) =>
-        promo.clientsId.includes((entity as Client).id)
-      );
+      return promos.filter((promo) => {
+        // Exclude promos where the endDate is in the past
+        if (dayjs(promo.endDate).isBefore(dayjs())) {
+          return false;
+        }
+
+        // Global check: include if global is true and entity.id is not in excludedClientsId
+        if (
+          promo.global &&
+          !promo.excludedClientsId?.includes((entity as Client).id)
+        ) {
+          return true;
+        }
+
+        // Check if the entity.id is present in clientsId array
+        return promo.clientsId?.includes((entity as Client).id);
+      });
 
     case "agent": {
       // For agent, return unique promos for all the agent's clients
       const agentClientIds = (entity as Agent).clients.map(
         (client) => client.id
       );
-      const uniquePromos = promos.filter((promo) =>
-        promo.clientsId.some((clientId) => agentClientIds.includes(clientId))
-      );
-      return uniquePromos;
+
+      return promos.filter((promo) => {
+        // Global check: include if global is true
+        if (promo.global) {
+          return true;
+        }
+
+        // Check if any of the agent's clients are in the clientsId array
+        return promo.clientsId?.some((clientId) =>
+          agentClientIds.includes(clientId)
+        );
+      });
     }
 
     case "admin":

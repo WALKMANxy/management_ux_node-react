@@ -11,6 +11,7 @@ import {
 import { selectPromos } from "../features/promoVisits/dataSelectors";
 import { selectCurrentUser } from "../features/users/userSlice";
 import { Promo } from "../models/dataModels";
+import { showToast } from "../utils/toastMessage";
 
 type PromoMode = "view" | "create" | "edit";
 
@@ -74,9 +75,20 @@ const usePromos = () => {
   const handleCreatePromo = async (promoData: Promo) => {
     try {
       await dispatch(createPromoAsync(promoData)).unwrap();
+      showToast.success("Promo created successfully");
+
       dispatch(getPromos()); // Refresh the list of promos
-    } catch (error) {
-      console.error("Failed to create promo:", error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        showToast.error("Failed to create promo: " + error.message);
+        console.error("Failed to create promo:", error);
+      } else {
+        showToast.error("Failed to create promo: An unknown error occurred");
+        console.error(
+          "Failed to create promo: An unknown error occurred",
+          error
+        );
+      }
       throw error; // Re-throw to handle in the component
     }
   };
@@ -90,9 +102,19 @@ const usePromos = () => {
       await dispatch(
         updatePromoAsync({ _id: promoData._id, promoData })
       ).unwrap();
+      showToast.success("Promo updated successfully");
       dispatch(getPromos()); // Refresh the list of promos
-    } catch (error) {
-      console.error("Failed to update promo:", error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        showToast.error("Failed to update promo: " + error.message);
+        console.error("Failed to update promo:", error);
+      } else {
+        showToast.error("Failed to update promo: An unknown error occurred");
+        console.error(
+          "Failed to update promo: An unknown error occurred",
+          error
+        );
+      }
       throw error; // Re-throw to handle in the component
     }
   };
@@ -107,13 +129,6 @@ const usePromos = () => {
 
     const promoData: Promo = selectedPromo;
 
-    /*  // Log promoData and types of each property
-    console.log("Sunsetting Promo, old data:", promoData);
-    console.log("Property Types:");
-    Object.entries(promoData).forEach(([key, value]) => {
-      console.log(`${key}: ${typeof value}`);
-    }); */
-
     try {
       if (!promoData._id) {
         throw new Error("Promo ID is missing for sunset.");
@@ -127,22 +142,25 @@ const usePromos = () => {
         createdAt: new Date(promoData.createdAt), // Set endDate to current time
       };
 
-      /* // Log promoData and types of each property
-      console.log("Sunsetting Promo, new data:", updatedPromoData);
-      console.log("Property Types:");
-      Object.entries(updatedPromoData).forEach(([key, value]) => {
-        console.log(`${key}: ${typeof value}`);
-      }); */
-
       // Dispatch the update promo action with the modified endDate
       await dispatch(
         updatePromoAsync({ _id: promoData._id, promoData: updatedPromoData })
       ).unwrap();
+      showToast.info("Promo sunset successfully");
 
       // Refresh the list of promos
       dispatch(getPromos());
-    } catch (error) {
-      console.error("Failed to sunset promo:", error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        showToast.error("Failed to sunset promo: " + error.message);
+        console.error("Failed to sunset promo:", error);
+      } else {
+        showToast.error("Failed to sunset promo: An unknown error occurred");
+        console.error(
+          "Failed to sunset promo: An unknown error occurred",
+          error
+        );
+      }
       throw error; // Re-throw to handle in the component
     }
   };
@@ -167,6 +185,7 @@ const usePromos = () => {
 
   const handleRefreshPromos = () => {
     dispatch(getPromos());
+    showToast.success("Promos refreshed successfully");
   };
 
   return {
