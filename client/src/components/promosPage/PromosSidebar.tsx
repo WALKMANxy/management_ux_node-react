@@ -1,9 +1,12 @@
-import RefreshIcon from "@mui/icons-material/Refresh";
+// src/components/promosPage/PromosSidebar.tsx
+
 import AddIcon from "@mui/icons-material/Add";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   Avatar,
   Box,
+  Divider,
   IconButton,
   InputAdornment,
   List,
@@ -12,24 +15,26 @@ import {
   ListItemText,
   TextField,
   Typography,
-  Divider,
 } from "@mui/material";
 import React, { useState } from "react";
-import usePromos from "../../hooks/usePromos";
 import { Promo } from "../../models/dataModels";
+import usePromos from "../../hooks/usePromos";
 
 interface PromosSidebarProps {
   onCreatePromo: () => void;
+  onSelectPromo: (promo: Promo) => void;
 }
 
-const PromosSidebar: React.FC<PromosSidebarProps> = ({ onCreatePromo }) => {
+const PromosSidebar: React.FC<PromosSidebarProps> = ({
+  onCreatePromo,
+  onSelectPromo,
+}) => {
   const {
     promos,
-    handlePromoSelect,
     selectedPromoId,
     handleRefreshPromos,
     userRole,
-  } = usePromos();
+  } = usePromos(); // Assuming usePromos is imported correctly
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +52,12 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({ onCreatePromo }) => {
   return (
     <Box sx={{ p: 2 }}>
       {/* Header with title and create button */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
         <Typography variant="h5" gutterBottom>
           Promos
         </Typography>
@@ -93,14 +103,20 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({ onCreatePromo }) => {
               <ListItem
                 button
                 selected={selectedPromoId === promo._id}
-                onClick={() => handlePromoSelect(promo)}
+                onClick={() => onSelectPromo(promo)}
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  bgcolor: isPromoActive(promo) ? "rgba(0, 255, 0, 0.1)" : "grey.300",
+                  bgcolor: isPromoActive(promo)
+                    ? "rgba(0, 255, 0, 0.1)"
+                    : "grey.300",
                   "&:hover": {
-                    bgcolor: isPromoActive(promo) ? "rgba(0, 255, 0, 0.2)" : "grey.400",
+                    bgcolor: isPromoActive(promo)
+                      ? "rgba(0, 255, 0, 0.2)"
+                      : "grey.400",
                   },
+                  borderRadius: "12px", // Add border radius for rounded corners
+
                 }}
               >
                 <ListItemAvatar>
@@ -111,7 +127,7 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({ onCreatePromo }) => {
                   secondary={`Type: ${promo.promoType}`}
                 />
               </ListItem>
-              <Divider />
+              <Divider sx={{ my: 1 }} />
             </React.Fragment>
           ))
         ) : (

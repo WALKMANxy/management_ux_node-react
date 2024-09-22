@@ -13,42 +13,51 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { RootState } from "../../app/store";
+import React, { useEffect } from "react";
+import { useAppSelector } from "../../app/hooks";
 import CreatePromoForm from "../../components/promosPage/CreatePromoForm";
+import EligibleClientsGrid from "../../components/promosPage/EligibleClientsGrid";
 import PromoDetailsCard from "../../components/promosPage/PromoDetailsCard";
 import PromosSidebar from "../../components/promosPage/PromosSidebar";
-import { clearSelectedPromo } from "../../features/data/dataSlice";
+import usePromos from "../../hooks/usePromos";
 
 const PromosPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const dispatch = useAppDispatch();
 
-  const selectedPromoId = useAppSelector(
-    (state: RootState) => state.data.selectedPromoId
-  );
-
-  const [isCreatingPromo, setIsCreatingPromo] = useState(false);
+  const {
+    mode,
+    selectedPromo,
+    handlePromoDeselect,
+    handlePromoSelect,
+    initiateCreatePromo,
+    initiateEditPromo,
+    handleCreatePromo,
+    handleUpdatePromo,
+    handleSunsetPromo,
+  } = usePromos();
 
   // Get data fetching status and error
-  const status = useAppSelector((state: RootState) => state.data.status);
-  const error = useAppSelector((state: RootState) => state.data.error);
+  const status = useAppSelector((state) => state.data.status);
+  const error = useAppSelector((state) => state.data.error);
 
   // State variables for collapsible containers
-  const [isPromoDetailsCollapsed, setIsPromoDetailsCollapsed] = useState(false);
+  const [isPromoDetailsCollapsed, setIsPromoDetailsCollapsed] =
+    React.useState(false);
+  const [isEditFormCollapsed, setIsEditFormCollapsed] = React.useState(false);
   const [isEligibleClientsCollapsed, setIsEligibleClientsCollapsed] =
-    useState(false);
+    React.useState(false);
 
-  const handleOpenCreatePromo = () => {
-    setIsCreatingPromo(true);
-    dispatch(clearSelectedPromo());
-  };
+  useEffect(() => {
+    console.log("Page mode:", mode);
+  }, [mode]);
 
-  const handleCloseCreatePromo = () => {
-    setIsCreatingPromo(false);
-  };
+  // Reset collapsible sections when selectedPromo or mode changes
+  useEffect(() => {
+    setIsPromoDetailsCollapsed(false);
+    setIsEligibleClientsCollapsed(false);
+    setIsEditFormCollapsed(false);
+  }, [selectedPromo, mode]);
 
   // Handle loading state
   if (status === "loading") {
@@ -97,109 +106,96 @@ const PromosPage: React.FC = () => {
       }}
     >
       <Grid container sx={{ flexGrow: 1, height: "100%" }}>
-        {/* Sidebar */}
         <Grid
           item
           xs={12}
           md={3}
           sx={{
-            display: { xs: isMobile && selectedPromoId ? "none" : "block" },
+            display: { xs: isMobile && selectedPromo ? "none" : "block" },
             borderRight: "1px solid #e0e0e0",
             height: "100%",
             overflowY: "auto",
           }}
         >
-          <PromosSidebar onCreatePromo={handleOpenCreatePromo} />
+          <PromosSidebar
+            onCreatePromo={initiateCreatePromo}
+            onSelectPromo={handlePromoSelect} // Pass handlePromoSelect here
+          />
         </Grid>
-
-        {/* Main content area */}
         <Grid
           item
           xs={12}
           md={9}
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            p: 2,
-          }}
+          sx={{ display: "flex", flexDirection: "column", p: 2 }}
         >
-          {/* Conditionally render components based on selection */}
-          {isCreatingPromo ? (
-            <CreatePromoForm onClose={handleCloseCreatePromo} />
-          ) : selectedPromoId ? (
+          {mode === "create" ? (
+            <Paper
+              elevation={3}
+              sx={{ mb: 2, p: 2, borderRadius: 2, overflow: "hidden" }}
+            >
+              <CreatePromoForm
+                onClose={handlePromoDeselect}
+                isCreating={true}
+                onSubmit={handleCreatePromo}
+              />
+            </Paper>
+          ) : mode === "edit" && selectedPromo ? (
             <>
-              {/* Promo Details Collapsible Container */}
-              <Paper
-                sx={{
-                  mb: 2,
-                  borderRadius: 2,
-                  overflow: "hidden",
-                }}
+              <CollapsibleSection
+                title="Promo Details"
+                isCollapsed={isPromoDetailsCollapsed}
+                setIsCollapsed={setIsPromoDetailsCollapsed}
               >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    bgcolor: "#f4f5f7",
-                    p: 1,
-                    pl: 2,
-                  }}
-                >
-                  <Typography variant="h4">Promo Details</Typography>
-                  <IconButton
-                    onClick={() =>
-                      setIsPromoDetailsCollapsed(!isPromoDetailsCollapsed)
-                    }
-                  >
-                    {isPromoDetailsCollapsed ? (
-                      <ExpandMoreIcon />
-                    ) : (
-                      <ExpandLessIcon />
-                    )}
-                  </IconButton>
-                </Box>
-                <Collapse in={!isPromoDetailsCollapsed}>
-                  <PromoDetailsCard
-                    promoId={selectedPromoId}
-                    onEditPromo={handleOpenCreatePromo}
-                    onDeselectPromo={() => dispatch(clearSelectedPromo())}
-                  />
-                </Collapse>
-              </Paper>
-
-              {/* Eligible Clients Collapsible Container */}
-              <Paper
-                sx={{
-                  mb: 2,
-                  borderRadius: 2,
-                  overflow: "hidden",
-                }}
+                <PromoDetailsCard
+                  onEditPromo={initiateEditPromo}
+                  onDeselectPromo={handlePromoDeselect}
+                  onTerminatePromo={handleSunsetPromo}
+                />
+              </CollapsibleSection>
+              <CollapsibleSection
+                title="Edit Promo"
+                isCollapsed={isEditFormCollapsed}
+                setIsCollapsed={setIsEditFormCollapsed}
               >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    bgcolor: "#f4f5f7",
-                    p: 1,
-                    pl: 2,
-                  }}
-                >
-                  <Typography variant="h4">Eligible Clients</Typography>
-                  <IconButton
-                    onClick={() =>
-                      setIsEligibleClientsCollapsed(!isEligibleClientsCollapsed)
-                    }
-                  >
-                    {isEligibleClientsCollapsed ? (
-                      <ExpandMoreIcon />
-                    ) : (
-                      <ExpandLessIcon />
-                    )}
-                  </IconButton>
-                </Box>
-              </Paper>
+                <CreatePromoForm
+                  onClose={handlePromoDeselect}
+                  promoData={selectedPromo}
+                  isCreating={false}
+                  onSubmit={handleUpdatePromo}
+                />
+              </CollapsibleSection>
+            </>
+          ) : mode === "view" && selectedPromo ? (
+            <>
+              <CollapsibleSection
+                title="Promo Details"
+                isCollapsed={isPromoDetailsCollapsed}
+                setIsCollapsed={setIsPromoDetailsCollapsed}
+              >
+                <PromoDetailsCard
+                  onEditPromo={initiateEditPromo}
+                  onDeselectPromo={handlePromoDeselect}
+                  onTerminatePromo={handleSunsetPromo}
+                />
+              </CollapsibleSection>
+              <CollapsibleSection
+                title={
+                  selectedPromo.global ? "Excluded Clients" : "Eligible Clients"
+                }
+                isCollapsed={isEligibleClientsCollapsed}
+                setIsCollapsed={setIsEligibleClientsCollapsed}
+              >
+                <EligibleClientsGrid
+                  isViewing={true}
+                  selectedClients={
+                    selectedPromo.global ? [] : selectedPromo.clientsId
+                  }
+                  excludedClients={
+                    selectedPromo.global ? selectedPromo.excludedClientsId : []
+                  }
+                  global={selectedPromo.global}
+                />
+              </CollapsibleSection>
             </>
           ) : (
             <Typography variant="h6" sx={{ mt: 2 }}>
@@ -211,5 +207,41 @@ const PromosPage: React.FC = () => {
     </Box>
   );
 };
+
+const CollapsibleSection = ({
+  title,
+  isCollapsed,
+  setIsCollapsed,
+  children,
+}: {
+  title: string;
+  isCollapsed: boolean;
+  setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+  children: React.ReactNode;
+}) => (
+  <Paper
+    elevation={3}
+    sx={{ mb: 2, p: 2, borderRadius: 2, overflow: "hidden" }}
+  >
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        p: 1,
+        pl: 2,
+        mb: 1,
+      }}
+    >
+      <Typography variant="h4" sx={{ ml: 1 }}>
+        {title}
+      </Typography>
+      <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
+        {isCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+      </IconButton>
+    </Box>
+    <Collapse in={!isCollapsed}>{children}</Collapse>
+  </Paper>
+);
 
 export default PromosPage;
