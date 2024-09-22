@@ -3,8 +3,8 @@ import { promoValidationRules } from "../constants/validationRules";
 import { PromoController } from "../controllers/promoController";
 import { authenticateUser } from "../middlewares/authentication";
 import {
+  checkAdminRole,
   checkAgentOrAdminOrClientRole,
-  checkAgentOrAdminRole,
 } from "../middlewares/roleChecker";
 import { checkValidation } from "../middlewares/validate";
 
@@ -21,7 +21,7 @@ router.post(
   "/",
   promoValidationRules,
   checkValidation,
-  checkAgentOrAdminRole,
+  checkAdminRole,
   PromoController.createPromo
 );
 
@@ -30,7 +30,7 @@ router.put(
   "/:id",
   promoValidationRules,
   checkValidation,
-  checkAgentOrAdminRole,
+  checkAdminRole,
   PromoController.replacePromo
 );
 
@@ -39,7 +39,7 @@ router.patch(
   "/:id",
   promoValidationRules,
   checkValidation,
-  checkAgentOrAdminRole,
+  checkAdminRole,
   PromoController.updatePromo
 );
 
