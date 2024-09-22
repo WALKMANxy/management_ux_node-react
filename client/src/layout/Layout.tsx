@@ -11,7 +11,7 @@ const Layout: React.FC = () => {
 
   // Check if the current path matches specific routes
   const isClientsOrMessagesPage =
-    location.pathname === "/clients" || location.pathname === "/messages" || location.pathname === "/visits";
+    location.pathname === "/clients" || location.pathname === "/messages" || location.pathname === "/visits" || location.pathname === "/promos";
   const isSettingsPage = location.pathname === "/settings"; // Check if on the /settings page
 
   return (

@@ -1,18 +1,18 @@
-// src/components/UserPage/AppSettings.tsx
-import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Box,
-  Typography,
   Divider,
-  Switch,
   FormControlLabel,
-  RadioGroup,
-  Radio,
   FormLabel,
   Paper,
-  Alert,
+  Radio,
+  RadioGroup,
+  Switch,
+  Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import React, { useEffect, useState } from "react";
+import { showToast } from "../../utils/toastMessage";
 
 const Section = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -26,43 +26,109 @@ const AppSettings: React.FC = () => {
     JSON.parse(localStorage.getItem("notificationsEnabled") || "true")
   );
   const [themeChoice, setThemeChoice] = useState("auto");
-  const [notificationStatus, setNotificationStatus] = useState(Notification.permission);
+  const [notificationStatus, setNotificationStatus] = useState(
+    Notification.permission
+  );
 
   useEffect(() => {
     // Check the notification permission status when the component mounts
     if (notificationStatus === "default") {
-      Notification.requestPermission().then((permission) => {
-        setNotificationStatus(permission);
-        if (permission === "granted") {
-          console.log("Notification permission granted.");
-        } else if (permission === "denied") {
-          console.log("Notification permission denied.");
-        }
-      });
+      Notification.requestPermission()
+        .then((permission) => {
+          setNotificationStatus(permission);
+          if (permission === "granted") {
+            showToast.success("Notification permission granted.");
+          } else if (permission === "denied") {
+            showToast.error("Notification permission denied.");
+          }
+        })
+        .catch((error: unknown) => {
+          if (error instanceof Error) {
+            showToast.error(
+              "Failed to request notification permission: " + error.message
+            );
+          } else {
+            showToast.error(
+              "Failed to request notification permission: An unknown error occurred"
+            );
+          }
+        });
     }
   }, [notificationStatus]);
 
   const handleNotificationsToggle = () => {
-    const newValue = !notificationsEnabled;
-    setNotificationsEnabled(newValue);
-    localStorage.setItem("notificationsEnabled", JSON.stringify(newValue));
+    try {
+      const newValue = !notificationsEnabled;
+      setNotificationsEnabled(newValue);
+      localStorage.setItem("notificationsEnabled", JSON.stringify(newValue));
 
-    // If notifications are being enabled, check permission again
-    if (newValue && notificationStatus === "default") {
-      Notification.requestPermission().then((permission) => {
-        setNotificationStatus(permission);
-      });
+      showToast.success(
+        `Notifications have been ${newValue ? "enabled" : "disabled"}.`
+      );
+
+      // If notifications are being enabled, check permission again
+      if (newValue && notificationStatus === "default") {
+        Notification.requestPermission()
+          .then((permission) => {
+            setNotificationStatus(permission);
+            if (permission === "granted") {
+              showToast.success("Notification permission granted.");
+            } else if (permission === "denied") {
+              showToast.error("Notification permission denied.");
+            }
+          })
+          .catch((error: unknown) => {
+            if (error instanceof Error) {
+              showToast.error(
+                "Failed to request notification permission: " + error.message
+              );
+            } else {
+              showToast.error(
+                "Failed to request notification permission: An unknown error occurred"
+              );
+            }
+          });
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        showToast.error(
+          "Failed to update notification settings: " + error.message
+        );
+      } else {
+        showToast.error(
+          "Failed to update notification settings: An unknown error occurred"
+        );
+      }
     }
   };
 
   const handleThemeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setThemeChoice(event.target.value);
+    try {
+      const newTheme = event.target.value;
+      setThemeChoice(newTheme);
+      showToast.success(`Theme changed to ${newTheme}.`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        showToast.error("Failed to change theme: " + error.message);
+      } else {
+        showToast.error("Failed to change theme: An unknown error occurred");
+      }
+    }
   };
 
   return (
     <Box>
+      <Typography variant="h4" gutterBottom>
+        App Settings
+      </Typography>
+      <Divider
+        sx={{
+          height: 6,
+          borderRadius: 3,
+        }}
+      />
       {/* Enable Notifications Section */}
-      <Section elevation={3}>
+      <Section elevation={3} sx={{ borderRadius: 3 }}>
         <Typography variant="h6" gutterBottom>
           Enable Notifications
         </Typography>
@@ -88,7 +154,7 @@ const AppSettings: React.FC = () => {
       </Section>
 
       {/* Choose Theme Section */}
-      <Section elevation={3}>
+      <Section elevation={3} sx={{ borderRadius: 3 }}>
         <Typography variant="h6" gutterBottom>
           Choose Theme
         </Typography>

@@ -1,5 +1,0 @@
-/* Assuming sonner uses a specific class for the close button */
-.sonner-toast__close-button {
-    border-radius: 50%; /* Makes the close button circular */
-  }
-

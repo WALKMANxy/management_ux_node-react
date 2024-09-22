@@ -1,5 +1,4 @@
 import { toast } from "sonner";
-import "./sonnerToast.css";
 
 export const showToast = {
   default: (message: string) => {

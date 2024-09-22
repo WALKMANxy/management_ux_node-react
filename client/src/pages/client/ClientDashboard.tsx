@@ -193,7 +193,7 @@ const ClientDashboard: React.FC = () => {
               </Grid>
               <Grid container item xs={12} md={6}>
                 {clientDetails ? (
-                  <ActivePromotions isLoading={isLoading} />
+                  <ActivePromotions />
                 ) : (
                   <Skeleton
                     animation="wave"

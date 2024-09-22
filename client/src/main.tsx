@@ -3,6 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { I18nextProvider } from "react-i18next";
 import { Provider } from "react-redux";
+import { Toaster } from "sonner";
 import App from "./App";
 import store from "./app/store";
 import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
@@ -16,7 +17,6 @@ webSocketService.injectStore(store);
 
 registerPWA();
 
-
 const container = document.getElementById("root");
 const root = ReactDOM.createRoot(container!);
 
@@ -25,6 +25,13 @@ root.render(
     <ErrorBoundary>
       <Provider store={store}>
         <I18nextProvider i18n={i18n}>
+          <Toaster
+            theme="system"
+            richColors
+            closeButton
+            position="bottom-center" // Position the toast at the bottom center
+            toastOptions={{ duration: 3000 }}
+          />
           <App />
         </I18nextProvider>
       </Provider>
