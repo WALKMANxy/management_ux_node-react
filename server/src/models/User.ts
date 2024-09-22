@@ -7,7 +7,7 @@ export interface IUser extends Document {
   password?: string;
   passwordResetToken?: string;
   passwordResetExpires?: Date;
-  role: "admin" | "agent" | "client" | "guest";
+  role: "admin" | "agent" | "client" | "employee" | "guest";
   entityCode?: string;
   entityName?: string;
   avatar?: string;
@@ -29,7 +29,7 @@ const userSchema = new Schema<IUser>(
     role: {
       type: String,
       required: true,
-      enum: ["admin", "agent", "client", "guest"],
+      enum: ["admin", "agent", "client", "employee", "guest"],
       default: "guest",
     },
     entityCode: { type: String },
