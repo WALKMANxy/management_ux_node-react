@@ -26,6 +26,7 @@ import VisitsPage from "./pages/common/VisitsPage";
 import LandingPage from "./pages/landing/LandingPage";
 import { refreshSession } from "./services/sessionService";
 import "./components/statistics/grids/AGGridTable.css"; // Import the custom AG Grid CSS
+import CalendarPage from "./pages/common/CalendarPage";
 /* console.log("Vite mode:", import.meta.env.MODE);
  */
 
@@ -137,6 +138,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <PromosPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "calendar",
+        element: (
+          <ProtectedRoute>
+            <CalendarPage />
           </ProtectedRoute>
         ),
       },

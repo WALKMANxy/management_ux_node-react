@@ -80,3 +80,40 @@ export interface IChat {
   updatedAt?: Date;
   status: "pending" | "created" | "failed"; // Status indicating the chat state
 }
+
+export type CalendarEvent = {
+  _id?: string;
+  userId: string;
+  startDate: Date;
+  endDate: Date;
+  eventType: "absence" | "holiday" | "event";
+  eventName: string;
+  reason:
+    | "illness"
+    | "day_off"
+    | "unexpected_event"
+    | "medical_visit"
+    | "public_holiday"
+    | "company_holiday"
+    | "company_meeting"
+    | "company_party"
+    | "conference"
+    | "expo"
+    | "generic";
+  note?: string;
+  status: "pending" | "approved" | "rejected" | "cancelled";
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export interface Holiday {
+  date: string; // ISO date string (e.g., "2024-01-01")
+  localName: string;
+  name: string;
+  countryCode: string;
+  fixed: boolean;
+  global: boolean;
+  counties: string[] | null;
+  launchYear: number | null;
+  types: string[];
+}

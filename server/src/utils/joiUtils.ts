@@ -19,17 +19,50 @@ export const messageSchema = Joi.object({
   }).required(),
 });
 
-export const createRequestSchema = Joi.object({
+// Schema for creating a new CalendarEvent
+export const createEventSchema = Joi.object({
   startDate: Joi.date().required(),
   endDate: Joi.date().greater(Joi.ref("startDate")).required(),
-  reason: Joi.string()
-    .valid("illness", "day_off", "unexpected_event", "medical_visit")
+  eventType: Joi.string()
+    .valid("holiday", "event", "absence")
     .required(),
+  reason: Joi.when("eventType", {
+    switch: [
+      {
+        is: "absence",
+        then: Joi.string().valid(
+          "illness",
+          "day_off",
+          "unexpected_event",
+          "medical_visit"
+        ).required(),
+      },
+      {
+        is: "holiday",
+        then: Joi.string().valid(
+          "public_holiday",
+          "company_holiday",
+          "religious_holiday"
+        ).required(),
+      },
+      {
+        is: "event",
+        then: Joi.string().valid(
+          "company_meeting",
+          "company_party",
+          "conference",
+          "expo",
+          "generic"
+        ).required(),
+      },
+    ],
+    otherwise: Joi.forbidden(), // Forbid reason if eventType doesn't match any known value
+  }),
   note: Joi.string().optional(),
 });
 
-// Schema for updating the status of a request
-export const updateRequestStatusSchema = Joi.object({
+// Schema for updating the status of a CalendarEvent
+export const updateEventStatusSchema = Joi.object({
   status: Joi.string()
     .valid("pending", "approved", "rejected", "cancelled")
     .required(),
