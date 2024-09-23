@@ -19,6 +19,7 @@ dayjs.extend(localeData);
 dayjs.extend(localizedFormat);
 dayjs.extend(minMax);
 dayjs.extend(utc);
+dayjs.extend(localeData);
 
 // Dynamically set the locale based on i18n's current language
 const currentLocale = i18n.language;

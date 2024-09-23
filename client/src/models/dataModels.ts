@@ -86,7 +86,7 @@ export type CalendarEvent = {
   userId: string;
   startDate: Date;
   endDate: Date;
-  eventType: "absence" | "holiday" | "event";
+  eventType: "absence" | "holiday" | "event" | "";
   eventName: string;
   reason:
     | "illness"
@@ -99,7 +99,8 @@ export type CalendarEvent = {
     | "company_party"
     | "conference"
     | "expo"
-    | "generic";
+    | "generic"
+    | "";
   note?: string;
   status: "pending" | "approved" | "rejected" | "cancelled";
   createdAt: Date;

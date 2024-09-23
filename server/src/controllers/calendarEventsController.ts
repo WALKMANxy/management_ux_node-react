@@ -1,8 +1,8 @@
 import { Response } from "express";
-import { AuthenticatedRequest } from "../models/types";
-import { logger } from "../utils/logger";
 import { emitToAdmins, emitToUser } from "../middlewares/webSocket";
+import { AuthenticatedRequest } from "../models/types";
 import { CalendarEventService } from "../services/calendarEventsService";
+import { logger } from "../utils/logger";
 
 export class CalendarEventController {
   // Create a new calendar event
@@ -46,7 +46,9 @@ export class CalendarEventController {
           error instanceof Error ? error.message : error
         }`
       );
-      return res.status(500).json({ message: "Failed to create calendar event" });
+      return res
+        .status(500)
+        .json({ message: "Failed to create calendar event" });
     }
   }
 
@@ -55,39 +57,73 @@ export class CalendarEventController {
     req: AuthenticatedRequest,
     res: Response
   ) {
+    logger.debug("getEventsByMonthForAdmin called");
+
     try {
+      // Log the incoming request details
+      logger.debug(
+        `Request received with query parameters: ${JSON.stringify(req.query)}`
+      );
+
       const { year, month } = req.query;
 
+      // Validate query parameters
       if (!year || !month) {
-        logger.warn(`Missing year or month query parameters`);
+        logger.warn(
+          `Missing year or month query parameters. Received - year: ${year}, month: ${month}`
+        );
         return res.status(400).json({
           message: "Year and month query parameters are required.",
         });
       }
 
+      logger.debug(
+        `Attempting to fetch events for year: ${year}, month: ${month}`
+      );
+
+      // Fetch events
       const events = await CalendarEventService.getEventsByMonthForAdmin(
         Number(year),
         Number(month)
       );
 
-      logger.info(
-        `Fetched all calendar events for the admin in ${month}/${year}`
+      if (events && events.length > 0) {
+        logger.info(
+          `Fetched ${events.length} events for the admin in ${month}/${year}`
+        );
+      } else {
+        logger.info(`No events found for the admin in ${month}/${year}`);
+      }
+
+      // Log the fetched events (limit the log size to avoid excessive output)
+      logger.debug(
+        `Fetched events: ${JSON.stringify(events, null, 2).substring(
+          0,
+          1000
+        )}...`
       );
+
       return res.status(200).json(events);
     } catch (error) {
       logger.error(
         `Error fetching all calendar events by month: ${
-          error instanceof Error ? error.message : error
+          error instanceof Error ? error.message : JSON.stringify(error)
         }`
       );
+
+      // Log the stack trace if available
+      if (error instanceof Error) {
+        logger.error(error.stack);
+      }
+
       return res
         .status(500)
         .json({ message: "Failed to fetch calendar events" });
     }
   }
 
-   // Get events by status and user ID for a specific month
-   static async getEventsByStatusAndUser(
+  // Get events by status and user ID for a specific month
+  static async getEventsByStatusAndUser(
     req: AuthenticatedRequest,
     res: Response
   ) {
@@ -112,8 +148,7 @@ export class CalendarEventController {
         logger.info(
           `No calendar events found for user ${userId} in ${month}/${year}`
         );
-        return res
-          .status(200)
+        return res.status(200);
       }
 
       logger.info(
@@ -162,7 +197,11 @@ export class CalendarEventController {
       logger.info(`Calendar event with ID ${eventId} updated to ${status}`);
 
       // Emit WebSocket event for status update to the event's user
-      emitToUser(updatedEvent.userId.toString(), "calendarEvents:newStatusUpdate", updatedEvent);
+      emitToUser(
+        updatedEvent.userId.toString(),
+        "calendarEvents:newStatusUpdate",
+        updatedEvent
+      );
 
       return res.status(200).json(updatedEvent);
     } catch (error) {

@@ -158,5 +158,16 @@
     "email": "E-mail",
     "vat": "VAT Number",
     "credits": "credits: @2024"
-  }
+  },
+  "reasons": {
+    "company_party": "Company Party",
+    "conference": "Conference",
+    "expo": "Expo",
+    "illness": "Illness",
+    "day_off": "Day Off"
+  },
+  "Failed to load server events. Showing holiday events only.": "Failed to load server events. Showing holiday events only.",
+  "Failed to load holiday events. Showing server events only.": "Failed to load holiday events. Showing server events only.",
+  "Failed to load events.": "Failed to load events.",
+  "Please select at least one day.": "Please select at least one day."
 }

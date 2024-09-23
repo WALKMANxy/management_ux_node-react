@@ -300,7 +300,7 @@ export interface CreateEventPayload {
   userId: string;
   startDate: Date;
   endDate: Date;
-  eventType: "absence" | "holiday" | "event";
+  eventType: "absence" | "holiday" | "event" | "";
   reason:
     | "illness"
     | "day_off"
@@ -313,7 +313,8 @@ export interface CreateEventPayload {
     | "company_party"
     | "conference"
     | "expo"
-    | "generic";
+    | "generic"
+    | "";
   note?: string;
 }
 
@@ -322,6 +323,4 @@ export interface UpdateEventStatusPayload {
   status: "pending" | "approved" | "rejected" | "cancelled";
 }
 
-export interface GetEventsByMonthResponse {
-  events: CalendarEvent[];
-}
+export type GetEventsByMonthResponse = CalendarEvent[];

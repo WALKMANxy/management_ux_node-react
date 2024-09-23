@@ -1,8 +1,6 @@
 // hooks/useCalendar.ts
 
 import { useMediaQuery, useTheme } from "@mui/material";
-import { SerializedError } from "@reduxjs/toolkit";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import dayjs from "dayjs";
 import { useCallback, useMemo, useState } from "react";
 import { SlotInfo } from "react-big-calendar";
@@ -19,28 +17,12 @@ import { CalendarEvent } from "../models/dataModels";
 import { CreateEventPayload } from "../models/propsModels";
 import { showToast } from "../utils/toastMessage";
 
-interface UseCalendarReturnType {
-  selectedDays: Date[];
-  viewMode: "calendar" | "history";
-  openForm: boolean;
-  serverEvents: CalendarEvent[] | undefined;
-  isServerLoading: boolean;
-  serverError: FetchBaseQueryError | SerializedError | undefined;
-  creatingError: FetchBaseQueryError | SerializedError | undefined;
-  handleSelectSlot: (slotInfo: SlotInfo) => void;
-  handleSelectEvent: (event: CalendarEvent) => void;
-  handleFormSubmit: (data: CreateEventPayload) => void;
-  handleFormCancel: () => void;
-  toggleViewMode: () => void;
-  defaultDate: Date;
-  scrollToTime: Date;
-  isCreating: boolean;
-}
-
-export const useCalendar = (): UseCalendarReturnType => {
+export const useCalendar = () => {
   const [selectedDays, setSelectedDays] = useState<Date[]>([]);
   const [viewMode, setViewMode] = useState<"calendar" | "history">("calendar");
   const [openForm, setOpenForm] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(dayjs().month() + 1);
+  const [currentYear, setCurrentYear] = useState(dayjs().year());
 
   const userRole = useSelector(selectUserRole);
   const user = useAppSelector(selectCurrentUser);
@@ -48,14 +30,10 @@ export const useCalendar = (): UseCalendarReturnType => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const currentMonth = dayjs().month() + 1;
-  const currentYear = dayjs().year();
-
   // RTK Query Mutations
   const [createEvent, { isLoading: isCreating, error: creatingError }] =
     useCreateEventMutation();
 
-  // Fetch events based on user role
   const {
     data: adminEventsData,
     isLoading: isAdminLoading,
@@ -74,12 +52,28 @@ export const useCalendar = (): UseCalendarReturnType => {
     { skip: userRole === "admin" }
   );
 
+  // Function to update current month and year
+  const updateCurrentDate = (date: Date) => {
+    setCurrentMonth(date.getMonth() + 1);
+    setCurrentYear(date.getFullYear());
+  };
+
   const serverEvents: CalendarEvent[] | undefined = useMemo(() => {
+    console.log("User role:", userRole);
+    console.log("Admin events data:", adminEventsData);
+    console.log("User events data:", userEventsData);
+
+    let events;
+
     if (userRole === "admin") {
-      return adminEventsData?.events || [];
+      events = adminEventsData || [];
     } else {
-      return userEventsData?.events || [];
+      events = userEventsData || [];
     }
+
+    console.log("Server events after processing:", events);
+
+    return events;
   }, [adminEventsData, userEventsData, userRole]);
 
   const isServerLoading = isAdminLoading || isUserLoading;
@@ -148,7 +142,7 @@ export const useCalendar = (): UseCalendarReturnType => {
           : selectedDays[1],
         eventType: data.eventType,
         reason: data.reason as CalendarEvent["reason"],
-        note: data.note,
+        note: data.note?.trim() || undefined,
       };
 
       await createEvent(payload).unwrap();
@@ -192,5 +186,6 @@ export const useCalendar = (): UseCalendarReturnType => {
     defaultDate,
     scrollToTime,
     isCreating,
+    updateCurrentDate,
   };
 };
