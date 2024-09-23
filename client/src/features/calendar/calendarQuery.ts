@@ -1,5 +1,4 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import i18n from "../../i18n";
 import { CalendarEvent, Holiday } from "../../models/dataModels";
 import {
   CreateEventPayload,
@@ -8,7 +7,13 @@ import {
 } from "../../models/propsModels";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
-const currentLocale = i18n.language;
+
+const currentLocale = (navigator.language || navigator.languages[0]).replace(
+  /^[a-z]{2}-/,
+  ""
+);
+/* console.debug(`Modified locale (region only): ${currentLocale}`);
+ */
 
 // Utility function to convert strings to Date objects
 const normalizeDate = (date: string | Date): Date => {
@@ -50,20 +55,26 @@ export const calendarApi = createApi({
     }),
 
     getEventsByStatusAndUser: builder.query<
-      GetEventsByMonthResponse,
+      CalendarEvent[],
       { year: number; month: number }
     >({
       query: ({ year, month }) => {
-        // Debugging: Log the query parameters
         console.log("Fetching User Events:", { year, month });
-
         return `calendar/events/user?year=${year}&month=${month}`;
       },
+      transformResponse: (response: GetEventsByMonthResponse) => {
+        // Normalize date strings to Date objects
+        return response.map((event) => ({
+          ...event,
+          createdAt: normalizeDate(event.createdAt),
+          startDate: normalizeDate(event.startDate),
+          endDate: normalizeDate(event.endDate),
+          updatedAt: normalizeDate(event.updatedAt),
+        }));
+      },
       providesTags: (result) => {
-        if (result && result) {
-          // Debugging: Log the result events
+        if (result && Array.isArray(result)) {
           console.log("User Events Fetched:", result);
-
           return result.map(
             ({ _id }) => ({ type: "CalendarEvent", _id: _id } as const)
           );
@@ -96,22 +107,15 @@ export const calendarApi = createApi({
       ],
     }),
     // Public API endpoint
-    getHolidays: builder.query<Holiday[], void>({
-      async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
-        const currentYear = new Date().getFullYear();
+    getHolidays: builder.query<Holiday[], { year: number }>({
+      async queryFn({ year }, _queryApi, _extraOptions, fetchWithBQ) {
         let countryCode = "IT"; // Default to Italy
 
-        // Map i18n language to the country code
-        if (currentLocale === "en") {
-          countryCode = "US"; // For example, US for English
-        } else if (currentLocale === "it") {
-          countryCode = "IT"; // Italy
-        }
-
-        const url = `https://date.nager.at/api/v3/PublicHolidays/${currentYear}/${countryCode}`;
-        console.log(
-          `Fetching holidays for ${currentYear} in ${countryCode} from ${url}`
-        );
+        /*         console.debug(`Current locale: ${currentLocale}`);
+         */ // Map i18n language to the country code
+        countryCode = currentLocale.toUpperCase();
+        /*         console.debug(`Country code set to: ${countryCode}`);
+         */ const url = `https://date.nager.at/api/v3/PublicHolidays/${year}/${countryCode}`;
 
         try {
           const result = await fetchWithBQ({

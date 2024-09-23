@@ -1,15 +1,12 @@
 // pages/CalendarPage.tsx
 
-import AddIcon from "@mui/icons-material/Add";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import {
   Box,
   CircularProgress,
-  Fab,
   IconButton,
   Paper,
-  useMediaQuery,
   useTheme,
 } from "@mui/material";
 import React, { Fragment, useEffect } from "react";
@@ -44,34 +41,30 @@ const CalendarPage: React.FC = () => {
     handleFormSubmit,
     handleFormCancel,
     toggleViewMode,
-    defaultDate,
-    scrollToTime,
+    /*     defaultDate,
+     */ scrollToTime,
     isCreating,
-    updateCurrentDate,
+    currentDate, // Get currentDate from useCalendar
+    setCurrentDate, // Get setCurrentDate from useCalendar
   } = useCalendar();
 
   const { holidayEvents, isHolidaysLoading, holidaysError } =
-    useCalendarWithHolidays();
+    useCalendarWithHolidays(currentDate);
 
   const userRole = useSelector(selectUserRole);
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // State to hold the final events to display
   const [displayEvents, setDisplayEvents] = React.useState<CalendarEvent[]>([]);
 
   // Effect to handle merging based on error states
   useEffect(() => {
-    console.log("Server Events:", serverEvents);
-    console.log("Holiday Events:", holidayEvents);
-    console.log("Server Error:", serverError);
-    console.log("Holidays Error:", holidaysError);
-
     if (!serverError && !holidaysError && serverEvents && holidayEvents) {
       // Both fetches succeeded, merge the events
       setDisplayEvents([...serverEvents, ...holidayEvents]);
-      console.log("Merged Events:", [...serverEvents, ...holidayEvents]);
+      /*       console.log("Merged Events:", [...serverEvents, ...holidayEvents]);
+       */
     } else if (serverError && !holidaysError && holidayEvents) {
       // Server events failed, show only holiday events
       setDisplayEvents(holidayEvents);
@@ -119,47 +112,26 @@ const CalendarPage: React.FC = () => {
     const day = date.getDay(); // Get the day of the week (0 = Sunday, 6 = Saturday)
     const isWeekend = day === 0 || day === 6;
 
-    // Check if any events exist on this day and apply specific background colors
+    // Check if any events exist on this day
     const hasEventTypeEvent = serverEvents?.some(
       (event) =>
         new Date(event.startDate).toDateString() === date.toDateString() &&
         event.eventType === "event"
     );
 
-    const hasApprovedAbsence = serverEvents?.some(
-      (event) =>
-        new Date(event.startDate).toDateString() === date.toDateString() &&
-        event.eventType === "absence" &&
-        event.status === "approved"
-    );
+    // Return styles for the day
+    const styles = {
+      holiday: isHoliday ? { backgroundColor: "rgba(255, 0, 0, 0.05)" } : {},
+      event: hasEventTypeEvent
+        ? { backgroundColor: "rgba(0, 0, 255, 0.05)" }
+        : {},
+      weekend:
+        isWeekend && userRole !== "admin" ? { cursor: "not-allowed" } : {},
+    };
 
-    if (isHoliday) {
-      return {
-        style: {
-          backgroundColor: "rgba(255, 0, 0, 0.05)", // Very faint red background for holidays
-        },
-      };
-    } else if (hasEventTypeEvent) {
-      return {
-        style: {
-          backgroundColor: "rgba(0, 0, 255, 0.05)", // Very faint blue background for eventType: event
-        },
-      };
-    } else if (hasApprovedAbsence) {
-      return {
-        style: {
-          backgroundColor: "rgba(255, 0, 0, 0.1)", // Very faint red background for eventType: absence with approved status
-        },
-      };
-    } else if (isWeekend && userRole !== "admin") {
-      return {
-        style: {
-          cursor: "not-allowed", // Change the cursor to indicate it's non-clickable
-        },
-        className: "non-clickable-day", // Optional: Add a class for further customization if needed
-      };
-    }
-    return {};
+    return {
+      style: { ...styles.holiday, ...styles.event, ...styles.weekend },
+    };
   };
 
   // Function to customize event styles based on event type
@@ -233,48 +205,29 @@ const CalendarPage: React.FC = () => {
               onSelectEvent={handleSelectEvent}
               onSelectSlot={handleSelectSlot}
               dayLayoutAlgorithm="no-overlap"
-              defaultDate={defaultDate}
+              defaultDate={currentDate}
               scrollToTime={scrollToTime}
               views={["month", "week", "day"]}
               step={60}
               showMultiDayTimes
-              onNavigate={(newDate: Date) => {
-                updateCurrentDate(newDate);
-              }}
               defaultView="month"
               dayPropGetter={dayPropGetter} // Apply the dayPropGetter
               eventPropGetter={(event) => ({
                 style: eventStyleGetter(event as CalendarEvent),
               })}
               components={{
-                toolbar: CustomToolbar,
+                toolbar: (toolbarProps) => (
+                  <CustomToolbar
+                    toolbar={toolbarProps}
+                    currentDate={currentDate}
+                    setCurrentDate={setCurrentDate}
+                  />
+                ),
                 event: CalendarEventComponent, // Use the custom event component
               }}
             />
           </Paper>
 
-          {/* Floating Action Button for Mobile Users */}
-          {isMobile && selectedDays.length > 0 && (
-            <Fab
-              color="primary"
-              aria-label="add"
-              className="fab-button"
-              sx={{ position: "fixed", bottom: 16, right: 16 }}
-              onClick={() => {
-                if (selectedDays.length === 0) {
-                  showToast.error("Please select at least one day.");
-                  return;
-                }
-                // Open the form
-                // Since `setOpenForm` is handled inside `useCalendar`, you might need to expose a method to open it here
-                // For simplicity, ensure the form is open if not already
-                // Assuming `openForm` can be toggled externally
-                // Alternatively, ensure the FAB triggers a side-effect to open the form
-              }}
-            >
-              <AddIcon />
-            </Fab>
-          )}
           <EventForm
             open={openForm}
             selectedDays={selectedDays}
