@@ -12,6 +12,7 @@ import {
   Menu as MenuIcon,
   People as PeopleIcon,
 } from "@mui/icons-material";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import {
   AppBar,
   Box,
@@ -33,11 +34,11 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../app/hooks";
 import { RootState } from "../../app/store";
 import { handleLogout } from "../../features/auth/authSlice";
+import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 import { clearSelection } from "../../features/data/dataSlice";
 import GlobalSearch from "./GlobalSearch";
 import NotificationBell from "./NotificationBell";
 import UserAvatar from "./UserAvatar";
-import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 
 const Header: React.FC = () => {
   const theme = useTheme();
@@ -94,7 +95,6 @@ const Header: React.FC = () => {
     // Update the previous location to the current one
     prevLocationRef.current = location.pathname;
   });
-
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -195,6 +195,12 @@ const Header: React.FC = () => {
             <LocalOfferIcon />
           </ListItemIcon>
           <ListItemText primary={t("promos")} />
+        </ListItem>
+        <ListItem button component={Link} to="/calendar" onClick={toggleDrawer}>
+          <ListItemIcon sx={{ color: "white" }}>
+            <CalendarMonthIcon />
+          </ListItemIcon>
+          <ListItemText primary={t("calendar")} />
         </ListItem>
       </>
     );

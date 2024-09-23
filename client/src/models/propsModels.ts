@@ -7,7 +7,7 @@ import {
 import { AgGridReact } from "ag-grid-react";
 import { Dayjs } from "dayjs";
 import { ReactNode } from "react";
-import { Movement, MovementDetail } from "./dataModels";
+import { CalendarEvent, Movement, MovementDetail } from "./dataModels";
 import { Agent, Client, UserRole } from "./entityModels";
 import { SearchResult } from "./searchModels";
 
@@ -294,4 +294,34 @@ export interface TopBrandsSoldProps {
   brandColors: string[];
   isMobile: boolean;
   userRole: UserRole;
+}
+
+export interface CreateEventPayload {
+  userId: string;
+  startDate: Date;
+  endDate: Date;
+  eventType: "absence" | "holiday" | "event";
+  reason:
+    | "illness"
+    | "day_off"
+    | "unexpected_event"
+    | "medical_visit"
+    | "public_holiday"
+    | "company_holiday"
+    | "religious_holiday"
+    | "company_meeting"
+    | "company_party"
+    | "conference"
+    | "expo"
+    | "generic";
+  note?: string;
+}
+
+export interface UpdateEventStatusPayload {
+  eventId: string;
+  status: "pending" | "approved" | "rejected" | "cancelled";
+}
+
+export interface GetEventsByMonthResponse {
+  events: CalendarEvent[];
 }
