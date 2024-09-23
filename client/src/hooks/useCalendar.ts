@@ -21,8 +21,10 @@ export const useCalendar = () => {
   const [selectedDays, setSelectedDays] = useState<Date[]>([]);
   const [viewMode, setViewMode] = useState<"calendar" | "history">("calendar");
   const [openForm, setOpenForm] = useState(false);
-  const [currentMonth, setCurrentMonth] = useState(dayjs().month() + 1);
-  const [currentYear, setCurrentYear] = useState(dayjs().year());
+  const [currentDate, setCurrentDate] = useState<Date>(new Date()); // Centralized currentDate
+
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentYear = currentDate.getFullYear();
 
   const userRole = useSelector(selectUserRole);
   const user = useAppSelector(selectCurrentUser);
@@ -52,17 +54,7 @@ export const useCalendar = () => {
     { skip: userRole === "admin" }
   );
 
-  // Function to update current month and year
-  const updateCurrentDate = (date: Date) => {
-    setCurrentMonth(date.getMonth() + 1);
-    setCurrentYear(date.getFullYear());
-  };
-
   const serverEvents: CalendarEvent[] | undefined = useMemo(() => {
-    console.log("User role:", userRole);
-    console.log("Admin events data:", adminEventsData);
-    console.log("User events data:", userEventsData);
-
     let events;
 
     if (userRole === "admin") {
@@ -70,8 +62,6 @@ export const useCalendar = () => {
     } else {
       events = userEventsData || [];
     }
-
-    console.log("Server events after processing:", events);
 
     return events;
   }, [adminEventsData, userEventsData, userRole]);
@@ -89,30 +79,10 @@ export const useCalendar = () => {
         return;
       }
 
-      if (isMobile) {
-        // For mobile, allow multiple selections
-        const isAlreadySelected = selectedDays.some((date) =>
-          dayjs(date).isSame(slotInfo.start, "day")
-        );
-
-        if (isAlreadySelected) {
-          // Deselect the day
-          setSelectedDays((prev) =>
-            prev.filter((date) => !dayjs(date).isSame(slotInfo.start, "day"))
-          );
-        } else {
-          // Select the day
-          setSelectedDays((prev) => [...prev, slotInfo.start]);
-        }
-
-        // Open the form only when the user clicks the FAB
-      } else {
-        // For desktop, open the form immediately
-        setSelectedDays([slotInfo.start, slotInfo.end]);
-        setOpenForm(true);
-      }
+      setSelectedDays([slotInfo.start, slotInfo.end]);
+      setOpenForm(true);
     },
-    [userRole, isMobile, selectedDays]
+    [userRole]
   );
 
   const handleSelectEvent = useCallback((event: CalendarEvent) => {
@@ -167,7 +137,6 @@ export const useCalendar = () => {
     setViewMode((prev) => (prev === "calendar" ? "history" : "calendar"));
   };
 
-  const defaultDate = useMemo(() => new Date(), []);
   const scrollToTime = useMemo(() => new Date(1970, 1, 1, 6), []);
 
   return {
@@ -183,9 +152,9 @@ export const useCalendar = () => {
     handleFormSubmit,
     handleFormCancel,
     toggleViewMode,
-    defaultDate,
     scrollToTime,
     isCreating,
-    updateCurrentDate,
+    currentDate,
+    setCurrentDate,
   };
 };
