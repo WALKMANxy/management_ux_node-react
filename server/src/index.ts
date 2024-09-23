@@ -24,7 +24,7 @@ import movementsRoutes from "./routes/movements";
 import oauthRoutes from "./routes/OAuth";
 import promosRoutes from "./routes/promos";
 import usersRoutes from "./routes/users";
-import dayOffRequestRoutes from "./routes/daysOff"; // Import the new day-off request routes
+import calendarEventsRoutes from "./routes/calendarEvents"; // Import the new day-off request routes
 
 import visitsRoutes from "./routes/visits";
 import { errorHandler } from "./utils/errorHandler";
@@ -81,7 +81,7 @@ app.use("/movements", movementsRoutes);
 app.use("/promos", promosRoutes);
 app.use("/visits", visitsRoutes);
 app.use("/users", usersRoutes);
-app.use("/dayoff", dayOffRequestRoutes); // Register the day-off request routes
+app.use("/calendar", calendarEventsRoutes); // Register the day-off request routes
 
 app.use("/chats", chatRoutes); // Add chat routes
 

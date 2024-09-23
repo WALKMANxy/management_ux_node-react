@@ -13,6 +13,7 @@ import searchReducer from "../features/search/searchSlice";
 import { userApi } from "../features/users/userQueries";
 import userReducer from "../features/users/userSlice";
 import { promoVisitApi } from "../features/data/promosVisitsQueries";
+import { calendarApi } from "../features/calendar/calendarQuery";
 
 // Combine all your reducers
 const appReducer = combineReducers({
@@ -25,7 +26,8 @@ const appReducer = combineReducers({
   [authApi.reducerPath]: authApi.reducer,
   [userApi.reducerPath]: userApi.reducer,
   [chatApi.reducerPath]: chatApi.reducer,
-  [dataApi.reducerPath]: dataApi.reducer, // Add the dataApi reducer here
+  [dataApi.reducerPath]: dataApi.reducer,
+  [calendarApi.reducerPath]: calendarApi.reducer,
   [promoVisitApi.reducerPath]: promoVisitApi.reducer,
 });
 

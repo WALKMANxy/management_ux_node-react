@@ -1,0 +1,12 @@
+/* components/calendarPage/CalendarPage.css */
+
+/* Style for weekend days */
+.rbc-day-bg.rbc-weekend {
+    background-color: #ffe6e6; /* Faint red background */
+  }
+
+  /* Optional: Change cursor to not-allowed for non-selectable weekends */
+  .non-selectable {
+    cursor: not-allowed;
+  }
+  

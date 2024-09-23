@@ -9,6 +9,7 @@ import { userApi } from "../features/users/userQueries";
 import { loadAuthState, saveAuthState } from "../utils/localStorage";
 import listenerMiddleware from "./listeners";
 import rootReducer from "./rootReducer";
+import { calendarApi } from "../features/calendar/calendarQuery";
 
 const preloadedState: Partial<RootState> = {
   auth: loadAuthState(),
@@ -28,7 +29,8 @@ const store = configureStore({
       .concat(chatApi.middleware)
       .concat(dataApi.middleware)
       .concat(promoVisitApi.middleware)
-      .concat(listenerMiddleware.middleware), // Add dataApi middleware
+      .concat(listenerMiddleware.middleware)
+      .concat(calendarApi.middleware),
 });
 
 store.subscribe(() => {
