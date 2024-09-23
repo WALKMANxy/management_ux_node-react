@@ -1,12 +1,16 @@
 /* components/calendarPage/CalendarPage.css */
 
-/* Style for weekend days */
-.rbc-day-bg.rbc-weekend {
-    background-color: #ffe6e6; /* Faint red background */
-  }
+.rbc-header {
+  border-bottom: none;
+  padding-top: 0.5rem;
+}
 
-  /* Optional: Change cursor to not-allowed for non-selectable weekends */
-  .non-selectable {
-    cursor: not-allowed;
-  }
-  
+.rbc-toolbar .rbc-toolbar-label {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.rbc-date-cell {
+padding-top: 0.5rem;
+text-align: center;
+}

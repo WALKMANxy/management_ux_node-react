@@ -10,6 +10,12 @@ import {
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
 const currentLocale = i18n.language;
 
+// Utility function to convert strings to Date objects
+const normalizeDate = (date: string | Date): Date => {
+  // Only convert if the date is a string
+  return typeof date === "string" ? new Date(date) : date;
+};
+
 // Base query for your server endpoints
 const baseQueryWithCredentials = fetchBaseQuery({
   baseUrl,
@@ -22,31 +28,52 @@ export const calendarApi = createApi({
   tagTypes: ["CalendarEvent"],
   endpoints: (builder) => ({
     getEventsByMonthForAdmin: builder.query<
-      GetEventsByMonthResponse,
+      CalendarEvent[],
       { year: number; month: number }
     >({
       query: ({ year, month }) =>
         `calendar/events/admin?year=${year}&month=${month}`,
+      transformResponse: (response: GetEventsByMonthResponse) => {
+        // Convert date strings to Date objects
+        return response.map((event) => ({
+          ...event,
+          createdAt: normalizeDate(event.createdAt),
+          startDate: normalizeDate(event.startDate),
+          endDate: normalizeDate(event.endDate),
+          updatedAt: normalizeDate(event.updatedAt),
+        }));
+      },
       providesTags: (result) =>
-        result && result.events
-          ? result.events.map(
-              ({ _id }) => ({ type: "CalendarEvent", _id: _id } as const)
-            )
+        result
+          ? result.map(({ _id }) => ({ type: "CalendarEvent", _id }))
           : ["CalendarEvent"],
     }),
+
     getEventsByStatusAndUser: builder.query<
       GetEventsByMonthResponse,
       { year: number; month: number }
     >({
-      query: ({ year, month }) =>
-        `calendar/events/user?year=${year}&month=${month}`,
-      providesTags: (result) =>
-        result && result.events
-          ? result.events.map(
-              ({ _id }) => ({ type: "CalendarEvent", _id: _id } as const)
-            )
-          : ["CalendarEvent"],
+      query: ({ year, month }) => {
+        // Debugging: Log the query parameters
+        console.log("Fetching User Events:", { year, month });
+
+        return `calendar/events/user?year=${year}&month=${month}`;
+      },
+      providesTags: (result) => {
+        if (result && result) {
+          // Debugging: Log the result events
+          console.log("User Events Fetched:", result);
+
+          return result.map(
+            ({ _id }) => ({ type: "CalendarEvent", _id: _id } as const)
+          );
+        } else {
+          console.log("No User Events Found or Fetch Failed.");
+          return ["CalendarEvent"];
+        }
+      },
     }),
+
     createEvent: builder.mutation<CalendarEvent, CreateEventPayload>({
       query: (newEvent) => ({
         url: "calendar/events",
