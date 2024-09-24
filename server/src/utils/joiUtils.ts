@@ -57,6 +57,14 @@ export const createEventSchema = Joi.object({
   note: Joi.string().optional(),
 });
 
+export const editEventSchema = Joi.object({
+  startDate: Joi.date().optional(),
+  endDate: Joi.date().optional(),
+  eventType: Joi.string().valid('absence', 'holiday', 'event').optional(),
+  reason: Joi.string().optional(),
+  note: Joi.string().allow('', null).optional(),
+});
+
 // Schema for updating the status of a CalendarEvent
 export const updateEventStatusSchema = Joi.object({
   status: Joi.string()
