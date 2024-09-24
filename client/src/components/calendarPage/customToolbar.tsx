@@ -8,11 +8,13 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Tooltip,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
 import { DateRangeIcon } from "@mui/x-date-pickers";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface CustomToolbarProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,6 +28,7 @@ export const CustomToolbar: React.FC<CustomToolbarProps> = ({
   setCurrentDate,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -136,9 +139,15 @@ export const CustomToolbar: React.FC<CustomToolbarProps> = ({
             open={Boolean(anchorEl)}
             onClose={() => setAnchorEl(null)}
           >
-            <MenuItem onClick={() => handleViewChange("month")}>Month</MenuItem>
-            <MenuItem onClick={() => handleViewChange("week")}>Week</MenuItem>
-            <MenuItem onClick={() => handleViewChange("day")}>Day</MenuItem>
+            <MenuItem onClick={() => handleViewChange("month")}>
+              {t("customToolbar.view.month")}
+            </MenuItem>
+            <MenuItem onClick={() => handleViewChange("week")}>
+              {t("customToolbar.view.week")}
+            </MenuItem>
+            <MenuItem onClick={() => handleViewChange("day")}>
+              {t("customToolbar.view.day")}
+            </MenuItem>
           </Menu>
         </>
       ) : (
@@ -150,17 +159,19 @@ export const CustomToolbar: React.FC<CustomToolbarProps> = ({
           }}
         >
           {/* Refresh Icon anchored to flex start */}
-          <IconButton
-            onClick={goToToday}
-            aria-label="today"
-            style={{
-              marginRight: "8px",
-              borderRadius: "20px",
-              border: "none",
-            }}
-          >
-            <RestartAltIcon fontSize="large" />
-          </IconButton>
+          <Tooltip title={t("customToolbar.today")}>
+            <IconButton
+              onClick={goToToday}
+              aria-label="today"
+              style={{
+                marginRight: "8px",
+                borderRadius: "20px",
+                border: "none",
+              }}
+            >
+              <RestartAltIcon fontSize="large" />
+            </IconButton>
+          </Tooltip>
 
           {/* Navigation Buttons and Title anchored at center */}
           <div
@@ -171,13 +182,15 @@ export const CustomToolbar: React.FC<CustomToolbarProps> = ({
               justifyContent: "center",
             }}
           >
-            <IconButton
-              onClick={goToBack}
-              aria-label="previous"
-              style={{ borderRadius: "20px", border: "none" }}
-            >
-              <ChevronLeftIcon fontSize="large" />
-            </IconButton>
+            <Tooltip title={t("customToolbar.previous")}>
+              <IconButton
+                onClick={goToBack}
+                aria-label="previous"
+                style={{ borderRadius: "20px", border: "none" }}
+              >
+                <ChevronLeftIcon fontSize="large" />
+              </IconButton>
+            </Tooltip>
             <span
               className="rbc-toolbar-label"
               style={{
@@ -193,13 +206,15 @@ export const CustomToolbar: React.FC<CustomToolbarProps> = ({
             >
               {toolbar.label}
             </span>
-            <IconButton
-              onClick={goToNext}
-              aria-label="next"
-              style={{ borderRadius: "20px", border: "none" }}
-            >
-              <ChevronRightIcon fontSize="large" />
-            </IconButton>
+            <Tooltip title={t("customToolbar.next")}>
+              <IconButton
+                onClick={goToNext}
+                aria-label="next"
+                style={{ borderRadius: "20px", border: "none" }}
+              >
+                <ChevronRightIcon fontSize="large" />
+              </IconButton>
+            </Tooltip>
           </div>
 
           {/* View Buttons anchored at flex-end */}
@@ -210,27 +225,33 @@ export const CustomToolbar: React.FC<CustomToolbarProps> = ({
               marginLeft: "auto",
             }}
           >
-            <IconButton
-              onClick={goToMonthView}
-              aria-label="month view"
-              style={{ borderRadius: "20px", border: "none" }}
-            >
-              <CalendarViewMonthIcon fontSize="large" />
-            </IconButton>
-            <IconButton
-              onClick={goToWeekView}
-              aria-label="week view"
-              style={{ borderRadius: "20px", border: "none" }}
-            >
-              <ViewWeekIcon fontSize="large" />
-            </IconButton>
-            <IconButton
-              onClick={goToDayView}
-              aria-label="day view"
-              style={{ borderRadius: "20px", border: "none" }}
-            >
-              <ViewDayIcon fontSize="large" />
-            </IconButton>
+            <Tooltip title={t("customToolbar.view.month")}>
+              <IconButton
+                onClick={goToMonthView}
+                aria-label="month view"
+                style={{ borderRadius: "20px", border: "none" }}
+              >
+                <CalendarViewMonthIcon fontSize="large" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("customToolbar.view.week")}>
+              <IconButton
+                onClick={goToWeekView}
+                aria-label="week view"
+                style={{ borderRadius: "20px", border: "none" }}
+              >
+                <ViewWeekIcon fontSize="large" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("customToolbar.view.day")}>
+              <IconButton
+                onClick={goToDayView}
+                aria-label="day view"
+                style={{ borderRadius: "20px", border: "none" }}
+              >
+                <ViewDayIcon fontSize="large" />
+              </IconButton>
+            </Tooltip>
           </div>
         </div>
       )}

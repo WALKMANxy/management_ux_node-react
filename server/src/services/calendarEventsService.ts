@@ -121,4 +121,44 @@ export class CalendarEventService {
       throw new Error("Error while updating calendar event status");
     }
   }
+
+  // Edit an existing calendar event
+  static async editEvent(
+    eventId: string,
+    data: Partial<ICalendarEvent>
+  ): Promise<ICalendarEvent | null> {
+    try {
+      const updatedEvent = await CalendarEvent.findByIdAndUpdate(
+        eventId,
+        { ...data, updatedAt: new Date() },
+        { new: true }
+      ).exec();
+
+      return updatedEvent;
+    } catch (error) {
+      logger.error(
+        `Service error editing calendar event: ${
+          error instanceof Error ? error.message : error
+        }`
+      );
+      throw new Error("Error while editing calendar event");
+    }
+  }
+
+   // Delete a calendar event by its ID
+   static async deleteEvent(eventId: string): Promise<ICalendarEvent | null> {
+    try {
+      const deletedEvent = await CalendarEvent.findByIdAndDelete(eventId).exec();
+      return deletedEvent;
+    } catch (error) {
+      logger.error(
+        `Service error deleting calendar event: ${
+          error instanceof Error ? error.message : error
+        }`
+      );
+      throw new Error("Error while deleting calendar event");
+    }
+  }
+
+  
 }
