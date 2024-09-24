@@ -43,7 +43,7 @@ const SearchResultsContainer = styled(Paper)(({ theme }) => ({
   overflowY: "auto",
   marginTop: theme.spacing(1),
   backdropFilter: "blur(15px)", // Increased blur for a more pronounced frosted effect
-  backgroundColor: "rgba(255, 255, 255, 0.5)", // Slightly more transparent for a frosty look
+  backgroundColor: "rgba(255, 255, 255, 0.8)", // Slightly more transparent for a frosty look
   borderRadius: "12px", // Rounded corners for a smoother look
   padding: theme.spacing(2),
   border: `1px solid rgba(255, 255, 255, 0.3)`, // Light border to enhance the frosted effect

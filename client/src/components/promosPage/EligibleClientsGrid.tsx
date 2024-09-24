@@ -1,7 +1,11 @@
 // src/components/promosPage/EligibleClientsGrid.tsx
 
 import { Box, Button, Tooltip, Typography } from "@mui/material";
-import { ColDef, SelectionOptions, SizeColumnsToContentStrategy } from "ag-grid-community";
+import {
+  ColDef,
+  SelectionOptions,
+  SizeColumnsToContentStrategy,
+} from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css";
 import { AgGridReact } from "ag-grid-react";
 import React, { useMemo, useRef } from "react";
@@ -21,12 +25,13 @@ interface EligibleClientsGridProps {
   setExcludedClients?: (excluded: string[]) => void;
   isViewing: boolean;
 }
+
 const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
-  selectedClients,
+  selectedClients = [],
   setSelectedClients,
-  global,
+  global = false,
   setGlobal,
-  excludedClients,
+  excludedClients = [],
   setExcludedClients,
   isViewing,
 }) => {
@@ -47,8 +52,6 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
       type: "fitCellContents",
     };
   }, []);
-
-  console.log("re rendering eligible clients grid");
 
   // Define column definitions
   const columnDefs: ColDef[] = useMemo(() => {
@@ -108,45 +111,34 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
 
   // Prepare row data based on viewing mode
   const rowData = useMemo(() => {
-    if (isViewing) {
-      return filteredClients; // Use filteredClients when viewing a promo
-    }
-    return Object.values(clients); // Otherwise, use all clients
+    return isViewing ? filteredClients : Object.values(clients);
   }, [isViewing, filteredClients, clients]);
 
   // Handle row selection
   const onSelectionChanged = () => {
     const selectedNodes = gridRef.current?.api.getSelectedNodes();
-    const selectedIds = selectedNodes
-      ? selectedNodes.map((node) => node.data.id)
-      : [];
+    const selectedIds = selectedNodes?.map((node) => node.data.id) || [];
 
     if (global) {
-      setExcludedClients!(selectedIds);
+      setExcludedClients?.(selectedIds);
     } else {
-      setSelectedClients!(selectedIds);
+      setSelectedClients?.(selectedIds);
     }
   };
 
   // Handle Toggle with toast
   const handleToggle = () => {
     const newGlobal = !global;
-    setGlobal!(newGlobal);
+    setGlobal?.(newGlobal);
 
     if (newGlobal) {
-      // If toggling to global
-      showToast.info(
-        "The promo will now apply globally, select a client to exclude it"
-      );
-      setExcludedClients!([]); // Reset excluded clients when switching to global
-      setSelectedClients!([]); // Also clear selected clients
+      showToast.info(t("eligibleClients.globalPromoToast"));
+      setExcludedClients?.([]);
+      setSelectedClients?.([]);
     } else {
-      // If toggling to manual
-      showToast.info(
-        "The promo will now apply manually, select a client to include it"
-      );
-      setSelectedClients!([]); // Reset selected clients when switching to manual
-      setExcludedClients!([]); // Also clear excluded clients
+      showToast.info(t("eligibleClients.manualPromoToast"));
+      setSelectedClients?.([]);
+      setExcludedClients?.([]);
     }
   };
 
@@ -168,10 +160,10 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
       >
         <Typography variant="subtitle1">
           {global
-            ? `${t("eligibleClients.PromoIsGlobal")} (${t(
+            ? `${t("eligibleClients.promoIsGlobal")} (${t(
                 "eligibleClients.excludedClients"
               )}: ${excludedClients?.length ?? 0})`
-            : `${t("eligibleClients.PromoIsNotGlobal")} (${t(
+            : `${t("eligibleClients.promoIsNotGlobal")} (${t(
                 "eligibleClients.selectedClients"
               )}: ${selectedClients?.length ?? 0})`}
         </Typography>
@@ -223,7 +215,9 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
           enableCellTextSelection={true}
           rowBuffer={5}
           autoSizeStrategy={autoSizeStrategy}
-          overlayNoRowsTemplate="<span style='padding: 10px; border: 1px solid #444; background: lightgoldenrodyellow;'>No clients to display</span>"
+          overlayNoRowsTemplate={`<span style="padding: 10px; border: 1px solid #444; background: lightgoldenrodyellow;">${t(
+            "eligibleClients.noClients"
+          )}</span>`}
           defaultColDef={{
             flex: 1,
             floatingFilter: true, // Enable floating filters

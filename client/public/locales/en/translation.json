@@ -106,7 +106,10 @@
     "totalRevenue": "Total Revenue",
     "revenueThisMonth": "Revenue This Month",
     "unpaidRevenue": "Unpaid Revenue",
-    "paymentMethod": "Payment Method"
+    "paymentMethod": "Payment Method",
+    "id": "ID",
+    "address": "Address",
+    "agent": "Agent"
   },
   "landingPage": {
     "welcome": "Welcome back, {name}",
@@ -506,5 +509,111 @@
     "chats": "Chats",
     "settings": "Settings",
     "logout": "Logout"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "register": "Register",
+    "continueToApp": "Continue to {{appName}}",
+    "email": "Email",
+    "password": "Password",
+    "keepMeSignedIn": "Keep me signed in",
+    "recommendedOnTrustedDevices": "Recommended on trusted devices",
+    "enterPassword": "Enter your password",
+    "forgotPassword": "Forgot password?",
+    "newToApp": "New to {{appName}}?",
+    "createAccount": "Create an account",
+    "alreadyHaveAccount": "Already have an account?",
+    "hidePassword": "Hide password",
+    "showPassword": "Show password",
+    "continueWithGoogle": "Continue with Google",
+    "resetPassword": "Reset Password",
+    "resetInstructions": "If you forgot the password, you can reset it by entering your email.",
+    "requestResetCode": "Request Reset Code",
+    "verifyCode": "Verify Code",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "updatePassword": "Update Password",
+    "passwordUppercaseError": "Password must include at least one uppercase letter.",
+    "passwordLowercaseError": "Password must include at least one lowercase letter.",
+    "passwordNumberError": "Password must include at least one number.",
+    "passwordSpecialCharError": "Password must include at least one special character.",
+    "resetCodeSent": "If an account with that email exists, a reset code has been sent.",
+    "requestResetFailed": "Failed to request password reset. Please try again.",
+    "codeVerified": "Code verified successfully. Please set a new password.",
+    "invalidCode": "Invalid or expired code. Please try again.",
+    "passwordsDoNotMatch": "Passwords do not match. Please try again.",
+    "passwordUpdated": "Password updated successfully. You can now log in.",
+    "updatePasswordFailed": "Failed to update password. Please check your inputs.",
+    "enterEmail": "Enter your email",
+    "enterNewPassword": "Enter your new password",
+    "enterVerificationCode": "Enter the verification code provided in your email",
+    "passwordUpdatedToast": "Password updated successfully. You can now log in!"
+  },
+  "movementDetails": {
+    "id": "ID",
+    "dateOfOrder": "Date of Order",
+    "title": "Movement Details",
+    "expand": "Expand details",
+    "collapse": "Collapse details"
+  },
+
+  "createPromoForm": {
+    "createTitle": "Create New Promo",
+    "editTitle": "Edit Promo",
+    "promoTypeLabel": "Promo Type",
+    "promoTypeContract": "Contract",
+    "promoTypeSale": "Sale",
+    "promoTypeExtra": "Extra",
+    "promoTypeRequired": "Promo Type is required",
+    "promoNameLabel": "Promo Name",
+    "promoNameRequired": "Promo Name is required",
+    "startDateLabel": "Start Date",
+    "startDateRequired": "Start Date is required",
+    "endDateLabel": "End Date",
+    "endDateRequired": "End Date is required",
+    "endDateValidation": "End Date cannot be before Start Date.",
+    "discountLabel": "Discount Description",
+    "discountRequired": "Discount Description is required",
+    "discountHelperText": "e.g., 'Every 100 euros spent, you get a 10 euros coupon'",
+    "eligibleClientsLabel": "Eligible Clients",
+    "excludedClientsLabel": "Excluded Clients",
+    "createPromo": "Create Promo",
+    "updatePromo": "Update Promo",
+    "cancel": "Cancel"
+  },
+
+  "eligibleClients": {
+    "promoIsGlobal": "Promo is global",
+    "promoIsNotGlobal": "Promo is not global",
+    "excludedClients": "Excluded Clients",
+    "selectedClients": "Selected Clients",
+    "switchToManual": "Switch to manual selection",
+    "switchToGlobal": "Switch to global promo",
+    "globalPromo": "Global Promo",
+    "manualSelection": "Manual Selection",
+    "globalPromoToast": "The promo will now apply globally. Select a client to exclude it.",
+    "manualPromoToast": "The promo will now apply manually. Select a client to include it.",
+    "noClients": "No clients to display"
+  },
+  "promoDetails": {
+    "notFound": "Promo details not found"
+  },
+  "promo": {
+    "type": "Type",
+    "discount": "Discount",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "global": "Global",
+    "notGlobal": "Not Global",
+    "issuedBy": "Issued By",
+    "edit": "Edit",
+    "terminate": "Terminate",
+    "deselect": "Deselect"
+  },
+  "promosSidebar": {
+    "title": "Promos",
+    "searchPlaceholder": "Search Promos",
+    "type": "Type",
+    "noPromosFound": "No promos found."
   }
 }
