@@ -106,6 +106,30 @@ export const calendarApi = createApi({
         { type: "CalendarEvent", _id: eventId },
       ],
     }),
+    deleteEvent: builder.mutation<{ message: string }, string>({
+      query: (eventId) => ({
+        url: `calendar/events/${eventId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (_result, _error, eventId) => [
+        { type: "CalendarEvent", _id: eventId },
+      ],
+    }),
+    // Mutation to edit a calendar event
+    editEvent: builder.mutation<
+      CalendarEvent,
+      { eventId: string; data: Partial<CreateEventPayload> }
+    >({
+      query: ({ eventId, data }) => ({
+        url: `calendar/events/${eventId}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: (_result, _error, { eventId }) => [
+        { type: "CalendarEvent", _id: eventId },
+      ],
+    }),
+
     // Public API endpoint
     getHolidays: builder.query<Holiday[], { year: number }>({
       async queryFn({ year }, _queryApi, _extraOptions, fetchWithBQ) {
@@ -144,5 +168,7 @@ export const {
   useGetEventsByStatusAndUserQuery,
   useCreateEventMutation,
   useUpdateEventStatusMutation,
+  useEditEventMutation, // Newly added
+  useDeleteEventMutation, // Newly added
   useGetHolidaysQuery,
 } = calendarApi;

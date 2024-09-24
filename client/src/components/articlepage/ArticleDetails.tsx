@@ -39,9 +39,6 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
         )
       : false;
 
-    /* console.log("selectedArticle: ", selectedArticle);
-    console.log("clientMovements: ", clientMovements); */
-
     return (
       <Paper
         elevation={3}

@@ -48,6 +48,8 @@ export type ArticleProp = {
     articleId: string;
     name: string;
     brand: string;
+    quantity: number;
+    unitPrice: string;
     priceSold: string;
     priceBought: string;
     [key: string]: string | number;

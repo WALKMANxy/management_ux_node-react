@@ -166,8 +166,189 @@
     "illness": "Illness",
     "day_off": "Day Off"
   },
-  "Failed to load server events. Showing holiday events only.": "Failed to load server events. Showing holiday events only.",
-  "Failed to load holiday events. Showing server events only.": "Failed to load holiday events. Showing server events only.",
-  "Failed to load events.": "Failed to load events.",
-  "Please select at least one day.": "Please select at least one day."
+  "confirmDialog": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "defaultTitle": "Are you sure?",
+    "defaultMessage": "Please confirm your action.",
+    "deleteEvent": "Delete Event?"
+  },
+  "articleDetail": {
+    "id": "ID",
+    "name": "Name",
+    "brand": "Brand",
+    "quantity": "Quantity",
+    "unitPrice": "Price per item",
+    "priceSold": "Sold at",
+    "priceBought": "Bought at"
+  },
+  "articleDetails": {
+    "title": "Article Details",
+    "noHistory": "No history available"
+  },
+  "calendarEvent": {
+    "unknown": "Unknown",
+    "reasons": {
+      "illness": "Illness",
+      "day_off": "Day Off",
+      "unexpected_event": "Unexpected Event",
+      "medical_visit": "Medical Visit",
+      "public_holiday": "Public Holiday",
+      "company_holiday": "Company Holiday",
+      "company_meeting": "Company Meeting",
+      "company_party": "Company Party",
+      "conference": "Conference",
+      "expo": "Expo",
+      "generic": "Generic"
+    }
+  },
+  "customToolbar": {
+    "today": "Today",
+    "previous": "Previous",
+    "next": "Next",
+    "view": {
+      "month": "Month",
+      "week": "Week",
+      "day": "Day"
+    }
+  },
+  "eventForm": {
+    "title": "Create New Event",
+    "labels": {
+      "startTime": "Start Time",
+      "endTime": "End Time",
+      "eventType": "Event Type",
+      "reason": "Reason",
+      "note": "Note (Optional)",
+      "cancel": "Cancel",
+      "create": "Create"
+    },
+    "options": {
+      "absence": "Absence",
+      "event": "Event"
+    },
+    "reasons": {
+      "illness": "Illness",
+      "day_off": "Day Off",
+      "unexpected_event": "Unexpected Event",
+      "medical_visit": "Medical Visit",
+      "public_holiday": "Public Holiday",
+      "company_holiday": "Company Holiday",
+      "company_meeting": "Company Meeting",
+      "company_party": "Company Party",
+      "conference": "Conference",
+      "expo": "Expo",
+      "generic": "Generic"
+    },
+    "validation": {
+      "startTimeRequired": "Start time is required",
+      "endTimeRequired": "End time is required",
+      "eventTypeRequired": "Event type is required",
+      "reasonRequired": "Reason is required",
+      "dateTooFar": "You can't pick an absence date further than two months from today. Please, select an absence date before {{date}}."
+    },
+    "tooltips": {
+      "cancel": "Cancel",
+      "create": "Create Event"
+    },
+    "eventHistory": {
+      "title": "Event History",
+      "headers": {
+        "user": "User",
+        "eventType": "Event Type",
+        "reason": "Reason",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "unknown": "Unknown",
+      "na": "N/A",
+      "eventTypes": {
+        "absence": "Absence",
+        "event": "Event",
+        "holiday": "Holiday",
+        "generic": "Generic"
+      },
+      "reasons": {
+        "illness": "Illness",
+        "day_off": "Day Off",
+        "unexpected_event": "Unexpected Event",
+        "medical_visit": "Medical Visit",
+        "company_meeting": "Company Meeting",
+        "company_party": "Company Party",
+        "conference": "Conference",
+        "expo": "Expo",
+        "generic": "Generic"
+      },
+      "statuses": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled"
+      },
+      "actions": {
+        "na": "N/A"
+      },
+      "tooltips": {
+        "approve": "Approve Event",
+        "reject": "Reject Event"
+      },
+      "toast": {
+        "approveSuccess": "Event approved successfully!",
+        "approveFailure": "Failed to approve event",
+        "rejectSuccess": "Event rejected successfully!",
+        "rejectFailure": "Failed to reject event",
+        "genericError": "An unexpected error occurred"
+      }
+    }
+  },
+  "eventTitle": {
+    "unknown": "Unknown",
+    "reasons": {
+      "illness": "Illness",
+      "day_off": "Day Off",
+      "unexpected_event": "Unexpected Event",
+      "medical_visit": "Medical Visit",
+      "public_holiday": "Public Holiday",
+      "company_holiday": "Company Holiday",
+      "company_meeting": "Company Meeting",
+      "company_party": "Company Party",
+      "conference": "Conference",
+      "expo": "Expo",
+      "generic": "Generic"
+    },
+    "tooltips": {
+      "illness": "Reason: Illness",
+      "day_off": "Reason: Day Off",
+      "unexpected_event": "Reason: Unexpected Event",
+      "medical_visit": "Reason: Medical Visit",
+      "public_holiday": "Reason: Public Holiday",
+      "company_holiday": "Reason: Company Holiday",
+      "company_meeting": "Reason: Company Meeting",
+      "company_party": "Reason: Company Party",
+      "conference": "Reason: Conference",
+      "expo": "Reason: Expo",
+      "generic": "Reason: Generic",
+      "unknown": "Unknown Entity"
+    }
+  },
+  "popOverEvent": {
+    "labels": {
+      "type": "Type",
+      "reason": "Reason",
+      "note": "Note",
+      "unknown": "Unknown"
+    },
+    "tooltips": {
+      "edit": "Edit Event",
+      "delete": "Delete Event"
+    }
+  },
+  "eventTypes": {
+    "absence": "Absence",
+    "holiday": "Holiday",
+    "event": "Event",
+    "generic": "Generic"
+  }
 }

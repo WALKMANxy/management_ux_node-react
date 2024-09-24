@@ -1,4 +1,4 @@
-// components/calendarPage/EventForm.tsx
+// src/components/calendarPage/EventForm.tsx
 
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -14,6 +14,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import {
   DateTimePicker,
@@ -22,13 +23,15 @@ import {
 } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import * as React from "react";
+import React, { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { selectUserRole } from "../../features/auth/authSlice";
 import { CalendarEvent } from "../../models/dataModels";
 import { CreateEventPayload } from "../../models/propsModels";
+import { getTwoMonthsFromNow } from "../../utils/dataUtils";
+import { showToast } from "../../utils/toastMessage";
 
 interface EventFormProps {
   open: boolean;
@@ -36,12 +39,10 @@ interface EventFormProps {
   onSubmit: (data: CreateEventPayload) => void;
   onCancel: () => void;
   isSubmitting: boolean; // New prop for loading state
+  initialData?: CalendarEvent | null; // For editing
 }
 
-const reasonOptions: Record<
-  CalendarEvent["eventType"],
-  CalendarEvent["reason"][]
-> = {
+const reasonOptions: Record<"absence" | "event", string[]> = {
   absence: [
     "illness",
     "day_off",
@@ -49,9 +50,7 @@ const reasonOptions: Record<
     "medical_visit",
     "generic",
   ],
-  holiday: ["public_holiday", "company_holiday"],
   event: ["company_meeting", "company_party", "conference", "expo", "generic"],
-  "": [], // Handle empty eventType
 };
 
 export const EventForm: React.FC<EventFormProps> = ({
@@ -60,6 +59,7 @@ export const EventForm: React.FC<EventFormProps> = ({
   onSubmit,
   onCancel,
   isSubmitting,
+  initialData,
 }) => {
   const { t } = useTranslation();
   const userRole = useSelector(selectUserRole);
@@ -73,30 +73,61 @@ export const EventForm: React.FC<EventFormProps> = ({
     formState: { errors },
   } = useForm<CreateEventPayload>({
     defaultValues: {
-      eventType: "", // No default value
-      reason: "", // No default value
-      note: "",
-      startDate: selectedDays[0], // Add startDateTime to your payload
-      endDate: selectedDays.length > 1 ? selectedDays[1] : selectedDays[0], // Add endDateTime to your payload
+      eventType:
+        initialData?.eventType || (userRole === "admin" ? "" : "absence"),
+      reason: "",
+      note: initialData?.note || "",
+      startDate: initialData?.startDate || selectedDays[0],
+      endDate:
+        initialData?.endDate ||
+        (selectedDays.length > 1 ? selectedDays[1] : selectedDays[0]),
     },
   });
 
   const eventType = watch("eventType");
 
-  React.useEffect(() => {
+  // Reset form when it's opened
+  useEffect(() => {
     if (open) {
+      const twoMonthsFromNow = getTwoMonthsFromNow();
+
+      if (
+        userRole !== "admin" &&
+        dayjs(selectedDays[0]).isAfter(twoMonthsFromNow)
+      ) {
+        showToast.error(
+          t("eventForm.validation.dateTooFar", {
+            date: dayjs(twoMonthsFromNow).format("MMMM D, YYYY"),
+          })
+        );
+        onCancel(); // Close the form immediately
+        return;
+      }
+
+      const eventTypeValue =
+        initialData?.eventType || (userRole === "admin" ? "" : "absence");
+
       reset({
-        eventType: userRole === "admin" ? "" : "absence", // Set to 'absence' for non-admins
-        reason: "",
-        note: "",
-        startDate: selectedDays[0],
-        endDate: selectedDays.length > 1 ? selectedDays[1] : selectedDays[0],
+        eventType: eventTypeValue,
+        reason: initialData?.reason || "",
+        note: initialData?.note || "",
+        startDate: initialData?.startDate || selectedDays[0],
+        endDate:
+          initialData?.endDate ||
+          (selectedDays.length > 1 ? selectedDays[1] : selectedDays[0]),
       });
+
+      // Explicitly set the eventType to ensure it's updated
+      setValue("eventType", eventTypeValue);
     }
-  }, [open, reset, userRole, selectedDays]);
+  }, [open, reset, userRole, selectedDays, onCancel, t, initialData, setValue]);
 
   const handleFormSubmit = (data: CreateEventPayload) => {
-    onSubmit(data);
+    onSubmit({
+      ...data,
+      startDate: dayjs(data.startDate).toDate(), // Ensure Date object is passed
+      endDate: dayjs(data.endDate).toDate(), // Ensure Date object is passed
+    });
   };
 
   return (
@@ -112,18 +143,18 @@ export const EventForm: React.FC<EventFormProps> = ({
           },
         }}
       >
-        <DialogTitle>{t("Create New Event")}</DialogTitle>
+        <DialogTitle>{t("eventForm.title")}</DialogTitle>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <DialogContent sx={{ padding: 2 }}>
             {/* Start Time Picker */}
             <Controller
               name="startDate"
               control={control}
-              rules={{ required: t("Start time is required") }}
+              rules={{ required: t("eventForm.validation.startTimeRequired") }}
               render={({ field }) => (
                 <DateTimePicker
                   {...field}
-                  label={t("Start Time")}
+                  label={t("eventForm.labels.startTime")}
                   value={field.value ? dayjs(field.value) : null}
                   onChange={(newValue) => {
                     if (newValue) {
@@ -151,11 +182,11 @@ export const EventForm: React.FC<EventFormProps> = ({
             <Controller
               name="endDate"
               control={control}
-              rules={{ required: t("End time is required") }}
+              rules={{ required: t("eventForm.validation.endTimeRequired") }}
               render={({ field }) => (
                 <DateTimePicker
                   {...field}
-                  label={t("End Time")}
+                  label={t("eventForm.labels.endTime")}
                   value={field.value ? dayjs(field.value) : null}
                   onChange={(newValue) => {
                     if (newValue) {
@@ -186,20 +217,27 @@ export const EventForm: React.FC<EventFormProps> = ({
             {/* Event Type Field (Visible Only to Admins) */}
             {userRole === "admin" && (
               <FormControl fullWidth margin="normal">
-                <InputLabel id="event-type-label">{t("Event Type")}</InputLabel>
+                <InputLabel id="event-type-label">
+                  {t("eventForm.labels.eventType")}
+                </InputLabel>
                 <Controller
                   name="eventType"
                   control={control}
-                  rules={{ required: t("Event type is required") }}
+                  rules={{
+                    required: t("eventForm.validation.eventTypeRequired"),
+                  }}
                   render={({ field }) => (
                     <Select
                       {...field}
                       labelId="event-type-label"
-                      label={t("Event Type")}
+                      label={t("eventForm.labels.eventType")}
                     >
-                      <MenuItem value="absence">{t("Absence")}</MenuItem>
-                      <MenuItem value="holiday">{t("Holiday")}</MenuItem>
-                      <MenuItem value="event">{t("Event")}</MenuItem>
+                      <MenuItem value="absence">
+                        {t("eventForm.options.absence")}
+                      </MenuItem>
+                      <MenuItem value="event">
+                        {t("eventForm.options.event")}
+                      </MenuItem>
                     </Select>
                   )}
                 />
@@ -213,22 +251,24 @@ export const EventForm: React.FC<EventFormProps> = ({
 
             {/* Reason Field */}
             <FormControl fullWidth margin="normal">
-              <InputLabel id="reason-label">{t("Reason")}</InputLabel>
+              <InputLabel id="reason-label">
+                {t("eventForm.labels.reason")}
+              </InputLabel>
               <Controller
                 name="reason"
                 control={control}
-                rules={{ required: t("Reason is required") }}
+                rules={{ required: t("eventForm.validation.reasonRequired") }}
                 render={({ field }) => (
                   <Select
                     {...field}
                     labelId="reason-label"
-                    label={t("Reason")}
+                    label={t("eventForm.labels.reason")}
                     disabled={userRole === "admin" ? !eventType : false} // Disable only if admin and eventType not selected
                   >
-                    {eventType &&
+                    {(eventType === "absence" || eventType === "event") &&
                       reasonOptions[eventType]?.map((reason) => (
                         <MenuItem key={reason} value={reason}>
-                          {t(`reasons.${reason}`)}
+                          {t(`eventForm.reasons.${reason}`)}
                         </MenuItem>
                       ))}
                   </Select>
@@ -246,7 +286,7 @@ export const EventForm: React.FC<EventFormProps> = ({
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label={t("Note (Optional)")}
+                  label={t("eventForm.labels.note")}
                   fullWidth
                   margin="normal"
                   multiline
@@ -257,26 +297,32 @@ export const EventForm: React.FC<EventFormProps> = ({
           </DialogContent>
           <DialogActions>
             {/* Cancel Button */}
-            <IconButton
-              onClick={onCancel}
-              color="secondary"
-              aria-label={t("Cancel")}
-            >
-              <CloseIcon />
-            </IconButton>
+            <Tooltip title={t("eventForm.tooltips.cancel")}>
+              <IconButton
+                onClick={onCancel}
+                color="secondary"
+                aria-label={t("eventForm.labels.cancel")}
+              >
+                <CloseIcon />
+              </IconButton>
+            </Tooltip>
 
             {/* Create Button */}
-            <IconButton
-              type="submit"
-              color="primary"
-              disabled={isSubmitting}
-              aria-label={t("Create")}
-            >
-              {isSubmitting ? <CircularProgress size={24} /> : <CheckIcon />}
-            </IconButton>
+            <Tooltip title={t("eventForm.tooltips.create")}>
+              <IconButton
+                type="submit"
+                color="primary"
+                disabled={isSubmitting}
+                aria-label={t("eventForm.labels.create")}
+              >
+                {isSubmitting ? <CircularProgress size={24} /> : <CheckIcon />}
+              </IconButton>
+            </Tooltip>
           </DialogActions>
         </form>
       </Dialog>
     </LocalizationProvider>
   );
 };
+
+export default EventForm;

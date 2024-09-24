@@ -215,4 +215,91 @@ export class CalendarEventController {
         .json({ message: "Failed to update calendar event status" });
     }
   }
+
+  // Update an existing calendar event
+  static async editEvent(req: AuthenticatedRequest, res: Response) {
+    try {
+      const { eventId } = req.params;
+      const { startDate, endDate, eventType, reason, note } = req.body;
+
+      // Validate required fields (at least one field should be present)
+      if (!startDate && !endDate && !eventType && !reason && !note) {
+        logger.warn(`No fields provided for updating event ${eventId}`);
+        return res.status(400).json({
+          message:
+            "At least one field (startDate, endDate, eventType, reason, note) must be provided for update.",
+        });
+      }
+
+      // Update the event using the service
+      const updatedEvent = await CalendarEventService.editEvent(eventId, {
+        startDate,
+        endDate,
+        eventType,
+        reason,
+        note,
+      });
+
+      if (!updatedEvent) {
+        logger.info(`Calendar event with ID ${eventId} not found for editing`);
+        return res.status(404).json({ message: "Calendar event not found." });
+      }
+
+      logger.info(`Calendar event with ID ${eventId} updated successfully`);
+
+      // Emit WebSocket event for update
+      emitToAdmins("calendarEvents:eventUpdated", updatedEvent);
+      emitToUser(
+        updatedEvent.userId.toString(),
+        "calendarEvents:eventUpdated",
+        updatedEvent
+      );
+
+      return res.status(200).json(updatedEvent);
+    } catch (error) {
+      logger.error(
+        `Error editing calendar event: ${
+          error instanceof Error ? error.message : error
+        }`
+      );
+      return res.status(500).json({ message: "Failed to edit calendar event" });
+    }
+  }
+
+  static async deleteEvent(req: AuthenticatedRequest, res: Response) {
+    try {
+      const { eventId } = req.params;
+
+      // Delete the event using the service
+      const deletedEvent = await CalendarEventService.deleteEvent(eventId);
+
+      if (!deletedEvent) {
+        logger.info(`Calendar event with ID ${eventId} not found for deletion`);
+        return res.status(404).json({ message: "Calendar event not found." });
+      }
+
+      logger.info(`Calendar event with ID ${eventId} deleted successfully`);
+
+      // Emit WebSocket event for deletion
+      emitToAdmins("calendarEvents:eventDeleted", deletedEvent);
+      emitToUser(
+        deletedEvent.userId.toString(),
+        "calendarEvents:eventDeleted",
+        deletedEvent
+      );
+
+      return res
+        .status(200)
+        .json({ message: "Calendar event deleted successfully." });
+    } catch (error) {
+      logger.error(
+        `Error deleting calendar event: ${
+          error instanceof Error ? error.message : error
+        }`
+      );
+      return res
+        .status(500)
+        .json({ message: "Failed to delete calendar event" });
+    }
+  }
 }
