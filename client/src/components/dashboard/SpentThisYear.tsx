@@ -1,12 +1,14 @@
+// src/components/SpentThisYear.tsx
+
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
+import { Avatar, Box, Grid, Paper, Tooltip, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { SpentThisYearProps } from "../../models/propsModels";
+import { ComparisonResult, SpentThisYearProps } from "../../models/propsModels";
 import { currencyFormatter } from "../../utils/dataUtils";
 
 const SpentThisYear: React.FC<SpentThisYearProps> = ({
@@ -20,80 +22,122 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
 
   const formattedAmount = currencyFormatter(parseFloat(amount));
 
-  let comparisonColor;
-  let comparisonIcon;
-  let comparisonText;
-
-  if (comparison) {
+  /**
+   * Determines the comparison result based on the value and user role.
+   *
+   * @param {number} value - The comparison value.
+   * @returns {ComparisonResult} The comparison result object.
+   */
+  const getComparisonResult = (value: number): ComparisonResult => {
     const isAgentComparison = userRole === "admin" && isAgentSelected;
     const isClientComparison =
       (userRole === "admin" && !isAgentSelected) || userRole === "agent";
 
     if (isAgentComparison) {
-      if (comparison.value >= 10) {
-        comparisonColor = theme.palette.success.main;
-        comparisonIcon = <ArrowUpwardIcon fontSize="inherit" />;
-        comparisonText = t("more");
-      } else if (comparison.value >= 5) {
-        comparisonColor = theme.palette.grey[500];
-        comparisonIcon = <ArrowUpwardIcon fontSize="inherit" />;
-        comparisonText = t("neutral");
+      if (value >= 10) {
+        return {
+          color: theme.palette.success.main,
+          icon: <ArrowUpwardIcon fontSize="inherit" />,
+          text: t("spentThisYear.more", "more"),
+        };
+      } else if (value >= 5) {
+        return {
+          color: theme.palette.grey[500],
+          icon: <ArrowUpwardIcon fontSize="inherit" />,
+          text: t("spentThisYear.neutral", "neutral"),
+        };
       } else {
-        comparisonColor = theme.palette.error.main;
-        comparisonIcon = <ArrowDownwardIcon fontSize="inherit" />;
-        comparisonText = t("less");
+        return {
+          color: theme.palette.error.main,
+          icon: <ArrowDownwardIcon fontSize="inherit" />,
+          text: t("spentThisYear.less", "less"),
+        };
       }
     } else if (isClientComparison) {
-      if (comparison.value >= 1.25) {
-        comparisonColor = theme.palette.success.main;
-        comparisonIcon = <ArrowUpwardIcon fontSize="inherit" />;
-        comparisonText = t("more");
-      } else if (comparison.value > 0.75) {
-        comparisonColor = theme.palette.grey[500];
-        comparisonIcon = <ArrowUpwardIcon fontSize="inherit" />;
-        comparisonText = t("neutral");
+      if (value >= 1.25) {
+        return {
+          color: theme.palette.success.main,
+          icon: <ArrowUpwardIcon fontSize="inherit" />,
+          text: t("spentThisYear.more", "more"),
+        };
+      } else if (value > 0.75) {
+        return {
+          color: theme.palette.grey[500],
+          icon: <ArrowUpwardIcon fontSize="inherit" />,
+          text: t("spentThisYear.neutral", "neutral"),
+        };
       } else {
-        comparisonColor = theme.palette.error.main;
-        comparisonIcon = <ArrowDownwardIcon fontSize="inherit" />;
-        comparisonText = t("less");
+        return {
+          color: theme.palette.error.main,
+          icon: <ArrowDownwardIcon fontSize="inherit" />,
+          text: t("spentThisYear.less", "less"),
+        };
       }
     }
-  }
+    return { color: "", icon: <></>, text: "" };
+  };
+
+  const comparisonResult = comparison
+    ? getComparisonResult(comparison.value)
+    : null;
+
+  const styles = {
+    paper: {
+      p: 3,
+      borderRadius: "12px",
+      background: "linear-gradient(135deg, #e3f2fd 30%, #bbdefb 100%)",
+      color: "#000",
+      position: "relative",
+      overflow: "hidden",
+      height: "100%",
+      "&:after": {
+        content: '""',
+        position: "absolute",
+        width: 210,
+        height: 210,
+        background: "#43a047", // Dark Green
+        borderRadius: "50%",
+        top: -85,
+        right: -95,
+      },
+      "&:before": {
+        content: '""',
+        position: "absolute",
+        width: 210,
+        height: 210,
+        background: "#a5d6a7", // Light Green
+        borderRadius: "50%",
+        top: -125,
+        right: -15,
+        opacity: 0.5,
+      },
+    },
+    amount: {
+      fontSize: "2.7rem",
+      fontWeight: 500,
+      mr: 1,
+      mt: 1.75,
+      mb: 0.75,
+      wordBreak: "break-word", // Ensure long amounts wrap
+    },
+    title: {
+      fontSize: "1.5rem",
+      fontWeight: 500,
+      color: "#000",
+      whiteSpace: "normal", // Allow text to wrap
+      wordBreak: "break-word", // Ensure long titles wrap
+    },
+    comparison: {
+      fontSize: "1.65rem",
+      fontWeight: 500,
+      color: "", // Will be set dynamically
+      paddingTop: 1,
+      wordBreak: "break-word", // Ensure long comparison texts wrap
+    },
+  };
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: 3,
-        borderRadius: "12px",
-        background: "linear-gradient(135deg, #e3f2fd 30%, #bbdefb 100%)",
-        color: "#000",
-        position: "relative",
-        overflow: "hidden",
-        height: "100%",
-        "&:after": {
-          content: '""',
-          position: "absolute",
-          width: 210,
-          height: 210,
-          background: "#43a047", // Dark Green
-          borderRadius: "50%",
-          top: -85,
-          right: -95,
-        },
-        "&:before": {
-          content: '""',
-          position: "absolute",
-          width: 210,
-          height: 210,
-          background: "#a5d6a7", // Light Green
-          borderRadius: "50%",
-          top: -125,
-          right: -15,
-          opacity: 0.5,
-        },
-      }}
-    >
+    <Paper elevation={3} sx={styles.paper}>
       <Box sx={{ p: 2.25 }}>
         <Grid container direction="column">
           <Grid item>
@@ -109,7 +153,7 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
                 >
                   <img
                     src="/icons/moneybag.svg"
-                    alt={t("spentThisYear.iconAlt")}
+                    alt={t("spentThisYear.iconAlt", "Money Bag Icon")}
                     style={{ width: "100%", height: "100%" }}
                   />
                 </Avatar>
@@ -119,64 +163,67 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
           <Grid item>
             <Grid container alignItems="center">
               <Grid item>
-                <Typography
-                  sx={{
-                    fontSize: "2.7rem",
-                    fontWeight: 500,
-                    mr: 1,
-                    mt: 1.75,
-                    mb: 0.75,
-                    zIndex: 10,
-                    position: "relative"
-                  }}
-                >
-                  {formattedAmount}
-                </Typography>
+                <Typography sx={styles.amount}>{formattedAmount}</Typography>
               </Grid>
-              {userRole !== "client" && comparison && comparisonIcon && (
+              {userRole !== "client" && comparisonResult && (
                 <Grid item>
-                  <Avatar
-                    sx={{
-                      cursor: "pointer",
-                      bgcolor: comparisonColor,
-                      color: "#000",
-                      zIndex: 10,
-                    position: "relative"
-                    }}
+                  <Tooltip
+                    title={`${comparisonResult.text} ${
+                      userRole === "admin" && isAgentSelected
+                        ? t(
+                            "spentThisYear.comparedToOtherAgents",
+                            "compared to other agents"
+                          )
+                        : t(
+                            "spentThisYear.comparedToOtherClients",
+                            "compared to other clients"
+                          )
+                    }`}
+                    arrow
                   >
-                    {comparisonIcon}
-                  </Avatar>
+                    <Avatar
+                      sx={{
+                        cursor: "pointer",
+                        bgcolor: comparisonResult.color,
+                        color: "#000",
+                        zIndex: 10,
+                        position: "relative",
+                      }}
+                      aria-label={`Comparison: ${comparisonResult.text}`}
+                    >
+                      {comparisonResult.icon}
+                    </Avatar>
+                  </Tooltip>
                 </Grid>
               )}
             </Grid>
           </Grid>
           <Grid item sx={{ mb: 1.25 }}>
-            <Typography
-              sx={{
-                fontSize: "1.5rem",
-                fontWeight: 500,
-                color: "#000",
-              }}
-            >
+            <Typography sx={styles.title}>
               {t(
                 isAgentSelected
                   ? "spentThisYear.titleAgent"
-                  : "spentThisYear.titleClient"
+                  : "spentThisYear.titleClient",
+                isAgentSelected ? "Earned this year:" : "Spent this year:"
               )}
             </Typography>
-            {userRole !== "client" && comparison && (
+            {userRole !== "client" && comparisonResult && (
               <Typography
                 sx={{
-                  fontSize: "1.65rem", // 10% larger than the original 1.5rem
-                  fontWeight: 500,
-                  color: comparisonColor,
-                  paddingTop: 1, // Added padding for spacing
+                  ...styles.comparison,
+                  color: comparisonResult.color,
                 }}
               >
-                {Math.abs(comparison.value)}% {comparisonText}{" "}
+                {Math.abs(comparison!.value)}% {comparisonResult.text}{" "}
                 {userRole === "admin" && isAgentSelected
-                  ? t("comparedToOtherAgents")
-                  : t("comparedToOtherClients")}
+                  ? t(
+                      "spentThisYear.comparedToOtherAgents",
+                      "compared to other agents"
+                    )
+                  : t(
+                      "spentThisYear.comparedToOtherClients",
+                      "compared to other clients"
+                    )}
               </Typography>
             )}
           </Grid>
@@ -186,4 +233,5 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
   );
 };
 
-export default SpentThisYear;
+// Correct usage of React.memo with export
+export default React.memo(SpentThisYear);

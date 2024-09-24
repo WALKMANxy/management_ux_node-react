@@ -1,6 +1,15 @@
+// src/components/UpcomingVisits.tsx
+
 import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
 import { Timeline, timelineItemClasses } from "@mui/lab";
-import { Box, IconButton, Paper, Skeleton, Typography } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Paper,
+  Skeleton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +23,9 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
   const navigate = useNavigate();
   const visits = useAppSelector(selectVisits);
 
-  // Memoize the upcoming visits computation
+  /**
+   * Computes the top 3 upcoming visits that are pending and not completed.
+   */
   const upcomingVisits = useMemo(() => {
     // Filter visits to include only those that are pending and not completed
     const filteredVisits = visits.filter(
@@ -36,9 +47,10 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
       sx={{
         p: 3,
         borderRadius: "12px",
+        background: "linear-gradient(135deg, #e8f5e9 30%, #c8e6c9 100%)",
+        color: "#000",
         position: "relative",
         overflow: "hidden",
-        background: "linear-gradient(135deg, #e8f5e9 30%, #c8e6c9 100%)",
         height: "auto",
         "&::before": {
           content: '""',
@@ -54,12 +66,16 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
         },
       }}
     >
-      <Box sx={{ position: "relative", zIndex: 1,  }}>
-        <Typography variant="h5" gutterBottom>
-          {t("upcomingVisits.title")}
+      <Box sx={{ position: "relative", zIndex: 1 }}>
+        {/* Title */}
+        <Typography variant="h5" gutterBottom sx={{ wordBreak: "break-word" }}>
+          {t("upcomingVisits.title", "Upcoming Visits")}
         </Typography>
+
+        {/* Content Area */}
         <Box sx={{ maxHeight: 420, overflow: "auto" }}>
           {isLoading ? (
+            // Loading State
             <Skeleton
               variant="rectangular"
               width="100%"
@@ -67,10 +83,15 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
               sx={{ borderRadius: 2 }}
             />
           ) : upcomingVisits.length === 0 ? (
+            // No Upcoming Visits
             <Typography variant="body1">
-              {t("upcomingVisits.noProgrammedVisits")}
+              {t(
+                "upcomingVisits.noProgrammedVisits",
+                "No upcoming visits scheduled."
+              )}
             </Typography>
           ) : (
+            // Display Upcoming Visits
             <Timeline
               position="left"
               sx={{
@@ -94,22 +115,30 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
             </Timeline>
           )}
         </Box>
-        <IconButton
-          onClick={() => navigate("/visits")}
-          sx={{
-            mt: 3,
-            borderRadius: 2,
-            position: "relative",
 
-            backgroundColor: "gray",
-            color: "#fff",
-            "&:hover": {
-              backgroundColor: "#c8e6c9",
-            },
-          }}
-        >
-          <AirplaneTicketIcon />
-        </IconButton>
+        {/* Navigate to All Visits */}
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <Tooltip
+            title={t("upcomingVisits.viewAllVisits", "View All Visits")}
+            arrow
+          >
+            <IconButton
+              onClick={() => navigate("/visits")}
+              sx={{
+                mt: 3,
+                borderRadius: 2,
+                backgroundColor: (theme) => theme.palette.grey[700],
+                color: "#fff",
+                "&:hover": {
+                  backgroundColor: (theme) => theme.palette.grey[500],
+                },
+              }}
+              aria-label={t("upcomingVisits.viewAllVisits", "View All Visits")}
+            >
+              <AirplaneTicketIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Box>
     </Paper>
   );

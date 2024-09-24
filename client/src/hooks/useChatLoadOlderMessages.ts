@@ -67,7 +67,7 @@ const useLoadOlderMessages = (currentChatId: string | null) => {
       loading ||
       !hasMoreMessages ||
       !oldestMessage ||
-      messages.length <= 25
+      messages.length <= 20
     )
       return;
 

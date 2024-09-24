@@ -18,6 +18,7 @@ import { DayCalendarSkeleton } from "@mui/x-date-pickers/DayCalendarSkeleton";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
@@ -41,6 +42,7 @@ const CalendarComponent: React.FC = () => {
   const clients = useAppSelector((state) => state.data.clients);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation(); // Initialize translation
 
   const userRole = currentUserDetails?.role; // Extract userRole
 
@@ -225,8 +227,14 @@ const CalendarComponent: React.FC = () => {
       </LocalizationProvider>
 
       {/* Dialog for selecting a visit when multiple visits exist on a day */}
-      <Dialog open={openDialog} onClose={handleDialogClose}>
-        <DialogTitle>{`Select a Visit`}</DialogTitle>
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        aria-labelledby="select-visit-dialog-title"
+      >
+        <DialogTitle id="select-visit-dialog-title">
+          {t("calendarComponent.selectVisit", "Select a Visit")}
+        </DialogTitle>
         <DialogContent>
           {visitsOnSelectedDay.length > 0 ? (
             <List>
@@ -238,20 +246,26 @@ const CalendarComponent: React.FC = () => {
                 >
                   <ListItemText
                     primary={`${visit.type} - ${visit.visitReason}`}
-                    secondary={`Client ID: ${visit.clientId} | Date: ${dayjs(
-                      visit.date
-                    ).format("DD/MM/YYYY HH:mm")}`}
+                    secondary={`${t(
+                      "calendarComponent.clientId",
+                      "Client ID"
+                    )}: ${visit.clientId} | ${t(
+                      "calendarComponent.date",
+                      "Date"
+                    )}: ${dayjs(visit.date).format("DD/MM/YYYY HH:mm")}`}
                   />
                 </ListItem>
               ))}
             </List>
           ) : (
-            <Typography>No visits available.</Typography>
+            <Typography>
+              {t("calendarComponent.noVisitsAvailable", "No visits available.")}
+            </Typography>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose} color="primary">
-            Close
+            {t("calendarComponent.close", "Close")}
           </Button>
         </DialogActions>
       </Dialog>

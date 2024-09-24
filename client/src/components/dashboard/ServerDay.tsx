@@ -1,11 +1,14 @@
-import React from "react";
-import { Badge } from "@mui/material";
+// src/components/ServerDay.tsx
+
+import { Badge, Tooltip } from "@mui/material";
 import { PickersDay, PickersDayProps } from "@mui/x-date-pickers/PickersDay";
 import { Dayjs } from "dayjs";
+import React from "react";
 
 export interface HighlightedDay {
   date: number;
   color: string;
+  label?: string; // Optional descriptive label for accessibility
 }
 
 export interface ServerDayProps extends PickersDayProps<Dayjs> {
@@ -28,6 +31,10 @@ const ServerDay: React.FC<ServerDayProps> = (props) => {
 
   const isSelected = !outsideCurrentMonth && Boolean(highlightedDay);
 
+  // Extract label for ARIA if provided
+  const ariaLabel =
+    highlightedDay?.label || (isSelected ? "This day has an event" : undefined);
+
   const handleClick = () => {
     if (isSelected) {
       onDayClick(day);
@@ -35,32 +42,32 @@ const ServerDay: React.FC<ServerDayProps> = (props) => {
   };
 
   return (
-    <Badge
-      overlap="circular"
-      badgeContent={isSelected ? "•" : undefined}
-      
-      aria-label={isSelected ? "This day has an event" : undefined}
-    >
-      <PickersDay
-        {...other}
-        outsideCurrentMonth={outsideCurrentMonth}
-        day={day}
-        onClick={handleClick}
-        sx={{
-          backgroundColor: isSelected
-            ? "rgba(63, 81, 181, 0.2)"
-            : "rgba(255, 235, 59, 0.1)",
-          cursor: isSelected ? "pointer" : "default",
-          "&:hover": {
+    <Tooltip title={ariaLabel || ""} disableHoverListener={!ariaLabel}>
+      <Badge
+        overlap="circular"
+        badgeContent={isSelected ? "•" : undefined}
+        aria-label={ariaLabel}
+      >
+        <PickersDay
+          {...other}
+          outsideCurrentMonth={outsideCurrentMonth}
+          day={day}
+          onClick={handleClick}
+          sx={{
             backgroundColor: isSelected
-              ? "rgba(63, 81, 181, 0.5)"
-              : "rgba(255, 235, 59, 0.3)",
-          },
-        }}
-      />
-    </Badge>
+              ? "rgba(63, 81, 181, 0.2)"
+              : "rgba(255, 235, 59, 0.1)",
+            cursor: isSelected ? "pointer" : "default",
+            "&:hover": {
+              backgroundColor: isSelected
+                ? "rgba(63, 81, 181, 0.5)"
+                : "rgba(255, 235, 59, 0.3)",
+            },
+          }}
+        />
+      </Badge>
+    </Tooltip>
   );
-
 };
 
-export default ServerDay;
+export default React.memo(ServerDay);

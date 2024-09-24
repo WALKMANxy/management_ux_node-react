@@ -1,4 +1,5 @@
-//src/components/chatPage/ChatList.tsx
+// src/components/chatPage/ChatList.tsx
+
 import {
   Avatar,
   Badge,
@@ -11,30 +12,45 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import useChatLogic from "../../hooks/useChatsLogic";
 import { formatDate } from "../../utils/chatUtils";
 
 interface ChatListProps {
   searchTerm?: string; // Make searchTerm optional
-  loading: boolean; // Loading state prop
+  loading?: boolean; // Make loading optional
 }
 
-const ChatList: React.FC<ChatListProps> = ({ searchTerm = "" }) => {
+/**
+ * ChatList Component
+ * Displays a list of chats with avatars, unread message counts, and message previews.
+ *
+ * @param {ChatListProps} props - Component props.
+ * @returns {JSX.Element} The rendered component.
+ */
+const ChatList: React.FC<ChatListProps> = ({
+  searchTerm = "",
+  loading = false,
+}) => {
+  const { t } = useTranslation();
   const {
     getFilteredAndSortedChats,
     getChatTitle,
     getUnreadCount,
     selectChat,
     loadingChats,
-  } = useChatLogic(); // Destructure the required functions from the hook  const currentUserId = useAppSelector((state: RootState) => state.auth.userId);
+  } = useChatLogic(); // Destructure the required functions from the hook
 
+  // Combine external loading prop with internal loadingChats state
+  const isLoading = loading || loadingChats;
+
+  // Retrieve sorted and filtered chats based on the search term
   const sortedChats = getFilteredAndSortedChats(searchTerm);
 
-  /*   console.log("ChatList rendering now")
-   */
   return (
     <List>
-      {loadingChats ? (
+      {isLoading ? (
+        // Display skeletons while loading chats
         Array.from({ length: 5 }).map((_, index) => (
           <ListItem key={index}>
             <Skeleton variant="circular" width={40} height={40} />
@@ -42,25 +58,26 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm = "" }) => {
           </ListItem>
         ))
       ) : sortedChats.length > 0 ? (
+        // Display list of chats
         sortedChats.map((chat) => {
           const lastMessage = chat.messages[chat.messages.length - 1];
           const lastMessagePreview = lastMessage
             ? lastMessage.content.slice(0, 20)
-            : "No messages";
+            : t("chatList.noMessages");
 
           const title = getChatTitle(chat);
-          const avatar = <Avatar>{title.charAt(0)}</Avatar>;
+          const avatarLetter = title.charAt(0).toUpperCase();
+          const avatar = <Avatar>{avatarLetter}</Avatar>; // You can customize the avatar as needed
           const unreadCount = getUnreadCount(chat);
           const isNew = unreadCount > 0;
 
           return (
             <ListItem
-              className={`animate__animated ${isNew ? "animate__bounce" : ""}`}
-              button
               key={chat._id}
+              button
               onClick={() => {
-                /*                 console.log("Chat selected with ID:", chat._id); // Debug: Check if the click event fires with the correct chat ID
-                 */ selectChat(chat); // Call selectChat to update the current chat state
+                selectChat(chat); // Call selectChat to update the current chat state
+                // Optionally, mark messages as read here if not handled within selectChat
               }}
               sx={{ borderBottom: "1px solid #e0e0e0" }}
             >
@@ -68,6 +85,7 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm = "" }) => {
                 <Badge
                   badgeContent={unreadCount}
                   color="secondary"
+                  invisible={!isNew}
                   anchorOrigin={{
                     vertical: "top",
                     horizontal: "right",
@@ -86,7 +104,7 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm = "" }) => {
                   <Typography variant="caption" color="textSecondary">
                     {lastMessage.timestamp
                       ? formatDate(lastMessage.timestamp)
-                      : "-"}
+                      : t("chatList.na")}
                   </Typography>
                 </Box>
               )}
@@ -94,9 +112,10 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm = "" }) => {
           );
         })
       ) : (
+        // Display message when no chats are found
         <Box textAlign="center" p={2}>
           <Typography variant="body1" color="textSecondary">
-            No chats found.
+            {t("chatList.noChatsFound")}
           </Typography>
         </Box>
       )}
@@ -104,4 +123,4 @@ const ChatList: React.FC<ChatListProps> = ({ searchTerm = "" }) => {
   );
 };
 
-export default ChatList;
+export default React.memo(ChatList);

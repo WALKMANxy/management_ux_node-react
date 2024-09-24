@@ -49,16 +49,11 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
 
   // Display the current month's orders or the total orders based on timeValue
   const displayedTotal = useMemo(() => {
-    if (timeValue) {
-      // If the timeValue is true, show the current month's orders
-      return monthlyOrders[currentMonthIndex] || 0;
-    }
-    // Otherwise, show the total orders
-    return totalOrder;
+    return timeValue ? monthlyOrders[currentMonthIndex] || 0 : totalOrder;
   }, [timeValue, monthlyOrders, totalOrder, currentMonthIndex]);
 
   const formattedMonthlyCategories = useMemo(
-    () => monthlyCategories.map((date) => dayjs(date).format("MMM")),
+    () => monthlyCategories.map((date) => dayjs(date).format("MM")),
     [monthlyCategories]
   );
 
@@ -195,13 +190,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
                   </Grid>
                 </Grid>
               </Grid>
-              <Grid
-                item
-                xs={10}
-                md={6}
-                sx={{
-                }}
-              >
+              <Grid item xs={10} md={6} sx={{}}>
                 {timeValue ? (
                   <Chart
                     {...ChartData(formattedMonthlyCategories, monthlyOrders)}

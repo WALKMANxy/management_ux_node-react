@@ -1,5 +1,3 @@
-// src/components/UserPage/UserAvatar.tsx
-
 import ChatIcon from "@mui/icons-material/Chat";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -20,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { handleLogout } from "../../features/auth/authSlice";
 import { selectCurrentUser } from "../../features/users/userSlice";
+import { useTranslation } from "react-i18next";
 
 const UserAvatar: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -28,34 +27,30 @@ const UserAvatar: React.FC = () => {
   const currentUser = useAppSelector(selectCurrentUser);
   const avatarSrc = currentUser?.avatar || "/default-avatar.png";
   const avatarAlt = currentUser?.entityName || "User Avatar";
+  const { t } = useTranslation();
 
   const initiateLogout = () => {
     dispatch(handleLogout());
   };
 
-  // Open popover on avatar click
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  // Close popover
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  // Navigate to the chat page
   const handleChatsClick = () => {
     navigate("/messages");
     handleClose();
   };
 
-  // Navigate to the settings page
   const handleSettingsClick = () => {
     navigate("/settings");
     handleClose();
   };
 
-  // Handle logout action
   const handleLogoutClick = () => {
     initiateLogout();
     navigate("/"); // Redirect to landing page after logout
@@ -85,18 +80,27 @@ const UserAvatar: React.FC = () => {
           horizontal: "right",
         }}
         disableScrollLock={true} // Prevent scroll lock issues
+        PaperProps={{
+          sx: {
+            backdropFilter: "blur(10px)", // Frosted glass effect
+            backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent background
+            borderRadius: "8px",
+            padding: 2,
+          },
+        }}
       >
         <Box sx={{ p: 2 }}>
           <Typography variant="h6" component="h2" gutterBottom>
-            {currentUser?.entityName || "User"}
+            {currentUser?.entityName || t("userAvatar.defaultUser", "User")}
           </Typography>
+          <Divider sx={{ mb: 2 }} /> {/* Subtle divider below the title */}
           <List>
             {/* Chats Link */}
             <ListItem button onClick={handleChatsClick}>
               <ListItemIcon>
                 <ChatIcon />
               </ListItemIcon>
-              <ListItemText primary="Chats" />
+              <ListItemText primary={t("userAvatar.chats", "Chats")} />
             </ListItem>
             <Divider />
 
@@ -105,7 +109,7 @@ const UserAvatar: React.FC = () => {
               <ListItemIcon>
                 <SettingsIcon />
               </ListItemIcon>
-              <ListItemText primary="Settings" />
+              <ListItemText primary={t("userAvatar.settings", "Settings")} />
             </ListItem>
             <Divider />
 
@@ -114,7 +118,7 @@ const UserAvatar: React.FC = () => {
               <ListItemIcon>
                 <ExitToAppIcon />
               </ListItemIcon>
-              <ListItemText primary="Logout" />
+              <ListItemText primary={t("userAvatar.logout", "Logout")} />
             </ListItem>
           </List>
         </Box>

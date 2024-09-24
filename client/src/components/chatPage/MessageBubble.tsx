@@ -1,6 +1,8 @@
-// MessageBubble.tsx
-import { Avatar, Box, Typography } from "@mui/material";
+// src/components/chatPage/MessageBubble.tsx
+
+import { Avatar, Box, Tooltip, Typography } from "@mui/material";
 import React, { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
 import { selectCurrentChat } from "../../features/chat/chatSlice";
@@ -8,17 +10,26 @@ import { IMessage } from "../../models/dataModels";
 import { User } from "../../models/entityModels";
 import "../../Styles/animatecss.css";
 import MessageStatusIcon from "./MessageStatusIcon";
+
 interface MessageBubbleProps {
   message: IMessage;
   participantsData: Partial<User>[]; // Array of participants data passed from ChatView
   chatType: string;
 }
 
+/**
+ * MessageBubble Component
+ * Displays an individual chat message with appropriate styling and metadata.
+ *
+ * @param {MessageBubbleProps} props - Component props.
+ * @returns {JSX.Element} The rendered component.
+ */
 const MessageBubble: React.FC<MessageBubbleProps> = ({
   message,
   participantsData = [],
   chatType,
 }) => {
+  const { t } = useTranslation();
   const currentUserId = useAppSelector((state: RootState) => state.auth.userId);
   const isOwnMessage = message.sender === currentUserId;
   const currentChat = useAppSelector(selectCurrentChat);
@@ -43,6 +54,11 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
       : "animate__animated animate__fadeInUp"
     : "animate__animated animate__fadeInUp";
 
+  /**
+   * Determines the background color of the message bubble based on message type and ownership.
+   *
+   * @returns {string} The background color.
+   */
   const getBackgroundColor = () => {
     switch (message.messageType) {
       case "alert":
@@ -55,6 +71,22 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
         return isOwnMessage ? "rgba(33,138,255, 0.3)" : "#ffffff";
     }
   };
+  /**
+   * Formats the timestamp for display.
+   *
+   * @returns {string} The formatted time string.
+   */
+  const formattedTime = new Date(message.timestamp).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  /**
+   * Formats the full timestamp for the tooltip.
+   *
+   * @returns {string} The formatted full timestamp.
+   */
+  const fullTimestamp = new Date(message.timestamp).toLocaleString();
 
   return (
     <Box
@@ -70,64 +102,78 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
     >
       {/* Show sender avatar only if the message is not from the current user and in group chats */}
       {!isOwnMessage && currentChatType === "group" && (
-        <Avatar src={senderAvatar} sx={{ width: 32, height: 32, mr: 1 }} />
+        <Avatar
+          src={senderAvatar}
+          alt={sender?.entityName || t("messageBubble.labels.unknownSender")}
+          sx={{ width: 32, height: 32, mr: 1 }}
+        />
       )}
 
-      {/* Message Bubble */}
-      <Box
-        sx={{
-          p: 1.5,
-          bgcolor: getBackgroundColor(),
-          borderRadius: "1em",
-          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
-          maxWidth: "100%", // Ensure the bubble doesn’t exceed the parent width
-          textAlign: "left", // Align text based on the message direction
-        }}
-      >
-        <Typography
-          variant="body2"
+      {/* Message Bubble with Frosted Glass Effect */}
+      <Tooltip title={fullTimestamp} arrow>
+        <Box
           sx={{
-            wordBreak: "break-word", // Allows long words to break and wrap to the next line
-            overflowWrap: "break-word", // Ensures text wraps within the container
+            p: 1.5,
+            bgcolor: getBackgroundColor(),
+            borderRadius: "1em",
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
+            maxWidth: "100%", // Ensure the bubble doesn’t exceed the parent width
+            textAlign: "left", // Align text based on the message direction
+            backdropFilter: "blur(10px)", // Frosted glass effect
           }}
         >
-          {message.content}
-        </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              wordBreak: "break-word", // Allows long words to break and wrap to the next line
+              overflowWrap: "break-word", // Ensures text wraps within the container
+            }}
+          >
+            {message.content}
+          </Typography>
 
-        {/* Timestamp and Status Icon */}
-        <Typography
-          variant="caption"
-          sx={{
-            color: "gray",
-            display: "flex",
-            alignItems: "center",
-            mt: 0.5,
-            justifyContent: isOwnMessage ? "flex-end" : "flex-start",
-            gap: 0.5, // Add margin between timestamp and status icon
-          }}
-        >
-          {new Date(message.timestamp).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-          <MessageStatusIcon
-            message={message}
-            chatType={chatType}
-            participantsData={participantsData}
-            isOwnMessage={isOwnMessage}
-          />
-        </Typography>
-      </Box>
+          {/* Timestamp and Status Icon */}
+          <Box
+            sx={{
+              color: "gray",
+              display: "flex",
+              alignItems: "center",
+              mt: 0.5,
+              justifyContent: isOwnMessage ? "flex-end" : "flex-start",
+              gap: 0.5, // Add margin between timestamp and status icon
+            }}
+          >
+            <Typography variant="caption">{formattedTime}</Typography>
+            <MessageStatusIcon
+              message={message}
+              chatType={chatType}
+              participantsData={participantsData}
+              isOwnMessage={isOwnMessage}
+            />
+          </Box>
+        </Box>
+      </Tooltip>
     </Box>
   );
 };
 
+/**
+ * Memoization function for MessageBubble component.
+ * We only re-render the component if the readBy array length changes or any of the elements change.
+ * This optimization prevents unnecessary re-renders when the message status changes.
+ * @param {Object} prevProps Previous props
+ * @param {Object} nextProps Next props
+ * @returns {boolean} Whether the component should be re-rendered
+ */
 export default React.memo(MessageBubble, (prevProps, nextProps) => {
   return (
+    // Check if the readBy array length is the same
     prevProps.message.readBy.length === nextProps.message.readBy.length &&
+    // Check if all elements in the readBy array are the same
     prevProps.message.readBy.every(
       (value, index) => value === nextProps.message.readBy[index]
     ) &&
-    prevProps.message.status === nextProps.message.status // Include status in comparison
+    // Check if the message status is the same
+    prevProps.message.status === nextProps.message.status
   );
 });
