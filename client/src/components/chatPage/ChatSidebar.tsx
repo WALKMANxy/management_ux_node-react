@@ -1,4 +1,5 @@
-//Src/components/chatPage/ChatSidebar.tsx
+// src/components/chatPage/ChatSidebar.tsx
+
 import ChatIcon from "@mui/icons-material/Chat";
 import ContactsIcon from "@mui/icons-material/Contacts";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -8,8 +9,10 @@ import {
   IconButton,
   InputAdornment,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
+import "animate.css"; // Import animate.css for animations
 import React, {
   useCallback,
   useEffect,
@@ -17,13 +20,15 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "../../app/hooks";
+import { fetchMessagesFromMultipleChatsThunk } from "../../features/chat/chatThunks";
 import useChatLogic from "../../hooks/useChatsLogic"; // Hook to manage chat logic
 import ChatList from "./ChatList"; // ChatList Component
 import ContactsList from "./ContactsList";
-import { fetchMessagesFromMultipleChatsThunk } from "../../features/chat/chatThunks";
 
 const ChatSidebar: React.FC = () => {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [showContacts, setShowContacts] = useState(false);
   const animationClass = useRef("animate__fadeInLeft");
@@ -39,24 +44,24 @@ const ChatSidebar: React.FC = () => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
 
-/*   console.log("ChatSidebar rendering now")
- */
-
-  // Handle toggling between contacts and chats with animations
+  /**
+   * Handles toggling between contacts and chats with fade-in/fade-out animations.
+   */
   const handleToggleContacts = useCallback(() => {
-    animationClass.current = showContacts
-      ? "animate__fadeOut"
-      : "animate__fadeOut";
+    // Apply fade-out animation
+    animationClass.current = "animate__fadeOut";
 
     setTimeout(() => {
+      // Toggle the view
       setShowContacts((prev) => !prev);
-      animationClass.current = showContacts
-        ? "animate__fadeIn"
-        : "animate__fadeIn";
-    }, 200);
-  }, [showContacts]);
+      // Apply fade-in animation
+      animationClass.current = "animate__fadeIn";
+    }, 200); // Duration should match animate.css animation duration
+  }, []);
 
-  // Fetch contacts only once when the component is first rendered
+  /**
+   * Fetch contacts only once when the component is first rendered.
+   */
   useEffect(() => {
     if (!contactsFetched.current) {
       fetchContacts();
@@ -64,12 +69,18 @@ const ChatSidebar: React.FC = () => {
     }
   }, [fetchContacts]);
 
-  // Handle manual refresh of contacts when refresh button is clicked
+  /**
+   * Handle manual refresh of contacts when refresh button is clicked.
+   */
   const handleRefreshContacts = useCallback(() => {
     fetchContacts();
   }, [fetchContacts]);
 
-  // Handle search term changes
+  /**
+   * Handle search term changes.
+   *
+   * @param {React.ChangeEvent<HTMLInputElement>} e - The change event.
+   */
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setSearchTerm(e.target.value);
@@ -77,7 +88,9 @@ const ChatSidebar: React.FC = () => {
     []
   );
 
-  // Fetch messages when chats are visible and search term changes
+  /**
+   * Fetch messages when chats are visible and search term changes.
+   */
   useEffect(() => {
     if (
       searchTerm &&
@@ -96,11 +109,16 @@ const ChatSidebar: React.FC = () => {
     }
   }, [searchTerm, showContacts, chats, dispatch]);
 
-  // Memoized components for chat and contact lists to avoid unnecessary renders
+  /**
+   * Memoized ChatList component to avoid unnecessary re-renders.
+   */
   const chatList = useMemo(() => {
     return <ChatList searchTerm={searchTerm} loading={loading} />;
   }, [searchTerm, loading]);
 
+  /**
+   * Memoized ContactsList component to avoid unnecessary re-renders.
+   */
   const contactsList = useMemo(() => {
     return (
       <ContactsList
@@ -114,18 +132,18 @@ const ChatSidebar: React.FC = () => {
 
   return (
     <Box
-      className={`animate__animated animate_faster ${animationClass.current}`}
+      className={`animate__animated animate__faster ${animationClass.current}`}
       sx={{
         p: 2,
         bgcolor: "#ffffff",
         height: "100%",
         overflowY: "auto",
-        borderTopLeftRadius: 12, // Apply radius to the top-left corner
-        borderBottomLeftRadius: 12, // Apply radius to the bottom-left corner
+        borderTopLeftRadius: 12, // 16px equivalent
+        borderBottomLeftRadius: 12, // 16px equivalent
         transition: "all 0.2s ease-in-out",
       }}
     >
-      {/* Header with title and toggle icon */}
+      {/* Header with title and toggle icons */}
       <Box
         display="flex"
         justifyContent="space-between"
@@ -133,17 +151,39 @@ const ChatSidebar: React.FC = () => {
         mb={2}
       >
         <Typography variant="h6" sx={{ fontSize: "2rem" }}>
-          {showContacts ? "Contacts" : "Chats"}
+          {showContacts
+            ? t("chatSidebar.labels.contacts")
+            : t("chatSidebar.labels.chats")}
         </Typography>
         <Box display="flex" alignItems="center">
           {showContacts && (
-            <IconButton onClick={handleRefreshContacts}>
-              <RefreshIcon />
-            </IconButton>
+            <Tooltip title={t("chatSidebar.tooltips.refreshContacts")}>
+              <IconButton
+                onClick={handleRefreshContacts}
+                aria-label={t("chatSidebar.tooltips.refreshContacts")}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
           )}
-          <IconButton onClick={handleToggleContacts}>
-            {showContacts ? <ChatIcon /> : <ContactsIcon />}
-          </IconButton>
+          <Tooltip
+            title={
+              showContacts
+                ? t("chatSidebar.tooltips.showChats")
+                : t("chatSidebar.tooltips.showContacts")
+            }
+          >
+            <IconButton
+              onClick={handleToggleContacts}
+              aria-label={
+                showContacts
+                  ? t("chatSidebar.tooltips.showChats")
+                  : t("chatSidebar.tooltips.showContacts")
+              }
+            >
+              {showContacts ? <ChatIcon /> : <ContactsIcon />}
+            </IconButton>
+          </Tooltip>
         </Box>
       </Box>
 
@@ -151,7 +191,11 @@ const ChatSidebar: React.FC = () => {
       <TextField
         id="outlined-search"
         variant="outlined"
-        placeholder={`Search ${showContacts ? "contacts" : "chats"}`}
+        placeholder={
+          showContacts
+            ? t("chatSidebar.placeholders.searchContacts")
+            : t("chatSidebar.placeholders.searchChats")
+        }
         fullWidth
         value={searchTerm}
         autoComplete="off" // Prevents autofill suggestions
@@ -187,7 +231,7 @@ const ChatSidebar: React.FC = () => {
         }}
       />
 
-      {/* Render the memoized components based on the current view */}
+      {/* Render the memoized components with animations */}
       <Box
         sx={{
           position: "relative",

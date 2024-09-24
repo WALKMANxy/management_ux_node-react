@@ -1,5 +1,6 @@
-// AgentActivityOverview.tsx
+// src/components/clientpage/AgentActivityOverview.tsx
 
+import LoyaltyIcon from "@mui/icons-material/Loyalty";
 import {
   Timeline,
   TimelineConnector,
@@ -11,7 +12,9 @@ import {
   TimelineSeparator,
 } from "@mui/lab";
 import { CardHeader, Paper, Typography } from "@mui/material";
+import dayjs from "dayjs";
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
 import { selectVisits } from "../../features/data/dataSelectors";
 import { Agent } from "../../models/entityModels";
@@ -41,13 +44,13 @@ interface AgentActivityOverviewProps {
 const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({
   selectedAgent,
 }) => {
-  // Fetch visits using the selectVisits selector
-  const visits = useAppSelector(selectVisits);
+  const promos = useAppSelector(selectVisits); // Assuming 'selectVisits' fetches promotion-related visits
+  const { t } = useTranslation(); // Initialize translation
 
   // Generate activity list using the utility function
   const activityList: ActivityItem[] = useMemo(
-    () => generateActivityList(selectedAgent.clients, selectedAgent.id, visits),
-    [selectedAgent, visits]
+    () => generateActivityList(selectedAgent.clients, selectedAgent.id, promos),
+    [selectedAgent, promos]
   );
 
   return (
@@ -73,7 +76,7 @@ const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({
         },
       }}
     >
-      <CardHeader title="Recent Activity" />
+      <CardHeader title={t("agentActivity.title", "Recent Activity")} />
       <Timeline
         position="alternate"
         sx={{
@@ -85,21 +88,34 @@ const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({
           },
         }}
       >
-        {activityList.map((item, index) => (
-          <OrderItem
-            key={item.id}
-            item={item}
-            lastTimeline={index === activityList.length - 1}
-          />
-        ))}
+        {activityList.length === 0 ? (
+          <Typography variant="body1" color="text.secondary">
+            {t("agentActivity.noRecentActivities", "No recent activities.")}
+          </Typography>
+        ) : (
+          activityList.map((item, index) => (
+            <OrderItem
+              key={item.id}
+              item={item}
+              lastTimeline={index === activityList.length - 1}
+            />
+          ))
+        )}
       </Timeline>
     </Paper>
   );
 };
 
 const OrderItem: React.FC<OrderItemProps> = ({ item, lastTimeline }) => {
-  const { type, title, time, details, subDetails } = item;
+  const { type, title, time, details } = item;
+  const { t } = useTranslation(); // Initialize translation
 
+  /**
+   * Determines the color of the TimelineDot based on the activity type.
+   *
+   * @param {string} type - The type of activity.
+   * @returns {"primary" | "success" | "error" | "grey"} The color for the TimelineDot.
+   */
   const getDotColor = (
     type: string
   ): "primary" | "success" | "error" | "grey" => {
@@ -115,18 +131,14 @@ const OrderItem: React.FC<OrderItemProps> = ({ item, lastTimeline }) => {
     }
   };
 
-   // Function to format date and time in the desired format
-   const formatDateTime = (time: string): string => {
-    const date = new Date(time);
-    return date.toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    }) + ' ' + date.toLocaleTimeString('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
+  /**
+   * Formats the date to exclude the time component.
+   *
+   * @param {string} time - The ISO date string.
+   * @returns {string} The formatted date string (DD/MM/YYYY).
+   */
+  const formatDate = (time: string): string => {
+    return dayjs(time).format("DD/MM/YYYY");
   };
 
   return (
@@ -137,23 +149,22 @@ const OrderItem: React.FC<OrderItemProps> = ({ item, lastTimeline }) => {
         variant="body2"
         color="text.secondary"
       >
-        {formatDateTime(time)} {/* Format the time here */}
-        </TimelineOppositeContent>
+        {t("agentActivity.occurredAt", "Occurred at")} {formatDate(time)}
+      </TimelineOppositeContent>
       <TimelineSeparator>
-        <TimelineDot color={getDotColor(type)} />
+        <TimelineConnector />
+        <TimelineDot color={getDotColor(type)} aria-label={type}>
+          {/* Optional: Add ARIA hidden if decorative */}
+          <LoyaltyIcon aria-hidden="true" />
+        </TimelineDot>
         {!lastTimeline && <TimelineConnector />}
       </TimelineSeparator>
       <TimelineContent>
         <Typography variant="subtitle2">{title}</Typography>
         <Typography variant="body2">{details}</Typography>
-        {subDetails && (
-          <Typography variant="body2" sx={{ color: "text.secondary" }}>
-            {subDetails}
-          </Typography>
-        )}
       </TimelineContent>
     </TimelineItem>
   );
 };
 
-export default AgentActivityOverview;
+export default React.memo(AgentActivityOverview);

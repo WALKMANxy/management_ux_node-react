@@ -1,4 +1,5 @@
-// ChatView.tsx
+// src/components/chatPage/ChatView.tsx
+
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
@@ -9,11 +10,13 @@ import {
   Menu,
   MenuItem,
   Paper,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "../../app/hooks";
 import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 import useLoadOlderMessages from "../../hooks/useChatLoadOlderMessages";
@@ -23,6 +26,7 @@ import RenderMessage from "./RenderMessage"; // Import the RenderMessage compone
 import RenderParticipantsAvatars from "./RenderParticipantsAvatars"; // Import the RenderParticipantsAvatars component
 
 const ChatView: React.FC = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const dispatch = useAppDispatch();
@@ -46,15 +50,15 @@ const ChatView: React.FC = () => {
     currentChat?._id || null
   );
 
-  // Function to handle returning to the sidebar on mobile
+  /**
+   * Handles returning to the sidebar on mobile by clearing the current chat.
+   */
   const handleBackToChats = () => {
     dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
   };
 
   const currentChatStatus = currentChat?.status;
 
-  /*   console.log("ChatView rendering now");
-   */
   // Fallback if currentChat is not set
   if (!currentChat) {
     return (
@@ -68,7 +72,7 @@ const ChatView: React.FC = () => {
         }}
       >
         <Typography variant="h6" color="textSecondary">
-          No chat selected. Please select a chat to view.
+          {t("chatView.labels.noChatSelected")}
         </Typography>
       </Box>
     );
@@ -84,8 +88,8 @@ const ChatView: React.FC = () => {
         p: isMobile ? 0 : 2, // Remove padding on mobile
         paddingTop: isMobile ? 2 : 0,
         bgcolor: "#ffffff",
-        borderTopRightRadius: 12, // Apply radius to the top-left corner
-        borderBottomRightRadius: 12, // Apply radius to the bottom-left corner
+        borderTopRightRadius: 12, // 16px equivalent
+        borderBottomRightRadius: 12, // 16px equivalent
       }}
     >
       {/* Chat Header */}
@@ -105,9 +109,14 @@ const ChatView: React.FC = () => {
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
           {isMobile && (
-            <IconButton onClick={handleBackToChats}>
-              <ArrowBackIcon />
-            </IconButton>
+            <Tooltip title={t("chatView.tooltips.backToChats")}>
+              <IconButton
+                onClick={handleBackToChats}
+                aria-label={t("chatView.tooltips.backToChats")}
+              >
+                <ArrowBackIcon />
+              </IconButton>
+            </Tooltip>
           )}
           <Avatar
             src={
@@ -115,6 +124,8 @@ const ChatView: React.FC = () => {
                 ? participantsData[0]?.avatar ?? ""
                 : getAdminAvatar() ?? ""
             }
+            alt={getChatTitle()}
+            sx={{ width: 40, height: 40 }}
           />
           <Typography variant="h6" sx={{ ml: 2 }}>
             {getChatTitle()}
@@ -125,9 +136,14 @@ const ChatView: React.FC = () => {
             participantsData={participantsData}
             chatType={currentChat.type}
           />
-          <IconButton onClick={handleMenuOpen}>
-            <MoreVertIcon />
-          </IconButton>
+          <Tooltip title={t("chatView.tooltips.moreOptions")}>
+            <IconButton
+              onClick={handleMenuOpen}
+              aria-label={t("chatView.tooltips.moreOptions")}
+            >
+              <MoreVertIcon />
+            </IconButton>
+          </Tooltip>
         </Box>
         <Menu
           anchorEl={menuAnchorEl}
@@ -136,7 +152,7 @@ const ChatView: React.FC = () => {
         >
           {getChatOptions().map((option) => (
             <MenuItem key={option} onClick={handleMenuClose}>
-              {option}
+              {t(`chatView.menuOptions.${option}`)}
             </MenuItem>
           ))}
         </Menu>
@@ -149,13 +165,13 @@ const ChatView: React.FC = () => {
         sx={{
           borderRadius: "1.5em", // Rounded corners for the paper
           overflowY: "auto", // Enable scrolling for messages
-          display: "flex", // Add this line
-          flexDirection: "column", // Add this line
+          display: "flex",
+          flexDirection: "column",
           "&::-webkit-scrollbar": {
             display: "none",
           },
           position: "relative",
-          height: "79dvh",
+          height: isMobile ? "calc(100dvh - 120px)" : "79dvh", // Adjust height based on mobile or desktop
         }}
       >
         <Box
@@ -164,8 +180,8 @@ const ChatView: React.FC = () => {
             bgcolor: "#f9f9f9",
             borderRadius: 6,
             overflowY: "auto", // Enable scrolling for messages
-            display: "flex", // Add this line
-            flexDirection: "column", // Add this line
+            display: "flex",
+            flexDirection: "column",
             "&::-webkit-scrollbar": {
               display: "none",
             },
