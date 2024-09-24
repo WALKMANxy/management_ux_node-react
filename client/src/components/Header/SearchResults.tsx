@@ -1,9 +1,14 @@
-import { Card, CardContent, Typography } from "@mui/material";
-import React, { useEffect, useRef } from "react";
+// src/components/SearchResults.tsx
+
+import { Box, Card, CardContent, Typography } from "@mui/material";
+import React, { memo, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 import { SearchResultsProps } from "../../models/propsModels";
 import { generateRandomString } from "../../utils/constants";
-import "./SearchResults.module.css";
+
+const ITEM_HEIGHT = 160; // Adjust based on your design
+const MAX_ITEMS_VISIBLE = 5; // Maximum items visible without scrolling
 
 const SearchResults: React.FC<SearchResultsProps> = ({
   onSelect,
@@ -11,97 +16,135 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   results,
 }) => {
   const { t } = useTranslation();
-  const resultsRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<List>(null);
 
   useEffect(() => {
-    if (resultsRef.current) {
-      const selectedElement = resultsRef.current.children[
-        selectedIndex
-      ] as HTMLElement;
-      if (selectedElement) {
-        selectedElement.scrollIntoView({ block: "nearest" });
-      }
+    if (listRef.current && selectedIndex >= 0) {
+      listRef.current.scrollToItem(selectedIndex, "smart");
     }
   }, [selectedIndex]);
 
+  const renderRow = ({ index, style }: ListChildComponentProps) => {
+    const result = results[index];
+    const isSelected = index === selectedIndex;
+
+    return (
+      <Box
+        style={style}
+        key={`${result.id}-${generateRandomString()}`}
+        onClick={() => onSelect(result)}
+        sx={{
+          backgroundColor: isSelected ? "rgba(0, 0, 0, 0.08)" : "transparent",
+          cursor: "pointer",
+          paddingY: 0.5,
+          height: "100%",
+        }}
+      >
+        <Card
+          variant="outlined"
+          sx={{
+            height: "100%",
+            borderRadius: 2,
+            boxShadow: "none",
+            backgroundColor: "rgba(255, 255, 255,0.7)",
+            "&:hover": {
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            },
+          }}
+        >
+          <CardContent>
+            <Typography variant="h6" noWrap>
+              {result.name}
+            </Typography>
+            {result.type === "article" && (
+              <>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.articleId", {
+                    articleId: result.articleId,
+                  })}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.brand", { brand: result.brand })}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.lastSoldDate", {
+                    lastSoldDate: result.lastSoldDate,
+                  })}
+                </Typography>
+              </>
+            )}
+            {result.type === "client" && (
+              <>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.province", { province: result.province })}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.phone", { phone: result.phone })}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.paymentMethod", {
+                    paymentMethod: result.paymentMethod,
+                  })}
+                </Typography>
+              </>
+            )}
+            {result.type === "promo" && (
+              <>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.discountAmount", {
+                    discountAmount: result.discount,
+                  })}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.startDate", {
+                    startDate: result.startDate,
+                  })}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.endDate", { endDate: result.endDate })}
+                </Typography>
+              </>
+            )}
+            <Typography variant="body2" color="textSecondary" noWrap>
+              {t("searchResults.type", { type: result.type })}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Box>
+    );
+  };
+
+  const listHeight =
+    results.length < MAX_ITEMS_VISIBLE
+      ? results.length * ITEM_HEIGHT
+      : MAX_ITEMS_VISIBLE * ITEM_HEIGHT;
+
   return (
-    <div className="search-results" ref={resultsRef}>
+    <Box>
       {results.length > 0 ? (
-        results.map((result, index) => (
-          <Card
-            key={`${result.id}-${generateRandomString()}`}
-            className={`search-result-item ${
-              index === selectedIndex ? "selected" : ""
-            }`}
-            onClick={() => onSelect(result)} // Pass the entire result object
-            sx={{ marginBottom: 2 }}
-          >
-            <CardContent>
-              <Typography variant="h6">{result.name}</Typography>
-              {result.type === "article" && (
-                <>
-                  <Typography variant="body2">
-                    {t("searchResults.articleId", {
-                      articleId: result.articleId,
-                    })}
-                  </Typography>
-                  <Typography variant="body2">
-                    {t("searchResults.brand", { brand: result.brand })}
-                  </Typography>
-                  <Typography variant="body2">
-                    {t("searchResults.lastSoldDate", {
-                      lastSoldDate: result.lastSoldDate,
-                    })}
-                  </Typography>
-                </>
-              )}
-              {result.type === "client" && (
-                <>
-                  <Typography variant="body2">
-                    {t("searchResults.province", { province: result.province })}
-                  </Typography>
-                  <Typography variant="body2">
-                    {t("searchResults.phone", { phone: result.phone })}
-                  </Typography>
-                  <Typography variant="body2">
-                    {t("searchResults.paymentMethod", {
-                      paymentMethod: result.paymentMethod,
-                    })}
-                  </Typography>
-                </>
-              )}
-              {result.type === "promo" && (
-                <>
-                  <Typography variant="body2">
-                    {t("searchResults.discountAmount", {})}
-                  </Typography>
-                  <Typography variant="body2">
-                    {t("searchResults.startDate", {
-                      startDate: result.startDate,
-                    })}
-                  </Typography>
-                  <Typography variant="body2">
-                    {t("searchResults.endDate", { endDate: result.endDate })}
-                  </Typography>
-                </>
-              )}
-              <Typography variant="body2">
-                {t("searchResults.type", { type: result.type })}
-              </Typography>
-            </CardContent>
-          </Card>
-        ))
+        <List
+          height={listHeight}
+          itemCount={results.length}
+          itemSize={ITEM_HEIGHT}
+          width="100%"
+          ref={listRef}
+          outerElementType={React.forwardRef((props, ref) => (
+            <div {...props} ref={ref as React.Ref<HTMLDivElement>} />
+          ))}
+        >
+          {renderRow}
+        </List>
       ) : (
-        <Card className="search-result-item" sx={{ marginBottom: 2 }}>
+        <Card sx={{ marginBottom: 2 }}>
           <CardContent>
             <Typography variant="body2">
-              {t("searchResults.noResults")}
+              {t("searchResults.noResults", "No results found.")}
             </Typography>
           </CardContent>
         </Card>
       )}
-    </div>
+    </Box>
   );
 };
 
-export default SearchResults;
+export default memo(SearchResults);

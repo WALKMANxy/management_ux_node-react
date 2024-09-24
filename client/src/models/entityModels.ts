@@ -1,6 +1,6 @@
 import { Movement } from "./dataModels";
 
-export type UserRole = "admin" | "agent" | "client" | "guest";
+export type UserRole = "admin" | "agent" | "client" | "employee" | "guest";
 
 export type User = {
   _id: string; // Corresponds to MongoDB's _id

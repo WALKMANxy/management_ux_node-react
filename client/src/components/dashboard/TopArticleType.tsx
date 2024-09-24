@@ -3,7 +3,10 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { TopArticleTypeProps } from "../../models/propsModels";
 
-const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles, isAgentSelected }) => {
+const TopArticleType: React.FC<TopArticleTypeProps> = ({
+  articles,
+  isAgentSelected,
+}) => {
   const { t } = useTranslation();
 
   return (
@@ -55,8 +58,8 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles, isAgentSelect
             >
               {t(
                 isAgentSelected
-                  ? "topArticleType.titleAgent"
-                  : "topArticleType.titleClient"
+                  ? "topArticleType.titleAgent" // Translated to "Top Sold"
+                  : "topArticleType.titleClient" // Translated to "Top Bought"
               )}
             </Typography>
           </Grid>
@@ -75,7 +78,7 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles, isAgentSelect
                   >
                     <img
                       src="/icons/garage.svg"
-                      alt={t("topArticleType.iconAlt")}
+                      alt={t("topArticleType.iconAlt")} // "Icon representing top article type"
                       style={{ width: "100%", height: "100%" }}
                     />
                   </Avatar>
@@ -85,14 +88,29 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({ articles, isAgentSelect
           </Grid>
           <Grid item>
             {articles.map((article, index) => (
-              // Ensure a unique key by combining id and index
               <Box key={`${article.id}-${index}`} sx={{ mb: 1 }}>
-                <Typography sx={{ fontSize: "1.2rem", fontWeight: 500 }}>
+                <Typography
+                  sx={{
+                    fontSize: "1.2rem",
+                    fontWeight: 500,
+                    wordBreak: "break-word", // Allows text to wrap to the next line if necessary
+                  }}
+                >
                   {article.name} (ID: {article.id})
                 </Typography>
-                <Typography sx={{ fontSize: "1rem", color: "#000" }}>
+                <Typography
+                  variant="subtitle2" // Adjusted to use subtitle variant
+                  sx={{
+                    color: "#000",
+                    wordBreak: "break-word", // Ensure text wraps within the container
+                  }}
+                >
                   {t("topArticleType.amountPurchased")}: {article.quantity}
                 </Typography>
+                {index < articles.length - 1 && (
+                  <Divider sx={{ my: 2, borderRadius: "12px" }} />
+                )}{" "}
+                {/* Add a subtle divider between items */}
               </Box>
             ))}
           </Grid>

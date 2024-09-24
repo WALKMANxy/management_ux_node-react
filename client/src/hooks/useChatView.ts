@@ -45,28 +45,31 @@ const useChatView = () => {
   const getChatOptions = () => {
     if (!currentChat) return [];
 
-    if (
-      currentChat.type === "group" &&
-      currentChat.admins &&
-      currentChat.admins.includes(currentUserId)
-    ) {
-      return ["Edit group name", "Edit group members", "Delete chat"];
+    if (currentChat.type === "group" && currentChat.admins?.includes(currentUserId)) {
+      return [
+        "mute",
+        "edit_group",
+        "edit_group_member",
+        "delete_chat",
+        "archive_chat",
+      ];
     } else if (currentChat.type === "group") {
-      return ["Archive chat"];
+      return ["mute", "archive_chat"];
     } else if (
       currentChat.type === "broadcast" &&
-      currentChat.admins &&
-      currentChat.admins.includes(currentUserId)
+      currentChat.admins?.includes(currentUserId)
     ) {
       return [
-        "Edit broadcast name",
-        "Edit broadcast members",
-        "Delete broadcast",
+        "mute",
+        "edit_broadcast_name",
+        "edit_broadcast_members",
+        "delete_broadcast",
+        "archive_chat",
       ];
     } else if (currentChat.type === "broadcast") {
-      return ["Archive chat"];
+      return ["mute", "archive_chat"];
     } else {
-      return ["Archive chat"];
+      return ["mute", "archive_chat"];
     }
   };
 

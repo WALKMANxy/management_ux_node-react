@@ -34,23 +34,6 @@ const useGlobalSearch = (filter: string) => {
     setShowResults(true);
   }, [dispatch, debouncedInput, filter]);
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter") {
-      if (selectedIndex >= 0 && selectedIndex < results.length) {
-        setShowResults(false);
-        setSelectedIndex(-1);
-      } else {
-        handleSearch();
-      }
-    } else if (event.key === "ArrowDown") {
-      setSelectedIndex((prevIndex) => (prevIndex + 1) % results.length);
-    } else if (event.key === "ArrowUp") {
-      setSelectedIndex(
-        (prevIndex) => (prevIndex - 1 + results.length) % results.length
-      );
-    }
-  };
-
   const handleClickOutside = useCallback((event: MouseEvent) => {
     if (
       searchRef.current &&
@@ -73,36 +56,32 @@ const useGlobalSearch = (filter: string) => {
     handleSearch();
   }, [debouncedInput, handleSearch]);
 
+  // Reset selectedIndex when results change
+  useEffect(() => {
+    if (results.length > 0) {
+      setSelectedIndex(0); // Highlight the first item
+    } else {
+      setSelectedIndex(-1);
+    }
+  }, [results]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
     setSelectedIndex(-1);
   };
 
   const handleFocus = () => {
-    setShowResults(false);
     if (input.length >= 3) {
       handleSearch();
     } else {
       dispatch(clearResults());
     }
-    setSelectedIndex(-1);
-    //console.log("handleFocus - Input focused");
+    setShowResults(true);
   };
-
-  /* useEffect(() => {
-    console.log("useGlobalSearch - Current state:", {
-      input,
-      results,
-      status,
-      selectedIndex,
-      showResults,
-    });
-  }); */
 
   return {
     input,
     handleChange,
-    handleKeyDown,
     handleFocus,
     showResults,
     searchRef,
