@@ -22,11 +22,10 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
 import React from "react";
-import EligibleClientsGrid from "./EligibleClientsGrid";
-
 import { Controller } from "react-hook-form";
 import usePromoForm from "../../hooks/usePromoForm";
 import { Promo } from "../../models/dataModels";
+import EligibleClientsGrid from "./EligibleClientsGrid";
 
 interface CreatePromoFormProps {
   onClose: () => void;
@@ -49,7 +48,7 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
     clients,
     t,
     errors,
-    setValue, // Destructure setValue from usePromoForm
+    setValue,
   } = usePromoForm({
     promoData,
     isCreating,
@@ -68,8 +67,6 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
   const setExcludedClients = (clients: string[]) =>
     setValue("excludedClients", clients);
   const setGlobal = (global: boolean) => setValue("global", global);
-
-  console.log("re rendering component");
 
   return (
     <LocalizationProvider
@@ -90,15 +87,15 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
           height: "100%",
         }}
       >
-        {isCreating && (
-          <Typography
-            variant="h3"
-            gutterBottom
-            sx={{ fontWeight: 600, mb: 4, color: "#4d4b5f", mt: 1, ml: 2 }}
-          >
-            Create New Promo
-          </Typography>
-        )}
+        <Typography
+          variant="h3"
+          gutterBottom
+          sx={{ fontWeight: 600, mb: 4, color: "#4d4b5f", mt: 1, ml: 2 }}
+        >
+          {isCreating
+            ? t("createPromoForm.createTitle")
+            : t("createPromoForm.editTitle")}
+        </Typography>
 
         <Grid container spacing={2}>
           {/* Promo Type Selector */}
@@ -106,22 +103,30 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
             <Controller
               name="promoType"
               control={control}
-              rules={{ required: "Promo Type is required" }}
+              rules={{ required: t("createPromoForm.promoTypeRequired") }}
               render={({ field }) => (
                 <FormControl fullWidth required variant="outlined">
-                  <InputLabel id="promo-type-label">Promo Type</InputLabel>
+                  <InputLabel id="promo-type-label">
+                    {t("createPromoForm.promoTypeLabel")}
+                  </InputLabel>
                   <Select
                     {...field}
                     labelId="promo-type-label"
                     id="promo-type"
-                    label="Promo Type *"
+                    label={t("createPromoForm.promoTypeLabel")}
                     sx={{
                       borderRadius: "20px",
                     }}
                   >
-                    <MenuItem value="Contract">Contract</MenuItem>
-                    <MenuItem value="Sale">Sale</MenuItem>
-                    <MenuItem value="Extra">Extra</MenuItem>
+                    <MenuItem value="Contract">
+                      {t("createPromoForm.promoTypeContract")}
+                    </MenuItem>
+                    <MenuItem value="Sale">
+                      {t("createPromoForm.promoTypeSale")}
+                    </MenuItem>
+                    <MenuItem value="Extra">
+                      {t("createPromoForm.promoTypeExtra")}
+                    </MenuItem>
                   </Select>
                 </FormControl>
               )}
@@ -138,11 +143,11 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
             <Controller
               name="name"
               control={control}
-              rules={{ required: "Promo Name is required" }}
+              rules={{ required: t("createPromoForm.promoNameRequired") }}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Promo Name"
+                  label={t("createPromoForm.promoNameLabel")}
                   fullWidth
                   required
                   variant="outlined"
@@ -163,7 +168,7 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
             <Controller
               name="startDate"
               control={control}
-              rules={{ required: "Start Date is required" }}
+              rules={{ required: t("createPromoForm.startDateRequired") }}
               render={({ field }) => (
                 <Paper elevation={1} sx={{ p: 2, borderRadius: 6 }}>
                   <StaticDatePicker
@@ -180,7 +185,7 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
                       },
                     }}
                     localeText={{
-                      toolbarTitle: t("datePicker.startDateLabel"),
+                      toolbarTitle: t("createPromoForm.startDateLabel"),
                     }}
                   />
                 </Paper>
@@ -199,11 +204,11 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
               name="endDate"
               control={control}
               rules={{
-                required: "End Date is required",
+                required: t("createPromoForm.endDateRequired"),
                 validate: (value) => {
                   const startDate = watch("startDate");
                   if (value && startDate && value.isBefore(startDate)) {
-                    return "End Date cannot be before Start Date.";
+                    return t("createPromoForm.endDateValidation");
                   }
                   return true;
                 },
@@ -224,7 +229,7 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
                       },
                     }}
                     localeText={{
-                      toolbarTitle: t("datePicker.endDateLabel"),
+                      toolbarTitle: t("createPromoForm.endDateLabel"),
                     }}
                   />
                 </Paper>
@@ -242,11 +247,11 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
             <Controller
               name="discount"
               control={control}
-              rules={{ required: "Discount Description is required" }}
+              rules={{ required: t("createPromoForm.discountRequired") }}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Discount Description"
+                  label={t("createPromoForm.discountLabel")}
                   fullWidth
                   required
                   variant="outlined"
@@ -262,7 +267,7 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
                   helperText={
                     errors.discount
                       ? errors.discount.message
-                      : 'e.g., "Every 100 euros spent, you get a 10 euros coupon"'
+                      : t("createPromoForm.discountHelperText")
                   }
                   error={!!errors.discount}
                 />
@@ -275,7 +280,9 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
         <Grid item xs={12}>
           <FormControl fullWidth disabled variant="outlined">
             <InputLabel id="clients-label">
-              {isGlobal ? "Excluded Clients" : "Eligible Clients"}
+              {isGlobal
+                ? t("createPromoForm.excludedClientsLabel")
+                : t("createPromoForm.eligibleClientsLabel")}
             </InputLabel>
             <Select
               labelId="clients-label"
@@ -284,7 +291,11 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
               value={isGlobal ? excludedClients : selectedClients}
               input={
                 <OutlinedInput
-                  label={isGlobal ? "Excluded Clients" : "Eligible Clients"}
+                  label={
+                    isGlobal
+                      ? t("createPromoForm.excludedClientsLabel")
+                      : t("createPromoForm.eligibleClientsLabel")
+                  }
                 />
               }
               renderValue={(selected) => (
@@ -331,7 +342,13 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
               gap: 4,
             }}
           >
-            <Tooltip title={isCreating ? "Create Promo" : "Update Promo"}>
+            <Tooltip
+              title={
+                isCreating
+                  ? t("createPromoForm.createPromo")
+                  : t("createPromoForm.updatePromo")
+              }
+            >
               <IconButton
                 type="submit"
                 color="primary"
@@ -347,13 +364,17 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
                     transform: "scale(0.95)",
                   },
                 }}
-                aria-label={isCreating ? "Create Promo" : "Update Promo"}
+                aria-label={
+                  isCreating
+                    ? t("createPromoForm.createPromo")
+                    : t("createPromoForm.updatePromo")
+                }
               >
                 {isCreating ? <AddIcon /> : <EditIcon />}
               </IconButton>
             </Tooltip>
 
-            <Tooltip title="Cancel">
+            <Tooltip title={t("createPromoForm.cancel")}>
               <IconButton
                 color="error"
                 onClick={onClose}
@@ -369,7 +390,7 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
                     transform: "scale(0.95)",
                   },
                 }}
-                aria-label="Cancel"
+                aria-label={t("createPromoForm.cancel")}
               >
                 <CloseIcon />
               </IconButton>

@@ -76,13 +76,18 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
               >
                 <Grid item>
                   <Typography variant="h2">
-                    {t("movementDetails.title")}
+                    {t("movementDetails.title", "Movement Details")}
                   </Typography>
                 </Grid>
                 <Grid item>
                   <IconButton
                     onClick={() =>
                       setMovementDetailsCollapsed(!isMovementDetailsCollapsed)
+                    }
+                    aria-label={
+                      isMovementDetailsCollapsed
+                        ? t("movementDetails.expand", "Expand details")
+                        : t("movementDetails.collapse", "Collapse details")
                     }
                   >
                     {isMovementDetailsCollapsed ? (
@@ -97,7 +102,7 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
           </Grid>
         </Box>
         <Collapse in={!isMovementDetailsCollapsed}>
-          {selectedMovement ? (
+          {selectedMovement && (
             <Box sx={{ p: 2 }}>
               <Grid
                 container
@@ -120,8 +125,6 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
                 </Grid>
               </Grid>
             </Box>
-          ) : (
-            <Box sx={{ p: 2 }}></Box>
           )}
         </Collapse>
       </Paper>

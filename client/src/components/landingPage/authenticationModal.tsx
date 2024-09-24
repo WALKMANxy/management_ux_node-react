@@ -82,7 +82,13 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
       onClose={onClose}
       maxWidth="xs"
       fullWidth
-      PaperProps={{ sx: { borderRadius: "30px" } }}
+      PaperProps={{
+        sx: {
+          borderRadius: "30px",
+          backdropFilter: "blur(120px)", // Frosted glass effect
+          backgroundColor: "rgba(255, 255, 255, 1)", // Semi-transparent background
+        },
+      }}
     >
       <DialogContent
         className={animationClass}
@@ -100,7 +106,7 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
         ) : (
           <>
             <Typography
-              variant="h4"
+              variant="h3"
               sx={{ fontWeight: "bold", marginBottom: "12px" }}
             >
               {isLoginMode ? t("auth.signIn") : t("auth.register")}
@@ -144,13 +150,17 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   variant="outlined"
-                  sx={{ marginBottom: "16px", borderRadius: "12px" }}
+                  sx={{
+                    backgroundColor: "rgba(255, 255, 255, 0.4)",
+                    marginBottom: "16px",
+                    backdropFilter: "blur(15px)",
+                  }}
                   className={
                     shakeEmail ? "animate__animated animate__shakeX" : ""
                   }
                   type="email"
-                  aria-label="Email address"
-                  placeholder="Enter your email"
+                  aria-label={t("auth.email")}
+                  placeholder={t("auth.enterEmail")}
                   inputProps={{
                     autoComplete: "email",
                   }}
@@ -172,7 +182,11 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   variant="outlined"
-                  sx={{ marginBottom: "16px", borderRadius: "12px" }}
+                  sx={{
+                    backgroundColor: "rgba(255, 255, 255, 0.4)",
+                    marginBottom: "16px",
+                    backdropFilter: "blur(15px)",
+                  }}
                   className={
                     shakePassword ? "animate__animated animate__shakeX" : ""
                   }
@@ -192,8 +206,8 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
                       </InputAdornment>
                     ),
                   }}
-                  aria-label="Password"
-                  placeholder="Enter your password"
+                  aria-label={t("auth.password")}
+                  placeholder={t("auth.enterPassword")}
                   inputProps={{
                     autoComplete: "current-password",
                   }}
@@ -217,14 +231,18 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       variant="outlined"
-                      sx={{ marginBottom: "16px", borderRadius: "12px" }}
+                      sx={{
+                        backgroundColor: "rgba(255, 255, 255, 0.4)",
+                        marginBottom: "16px",
+                        backdropFilter: "blur(15px)",
+                      }}
                       className={
                         shakeConfirmPassword
                           ? "animate__animated animate__shakeX"
                           : ""
                       }
-                      aria-label="Confirm password"
-                      placeholder="Confirm your password"
+                      aria-label={t("auth.confirmPassword")}
+                      placeholder={t("auth.confirmPassword")}
                       inputProps={{
                         autoComplete: "new-password",
                       }}

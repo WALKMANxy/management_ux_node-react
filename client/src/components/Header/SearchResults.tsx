@@ -43,10 +43,23 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         <Card
           variant="outlined"
           sx={{
+            position: "relative",
             height: "100%",
             borderRadius: 2,
             boxShadow: "none",
-            backgroundColor: "rgba(255, 255, 255,0.7)",
+            backgroundColor: "rgba(255, 255, 255, 1)", // Transparent layer to create the frosted glass effect
+            overflow: "hidden", // Ensure the pseudo-element stays within the card
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: "inherit", // Inherits the background of the card
+              filter: "blur(25px)", // Apply the blur here
+              zIndex: -1, // Place the pseudo-element behind the content
+            },
             "&:hover": {
               boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
             },
