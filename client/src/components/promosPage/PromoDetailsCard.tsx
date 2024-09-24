@@ -1,3 +1,5 @@
+// src/components/promosPage/PromoDetailsCard.tsx
+
 import { Avatar, Box, Button, Divider, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import React from "react";
@@ -37,7 +39,6 @@ const PromoDetailsCard: React.FC<PromoDetailsCardProps> = ({
   onTerminatePromo,
 }) => {
   const { selectedPromo } = usePromos(); // Get selectedPromo from the hook
-
   const { t } = useTranslation();
 
   const users = useAppSelector((state) => state.users.users);

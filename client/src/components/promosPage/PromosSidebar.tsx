@@ -17,8 +17,9 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import { Promo } from "../../models/dataModels";
+import { useTranslation } from "react-i18next";
 import usePromos from "../../hooks/usePromos";
+import { Promo } from "../../models/dataModels";
 
 interface PromosSidebarProps {
   onCreatePromo: () => void;
@@ -29,12 +30,9 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
   onCreatePromo,
   onSelectPromo,
 }) => {
-  const {
-    promos,
-    selectedPromoId,
-    handleRefreshPromos,
-    userRole,
-  } = usePromos(); // Assuming usePromos is imported correctly
+  const { t } = useTranslation();
+  const { promos, selectedPromoId, handleRefreshPromos, userRole } =
+    usePromos();
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +57,7 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
         mb={2}
       >
         <Typography variant="h5" gutterBottom>
-          Promos
+          {t("promosSidebar.title", "Promos")}
         </Typography>
         <Box display="flex" gap={1}>
           <IconButton onClick={handleRefreshPromos} size="small">
@@ -76,7 +74,7 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
       {/* Search Bar */}
       <TextField
         variant="outlined"
-        placeholder="Search Promos"
+        placeholder={t("promosSidebar.searchPlaceholder", "Search Promos")}
         fullWidth
         value={searchTerm}
         onChange={handleSearchChange}
@@ -116,7 +114,6 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
                       : "grey.400",
                   },
                   borderRadius: "12px", // Add border radius for rounded corners
-
                 }}
               >
                 <ListItemAvatar>
@@ -124,7 +121,7 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
                 </ListItemAvatar>
                 <ListItemText
                   primary={promo.name}
-                  secondary={`Type: ${promo.promoType}`}
+                  secondary={`${t("promosSidebar.type")}: ${promo.promoType}`}
                 />
               </ListItem>
               <Divider sx={{ my: 1 }} />
@@ -132,7 +129,7 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
           ))
         ) : (
           <Typography variant="body2" sx={{ textAlign: "center", mt: 2 }}>
-            No promos found.
+            {t("promosSidebar.noPromosFound", "No promos found.")}
           </Typography>
         )}
       </List>

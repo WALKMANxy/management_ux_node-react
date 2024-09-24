@@ -1,7 +1,9 @@
 // src/components/movementpage/MovementDetailComponent.tsx
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import PersonIcon from "@mui/icons-material/Person";
+import FingerprintIcon from "@mui/icons-material/Fingerprint";
+
 import { Box, Grid, Skeleton, Typography } from "@mui/material";
+import dayjs from "dayjs";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { MovementProp } from "../../models/propsModels";
@@ -13,12 +15,13 @@ const MovementDetailComponent: React.FC<MovementProp> = ({
   const { t } = useTranslation();
 
   const keyMap: { [key: string]: string } = {
-    id: t("details.id"),
-    dateOfOrder: t("details.dateOfOrder"),
+    id: t("movementDetails.id"),
+    dateOfOrder: t("movementDetails.dateOfOrder"),
+    // Add more keys as necessary
   };
 
   const icons: { [key: string]: JSX.Element } = {
-    id: <PersonIcon />,
+    id: <FingerprintIcon />,
     dateOfOrder: <CalendarTodayIcon />,
   };
 
@@ -28,9 +31,9 @@ const MovementDetailComponent: React.FC<MovementProp> = ({
         {Object.entries(detail).map(([key, value]) => {
           const displayKey = keyMap[key] || key;
           const displayValue = isLoading ? (
-            <Skeleton width="80%" />
+            <Skeleton width="80%" height={24} />
           ) : key === "dateOfOrder" ? (
-            new Date(value).toLocaleDateString()
+            dayjs(value).format("DD/MM/YYYY") // Using dayjs for consistent date formatting
           ) : (
             value
           );
