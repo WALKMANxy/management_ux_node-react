@@ -249,9 +249,7 @@ const Header: React.FC = () => {
       <AppBar
         position="fixed"
         sx={{
-          backdropFilter: "blur(25px)", // Increased blur for a more pronounced frosted effect
           backgroundColor: "rgba(0, 0, 0, 1)", // Slightly more transparent for a frosty look
-          borderBlockColor: "rgba(255, 255, 255, 0.3)", // Light border to enhance the frosted effect
           borderBottomLeftRadius: "32px", // Rounded corners for a smoother look
           borderBottomRightRadius: "32px", // Rounded corners for a smoother look
           boxShadow: `0px 4px 12px rgba(0, 0, 0, 0.1)`, // Soft shadow for depth

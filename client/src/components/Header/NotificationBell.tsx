@@ -108,7 +108,12 @@ const NotificationBell: React.FC = () => {
                   <ListItem
                     button
                     onClick={() => handleChatClick(chat._id)}
-                    sx={{ display: "flex", alignItems: "flex-start" }}
+                    sx={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      boxShadow: "0 1px 4px rgba(0, 0, 0, 0.4)",
+                      borderRadius: "8px"
+                    }}
                   >
                     <ListItemText
                       primary={getChatTitle(chat)}

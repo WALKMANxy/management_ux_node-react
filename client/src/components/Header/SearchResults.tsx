@@ -1,7 +1,13 @@
 // src/components/SearchResults.tsx
 
+import LoyaltyIcon from "@mui/icons-material/Loyalty";
+import PersonIcon from "@mui/icons-material/Person";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import WarehouseIcon from "@mui/icons-material/Warehouse";
 import { Box, Card, CardContent, Typography } from "@mui/material";
-import React, { memo, useEffect, useRef } from "react";
+import { styled } from "@mui/material/styles";
+import dayjs from "dayjs";
+import React, { memo, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 import { SearchResultsProps } from "../../models/propsModels";
@@ -9,6 +15,13 @@ import { generateRandomString } from "../../utils/constants";
 
 const ITEM_HEIGHT = 160; // Adjust based on your design
 const MAX_ITEMS_VISIBLE = 5; // Maximum items visible without scrolling
+
+// Styled component for type icons at the bottom right
+const TypeIconBox = styled(Box)(({ theme }) => ({
+  position: "absolute",
+  bottom: theme.spacing(1),
+  right: theme.spacing(1),
+}));
 
 const SearchResults: React.FC<SearchResultsProps> = ({
   onSelect,
@@ -24,9 +37,62 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     }
   }, [selectedIndex]);
 
+  // Define the icons based on the result type
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "client":
+        return <PersonIcon />;
+      case "agent":
+        return <SupportAgentIcon />;
+      case "article":
+        return <WarehouseIcon />;
+      case "promo":
+        return <LoyaltyIcon />;
+      default:
+        return null;
+    }
+  };
+
+  // Define background colors based on the result type
+  const getBackgroundColor = (type: string) => {
+    switch (type) {
+      case "agent":
+        return "rgba(173, 216, 230, 0.1)"; // Light Blue
+      case "article":
+        return "rgba(255, 165, 0, 0.1)"; // Light Orange
+      case "promo":
+        return "rgba(144, 238, 144, 0.1)"; // Light Green
+      case "client":
+      default:
+        return "rgba(255, 255, 255, 1)"; // White
+    }
+  };
+
   const renderRow = ({ index, style }: ListChildComponentProps) => {
     const result = results[index];
     const isSelected = index === selectedIndex;
+
+    // Handle undefined values gracefully
+    const displayId =
+      result.type === "promo"
+        ? result._id || t("searchResults.idUnknown")
+        : result.id || t("searchResults.idUnknown");
+    const displayPhone = result.phone || t("searchResults.phoneUnknown");
+    const displayEmail = result.email || t("searchResults.emailUnknown");
+    const displayPromoType =
+      result.promoType || t("searchResults.promoTypeUnknown");
+    const displayDiscount =
+      result.discount || t("searchResults.discountUnknown");
+    const displayStartDate = result.startDate
+      ? dayjs(result.startDate).format("DD/MM/YYYY")
+      : t("searchResults.startDateUnknown");
+    const displayEndDate = result.endDate
+      ? dayjs(result.endDate).format("DD/MM/YYYY")
+      : t("searchResults.endDateUnknown");
+    const displayBrand = result.brand || t("searchResults.brandUnknown");
+    const displayLastSoldDate = result.lastSoldDate
+      ? dayjs(result.lastSoldDate).format("DD/MM/YYYY")
+      : t("searchResults.lastSoldDateUnknown");
 
     return (
       <Box
@@ -34,10 +100,15 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         key={`${result.id}-${generateRandomString()}`}
         onClick={() => onSelect(result)}
         sx={{
-          backgroundColor: isSelected ? "rgba(0, 0, 0, 0.08)" : "transparent",
+          backgroundColor: isSelected
+            ? "rgba(0, 0, 0, 0.08)"
+            : getBackgroundColor(result.type),
           cursor: "pointer",
           paddingY: 0.5,
           height: "100%",
+          position: "relative",
+          borderRadius: 2,
+          overflow: "hidden",
         }}
       >
         <Card
@@ -47,19 +118,8 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             height: "100%",
             borderRadius: 2,
             boxShadow: "none",
-            backgroundColor: "rgba(255, 255, 255, 1)", // Transparent layer to create the frosted glass effect
-            overflow: "hidden", // Ensure the pseudo-element stays within the card
-            "&::before": {
-              content: '""',
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: "inherit", // Inherits the background of the card
-              filter: "blur(25px)", // Apply the blur here
-              zIndex: -1, // Place the pseudo-element behind the content
-            },
+            backgroundColor: "transparent", // Transparent to allow Box backgroundColor to show
+            overflow: "hidden",
             "&:hover": {
               boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
             },
@@ -69,68 +129,90 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             <Typography variant="h6" noWrap>
               {result.name}
             </Typography>
-            {result.type === "article" && (
+
+            {/* Display based on type */}
+            {result.type === "agent" && (
               <>
                 <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.articleId", {
-                    articleId: result.articleId,
-                  })}
+                  {t("searchResults.id")}: {displayId}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.brand", { brand: result.brand })}
+                  {t("searchResults.phone")}: {displayPhone}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.lastSoldDate", {
-                    lastSoldDate: result.lastSoldDate,
-                  })}
+                  {t("searchResults.email")}: {displayEmail}
                 </Typography>
               </>
             )}
-            {result.type === "client" && (
-              <>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.province", { province: result.province })}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.phone", { phone: result.phone })}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.paymentMethod", {
-                    paymentMethod: result.paymentMethod,
-                  })}
-                </Typography>
-              </>
-            )}
+
             {result.type === "promo" && (
               <>
                 <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.discountAmount", {
-                    discountAmount: result.discount,
-                  })}
+                  {t("searchResults.id")}: {displayId}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.startDate", {
-                    startDate: result.startDate,
-                  })}
+                  {t("searchResults.promoType")}: {displayPromoType}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.endDate", { endDate: result.endDate })}
+                  {t("searchResults.discount")}: {displayDiscount}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.startDate")}: {displayStartDate}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.endDate")}: {displayEndDate}
                 </Typography>
               </>
             )}
-            <Typography variant="body2" color="textSecondary" noWrap>
-              {t("searchResults.type", { type: result.type })}
-            </Typography>
+
+            {result.type === "client" && (
+              <>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.id")}: {displayId}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.province")}:{" "}
+                  {result.province || t("searchResults.provinceUnknown")}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.phone")}: {displayPhone}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.paymentMethod")}:{" "}
+                  {result.paymentMethod ||
+                    t("searchResults.paymentMethodUnknown")}
+                </Typography>
+              </>
+            )}
+            {/* Display based on type */}
+            {result.type === "article" && (
+              <>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.articleId")}: {displayId}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.brand")}: {displayBrand}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.lastSoldDate")}: {displayLastSoldDate}
+                </Typography>
+              </>
+            )}
+
+            {/* Type Icon */}
+            <TypeIconBox>{getTypeIcon(result.type)}</TypeIconBox>
           </CardContent>
         </Card>
       </Box>
     );
   };
 
-  const listHeight =
-    results.length < MAX_ITEMS_VISIBLE
+  // Calculate the height of the list based on the number of results
+  const listHeight = useMemo(() => {
+    return results.length < MAX_ITEMS_VISIBLE
       ? results.length * ITEM_HEIGHT
       : MAX_ITEMS_VISIBLE * ITEM_HEIGHT;
+  }, [results.length]);
 
   return (
     <Box>
