@@ -8,7 +8,7 @@ import {
 } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css";
 import { AgGridReact } from "ag-grid-react";
-import React, { useMemo, useRef } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
 import { selectCurrentUser } from "../../features/users/userSlice";
@@ -57,7 +57,7 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
   const columnDefs: ColDef[] = useMemo(() => {
     const baseColumns: ColDef[] = [
       {
-        headerName: t("clientsPage.id"),
+        headerName: t("clientsPage.id", "ID"),
         field: "id",
         sortable: true,
         filter: "agTextColumnFilter",
@@ -66,28 +66,28 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
         autoHeight: false,
       },
       {
-        headerName: t("clientsPage.name"),
+        headerName: t("clientsPage.name", "Name"),
         field: "name",
         sortable: true,
         filter: "agTextColumnFilter",
         autoHeight: false,
       },
       {
-        headerName: t("clientsPage.address"),
+        headerName: t("clientsPage.address", "Address"),
         field: "address",
         sortable: true,
         filter: "agTextColumnFilter",
         autoHeight: false,
       },
       {
-        headerName: t("clientsPage.province"),
+        headerName: t("clientsPage.province", "Province"),
         field: "province",
         sortable: true,
         filter: "agTextColumnFilter",
         autoHeight: false,
       },
       {
-        headerName: t("clientsPage.paymentMethod"),
+        headerName: t("clientsPage.paymentMethod", "Payment Method"),
         field: "paymentMethod",
         sortable: true,
         filter: "agTextColumnFilter",
@@ -98,7 +98,7 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
     // Conditionally add the 'agent' column if the userRole is 'admin'
     if (userRole === "admin") {
       baseColumns.push({
-        headerName: t("clientsPage.agent"),
+        headerName: t("clientsPage.agent", "Agent"),
         field: "agent",
         sortable: true,
         filter: "agTextColumnFilter",
@@ -115,7 +115,7 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
   }, [isViewing, filteredClients, clients]);
 
   // Handle row selection
-  const onSelectionChanged = () => {
+  const onSelectionChanged = useCallback(() => {
     const selectedNodes = gridRef.current?.api.getSelectedNodes();
     const selectedIds = selectedNodes?.map((node) => node.data.id) || [];
 
@@ -124,23 +124,33 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
     } else {
       setSelectedClients?.(selectedIds);
     }
-  };
+  }, [global, setExcludedClients, setSelectedClients]);
 
   // Handle Toggle with toast
-  const handleToggle = () => {
+  const handleToggle = useCallback(() => {
     const newGlobal = !global;
     setGlobal?.(newGlobal);
 
     if (newGlobal) {
-      showToast.info(t("eligibleClients.globalPromoToast"));
+      showToast.info(
+        t(
+          "eligibleClients.globalPromoToast",
+          "The promo will now apply globally. Select clients to exclude."
+        )
+      );
       setExcludedClients?.([]);
       setSelectedClients?.([]);
     } else {
-      showToast.info(t("eligibleClients.manualPromoToast"));
+      showToast.info(
+        t(
+          "eligibleClients.manualPromoToast",
+          "The promo will now apply manually. Select clients to include."
+        )
+      );
       setSelectedClients?.([]);
       setExcludedClients?.([]);
     }
-  };
+  }, [global, setGlobal, setExcludedClients, setSelectedClients, t]);
 
   return (
     <Box
@@ -156,16 +166,27 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
         display="flex"
         justifyContent="space-between"
         alignItems="center"
-        mb={1}
+        mb={2}
       >
-        <Typography variant="subtitle1">
+        <Typography
+          variant="subtitle1"
+          sx={{
+            ml: 1,
+            px: 2,
+
+            boxShadow: `0px 4px 8px ${
+              global ? "rgba(255, 165, 0, 0.4)" : "rgba(0, 128, 0, 0.4)"
+            }`, // Faint shadow color based on global state
+            borderRadius: "24px", // Optional: Add border-radius for smoother edges
+          }}
+        >
           {global
-            ? `${t("eligibleClients.promoIsGlobal")} (${t(
-                "eligibleClients.excludedClients"
-              )}: ${excludedClients?.length ?? 0})`
-            : `${t("eligibleClients.promoIsNotGlobal")} (${t(
-                "eligibleClients.selectedClients"
-              )}: ${selectedClients?.length ?? 0})`}
+            ? `${t("eligibleClients.excludedClients")}: ${
+                excludedClients?.length ?? 0
+              }`
+            : `${t("eligibleClients.includedClients")}: ${
+                selectedClients?.length ?? 0
+              }`}
         </Typography>
 
         {!isViewing && (
@@ -181,8 +202,8 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
                 onClick={handleToggle}
                 variant="contained"
                 sx={{
-                  backgroundColor: global ? "lightgreen" : "chocolate",
-                  color: "black",
+                  backgroundColor: global ? "green" : "chocolate",
+                  color: "white",
                   borderRadius: "12px",
                   textTransform: "none",
                   fontWeight: "bold",
@@ -215,9 +236,19 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
           enableCellTextSelection={true}
           rowBuffer={5}
           autoSizeStrategy={autoSizeStrategy}
-          overlayNoRowsTemplate={`<span style="padding: 10px; border: 1px solid #444; background: lightgoldenrodyellow;">${t(
-            "eligibleClients.noClients"
-          )}</span>`}
+          overlayNoRowsTemplate={`<div style="
+            padding: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            color: rgba(0, 0, 0, 0.87);
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+          ">
+            ${t("eligibleClients.noClients", "No clients to display.")}
+          </div>`}
           defaultColDef={{
             flex: 1,
             floatingFilter: true, // Enable floating filters

@@ -21,7 +21,7 @@ import {
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
-import React from "react";
+import React, { useMemo } from "react";
 import { Controller } from "react-hook-form";
 import usePromoForm from "../../hooks/usePromoForm";
 import { Promo } from "../../models/dataModels";
@@ -56,6 +56,9 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
     onClose,
   });
 
+  // Memoizing locale to prevent unnecessary re-renders
+  const memoizedLocale = useMemo(() => selectedLocale, [selectedLocale]);
+
   // Extract form values using watch
   const isGlobal = watch("global");
   const selectedClients = watch("selectedClients");
@@ -71,8 +74,8 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
   return (
     <LocalizationProvider
       dateAdapter={AdapterDayjs}
-      adapterLocale={selectedLocale.adapterLocale}
-      localeText={selectedLocale.localeText}
+      adapterLocale={memoizedLocale.adapterLocale}
+      localeText={memoizedLocale.localeText}
     >
       <Box
         component="form"
@@ -353,9 +356,9 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
                 type="submit"
                 color="primary"
                 sx={{
-                  backgroundColor: "primary.main",
+                  backgroundColor: "success.main",
                   color: "white",
-                  "&:hover": { backgroundColor: "primary.dark" },
+                  "&:hover": { backgroundColor: "success.dark" },
                   borderRadius: "50%",
                   width: 56,
                   height: 56,

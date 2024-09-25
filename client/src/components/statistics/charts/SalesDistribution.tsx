@@ -6,12 +6,13 @@ import {
   Divider,
   Paper,
   Skeleton,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
 import { ApexOptions } from "apexcharts";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
@@ -77,20 +78,27 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
         enabled: false,
       },
       tooltip: {
-        custom: ({ series, seriesIndex, dataPointIndex, w }) => {
+        custom: function ({ series, seriesIndex, dataPointIndex }) {
           const fullLabel = dataset[dataPointIndex].label;
           const value = series[seriesIndex][dataPointIndex];
           const formattedValue = currencyFormatter(value);
-          const x = w.globals.dom.baseEl.getBoundingClientRect().left;
-          const tooltipWidth = 150;
 
-          const positionLeft = x + tooltipWidth > window.innerWidth;
+          return `
+            <div style="
+              padding: 12px;
+              backgroundColor: rgba(255, 255, 255, 0.3);
+              border-radius: 8px;
+              box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+              backdrop-filter: blur(6px);
+              font-family: 'Roboto', sans-serif;
+              font-size: 14px;
+              color: ${theme.palette.text.primary};
+            ">
+              <strong>${fullLabel}</strong><br/>
 
-          return `<div class="tooltip-custom" style="font-size: 14px; padding: 8px; white-space: nowrap; background: #fff; border: 1px solid #ccc; border-radius: 4px; ${
-            positionLeft ? "right: 0;" : "left: 0;"
-          }">
-            <span>${fullLabel}</span>: <strong>${formattedValue}</strong>
-          </div>`;
+               ${formattedValue}
+            </div>
+          `;
         },
         fixed: {
           enabled: true,
@@ -104,18 +112,27 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
         colors: ["#26a69a"],
       },
     }),
-    [dataset]
+    [dataset, theme]
   );
 
+  // Define series data
   const series = useMemo(
     () => [
       {
-        name: t("salesDistribution.revenue"),
+        name:
+          viewMode === "agents"
+            ? t("salesDistribution.revenue")
+            : t("salesDistribution.expense"),
         data: dataset.map((data) => data.value),
       },
     ],
-    [dataset, t]
+    [dataset, t, viewMode]
   );
+
+  // Handle view mode toggle
+  const handleViewModeToggle = useCallback((mode: "clients" | "agents") => {
+    setViewMode(mode);
+  }, []);
 
   return (
     <Paper
@@ -148,7 +165,6 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
           left: -95,
           zIndex: 5,
           opacity: 0.3,
-
         },
       }}
     >
@@ -168,7 +184,7 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
             color: "#fff",
             mt: 1,
             left: 18,
-            top: 12
+            top: 12,
           }}
         >
           <PollIcon fontSize="inherit" />
@@ -204,33 +220,52 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
             mt: isMobile ? 5 : 0,
           }}
         >
-          <Button
-            variant={viewMode === "clients" ? "contained" : "outlined"}
-            onClick={() => setViewMode("clients")}
+          <Tooltip
+            title={t("salesDistribution.viewClients", "View Clients")}
+            arrow
           >
-            {t("salesDistribution.clients")}
-          </Button>
-          <Button
-            variant={viewMode === "agents" ? "contained" : "outlined"}
-            onClick={() => setViewMode("agents")}
+            <Button
+              variant={viewMode === "clients" ? "contained" : "outlined"}
+              onClick={() => handleViewModeToggle("clients")}
+            >
+              {t("salesDistribution.clients", "Clients")}
+            </Button>
+          </Tooltip>
+          <Tooltip
+            title={t("salesDistribution.viewAgents", "View Agents")}
+            arrow
           >
-            {t("salesDistribution.agents")}
-          </Button>
+            <Button
+              variant={viewMode === "agents" ? "contained" : "outlined"}
+              onClick={() => handleViewModeToggle("agents")}
+            >
+              {t("salesDistribution.agents", "Agents")}
+            </Button>
+          </Tooltip>
         </Box>
       )}
 
+      {/* Divider */}
       <Divider sx={{ my: 2, borderRadius: "12px", zIndex: 1 }} />
 
-      <Box sx={{ width: "100%", height: "300px", zIndex: 2 }}>
+      {/* Chart or Skeleton */}
+      <Box
+        sx={{ width: "100%", height: isMobile ? "250px" : "300px", zIndex: 2 }}
+      >
         {loading ? (
           <Skeleton
             variant="rectangular"
             width="100%"
-            height={300}
+            height={isMobile ? 250 : 300}
             sx={{ borderRadius: "12px" }}
           />
         ) : (
-          <Chart options={options} series={series} type="bar" height={300} />
+          <Chart
+            options={options}
+            series={series}
+            type="bar"
+            height={isMobile ? 250 : 300}
+          />
         )}
       </Box>
     </Paper>

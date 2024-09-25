@@ -34,6 +34,8 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [animationClass, setAnimationClass] = useState("animate__fadeIn");
   const [isPasswordReset, setIsPasswordReset] = useState(false); // State to track if user is in password reset flow
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const {
     isLoginMode,
     email,
@@ -58,6 +60,9 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   const toggleMode = useCallback(() => {
@@ -226,7 +231,7 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
                       {t("auth.confirmPassword")}
                     </Typography>
                     <TextField
-                      type="password"
+                      type={showConfirmPassword ? "text" : "password"}
                       fullWidth
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
@@ -241,8 +246,28 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
                           ? "animate__animated animate__shakeX"
                           : ""
                       }
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={toggleConfirmPasswordVisibility}
+                              aria-label={
+                                showConfirmPassword
+                                  ? t("auth.hidePassword")
+                                  : t("auth.showPassword")
+                              }
+                            >
+                              {showConfirmPassword ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
                       aria-label={t("auth.confirmPassword")}
-                      placeholder={t("auth.confirmPassword")}
+                      placeholder={t("auth.enterConfirmPassword")}
                       inputProps={{
                         autoComplete: "new-password",
                       }}

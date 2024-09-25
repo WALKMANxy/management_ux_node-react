@@ -96,7 +96,15 @@ const UserAvatar: React.FC = () => {
           <Divider sx={{ mb: 2 }} /> {/* Subtle divider below the title */}
           <List>
             {/* Chats Link */}
-            <ListItem button onClick={handleChatsClick}>
+            <ListItem
+              button
+              onClick={handleChatsClick}
+              sx={{
+                boxShadow: 1,
+                borderRadius: 2,
+                mb: 1,
+              }}
+            >
               <ListItemIcon>
                 <ChatIcon />
               </ListItemIcon>
@@ -105,7 +113,16 @@ const UserAvatar: React.FC = () => {
             <Divider />
 
             {/* Settings Link */}
-            <ListItem button onClick={handleSettingsClick}>
+            <ListItem
+              button
+              onClick={handleSettingsClick}
+              sx={{
+                boxShadow: 1,
+                borderRadius: 2,
+                mb: 1,
+
+              }}
+            >
               <ListItemIcon>
                 <SettingsIcon />
               </ListItemIcon>
@@ -114,7 +131,14 @@ const UserAvatar: React.FC = () => {
             <Divider />
 
             {/* Logout Link */}
-            <ListItem button onClick={handleLogoutClick}>
+            <ListItem
+              button
+              onClick={handleLogoutClick}
+              sx={{
+                boxShadow: 1,
+                borderRadius: 2,
+              }}
+            >
               <ListItemIcon>
                 <ExitToAppIcon />
               </ListItemIcon>
