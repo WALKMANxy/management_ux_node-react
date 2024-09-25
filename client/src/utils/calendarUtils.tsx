@@ -51,3 +51,20 @@ export const getBackgroundColorForEvent = (event: CalendarEvent): string => {
   return ""; // Default background color if none match
 };
 
+// Utility function to convert strings to Date objects
+export const normalizeDate = (date: string | Date): Date => {
+  // Only convert if the date is a string
+  return typeof date === "string" ? new Date(date) : date;
+};
+
+export const transformCalendarEvents = (
+  events: CalendarEvent[]
+): CalendarEvent[] => {
+  return events.map((event) => ({
+    ...event,
+    createdAt: normalizeDate(event.createdAt),
+    startDate: normalizeDate(event.startDate),
+    endDate: normalizeDate(event.endDate),
+    updatedAt: normalizeDate(event.updatedAt),
+  }));
+};

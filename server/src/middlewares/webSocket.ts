@@ -16,9 +16,7 @@ interface AuthenticatedSocket extends Socket {
 
 const connectedClients = new Map<string, Set<AuthenticatedSocket>>();
 
-
 export const setupWebSocket = (io: SocketIOServer) => {
-
   io.use(async (socket: AuthenticatedSocket, next) => {
     const cookies = parseCookie(socket.handshake.headers.cookie || "");
     const sessionToken = cookies["sessionToken"];
@@ -82,8 +80,6 @@ export const setupWebSocket = (io: SocketIOServer) => {
         }
       }
     });
-
-
 
     // Handle incoming message with client-generated local_id and server-generated _id
     socket.on(
@@ -151,9 +147,11 @@ export const setupWebSocket = (io: SocketIOServer) => {
       "chat:read",
       async ({
         chatId,
+        userId,
         messageIds,
       }: {
         chatId: string;
+        userId: string;
         messageIds: string[];
       }) => {
         // Ensure userId exists and convert it to ObjectId
@@ -164,14 +162,14 @@ export const setupWebSocket = (io: SocketIOServer) => {
           return;
         }
 
-        const userObjectId = new mongoose.Types.ObjectId(socket.userId);
+        const userObjectId = new mongoose.Types.ObjectId(userId);
 
         try {
           // Use the service to update the read status of the specified messages
           const updatedChat = await ChatService.updateReadStatus(
             chatId,
             messageIds,
-            userObjectId.toString()
+            userObjectId
           );
 
           if (!updatedChat) {

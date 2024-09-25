@@ -299,9 +299,9 @@ const useChatLogic = () => {
     }
 
     // Default return if no contacts are found
-    console.log(
+    /* console.log(
       "User role not recognized or no contacts found. Returning empty array."
-    );
+    ); */
     return [];
   }, [users, userRole, agentClientIds, currentUserId]); // Dependencies array
 

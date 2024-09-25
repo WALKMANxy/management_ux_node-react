@@ -5,6 +5,7 @@ import {
   GetEventsByMonthResponse,
   UpdateEventStatusPayload,
 } from "../../models/propsModels";
+import { transformCalendarEvents } from "../../utils/calendarUtils";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
 
@@ -12,16 +13,7 @@ const currentLocale = (navigator.language || navigator.languages[0]).replace(
   /^[a-z]{2}-/,
   ""
 );
-/* console.debug(`Modified locale (region only): ${currentLocale}`);
- */
 
-// Utility function to convert strings to Date objects
-const normalizeDate = (date: string | Date): Date => {
-  // Only convert if the date is a string
-  return typeof date === "string" ? new Date(date) : date;
-};
-
-// Base query for your server endpoints
 const baseQueryWithCredentials = fetchBaseQuery({
   baseUrl,
   credentials: "include",
@@ -29,7 +21,7 @@ const baseQueryWithCredentials = fetchBaseQuery({
 
 export const calendarApi = createApi({
   reducerPath: "calendarApi",
-  baseQuery: baseQueryWithCredentials, // Default to the query with credentials
+  baseQuery: baseQueryWithCredentials,
   tagTypes: ["CalendarEvent"],
   endpoints: (builder) => ({
     getEventsByMonthForAdmin: builder.query<
@@ -38,51 +30,76 @@ export const calendarApi = createApi({
     >({
       query: ({ year, month }) =>
         `calendar/events/admin?year=${year}&month=${month}`,
-      transformResponse: (response: GetEventsByMonthResponse) => {
-        // Convert date strings to Date objects
-        return response.map((event) => ({
-          ...event,
-          createdAt: normalizeDate(event.createdAt),
-          startDate: normalizeDate(event.startDate),
-          endDate: normalizeDate(event.endDate),
-          updatedAt: normalizeDate(event.updatedAt),
-        }));
+      transformResponse: (response: GetEventsByMonthResponse) =>
+        transformCalendarEvents(response),
+      serializeQueryArgs: () => {
+        return "getEvents";
+      },
+
+      merge: (currentCache, newItems) => {
+        const eventMap = new Map(
+          currentCache.map((event) => [event._id, event])
+        );
+        newItems.forEach((event) => eventMap.set(event._id, event));
+        // Update the current cache in place
+        currentCache.splice(
+          0,
+          currentCache.length,
+          ...Array.from(eventMap.values())
+        );
+      },
+      forceRefetch({ currentArg, previousArg }) {
+        return currentArg !== previousArg;
       },
       providesTags: (result) =>
         result
-          ? result.map(({ _id }) => ({ type: "CalendarEvent", _id }))
-          : ["CalendarEvent"],
+          ? [
+              ...result.map(({ _id }) => ({
+                type: "CalendarEvent" as const,
+                id: _id,
+              })),
+              { type: "CalendarEvent", id: "PARTIAL-LIST" },
+            ]
+          : [{ type: "CalendarEvent", id: "PARTIAL-LIST" }],
     }),
 
     getEventsByStatusAndUser: builder.query<
       CalendarEvent[],
       { year: number; month: number }
     >({
-      query: ({ year, month }) => {
-        console.log("Fetching User Events:", { year, month });
-        return `calendar/events/user?year=${year}&month=${month}`;
+      query: ({ year, month }) =>
+        `calendar/events/user?year=${year}&month=${month}`,
+      transformResponse: (response: GetEventsByMonthResponse) =>
+        transformCalendarEvents(response),
+      serializeQueryArgs: () => {
+        return "getEvents";
       },
-      transformResponse: (response: GetEventsByMonthResponse) => {
-        // Normalize date strings to Date objects
-        return response.map((event) => ({
-          ...event,
-          createdAt: normalizeDate(event.createdAt),
-          startDate: normalizeDate(event.startDate),
-          endDate: normalizeDate(event.endDate),
-          updatedAt: normalizeDate(event.updatedAt),
-        }));
+
+      merge: (currentCache, newItems) => {
+        const eventMap = new Map(
+          currentCache.map((event) => [event._id, event])
+        );
+        newItems.forEach((event) => eventMap.set(event._id, event));
+        // Update the current cache in place
+        currentCache.splice(
+          0,
+          currentCache.length,
+          ...Array.from(eventMap.values())
+        );
       },
-      providesTags: (result) => {
-        if (result && Array.isArray(result)) {
-          console.log("User Events Fetched:", result);
-          return result.map(
-            ({ _id }) => ({ type: "CalendarEvent", _id: _id } as const)
-          );
-        } else {
-          console.log("No User Events Found or Fetch Failed.");
-          return ["CalendarEvent"];
-        }
+      forceRefetch({ currentArg, previousArg }) {
+        return currentArg !== previousArg;
       },
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ _id }) => ({
+                type: "CalendarEvent" as const,
+                id: _id,
+              })),
+              { type: "CalendarEvent", id: "PARTIAL-LIST" },
+            ]
+          : [{ type: "CalendarEvent", id: "PARTIAL-LIST" }],
     }),
 
     createEvent: builder.mutation<CalendarEvent, CreateEventPayload>({
@@ -91,8 +108,9 @@ export const calendarApi = createApi({
         method: "POST",
         body: newEvent,
       }),
-      invalidatesTags: ["CalendarEvent"],
+      invalidatesTags: [{ type: "CalendarEvent", id: "LIST" }],
     }),
+
     updateEventStatus: builder.mutation<
       CalendarEvent,
       UpdateEventStatusPayload
@@ -103,19 +121,42 @@ export const calendarApi = createApi({
         body: { status },
       }),
       invalidatesTags: (_result, _error, { eventId }) => [
-        { type: "CalendarEvent", _id: eventId },
+        { type: "CalendarEvent", id: eventId },
+        { type: "CalendarEvent", id: "PARTIAL-LIST" },
       ],
     }),
+
     deleteEvent: builder.mutation<{ message: string }, string>({
       query: (eventId) => ({
         url: `calendar/events/${eventId}`,
         method: "DELETE",
       }),
       invalidatesTags: (_result, _error, eventId) => [
-        { type: "CalendarEvent", _id: eventId },
+        { type: "CalendarEvent", id: eventId },
+        { type: "CalendarEvent", id: "LIST" },
       ],
+      async onQueryStarted(eventId, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          calendarApi.util.updateQueryData(
+            "getEventsByMonthForAdmin",
+            {
+              year: new Date().getFullYear(),
+              month: new Date().getMonth() + 1,
+            },
+            (draft) => {
+              const index = draft.findIndex((event) => event._id === eventId);
+              if (index !== -1) draft.splice(index, 1);
+            }
+          )
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
     }),
-    // Mutation to edit a calendar event
+
     editEvent: builder.mutation<
       CalendarEvent,
       { eventId: string; data: Partial<CreateEventPayload> }
@@ -126,20 +167,16 @@ export const calendarApi = createApi({
         body: data,
       }),
       invalidatesTags: (_result, _error, { eventId }) => [
-        { type: "CalendarEvent", _id: eventId },
+        { type: "CalendarEvent", id: eventId },
+        { type: "CalendarEvent", id: "PARTIAL-LIST" },
       ],
     }),
 
-    // Public API endpoint
     getHolidays: builder.query<Holiday[], { year: number }>({
       async queryFn({ year }, _queryApi, _extraOptions, fetchWithBQ) {
-        let countryCode = "IT"; // Default to Italy
-
-        /*         console.debug(`Current locale: ${currentLocale}`);
-         */ // Map i18n language to the country code
+        let countryCode = "IT";
         countryCode = currentLocale.toUpperCase();
-        /*         console.debug(`Country code set to: ${countryCode}`);
-         */ const url = `https://date.nager.at/api/v3/PublicHolidays/${year}/${countryCode}`;
+        const url = `https://date.nager.at/api/v3/PublicHolidays/${year}/${countryCode}`;
 
         try {
           const result = await fetchWithBQ({
@@ -147,7 +184,7 @@ export const calendarApi = createApi({
             method: "GET",
             ..._queryApi,
             ...(_extraOptions || {}),
-            credentials: "omit", // Explicitly omit credentials for CORS compliance
+            credentials: "omit",
           });
 
           if (result.error) {
@@ -168,7 +205,7 @@ export const {
   useGetEventsByStatusAndUserQuery,
   useCreateEventMutation,
   useUpdateEventStatusMutation,
-  useEditEventMutation, // Newly added
-  useDeleteEventMutation, // Newly added
+  useEditEventMutation,
+  useDeleteEventMutation,
   useGetHolidaysQuery,
 } = calendarApi;

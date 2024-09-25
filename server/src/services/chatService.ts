@@ -365,23 +365,23 @@ export class ChatService {
   static async updateReadStatus(
     chatId: string,
     messageIds: string[],
-    userId: string
+    userId: mongoose.Types.ObjectId
   ): Promise<IChat | null> {
     try {
       const chatObjectId = new Types.ObjectId(chatId);
-      const userObjectId = new Types.ObjectId(userId);
 
       // Update the readBy array for each message without loading the whole document
       const updateResult = await Chat.findOneAndUpdate(
-        { _id: chatObjectId, "messages.local_id": { $in: messageIds } }, // Match chat and messages
+        { _id: chatObjectId },
         {
           $addToSet: {
-            "messages.$.readBy": userObjectId, // Add the userObjectId to the readBy array if not already present
+            "messages.$[elem].readBy": userId,
           },
         },
         {
-          new: true, // Return the updated document
-          runValidators: true, // Ensure validation rules are respected
+          arrayFilters: [{ "elem.local_id": { $in: messageIds } }],
+          new: true,
+          runValidators: true,
         }
       ).exec();
 

@@ -12,6 +12,7 @@ import {
   fetchMessagesThunk,
   fetchOlderMessagesThunk,
 } from "./chatThunks";
+import { showToast } from "../../utils/toastMessage";
 
 // Define the simplified ChatState without the messages field
 interface ChatState {
@@ -151,50 +152,7 @@ const chatSlice = createSlice({
       };
     },
 
-    markMessagesAsReadReducer: (
-      state,
-      action: PayloadAction<{ chatId: string; currentUserId: string }>
-    ) => {
-      const { chatId, currentUserId } = action.payload;
 
-      // Retrieve the chat by its ID
-      const chat = state.chats[chatId];
-
-      // Check if the chat exists
-      if (!chat) {
-        console.error(`Chat with ID ${chatId} does not exist in the state.`);
-        return state; // Return the existing state if chat doesn't exist
-      }
-
-      // Create a new array of messages with updated read statuses
-      const updatedMessages = chat.messages.map((message) => {
-        // Ensure the message is not sent by the current user and hasn't been marked as read by them
-        if (
-          message.sender !== currentUserId &&
-          !message.readBy.includes(currentUserId)
-        ) {
-          // Return a new message object with updated readBy array
-          return {
-            ...message,
-            readBy: [...message.readBy, currentUserId],
-          };
-        }
-        return message;
-      });
-
-      // Return a new state object with the updated chat, ensuring immutability
-      return {
-        ...state,
-        chats: {
-          ...state.chats,
-          [chatId]: {
-            ...chat,
-            messages: updatedMessages,
-            updatedAt: new Date(),
-          },
-        },
-      };
-    },
 
     addChatReducer: (
       state,
@@ -417,10 +375,14 @@ const chatSlice = createSlice({
         state.status = "succeeded";
         const newChat = action.payload;
         state.chats[newChat._id] = newChat;
+         // Show success toast
+         showToast.success("Chat created successfully!");
       })
       .addCase(createChatThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
+         // Show error toast
+         showToast.error(`Failed to create chat: ${state.error}`);
       })
       .addCase(createMessageThunk.pending, (state) => {
         state.status = "loading";
@@ -471,7 +433,6 @@ export const {
   clearCurrentChatReducer,
   addMessageReducer,
   updateReadStatusReducer,
-  markMessagesAsReadReducer,
   addChatReducer,
 } = chatSlice.actions;
 

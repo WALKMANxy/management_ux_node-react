@@ -27,6 +27,7 @@ class WebSocketService {
   // Queues to handle offline updates
   private offlineReadStatusQueue: Array<{
     chatId: string;
+    userId: string;
     messageIds: string[];
   }> = [];
   private offlineMessageQueue: Array<{ chatId: string; message: IMessage }> =
@@ -68,8 +69,9 @@ class WebSocketService {
 
     // Flush read status updates
     while (this.offlineReadStatusQueue.length > 0) {
-      const { chatId, messageIds } = this.offlineReadStatusQueue.shift()!;
-      this.emitMessageRead(chatId, messageIds);
+      const { chatId, userId, messageIds } =
+        this.offlineReadStatusQueue.shift()!;
+      this.emitMessageRead(chatId, userId, messageIds);
     }
 
     // Flush queued messages
@@ -111,8 +113,6 @@ class WebSocketService {
       );
     }
   }
-
-  // WebSocketService.js
 
   // Handle incoming new message event
   public handleNewMessage = async ({
@@ -236,10 +236,10 @@ class WebSocketService {
   }
 
   // Emit a message read event to the server
-  public emitMessageRead(chatId: string, messageIds: string[]) {
+  public emitMessageRead(chatId: string, userId: string, messageIds: string[]) {
     if (!this.socket || !this.socket.connected) {
       console.warn("Socket disconnected. Queuing read status update.");
-      this.offlineReadStatusQueue.push({ chatId, messageIds });
+      this.offlineReadStatusQueue.push({ chatId, userId, messageIds });
       return;
     }
 
