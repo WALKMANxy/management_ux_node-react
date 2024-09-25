@@ -13,7 +13,7 @@ import { webSocketService } from "../services/webSocketService";
 const listenerMiddleware = createListenerMiddleware();
 
 // Queues for batching updates before sending them via WebSocket
-let readStatusQueue: Array<{ chatId: string; messageIds: string[] }> = [];
+let readStatusQueue: Array<{ chatId: string; userId: string, messageIds: string[] }> = [];
 let messageQueue: Array<{ chatId: string; messageData: IMessage }> = [];
 let chatQueue: Array<IChat> = [];
 
@@ -32,8 +32,8 @@ const DEBOUNCE_TIME = 100;
  */
 const processReadStatusQueue = () => {
   if (readStatusQueue.length > 0) {
-    readStatusQueue.forEach(({ chatId, messageIds }) => {
-      webSocketService.emitMessageRead(chatId, messageIds);
+    readStatusQueue.forEach(({ chatId, userId, messageIds }) => {
+      webSocketService.emitMessageRead(chatId,userId, messageIds);
     });
     readStatusQueue = []; // Clear the queue after processing
   }
@@ -71,13 +71,13 @@ const processChatQueue = () => {
 listenerMiddleware.startListening({
   actionCreator: updateReadStatusReducer,
   effect: async (action) => {
-    const { chatId, messageIds, fromServer } = action.payload;
+    const { chatId, userId,messageIds, fromServer } = action.payload;
 
     // Skip WebSocket emission if action is from the server
     if (fromServer) return;
 
     // Add the read status update to the queue
-    readStatusQueue.push({ chatId, messageIds });
+    readStatusQueue.push({ chatId, userId, messageIds });
 
     // Debounce the processing of the read status queue
     if (readStatusTimer) clearTimeout(readStatusTimer);

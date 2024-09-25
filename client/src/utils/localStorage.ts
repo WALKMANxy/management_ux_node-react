@@ -30,7 +30,8 @@ export const loadAuthState = (): AuthState | undefined => {
  * @param state - The AuthState to be saved.
  */
 export const saveAuthState = (state: AuthState): void => {
-  try {
+  /*   console.debug("Saving auth state to localStorage:", state);
+   */ try {
     const serializedState = JSON.stringify(state);
     localStorage.setItem("authState", serializedState);
   } catch (err) {
