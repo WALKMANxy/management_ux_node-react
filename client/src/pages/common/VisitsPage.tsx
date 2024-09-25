@@ -7,7 +7,6 @@ import {
   Collapse,
   Grid,
   IconButton,
-  Paper,
   Typography,
   useMediaQuery,
   useTheme,
@@ -35,7 +34,6 @@ const VisitsPage: React.FC = () => {
     (state: RootState) => state.data.selectedVisitId
   );
 
-
   const [isCreatingVisit, setIsCreatingVisit] = useState(false);
 
   // Get currentUser from Redux state
@@ -48,7 +46,6 @@ const VisitsPage: React.FC = () => {
   const selectedClientId = useAppSelector(
     (state: RootState) => state.data.selectedClientId
   );
-
 
   // Get data fetching status and error
   const status = useAppSelector((state: RootState) => state.data.status);
@@ -73,7 +70,14 @@ const VisitsPage: React.FC = () => {
     }
   }, [selectedVisitId, isCreatingVisit]);
 
+  useEffect(() => {
+    if (selectedVisitId) {
+      handleCloseCreateVisit();
+    }
+  });
+
   const handleOpenCreateVisit = () => {
+    dispatch(clearSelectedVisit());
     setIsCreatingVisit(true);
   };
 
@@ -158,87 +162,85 @@ const VisitsPage: React.FC = () => {
             }}
           >
             {/* Client Details Collapsible Container */}
-            <Paper
+
+            <Box
               sx={{
-                mb: 2,
-                borderRadius: 2,
-                overflow: "display",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                bgcolor: "#f4f5f7",
+                p: 1,
+                pt: 2,
+                pb: 2,
+                pl: 2,
                 height: "auto",
+                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                borderRadius: 6,
+                mb: 2,
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  bgcolor: "#f4f5f7",
-                  p: 1,
-                  pt: 2,
-                  pb: 2,
-                  pl: 2,
-                  height: "auto",
-
-                }}
+              <Typography variant="h4" sx={{ ml: 1 }}>
+                Client Details
+              </Typography>
+              <IconButton
+                onClick={() =>
+                  setIsClientDetailsCollapsed(!isClientDetailsCollapsed)
+                }
               >
-                <Typography variant="h4" sx={{ ml: 1 }}>Client Details</Typography>
-                <IconButton
-                  onClick={() =>
-                    setIsClientDetailsCollapsed(!isClientDetailsCollapsed)
-                  }
-                >
-                  {isClientDetailsCollapsed ? (
-                    <ExpandMoreIcon />
-                  ) : (
-                    <ExpandLessIcon />
-                  )}
-                </IconButton>
-              </Box>
-              <Collapse in={!isClientDetailsCollapsed}>
-                <ClientDetailsCard
-                  clientId={selectedClientId}
-                  onCreateVisit={handleOpenCreateVisit}
-                  onDeselectClient={() => dispatch(clearSelection())}
-                />
-              </Collapse>
-            </Paper>
+                {isClientDetailsCollapsed ? (
+                  <ExpandMoreIcon />
+                ) : (
+                  <ExpandLessIcon />
+                )}
+              </IconButton>
+            </Box>
+            <Collapse in={!isClientDetailsCollapsed}>
+              <ClientDetailsCard
+                clientId={selectedClientId}
+                onCreateVisit={handleOpenCreateVisit}
+                onDeselectClient={() => dispatch(clearSelection())}
+              />
+            </Collapse>
 
             {/* Visits Table Collapsible Container */}
-            <Paper
+
+            <Box
               sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                bgcolor: "#f4f5f7",
+                p: 1,
+                pt: 2,
+                pb: 2,
+                pl: 2,
+                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                borderRadius: 6,
                 mb: 2,
-                borderRadius: 2,
-                overflow: "display",
+                mt: !isClientDetailsCollapsed && isCreatingVisit ? 18 : 2,
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  bgcolor: "#f4f5f7",
-                  p: 1,
-                  pt: 2,
-                  pb: 2,
-                  pl: 2,
-                }}
+              <Typography variant="h4" sx={{ ml: 1 }}>
+                Visits
+              </Typography>
+              <IconButton
+                onClick={() =>
+                  setIsVisitsTableCollapsed(!isVisitsTableCollapsed)
+                }
               >
-                <Typography variant="h4" sx={{ ml: 1 }}>Visits</Typography>
-                <IconButton
-                  onClick={() =>
-                    setIsVisitsTableCollapsed(!isVisitsTableCollapsed)
-                  }
-                >
-                  {isVisitsTableCollapsed ? (
-                    <ExpandMoreIcon />
-                  ) : (
-                    <ExpandLessIcon />
-                  )}
-                </IconButton>
-              </Box>
-              <Collapse in={!isVisitsTableCollapsed}>
-                <VisitsTable clientId={selectedClientId} />
-              </Collapse>
-            </Paper>
+                {isVisitsTableCollapsed ? (
+                  <ExpandMoreIcon />
+                ) : (
+                  <ExpandLessIcon />
+                )}
+              </IconButton>
+            </Box>
+            <Collapse
+              sx={{ mb: isCreatingVisit && !isVisitsTableCollapsed ? 25 : 0 }}
+              in={!isVisitsTableCollapsed}
+            >
+              <VisitsTable clientId={selectedClientId} />
+            </Collapse>
 
             {/* Visit View (conditionally rendered) */}
             {selectedVisitId && (
@@ -248,7 +250,7 @@ const VisitsPage: React.FC = () => {
               />
             )}
             {/* Create Visit Form (conditionally rendered) */}
-            {isCreatingVisit && (
+            {isCreatingVisit && selectedVisitId === null && (
               <CreateVisitForm
                 clientId={selectedClientId}
                 onClose={handleCloseCreateVisit}

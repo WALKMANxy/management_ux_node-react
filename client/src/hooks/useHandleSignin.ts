@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "./useAuth";
+import { showToast } from "../utils/toastMessage";
 
 export const useHandleSignin = (onClose: () => void) => {
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -17,7 +18,7 @@ export const useHandleSignin = (onClose: () => void) => {
   const [shakePassword, setShakePassword] = useState(false);
   const [shakeConfirmPassword, setShakeConfirmPassword] = useState(false); // For confirming password shake effect
 
-  const { initiateLogin, initiateRegister } = useAuth();
+  const { initiateLogin, initiateRegister, handleLoginWithGoogle } = useAuth();
 
   const toggleMode = () => {
     setIsLoginMode(!isLoginMode);
@@ -107,6 +108,19 @@ export const useHandleSignin = (onClose: () => void) => {
     }
   };
 
+  const handleLoginWithGoogleClick = async () => {
+    try {
+       handleLoginWithGoogle();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+       showToast.error(error.message);
+      } else {
+       showToast.error("An unexpected error occurred");
+      }
+    }
+  };
+
+
   return {
     isLoginMode,
     email,
@@ -127,5 +141,6 @@ export const useHandleSignin = (onClose: () => void) => {
     shakeConfirmPassword,
     toggleMode,
     handleSubmit,
+    handleLoginWithGoogleClick
   };
 };

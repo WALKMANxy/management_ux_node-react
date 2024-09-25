@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useAppDispatch } from "../app/hooks";
 import store from "../app/store";
 import {
@@ -142,10 +143,15 @@ export const useAuth = () => {
       let errorSeverity: "error" | "info" = "error";
 
       if (error instanceof FetchUserRoleError) {
-        errorMessage = "Please wait for your account to be assigned a role before attempting to log in.";
+        errorMessage =
+          "Please wait for your account to be assigned a role before attempting to log in.";
         errorSeverity = "info";
-      } else if (error instanceof Error && error.message.includes("undefined")) {
-        errorMessage = "The server is currently unreachable, please try again later.";
+      } else if (
+        error instanceof Error &&
+        error.message.includes("undefined")
+      ) {
+        errorMessage =
+          "The server is currently unreachable, please try again later.";
       }
 
       const loginError = new LoginError(errorMessage);
@@ -179,5 +185,67 @@ export const useAuth = () => {
     }
   };
 
-  return { initiateRegister, initiateLogin, initiateLogout };
+  const handleLoginWithGoogle = () => {
+    const state = Math.random().toString(36).substring(2, 15);
+    sessionStorage.setItem("oauth_state", state);
+
+    const googleAuthUrl = `${
+      import.meta.env.VITE_API_BASE_URL
+    }/oauth2/google?state=${state}`;
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2.5;
+
+    window.open(
+      googleAuthUrl,
+      "GoogleLogin",
+      `width=${width},height=${height},left=${left},top=${top}`
+    );
+  };
+
+  useEffect(() => {
+    const messageListener = (event: MessageEvent) => {
+      // Ensure the message is coming from your server's origin
+      if (event.origin !== import.meta.env.VITE_API_BASE_URL) {
+        return;
+      }
+
+      const { status, state, user } = event.data;
+
+      const expectedState = sessionStorage.getItem("oauth_state");
+      sessionStorage.removeItem("oauth_state");
+
+      if (state !== expectedState) {
+        console.error("Invalid state parameter");
+        return;
+      }
+
+      if (status === "success" && user) {
+        console.log("User logged in successfully via Google OAuth");
+        dispatch(
+          handleLogin({
+            role: user.role,
+            id: user.entityCode,
+            userId: user._id,
+          })
+        );
+      } else {
+        console.error("Authentication failed via Google OAuth");
+      }
+    };
+
+    window.addEventListener("message", messageListener);
+
+    return () => {
+      window.removeEventListener("message", messageListener);
+    };
+  }, [dispatch]);
+
+  return {
+    initiateRegister,
+    initiateLogin,
+    initiateLogout,
+    handleLoginWithGoogle,
+  };
 };

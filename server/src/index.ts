@@ -70,7 +70,7 @@ app.use(limiter);
 
 // Public routes
 app.use("/auth", authRoutes);
-app.use("/oauth", oauthRoutes);
+app.use("/oauth2", oauthRoutes);
 
 // Protected routes
 app.use(authenticateUser);

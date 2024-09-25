@@ -56,6 +56,7 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
     shakeConfirmPassword,
     toggleMode: originalToggleMode,
     handleSubmit,
+    handleLoginWithGoogleClick,
   } = useHandleSignin(onClose);
 
   const togglePasswordVisibility = () => {
@@ -349,9 +350,7 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
                   color: "#ffffff", // Ensure the Google icon is white
                 },
               }}
-              onClick={() => {
-                /* Google OAuth logic here */
-              }}
+              onClick={handleLoginWithGoogleClick}
             >
               {t("auth.continueWithGoogle")}
             </Button>

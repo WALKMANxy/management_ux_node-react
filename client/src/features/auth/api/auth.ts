@@ -1,9 +1,9 @@
 // services/api/auth.ts
 
 import axios from "axios";
-import Cookies from "js-cookie";
-import { apiCall, authApiCall } from "../../../utils/apiUtils";
+import { authApiCall } from "../../../utils/apiUtils";
 import { getUserAgent } from "../../../utils/deviceUtils";
+import { generateRandomState } from "../../../utils/oatuhUtils";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
@@ -28,31 +28,33 @@ export const loginUser = async (credentials: {
 }> => {
   const userAgent = getUserAgent();
 
-  return authApiCall<{  id: string }>(
-    "auth/login",
-    "POST",
-    {
-      ...credentials,
-      userAgent,
-    }
-  );
+  return authApiCall<{ id: string }>("auth/login", "POST", {
+    ...credentials,
+    userAgent,
+  });
 };
 
 // Function to initiate Google OAuth flow
 export const initiateGoogleOAuth = () => {
-  window.location.href = `https://accounts.google.com/o/oauth2/auth?client_id=${googleClientId}&redirect_uri=${appUrl}/oauth2/callback&response_type=code&scope=email%20profile`;
+  const state = generateRandomState();
+  sessionStorage.setItem("oauth_state", state);
+  window.location.href = `https://accounts.google.com/o/oauth2/auth?client_id=${googleClientId}&redirect_uri=${appUrl}/oauth2/callback&response_type=code&scope=email%20profile&state=${state}`;
 };
-
 // Function to link Google account to an existing user
 export const linkGoogleAccount = async (code: string) => {
   try {
-    const token = Cookies.get("token"); // Get the JWT token if user is logged in
-    const response = await axios.get(`${baseUrl}/auth/link-google`, {
-      params: { code },
-      headers: {
-        Authorization: `Bearer ${token}`, // Include the token in the Authorization header
-      },
-    });
+    const response = await axios.post(
+      `${baseUrl}/auth/link-google`,
+      { code },
+      {
+        headers: {
+          "bypass-tunnel-reminder": "true",
+          "Content-Type": "application/json",
+        },
+
+        withCredentials: true,
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error linking Google account:", error);
@@ -61,7 +63,14 @@ export const linkGoogleAccount = async (code: string) => {
 };
 
 // Handle the OAuth callback and retrieve the user's session
-export const handleOAuthCallback = async (code: string) => {
+export const handleOAuthCallback = async (code: string, state: string) => {
+  const expectedState = sessionStorage.getItem("oauth_state");
+  sessionStorage.removeItem("oauth_state");
+
+  if (state !== expectedState) {
+    throw new Error("Invalid OAuth state");
+  }
+
   const userAgent = navigator.userAgent;
 
   try {
@@ -85,7 +94,7 @@ export const handleOAuthCallback = async (code: string) => {
 
 // API to request a password reset by sending the user's email
 export const requestPasswordReset = async (email: string): Promise<void> => {
-  return apiCall<void>("auth/request-password-reset", "POST", { email });
+  return authApiCall<void>("auth/request-password-reset", "POST", { email });
 };
 
 // API to verify the reset code entered by the user
@@ -93,7 +102,7 @@ export const verifyResetCode = async (
   email: string,
   code: string
 ): Promise<void> => {
-  return apiCall<void>("auth/verify-reset-code", "POST", { email, code });
+  return authApiCall<void>("auth/verify-reset-code", "POST", { email, code });
 };
 
 // API to update the user's password after successful code verification
@@ -102,7 +111,7 @@ export const updatePassword = async (
   code: string,
   newPassword: string
 ): Promise<void> => {
-  return apiCall<void>("auth/update-password", "POST", {
+  return authApiCall<void>("auth/update-password", "POST", {
     email,
     code,
     newPassword,
