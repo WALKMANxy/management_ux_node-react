@@ -174,6 +174,7 @@ export const EventForm: React.FC<EventFormProps> = ({
                     minutes: renderTimeViewClock,
                   }}
                   sx={{ mb: 2, width: "100%" }}
+                  disablePast={true}
                 />
               )}
             />
@@ -210,6 +211,8 @@ export const EventForm: React.FC<EventFormProps> = ({
                     minutes: renderTimeViewClock,
                   }}
                   sx={{ mt: 2, mb: 1, width: "100%" }}
+                  disablePast={true}
+
                 />
               )}
             />
