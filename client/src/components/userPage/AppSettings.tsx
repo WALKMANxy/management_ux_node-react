@@ -1,3 +1,4 @@
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"; // Import Info Icon
 import {
   Alert,
   Box,
@@ -8,10 +9,13 @@ import {
   Radio,
   RadioGroup,
   Switch,
+  SwitchProps,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next"; // Ensure react-i18next is imported
 import { showToast } from "../../utils/toastMessage";
 
 const Section = styled(Paper)(({ theme }) => ({
@@ -20,7 +24,112 @@ const Section = styled(Paper)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
 }));
 
+const IOSSwitch = styled((props: SwitchProps) => (
+  <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
+))(({ theme }) => ({
+  width: 42,
+  height: 26,
+  padding: 0,
+  "& .MuiSwitch-switchBase": {
+    padding: 0,
+    margin: 2,
+    transitionDuration: "300ms",
+    "&.Mui-checked": {
+      transform: "translateX(16px)",
+      color: "#fff",
+      "& + .MuiSwitch-track": {
+        backgroundColor: "#65C466",
+        opacity: 1,
+        border: 0,
+        ...theme.applyStyles("dark", {
+          backgroundColor: "#2ECA45",
+        }),
+      },
+      "&.Mui-disabled + .MuiSwitch-track": {
+        opacity: 0.5,
+      },
+    },
+    "&.Mui-focusVisible .MuiSwitch-thumb": {
+      color: "#33cf4d",
+      border: "6px solid #fff",
+    },
+    "&.Mui-disabled .MuiSwitch-thumb": {
+      color: theme.palette.grey[100],
+      ...theme.applyStyles("dark", {
+        color: theme.palette.grey[600],
+      }),
+    },
+    "&.Mui-disabled + .MuiSwitch-track": {
+      opacity: 0.7,
+      ...theme.applyStyles("dark", {
+        opacity: 0.3,
+      }),
+    },
+  },
+  "& .MuiSwitch-thumb": {
+    boxSizing: "border-box",
+    width: 22,
+    height: 22,
+  },
+  "& .MuiSwitch-track": {
+    borderRadius: 26 / 2,
+    backgroundColor: "#E9E9EA",
+    opacity: 1,
+    transition: theme.transitions.create(["background-color"], {
+      duration: 500,
+    }),
+    ...theme.applyStyles("dark", {
+      backgroundColor: "#39393D",
+    }),
+  },
+}));
+
+// Styled Box for Theme Options
+const ThemeOptionBox = styled(Box)<{
+  selected: boolean;
+  themetype: "light" | "dark" | "auto";
+}>(({ theme, selected, themetype }) => {
+  const baseStyles = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100px",
+    height: "auto",
+    borderRadius: theme.shape.borderRadius,
+    cursor: "pointer",
+    transition: "background-color 0.3s, color 0.3s",
+    opacity: selected ? 1 : 0.6,
+  };
+
+  if (themetype === "light") {
+    return {
+      ...baseStyles,
+      backgroundColor: selected ? "#FFFFFF" : "#F0F0F0",
+      boxShadow: selected ? theme.shadows[3] : "none",
+      color: selected ? "#000000" : "#A0A0A0",
+    };
+  } else if (themetype === "dark") {
+    return {
+      ...baseStyles,
+      backgroundColor: selected ? "#000000" : "#2E2E2E",
+      boxShadow: selected ? theme.shadows[3] : theme.shadows,
+      color: selected ? "#FFFFFF" : "#A0A0A0",
+    };
+  } else if (themetype === "auto") {
+    return {
+      ...baseStyles,
+      background: selected
+        ? "linear-gradient(45deg, #FFFFFF 50%, #000000 50%)"
+        : "linear-gradient(45deg, #F0F0F0 50%, #2E2E2E 50%)",
+      boxShadow: selected ? theme.shadows[3] : "none",
+      color: selected ? "#C7C7C7" : "#C7C7C7",
+    };
+  }
+});
+
 const AppSettings: React.FC = () => {
+  const { t } = useTranslation(); // Initialize translation
+
   // Load initial state from localStorage or default to true
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     JSON.parse(localStorage.getItem("notificationsEnabled") || "true")
@@ -37,33 +146,36 @@ const AppSettings: React.FC = () => {
         .then((permission) => {
           setNotificationStatus(permission);
           if (permission === "granted") {
-            showToast.success("Notification permission granted.");
+            showToast.success(t("appSettings.notificationGranted"));
           } else if (permission === "denied") {
-            showToast.error("Notification permission denied.");
+            showToast.error(t("appSettings.notificationDenied"));
           }
         })
         .catch((error: unknown) => {
           if (error instanceof Error) {
             showToast.error(
-              "Failed to request notification permission: " + error.message
+              t("common.errorUpdatingSettings") + ": " + error.message
             );
           } else {
             showToast.error(
-              "Failed to request notification permission: An unknown error occurred"
+              t("common.errorUpdatingSettings") +
+                ": " +
+                t("common.unknownError")
             );
           }
         });
     }
-  }, [notificationStatus]);
+  }, [notificationStatus, t]);
 
-  const handleNotificationsToggle = () => {
+  // Handle Notifications Toggle
+  const handleNotificationsToggle = useCallback(() => {
     try {
       const newValue = !notificationsEnabled;
       setNotificationsEnabled(newValue);
       localStorage.setItem("notificationsEnabled", JSON.stringify(newValue));
 
       showToast.success(
-        `Notifications have been ${newValue ? "enabled" : "disabled"}.`
+        t(`appSettings.notifications${newValue ? "Enabled" : "Disabled"}`)
       );
 
       // If notifications are being enabled, check permission again
@@ -72,19 +184,21 @@ const AppSettings: React.FC = () => {
           .then((permission) => {
             setNotificationStatus(permission);
             if (permission === "granted") {
-              showToast.success("Notification permission granted.");
+              showToast.success(t("appSettings.notificationGranted"));
             } else if (permission === "denied") {
-              showToast.error("Notification permission denied.");
+              showToast.error(t("appSettings.notificationDenied"));
             }
           })
           .catch((error: unknown) => {
             if (error instanceof Error) {
               showToast.error(
-                "Failed to request notification permission: " + error.message
+                t("common.errorUpdatingSettings") + ": " + error.message
               );
             } else {
               showToast.error(
-                "Failed to request notification permission: An unknown error occurred"
+                t("common.errorUpdatingSettings") +
+                  ": " +
+                  t("common.unknownError")
               );
             }
           });
@@ -92,34 +206,43 @@ const AppSettings: React.FC = () => {
     } catch (error: unknown) {
       if (error instanceof Error) {
         showToast.error(
-          "Failed to update notification settings: " + error.message
+          t("common.errorUpdatingSettings") + ": " + error.message
         );
       } else {
         showToast.error(
-          "Failed to update notification settings: An unknown error occurred"
+          t("common.errorUpdatingSettings") + ": " + t("common.unknownError")
         );
       }
     }
-  };
+  }, [notificationsEnabled, notificationStatus, t]);
 
-  const handleThemeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      const newTheme = event.target.value;
-      setThemeChoice(newTheme);
-      showToast.success(`Theme changed to ${newTheme}.`);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        showToast.error("Failed to change theme: " + error.message);
-      } else {
-        showToast.error("Failed to change theme: An unknown error occurred");
+  // Handle Theme Change
+  const handleThemeChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      try {
+        const newTheme = event.target.value as "light" | "dark" | "auto";
+        setThemeChoice(newTheme);
+        showToast.success(t(`appSettings.themeChanged`, { theme: newTheme }));
+        // Implement theme change logic here (e.g., update context or global state)
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          showToast.error(
+            t("common.errorUpdatingSettings") + ": " + error.message
+          );
+        } else {
+          showToast.error(
+            t("common.errorUpdatingSettings") + ": " + t("common.unknownError")
+          );
+        }
       }
-    }
-  };
+    },
+    [t]
+  );
 
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        App Settings
+        {t("appSettings.title")}
       </Typography>
       <Divider
         sx={{
@@ -130,25 +253,28 @@ const AppSettings: React.FC = () => {
       {/* Enable Notifications Section */}
       <Section elevation={3} sx={{ borderRadius: 3 }}>
         <Typography variant="h6" gutterBottom>
-          Enable Notifications
+          {t("appSettings.toggleNotifications")}
         </Typography>
         <Divider sx={{ mb: 2 }} />
         <FormControlLabel
           control={
-            <Switch
+            <IOSSwitch
               checked={notificationsEnabled}
               onChange={handleNotificationsToggle}
               color="primary"
+              sx={{ mr: 2, ml: 1 }}
+              inputProps={{
+                "aria-label": t("appSettings.enableNotificationsAria"),
+              }}
             />
           }
-          label="Receive browser notifications"
+          label={t("appSettings.receiveBrowserNotifications")}
         />
 
         {/* Display an alert if notifications are blocked */}
         {notificationStatus === "denied" && (
           <Alert severity="info" sx={{ mt: 2 }}>
-            In order to receive notifications for the chats, please allow the
-            notification permission in your browser settings.
+            {t("appSettings.notificationsInfo")}
           </Alert>
         )}
       </Section>
@@ -156,19 +282,79 @@ const AppSettings: React.FC = () => {
       {/* Choose Theme Section */}
       <Section elevation={3} sx={{ borderRadius: 3 }}>
         <Typography variant="h6" gutterBottom>
-          Choose Theme
+          {t("appSettings.chooseTheme")}
         </Typography>
         <Divider sx={{ mb: 2 }} />
-        <FormLabel component="legend">Theme Preference</FormLabel>
+        <FormLabel
+          component="legend"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            color: "text.secondary",
+            mb: 3,
+          }}
+        >
+          <Tooltip title={t("appSettings.themePreferenceTooltip")} arrow>
+            <InfoOutlinedIcon
+              sx={{ mr: 1, fontSize: 20, color: "text.secondary" }}
+            />
+          </Tooltip>
+          <Typography variant="body1">
+            {t("appSettings.themePreference")}
+          </Typography>
+        </FormLabel>
         <RadioGroup
-          aria-label="theme"
+          aria-label={t("appSettings.themePreference")}
           name="theme"
           value={themeChoice}
           onChange={handleThemeChange}
+          row
+          sx={{ gap: 2, mt: 1, mb: 2, ml: 1 }}
         >
-          <FormControlLabel value="auto" control={<Radio />} label="Auto" />
-          <FormControlLabel value="light" control={<Radio />} label="Light" />
-          <FormControlLabel value="dark" control={<Radio />} label="Dark" />
+          {/* Light Theme Option */}
+          <FormControlLabel
+            value="light"
+            control={<Radio sx={{ display: "none" }} />}
+            label={
+              <ThemeOptionBox
+                selected={themeChoice === "light"}
+                themetype="light"
+              >
+                <Typography>{t("appSettings.light")}</Typography>
+              </ThemeOptionBox>
+            }
+            sx={{ "& .MuiFormControlLabel-label": { width: "100%" } }}
+          />
+
+          {/* Dark Theme Option */}
+          <FormControlLabel
+            value="dark"
+            control={<Radio sx={{ display: "none" }} />}
+            label={
+              <ThemeOptionBox
+                selected={themeChoice === "dark"}
+                themetype="dark"
+              >
+                <Typography>{t("appSettings.dark")}</Typography>
+              </ThemeOptionBox>
+            }
+            sx={{ "& .MuiFormControlLabel-label": { width: "100%" } }}
+          />
+
+          {/* Auto Theme Option */}
+          <FormControlLabel
+            value="auto"
+            control={<Radio sx={{ display: "none" }} />}
+            label={
+              <ThemeOptionBox
+                selected={themeChoice === "auto"}
+                themetype="auto"
+              >
+                <Typography>{t("appSettings.auto")}</Typography>
+              </ThemeOptionBox>
+            }
+            sx={{ "& .MuiFormControlLabel-label": { width: "100%" } }}
+          />
         </RadioGroup>
       </Section>
     </Box>

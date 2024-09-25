@@ -10,9 +10,10 @@ import {
   MenuItem,
   Paper,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { MovementListProps } from "../../../models/propsModels";
 import AGGridTable from "./AGGridTable";
@@ -38,14 +39,38 @@ const MovementList: React.FC<MovementListProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const onFilterTextBoxChanged = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setQuickFilterText(event.target.value);
-  };
+  // Memoized handler for filter text change
+  const onFilterTextBoxChanged = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value || "";
+      setQuickFilterText(value);
+    },
+    [setQuickFilterText]
+  );
+
+  // Memoized handler for collapsing/expanding the movements list
+  const handleCollapseToggle = useCallback(() => {
+    setMovementListCollapsed(!isMovementListCollapsed);
+  }, [isMovementListCollapsed, setMovementListCollapsed]);
+
+  // Memoized handler for exporting data as CSV
+  const handleExportCSV = useCallback(() => {
+    exportDataAsCsv();
+    handleMenuClose();
+  }, [exportDataAsCsv, handleMenuClose]);
+
+  // Memoize filtered movements to prevent unnecessary re-renders
+  const memoizedFilteredMovements = useMemo(
+    () => filteredMovements(),
+    [filteredMovements]
+  );
+
+  // Memoize column definitions
+  const memoizedColumnDefs = useMemo(() => columnDefs, [columnDefs]);
 
   return (
     <Paper elevation={8} sx={{ mb: 2 }}>
+      {/* Header Section */}
       <Box
         sx={{
           display: "flex",
@@ -55,14 +80,30 @@ const MovementList: React.FC<MovementListProps> = ({
         }}
       >
         <Typography variant="h6">{t("movementList.title")}</Typography>
-        <IconButton
-          onClick={() => setMovementListCollapsed(!isMovementListCollapsed)}
+        <Tooltip
+          title={
+            isMovementListCollapsed
+              ? t("movementList.expand")
+              : t("movementList.collapse")
+          }
         >
-          {isMovementListCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-        </IconButton>
+          <IconButton
+            onClick={handleCollapseToggle}
+            aria-label={
+              isMovementListCollapsed
+                ? t("movementList.expand")
+                : t("movementList.collapse")
+            }
+          >
+            {isMovementListCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+          </IconButton>
+        </Tooltip>
       </Box>
+
+      {/* Collapsible Content */}
       <Collapse in={!isMovementListCollapsed}>
         <Box sx={{ p: 2 }}>
+          {/* Filter and Menu Section */}
           <Box
             sx={{
               display: "flex",
@@ -71,6 +112,7 @@ const MovementList: React.FC<MovementListProps> = ({
               mb: 2,
             }}
           >
+            {/* Quick Filter and Options Menu */}
             <Box
               sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}
             >
@@ -80,12 +122,23 @@ const MovementList: React.FC<MovementListProps> = ({
                 variant="outlined"
                 size="small"
                 fullWidth
+                value={quickFilterText}
                 onChange={onFilterTextBoxChanged}
+                InputProps={{
+                  "aria-label": t("movementList.quickFilterAriaLabel"),
+                }}
               />
-              <IconButton onClick={handleMenuOpen}>
-                <MoreVertIcon />
-              </IconButton>
+              <Tooltip title={t("movementList.options")}>
+                <IconButton
+                  onClick={handleMenuOpen}
+                  aria-label={t("movementList.options")}
+                >
+                  <MoreVertIcon />
+                </IconButton>
+              </Tooltip>
             </Box>
+
+            {/* Start Date Filter */}
             <TextField
               type="date"
               label={t("movementList.startDate")}
@@ -94,6 +147,8 @@ const MovementList: React.FC<MovementListProps> = ({
               onChange={(e) => setStartDate(e.target.value)}
               fullWidth={isMobile}
             />
+
+            {/* End Date Filter */}
             <TextField
               type="date"
               label={t("movementList.endDate")}
@@ -103,27 +158,41 @@ const MovementList: React.FC<MovementListProps> = ({
               fullWidth={isMobile}
             />
           </Box>
+
+          {/* Options Menu */}
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
           >
-            <MenuItem onClick={exportDataAsCsv}>
+            <MenuItem onClick={handleExportCSV}>
               {t("movementList.exportCSV")}
             </MenuItem>
           </Menu>
+
+          {/* AG Grid Table */}
           <AGGridTable
             ref={gridRef}
-            columnDefs={columnDefs}
-            rowData={filteredMovements()}
-            paginationPageSize={500}
+            columnDefs={memoizedColumnDefs}
+            rowData={memoizedFilteredMovements}
+            paginationPageSize={100} // Adjusted to a more manageable number
             quickFilterText={quickFilterText}
           />
         </Box>
       </Collapse>
+
+      {/* Reference for Movement Details (if needed for scrolling) */}
       <div ref={movementDetailsRef} />
     </Paper>
   );
 };
 
-export default MovementList;
+export default React.memo(MovementList);

@@ -71,7 +71,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
       </Box>
 
       {/* Info message for selecting a new role */}
-      <Box display="flex" alignItems="center" sx={{ mb: 2, mt: 2 }}>
+      <Box display="flex" alignItems="center" sx={{ my: 3 }}>
         <InfoIcon color="info" sx={{ mr: 1, fontSize: "1.2rem" }} />
         <Typography variant="subtitle1" sx={{ color: "gray" }}>
           Select a new role.
@@ -80,14 +80,14 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
 
       <Divider sx={{ mb: 2 }} />
 
-      <Box display="flex" flexDirection="column" gap={2}>
+      <Box display="flex" flexDirection="column" gap={1}>
         {/* Role Selection Buttons */}
         <ButtonGroup
           variant="contained"
           aria-label="Role selection"
           sx={{
             boxShadow: "none",
-            gap: 1,
+            gap: 2,
           }}
         >
           <Button
@@ -120,7 +120,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
         </ButtonGroup>
 
         {/* Info message for selecting an entity */}
-        <Box display="flex" alignItems="center" sx={{ mb: 2, mt: 2 }}>
+        <Box display="flex" alignItems="center" sx={{ my: 3 }}>
           <InfoIcon color="info" sx={{ mr: 1, fontSize: "1.2rem" }} />
           <Typography variant="subtitle1" sx={{ color: "gray" }}>
             Select an entity by double-clicking them.
