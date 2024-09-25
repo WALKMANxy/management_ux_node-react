@@ -1,33 +1,52 @@
 // src/components/UserPage/UserCard.tsx
 
-import { Avatar, Box, Typography } from "@mui/material";
+import { Avatar, Box, Tooltip, Typography, useTheme } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
-// Custom styles for titles and subtitles
-const titleFontSize = "1rem";
-const subtitleFontSize = "0.75rem";
-const fontFamily = "'Open Sans', sans-serif";
+// Define styled components for better maintainability
+const CardContainer = styled(Box)(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ({ theme, isnew }: { theme: any; isnew: boolean }) => ({
+    display: "flex",
+    alignItems: "center",
+    padding: theme.spacing(2),
+    gap: theme.spacing(2),
+    backgroundColor: isnew
+      ? "rgba(76,175,80,0.1)"
+      : theme.palette.background.paper,
+    borderRadius: theme.shape.borderRadius,
+    boxShadow: isnew ? theme.shadows[4] : theme.shadows[1],
+    width: "100%",
+    maxWidth: 400,
+    transition: "box-shadow 0.3s, background-color 0.3s",
+  })
+);
 
-const infoStyles = {
-  title: {
-    fontFamily: fontFamily,
-    color: "#4d4b5f",
-    fontSize: titleFontSize,
-    lineHeight: 1.2,
-    fontWeight: 600,
-    marginBottom: "0.5rem",
-    marginRight: "0.2rem"
-  },
-  subtitle: {
-    fontFamily: fontFamily,
-    color: "#696c6f",
-    fontWeight: 500,
-    fontSize: subtitleFontSize,
-    lineHeight: 1.4,
-  },
-};
+const UserInfo = styled(Box)(() => ({
+  display: "flex",
+  flexDirection: "column",
+}));
 
-// Component to display user information
+const Label = styled(Typography)(({ theme }) => ({
+  fontFamily: "'Open Sans', sans-serif",
+  color: theme.palette.text.secondary,
+  fontSize: "0.75rem",
+  fontWeight: 500,
+  lineHeight: 1.4,
+}));
+
+const Value = styled(Typography)(({ theme }) => ({
+  fontFamily: "'Open Sans', sans-serif",
+  color: theme.palette.text.primary,
+  fontSize: "1rem",
+  fontWeight: 600,
+  lineHeight: 1.2,
+  marginBottom: theme.spacing(0.5),
+}));
+
+// Define the interface for props
 interface UserCardProps {
   email: string;
   avatar?: string;
@@ -36,44 +55,61 @@ interface UserCardProps {
     code?: string;
     name?: string;
   };
-  isNew?: boolean; // New prop to indicate if this is a new entity
+  isNew?: boolean; // Indicates if this is a new entity
 }
 
-const UserCard: React.FC<UserCardProps> = ({ email, avatar, details, isNew }) => {
-  return (
-    <Box
-      display="flex"
-      p={1.5}
-      gap={2}
-      bgcolor={isNew ? "#e6f7e6" : "white"} // Change color to faint green if new
-      borderRadius={8}
-      sx={{
-        alignItems: "center",
-        width: "fit-content", // Adjust width based on content
-        boxShadow: isNew ? "0 2px 8px rgba(0, 128, 0, 0.2)" : "0 1px 4px rgba(0, 0, 0, 0.1)", // Optional: add a subtle shadow effect
-      }}
-    >
-      {/* User Avatar */}
-      <Avatar
-        src={avatar || "/default-avatar.png"} // Use user's avatar or fallback to default
-        sx={{ borderRadius: 3, width: 48, height: 48 }}
-      />
+// Functional Component with React.memo for performance optimization
+const UserCard: React.FC<UserCardProps> = React.memo(
+  ({ email, avatar, details, isNew = false }) => {
+    const theme = useTheme();
+    const { t } = useTranslation();
 
-      {/* User Info */}
-      <Box sx={{ flex: "auto" }}>
-        <Typography sx={infoStyles.title}>{email}</Typography>
-        <Typography sx={infoStyles.subtitle}>
-          Role: {details.role || "None"}
-        </Typography>
-        <Typography sx={infoStyles.subtitle}>
-          Code: {details.code || "None"}
-        </Typography>
-        <Typography sx={infoStyles.subtitle}>
-          Name: {details.name || "None"}
-        </Typography>
-      </Box>
-    </Box>
-  );
-};
+    return (
+      <CardContainer
+        isnew={isNew}
+        theme={theme}
+        sx={{ borderRadius: 6, width: "fit-content" }}
+      >
+        {/* User Avatar */}
+        <Avatar
+          src={avatar || "/default-avatar.png"} // Use user's avatar or fallback to default
+          alt={t("userCard.avatarAlt", "Avatar for") + ` ${email}`}
+          sx={{ borderRadius: 2, width: 56, height: 56 }}
+        />
+
+        {/* User Information */}
+        <UserInfo>
+          <Tooltip title={email} arrow placement="top">
+            <Value>{email}</Value>
+          </Tooltip>
+
+          {/* Role */}
+          <Box display="flex" alignItems="center">
+            <Label>{t("userCard.role", "Role")}:</Label>
+            <Typography sx={{ ml: 0.5 }}>
+              {details.role || t("userCard.none", "None")}
+            </Typography>
+          </Box>
+
+          {/* Entity Code */}
+          <Box display="flex" alignItems="center">
+            <Label>{t("userCard.code", "Code")}:</Label>
+            <Typography sx={{ ml: 0.5 }}>
+              {details.code || t("userCard.none", "None")}
+            </Typography>
+          </Box>
+
+          {/* Entity Name */}
+          <Box display="flex" alignItems="center">
+            <Label>{t("userCard.name", "Name")}:</Label>
+            <Typography sx={{ ml: 0.5 }}>
+              {details.name || t("userCard.none", "None")}
+            </Typography>
+          </Box>
+        </UserInfo>
+      </CardContainer>
+    );
+  }
+);
 
 export default UserCard;

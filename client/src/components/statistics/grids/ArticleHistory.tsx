@@ -1,5 +1,5 @@
-import { Box, Paper, Typography } from "@mui/material";
-import React, { useMemo } from "react";
+import { Box, Typography } from "@mui/material";
+import React, { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../app/store";
@@ -37,41 +37,47 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({
     );
   }, [clientMovements, clients, articleId]);
 
+  // Abstract valueGetter to reduce redundancy
+  const createValueGetter = useCallback(
+    (field: keyof MovementDetail) => (params: { data: Movement }) => {
+      const detail = params.data.details?.find(
+        (detail: MovementDetail) => detail.articleId === articleId
+      );
+      return detail ? detail[field] : 0;
+    },
+    [articleId]
+  );
+
   const columnDefinitions = useMemo(
     () => [
       {
         headerName: t("movementsHistory.date"),
         field: "dateOfOrder",
         sortable: true,
+        filter: "agDateColumnFilter",
       },
       {
         headerName: t("movementsHistory.client"),
         field: "clientName",
         sortable: true,
+        filter: "agTextColumnFilter",
       },
       {
         headerName: t("movementsHistory.quantity"),
-        valueGetter: (params: { data: Movement }) => {
-          const detail = params.data.details.find(
-            (detail: MovementDetail) => detail.articleId === articleId
-          );
-          return detail ? detail.quantity : 0;
-        },
+        valueGetter: createValueGetter("quantity"),
+
         comparator: numberComparator,
         sortable: true,
+        filter: "agNumberColumnFilter",
       },
       {
         headerName: t("movementsHistory.revenue"),
-        valueGetter: (params: { data: Movement }) => {
-          const detail = params.data.details.find(
-            (detail: MovementDetail) => detail.articleId === articleId
-          );
-          return detail ? detail.priceSold : 0;
-        },
+        valueGetter: createValueGetter("priceBought"),
         valueFormatter: (params: { value: number }) =>
           currencyFormatter(params.value),
         comparator: numberComparator,
         sortable: true,
+        filter: "agNumberColumnFilter",
       },
       {
         headerName: t("movementsHistory.cost"),
@@ -87,48 +93,33 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({
         sortable: true,
       },
     ],
-    [t, articleId]
+    [t, articleId, createValueGetter]
   );
 
-  /*   console.log("ArticleHistory movements: ", movements);
-   */
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: 3,
-        borderRadius: "12px",
-        background: "transparent",
-        color: "#000",
-        position: "relative",
-        overflow: "hidden",
-        height: "100%",
-      }}
-    >
-      <Box sx={{ height: 600, width: "100%" }}>
-        {movements.length > 0 ? (
-          <AGGridTable
-            columnDefs={columnDefinitions}
-            rowData={movements}
-            paginationPageSize={20}
-            quickFilterText=""
-          />
-        ) : (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: "100%",
-            }}
-          >
-            <Typography variant="h6" sx={{ textAlign: "center" }}>
-              {t("articleDetails.noHistory")}
-            </Typography>
-          </Box>
-        )}
-      </Box>
-    </Paper>
+    <Box sx={{ height: 600, width: "100%" }}>
+      {movements.length > 0 ? (
+        <AGGridTable
+          columnDefs={columnDefinitions}
+          rowData={movements}
+          paginationPageSize={20}
+          quickFilterText=""
+        />
+      ) : (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+          }}
+        >
+          <Typography variant="h6" sx={{ textAlign: "center" }}>
+            {t("articleDetails.noHistory")}
+          </Typography>
+        </Box>
+      )}
+    </Box>
   );
 };
 

@@ -10,9 +10,10 @@ import {
   MenuItem,
   Paper,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { ClientListProps } from "../../../models/propsModels";
 import AGGridTable from "./AGGridTable";
@@ -38,11 +39,33 @@ const ClientList: React.FC<ClientListProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const onFilterTextBoxChanged = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setQuickFilterText(event.target.value);
-  };
+  // Memoized handler for filter text change
+  const onFilterTextBoxChanged = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setQuickFilterText(event.target.value);
+    },
+    [setQuickFilterText]
+  );
+
+  // Memoized handler for collapsing/expanding the clients list
+  const handleCollapseToggle = useCallback(() => {
+    setClientListCollapsed(!isClientListCollapsed);
+  }, [isClientListCollapsed, setClientListCollapsed]);
+
+  // Memoized handler for exporting data as CSV
+  const handleExportCSV = useCallback(() => {
+    exportDataAsCsv();
+    handleMenuClose();
+  }, [exportDataAsCsv, handleMenuClose]);
+
+  // Memoize the filteredClients value to prevent re-renders
+  const memoizedFilteredClients = useMemo(
+    () => filteredClients,
+    [filteredClients]
+  );
+
+  // Memoize column definitions
+  const memoizedColumnDefs = useMemo(() => columnDefs, [columnDefs]);
 
   return (
     <Paper elevation={8} sx={{ mb: 2 }}>
@@ -55,14 +78,29 @@ const ClientList: React.FC<ClientListProps> = ({
         }}
       >
         <Typography variant="h6">{t("clientList.title")}</Typography>
-        <IconButton
-          onClick={() => setClientListCollapsed(!isClientListCollapsed)}
+        <Tooltip
+          title={
+            isClientListCollapsed
+              ? t("clientList.expand")
+              : t("clientList.collapse")
+          }
         >
-          {isClientListCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-        </IconButton>
+          <IconButton
+            onClick={handleCollapseToggle}
+            aria-label={
+              isClientListCollapsed
+                ? t("clientList.expand")
+                : t("clientList.collapse")
+            }
+          >
+            {isClientListCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+          </IconButton>
+        </Tooltip>
       </Box>
+      {/* Collapsible Content */}
       <Collapse in={!isClientListCollapsed}>
         <Box sx={{ p: 2 }}>
+          {/* Filter and Menu Section */}
           <Box
             sx={{
               display: "flex",
@@ -80,11 +118,20 @@ const ClientList: React.FC<ClientListProps> = ({
                 variant="outlined"
                 size="small"
                 fullWidth
+                value={quickFilterText}
                 onChange={onFilterTextBoxChanged}
+                InputProps={{
+                  "aria-label": t("clientList.quickFilterAriaLabel"),
+                }}
               />
-              <IconButton onClick={handleMenuOpen}>
-                <MoreVertIcon />
-              </IconButton>
+              <Tooltip title={t("clientList.options")}>
+                <IconButton
+                  onClick={handleMenuOpen}
+                  aria-label={t("clientList.options")}
+                >
+                  <MoreVertIcon />
+                </IconButton>
+              </Tooltip>
             </Box>
             <TextField
               type="date"
@@ -93,6 +140,9 @@ const ClientList: React.FC<ClientListProps> = ({
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               fullWidth={isMobile}
+              InputProps={{
+                "aria-label": t("clientList.startDateAriaLabel"),
+              }}
             />
             <TextField
               type="date"
@@ -101,29 +151,46 @@ const ClientList: React.FC<ClientListProps> = ({
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               fullWidth={isMobile}
+              InputProps={{
+                "aria-label": t("clientList.endDateAriaLabel"),
+              }}
             />
           </Box>
+
+          {/* Options Menu */}
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
           >
-            <MenuItem onClick={exportDataAsCsv}>
+            <MenuItem onClick={handleExportCSV}>
               {t("clientList.exportCSV")}
             </MenuItem>
           </Menu>
+
+          {/* AG Grid Table */}
           <AGGridTable
             ref={gridRef}
-            columnDefs={columnDefs}
-            rowData={filteredClients}
-            paginationPageSize={500}
+            columnDefs={memoizedColumnDefs}
+            rowData={memoizedFilteredClients}
+            paginationPageSize={100} // Adjusted to a more manageable number
             quickFilterText={quickFilterText}
           />
         </Box>
       </Collapse>
+
+      {/* Reference for Client Details (if needed for scrolling) */}
       <div ref={clientDetailsRef} />
     </Paper>
   );
 };
 
-export default ClientList;
+export default React.memo(ClientList);
