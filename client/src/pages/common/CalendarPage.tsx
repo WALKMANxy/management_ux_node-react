@@ -116,6 +116,10 @@ const CalendarPage: React.FC = () => {
     setConfirmDelete(event);
   };
 
+  useEffect(() => {
+    console.log(serverEvents?.length, holidayEvents?.length);
+  }, [serverEvents, holidayEvents]);
+
   // Optional: Show a loading spinner
   if (isLoading) {
     return (
@@ -238,7 +242,7 @@ const CalendarPage: React.FC = () => {
           />
         </Fragment>
       ) : (
-        <EventHistory events={serverEvents} userRole={userRole} />
+        <EventHistory events={serverEvents!} userRole={userRole} />
       )}
 
       {/* PopOverEvent Component */}

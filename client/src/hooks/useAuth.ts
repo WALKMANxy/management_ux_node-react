@@ -108,7 +108,7 @@ export const useAuth = () => {
             return;
           }
 
-          dispatch(
+          await dispatch(
             handleLogin({
               role: user.role,
               id: user.entityCode,
