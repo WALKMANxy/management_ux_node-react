@@ -21,7 +21,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../../app/store";
 import Loader from "../../components/common/Loader";
-import AuthenticationModal from "../../components/landingPage/authenticationModal";
+import AuthenticationModal from "../../components/landingPage/AuthenticationModal";
 
 const LandingPage: React.FC = () => {
   const { t } = useTranslation();

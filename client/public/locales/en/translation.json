@@ -39,27 +39,19 @@
   "globalSearch": {
     "placeholder": "Search..."
   },
-  "searchResults": {
-    "articleId": "Article OEM: {{articleId}}",
-    "brand": "Brand: {{brand}}",
-    "lastSoldDate": "Last Sold: {{lastSoldDate}}",
-    "province": "Province: {{province}}",
-    "phone": "Phone: {{phone}}",
-    "paymentMethod": "Payment Method: {{paymentMethod}}",
-    "discountAmount": "Discount Amount: {{discountAmount}}",
-    "startDate": "Start Date: {{startDate}}",
-    "endDate": "End Date: {{endDate}}",
-    "type": "Type: {{type}}",
-    "noResults": "No results found"
-  },
+
   "monthOverMonthSpendingTrend": {
-    "title": "Monthly Spending Trend",
+    "title": "Monthly Trend",
     "revenue": "Revenue",
     "expense": "Expense"
   },
   "salesDistribution": {
-    "title": "Sales Distribution Through Clients",
-    "revenue": "Revenue"
+    "title": "Sales Distribution",
+    "revenue": "Revenue",
+    "viewClients": "View Clients",
+    "viewAgents": "View Agents",
+    "clients": "Clients",
+    "agents": "Agents"
   },
   "topBrandsSold": {
     "titleAgent": "Top Brands Sold",
@@ -550,7 +542,7 @@
     "passwordUpdatedToast": "Password updated successfully. You can now log in!"
   },
   "movementDetails": {
-    "id": "ID",
+    "id": "List ID",
     "dateOfOrder": "Date of Order",
     "title": "Movement Details",
     "expand": "Expand details",
@@ -582,21 +574,43 @@
     "cancel": "Cancel"
   },
 
-  "eligibleClients": {
-    "promoIsGlobal": "Promo is global",
-    "promoIsNotGlobal": "Promo is not global",
-    "excludedClients": "Excluded Clients",
-    "selectedClients": "Selected Clients",
-    "switchToManual": "Switch to manual selection",
-    "switchToGlobal": "Switch to global promo",
-    "globalPromo": "Global Promo",
-    "manualSelection": "Manual Selection",
-    "globalPromoToast": "The promo will now apply globally. Select a client to exclude it.",
-    "manualPromoToast": "The promo will now apply manually. Select a client to include it.",
-    "noClients": "No clients to display"
+  "searchResults": {
+    "id": "ID",
+    "idUnknown": "Unknown ID",
+    "phone": "Phone",
+    "phoneUnknown": "Unknown Phone",
+    "email": "Email",
+    "emailUnknown": "Unknown Email",
+    "promoType": "Promo Type",
+    "promoTypeUnknown": "Unknown Promo Type",
+    "discount": "Discount",
+    "discountUnknown": "Unknown Discount",
+    "startDate": "Start Date",
+    "startDateUnknown": "Unknown Start Date",
+    "endDate": "End Date",
+    "endDateUnknown": "Unknown End Date",
+    "province": "Province",
+    "provinceUnknown": "Unknown Province",
+    "paymentMethod": "Payment Method",
+    "paymentMethodUnknown": "Unknown Payment Method",
+    "types": {
+      "client": "Client",
+      "agent": "Agent",
+      "article": "Article",
+      "promo": "Promo",
+      "visit": "Visit",
+      "alert": "Alert"
+    },
+    "noResults": "No results found.",
+    "articleId": "OEM",
+    "brand": "Brand",
+    "brandUnknown": "Unknown Brand",
+    "lastSoldDate": "Last Sold Date",
+    "lastSoldDateUnknown": "Unknown Last Sold Date",
+    "promoIssuedBy": "Issued By"
   },
   "promoDetails": {
-    "notFound": "Promo details not found"
+    "notFound": "Promo details not found."
   },
   "promo": {
     "type": "Type",
@@ -606,14 +620,29 @@
     "global": "Global",
     "notGlobal": "Not Global",
     "issuedBy": "Issued By",
-    "edit": "Edit",
-    "terminate": "Terminate",
-    "deselect": "Deselect"
+    "edit": "Edit Promo",
+    "editTooltip": "Edit Promo",
+    "terminate": "Terminate Promo",
+    "terminateTooltip": "Terminate Promo",
+    "deselect": "Deselect Promo",
+    "deselectTooltip": "Deselect Promo"
   },
+  "eligibleClients": {
+    "includedClients": "Included clients",
+    "excludedClients": "Excluded clients",
+    "switchToManual": "Switch to manual selection",
+    "switchToGlobal": "Switch to global selection",
+    "globalPromo": "Global Promo",
+    "manualSelection": "Manual Selection",
+    "noClients": "No clients to display"
+  },
+
   "promosSidebar": {
     "title": "Promos",
+    "refreshPromos": "Refresh Promos",
+    "createPromo": "Create Promo",
     "searchPlaceholder": "Search Promos",
-    "type": "Type",
-    "noPromosFound": "No promos found."
+    "noPromosFound": "No promos found.",
+    "type": "Type"
   }
 }

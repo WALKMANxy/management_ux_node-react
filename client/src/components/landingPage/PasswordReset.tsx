@@ -157,13 +157,15 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
           </Typography>
           <TextField
             fullWidth
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             variant="outlined"
-            sx={{ marginBottom: "16px", borderRadius: "12px" }}
+            sx={{ mb: 4, borderRadius: "12px" }}
             placeholder={t("auth.enterEmail")}
             inputProps={{
               autoComplete: "email",
+              spellCheck: false,
             }}
           />
           <Button

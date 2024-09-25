@@ -14,9 +14,10 @@ import {
   ListItemAvatar,
   ListItemText,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import usePromos from "../../hooks/usePromos";
 import { Promo } from "../../models/dataModels";
@@ -35,21 +36,29 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
     usePromos();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const filteredPromos = promos.filter((promo) =>
-    promo.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // Handle search input change
+  const handleSearchChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchTerm(event.target.value);
+    },
+    []
   );
 
-  const isPromoActive = (promo: Promo) => {
+  // Memoize filteredPromos to optimize performance
+  const filteredPromos = useMemo(() => {
+    return promos.filter((promo) =>
+      promo.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [promos, searchTerm]);
+
+  // Determine if a promo is active based on its end date
+  const isPromoActive = useCallback((promo: Promo) => {
     return new Date(promo.endDate) > new Date();
-  };
+  }, []);
 
   return (
     <Box sx={{ p: 2 }}>
-      {/* Header with title and create button */}
+      {/* Header with title and action buttons */}
       <Box
         display="flex"
         justifyContent="space-between"
@@ -60,13 +69,26 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
           {t("promosSidebar.title", "Promos")}
         </Typography>
         <Box display="flex" gap={1}>
-          <IconButton onClick={handleRefreshPromos} size="small">
-            <RefreshIcon />
-          </IconButton>
-          {userRole === "admin" && (
-            <IconButton onClick={onCreatePromo} size="small" color="primary">
-              <AddIcon />
+          <Tooltip title={t("promosSidebar.refreshPromos", "Refresh Promos")}>
+            <IconButton
+              onClick={handleRefreshPromos}
+              size="small"
+              aria-label={t("promosSidebar.refreshPromos", "Refresh Promos")}
+            >
+              <RefreshIcon />
             </IconButton>
+          </Tooltip>
+          {userRole === "admin" && (
+            <Tooltip title={t("promosSidebar.createPromo", "Create Promo")}>
+              <IconButton
+                onClick={onCreatePromo}
+                size="small"
+                color="primary"
+                aria-label={t("promosSidebar.createPromo", "Create Promo")}
+              >
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
           )}
         </Box>
       </Box>
@@ -106,29 +128,39 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
                   display: "flex",
                   alignItems: "center",
                   bgcolor: isPromoActive(promo)
-                    ? "rgba(0, 255, 0, 0.1)"
-                    : "grey.300",
+                    ? "rgba(144, 238, 144, 0.05)" // Faint green for active promos
+                    : "rgba(255, 165, 0, 0.05)", // Faint orange for inactive promos
                   "&:hover": {
                     bgcolor: isPromoActive(promo)
-                      ? "rgba(0, 255, 0, 0.2)"
-                      : "grey.400",
+                      ? "rgba(144, 238, 144, 0.2)"
+                      : "rgba(255, 165, 0, 0.2)",
                   },
-                  borderRadius: "12px", // Add border radius for rounded corners
+                  borderRadius: "12px", // Rounded corners
+                  mb: 1, // Margin bottom for spacing
                 }}
               >
                 <ListItemAvatar>
-                  <Avatar>{promo.name.charAt(0).toUpperCase()}</Avatar>
+                  <Avatar
+/*                     sx={{ bgcolor: isPromoActive(promo) ? "orange" : "green" }}
+ */                  >
+                    {promo.name.charAt(0).toUpperCase()}
+                  </Avatar>
                 </ListItemAvatar>
                 <ListItemText
                   primary={promo.name}
-                  secondary={`${t("promosSidebar.type")}: ${promo.promoType}`}
+                  secondary={`${t("promosSidebar.type", "Type")}: ${
+                    promo.promoType
+                  }`}
                 />
               </ListItem>
-              <Divider sx={{ my: 1 }} />
+              <Divider />
             </React.Fragment>
           ))
         ) : (
-          <Typography variant="body2" sx={{ textAlign: "center", mt: 2 }}>
+          <Typography
+            variant="body2"
+            sx={{ textAlign: "center", mt: 2, color: "text.secondary" }}
+          >
             {t("promosSidebar.noPromosFound", "No promos found.")}
           </Typography>
         )}
