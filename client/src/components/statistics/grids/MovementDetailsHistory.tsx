@@ -1,5 +1,5 @@
 // src/components/movementsPage/MovementDetailsHistory.tsx
-import { Box, Paper } from "@mui/material";
+import { Box } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
@@ -14,9 +14,9 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
   const { t } = useTranslation();
   const userRole = useSelector((state: RootState) => state.auth.role);
 
-  /* useEffect(() => {
-    console.log("Movement Details:", movementDetails);
-  }, [movementDetails]); */
+  // Define a stable formatter function to prevent unnecessary re-creations
+  const formatCurrency = (value: string) =>
+    currencyFormatter(parseFloat(value));
 
   const columnDefinitions = useMemo(() => {
     const baseColumns = [
@@ -47,8 +47,7 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
       {
         headerName: t("movementDetailsHistory.priceSold"),
         field: "priceSold",
-        valueFormatter: (params: { value: string }) =>
-          currencyFormatter(parseFloat(params.value)),
+        valueFormatter: formatCurrency,
         comparator: numberComparator,
         sortable: true,
       },
@@ -59,16 +58,14 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
         {
           headerName: t("movementDetailsHistory.unitPrice"),
           field: "unitPrice",
-          valueFormatter: (params: { value: string }) =>
-            currencyFormatter(parseFloat(params.value)),
+          valueFormatter: formatCurrency,
           comparator: numberComparator,
           sortable: true,
         },
         {
           headerName: t("movementDetailsHistory.priceBought"),
           field: "priceBought",
-          valueFormatter: (params: { value: string }) =>
-            currencyFormatter(parseFloat(params.value)),
+          valueFormatter: formatCurrency,
           comparator: numberComparator,
           sortable: true,
         }
@@ -79,27 +76,14 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
   }, [t, userRole]);
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: 3,
-        borderRadius: "12px",
-        background: "transparent",
-        color: "#000",
-        position: "relative",
-        overflow: "hidden",
-        height: "100%",
-      }}
-    >
-      <Box sx={{ height: 600, width: "100%" }}>
-        <AGGridTable
-          columnDefs={columnDefinitions}
-          rowData={movementDetails}
-          paginationPageSize={20}
-          quickFilterText=""
-        />
-      </Box>
-    </Paper>
+    <Box sx={{ height: 600, width: "100%" }}>
+      <AGGridTable
+        columnDefs={columnDefinitions}
+        rowData={movementDetails}
+        paginationPageSize={20}
+        quickFilterText=""
+      />
+    </Box>
   );
 };
 
