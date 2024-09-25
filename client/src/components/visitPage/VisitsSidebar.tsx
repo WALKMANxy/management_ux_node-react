@@ -14,13 +14,17 @@ import {
   ListItemAvatar,
   ListItemText,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useVisitSidebar } from "../../hooks/useVisitSidebar";
 import { Agent, Client } from "../../models/entityModels";
 
 const VisitsSidebar: React.FC = () => {
+  const { t } = useTranslation();
+
   const {
     userRole,
     searchTerm,
@@ -48,6 +52,18 @@ const VisitsSidebar: React.FC = () => {
     );
   };
 
+  // Handlers with useCallback to prevent unnecessary re-renders
+  const handleListItemClick = useCallback(
+    (item: Agent | Client) => {
+      if (userRole === "admin" && !selectedAgentId) {
+        handleAgentSelect(item.id);
+      } else {
+        handleClientSelect(item.id);
+      }
+    },
+    [userRole, selectedAgentId, handleAgentSelect, handleClientSelect]
+  );
+
   return (
     <Box sx={{ p: 2 }}>
       {/* Header with title and create button */}
@@ -59,59 +75,74 @@ const VisitsSidebar: React.FC = () => {
       >
         <Box display="flex" alignItems="center">
           {userRole === "admin" && selectedAgentId && (
-            <IconButton onClick={handleBackToAgents} size="small">
-              {" "}
-              {/* Makes the button smaller */}
-              <ArrowBackIosIcon fontSize="small" />{" "}
-              {/* Adjusts the icon size */}
-            </IconButton>
+            <Tooltip
+              title={t("visitsSidebar.goBackTooltip", "Go back to Agents")}
+              arrow
+            >
+              <IconButton
+                onClick={handleBackToAgents}
+                size="small"
+                aria-label={t("visitsSidebar.goBack", "Go Back")}
+              >
+                <ArrowBackIosIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           )}
-          <Typography variant="h4">
+          <Typography variant="h5">
             {userRole === "admin"
               ? selectedAgentId
-                ? "Clients"
-                : "Agents"
-              : "Visits"}
+                ? t("visitsSidebar.clients", "Clients")
+                : t("visitsSidebar.agents", "Agents")
+              : t("visitsSidebar.visits", "Visits")}
           </Typography>
         </Box>
         {(userRole === "admin" || userRole === "agent") && (
-          <Box display="flex" gap={1}>
-            {/* Refresh Button */}
-            <IconButton onClick={handleVisitsRefresh}>
+          <Tooltip
+            title={t("visitsSidebar.refreshTooltip", "Refresh Visits")}
+            arrow
+          >
+            <IconButton
+              onClick={handleVisitsRefresh}
+              aria-label={t("visitsSidebar.refresh", "Refresh Visits")}
+            >
               <RefreshIcon />
             </IconButton>
-          </Box>
+          </Tooltip>
         )}
       </Box>
 
       {/* Search Bar */}
-      <TextField
-        variant="outlined"
-        placeholder={`Search ${
-          userRole === "admin" && !selectedAgentId ? "Agents" : "Clients"
-        }`}
-        fullWidth
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        type="search" // Ensures minimal autofill interference
-        autoComplete="off" // Prevents autofill suggestions
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          ),
-        }}
-        sx={{
-          mb: 2,
-          "& .MuiOutlinedInput-root": {
-            borderRadius: "25px", // Ensure the input itself has rounded corners
-          },
-        }}
-      />
+      <Tooltip title={t("visitsSidebar.searchTooltip", "Search")} arrow>
+        <TextField
+          variant="outlined"
+          placeholder={
+            userRole === "admin" && !selectedAgentId
+              ? t("visitsSidebar.searchAgents", "Search Agents")
+              : t("visitsSidebar.searchClients", "Search Clients")
+          }
+          fullWidth
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          type="search"
+          autoComplete="off"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            mb: 2,
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "25px",
+            },
+          }}
+        />
+      </Tooltip>
 
       {/* List */}
-      <List>
+      <List sx={{ flexGrow: 1, overflowY: "auto" }}>
         {filteredList.map((item, index) => {
           const counts = isAgent(item)
             ? agentVisitCounts[item.id]
@@ -124,16 +155,12 @@ const VisitsSidebar: React.FC = () => {
               <ListItem
                 button
                 selected={isClient(item) && item.id === selectedClientId}
-                onClick={() =>
-                  userRole === "admin" && !selectedAgentId
-                    ? handleAgentSelect(item.id)
-                    : handleClientSelect(item.id)
-                }
+                onClick={() => handleListItemClick(item)}
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  borderRadius: "12px", // Add border radius for rounded corners
-                }} // Ensures alignment within the list item
+                  borderRadius: "12px",
+                }}
               >
                 <ListItemAvatar>
                   <Avatar>{item.name.charAt(0).toUpperCase()}</Avatar>
@@ -142,9 +169,12 @@ const VisitsSidebar: React.FC = () => {
                   primary={item.name}
                   secondary={
                     isAgent(item)
-                      ? `ID: ${item.id}`
+                      ? `${t("visitsSidebar.id", "ID")}: ${item.id}`
                       : isClient(item)
-                      ? `Code: ${item.id} | Province: ${item.province || "N/A"}`
+                      ? `${t("visitsSidebar.code", "Code")}: ${item.id} | ${t(
+                          "visitsSidebar.province",
+                          "Province"
+                        )}: ${item.province || t("visitsSidebar.na", "N/A")}`
                       : undefined
                   }
                 />
@@ -166,20 +196,28 @@ const VisitsSidebar: React.FC = () => {
                           hasIncomplete: boolean;
                         }
                       ).hasPending && (
-                        <Box
-                          sx={{
-                            width: 20,
-                            height: 20,
-                            borderRadius: "50%",
-                            backgroundColor: "lightgreen",
-                            color: "white",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
+                        <Tooltip
+                          title={t(
+                            "visitsSidebar.pendingVisits",
+                            "Has Pending Visits"
+                          )}
+                          arrow
                         >
-                          <ExclamationIcon fontSize="small" />
-                        </Box>
+                          <Box
+                            sx={{
+                              width: 20,
+                              height: 20,
+                              borderRadius: "50%",
+                              backgroundColor: "lightgreen",
+                              color: "white",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <ExclamationIcon fontSize="small" />
+                          </Box>
+                        </Tooltip>
                       )}
                     {isAgent(item) &&
                       (
@@ -188,20 +226,28 @@ const VisitsSidebar: React.FC = () => {
                           hasIncomplete: boolean;
                         }
                       ).hasIncomplete && (
-                        <Box
-                          sx={{
-                            width: 20,
-                            height: 20,
-                            borderRadius: "50%",
-                            backgroundColor: "lightcoral",
-                            color: "white",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
+                        <Tooltip
+                          title={t(
+                            "visitsSidebar.incompleteVisits",
+                            "Has Incomplete Visits"
+                          )}
+                          arrow
                         >
-                          <ExclamationIcon fontSize="small" />
-                        </Box>
+                          <Box
+                            sx={{
+                              width: 20,
+                              height: 20,
+                              borderRadius: "50%",
+                              backgroundColor: "lightcoral",
+                              color: "white",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <ExclamationIcon fontSize="small" />
+                          </Box>
+                        </Tooltip>
                       )}
 
                     {/* Client: Check for pendingCount and incompleteCount */}
@@ -212,27 +258,43 @@ const VisitsSidebar: React.FC = () => {
                           incompleteCount: number;
                         }
                       ).pendingCount > 0 && (
-                        <Box
-                          sx={{
-                            width: 20,
-                            height: 20,
-                            borderRadius: "50%",
-                            backgroundColor: "lightgreen",
-                            color: "white",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
+                        <Tooltip
+                          title={t(
+                            "visitsSidebar.pendingCount",
+                            "{{count}} Pending Visits",
+                            {
+                              count: (
+                                counts as {
+                                  pendingCount: number;
+                                  incompleteCount: number;
+                                }
+                              ).pendingCount,
+                            }
+                          )}
+                          arrow
                         >
-                          {
-                            (
-                              counts as {
-                                pendingCount: number;
-                                incompleteCount: number;
-                              }
-                            ).pendingCount
-                          }
-                        </Box>
+                          <Box
+                            sx={{
+                              width: 20,
+                              height: 20,
+                              borderRadius: "50%",
+                              backgroundColor: "lightgreen",
+                              color: "white",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            {
+                              (
+                                counts as {
+                                  pendingCount: number;
+                                  incompleteCount: number;
+                                }
+                              ).pendingCount
+                            }
+                          </Box>
+                        </Tooltip>
                       )}
                     {isClient(item) &&
                       (
@@ -241,27 +303,43 @@ const VisitsSidebar: React.FC = () => {
                           incompleteCount: number;
                         }
                       ).incompleteCount > 0 && (
-                        <Box
-                          sx={{
-                            width: 20,
-                            height: 20,
-                            borderRadius: "50%",
-                            backgroundColor: "lightcoral",
-                            color: "white",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
+                        <Tooltip
+                          title={t(
+                            "visitsSidebar.incompleteCount",
+                            "{{count}} Incomplete Visits",
+                            {
+                              count: (
+                                counts as {
+                                  pendingCount: number;
+                                  incompleteCount: number;
+                                }
+                              ).incompleteCount,
+                            }
+                          )}
+                          arrow
                         >
-                          {
-                            (
-                              counts as {
-                                pendingCount: number;
-                                incompleteCount: number;
-                              }
-                            ).incompleteCount
-                          }
-                        </Box>
+                          <Box
+                            sx={{
+                              width: 20,
+                              height: 20,
+                              borderRadius: "50%",
+                              backgroundColor: "lightcoral",
+                              color: "white",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            {
+                              (
+                                counts as {
+                                  pendingCount: number;
+                                  incompleteCount: number;
+                                }
+                              ).incompleteCount
+                            }
+                          </Box>
+                        </Tooltip>
                       )}
                   </Box>
                 )}

@@ -27,7 +27,11 @@ export const generateActivityList = (
   console.log("Visits:", visits); */
   const agentVisits = visits
     .filter((visit) => visit.agentId === agentId && visit.completed)
-    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .sort((a, b) => {
+      const aDate = typeof a.date === "string" ? new Date(a.date) : a.date;
+      const bDate = typeof b.date === "string" ? new Date(b.date) : b.date;
+      return bDate.getTime() - aDate.getTime();
+    })
     .slice(0, 5);
 
   /* console.log("Filtered visits:", agentVisits);

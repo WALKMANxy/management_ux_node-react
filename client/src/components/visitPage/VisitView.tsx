@@ -10,23 +10,51 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
+  Stack,
+  styled,
   Tooltip,
 } from "@mui/material";
 import dayjs from "dayjs";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppSelector } from "../../app/hooks";
 import { selectVisits } from "../../features/data/dataSelectors";
-import VisitCard from "./VisitCard";
 import EditVisitForm from "./EditVisitForm";
+import VisitCard from "./VisitCard";
 
 interface VisitViewProps {
   visitId: string;
   onDeselectVisit: () => void;
 }
 
+// Styled IconButton for Actions
+const StyledActionButton = styled(IconButton)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.common.white,
+  "&:hover": {
+    backgroundColor: theme.palette.primary.dark,
+  },
+  borderRadius: "50%",
+  width: 48,
+  height: 48,
+}));
+
+// Styled Close Button
+const StyledCloseButton = styled(IconButton)(({ theme }) => ({
+  backgroundColor: theme.palette.error.main,
+  color: theme.palette.common.white,
+  "&:hover": {
+    backgroundColor: theme.palette.error.dark,
+  },
+  borderRadius: "50%",
+  width: 48,
+  height: 48,
+}));
+
 const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
+
+  const selectedVisitId = useAppSelector((state) => state.data.selectedVisitId);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -49,6 +77,14 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
     setOpenConfirm(false);
   };
 
+  // useEffect to close the edit form when selectedVisitId changes
+  useEffect(() => {
+    if (isEditing) {
+      handleEditClose();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedVisitId]);
+
   // Fetch the visit data from the store
   const visits = useAppSelector(selectVisits);
 
@@ -57,7 +93,7 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
   if (!visit) return null;
 
   return (
-    <Box sx={{ m: 2 }}>
+    <Box>
       <VisitCard
         clientId={visit.clientId}
         type={visit.type}
@@ -72,39 +108,31 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
       />
 
       {/* Action Buttons */}
-      <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end", gap: 2 }}>
-        <Tooltip title="Edit Visit">
-          <IconButton
-            onClick={handleEditClick}
-            sx={{
-              backgroundColor: "blue",
-              color: "white",
-              "&:hover": { backgroundColor: "darkblue" },
-              borderRadius: "50%",
-              width: 48,
-              height: 48,
-            }}
-            aria-label="Edit Visit"
-          >
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Deselect Visit">
-          <IconButton
-            onClick={handleDeselectClick}
-            sx={{
-              backgroundColor: "red",
-              color: "white",
-              "&:hover": { backgroundColor: "darkred" },
-              borderRadius: "50%",
-              width: 48,
-              height: 48,
-            }}
-            aria-label="Deselect Visit"
-          >
-            <CloseIcon />
-          </IconButton>
-        </Tooltip>
+      <Box sx={{ mt: 2 }}>
+        <Stack
+          direction={"row"}
+          spacing={2}
+          justifyContent="flex-end"
+          sx={{ pr: 1.2, pt: 1 }} // Adjust padding-right or padding-left to align
+        >
+          <Tooltip title="Edit Visit" arrow>
+            <StyledActionButton
+              onClick={handleEditClick}
+              aria-label="Edit Visit"
+            >
+              <EditIcon />
+            </StyledActionButton>
+          </Tooltip>
+
+          <Tooltip title="Deselect Visit" arrow>
+            <StyledCloseButton
+              onClick={handleDeselectClick}
+              aria-label="Deselect Visit"
+            >
+              <CloseIcon />
+            </StyledCloseButton>
+          </Tooltip>
+        </Stack>
       </Box>
 
       {/* Confirmation Dialog for Deselecting Visit */}

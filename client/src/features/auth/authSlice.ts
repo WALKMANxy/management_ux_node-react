@@ -4,12 +4,13 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
 import { AuthState } from "../../models/stateModels";
 import { webSocketService } from "../../services/webSocketService";
+import { showToast } from "../../utils/toastMessage";
 
 const initialState: AuthState = {
   isLoggedIn: false,
   role: "guest",
-  id: "placeholderId",
-  userId: "placeholderUserId",
+  id: "",
+  userId: "",
 };
 
 // Thunk to handle login with potential side effects
@@ -21,39 +22,44 @@ export const handleLogin = createAsyncThunk(
       id,
       userId,
     }: { role: AuthState["role"]; id: string; userId: string },
-    { dispatch }
+    { rejectWithValue }
   ) => {
-    /*     console.log("Logging in with:", { role, id, userId });
-     */
-    // Perform side effects needed on login
-    sessionStorage.setItem(
-      "auth",
-      JSON.stringify({ isLoggedIn: true, role, id, userId })
-    );
+    try {
+      // Perform side effects needed on login
+      sessionStorage.setItem(
+        "auth",
+        JSON.stringify({ isLoggedIn: true, role, id, userId })
+      );
 
-    /*     console.log("Session storage after login:", sessionStorage.getItem("auth"));
-     */
+      webSocketService.connect();
 
-    webSocketService.connect();
+      // Return the payload to be used in the fulfilled case
+      return { role, id, userId };
+    } catch (error: unknown) {
+      const typedError = error as { message: string };
 
-    // Dispatch the login action after side effects are handled
-    dispatch(login({ role, id, userId }));
+      return rejectWithValue(typedError.message);
+    }
   }
 );
 
 // Thunk to handle logout with side effects
 export const handleLogout = createAsyncThunk(
   "auth/handleLogout",
-  async (_, { dispatch }) => {
-    // Perform side effects needed on logout
+  async (_, { rejectWithValue }) => {
+    try {
+      // Perform side effects needed on logout
+      sessionStorage.clear();
+      localStorage.clear();
+      webSocketService.disconnect();
+      Cookies.remove("token");
 
-    sessionStorage.clear();
-    localStorage.clear();
-    webSocketService.disconnect();
-    Cookies.remove("token");
+      return; // No payload needed
+    } catch (error: unknown) {
+      const typedError = error as { message: string };
 
-    // Dispatch the logout action after side effects are handled
-    dispatch(logout());
+      return rejectWithValue(typedError.message);
+    }
   }
 );
 
@@ -61,7 +67,9 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    login: (
+    // Optional: Define synchronous actions if needed
+    // For example, to update user info without side effects
+    updateUserInfo: (
       state,
       action: PayloadAction<{
         role: AuthState["role"];
@@ -69,18 +77,39 @@ const authSlice = createSlice({
         userId: string;
       }>
     ) => {
-      state.isLoggedIn = true;
       state.role = action.payload.role;
       state.id = action.payload.id;
       state.userId = action.payload.userId;
     },
-    logout: (state) => {
-      Object.assign(state, initialState);
-    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(handleLogin.fulfilled, (state, action) => {
+        state.isLoggedIn = true;
+        state.role = action.payload.role;
+        state.id = action.payload.id;
+        state.userId = action.payload.userId;
+      })
+      .addCase(handleLogout.fulfilled, (state) => {
+        state.isLoggedIn = false;
+        state.role = "guest";
+        state.id = "";
+        state.userId = "";
+      })
+      .addCase(handleLogin.rejected, (_state, action) => {
+        // Optionally, handle login errors
+        showToast.error("Failed to login: " + action.payload);
+
+        console.error(action.payload);
+      })
+      .addCase(handleLogout.rejected, (_state, action) => {
+        // Optionally, handle logout errors
+        showToast.error("Failed to logout: " + action.payload);
+
+        console.error(action.payload);
+      });
   },
 });
-
-export const { login, logout } = authSlice.actions;
 
 export default authSlice.reducer;
 
