@@ -84,11 +84,7 @@ class WebSocketService {
       this.emitNewChat(chat);
     }
 
-    // Flush queued chats
-    while (this.offlineChatQueue.length > 0) {
-      const { chat } = this.offlineChatQueue.shift()!;
-      this.emitNewChat(chat);
-    }
+    
   };
 
   private handleDisconnect = () => {
@@ -206,7 +202,7 @@ class WebSocketService {
 
     // Access the current state to check if the chat exists
     const state = store.getState();
-    const existingLocalChat = state.chats.chats[chat.local_id];
+    const existingLocalChat = state.chats.chats[chat._id || chat.local_id];
 
     if (existingLocalChat) {
       // Update the chat with server-confirmed data

@@ -206,6 +206,13 @@ const useChatLogic = () => {
     ) => {
       if (!participants.length) return;
 
+      console.log("Create chat:", {
+        participants,
+        chatType,
+        name,
+        description,
+      });
+
       const localId = generateId();
 
       const chatData: IChat = {
@@ -220,6 +227,8 @@ const useChatLogic = () => {
         updatedAt: new Date(),
         status: "pending", // Indicate that the chat is pending confirmation
       };
+
+      console.log("Dispatching to addChatReducer:", chatData);
 
       try {
         dispatch(addChatReducer({ chat: chatData }));

@@ -1,9 +1,11 @@
 // src/components/chatPage/ChatSidebar.tsx
 
+import AddIcon from "@mui/icons-material/Add";
 import ChatIcon from "@mui/icons-material/Chat";
 import ContactsIcon from "@mui/icons-material/Contacts";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SearchIcon from "@mui/icons-material/Search";
+
 import {
   Box,
   IconButton,
@@ -21,11 +23,13 @@ import React, {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { useAppDispatch } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { selectUserRole } from "../../features/auth/authSlice";
 import { fetchMessagesFromMultipleChatsThunk } from "../../features/chat/chatThunks";
 import useChatLogic from "../../hooks/useChatsLogic"; // Hook to manage chat logic
 import ChatList from "./ChatList"; // ChatList Component
 import ContactsList from "./ContactsList";
+import CreateChatForm from "./CreateChatForm";
 
 const ChatSidebar: React.FC = () => {
   const { t } = useTranslation();
@@ -43,7 +47,8 @@ const ChatSidebar: React.FC = () => {
   const contactsFetched = useRef(false); // Ref to track if contacts have been fetched
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
-
+  const [isCreateChatFormOpen, setIsCreateChatFormOpen] = useState(false);
+  const userRole = useAppSelector(selectUserRole);
   /**
    * Handles toggling between contacts and chats with fade-in/fade-out animations.
    */
@@ -166,6 +171,17 @@ const ChatSidebar: React.FC = () => {
               </IconButton>
             </Tooltip>
           )}
+          {/* "+" Button for Creating Chats */}
+          {userRole === "admin" && (
+            <Tooltip title={t("chatSidebar.tooltips.createChat")}>
+              <IconButton
+                onClick={() => setIsCreateChatFormOpen(true)}
+                aria-label={t("chatSidebar.tooltips.createChat")}
+              >
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+          )}
           <Tooltip
             title={
               showContacts
@@ -250,6 +266,12 @@ const ChatSidebar: React.FC = () => {
       >
         {contactsList}
       </Box>
+      {isCreateChatFormOpen && (
+        <CreateChatForm
+          open={isCreateChatFormOpen}
+          onClose={() => setIsCreateChatFormOpen(false)}
+        />
+      )}
     </Box>
   );
 };

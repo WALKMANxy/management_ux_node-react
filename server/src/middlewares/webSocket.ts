@@ -146,7 +146,6 @@ export const setupWebSocket = (io: SocketIOServer) => {
       "chat:read",
       async ({
         chatId,
-        userId,
         messageIds,
       }: {
         chatId: string;

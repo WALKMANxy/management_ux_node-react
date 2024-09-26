@@ -2,24 +2,17 @@
 
 import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
 import { Timeline, timelineItemClasses } from "@mui/lab";
-import {
-  Box,
-  IconButton,
-  Paper,
-  Skeleton,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Box, IconButton, Paper, Tooltip, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
 import { selectVisits } from "../../features/promoVisits/promoVisitsSelectors";
-import { UpcomingVisitsProps } from "../../models/propsModels";
 import { VisitItem } from "./VisitItem";
 
-const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
+const UpcomingVisits: React.FC = () => {
   const { t } = useTranslation();
+
   const navigate = useNavigate();
   const visits = useAppSelector(selectVisits);
 
@@ -74,15 +67,7 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
 
         {/* Content Area */}
         <Box sx={{ maxHeight: 420, overflow: "auto" }}>
-          {isLoading ? (
-            // Loading State
-            <Skeleton
-              variant="rectangular"
-              width="100%"
-              height={200}
-              sx={{ borderRadius: 2 }}
-            />
-          ) : upcomingVisits.length === 0 ? (
+          {upcomingVisits.length === 0 ? (
             // No Upcoming Visits
             <Typography variant="body1">
               {t(
