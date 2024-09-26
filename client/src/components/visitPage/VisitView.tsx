@@ -17,7 +17,7 @@ import {
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useAppSelector } from "../../app/hooks";
-import { selectVisits } from "../../features/data/dataSelectors";
+import { selectVisits } from "../../features/promoVisits/promoVisitsSelectors";
 import EditVisitForm from "./EditVisitForm";
 import VisitCard from "./VisitCard";
 

@@ -108,8 +108,8 @@ export const dataSlice = createSlice({
       const newPromo = action.payload;
       const role = state.currentUserDetails?.role;
 
-      console.log("addOrUpdatePromo called with:", action.payload); // Debugging
-
+/*       console.log("addOrUpdatePromo called with:", action.payload); // Debugging
+ */
       if (role === "admin") {
         if (!Array.isArray(state.currentUserPromos)) {
           state.currentUserPromos = [];
@@ -152,7 +152,7 @@ export const dataSlice = createSlice({
           };
           // Check if agentData exists within clientData and store it
           if (clientData.agentData) {
-            clientData.agentData.forEach((agent) => {
+            clientData.agentData.forEach((agent: Agent) => {
               state.agents[agent.id] = agent; // Store each agent in the state
             });
           }
@@ -168,7 +168,7 @@ export const dataSlice = createSlice({
 
           // Explicitly associate clients, visits, and promos with the agent
           const agentClients = agentData.clients.map(
-            (client) => state.clients[client.id]
+            (client: Client) => state.clients[client.id]
           );
           state.agents[agentData.id] = {
             ...agentData,

@@ -6,6 +6,8 @@ import { Agent, Client } from "../../models/entityModels";
 import { SearchParams, SearchResult } from "../../models/searchModels";
 import { SearchState, ThunkError } from "../../models/stateModels";
 
+// Prepare options for Fuse.js
+
 const initialState: SearchState = {
   query: "",
   results: [],
@@ -21,6 +23,11 @@ export const searchItems = createAsyncThunk<
   "search/searchItems",
   async ({ query, filter }, { getState, rejectWithValue }) => {
     try {
+      if (query.length < 2) {
+        // Early return if query is too short
+        return [];
+      }
+
       const state = getState();
 
       // Access data from the state correctly
@@ -31,6 +38,7 @@ export const searchItems = createAsyncThunk<
       const visits = state.data.currentUserVisits;
 
       const sanitizedQuery = query.toLowerCase();
+
       const seen = new Map<string, string>(); // Track seen IDs
       let searchResults: SearchResult[] = [];
 

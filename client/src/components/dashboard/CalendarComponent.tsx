@@ -22,14 +22,14 @@ import { useTranslation } from "react-i18next"; // Import useTranslation
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
-  selectVisits,
-  VisitWithAgent,
-} from "../../features/data/dataSelectors";
-import {
   selectAgent,
   selectClient,
   selectVisit,
 } from "../../features/data/dataSlice";
+import {
+  selectVisits,
+  VisitWithAgent,
+} from "../../features/promoVisits/promoVisitsSelectors";
 import { ServerDayProps } from "../../models/propsModels";
 import { agentColorMap } from "../../utils/constants";
 import ServerDay from "./ServerDay";

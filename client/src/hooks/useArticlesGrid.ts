@@ -8,9 +8,9 @@ import { calculateTotalQuantitySold } from "../utils/dataUtils";
 
 export const useArticlesGrid = () => {
   const clients = useSelector((state: RootState) => state.data.clients);
-  /*   console.log("Clients:", clients);
-   */ const [selectedArticle, setSelectedArticle] =
-    useState<MovementDetail | null>(null);
+  const [selectedArticle, setSelectedArticle] = useState<MovementDetail | null>(
+    null
+  );
   const [isArticleListCollapsed, setArticleListCollapsed] = useState(false);
   const [isArticleDetailsCollapsed, setArticleDetailsCollapsed] =
     useState(false);
@@ -38,83 +38,80 @@ export const useArticlesGrid = () => {
     }
   }, []);
 
+  // Precompute article details and movements maps
+  const { articleDetailsMap, articleMovementsMap } = useMemo(() => {
+    const detailsMap = new Map<string, MovementDetail>();
+    const movementsMap = new Map<
+      string,
+      { movement: Movement; client: Client }[]
+    >();
+
+    Object.values(clients).forEach((client) => {
+      client.movements.forEach((movement) => {
+        movement.details.forEach((detail) => {
+          const articleId = detail.articleId;
+          if (
+            articleId &&
+            articleId !== "." &&
+            detail.brand &&
+            detail.brand !== "."
+          ) {
+            if (!detailsMap.has(articleId)) {
+              detailsMap.set(articleId, detail);
+            }
+            if (!movementsMap.has(articleId)) {
+              movementsMap.set(articleId, []);
+            }
+            movementsMap.get(articleId)!.push({ movement, client });
+          }
+        });
+      });
+    });
+
+    return { articleDetailsMap: detailsMap, articleMovementsMap: movementsMap };
+  }, [clients]);
+
   const handleArticleSelect = useCallback(
     (articleId: string) => {
-      const allMovements: Movement[] = Object.values(clients).flatMap(
-        (client) => client.movements
-      );
-      const articleMovements = allMovements.filter((movement) =>
-        movement.details.some((detail) => detail.articleId === articleId)
-      );
-      if (articleMovements.length > 0) {
-        const selectedDetail =
-          articleMovements[0].details.find(
-            (detail) => detail.articleId === articleId
-          ) || null;
-        setSelectedArticle(selectedDetail);
-        setTimeout(() => {
-          if (articleDetailsRef.current) {
-            articleDetailsRef.current.scrollIntoView({ behavior: "smooth" });
-          }
-        }, 0);
-      } else {
-        setSelectedArticle(null);
-      }
+      const selectedDetail = articleDetailsMap.get(articleId) || null;
+      setSelectedArticle(selectedDetail);
+      setTimeout(() => {
+        articleDetailsRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 0);
     },
-    [clients]
+    [articleDetailsMap]
   );
 
-  const filteredArticles = useCallback(() => {
-    let allDetails: MovementDetail[] = Object.values(clients).flatMap(
-      (client: Client) =>
-        client.movements.flatMap((movement) => movement.details)
-    );
-
-    // Filter out articles with invalid oemID or brand
-    allDetails = allDetails.filter(
-      (detail) =>
-        detail.articleId &&
-        detail.articleId !== "." &&
-        detail.brand &&
-        detail.brand !== "."
-    );
+  const filteredArticles = useMemo(() => {
+    let articles = Array.from(articleDetailsMap.values());
 
     if (quickFilterText) {
-      allDetails = allDetails.filter((detail) =>
-        detail.name?.toLowerCase().includes(quickFilterText.toLowerCase())
+      const lowerQuickFilterText = quickFilterText.toLowerCase();
+      articles = articles.filter((detail) =>
+        detail.name?.toLowerCase().includes(lowerQuickFilterText)
       );
     }
 
     if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
-      allDetails = allDetails.filter((detail) => {
-        const detailMovements = Object.values(clients).flatMap(
-          (client: Client) =>
-            client.movements.filter((movement) =>
-              movement.details.some(
-                (movDetail) => movDetail.articleId === detail.articleId
-              )
-            )
-        );
-        return detailMovements.some((movement) => {
+      articles = articles.filter((detail) => {
+        const movementEntries = articleMovementsMap.get(detail.articleId) || [];
+        return movementEntries.some(({ movement }) => {
           const movementDate = new Date(movement.dateOfOrder);
           return movementDate >= start && movementDate <= end;
         });
       });
     }
 
-    const uniqueArticlesMap = new Map<string, MovementDetail>();
-    allDetails.forEach((detail) => {
-      if (!uniqueArticlesMap.has(detail.articleId)) {
-        uniqueArticlesMap.set(detail.articleId, detail);
-      }
-    });
-
-    const uniqueArticles = Array.from(uniqueArticlesMap.values());
-
-    return uniqueArticles;
-  }, [clients, quickFilterText, startDate, endDate]);
+    return articles;
+  }, [
+    articleDetailsMap,
+    articleMovementsMap,
+    quickFilterText,
+    startDate,
+    endDate,
+  ]);
 
   // Filter clients based on the user role
   const filteredClients = useMemo(() => {
@@ -131,21 +128,13 @@ export const useArticlesGrid = () => {
   // Get movements for the selected article based on the user role
   const clientMovements = useMemo(() => {
     if (!selectedArticle) return [];
-    const movements = Object.values(clients).flatMap((client: Client) =>
-      client.movements
-        .filter((movement) =>
-          movement.details.some(
-            (detail) => detail.articleId === selectedArticle.articleId
-          )
-        )
-        .map((movement) => ({
-          ...movement,
-          clientName: client.name,
-        }))
-    );
-    /*     console.log("clientMovements: ", movements);
-     */ return movements;
-  }, [clients, selectedArticle]);
+    const movementEntries =
+      articleMovementsMap.get(selectedArticle.articleId) || [];
+    return movementEntries.map(({ movement, client }) => ({
+      ...movement,
+      clientName: client.name,
+    }));
+  }, [selectedArticle, articleMovementsMap]);
 
   // Calculate total quantity sold for each article
   const totalQuantitySold = useMemo(() => {

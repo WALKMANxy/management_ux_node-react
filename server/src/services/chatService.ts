@@ -365,7 +365,7 @@ export class ChatService {
   static async updateReadStatus(
     chatId: string,
     messageIds: string[],
-    userId: mongoose.Types.ObjectId
+    userId: string
   ): Promise<IChat | null> {
     try {
       const chatObjectId = new Types.ObjectId(chatId);

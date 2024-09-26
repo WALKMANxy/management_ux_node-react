@@ -3,8 +3,11 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { Promo, Visit } from "../models/dataModels";
 import { serverClient, serverMovement } from "../models/dataSetTypes";
 import { Admin, Agent } from "../models/entityModels";
+import { showToast } from "./toastMessage";
 
 export const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+
+
 
 if (!baseUrl || baseUrl === "") {
   throw new Error("One or more environment variables are not defined");
@@ -35,7 +38,7 @@ export const apiCall = async <T>(
           (method === "PUT" || method === "PATCH") &&
           axiosError.response.status === 404
         ) {
-          console.log(`Resource not found at ${endpoint}, cannot update.`);
+          showToast.error(`Resource not found at ${endpoint}, cannot update.`);
           throw new Error(`Resource not found at ${endpoint}, cannot update.`);
         }
         const serverMessage =

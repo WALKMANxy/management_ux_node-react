@@ -12,7 +12,6 @@ import {
   fetchMessagesThunk,
   fetchOlderMessagesThunk,
 } from "./chatThunks";
-import { showToast } from "../../utils/toastMessage";
 
 // Define the simplified ChatState without the messages field
 interface ChatState {
@@ -62,46 +61,29 @@ const chatSlice = createSlice({
       const chat = state.chats[chatId];
 
       // Check if the chat exists
+
       if (!chat) {
         console.error("Chat does not exist in the state.");
-        return state; // Return the existing state if chat doesn't exist
+        return;
       }
 
-      // Create a new messages array with the updated message
-      const updatedMessages = [...chat.messages];
-      const existingMessageIndex = updatedMessages.findIndex(
+      const existingMessage = chat.messages.find(
         (msg) => msg.local_id === message.local_id
       );
 
-      if (existingMessageIndex !== -1) {
-        // Update the existing message
-        updatedMessages[existingMessageIndex] = {
-          ...updatedMessages[existingMessageIndex],
-          ...message,
-        };
+      if (existingMessage) {
+        Object.assign(existingMessage, message);
       } else {
-        // Add the new message
-        updatedMessages.push(message);
+        chat.messages.push(message);
       }
 
-      // Sort the updated messages by timestamp
-      updatedMessages.sort(
+      // Sort messages by timestamp
+      chat.messages.sort(
         (a, b) =>
           new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
       );
 
-      // Return a new state object with the updated chat, ensuring immutability
-      return {
-        ...state,
-        chats: {
-          ...state.chats,
-          [chatId]: {
-            ...chat,
-            messages: updatedMessages,
-            updatedAt: new Date(),
-          },
-        },
-      };
+      chat.updatedAt = new Date();
     },
 
     updateReadStatusReducer: (
@@ -124,35 +106,16 @@ const chatSlice = createSlice({
         return state; // Return the existing state if chat doesn't exist
       }
 
-      // Create a new array of messages with updated read statuses
-      const updatedMessages = chat.messages.map((message) => {
+      chat.messages.forEach((message) => {
         if (messageIds.includes(message.local_id ?? "")) {
-          // Create a new message object with updated readBy array if userId is not already included
-          return {
-            ...message,
-            readBy: message.readBy.includes(userId)
-              ? message.readBy
-              : [...message.readBy, userId],
-          };
+          if (!message.readBy.includes(userId)) {
+            message.readBy.push(userId);
+          }
         }
-        return message;
       });
 
-      // Return a new state object with the updated chat, ensuring immutability
-      return {
-        ...state,
-        chats: {
-          ...state.chats,
-          [chatId]: {
-            ...chat,
-            messages: updatedMessages,
-            updatedAt: new Date(),
-          },
-        },
-      };
+      chat.updatedAt = new Date();
     },
-
-
 
     addChatReducer: (
       state,
@@ -163,37 +126,23 @@ const chatSlice = createSlice({
     ) => {
       const { chat, fromServer } = action.payload;
 
-      // Check if the chat already exists in the state
       const existingChat = state.chats[chat.local_id];
 
       if (existingChat && fromServer) {
-        // If chat exists and is from the server, update the chat with server-confirmed data
-        return {
-          ...state,
-          chats: {
-            ...state.chats,
-            [chat._id]: {
-              ...existingChat,
-              ...chat, // Merge the existing chat with the server-confirmed data
-              local_id: chat.local_id, // Keep the local_id consistent
-              _id: chat._id, // Ensure the server ID is updated
-              status: chat.status, // Mark the status as succeeded
-            },
-          },
+        // Update with server-confirmed data
+        state.chats[chat._id] = {
+          ...existingChat,
+          ...chat,
+          local_id: chat.local_id,
+          _id: chat._id,
+          status: chat.status,
         };
-      } else if (existingChat && !fromServer) {
-        // If the chat is from the client and already exists (e.g., was added optimistically), do nothing
-        return state;
-      } else {
-        // If the chat is new or doesn't exist in the state
-        return {
-          ...state,
-          chats: {
-            ...state.chats,
-            [chat.local_id]: chat, // Add the new chat with its local_id
-          },
-        };
+        delete state.chats[chat.local_id];
+      } else if (!existingChat) {
+        // Add new chat
+        state.chats[chat.local_id] = chat;
       }
+      // If existingChat exists and not from server, do nothing
     },
   },
 
@@ -221,65 +170,44 @@ const chatSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchMessagesThunk.fulfilled, (state, action) => {
-        state.status = "succeeded"; // Update the status to reflect success
+        state.status = "succeeded";
         const { chatId, messages } = action.payload;
-
-        // Ensure the chat exists in the state
         const chat = state.chats[chatId];
         if (!chat) {
           console.error(`Chat with ID ${chatId} does not exist in the state.`);
           return;
         }
 
-        // Combine existing messages with the newly fetched messages
-        const combinedMessages = [...chat.messages, ...messages];
-
-        // Create a map to eliminate duplicates, using local_id as the key
-        const messageMap = new Map();
-        combinedMessages.forEach((message) => {
-          messageMap.set(message.local_id, message);
+        const messageMap = new Map<string, IMessage>();
+        chat.messages.forEach((msg) => {
+          if (msg.local_id) {
+            messageMap.set(msg.local_id, msg);
+          }
         });
-
-        // Convert the map back to an array and sort by timestamp
-        const sortedMessages = Array.from(messageMap.values()).sort(
+        messages.forEach((msg) => {
+          if (msg.local_id) {
+            messageMap.set(msg.local_id, msg);
+          }
+        });
+        chat.messages = Array.from(messageMap.values()).sort(
           (a, b) =>
             new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
         );
-
-        // Update the state immutably
-        state.chats = {
-          ...state.chats,
-          [chatId]: {
-            ...chat,
-            messages: sortedMessages, // Ensure a new reference for the messages array
-          },
-        };
-
-        // Optional: Log the updated chat object for debugging purposes
-        console.log(
-          `Messages updated for chat with ID: ${chatId}`,
-          sortedMessages
-        );
+        chat.updatedAt = new Date();
       })
-
       .addCase(fetchMessagesThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
       })
 
-      // Handle fetchMessagesFromMultipleChatsThunk
+      // Fetch Messages from Multiple Chats
       .addCase(
         fetchMessagesFromMultipleChatsThunk.fulfilled,
         (state, action) => {
-          state.status = "succeeded"; // Update status to indicate success
+          state.status = "succeeded";
 
-          // Create a copy of the chats to avoid direct mutations
-          const updatedChats = { ...state.chats };
-
-          // Iterate over each chat's messages from the payload
           action.payload.forEach(({ chatId, messages }) => {
-            // Ensure the chat exists in the copied state
-            const chat = updatedChats[chatId];
+            const chat = state.chats[chatId];
             if (!chat) {
               console.error(
                 `Chat with ID ${chatId} does not exist in the state.`
@@ -287,12 +215,10 @@ const chatSlice = createSlice({
               return;
             }
 
-            // Create a map of existing messages for quick lookups by local_id
             const existingMessagesMap = new Map(
               chat.messages.map((msg) => [msg.local_id, msg])
             );
 
-            // Merge or update the fetched messages
             messages.forEach((message) => {
               existingMessagesMap.set(message.local_id, {
                 ...existingMessagesMap.get(message.local_id),
@@ -300,73 +226,45 @@ const chatSlice = createSlice({
               });
             });
 
-            // Update the chat messages by converting the map back to an array
-            updatedChats[chatId] = {
-              ...chat,
-              messages: Array.from(existingMessagesMap.values()).sort(
-                (a, b) =>
-                  new Date(a.timestamp).getTime() -
-                  new Date(b.timestamp).getTime()
-              ),
-            };
-
-            // Optional: Log the updated state for debugging purposes
-            console.log(
-              `Updated chat with ID: ${chatId} - Messages count: ${updatedChats[chatId].messages.length}`
+            chat.messages = Array.from(existingMessagesMap.values()).sort(
+              (a, b) =>
+                new Date(a.timestamp).getTime() -
+                new Date(b.timestamp).getTime()
             );
+            chat.updatedAt = new Date();
           });
-
-          // Assign the updated chats back to the state
-          state.chats = updatedChats;
         }
       )
 
+      // Fetch Older Messages
       .addCase(fetchOlderMessagesThunk.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })
+      .addCase(fetchOlderMessagesThunk.fulfilled, (state, action) => {
+        const { chatId, messages } = action.payload;
+        const chat = state.chats[chatId];
+        if (!chat) return;
 
+        const existingMessageIds = new Set(
+          chat.messages.map((msg) => msg._id.toString())
+        );
+        const newMessages = messages.filter(
+          (msg) => !existingMessageIds.has(msg._id.toString())
+        );
+
+        chat.messages = [...newMessages.reverse(), ...chat.messages].sort(
+          (a, b) =>
+            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        );
+        chat.updatedAt = new Date();
+      })
       .addCase(fetchOlderMessagesThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
       })
-      .addCase(
-        fetchOlderMessagesThunk.fulfilled,
-        (
-          state,
-          action: PayloadAction<{ chatId: string; messages: IMessage[] }>
-        ) => {
-          const { chatId, messages } = action.payload;
 
-          if (!state.chats[chatId]) return;
-
-          // Filter out duplicates before adding new messages
-          const existingMessageIds = new Set(
-            state.chats[chatId].messages.map((msg) => msg._id.toString())
-          );
-          const newMessages = messages.filter(
-            (msg) => !existingMessageIds.has(msg._id.toString())
-          );
-
-          // Add new messages and sort by timestamp to maintain order
-          state.chats[chatId].messages = [
-            ...newMessages.reverse(), // Reverse the new messages to maintain chronological display
-            ...state.chats[chatId].messages,
-          ].sort(
-            (a, b) =>
-              new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-          ); // Sort by timestamp
-        }
-      )
-
-      .addCase(
-        fetchMessagesFromMultipleChatsThunk.rejected,
-        (state, action) => {
-          state.status = "failed";
-          state.error = action.payload as string;
-        }
-      )
-
+      // Create Chat
       .addCase(createChatThunk.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -375,51 +273,37 @@ const chatSlice = createSlice({
         state.status = "succeeded";
         const newChat = action.payload;
         state.chats[newChat._id] = newChat;
-         // Show success toast
-         showToast.success("Chat created successfully!");
       })
       .addCase(createChatThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
-         // Show error toast
-         showToast.error(`Failed to create chat: ${state.error}`);
       })
+      // Create Message
       .addCase(createMessageThunk.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })
       .addCase(createMessageThunk.fulfilled, (state, action) => {
-        state.status = "succeeded"; // Update status to indicate the action was successful
+        state.status = "succeeded";
         const { chatId, message } = action.payload;
-
-        // Find the chat by its ID
         const chat = state.chats[chatId];
         if (!chat) {
           console.error(`Chat with ID ${chatId} does not exist.`);
           return;
         }
 
-        // Use local_id for consistency and prevent duplicates
-        const existingMessageIndex = chat.messages.findIndex(
+        const existingMessage = chat.messages.find(
           (msg) => msg.local_id === message.local_id
         );
 
-        if (existingMessageIndex === -1) {
-          // If the message does not exist, add it to the chat's messages array
-          chat.messages.push(message);
-          console.log(`Message added to chat ${chatId}`);
+        if (existingMessage) {
+          Object.assign(existingMessage, message);
         } else {
-          // If the message exists, update the existing message
-          chat.messages[existingMessageIndex] = message;
-          console.log(`Message updated in chat ${chatId}`);
+          chat.messages.push(message);
         }
 
-        // Optional: Log the updated state for debugging purposes
-        console.log(
-          `Updated chat with ID: ${chatId} - Messages count: ${chat.messages.length}`
-        );
+        chat.updatedAt = new Date();
       })
-
       .addCase(createMessageThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;

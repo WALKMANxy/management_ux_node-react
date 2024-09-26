@@ -1,22 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useGetHolidaysQuery } from "../features/calendar/calendarQuery";
 import { CalendarEvent, Holiday } from "../models/dataModels";
+import { showToast } from "../utils/toastMessage";
 
 export const useCalendarWithHolidays = (currentDate: Date) => {
   const year = currentDate.getFullYear();
+  const { t } = useTranslation();
   const {
     data: holidays,
     isLoading: isHolidaysLoading,
     error: holidaysError,
   } = useGetHolidaysQuery({ year });
-  const [holidayEvents, setHolidayEvents] = useState<
-    CalendarEvent[] | undefined
-  >(undefined);
 
-  useEffect(() => {
+  const holidayEvents = useMemo(() => {
     if (holidays) {
-      const holidayEventsMapped: CalendarEvent[] = holidays.map(
-        (holiday: Holiday) => ({
+      return holidays.map(
+        (holiday: Holiday): CalendarEvent => ({
           userId: "holiday", // Assign a special ID for holidays
           startDate: new Date(holiday.date),
           endDate: new Date(holiday.date),
@@ -29,10 +29,15 @@ export const useCalendarWithHolidays = (currentDate: Date) => {
           updatedAt: new Date(holiday.date),
         })
       );
-
-      setHolidayEvents(holidayEventsMapped);
     }
+    return [];
   }, [holidays]);
+
+  useEffect(() => {
+    if (holidaysError) {
+      showToast.error(t("calendarWithHolidays.holidaysFetchError"));
+    }
+  }, [holidaysError, t]);
 
   return {
     holidayEvents,

@@ -322,7 +322,8 @@
       "type": "Type",
       "reason": "Reason",
       "note": "Note",
-      "unknown": "Unknown"
+      "unknown": "Unknown",
+      "visit":"Visit"
     },
     "tooltips": {
       "edit": "Edit Event",
@@ -558,7 +559,22 @@
     "enterEmail": "Enter your email",
     "enterNewPassword": "Enter your new password",
     "enterVerificationCode": "Enter the verification code provided in your email",
-    "passwordUpdatedToast": "Password updated successfully. You can now log in!"
+    "passwordUpdatedToast": "Password updated successfully. You can now log in!",
+    "registrationSuccess": "Registration successful!",
+    "registrationFailed": "Registration failed: {{error}}",
+    "loginFailed": "Login failed: {{message}}",
+    "roleNotAssigned": "Please wait for your account to be assigned a role before attempting to log in.",
+    "accountVerificationPending": "Your account is still being verified by the admins.",
+    "roleFetchingError": "Failed to fetch user role: {{error}}",
+    "userNotFound": "Failed to retrieve user information.",
+    "errorDuringLogin": "An error occurred during login.",
+    "serverUnreachable": "The server is currently unreachable, please try again later.",
+    "logoutSuccess": "User logged out successfully.",
+    "logoutFailed": "Failed to log out.",
+    "unexpectedError": "An unexpected error occurred.",
+    "googleLoginSuccess": "User logged in successfully via Google OAuth.",
+    "googleLoginFailed": "Authentication failed via Google OAuth.",
+    "invalidStateParameter": "Invalid state parameter"
   },
   "movementDetails": {
     "id": "List ID",
@@ -926,5 +942,36 @@
     "selectVisitError": "Unable to select visit.",
     "noVisits": "No visits found for this client.",
     "unknown": "Unknown"
+  },
+  "calendarHook": {
+    "weekendsNotSelectable": "Weekends are not selectable.",
+    "selectedDateRange": "Selected date range from {{start}} to {{end}}.",
+    "eventUpdatedSuccess": "Event updated successfully!",
+    "eventCreatedSuccess": "Event created successfully!",
+    "eventSubmitFailedWithError": "Failed to submit event: {{error}}",
+    "eventSubmitFailed": "Failed to submit event.",
+    "eventIdMissing": "Event ID is missing.",
+    "eventDeletedSuccess": "Event deleted successfully!",
+    "eventDeleteFailedWithError": "Failed to delete event: {{error}}",
+    "eventDeleteFailed": "Failed to delete event.",
+    "editingEvent": "Editing event: {{reason}}",
+    "formCanceled": "Form canceled.",
+    "switchedToView": "Switched to {{view}} view.",
+    "visitEventName": "Visit for {{clientId}}",
+    "selectedVisit": "Selected Visit: {{reason}} on {{date}}.",
+    "visitsNotEditable": "Visits cannot be edited from the calendar.",
+    "selectedEvent": "Selected {{reason}} on {{date}}.",
+    "roleNotAssigned": "Please wait for your account to be assigned a role before attempting to log in.",
+    "accountVerificationPending": "Your account is still being verified by the admins.",
+    "roleFetchingError": "Failed to fetch user role.",
+    "errorDuringLogin": "An error occurred during login: {{error}}",
+    "registrationSuccess": "Registration successful: {{message}}",
+    "registrationFailed": "Registration failed: {{message}}",
+    "loginFailed": "Login failed: {{message}}",
+    "viewModes": {
+      "calendar": "calendar",
+      "history": "history"
+    },
+    "userNotAuthenticated": "User is not authenticated."
   }
 }

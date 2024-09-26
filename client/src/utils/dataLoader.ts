@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import {
+  CalendarEvent,
   GlobalVisits,
   MovementDetail,
   Promo,
@@ -8,6 +9,7 @@ import {
 import { serverClient, serverMovement } from "../models/dataSetTypes";
 
 import { Admin, Agent, Client } from "../models/entityModels";
+
 
 const workerScriptPath = new URL("./worker.js", import.meta.url);
 
@@ -234,4 +236,21 @@ export const mapPromosToEntity = (
     default:
       throw new Error("Invalid user role");
   }
+};
+
+// Function to map a Visit to a CalendarEvent
+export const mapVisitToCalendarEvent = (visit: Visit): CalendarEvent => {
+  return {
+    _id: visit._id,
+    userId: visit.visitIssuedBy,
+    startDate: new Date(visit.date),
+    endDate: new Date(visit.date),
+    eventType: "visit",
+    eventName: `Visit for ${visit.clientId}`,
+    reason: visit.visitReason as CalendarEvent["reason"], // You may adjust this as needed
+    note: visit.notePublic,
+    status: visit.pending ? "pending" : visit.completed ? "approved" : "pending",
+    createdAt: new Date(visit.createdAt),
+    updatedAt: new Date(), // You may need to adjust this based on your data
+  };
 };
