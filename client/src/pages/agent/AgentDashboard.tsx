@@ -393,7 +393,18 @@ const AgentDashboard: React.FC = () => {
                 </Box>
               )}
             </Box>
-            <UpcomingVisits isLoading={isLoading} />
+            {loadingState ? (
+              <Skeleton
+                animation="wave"
+                variant="rectangular"
+                width="100%"
+                height={200}
+                sx={{ borderRadius: "12px" }}
+                aria-label="skeleton"
+              />
+            ) : (
+              <UpcomingVisits />
+            )}
           </Grid>
         )}
       </Grid>

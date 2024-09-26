@@ -303,7 +303,7 @@ export interface CreateEventPayload {
   userId: string;
   startDate: Date;
   endDate: Date;
-  eventType: "absence" | "holiday" | "event" | "";
+  eventType: "absence" | "event" | "holiday" | "visit" | "";
   reason:
     | "illness"
     | "day_off"

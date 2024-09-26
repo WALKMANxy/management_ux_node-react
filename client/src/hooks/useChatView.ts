@@ -45,7 +45,10 @@ const useChatView = () => {
   const getChatOptions = () => {
     if (!currentChat) return [];
 
-    if (currentChat.type === "group" && currentChat.admins?.includes(currentUserId)) {
+    if (
+      currentChat.type === "group" &&
+      currentChat.admins?.includes(currentUserId)
+    ) {
       return [
         "mute",
         "edit_group",
