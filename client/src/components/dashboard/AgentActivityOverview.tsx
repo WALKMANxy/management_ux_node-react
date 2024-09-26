@@ -16,7 +16,7 @@ import dayjs from "dayjs";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
-import { selectVisits } from "../../features/data/dataSelectors";
+import { selectVisits } from "../../features/promoVisits/promoVisitsSelectors";
 import { Agent } from "../../models/entityModels";
 import { generateActivityList } from "../../utils/activityUtils";
 

@@ -8,7 +8,7 @@ import {
   getPromos,
   updatePromoAsync,
 } from "../features/data/dataThunks";
-import { selectPromos } from "../features/promoVisits/dataSelectors";
+import { selectPromos } from "../features/promoVisits/promoVisitsSelectors";
 import { selectCurrentUser } from "../features/users/userSlice";
 import { Promo } from "../models/dataModels";
 import { showToast } from "../utils/toastMessage";

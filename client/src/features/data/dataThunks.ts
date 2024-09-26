@@ -2,8 +2,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Promo, Visit } from "../../models/dataModels";
 import { DataSliceState } from "../../models/stateModels";
-import { dataApi } from "./dataQueries";
-import { promoVisitApi } from "./promosVisitsQueries";
+import { promoVisitApi } from "../promoVisits/promosVisitsQueries";
+import { dataApi } from "./dataQueries.ts";
 
 export const fetchInitialData = createAsyncThunk(
   "data/fetchInitialData",
@@ -29,7 +29,7 @@ export const fetchInitialData = createAsyncThunk(
     } else {
       throw new Error("Invalid user role");
     }
-    return { role, userData, userId  };
+    return { role, userData, userId };
   }
 );
 // Thunk to update visits

@@ -356,12 +356,13 @@ const useChatLogic = () => {
     (chat: IChat) => {
       if (!currentUserId) return 0;
       return chat.messages.filter(
-        (message) => !message.readBy.includes(currentUserId)
+        (message) =>
+          !message.readBy.includes(currentUserId) &&
+          message.sender !== currentUserId
       ).length;
     },
     [currentUserId]
   );
-
   // Function to handle returning to the sidebar on mobile
   const handleBackToChats = () => {
     dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar

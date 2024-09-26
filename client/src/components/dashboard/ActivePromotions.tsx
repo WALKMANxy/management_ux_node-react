@@ -9,14 +9,14 @@ import TimelineDot from "@mui/lab/TimelineDot";
 import TimelineItem from "@mui/lab/TimelineItem";
 import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import TimelineSeparator from "@mui/lab/TimelineSeparator";
-import { Box, IconButton, Typography, Tooltip } from "@mui/material";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import React from "react";
+import { useTranslation } from "react-i18next"; // Ensure useTranslation is imported
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
-import { selectPromos } from "../../features/data/dataSelectors";
+import { selectPromos } from "../../features/promoVisits/promoVisitsSelectors";
 import { Promo } from "../../models/dataModels";
-import { useTranslation } from "react-i18next"; // Ensure useTranslation is imported
 
 const ActivePromotions: React.FC = () => {
   const promos = useAppSelector(selectPromos);
@@ -50,7 +50,8 @@ const ActivePromotions: React.FC = () => {
               variant="body2"
               color="text.secondary"
             >
-              {t("activePromotions.endsAt", "Ends at")} {formatEndDate(promo.endDate)}
+              {t("activePromotions.endsAt", "Ends at")}{" "}
+              {formatEndDate(promo.endDate)}
             </TimelineOppositeContent>
             <TimelineSeparator>
               <TimelineConnector />
@@ -86,7 +87,10 @@ const ActivePromotions: React.FC = () => {
         {t("activePromotions.title", "Active Promotions")}
       </Typography>
       {renderPromotions()}
-      <Tooltip title={t("activePromotions.viewAllPromotions", "View All Promotions")} arrow>
+      <Tooltip
+        title={t("activePromotions.viewAllPromotions", "View All Promotions")}
+        arrow
+      >
         <IconButton
           onClick={() => navigate("/promos")}
           sx={{
@@ -100,7 +104,10 @@ const ActivePromotions: React.FC = () => {
               backgroundColor: "#c8e6c9",
             },
           }}
-          aria-label={t("activePromotions.viewAllPromotions", "View All Promotions")}
+          aria-label={t(
+            "activePromotions.viewAllPromotions",
+            "View All Promotions"
+          )}
         >
           <MonetizationOnIcon />
         </IconButton>

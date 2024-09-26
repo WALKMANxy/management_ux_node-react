@@ -12,7 +12,7 @@ import { Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { VisitWithAgent } from "../../features/data/dataSelectors";
+import { VisitWithAgent } from "../../features/promoVisits/promoVisitsSelectors";
 
 // Helper component for individual visit items
 interface VisitItemProps {

@@ -4,6 +4,7 @@ import { useMediaQuery, useTheme } from "@mui/material";
 import dayjs from "dayjs";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { SlotInfo } from "react-big-calendar";
+import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { useAppSelector } from "../app/hooks";
 import { selectUserRole } from "../features/auth/authSlice";
@@ -14,8 +15,9 @@ import {
   useGetEventsByMonthForAdminQuery,
   useGetEventsByStatusAndUserQuery,
 } from "../features/calendar/calendarQuery";
+import { selectVisits } from "../features/promoVisits/promoVisitsSelectors";
 import { selectCurrentUser } from "../features/users/userSlice";
-import { CalendarEvent } from "../models/dataModels";
+import { CalendarEvent, Visit } from "../models/dataModels";
 import { CreateEventPayload } from "../models/propsModels";
 import { showToast } from "../utils/toastMessage";
 
@@ -36,10 +38,15 @@ export const useCalendar = () => {
   const userRole = useSelector(selectUserRole);
   const user = useAppSelector(selectCurrentUser);
 
+  // Get visits from the state
+  const visits = useSelector(selectVisits);
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null); // State for editing
+
+  const { t } = useTranslation();
 
   // RTK Query Mutations
   const [createEvent, { isLoading: isCreating, error: creatingError }] =
@@ -70,15 +77,11 @@ export const useCalendar = () => {
   );
 
   const serverEvents: CalendarEvent[] | undefined = useMemo(() => {
-    let events;
-
     if (userRole === "admin") {
-      events = adminEventsData || [];
+      return adminEventsData || [];
     } else {
-      events = userEventsData || [];
+      return userEventsData || [];
     }
-
-    return events;
   }, [adminEventsData, userEventsData, userRole]);
 
   const isServerLoading = isAdminLoading || isUserLoading;
@@ -112,23 +115,58 @@ export const useCalendar = () => {
     }
   }, [serverEvents]);
 
+  const mapVisitToCalendarEvent = useCallback(
+    (visit: Visit): CalendarEvent => {
+      return {
+        _id: visit._id,
+        userId: visit.visitIssuedBy,
+        startDate: new Date(visit.date),
+        endDate: new Date(visit.date),
+        eventType: "visit",
+        eventName: t("calendarHook.visitEventName", {
+          clientId: visit.clientId,
+        }),
+        reason: visit.visitReason as CalendarEvent["reason"],
+        note: visit.notePublic,
+        status: visit.pending
+          ? "pending"
+          : visit.completed
+          ? "approved"
+          : "pending",
+        createdAt: new Date(visit.createdAt),
+        updatedAt: new Date(),
+      };
+    },
+    [t]
+  );
+
+  // Map visits to CalendarEvents
+  const visitEvents: CalendarEvent[] = useMemo(() => {
+    if (visits && visits.length > 0) {
+      return visits.map((visit) => mapVisitToCalendarEvent(visit));
+    }
+    return [];
+  }, [visits, mapVisitToCalendarEvent]);
+
+  // Handle selecting a slot (date range)
   const handleSelectSlot = useCallback(
     (slotInfo: SlotInfo) => {
       const day = dayjs(slotInfo.start).day(); // 0 = Sunday, 6 = Saturday
 
       // Only non-admin users are restricted from selecting weekends
       if ((day === 0 || day === 6) && userRole !== "admin") {
-        showToast.error("Weekends are not selectable.");
+        showToast.error(t("calendarHook.weekendsNotSelectable"));
         return;
       }
 
       setSelectedDays([slotInfo.start, slotInfo.end]);
-      setEditingEvent(null); // Add this line to reset editingEvent
+      setEditingEvent(null); // Reset editingEvent
       setOpenForm(true);
     },
-    [userRole]
+    [userRole, t]
   );
 
+  // Handle selecting an event
   const handleSelectEvent = useCallback(
     (event: CalendarEvent, e: React.SyntheticEvent<Element, Event>) => {
       setAnchorEl(e.currentTarget as HTMLElement);
@@ -144,7 +182,7 @@ export const useCalendar = () => {
 
   const handleFormSubmit = async (data: CreateEventPayload) => {
     if (!user?._id) {
-      showToast.error("User is not authenticated.");
+      showToast.error(t("calendarHook.userNotAuthenticated"));
       return;
     }
     try {
@@ -161,7 +199,7 @@ export const useCalendar = () => {
         };
 
         await editEventMutation(payload).unwrap();
-        showToast.success("Event updated successfully!");
+        showToast.success(t("calendarHook.eventUpdatedSuccess"));
         setEditingEvent(null);
       } else {
         // Create new event
@@ -186,15 +224,17 @@ export const useCalendar = () => {
         };
 
         await createEvent(payload).unwrap();
-        showToast.success("Event created successfully!");
+        showToast.success(t("calendarHook.eventCreatedSuccess"));
       }
       setOpenForm(false);
       setSelectedDays([]);
     } catch (error: unknown) {
       if (error instanceof Error && error?.message) {
-        showToast.error(`Failed to submit event: ${error.message}`);
+        showToast.error(
+          t("calendarHook.eventSubmitFailedWithError", { error: error.message })
+        );
       } else {
-        showToast.error("Failed to submit event.");
+        showToast.error(t("calendarHook.eventSubmitFailed"));
       }
     }
   };
@@ -203,12 +243,12 @@ export const useCalendar = () => {
   const handleDeleteEvent = useCallback(
     async (event: CalendarEvent) => {
       if (!event._id) {
-        showToast.error("Event ID is missing.");
+        showToast.error(t("calendarHook.eventIdMissing"));
         return;
       }
       try {
         await deleteEventMutation(event._id).unwrap();
-        showToast.success("Event deleted successfully!");
+        showToast.success(t("calendarHook.eventDeletedSuccess"));
 
         // Update local state to remove the deleted event
         setAllServerEvents((prevEvents) =>
@@ -216,43 +256,64 @@ export const useCalendar = () => {
         );
       } catch (error: unknown) {
         if (error instanceof Error && error?.message) {
-          showToast.error(`Failed to delete event: ${error.message}`);
+          showToast.error(
+            t("calendarHook.eventDeleteFailedWithError", {
+              error: error.message,
+            })
+          );
         } else {
-          showToast.error("Failed to delete event.");
+          showToast.error(t("calendarHook.eventDeleteFailed"));
         }
       }
     },
-    [deleteEventMutation]
+    [deleteEventMutation, t]
   );
 
   // Handle editing an event
-  const handleEditEvent = useCallback((event: CalendarEvent) => {
-    handlePopoverClose();
-    setEditingEvent(event);
-    setSelectedDays([new Date(event.startDate), new Date(event.endDate)]);
-    setOpenForm(true);
-    handlePopoverClose();
-  }, []);
+  const handleEditEvent = useCallback(
+    (event: CalendarEvent) => {
+      handlePopoverClose();
+      setEditingEvent(event);
+      setSelectedDays([new Date(event.startDate), new Date(event.endDate)]);
+      setOpenForm(true);
+      showToast.info(t("calendarHook.editingEvent", { reason: event.reason }));
+    },
+    [t]
+  );
 
   const handleFormCancel = () => {
     setOpenForm(false);
     setSelectedDays([]);
-    // Optional: Clear the editing event (if any)
     setEditingEvent(null); // Clear any currently editing event to reset the form
+    showToast.info(t("calendarHook.formCanceled"));
   };
 
   const toggleViewMode = () => {
-    setViewMode((prev) => (prev === "calendar" ? "history" : "calendar"));
+    setViewMode((prev) => {
+      const newMode = prev === "calendar" ? "history" : "calendar";
+      showToast.info(
+        t("calendarHook.switchedToView", {
+          view: t(`calendarHook.viewModes.${newMode}`),
+        })
+      );
+      return newMode;
+    });
   };
 
   const scrollToTime = useMemo(() => new Date(1970, 1, 1, 6), []);
+
+  // Combine serverEvents and visitEvents
+  const combinedEvents: CalendarEvent[] = useMemo(() => {
+    // Combine and eliminate duplicates if necessary
+    return [...allServerEvents, ...visitEvents];
+  }, [allServerEvents, visitEvents]);
 
   return {
     creatingError,
     selectedDays,
     viewMode,
     openForm,
-    serverEvents: allServerEvents,
+    serverEvents: combinedEvents,
     isServerLoading,
     serverError,
     handleSelectSlot,

@@ -13,8 +13,8 @@ import dayjs from "dayjs";
 import React, { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { selectVisits } from "../../features/data/dataSelectors";
 import { selectVisit } from "../../features/data/dataSlice";
+import { selectVisits } from "../../features/promoVisits/promoVisitsSelectors";
 import { showToast } from "../../utils/toastMessage";
 
 // Styled Components

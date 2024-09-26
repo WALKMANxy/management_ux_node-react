@@ -1,8 +1,8 @@
 // src/utils/activityUtils.ts
 
+import { VisitWithAgent } from "../features/promoVisits/promoVisitsSelectors";
 import { Client } from "../models/entityModels";
 import { calculateRevenue, currencyFormatter } from "./dataUtils";
-import { VisitWithAgent } from "../features/data/dataSelectors";
 
 // Define the structure of an activity item
 export interface ActivityItem {
@@ -20,7 +20,6 @@ export const generateActivityList = (
   visits: VisitWithAgent[] // Use visits from the selectVisits selector
 ): ActivityItem[] => {
   const activities: ActivityItem[] = [];
-
 
   // Process completed visits for the agent, limit to the first 5
   /* console.log("Generating activity list for agent", agentId);
@@ -67,10 +66,12 @@ export const generateActivityList = (
       type: "sales",
       title: "Sale",
       time: new Date(movement.dateOfOrder).toISOString(),
-      details: `Client: ${movement.client.id}, ${movement.client.name} - Revenue: ${currencyFormatter(
-        revenue
-      )}`,
-      subDetails: `Order Date: ${new Date(movement.dateOfOrder).toLocaleDateString()}`,
+      details: `Client: ${movement.client.id}, ${
+        movement.client.name
+      } - Revenue: ${currencyFormatter(revenue)}`,
+      subDetails: `Order Date: ${new Date(
+        movement.dateOfOrder
+      ).toLocaleDateString()}`,
     });
   });
 

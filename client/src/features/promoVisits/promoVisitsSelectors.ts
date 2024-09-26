@@ -16,14 +16,16 @@ export const selectVisits = createSelector(
   (currentUserVisits, agents, currentUserDetails): VisitWithAgent[] => {
     if (!currentUserVisits || !currentUserDetails) return [];
 
-    const findAgentForClient = (clientId: string): Agent | undefined => {
-      return Object.values(agents).find((agent) =>
-        agent.clients.some((client) => client.id === clientId)
-      );
-    };
+    // Precompute a mapping from clientId to agent
+    const clientToAgentMap: Record<string, Agent> = {};
+    Object.values(agents).forEach((agent) => {
+      agent.clients.forEach((client) => {
+        clientToAgentMap[client.id] = agent;
+      });
+    });
 
     const processVisit = (visit: Visit): VisitWithAgent => {
-      const agent = findAgentForClient(visit.clientId);
+      const agent = clientToAgentMap[visit.clientId];
       return {
         ...visit,
         agentId: agent?.id || "unknown",
@@ -51,10 +53,7 @@ export const selectVisitById = (visitId: string) =>
   );
 
 export const selectPromos = createSelector(
-  [
-    (state: RootState) => state.data.currentUserPromos,
-    (state: RootState) => state.data.agents,
-  ],
+  [(state: RootState) => state.data.currentUserPromos],
   (currentUserPromos): Promo[] => {
     if (!currentUserPromos) return [];
 
@@ -62,7 +61,7 @@ export const selectPromos = createSelector(
       // Client or Agent case
       return currentUserPromos;
     } else {
-      return []; // Fallback if for some reason the structure is incorrect
+      return []; // Fallback
     }
   }
 );
