@@ -75,7 +75,7 @@ export const EventForm: React.FC<EventFormProps> = ({
     defaultValues: {
       eventType:
         initialData?.eventType || (userRole === "admin" ? "" : "absence"),
-      reason: "",
+      reason: initialData?.reason || "",
       note: initialData?.note || "",
       startDate: initialData?.startDate || selectedDays[0],
       endDate:
@@ -118,7 +118,7 @@ export const EventForm: React.FC<EventFormProps> = ({
       });
 
       // Explicitly set the eventType to ensure it's updated
-      setValue("eventType", eventTypeValue);
+      setValue("eventType", eventTypeValue as CreateEventPayload["eventType"]);
     }
   }, [open, reset, userRole, selectedDays, onCancel, t, initialData, setValue]);
 

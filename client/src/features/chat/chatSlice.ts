@@ -126,7 +126,7 @@ const chatSlice = createSlice({
     ) => {
       const { chat, fromServer } = action.payload;
 
-      const existingChat = state.chats[chat.local_id];
+      const existingChat = state.chats[chat._id || chat.local_id];
 
       if (existingChat && fromServer) {
         // Update with server-confirmed data

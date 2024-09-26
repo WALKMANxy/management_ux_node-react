@@ -323,7 +323,7 @@
       "reason": "Reason",
       "note": "Note",
       "unknown": "Unknown",
-      "visit":"Visit"
+      "visit": "Visit"
     },
     "tooltips": {
       "edit": "Edit Event",
@@ -973,5 +973,39 @@
       "history": "history"
     },
     "userNotAuthenticated": "User is not authenticated."
+  },
+
+  "createChatForm": {
+    "title": "Create New Chat",
+    "tooltips": {
+      "groupChat": "Create Group Chat",
+      "broadcastChat": "Create Broadcast Chat",
+      "cancel": "Cancel",
+      "create": "Create Chat"
+    },
+    "labels": {
+      "groupName": "Group Name",
+      "broadcastName": "Broadcast Name",
+      "selectParticipants": "Select Participants",
+      "cancel": "Cancel",
+      "create": "Create Chat"
+    },
+    "errors": {
+      "noParticipants": "Please select at least one participant.",
+      "chatNameRequired": "Chat name is required.",
+      "createChatFailed": "Failed to create chat. Please try again."
+    },
+    "success": {
+      "createChat": "Chat created successfully!"
+    },
+    "userList": {
+      "table": "User Selection Table",
+      "unknownUser": "Unknown User",
+      "unknownEmail": "Unknown Email",
+      "headers": {
+        "name": "Name",
+        "email": "Email"
+      }
+    }
   }
 }
