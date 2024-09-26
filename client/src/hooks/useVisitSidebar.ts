@@ -1,9 +1,9 @@
 // useVisitSidebar.ts
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { selectVisits } from "../features/data/dataSelectors";
 import { selectAgent, selectClient } from "../features/data/dataSlice";
 import { getVisits } from "../features/data/dataThunks";
+import { selectVisits } from "../features/promoVisits/promoVisitsSelectors";
 import { Agent, Client } from "../models/entityModels";
 
 export const useVisitSidebar = () => {
@@ -83,7 +83,7 @@ export const useVisitSidebar = () => {
       if (selectedAgentId) {
         const agent = agents[selectedAgentId];
         list = agent.clients.filter(
-          (client) =>
+          (client: Client) =>
             client.name.toLowerCase().includes(term) ||
             client.id.toLowerCase().includes(term) ||
             (client.province && client.province.toLowerCase().includes(term))

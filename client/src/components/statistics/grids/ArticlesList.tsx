@@ -53,7 +53,7 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
   }, [exportDataAsCsv, handleMenuClose]);
 
   const memoizedFilteredArticles = useMemo(
-    () => filteredArticles(),
+    () => filteredArticles,
     [filteredArticles]
   );
 

@@ -1,7 +1,6 @@
 import { Visit } from "../../../models/dataModels";
 import { apiCall } from "../../../utils/apiUtils";
 
-
 export const createVisit = async (visitData: {
   clientId: string;
   type: string;

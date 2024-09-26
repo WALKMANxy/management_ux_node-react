@@ -14,7 +14,7 @@ import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
-import { selectVisits } from "../../features/data/dataSelectors";
+import { selectVisits } from "../../features/promoVisits/promoVisitsSelectors";
 import { UpcomingVisitsProps } from "../../models/propsModels";
 import { VisitItem } from "./VisitItem";
 

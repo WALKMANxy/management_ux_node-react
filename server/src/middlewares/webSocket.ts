@@ -1,5 +1,4 @@
 import cookie from "cookie";
-import mongoose from "mongoose";
 import { Socket, Server as SocketIOServer } from "socket.io";
 import { IChat, IMessage } from "../models/Chat";
 import { User } from "../models/User";
@@ -162,14 +161,12 @@ export const setupWebSocket = (io: SocketIOServer) => {
           return;
         }
 
-        const userObjectId = new mongoose.Types.ObjectId(userId);
-
         try {
           // Use the service to update the read status of the specified messages
           const updatedChat = await ChatService.updateReadStatus(
             chatId,
             messageIds,
-            userObjectId
+            socket.userId
           );
 
           if (!updatedChat) {

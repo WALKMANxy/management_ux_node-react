@@ -26,7 +26,6 @@ const initialState: UserState = {
 export const fetchUsersByIds = createAsyncThunk(
   "users/fetchUsersByIds",
   async (ids: string[], { rejectWithValue }) => {
-
     try {
       const result = await getUsersByBatchIds(ids);
       return result;
@@ -232,8 +231,8 @@ export const selectAllUsers = createSelector(
   (users) => Object.values(users)
 );
 
-export const selectUsersLoading = (state: RootState) => state.users.status === "loading";
-
+export const selectUsersLoading = (state: RootState) =>
+  state.users.status === "loading";
 
 // Replace with a simple selector
 export const selectUsersStatus = (state: RootState) => state.users.status;

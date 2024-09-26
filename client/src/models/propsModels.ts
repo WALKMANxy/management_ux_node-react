@@ -240,7 +240,8 @@ export type UpcomingVisitsProps = {
 export type AGGridTableProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columnDefs: any[];
-  rowData: unknown[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  rowData: any;
   paginationPageSize: number;
   quickFilterText: string; // Added quickFilterText prop
 };
