@@ -222,7 +222,7 @@ const ChatSidebar: React.FC = () => {
           // For Firefox
           scrollbarWidth: "none",
           // For IE and Edge
-          "-msOverflowStyle": "none",
+          "MsOverflowStyle": "none",
         }}
       >
         <Box

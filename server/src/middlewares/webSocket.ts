@@ -14,8 +14,6 @@ interface AuthenticatedSocket extends Socket {
   authType?: "email" | "google";
 }
 
-const connectedClients = new Map<string, Set<AuthenticatedSocket>>();
-
 export const setupWebSocket = (io: SocketIOServer) => {
   io.use(async (socket: AuthenticatedSocket, next) => {
     const cookies = parseCookie(socket.handshake.headers.cookie || "");
@@ -49,17 +47,25 @@ export const setupWebSocket = (io: SocketIOServer) => {
     }
   });
 
-  io.on("connection", (socket: AuthenticatedSocket) => {
+  io.on("connection", async (socket: AuthenticatedSocket) => {
     logger.info("Client connected", {
       userId: socket.userId,
       socketId: socket.id,
     });
 
     if (socket.userId) {
-      if (!connectedClients.has(socket.userId)) {
-        connectedClients.set(socket.userId, new Set());
+      // Join the user-specific room
+      const userRoomId = `user:${socket.userId}`;
+      socket.join(userRoomId);
+      logger.debug(`Socket ${socket.id} joined user room ${userRoomId}`);
+
+      // Join all existing chat rooms the user is part of
+      await joinUserToChats(io, socket);
+      // If the user is an admin, join the 'admins' room
+      if (socket.userRole === "admin") {
+        socket.join("admins");
+        logger.debug(`Socket ${socket.id} joined admins room`);
       }
-      connectedClients.get(socket.userId)!.add(socket);
     }
 
     socket.on("disconnect", () => {
@@ -67,21 +73,10 @@ export const setupWebSocket = (io: SocketIOServer) => {
         userId: socket.userId,
         socketId: socket.id,
       });
-      if (socket.userId) {
-        const sockets = connectedClients.get(socket.userId);
-        if (sockets) {
-          sockets.delete(socket);
-          if (sockets.size === 0) {
-            connectedClients.delete(socket.userId);
-            logger.info("All sockets disconnected for user", {
-              userId: socket.userId,
-            });
-          }
-        }
-      }
+      // Socket.IO automatically handles leaving all rooms upon disconnection
     });
 
-    // Handle incoming message with client-generated local_id and server-generated _id
+    // Handle incoming message
     socket.on(
       "chat:message",
       async ({
@@ -92,7 +87,6 @@ export const setupWebSocket = (io: SocketIOServer) => {
         message: Partial<IMessage>;
       }) => {
         try {
-          // Add the message using the service, which handles validation and updates
           const updatedChat = await ChatService.addMessage(chatId, message);
 
           if (!updatedChat) {
@@ -102,47 +96,56 @@ export const setupWebSocket = (io: SocketIOServer) => {
             return;
           }
 
-          // Emit the new message to all connected participants
-          updatedChat.participants.forEach((participantId) => {
-            const sockets = connectedClients.get(participantId.toString());
-            if (sockets) {
-              sockets.forEach((clientSocket) => {
-                clientSocket.emit("chat:newMessage", {
-                  chatId,
-                  message:
-                    updatedChat.messages[updatedChat.messages.length - 1], // Send the latest message
-                });
-              });
-            }
+          const roomId = `chat:${chatId}`;
+          io.to(roomId).emit("chat:newMessage", {
+            chatId,
+            message: updatedChat.messages[updatedChat.messages.length - 1],
           });
         } catch (error) {
           logger.error("Error handling new message", { error });
         }
       }
     );
-    // Handle new chat creation with local_id from client and _id from server
+
+    // Handle chat creation
     socket.on("chat:create", async ({ chat }: { chat: Partial<IChat> }) => {
       try {
-        // Use the createChat service method to handle chat creation
         const createdChat = await ChatService.createChat(chat);
 
-        // Emit the chat (either existing or newly created) to all participants
+        // Automatically join all participants to the correct chat room
         createdChat.participants.forEach((participantId) => {
-          const sockets = connectedClients.get(participantId.toString());
-          if (sockets) {
-            sockets.forEach((clientSocket) => {
-              clientSocket.emit("chat:newChat", {
-                chat: createdChat, // Send the chat object with the correct server-assigned _id
-              });
+          const roomId = `chat:${createdChat._id}`;
+          const participantSocket = io.sockets.sockets.get(
+            participantId.toString()
+          );
+          if (participantSocket) {
+            participantSocket.join(roomId);
+            logger.info("User automatically joined chat room", {
+              userId: participantId.toString(),
+              chatId: createdChat._id,
+              roomId,
             });
           }
+        });
+
+        // Emit 'chat:newChat' to inform the clients about the new chat
+        createdChat.participants.forEach((participantId) => {
+          const participantRoomId = `user:${participantId.toString()}`;
+          io.to(participantRoomId).emit("chat:newChat", {
+            chat: createdChat,
+          });
+        });
+
+        logger.info("New chat created and users joined successfully.", {
+          chatId: createdChat._id,
+          participants: createdChat.participants,
         });
       } catch (error) {
         logger.error("Error handling new chat creation", { error });
       }
     });
 
-    // Update read status for multiple messages within a chat
+    // Handle read status updates
     socket.on(
       "chat:read",
       async ({
@@ -150,10 +153,8 @@ export const setupWebSocket = (io: SocketIOServer) => {
         messageIds,
       }: {
         chatId: string;
-        userId: string;
         messageIds: string[];
       }) => {
-        // Ensure userId exists and convert it to ObjectId
         if (!socket.userId) {
           logger.warn("User ID is missing in the chat:read event", {
             socketId: socket.id,
@@ -162,7 +163,6 @@ export const setupWebSocket = (io: SocketIOServer) => {
         }
 
         try {
-          // Use the service to update the read status of the specified messages
           const updatedChat = await ChatService.updateReadStatus(
             chatId,
             messageIds,
@@ -174,18 +174,11 @@ export const setupWebSocket = (io: SocketIOServer) => {
             return;
           }
 
-          // Emit the read status update to all participants
-          updatedChat.participants.forEach((participantId) => {
-            const sockets = connectedClients.get(participantId.toString());
-            if (sockets) {
-              sockets.forEach((clientSocket) => {
-                clientSocket.emit("chat:messageRead", {
-                  chatId,
-                  userId: socket.userId,
-                  messageIds, // Send back the read message IDs
-                });
-              });
-            }
+          const roomId = `chat:${chatId}`;
+          io.to(roomId).emit("chat:messageRead", {
+            chatId,
+            userId: socket.userId,
+            messageIds,
           });
         } catch (error) {
           logger.error("Error updating read status", { error });
@@ -193,6 +186,7 @@ export const setupWebSocket = (io: SocketIOServer) => {
       }
     );
 
+    // Handle automated messages
     socket.on(
       "chat:automatedMessage",
       async ({
@@ -203,13 +197,13 @@ export const setupWebSocket = (io: SocketIOServer) => {
         message: Partial<IMessage>;
       }) => {
         try {
-          const botId = config.botId; // Ensure botId is available in your config
+          const botId = config.botId;
 
-          // Send automated message to users and get corresponding chatIds
           const chatIds = await ChatService.sendAutomatedMessageToUsers(
             targetIds,
             message,
-            botId
+            botId,
+            io // Pass io instance
           );
 
           if (chatIds.length === 0) {
@@ -217,44 +211,15 @@ export const setupWebSocket = (io: SocketIOServer) => {
             return;
           }
 
-          // Fetch all chats in bulk
           const chats = await ChatService.getChatsByIdsArray(chatIds, botId);
 
-          if (chats.length === 0) {
-            logger.warn(
-              "No chats retrieved after sendAutomatedMessageToUsers."
-            );
-            return;
-          }
-
-          // Prepare a map of participantId to their messages
-          const participantToMessagesMap: Map<string, IMessage[]> = new Map();
-
           chats.forEach((chat) => {
+            const roomId = `chat:${chat._id}`;
             const latestMessage = chat.messages[chat.messages.length - 1];
             if (latestMessage) {
-              chat.participants.forEach((participantId) => {
-                const participantIdStr = participantId.toString();
-                if (participantIdStr === botId) return; // Exclude the bot
-
-                if (!participantToMessagesMap.has(participantIdStr)) {
-                  participantToMessagesMap.set(participantIdStr, []);
-                }
-                participantToMessagesMap
-                  .get(participantIdStr)!
-                  .push(latestMessage);
-              });
-            }
-          });
-
-          // Emit messages per participant
-          participantToMessagesMap.forEach((messages, participantId) => {
-            const sockets = connectedClients.get(participantId);
-            if (sockets) {
-              sockets.forEach((clientSocket) => {
-                clientSocket.emit("chat:newMessage", {
-                  messages,
-                });
+              io.to(roomId).emit("chat:newMessage", {
+                chatId: chat._id,
+                message: latestMessage,
               });
             }
           });
@@ -262,7 +227,7 @@ export const setupWebSocket = (io: SocketIOServer) => {
           logger.info("Automated messages emitted successfully.", {
             chatIds,
             targetIds,
-            totalParticipants: participantToMessagesMap.size,
+            totalChats: chats.length,
           });
         } catch (error) {
           logger.error("Error handling automated message", { error });
@@ -270,41 +235,45 @@ export const setupWebSocket = (io: SocketIOServer) => {
       }
     );
 
+
+
+    // Handle logout
     socket.on("logout", () => {
       logger.info("Client logout requested", {
         userId: socket.userId,
         socketId: socket.id,
       });
-
       socket.disconnect(true);
     });
   });
 
+
+
   io.on("connect_error", (error) => {
     logger.error("WebSocket connection error", { error });
   });
-
-  return { connectedClients };
 };
 
-// Function to emit events only to admins
-export function emitToAdmins(event: string, data: any) {
-  connectedClients.forEach((sockets) => {
-    sockets.forEach((clientSocket) => {
-      if (clientSocket.userRole === "admin") {
-        clientSocket.emit(event, data);
-      }
-    });
-  });
-}
 
-// Function to emit events only to a specific user
-export function emitToUser(userId: string, event: string, data: any) {
-  const sockets = connectedClients.get(userId);
-  if (sockets) {
-    sockets.forEach((clientSocket) => {
-      clientSocket.emit(event, data);
-    });
+
+// Function to join all chat rooms the user is part of upon connection
+async function joinUserToChats(
+  io: SocketIOServer,
+  socket: AuthenticatedSocket
+) {
+  if (socket.userId) {
+    const chatIds = await ChatService.getAllChatIds(socket.userId);
+    await Promise.all(
+      chatIds.map(async (chatId) => {
+        const roomId = `chat:${chatId}`;
+        await socket.join(roomId);
+        logger.info("User joined chat room", {
+          userId: socket.userId,
+          chatId,
+          roomId,
+        });
+      })
+    );
   }
 }
 

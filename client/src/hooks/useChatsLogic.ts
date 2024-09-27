@@ -79,7 +79,7 @@ const useChatLogic = () => {
       const retryDelay = Math.min(32000, 1000 * 2 ** chatRetryCount); // Exponential backoff
 
       const retryTimeout = setTimeout(() => {
-        console.log(`Retry attempt #${chatRetryCount}`);
+        // console.log(`Retry attempt #${chatRetryCount}`);
         fetchChats();
       }, retryDelay);
 
@@ -88,7 +88,6 @@ const useChatLogic = () => {
       };
     }
   }, [chatRetryCount, fetchChats]);
-
   // Select a chat
   const selectChat = useCallback(
     (chat: IChat) => {
@@ -100,9 +99,9 @@ const useChatLogic = () => {
         return;
       }
 
-      console.log(`Selected chat ID: ${chatId}`); // Debug: Log chat ID
+    /*   console.log(`Selected chat ID: ${chatId}`); // Debug: Log chat ID
       console.log(`Chat name: ${chat.name}`); // Debug: Log chat name
-      console.log(`Chat with ${chat.participants.length} members`); // Debug: Log the number of members
+      console.log(`Chat with ${chat.participants.length} members`); // Debug: Log the number of members */
 
       // Set the current chat in the state
       dispatch(setCurrentChatReducer(chat));
@@ -116,9 +115,9 @@ const useChatLogic = () => {
         )
         .map((message) => message.local_id ? message.local_id.toString() : message._id.toString());
 
-      console.log(
+    /*   console.log(
         `Found ${unreadMessageIds.length} unread messages by ${currentUserId} in chat ${chatId}`
-      ); // Debug: Log the number of unread messages
+      ); */ // Debug: Log the number of unread messages
 
       // Update read status for unread messages
       if (unreadMessageIds.length > 0) {
@@ -138,8 +137,8 @@ const useChatLogic = () => {
   // Debounced fetch handler to avoid multiple requests
   const handleLoadMoreMessages = debounce(() => {
     if (currentChat?._id) {
-      console.log(`Fetching more messages for chat: ${currentChat._id}`); // Debug: Log chat ID
-      console.log(`Current page: ${page}, limit: 20`); // Debug: Log the current page and limit
+     /*  console.log(`Fetching more messages for chat: ${currentChat._id}`); // Debug: Log chat ID
+      console.log(`Current page: ${page}, limit: 20`); // Debug: Log the current page and limit */
 
       // Dispatch the fetchMessagesThunk to load more messages, incrementing the page
       dispatch(
@@ -151,18 +150,18 @@ const useChatLogic = () => {
       )
         .unwrap()
         .then(() => {
-          console.log(`Fetched messages successfully for page: ${page}`); // Debug: Log success for current page
-          setPage((prevPage) => {
-            console.log(`Incrementing page to: ${prevPage + 1}`); // Debug: Log next page number
-            return prevPage + 1; // Increment page on successful fetch
+/*           console.log(`Fetched messages successfully for page: ${page}`); // Debug: Log success for current page
+ */          setPage((prevPage) => {
+/*             console.log(`Incrementing page to: ${prevPage + 1}`); // Debug: Log next page number
+ */            return prevPage + 1; // Increment page on successful fetch
           });
         })
         .catch((error: SerializedError) => {
           console.error("Error loading more messages:", error); // Debug: Log any errors during fetch
         });
     } else {
-      console.log("No current chat selected, skipping message fetch."); // Debug: Log when no chat is selected
-    }
+/*       console.log("No current chat selected, skipping message fetch."); // Debug: Log when no chat is selected
+ */    }
   }, 50);
 
   // Fetch contacts when needed
@@ -234,13 +233,13 @@ const useChatLogic = () => {
     ) => {
       if (!participants.length) return;
 
-      console.log("Create chat:", {
+     /*  console.log("Create chat:", {
         participants,
         chatType,
         name,
         description,
         admins, // Log admins if provided
-      });
+      }); */
 
       const localId = generateId();
 
@@ -257,8 +256,8 @@ const useChatLogic = () => {
         ...(admins && { admins }), // Conditionally add admins if provided
       };
 
-      console.log("Dispatching to addChatReducer:", chatData);
-
+/*       console.log("Dispatching to addChatReducer:", chatData);
+ */
       try {
         dispatch(addChatReducer({ chat: chatData }));
       } catch (error) {
