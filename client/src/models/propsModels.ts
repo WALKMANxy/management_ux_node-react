@@ -261,7 +261,7 @@ export type ClientDetailsProps = {
 export type ArticlesListProps = {
   quickFilterText: string;
   setQuickFilterText: (value: string) => void;
-  filteredArticles: () => MovementDetail[];
+  filteredArticles: MovementDetail[];
   columnDefs: ColDef[];
   gridRef: React.RefObject<AgGridReact>;
   handleMenuOpen: (event: React.MouseEvent<HTMLButtonElement>) => void;

@@ -92,8 +92,8 @@ export class CalendarEventController {
           `Fetched ${events.length} events for the admin in ${month}/${year}`
         );
       } else {
-        logger.info(`No events found for the admin in ${month}/${year}`);
-      }
+/*         logger.info(`No events found for the admin in ${month}/${year}`);
+ */      }
 
       // Log the fetched events (limit the log size to avoid excessive output)
       logger.debug(

@@ -14,7 +14,6 @@ interface DrawerContainerProps {
 const DrawerContainer: React.FC<DrawerContainerProps> = ({
   open,
   onClose,
-  isLoading,
   fabPosition = { top: 0, left: 0 },
 }) => {
   return (
@@ -55,7 +54,7 @@ const DrawerContainer: React.FC<DrawerContainerProps> = ({
         }}
       >
         <CalendarComponent />
-        <UpcomingVisits isLoading={isLoading} />
+        <UpcomingVisits />
       </Box>
     </Drawer>
   );
