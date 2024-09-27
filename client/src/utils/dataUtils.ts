@@ -364,6 +364,30 @@ export const currencyFormatter = (value: number | string): string => {
   return `€${numberValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,")}`;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const customCurrencyFormatter = (params: any): string => {
+  const value = params.value;
+
+  console.log("Custom Formatter - Processing value:", value);
+
+  if (value === null || value === undefined || value === "") {
+    return "€0.00"; // Handle empty or null values
+  }
+
+  // If value is a string, try to parse it to a float
+  const parsedValue = typeof value === "string" ? parseFloat(value) : value;
+
+  // If parsing fails (resulting in NaN), return the original value as a string
+  if (isNaN(parsedValue)) {
+    console.warn("Custom Formatter - Invalid number format for value:", value);
+    return value.toString();
+  }
+
+  // Format the number as currency
+  return `€${parsedValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,")}`;
+};
+
+
 export const numberComparator = (valueA: number, valueB: number) => {
   return valueA - valueB;
 };

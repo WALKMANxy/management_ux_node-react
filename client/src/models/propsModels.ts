@@ -202,7 +202,7 @@ export type MovementListProps = {
   setStartDate: (value: string) => void;
   endDate: string;
   setEndDate: (value: string) => void;
-  filteredMovements: () => Movement[];
+  filteredMovements: Movement[];
   columnDefs: ColDef[];
   gridRef: React.RefObject<AgGridReact>;
   handleMenuOpen: (event: React.MouseEvent<HTMLButtonElement>) => void;

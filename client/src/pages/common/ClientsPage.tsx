@@ -171,7 +171,7 @@ const ClientsPage: React.FC = () => {
   }, [handleClientSelect, t, userRole]);
 
   // Find the logged-in client details from clients array
-  const loggedInClientDetails = filteredClients().find(
+  const loggedInClientDetails = filteredClients.find(
     (client) => client.id === loggedInClientId
   );
 
@@ -196,7 +196,7 @@ const ClientsPage: React.FC = () => {
             setStartDate={setStartDate}
             endDate={endDate}
             setEndDate={setEndDate}
-            filteredClients={filteredClients()}
+            filteredClients={filteredClients}
             columnDefs={columnDefinitions}
             gridRef={gridRef}
             handleMenuOpen={handleMenuOpen}

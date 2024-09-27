@@ -58,11 +58,7 @@ const ClientList: React.FC<ClientListProps> = ({
     handleMenuClose();
   }, [exportDataAsCsv, handleMenuClose]);
 
-  // Memoize the filteredClients value to prevent re-renders
-  const memoizedFilteredClients = useMemo(
-    () => filteredClients,
-    [filteredClients]
-  );
+
 
   // Memoize column definitions
   const memoizedColumnDefs = useMemo(() => columnDefs, [columnDefs]);
@@ -180,7 +176,7 @@ const ClientList: React.FC<ClientListProps> = ({
           <AGGridTable
             ref={gridRef}
             columnDefs={memoizedColumnDefs}
-            rowData={memoizedFilteredClients}
+            rowData={filteredClients}
             paginationPageSize={100} // Adjusted to a more manageable number
             quickFilterText={quickFilterText}
           />

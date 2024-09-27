@@ -129,13 +129,13 @@ const ChatView: React.FC = () => {
             src={
               currentChat?.type === "simple"
                 ? participantsData[0]?.avatar ?? ""
-                : getAdminAvatar() ?? ""
+                : getAdminAvatar ?? ""
             }
-            alt={getChatTitle()}
+            alt={getChatTitle}
             sx={{ width: 40, height: 40 }}
           />
           <Typography variant="h6" sx={{ ml: 2 }}>
-            {getChatTitle()}
+            {getChatTitle}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -157,7 +157,7 @@ const ChatView: React.FC = () => {
           open={isMenuOpen}
           onClose={handleMenuClose}
         >
-          {getChatOptions().map((option) => (
+          {getChatOptions.map((option) => (
             <MenuItem key={option} onClick={handleMenuClose}>
               {t(`chatView.menuOptions.${option}`)}
             </MenuItem>

@@ -1,11 +1,14 @@
 // src/components/movementsPage/MovementDetailsHistory.tsx
 import { Box } from "@mui/material";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../app/store";
 import { MovementDetailsHistoryProps } from "../../../models/propsModels";
-import { currencyFormatter, numberComparator } from "../../../utils/dataUtils";
+import {
+  customCurrencyFormatter,
+  numberComparator,
+} from "../../../utils/dataUtils";
 import AGGridTable from "./AGGridTable";
 
 const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
@@ -14,9 +17,12 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
   const { t } = useTranslation();
   const userRole = useSelector((state: RootState) => state.auth.role);
 
+  // Log the movementDetails to inspect the data structure
+  useEffect(() => {
+    console.log("Movement Details:", movementDetails);
+  }, [movementDetails]);
+
   // Define a stable formatter function to prevent unnecessary re-creations
-  const formatCurrency = (value: string) =>
-    currencyFormatter(parseFloat(value));
 
   const columnDefinitions = useMemo(() => {
     const baseColumns = [
@@ -47,7 +53,7 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
       {
         headerName: t("movementDetailsHistory.priceSold"),
         field: "priceSold",
-        valueFormatter: formatCurrency,
+        valueFormatter: customCurrencyFormatter,
         comparator: numberComparator,
         sortable: true,
       },
@@ -58,14 +64,14 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
         {
           headerName: t("movementDetailsHistory.unitPrice"),
           field: "unitPrice",
-          valueFormatter: formatCurrency,
+          valueFormatter: customCurrencyFormatter,
           comparator: numberComparator,
           sortable: true,
         },
         {
           headerName: t("movementDetailsHistory.priceBought"),
           field: "priceBought",
-          valueFormatter: formatCurrency,
+          valueFormatter: customCurrencyFormatter,
           comparator: numberComparator,
           sortable: true,
         }
