@@ -24,6 +24,7 @@ const useLoadingData = () => {
 
   const toastId = "loadingDataToast";
 
+
   // Get data from the dataSlice
   const {
     clients,
@@ -59,6 +60,8 @@ const useLoadingData = () => {
       ]);
       setLocalError(null);
       setRetryCount(0);
+
+      showToast.success(t("useStatsToasts.successData"));
 
       updateUserEntityNameIfMissing(dispatch, currentUser, currentUserDetails);
     } catch (err: unknown) {
@@ -121,8 +124,10 @@ const useLoadingData = () => {
   const loadingState = loading || fakeLoading;
 
   useEffect(() => {
-    console.log("useLoadingData hook used to fetch data");
-  }, []);
+    if (localError) {
+      setFakeLoading(false);
+    }
+  }, [localError]);
 
   return {
     loading,

@@ -213,7 +213,9 @@ class WebSocketService {
 
     // Access the current state to check if the chat exists
     const state = store.getState();
-    const existingLocalChat = state.chats.chats[chat._id || chat.local_id];
+    const existingLocalChat =
+      (chat._id && state.chats.chats[chat._id]) ||
+      (chat.local_id && state.chats.chats[chat.local_id]);
 
     if (existingLocalChat) {
       // Update the chat with server-confirmed data
