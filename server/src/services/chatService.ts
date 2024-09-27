@@ -3,6 +3,85 @@
 import mongoose, { Types } from "mongoose";
 import { Chat, IChat, IMessage } from "../models/Chat";
 
+// Custom Error Classes (Optional but Recommended)
+class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ValidationError";
+  }
+}
+
+class DuplicateChatError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "DuplicateChatError";
+  }
+}
+
+// Utility function to check if a string is a valid ObjectId
+const isValidObjectId = (id: string) => mongoose.Types.ObjectId.isValid(id);
+
+// Refactored findExistingChat function
+async function findExistingChat(
+  chatData: Partial<IChat>
+): Promise<IChat | null> {
+  if (chatData.type === "simple" && chatData.participants) {
+    const sortedParticipants = chatData.participants
+      .map((p) => p.toString())
+      .sort();
+    return Chat.findOne({
+      type: "simple",
+      participants: {
+        $all: sortedParticipants,
+        $size: sortedParticipants.length,
+      },
+    });
+  }
+
+  if (["group", "broadcast"].includes(chatData.type!)) {
+    // Only query by _id if it's a valid ObjectId
+    if (chatData._id && isValidObjectId(chatData._id.toString())) {
+      const chatById = await Chat.findOne({
+        type: chatData.type,
+        _id: chatData._id,
+      });
+      if (chatById) return chatById;
+    }
+
+    // Query by local_id
+    if (chatData.local_id) {
+      const chatByLocalId = await Chat.findOne({
+        type: chatData.type,
+        local_id: chatData.local_id,
+      });
+      if (chatByLocalId) return chatByLocalId;
+    }
+
+    // Additional uniqueness checks based on name or admin
+    if (chatData.type === "group" && chatData.name) {
+      const chatByName = await Chat.findOne({
+        type: "group",
+        name: chatData.name,
+      });
+      if (chatByName) return chatByName;
+    }
+
+    if (
+      chatData.type === "broadcast" &&
+      chatData.admins &&
+      chatData.admins.length > 0
+    ) {
+      const chatByAdmin = await Chat.findOne({
+        type: "broadcast",
+        admins: { $in: chatData.admins },
+      });
+      if (chatByAdmin) return chatByAdmin;
+    }
+  }
+
+  return null;
+}
+
 export class ChatService {
   // Fetch all chats for a user with the latest message preview
   static async getAllChats(userId: string): Promise<IChat[]> {
@@ -223,101 +302,88 @@ export class ChatService {
 
   // Create a new chat (simple, group, or broadcast)
 
+  // Revised createChat Function
   static async createChat(chatData: Partial<IChat>): Promise<IChat> {
     try {
-      // Validate chat type and required fields
+      // **Validation Logic**
       if (!chatData.type) {
-        throw new Error("Chat type is required.");
+        throw new ValidationError("Chat type is required.");
       }
 
-      // Validation for group chats: must have a name and participants
       if (
         chatData.type === "group" &&
         (!chatData.name ||
           !chatData.participants ||
           chatData.participants.length === 0)
       ) {
-        throw new Error(
+        throw new ValidationError(
           "Group chats must have a name and at least one participant."
         );
       }
 
-      // Validation for broadcast chats: must have participants
       if (
         chatData.type === "broadcast" &&
         (!chatData.participants || chatData.participants.length === 0)
       ) {
-        throw new Error("Broadcast chats must have participants.");
+        throw new ValidationError("Broadcast chats must have participants.");
       }
 
-      // Ensure local_id is provided, especially when originating from the client
       if (!chatData.local_id) {
-        throw new Error("local_id is required for chat creation.");
+        throw new ValidationError("local_id is required for chat creation.");
       }
 
-      // Check for an existing simple chat with the same participants
-      if (chatData.type === "simple" && chatData.participants) {
-        // Sort participant IDs to ensure the uniqueness check is order-agnostic
-        const sortedParticipants = chatData.participants
-          .map((participant) => participant.toString())
+      // **Duplicate Chat Check**
+      let existingChat: IChat | null = await findExistingChat(chatData);
+
+      if (existingChat) {
+        // If a chat already exists, return it instead of creating a new one
+        return existingChat;
+      }
+
+      // **Exclude _id from chatData to Prevent Casting Errors**
+      const { _id, ...restChatData } = chatData;
+
+      // **Sort Participants for Consistency in Simple Chats**
+      if (restChatData.type === "simple" && restChatData.participants) {
+        restChatData.participants = restChatData.participants
+          .map((p) => p)
           .sort();
-
-        // Attempt to find an existing chat with the same participants
-        const existingChat = await Chat.findOne({
-          type: "simple",
-          participants: {
-            $all: sortedParticipants,
-            $size: sortedParticipants.length,
-          },
-        });
-
-        if (existingChat) {
-          // If a chat already exists, return it instead of creating a new one
-          return existingChat;
-        }
       }
 
-      // Create the new chat instance
+      // **Create the New Chat Instance with Server-Generated _id**
       const chat = new Chat({
-        ...chatData,
-        _id: new mongoose.Types.ObjectId(), // Ensure _id is a valid ObjectId generated by the server
-        messages: chatData.messages || [], // Initialize messages as an empty array if not provided
-        updatedAt: chatData.updatedAt || new Date(),
+        ...restChatData,
+        // Let Mongoose handle _id generation
+        messages: restChatData.messages || [],
         status: "created",
       });
-      // Save the chat to the database
+
+      // **Save the Chat to the Database**
       await chat.save();
 
-      // Return the newly created chat object
+      // **Return the Newly Created Chat Object**
       return chat;
     } catch (error: any) {
-      // Check for duplicate key error (E11000) thrown by MongoDB unique constraint
+      // **Handle Duplicate Key Errors**
       if (error.code === 11000) {
         console.error("Duplicate chat creation attempt detected:", error);
 
-        // Attempt to find and return the existing chat if a duplicate error is thrown
-        if (chatData.type === "simple" && chatData.participants) {
-          const sortedParticipants = chatData.participants
-            .map((participant) => participant.toString())
-            .sort();
+        let existingChat: IChat | null = await findExistingChat(chatData);
 
-          const existingChat = await Chat.findOne({
-            type: "simple",
-            participants: {
-              $all: sortedParticipants,
-              $size: sortedParticipants.length,
-            },
-          });
-
-          if (existingChat) {
-            return existingChat;
-          }
+        if (existingChat) {
+          return existingChat;
         }
+
+        throw new DuplicateChatError(
+          "A chat with the provided details already exists."
+        );
       }
 
-      // Log and rethrow the error if it is not a duplicate error
+      // **Log and Rethrow Other Errors**
       console.error("Error creating chat:", error);
-      throw new Error("Failed to create chat");
+      throw error instanceof ValidationError
+        ? error
+        : new Error("Failed to create chat");
     }
   }
 

@@ -8,7 +8,7 @@ import { RootState } from "../../app/store";
 import { selectCurrentChat } from "../../features/chat/chatSlice";
 import { IMessage } from "../../models/dataModels";
 import { User } from "../../models/entityModels";
-import "../../Styles/animatecss.css";
+import "../../Styles/styles.css";
 import MessageStatusIcon from "./MessageStatusIcon";
 
 interface MessageBubbleProps {
@@ -38,6 +38,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   // Find the sender's details from the participants data
   const sender = participantsData.find((user) => user._id === message.sender);
   const senderAvatar = sender?.avatar || "";
+  const senderName = sender?.entityName || "";
 
   const hasMountedRef = useRef(false);
 
@@ -88,6 +89,20 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
    */
   const fullTimestamp = new Date(message.timestamp).toLocaleString();
 
+  /**
+   * Determines whether to display the sender's name.
+   *
+   * @returns {boolean} True if the sender's name should be displayed; otherwise, false.
+   */
+  const shouldDisplaySenderName = () => {
+    // Display sender's name only in group and broadcast chats for messages not from the current user
+    return (
+      !isOwnMessage &&
+      (chatType === "group" || chatType === "broadcast") &&
+      senderName
+    );
+  };
+
   return (
     <Box
       className={animationClass}
@@ -96,7 +111,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
         flexDirection: isOwnMessage ? "row-reverse" : "row", // Control the message direction
         alignItems: "flex-end",
         justifyContent: isOwnMessage ? "flex-end" : "flex-start",
-        mb: 1,
         maxWidth: "75%", // Control bubble width without making it float away from its anchor
       }}
     >
@@ -109,50 +123,68 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
         />
       )}
 
-      {/* Message Bubble with Frosted Glass Effect */}
-      <Tooltip title={fullTimestamp} arrow>
-        <Box
-          sx={{
-            p: 1.5,
-            bgcolor: getBackgroundColor(),
-            borderRadius: "1em",
-            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
-            maxWidth: "100%", // Ensure the bubble doesn’t exceed the parent width
-            textAlign: "left", // Align text based on the message direction
-            backdropFilter: "blur(10px)", // Frosted glass effect
-          }}
-        >
+      {/* Container for Sender's Name and Message Bubble */}
+      <Box>
+        {/* Conditionally render the sender's name */}
+        {shouldDisplaySenderName() && (
           <Typography
-            variant="body2"
+            variant="caption"
             sx={{
-              wordBreak: "break-word", // Allows long words to break and wrap to the next line
-              overflowWrap: "break-word", // Ensures text wraps within the container
+              color: "text.secondary",
+              textAlign: isOwnMessage ? "right" : "left",
+              ml: 1,
             }}
           >
-            {message.content}
+            {senderName}
           </Typography>
+        )}
 
-          {/* Timestamp and Status Icon */}
+        {/* Message Bubble with Frosted Glass Effect */}
+        <Tooltip title={fullTimestamp} arrow>
           <Box
             sx={{
-              color: "gray",
-              display: "flex",
-              alignItems: "center",
-              mt: 0.5,
-              justifyContent: isOwnMessage ? "flex-end" : "flex-start",
-              gap: 0.5, // Add margin between timestamp and status icon
+              p: 1.5,
+              bgcolor: getBackgroundColor(),
+              borderRadius: "1em",
+              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
+              maxWidth: "100%", // Ensure the bubble doesn’t exceed the parent width
+              textAlign: "left", // Align text based on the message direction
+              backdropFilter: "blur(10px)", // Frosted glass effect
             }}
           >
-            <Typography variant="caption">{formattedTime}</Typography>
-            <MessageStatusIcon
-              message={message}
-              chatType={chatType}
-              participantsData={participantsData}
-              isOwnMessage={isOwnMessage}
-            />
+            <Typography
+              variant="body2"
+              sx={{
+                wordBreak: "break-word", // Allows long words to break and wrap to the next line
+                overflowWrap: "break-word", // Ensures text wraps within the container
+              }}
+            >
+              {message.content}
+            </Typography>
+
+            {/* Timestamp and Status Icon */}
+            <Box
+              sx={{
+                color: "gray",
+                display: "flex",
+                alignItems: "center",
+                mb: -1,
+                mt: 0.5,
+                justifyContent: isOwnMessage ? "flex-end" : "flex-start",
+                gap: 0.5, // Add margin between timestamp and status icon
+              }}
+            >
+              <Typography variant="caption">{formattedTime}</Typography>
+              <MessageStatusIcon
+                message={message}
+                chatType={chatType}
+                participantsData={participantsData}
+                isOwnMessage={isOwnMessage}
+              />
+            </Box>
           </Box>
-        </Box>
-      </Tooltip>
+        </Tooltip>
+      </Box>
     </Box>
   );
 };

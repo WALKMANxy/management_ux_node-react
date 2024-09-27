@@ -14,7 +14,6 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import "animate.css"; // Import animate.css for animations
 import React, {
   useCallback,
   useEffect,
@@ -26,8 +25,8 @@ import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectUserRole } from "../../features/auth/authSlice";
 import { fetchMessagesFromMultipleChatsThunk } from "../../features/chat/chatThunks";
-import useChatLogic from "../../hooks/useChatsLogic"; // Hook to manage chat logic
-import ChatList from "./ChatList"; // ChatList Component
+import useChatLogic from "../../hooks/useChatsLogic";
+import ChatList from "./ChatList";
 import ContactsList from "./ContactsList";
 import CreateChatForm from "./CreateChatForm";
 
@@ -44,29 +43,20 @@ const ChatSidebar: React.FC = () => {
     loadingContacts,
   } = useChatLogic();
   const messagesFetched = useRef(false);
-  const contactsFetched = useRef(false); // Ref to track if contacts have been fetched
+  const contactsFetched = useRef(false);
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const [isCreateChatFormOpen, setIsCreateChatFormOpen] = useState(false);
   const userRole = useAppSelector(selectUserRole);
-  /**
-   * Handles toggling between contacts and chats with fade-in/fade-out animations.
-   */
-  const handleToggleContacts = useCallback(() => {
-    // Apply fade-out animation
-    animationClass.current = "animate__fadeOut";
 
+  const handleToggleContacts = useCallback(() => {
+    animationClass.current = "animate__fadeOut";
     setTimeout(() => {
-      // Toggle the view
       setShowContacts((prev) => !prev);
-      // Apply fade-in animation
       animationClass.current = "animate__fadeIn";
-    }, 200); // Duration should match animate.css animation duration
+    }, 200);
   }, []);
 
-  /**
-   * Fetch contacts only once when the component is first rendered.
-   */
   useEffect(() => {
     if (!contactsFetched.current) {
       fetchContacts();
@@ -74,18 +64,10 @@ const ChatSidebar: React.FC = () => {
     }
   }, [fetchContacts]);
 
-  /**
-   * Handle manual refresh of contacts when refresh button is clicked.
-   */
   const handleRefreshContacts = useCallback(() => {
     fetchContacts();
   }, [fetchContacts]);
 
-  /**
-   * Handle search term changes.
-   *
-   * @param {React.ChangeEvent<HTMLInputElement>} e - The change event.
-   */
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setSearchTerm(e.target.value);
@@ -93,9 +75,6 @@ const ChatSidebar: React.FC = () => {
     []
   );
 
-  /**
-   * Fetch messages when chats are visible and search term changes.
-   */
   useEffect(() => {
     if (
       searchTerm &&
@@ -103,7 +82,9 @@ const ChatSidebar: React.FC = () => {
       !showContacts &&
       !messagesFetched.current
     ) {
-      const chatIds = chats.map((chat) => chat._id).filter(Boolean);
+      const chatIds = chats
+        .map((chat) => chat._id || chat.local_id)
+        .filter(Boolean);
       if (chatIds.length > 0) {
         setLoading(true);
         dispatch(fetchMessagesFromMultipleChatsThunk(chatIds)).finally(() =>
@@ -114,16 +95,10 @@ const ChatSidebar: React.FC = () => {
     }
   }, [searchTerm, showContacts, chats, dispatch]);
 
-  /**
-   * Memoized ChatList component to avoid unnecessary re-renders.
-   */
   const chatList = useMemo(() => {
     return <ChatList searchTerm={searchTerm} loading={loading} />;
   }, [searchTerm, loading]);
 
-  /**
-   * Memoized ContactsList component to avoid unnecessary re-renders.
-   */
   const contactsList = useMemo(() => {
     return (
       <ContactsList
@@ -142,9 +117,10 @@ const ChatSidebar: React.FC = () => {
         p: 2,
         bgcolor: "#ffffff",
         height: "100%",
-        overflowY: "auto",
-        borderTopLeftRadius: 12, // 16px equivalent
-        borderBottomLeftRadius: 12, // 16px equivalent
+        display: "flex",
+        flexDirection: "column",
+        borderTopLeftRadius: 12,
+        borderBottomLeftRadius: 12,
         transition: "all 0.2s ease-in-out",
       }}
     >
@@ -171,8 +147,7 @@ const ChatSidebar: React.FC = () => {
               </IconButton>
             </Tooltip>
           )}
-          {/* "+" Button for Creating Chats */}
-          {userRole === "admin" && (
+          {userRole === "admin" && !showContacts && (
             <Tooltip title={t("chatSidebar.tooltips.createChat")}>
               <IconButton
                 onClick={() => setIsCreateChatFormOpen(true)}
@@ -214,21 +189,9 @@ const ChatSidebar: React.FC = () => {
         }
         fullWidth
         value={searchTerm}
-        autoComplete="off" // Prevents autofill suggestions
-        type="search" // Ensures minimal autofill interference
+        autoComplete="off"
+        type="search"
         onChange={handleSearchChange}
-        onFocus={() => {
-          if (!showContacts && chats.length > 0 && !messagesFetched.current) {
-            setLoading(true);
-            const chatIds = chats.map((chat) => chat._id).filter(Boolean);
-            if (chatIds.length > 0) {
-              dispatch(fetchMessagesFromMultipleChatsThunk(chatIds)).finally(
-                () => setLoading(false)
-              );
-              messagesFetched.current = true;
-            }
-          }
-        }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -238,34 +201,50 @@ const ChatSidebar: React.FC = () => {
         }}
         sx={{
           mb: 2,
-          mx: 1, // Adds small margins on the left and right
-          borderRadius: "15px", // Rounded corners
-          width: "calc(100% - 16px)", // Adjusts width to account for the margins
+          mx: 1,
+          borderRadius: "15px",
+          width: "calc(100% - 16px)",
           "& .MuiOutlinedInput-root": {
-            borderRadius: "25px", // Ensure the input itself has rounded corners
+            borderRadius: "25px",
           },
         }}
       />
 
-      {/* Render the memoized components with animations */}
+      {/* Scrollable content */}
       <Box
         sx={{
-          position: "relative",
-          display: showContacts ? "none" : "block",
-          opacity: showContacts ? 0 : 1,
+          flex: 1,
+          overflowY: "auto",
+          // Hide the scrollbar
+          "&::-webkitScrollbar": {
+            display: "none",
+          },
+          // For Firefox
+          scrollbarWidth: "none",
+          // For IE and Edge
+          "-msOverflowStyle": "none",
         }}
       >
-        {chatList}
+        <Box
+          sx={{
+            position: "relative",
+            display: showContacts ? "none" : "block",
+            opacity: showContacts ? 0 : 1,
+          }}
+        >
+          {chatList}
+        </Box>
+        <Box
+          sx={{
+            position: "relative",
+            display: showContacts ? "block" : "none",
+            opacity: showContacts ? 1 : 0,
+          }}
+        >
+          {contactsList}
+        </Box>
       </Box>
-      <Box
-        sx={{
-          position: "relative",
-          display: showContacts ? "block" : "none",
-          opacity: showContacts ? 1 : 0,
-        }}
-      >
-        {contactsList}
-      </Box>
+
       {isCreateChatFormOpen && (
         <CreateChatForm
           open={isCreateChatFormOpen}

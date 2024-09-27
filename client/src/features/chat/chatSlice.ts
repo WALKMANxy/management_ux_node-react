@@ -126,24 +126,38 @@ const chatSlice = createSlice({
     ) => {
       const { chat, fromServer } = action.payload;
 
-      const existingChat = state.chats[chat._id || chat.local_id];
-
-      if (existingChat && fromServer) {
-        // Update with server-confirmed data
-        state.chats[chat._id] = {
-          ...existingChat,
-          ...chat,
-          local_id: chat.local_id,
-          _id: chat._id,
-          status: chat.status,
-        };
-        delete state.chats[chat.local_id];
-      } else if (!existingChat) {
-        // Add new chat
-        state.chats[chat.local_id] = chat;
+      if (fromServer && chat._id) {
+        const localId = chat.local_id;
+        if (localId && state.chats[localId]) {
+          console.log(
+            `addChatReducer: Found existing chat with local_id ${localId}. Updating with server data and using _id ${chat._id}.`
+          );
+          // Replace the chat keyed by local_id with the chat keyed by _id
+          state.chats[chat._id] = {
+            ...state.chats[localId], // Retain existing data
+            ...chat, // Overwrite with server data
+            _id: chat._id, // Ensure _id is set
+            status: chat.status, // Update status
+          };
+          // Remove the old chat entry keyed by local_id
+          delete state.chats[localId];
+        } else {
+          console.log(
+            `addChatReducer: Adding new chat from server with _id ${chat._id}.`
+          );
+          // If no matching local_id, add the chat as a new entry keyed by _id
+          state.chats[chat._id] = chat;
+        }
+      } else {
+        // Client-originated chat, add to state keyed by local_id
+        const localId = chat.local_id;
+        if (localId) {
+          console.log(`addChatReducer: Adding new chat with local_id ${localId}`);
+          state.chats[localId] = chat;
+        }
       }
-      // If existingChat exists and not from server, do nothing
     },
+
   },
 
   extraReducers: (builder) => {
@@ -156,7 +170,7 @@ const chatSlice = createSlice({
       .addCase(fetchAllChatsThunk.fulfilled, (state, action) => {
         state.status = "succeeded";
         action.payload.forEach((chat: WritableDraft<IChat>) => {
-          state.chats[chat._id] = chat;
+          state.chats[chat._id!] = chat;
         });
       })
 
@@ -272,7 +286,7 @@ const chatSlice = createSlice({
       .addCase(createChatThunk.fulfilled, (state, action) => {
         state.status = "succeeded";
         const newChat = action.payload;
-        state.chats[newChat._id] = newChat;
+        state.chats[newChat._id!] = newChat;
       })
       .addCase(createChatThunk.rejected, (state, action) => {
         state.status = "failed";
