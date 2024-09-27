@@ -98,7 +98,7 @@
     "calendar": "Calendar",
     "viewMore": "View More",
     "totalEarning": "Total Earning",
-    "totalOrder": "Total Orders",
+
     "spentThisMonth": "Spent This Month",
     "spentThisYear": "Spent This Year",
     "topArticleType": "Most Bought Articles",
@@ -111,7 +111,7 @@
     "name": "Name",
     "province": "Province",
     "phone": "Phone Number",
-    "totalOrders": "Total Orders",
+
     "ordersThisMonth": "Orders This Month",
     "totalRevenue": "Total Revenue",
     "revenueThisMonth": "Revenue This Month",
@@ -485,7 +485,7 @@
   "totalOrder": {
     "month": "Month",
     "year": "Year",
-    "ordersThisMonth": "Orders This Year",
+    "ordersThisMonth": "Orders This Month",
     "totalOrders": "Orders This Year",
     "iconAlt": "Orders Icon"
   },

@@ -22,6 +22,8 @@ const useLoadingData = () => {
   const [retryCount, setRetryCount] = useState<number>(0); // Track retry attempts
   const [fakeLoading, setFakeLoading] = useState(true);
 
+  const toastId = "loadingDataToast";
+
   // Get data from the dataSlice
   const {
     clients,
@@ -47,7 +49,7 @@ const useLoadingData = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      showToast.loading(t("useStatsToasts.loadingData"));
+      toast.loading(t("useStatsToasts.loadingData"), { id: toastId });
 
       setLoading(true);
       await dispatch(fetchInitialData()).unwrap();
@@ -58,20 +60,19 @@ const useLoadingData = () => {
       setLocalError(null);
       setRetryCount(0);
 
-      showToast.success(t("useStatsToasts.successData"));
-
       updateUserEntityNameIfMissing(dispatch, currentUser, currentUserDetails);
     } catch (err: unknown) {
-      showToast.error(t("useStatsToasts.failedData"));
+      toast.error(t("useStatsToasts.failedData"), { id: toastId });
       console.error("Error fetching initial data:", err);
       if (err instanceof Error) {
         setLocalError(err.message);
-        showToast.error(
-          t("useStatsToasts.errorMessage", { message: err.message })
+        toast.error(
+          t("useStatsToasts.errorMessage", { message: err.message }),
+          { id: toastId }
         );
       } else {
         setLocalError("An unknown error occurred while fetching data.");
-        showToast.error(t("useStatsToasts.unknownError"));
+        toast.error(t("useStatsToasts.unknownError"), { id: toastId });
       }
 
       if (retryCount < 5) {
@@ -80,7 +81,7 @@ const useLoadingData = () => {
       }
     } finally {
       setLoading(false);
-      toast.dismiss();
+      toast.dismiss(toastId); // Dismiss the toast when the operation is complete
     }
   }, [dispatch, retryCount, currentUser, currentUserDetails, t]);
 
@@ -118,6 +119,10 @@ const useLoadingData = () => {
   }, []);
 
   const loadingState = loading || fakeLoading;
+
+  useEffect(() => {
+    console.log("useLoadingData hook used to fetch data");
+  }, []);
 
   return {
     loading,

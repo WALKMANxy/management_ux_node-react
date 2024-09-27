@@ -102,7 +102,6 @@ const AdminDashboard: React.FC = () => {
   return (
     <Box
       className="admin-dashboard"
-      sx={{ p: isMobile ? 0 : 4, bgcolor: "#f4f5f7" }}
     >
       {loadingState ? (
         <Skeleton
