@@ -10,7 +10,6 @@ import i18n from "./i18n";
 import "./main.css";
 import { registerPWA } from "./pwa";
 import { webSocketService } from "./services/webSocketService";
-import "./styles/styles.css";
 import "./utils/tokenIntercept";
 
 webSocketService.injectStore(store);
