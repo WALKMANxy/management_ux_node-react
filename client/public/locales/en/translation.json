@@ -726,6 +726,17 @@
     "themeChanged": "Theme changed to {{theme}}."
   },
   "modifyAccount": {
+    "invalidEmail": "Email is not valid.",
+    "passwordUppercase": "Password must include at least one uppercase letter.",
+    "passwordLowercase": "Password must include at least one lowercase letter.",
+    "passwordNumber": "Password must include at least one number.",
+    "passwordSpecialChar": "Password must include at least one special character.",
+    "emailUpdated": "Account information updated. You will now be logged out.",
+    "passwordUpdated": "Password updated. You will now be logged out.",
+    "updateEmailFailed": "Failed to update account information: {{message}}",
+    "updatePasswordFailed": "Failed to update password: {{message}}",
+    "updateEmailUnknownError": "Failed to update account information: An unknown error occurred.",
+    "updatePasswordUnknownError": "Failed to update password: An unknown error occurred.",
     "title": "Modify Account",
     "modifyEmail": "Modify Email",
     "currentEmail": "Current Email",
@@ -1011,6 +1022,42 @@
     }
   },
   "chats": {
-    "error": "An error occured with the chats:"
+    "error": "An error occured with the chats:",
+    "defaultTitle": "Chat",
+    "groupTitle": "Group Chat"
+  },
+  "errors": {
+    "userNotFound": "User with ID {{id}} not found.",
+    "adminNotFound": "Admin with ID {{id}} not found.",
+    "unknown": "An unknown error occurred.",
+    "unknownAgent": "Unknown Agent",
+    "searchFailed": "Search failed. Please try again."
+  },
+  "signin": {
+    "loginSuccess": "Logged in successfully!",
+    "registrationSuccess": "Registered successfully!",
+    "loginWithGoogleSuccess": "Logged in with Google successfully!",
+    "passwordMismatch": "Passwords do not match."
+  },
+  "promoForm": {
+    "success": "Promo submitted successfully!",
+    "updateFailed": "Failed to submit promo: {{message}}",
+    "unknownError": "Failed to submit promo: An unknown error occurred."
+  },
+  "usePromos": {
+    "createSuccess": "Promo created successfully!",
+    "createFailed": "Failed to create promo: {{message}}",
+    "createUnknownError": "Failed to create promo: An unknown error occurred.",
+    "updateMissingId": "Promo ID is missing for update.",
+    "updateSuccess": "Promo updated successfully!",
+    "updateFailed": "Failed to update promo: {{message}}",
+    "updateUnknownError": "Failed to update promo: An unknown error occurred.",
+    "sunsetNoPromoSelected": "No promo selected for sunset.",
+    "sunsetMissingId": "Promo ID is missing for sunset.",
+    "sunsetSuccess": "Promo sunset successfully.",
+    "sunsetFailed": "Failed to sunset promo: {{message}}",
+    "sunsetUnknownError": "Failed to sunset promo: An unknown error occurred.",
+    "editNoPromoSelected": "No promo selected to edit.",
+    "refreshSuccess": "Promos refreshed successfully."
   }
 }

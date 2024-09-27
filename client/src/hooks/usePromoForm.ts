@@ -69,16 +69,19 @@ const usePromoForm = ({
     watch,
     setValue,
   } = useForm<FormValues>({
-    defaultValues: {
-      promoType: promoData?.promoType || "",
-      name: promoData?.name || "",
-      discount: promoData?.discount || "",
-      startDate: promoData?.startDate ? dayjs(promoData.startDate) : dayjs(),
-      endDate: promoData?.endDate ? dayjs(promoData.endDate) : dayjs(),
-      selectedClients: promoData?.clientsId || [],
-      excludedClients: promoData?.excludedClientsId || [],
-      global: promoData?.global || false,
-    },
+    defaultValues: useMemo(
+      () => ({
+        promoType: promoData?.promoType || "",
+        name: promoData?.name || "",
+        discount: promoData?.discount || "",
+        startDate: promoData?.startDate ? dayjs(promoData.startDate) : dayjs(),
+        endDate: promoData?.endDate ? dayjs(promoData.endDate) : dayjs(),
+        selectedClients: promoData?.clientsId || [],
+        excludedClients: promoData?.excludedClientsId || [],
+        global: promoData?.global || false,
+      }),
+      [promoData]
+    ),
   });
 
   const { selectedLocale } = useMemo(() => {
@@ -101,8 +104,8 @@ const usePromoForm = ({
         return;
       }
 
-      console.log("Form data before processing:", data);
-
+      /*       console.log("Form data before processing:", data);
+       */
       // Prepare promo data
       const preparedPromoData: Promo = {
         _id: promoData?._id,
@@ -129,15 +132,13 @@ const usePromoForm = ({
         onClose();
       } catch (error: unknown) {
         if (error instanceof Error) {
-          showToast.error(
-            "There was a problem with the promo: " + error.message
-          );
+          showToast.error(t("promoForm.updateFailed " + error.message));
         } else {
           showToast.error("There was a problem with the promo.");
         }
       }
     },
-    [onSubmit, isCreating, reset, onClose, userId, promoData?._id]
+    [onSubmit, isCreating, reset, onClose, userId, promoData?._id, t]
   );
 
   return {

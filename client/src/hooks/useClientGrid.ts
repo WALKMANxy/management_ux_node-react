@@ -1,11 +1,17 @@
 //src/hooks/useClientGrid.ts
 import { AgGridReact } from "ag-grid-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
 import { Agent, Client } from "../models/entityModels";
+import { showToast } from "../utils/toastMessage";
 
 export const useClientsGrid = () => {
+  const { t } = useTranslation(); // Initialize translation
+
+  const [error, setError] = useState<string | null>(null);
+
   const clients = Object.values(
     useSelector((state: RootState) => state.data.clients)
   );
@@ -15,8 +21,8 @@ export const useClientsGrid = () => {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isClientListCollapsed, setClientListCollapsed] = useState(false);
   const [isClientDetailsCollapsed, setClientDetailsCollapsed] = useState(false);
-  const userRole = useSelector((state: RootState) => state.auth.role);
-  const userId = useSelector((state: RootState) => state.auth.id);
+  /*  const userRole = useSelector((state: RootState) => state.auth.role);
+  const userId = useSelector((state: RootState) => state.auth.id); */
   const [quickFilterText, setQuickFilterText] = useState("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -24,13 +30,25 @@ export const useClientsGrid = () => {
   const clientDetailsRef = useRef<HTMLDivElement>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+  // Error Handling: Display toast when an error occurs
+  useEffect(() => {
+    if (error) {
+      showToast.error(error);
+      setError(null); // Reset error after displaying
+    }
+  }, [error]);
 
-  const handleMenuClose = () => {
+  // Handlers for menu
+  const handleMenuOpen = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      setAnchorEl(event.currentTarget);
+    },
+    []
+  );
+
+  const handleMenuClose = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
 
   const exportDataAsCsv = useCallback(() => {
     if (gridRef.current) {
@@ -38,15 +56,17 @@ export const useClientsGrid = () => {
     }
   }, []);
 
-  const addAgentNameToClient = (client: Client, agentDetails: Agent[]) => {
-    /*     console.log("addAgentNameToClient", { client, agentDetails });
-     */ const agent = agentDetails.find((agent) => agent.id === client.agent);
-    /*     console.log("agentDetails.find", { clientAgent: client.agent, agent });
-     */ return {
-      ...client,
-      agentName: agent ? agent.name : "Unknown Agent",
-    };
-  };
+  // Helper function to add agent name to client
+  const addAgentNameToClient = useCallback(
+    (client: Client, agents: Agent[]): Client & { agentName: string } => {
+      const agent = agents.find((agent) => agent.id === client.agent);
+      return {
+        ...client,
+        agentName: agent ? agent.name : t("clients.unknownAgent"),
+      };
+    },
+    [t]
+  );
 
   const handleClientSelect = useCallback(
     (clientId: string) => {
@@ -63,10 +83,10 @@ export const useClientsGrid = () => {
         setSelectedClient(null);
       }
     },
-    [clients, agentDetails]
+    [clients, agentDetails, addAgentNameToClient]
   );
 
-  const filteredClients = useCallback(() => {
+  /* const filteredClients = useCallback(() => {
     let filtered = clients;
     if (userRole === "agent") {
       filtered = filtered.filter((client) => client.agent === userId);
@@ -84,7 +104,20 @@ export const useClientsGrid = () => {
       });
     }
     return filtered.map((client) => addAgentNameToClient(client, agentDetails));
-  }, [clients, userRole, userId, startDate, endDate, agentDetails]);
+  }, [clients, userRole, userId, startDate, endDate, agentDetails]); */
+
+  const clientsWithAgentNames = useMemo(() => {
+    try {
+      // Add agent names and then sort clients alphabetically by name
+      return clients
+        .map((client) => addAgentNameToClient(client, agentDetails))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      setError(err.message || t("errors.unknown"));
+      return [];
+    }
+  }, [clients, agentDetails, addAgentNameToClient, t]);
 
   return {
     clients,
@@ -97,7 +130,7 @@ export const useClientsGrid = () => {
     endDate,
     setEndDate,
     handleClientSelect,
-    filteredClients,
+    filteredClients: clientsWithAgentNames,
     gridRef,
     clientDetailsRef,
     isClientListCollapsed,

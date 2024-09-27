@@ -103,6 +103,8 @@ export const useArticlesGrid = () => {
         });
       });
     }
+    // Sort articles by brand name
+    articles.sort((a, b) => (a.brand || "").localeCompare(b.brand || ""));
 
     return articles;
   }, [

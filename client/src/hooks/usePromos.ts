@@ -1,6 +1,7 @@
 // src/hooks/usePromos.ts
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { clearSelectedPromo, selectPromo } from "../features/data/dataSlice";
 import {
@@ -18,6 +19,8 @@ type PromoMode = "view" | "create" | "edit";
 const usePromos = () => {
   const dispatch = useAppDispatch();
   const promos = useAppSelector(selectPromos);
+  const { t } = useTranslation(); // Initialize translation
+
   const allClients = useAppSelector((state) => state.data.clients);
   const agents = useAppSelector((state) => state.data.agents);
   const currentUser = useAppSelector(selectCurrentUser);
@@ -60,69 +63,80 @@ const usePromos = () => {
   const [mode, setMode] = useState<PromoMode>("view");
 
   // Handle promo selection and set mode to 'view'
-  const handlePromoSelect = (promo: Promo) => {
-    dispatch(selectPromo(promo._id!));
-    setMode("view");
-  };
+  const handlePromoSelect = useCallback(
+    (promo: Promo) => {
+      dispatch(selectPromo(promo._id!));
+      setMode("view");
+    },
+    [dispatch]
+  );
 
   // Handle promo deselection
-  const handlePromoDeselect = () => {
+  const handlePromoDeselect = useCallback(() => {
     dispatch(clearSelectedPromo());
     setMode("view");
-  };
+  }, [dispatch]);
 
   // Handle promo creation
-  const handleCreatePromo = async (promoData: Promo) => {
-    try {
-      await dispatch(createPromoAsync(promoData)).unwrap();
-      showToast.success("Promo created successfully");
+  const handleCreatePromo = useCallback(
+    async (promoData: Promo) => {
+      try {
+        await dispatch(createPromoAsync(promoData)).unwrap();
+        showToast.success(t("usePromos.createSuccess"));
 
-      dispatch(getPromos()); // Refresh the list of promos
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        showToast.error("Failed to create promo: " + error.message);
-        console.error("Failed to create promo:", error);
-      } else {
-        showToast.error("Failed to create promo: An unknown error occurred");
-        console.error(
-          "Failed to create promo: An unknown error occurred",
-          error
-        );
+        dispatch(getPromos()); // Refresh the list of promos
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          showToast.error(t("usePromos.createFailed", { message: error.message }));
+          console.error("Failed to create promo:", error);
+        } else {
+          showToast.error(t("usePromos.createUnknownError"));
+          console.error(
+            "Failed to create promo: An unknown error occurred",
+            error
+          );
+        }
+        throw error; // Re-throw to handle in the component
       }
-      throw error; // Re-throw to handle in the component
-    }
-  };
+    },
+    [dispatch, t]
+  );
 
   // Handle promo update
-  const handleUpdatePromo = async (promoData: Promo) => {
-    try {
-      if (!promoData._id) {
-        throw new Error("Promo ID is missing for update.");
+  const handleUpdatePromo = useCallback(
+    async (promoData: Promo) => {
+      try {
+        if (!promoData._id) {
+          throw new Error(t("usePromos.updateMissingId"));
+        }
+        await dispatch(
+          updatePromoAsync({ _id: promoData._id, promoData })
+        ).unwrap();
+        showToast.success(t("usePromos.updateSuccess"));
+        dispatch(getPromos()); // Refresh the list of promos
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          showToast.error(t("usePromos.updateFailed", { message: error.message }));
+          console.error("Failed to update promo:", error);
+        } else {
+          showToast.error(t("usePromos.updateUnknownError"));
+          console.error(
+            "Failed to update promo: An unknown error occurred",
+            error
+          );
+        }
+        throw error; // Re-throw to handle in the component
       }
-      await dispatch(
-        updatePromoAsync({ _id: promoData._id, promoData })
-      ).unwrap();
-      showToast.success("Promo updated successfully");
-      dispatch(getPromos()); // Refresh the list of promos
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        showToast.error("Failed to update promo: " + error.message);
-        console.error("Failed to update promo:", error);
-      } else {
-        showToast.error("Failed to update promo: An unknown error occurred");
-        console.error(
-          "Failed to update promo: An unknown error occurred",
-          error
-        );
-      }
-      throw error; // Re-throw to handle in the component
-    }
-  };
+    },
+    [dispatch, t]
+  );
 
   // Handle promo sunset
-  const handleSunsetPromo = async () => {
+  // Handle promo sunset
+  const handleSunsetPromo = useCallback(async () => {
     // Check if selectedPromo is defined
     if (!selectedPromo) {
+      showToast.error(t("usePromos.sunsetNoPromoSelected"));
       console.error("No promo selected for sunset.");
       return; // Exit the function if no promo is selected
     }
@@ -131,31 +145,31 @@ const usePromos = () => {
 
     try {
       if (!promoData._id) {
-        throw new Error("Promo ID is missing for sunset.");
+        throw new Error(t("usePromos.sunsetMissingId"));
       }
 
       // Set the end date to the current time
       const updatedPromoData: Promo = {
         ...promoData,
         endDate: new Date(),
-        startDate: new Date(promoData.startDate),
-        createdAt: new Date(promoData.createdAt), // Set endDate to current time
+        startDate: new Date(promoData.startDate), // Ensure startDate is a Date object
+        createdAt: new Date(promoData.createdAt), // Ensure createdAt is a Date object
       };
 
       // Dispatch the update promo action with the modified endDate
       await dispatch(
         updatePromoAsync({ _id: promoData._id, promoData: updatedPromoData })
       ).unwrap();
-      showToast.info("Promo sunset successfully");
+      showToast.info(t("usePromos.sunsetSuccess"));
 
       // Refresh the list of promos
       dispatch(getPromos());
     } catch (error: unknown) {
       if (error instanceof Error) {
-        showToast.error("Failed to sunset promo: " + error.message);
+        showToast.error(t("usePromos.sunsetFailed", { message: error.message }));
         console.error("Failed to sunset promo:", error);
       } else {
-        showToast.error("Failed to sunset promo: An unknown error occurred");
+        showToast.error(t("usePromos.sunsetUnknownError"));
         console.error(
           "Failed to sunset promo: An unknown error occurred",
           error
@@ -163,30 +177,33 @@ const usePromos = () => {
       }
       throw error; // Re-throw to handle in the component
     }
-  };
+  }, [dispatch, selectedPromo, t]);
 
   // Initiate creation mode
-  const initiateCreatePromo = () => {
+  const initiateCreatePromo = useCallback(() => {
     dispatch(clearSelectedPromo());
     setMode("create");
-  };
+  }, [dispatch]);
 
   // Initiate edit mode
-  const initiateEditPromo = () => {
+  const initiateEditPromo = useCallback(() => {
     if (selectedPromo) {
       setMode("edit");
+    } else {
+      showToast.error(t("usePromos.editNoPromoSelected"));
     }
-  };
+  }, [selectedPromo, t]);
 
   // Fetch promos on component mount
   useEffect(() => {
     dispatch(getPromos());
   }, [dispatch]);
 
-  const handleRefreshPromos = () => {
+  // Handle promo refresh
+  const handleRefreshPromos = useCallback(() => {
     dispatch(getPromos());
-    showToast.success("Promos refreshed successfully");
-  };
+    showToast.success(t("usePromos.refreshSuccess"));
+  }, [dispatch, t]);
 
   return {
     clients,

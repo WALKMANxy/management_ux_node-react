@@ -42,6 +42,8 @@ const useChatLogic = () => {
 
   const currentChatId = useMemo(() => currentChat?._id, [currentChat]);
 
+  
+
   const fetchChats = useCallback(async () => {
     try {
       setLoadingChats(true);
