@@ -1,5 +1,6 @@
 // src/layout/Layout.tsx
 import { Box, useMediaQuery, useTheme } from "@mui/material";
+import "animate.css";
 import React from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
@@ -31,6 +32,8 @@ const Layout: React.FC = () => {
         {!currentChat || !isMobile ? <Header /> : null}
         <Box
           component="main"
+          className="animate__animated animate__fadeIn"
+          key={location.pathname} // Add a key based on the pathname
           sx={{
             flex: 1, // Let main content grow to fill available space
 

@@ -24,11 +24,14 @@ import {
   clearSelection,
   selectClient,
 } from "../../features/data/dataSlice";
+import useLoadingData from "../../hooks/useLoadingData";
 
 const VisitsPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const dispatch = useAppDispatch();
+
+  const { loading } = useLoadingData();
 
   const selectedVisitId = useAppSelector(
     (state: RootState) => state.data.selectedVisitId
@@ -86,7 +89,7 @@ const VisitsPage: React.FC = () => {
   };
 
   // Handle loading state
-  if (status === "loading") {
+  if (loading) {
     return (
       <Box
         sx={{

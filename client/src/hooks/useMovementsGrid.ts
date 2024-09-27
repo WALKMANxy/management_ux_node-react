@@ -1,6 +1,6 @@
 // src/hooks/useMovementsGrid.ts
 import { AgGridReact } from "ag-grid-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
@@ -142,12 +142,6 @@ export const useMovementsGrid = () => {
 
     return movements;
   }, [enrichedClients, startDate, endDate, t]);
-
-  useEffect(() => {
-    if (selectedMovement) {
-      console.log("Selected Movement:", selectedMovement);
-    }
-  }, [selectedMovement]);
 
   return {
     clients: enrichedClients,

@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
 import { Movement } from "../models/dataModels";
-import { Admin, Agent, Client } from "../models/entityModels";
-import { ignoreArticleNames } from "./constants";
+import { Admin, Agent, Client, UserRole } from "../models/entityModels";
 import { BrandData } from "../models/propsModels";
+import { ignoreArticleNames } from "./constants";
 
 // Helper function to get month and year from a date string
 export const getMonthYear = (dateString: string) => {
@@ -92,9 +92,8 @@ export const calculateTotalOrders = (clients: Client[]): number => {
   return Object.keys(groupedMovements).length;
 };
 
-export const calculateTopBrandsData = (
-  movements: Movement[]
-): BrandData[] => { // Ensure the return type is BrandData[]
+export const calculateTopBrandsData = (movements: Movement[]): BrandData[] => {
+  // Ensure the return type is BrandData[]
   const brandCount: { [key: string]: { name: string; quantity: number } } = {};
 
   // Iterate over each movement
@@ -368,8 +367,8 @@ export const currencyFormatter = (value: number | string): string => {
 export const customCurrencyFormatter = (params: any): string => {
   const value = params.value;
 
-  console.log("Custom Formatter - Processing value:", value);
-
+/*   console.log("Custom Formatter - Processing value:", value);
+ */
   if (value === null || value === undefined || value === "") {
     return "€0.00"; // Handle empty or null values
   }
@@ -387,7 +386,6 @@ export const customCurrencyFormatter = (params: any): string => {
   return `€${parsedValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,")}`;
 };
 
-
 export const numberComparator = (valueA: number, valueB: number) => {
   return valueA - valueB;
 };
@@ -396,10 +394,13 @@ export const getTrend = (percentage: string | number) =>
   parseFloat(`${percentage}`) > 50 ? "up" : "down";
 
 export const getAdjustedClients = (
-  role: "admin" | "agent" | "client" | undefined,
+  role: UserRole,
   currentUserData: Client | Admin | Agent | null,
   clients: Record<string, Client>
 ) => {
+  if (role === "employee" || role === "guest") {
+    return [];
+  }
   if (role === "client" && currentUserData) {
     return [currentUserData as Client]; // Adjusted clients for client role
   } else {
@@ -408,11 +409,14 @@ export const getAdjustedClients = (
 };
 
 export const getMovementsByRole = (
-  role: "admin" | "agent" | "client" | undefined,
+  role: UserRole,
   currentUserData: Admin | Client | Agent | null,
   clients: Record<string, Client>
 ): Movement[] => {
   if (!currentUserData) return [];
+  else if (role === "employee" || role === "guest") {
+    return [];
+  }
 
   switch (role) {
     case "agent":
@@ -453,7 +457,6 @@ export const calculateRevenue = (movements: Movement[]) =>
 export const calculatePercentage = (part: number, total: number): string =>
   total === 0 ? "0.00" : ((part / total) * 100).toFixed(2);
 
-
 export const getTwoMonthsFromNow = () => {
-  return dayjs().add(2, 'month').startOf('day').toDate();
+  return dayjs().add(2, "month").startOf("day").toDate();
 };

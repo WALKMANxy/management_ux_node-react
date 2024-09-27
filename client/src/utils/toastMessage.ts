@@ -39,4 +39,10 @@ export const showToast = {
       duration: 3000,
     });
   },
+
+  loading: (message: string) => {
+    toast.loading(message, {
+      duration: 3000,
+    });
+  },
 };

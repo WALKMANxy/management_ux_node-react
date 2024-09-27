@@ -1,5 +1,5 @@
 // src/hooks/useVisitsPage.ts
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { RootState } from "../app/store";
 import {
@@ -19,6 +19,8 @@ export const useVisitsPage = () => {
     (state: RootState) => state.data.currentUserDetails
   );
   const userRole = currentUser?.role;
+
+  const currentUserId = currentUser?.id;
 
   // Get selectedClientId from Redux state
   const selectedClientId = useAppSelector(
@@ -40,10 +42,10 @@ export const useVisitsPage = () => {
 
   // Automatically select the client and hide sidebar for client users
   useEffect(() => {
-    if (userRole === "client" && currentUser?.id) {
-      dispatch(selectClient(currentUser.id));
+    if (userRole === "client" && currentUserId) {
+      dispatch(selectClient(currentUserId));
     }
-  }, [userRole, currentUser, dispatch]);
+  }, [userRole, currentUserId, dispatch]);
 
   // Handle creating a visit
   useEffect(() => {
@@ -74,30 +76,30 @@ export const useVisitsPage = () => {
     }
   }, [selectedVisitId, isCreatingVisit]);
 
-  const handleOpenCreateVisit = () => {
+  const handleOpenCreateVisit = useCallback(() => {
     setIsCreatingVisit(true);
-  };
+  }, []);
 
-  const handleCloseCreateVisit = () => {
+  const handleCloseCreateVisit = useCallback(() => {
     setIsCreatingVisit(false);
-  };
+  }, []);
 
-  const handleDeselectClient = () => {
+  const handleDeselectClient = useCallback(() => {
     dispatch(clearSelection());
-  };
+  }, [dispatch]);
 
-  const handleDeselectVisit = () => {
+  const handleDeselectVisit = useCallback(() => {
     dispatch(clearSelectedVisit());
     setIsEditing(false);
-  };
+  }, [dispatch]);
 
-  const handleStartEditing = () => {
+  const handleStartEditing = useCallback(() => {
     setIsEditing(true);
-  };
+  }, []);
 
-  const handleStopEditing = () => {
+  const handleStopEditing = useCallback(() => {
     setIsEditing(false);
-  };
+  }, []);
 
   return {
     userRole,

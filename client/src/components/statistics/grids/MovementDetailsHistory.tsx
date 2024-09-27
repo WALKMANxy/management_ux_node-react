@@ -1,6 +1,6 @@
 // src/components/movementsPage/MovementDetailsHistory.tsx
 import { Box } from "@mui/material";
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../app/store";
@@ -17,10 +17,10 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
   const { t } = useTranslation();
   const userRole = useSelector((state: RootState) => state.auth.role);
 
-  // Log the movementDetails to inspect the data structure
+  /*  // Log the movementDetails to inspect the data structure
   useEffect(() => {
     console.log("Movement Details:", movementDetails);
-  }, [movementDetails]);
+  }, [movementDetails]); */
 
   // Define a stable formatter function to prevent unnecessary re-creations
 

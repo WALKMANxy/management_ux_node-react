@@ -116,9 +116,9 @@ const CalendarPage: React.FC = () => {
     setConfirmDelete(event);
   };
 
-  useEffect(() => {
+  /*   useEffect(() => {
     console.log(serverEvents?.length, holidayEvents?.length);
-  }, [serverEvents, holidayEvents]);
+  }, [serverEvents, holidayEvents]); */
 
   // Optional: Show a loading spinner
   if (isLoading) {

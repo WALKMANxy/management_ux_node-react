@@ -282,6 +282,7 @@ const Header: React.FC = () => {
             alt="Logo"
             style={{ height: "40px", marginRight: "16px", cursor: "pointer" }}
             onClick={handleLogoClick}
+
           />
           <GlobalSearch
             filter="all"

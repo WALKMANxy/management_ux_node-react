@@ -825,7 +825,16 @@
     "saveChanges": "Save",
     "alerts": {
       "success": "Changes saved successfully!",
-      "error": "An error occurred. Please try again."
+      "error": "An error occurred. Please try again.",
+      "updateSuccess": "User updated successfully.",
+      "updateSuccessToast": "User updated successfully.",
+      "updateFailed": "Failed to update user: {{message}}",
+      "updateFailedToast": "Failed to update user: {{message}}",
+      "updateUnknownError": "Failed to update user: An unknown error occurred.",
+      "updateUnknownErrorToast": "Failed to update user: An unknown error occurred.",
+      "userIdUndefined": "User ID is undefined.",
+      "userIdUndefinedToast": "User ID is undefined.",
+      "loadAdminsErrror": "Failed to load admins. Please try again."
     }
   },
   "createVisitForm": {
@@ -1059,5 +1068,26 @@
     "sunsetUnknownError": "Failed to sunset promo: An unknown error occurred.",
     "editNoPromoSelected": "No promo selected to edit.",
     "refreshSuccess": "Promos refreshed successfully."
+  },
+  "resizeObserver": {
+    "unsupported": "ResizeObserver is not supported in your browser. Please update or use a different browser."
+  },
+  "useVisits": {
+    "agentSelected": "Agent selected successfully.",
+    "clientSelected": "Client selected successfully.",
+    "backToAgents": "Returned to agents list.",
+    "visitCreated": "Visit created successfully.",
+    "failedToCreateVisit": "Failed to create visit. Please try again.",
+    "visitsRefreshed": "Visits refreshed successfully.",
+    "failedToRefreshVisits": "Failed to refresh visits. Please try again.",
+    "agentNotFound": "Selected agent not found."
+  },
+  "useStatsToasts": {
+    "loadingData": "Loading data...",
+    "successData": "Data fetched successfully!",
+    "failedData": "Failed to fetch data. Please try refreshing the page, or come back later.",
+    "errorMessage": "Error: {{message}}",
+    "unknownError": "An unknown error occurred while fetching data. Try refreshing the page or contact IT.",
+    "retryingData": "Retrying to fetch initial data... (Attempt #{{attempt}})"
   }
 }
