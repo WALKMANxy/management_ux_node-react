@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import useChatLogic from "../../hooks/useChatsLogic"; // Import the custom hook
 import { formatDateForDivider } from "../../utils/chatUtils";
+import { showToast } from "../../utils/toastMessage";
 
 const shakeAnimation = keyframes`
   0%, 100% { transform: translateX(0); }
@@ -40,7 +41,11 @@ const NotificationBell: React.FC = () => {
     setAnchorEl(event.currentTarget); // Anchor the popover to the bell icon
   };
 
-  const handleChatClick = (chatId: string) => {
+  const handleChatClick = (chatId: string | undefined) => {
+    if (!chatId) {
+      showToast.error("Chat ID is missing.");
+      return;
+    }
     handleSelectChat(chatId); // Select chat using the handler from the hook
     setAnchorEl(null);
     navigate("/messages"); // Navigate to the chat view page

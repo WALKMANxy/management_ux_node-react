@@ -231,7 +231,7 @@ const ClientDashboard: React.FC = () => {
               </Box>
             </Box>
 
-            <UpcomingVisits isLoading={isLoading} />
+            <UpcomingVisits/>
           </Grid>
         )}
       </Grid>
