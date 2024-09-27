@@ -10,7 +10,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
 import GlobalSearch from "../../components/Header/GlobalSearch";
@@ -28,6 +28,7 @@ import MonthOverMonthSpendingTrend from "../../components/statistics/charts/Mont
 import SalesDistribution from "../../components/statistics/charts/SalesDistribution";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
 import { selectCurrentUser } from "../../features/users/userSlice";
+import useLoadingData from "../../hooks/useLoadingData";
 import useSelectionState from "../../hooks/useSelectionState";
 import useStats from "../../hooks/useStats";
 import { brandColors } from "../../utils/constants";
@@ -46,6 +47,8 @@ const AdminDashboard: React.FC = () => {
   const handleToggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
   };
+
+  const { loadingState } = useLoadingData();
 
   const {
     handleSelect,
@@ -73,32 +76,9 @@ const AdminDashboard: React.FC = () => {
     ordersData,
     yearlyCategories,
     yearlyOrdersData,
-    isLoading,
   } = useStats(isMobile);
 
-  const [fakeLoading, setFakeLoading] = useState(true);
-
   const user = useAppSelector(selectCurrentUser);
-
-  useEffect(() => {
-    if (selectedClient) {
-      console.log("Selected client:", selectedClient);
-    }
-  }, [selectedClient]);
-
-  useEffect(() => {
-    if (selectedAgent) {
-      console.log("Selected client:", selectedAgent);
-    }
-  }, [selectedAgent]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setFakeLoading(false);
-    }, 400); // Fake loading for 700ms
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const selectedAgentData = useMemo(() => {
     if (selectedAgent && salesDistributionDataAgents.agents.length > 0) {
@@ -118,8 +98,6 @@ const AdminDashboard: React.FC = () => {
     }
     return [];
   }, [selectedAgentData]);
-
-  const loadingState = isLoading || fakeLoading;
 
   return (
     <Box
@@ -427,10 +405,7 @@ const AdminDashboard: React.FC = () => {
                       aria-label="skeleton"
                     />
                   ) : (
-                    <TotalEarning
-                      totalEarning={totalRevenue}
-                      isLoading={isLoading}
-                    />
+                    <TotalEarning totalEarning={totalRevenue} />
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -446,7 +421,6 @@ const AdminDashboard: React.FC = () => {
                   ) : (
                     <TotalOrder
                       totalOrder={totalOrders}
-                      isLoading={isLoading}
                       monthlyOrders={ordersData}
                       yearlyOrders={yearlyOrdersData}
                       monthlyCategories={months}
@@ -580,11 +554,7 @@ const AdminDashboard: React.FC = () => {
 
       {/* Drawer Container for Calendar and Upcoming Visits */}
       {isTablet && (
-        <DrawerContainer
-          open={drawerOpen}
-          onClose={handleToggleDrawer}
-          isLoading={isLoading}
-        />
+        <DrawerContainer open={drawerOpen} onClose={handleToggleDrawer} />
       )}
     </Box>
   );

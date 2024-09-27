@@ -8,6 +8,7 @@ import ChatView from "../../components/chatPage/ChatView";
 const ChatPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  
 
   // Get currentChat from Redux state
   const currentChat = useAppSelector(

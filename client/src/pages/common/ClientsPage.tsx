@@ -17,12 +17,17 @@ import {
   currencyFormatter,
   numberComparator,
 } from "../../utils/dataUtils";
+import useLoadingData from "../../hooks/useLoadingData";
+import Spinner from "../../components/common/Spinner";
 
 const ClientsPage: React.FC = () => {
   const { t } = useTranslation();
   const isMobile = useMediaQuery("(max-width:600px)");
   const userRole = useSelector((state: RootState) => state.auth.role);
   const loggedInClientId = useSelector((state: RootState) => state.auth.id);
+
+  const { loading } = useLoadingData();
+
 
   const {
     filteredClients,
@@ -174,6 +179,24 @@ const ClientsPage: React.FC = () => {
   const loggedInClientDetails = filteredClients.find(
     (client) => client.id === loggedInClientId
   );
+
+   // Handle loading state
+   if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          height: "100vh",
+          justifyContent: "center",
+          alignItems: "center",
+          bgcolor: "#f4f5f7",
+        }}
+      >
+        <Spinner />
+      </Box>
+    );
+  }
+
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>

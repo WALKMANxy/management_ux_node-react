@@ -230,7 +230,6 @@ export type TopArticleTypeProps = {
 
 export type TotalEarningProps = {
   totalEarning: number;
-  isLoading: boolean;
 };
 
 export type UpcomingVisitsProps = {

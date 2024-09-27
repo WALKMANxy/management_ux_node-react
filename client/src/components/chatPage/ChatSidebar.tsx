@@ -14,6 +14,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import "animate.css";
 import React, {
   useCallback,
   useEffect,
@@ -34,7 +35,9 @@ const ChatSidebar: React.FC = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [showContacts, setShowContacts] = useState(false);
-  const animationClass = useRef("animate__fadeInLeft");
+  const [animationClass, setAnimationClass] = useState("animate__fadeInLeft");
+  const [isFirstMount, setIsFirstMount] = useState(true);
+
   const {
     chats,
     filteredContacts,
@@ -49,12 +52,27 @@ const ChatSidebar: React.FC = () => {
   const [isCreateChatFormOpen, setIsCreateChatFormOpen] = useState(false);
   const userRole = useAppSelector(selectUserRole);
 
+  // Handle first mount animation
+  useEffect(() => {
+    // After the first mount, set isFirstMount to false
+    setIsFirstMount(false);
+    // Cleanup animation class if necessary
+    return () => {};
+  }, []);
+
+  // Determine the animation class
+  const appliedAnimationClass = isFirstMount
+    ? "animate__fadeInLeft animate_faster"
+    : animationClass;
+
   const handleToggleContacts = useCallback(() => {
-    animationClass.current = "animate__fadeOut";
+    // Apply fadeOut animation
+    setAnimationClass("animate__fadeOut");
+    // After fadeOut, toggle the view and apply fadeIn
     setTimeout(() => {
       setShowContacts((prev) => !prev);
-      animationClass.current = "animate__fadeIn";
-    }, 200);
+      setAnimationClass("animate__fadeIn");
+    }, 50); // Duration should match the animation duration
   }, []);
 
   useEffect(() => {
@@ -112,7 +130,7 @@ const ChatSidebar: React.FC = () => {
 
   return (
     <Box
-      className={`animate__animated animate__faster ${animationClass.current}`}
+      className={`animate__animated  ${appliedAnimationClass}`}
       sx={{
         p: 2,
         bgcolor: "#ffffff",
@@ -222,7 +240,7 @@ const ChatSidebar: React.FC = () => {
           // For Firefox
           scrollbarWidth: "none",
           // For IE and Edge
-          "MsOverflowStyle": "none",
+          MsOverflowStyle: "none",
         }}
       >
         <Box

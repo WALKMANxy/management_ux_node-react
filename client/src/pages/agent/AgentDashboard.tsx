@@ -11,7 +11,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import ActivePromotions from "../../components/dashboard/ActivePromotions";
 import CalendarComponent from "../../components/dashboard/CalendarComponent";
@@ -26,6 +26,7 @@ import GlobalSearch from "../../components/Header/GlobalSearch";
 import MonthOverMonthSpendingTrend from "../../components/statistics/charts/MonthOverMonthSpendingTrend";
 import SalesDistribution from "../../components/statistics/charts/SalesDistribution";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
+import useLoadingData from "../../hooks/useLoadingData";
 import useSelectionState from "../../hooks/useSelectionState";
 import useStats from "../../hooks/useStats";
 import { brandColors } from "../../utils/constants";
@@ -50,6 +51,8 @@ const AgentDashboard: React.FC = () => {
     clientComparativeStatisticsMonthly,
   } = useSelectionState(isMobile);
 
+  const { loadingState } = useLoadingData();
+
   const {
     details,
     calculateTotalSpentThisMonth,
@@ -64,20 +67,7 @@ const AgentDashboard: React.FC = () => {
     ordersData,
     yearlyCategories,
     yearlyOrdersData,
-    isLoading,
   } = useStats(isMobile);
-
-  const [fakeLoading, setFakeLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setFakeLoading(false);
-    }, 400); // Fake loading for 700ms
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const loadingState = isLoading || fakeLoading;
 
   return (
     <Box
@@ -225,7 +215,7 @@ const AgentDashboard: React.FC = () => {
             </Box>
           ) : (
             <Box mb={4}>
-              {isLoading ? (
+              {loadingState ? (
                 <Skeleton
                   animation="wave"
                   variant="text"
@@ -247,11 +237,8 @@ const AgentDashboard: React.FC = () => {
               <Divider sx={{ my: 2, borderRadius: "12px" }} />
               <Grid container spacing={2}>
                 <Grid item xs={12} md={6}>
-                  {details && "clients" in details ? (
-                    <TotalEarning
-                      totalEarning={totalRevenue}
-                      isLoading={!details}
-                    />
+                  {!loadingState ? (
+                    <TotalEarning totalEarning={totalRevenue} />
                   ) : (
                     <Skeleton
                       animation="wave"
@@ -264,10 +251,9 @@ const AgentDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  {details && "clients" in details ? (
+                  {!loadingState ? (
                     <TotalOrder
                       totalOrder={totalOrders}
-                      isLoading={!details}
                       monthlyOrders={ordersData}
                       yearlyOrders={yearlyOrdersData}
                       monthlyCategories={months}
@@ -285,7 +271,7 @@ const AgentDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  {details && "clients" in details ? (
+                  {!loadingState ? (
                     <MonthOverMonthSpendingTrend
                       months={months}
                       revenueData={revenueData}
@@ -304,7 +290,7 @@ const AgentDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  {details && "clients" in details ? (
+                  {!loadingState ? (
                     <TopBrandsSold
                       topBrandsData={topBrandsData}
                       isMobile={isMobile}
@@ -323,7 +309,7 @@ const AgentDashboard: React.FC = () => {
                   )}
                 </Grid>
                 <Grid item xs={12}>
-                  {details && "clients" in details ? (
+                  {!loadingState ? (
                     <SalesDistribution
                       salesDistributionDataClients={
                         salesDistributionDataClients
@@ -410,11 +396,7 @@ const AgentDashboard: React.FC = () => {
       </Grid>
       {/* Drawer Container for Calendar and Upcoming Visits */}
       {isTablet && (
-        <DrawerContainer
-          open={drawerOpen}
-          onClose={handleToggleDrawer}
-          isLoading={isLoading}
-        />
+        <DrawerContainer open={drawerOpen} onClose={handleToggleDrawer} />
       )}
     </Box>
   );

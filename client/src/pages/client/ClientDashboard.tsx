@@ -19,6 +19,7 @@ import TopArticleType from "../../components/dashboard/TopArticleType";
 import UpcomingVisits from "../../components/dashboard/UpcomingVisits";
 import MonthOverMonthSpendingTrend from "../../components/statistics/charts/MonthOverMonthSpendingTrend";
 import TopBrandsSold from "../../components/statistics/charts/TopBrandSold";
+import useLoadingData from "../../hooks/useLoadingData";
 import useStats from "../../hooks/useStats"; // Use the new unified hook
 import { brandColors } from "../../utils/constants";
 
@@ -29,6 +30,8 @@ const ClientDashboard: React.FC = () => {
   const isTablet = useMediaQuery("(min-width:600px) and (max-width:1250px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  const { loadingState } = useLoadingData();
+
   const {
     details: clientDetails,
     calculateTotalSpentThisMonth,
@@ -37,7 +40,6 @@ const ClientDashboard: React.FC = () => {
     topBrandsData,
     months,
     revenueData,
-    isLoading,
   } = useStats(isMobile);
 
   const handleToggleDrawer = () => {
@@ -49,7 +51,7 @@ const ClientDashboard: React.FC = () => {
       className="client-dashboard"
       sx={{ p: isMobile ? 0 : 4, bgcolor: "#f4f5f7" }}
     >
-      {isLoading ? (
+      {loadingState ? (
         <Skeleton
           animation="wave"
           variant="text"
@@ -60,7 +62,7 @@ const ClientDashboard: React.FC = () => {
         />
       ) : (
         <Typography variant="h4" gutterBottom>
-          {clientDetails && "name" in clientDetails ? (
+          {!loadingState && clientDetails && "name" in clientDetails ? (
             <>
               {t("clientDashboard.welcomeBack", { name: clientDetails.name })}
             </>
@@ -88,7 +90,7 @@ const ClientDashboard: React.FC = () => {
       <Grid container spacing={6} mt={2}>
         <Grid item xs={!isTablet ? 12 : 0} md={!isTablet ? 9 : 0}>
           <Box mb={4}>
-            {isLoading ? (
+            {loadingState ? (
               <Skeleton
                 animation="wave"
                 variant="text"
@@ -105,7 +107,9 @@ const ClientDashboard: React.FC = () => {
 
             <Grid container spacing={2}>
               <Grid item xs={12} md={4}>
-                {clientDetails && "movements" in clientDetails ? (
+                {!loadingState &&
+                clientDetails &&
+                "movements" in clientDetails ? (
                   <SpentThisMonth
                     amount={
                       calculateTotalSpentThisMonth(clientDetails.movements)
@@ -123,7 +127,9 @@ const ClientDashboard: React.FC = () => {
                 )}
               </Grid>
               <Grid item xs={12} md={4}>
-                {clientDetails && "movements" in clientDetails ? (
+                {!loadingState &&
+                clientDetails &&
+                "movements" in clientDetails ? (
                   <SpentThisYear
                     amount={calculateTotalSpentThisYear(
                       clientDetails.movements
@@ -140,7 +146,9 @@ const ClientDashboard: React.FC = () => {
                 )}
               </Grid>
               <Grid item xs={12} md={4}>
-                {clientDetails && "movements" in clientDetails ? (
+                {!loadingState &&
+                clientDetails &&
+                "movements" in clientDetails ? (
                   <TopArticleType
                     articles={calculateTopArticleType(clientDetails.movements)}
                     isAgentSelected={false}
@@ -156,7 +164,7 @@ const ClientDashboard: React.FC = () => {
                 )}
               </Grid>
               <Grid item xs={12} md={6}>
-                {clientDetails ? (
+                {!loadingState && clientDetails ? (
                   <MonthOverMonthSpendingTrend
                     months={months}
                     revenueData={revenueData}
@@ -174,7 +182,7 @@ const ClientDashboard: React.FC = () => {
                 )}
               </Grid>
               <Grid item xs={12} md={6}>
-                {clientDetails ? (
+                {!loadingState && clientDetails ? (
                   <TopBrandsSold
                     topBrandsData={topBrandsData}
                     brandColors={brandColors}
@@ -192,7 +200,7 @@ const ClientDashboard: React.FC = () => {
                 )}
               </Grid>
               <Grid container item xs={12} md={6}>
-                {clientDetails ? (
+                {!loadingState && clientDetails ? (
                   <ActivePromotions />
                 ) : (
                   <Skeleton
@@ -217,7 +225,7 @@ const ClientDashboard: React.FC = () => {
               </Typography>
 
               <Box sx={{ margin: "0 auto" }}>
-                {clientDetails ? (
+                {!loadingState && clientDetails ? (
                   <CalendarComponent />
                 ) : (
                   <Skeleton
@@ -231,17 +239,13 @@ const ClientDashboard: React.FC = () => {
               </Box>
             </Box>
 
-            <UpcomingVisits/>
+            <UpcomingVisits />
           </Grid>
         )}
       </Grid>
 
       {/* Drawer with CalendarComponent and UpcomingVisits */}
-      <DrawerContainer
-        open={drawerOpen}
-        onClose={handleToggleDrawer}
-        isLoading={isLoading}
-      />
+      <DrawerContainer open={drawerOpen} onClose={handleToggleDrawer} />
     </Box>
   );
 };
