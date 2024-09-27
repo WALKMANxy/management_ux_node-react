@@ -126,3 +126,17 @@ export const agentColorMap: { [key: string]: string } = {
   "99": "#D2691E", // Seguito da Avvocato
   "100": "#808080", // Non Assegnato
 };
+
+
+// src/constants/routes.ts
+export const CLIENTS_OR_MESSAGES_PATHS = [
+  "/clients",
+  "/messages",
+  "/visits",
+  "/promos",
+  "/calendar",
+  "/movements",
+  "/articles",
+];
+
+export const SETTINGS_PATH = "/settings";
