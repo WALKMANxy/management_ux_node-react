@@ -3,6 +3,8 @@
 import mongoose, { Types } from "mongoose";
 import { Chat, IChat, IMessage } from "../models/Chat";
 import { logger } from "../utils/logger";
+import { Server } from "socket.io";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
 
 // Custom Error Classes (Optional but Recommended)
 class ValidationError extends Error {
@@ -100,6 +102,24 @@ export class ChatService {
       throw new Error("Failed to fetch chats");
     }
   }
+
+  static async getAllChatIds(userId: string): Promise<Types.ObjectId[]> {
+    try {
+      const chatIds = await Chat.find({
+        participants: userId,
+      })
+        .sort({ updatedAt: -1 }) // Sort by the most recently updated chats
+        .select({ _id: 1 }) // Only select the _id field
+        .lean() // Use lean for faster reads as we're not modifying the data
+        .exec(); // Execute the query
+
+      return chatIds.map(chat => chat._id);
+    } catch (error) {
+      console.error("Error fetching chat IDs:", error);
+      throw new Error("Failed to fetch chat IDs");
+    }
+  }
+
 
   // Fetch a specific chat by its ID for the authenticated user
   static async getChatById(
@@ -412,7 +432,8 @@ export class ChatService {
 
   static async findOrCreateChat(
     userId: string,
-    botId: string
+    botId: string,
+    io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>  // Pass the io instance to emit events
   ): Promise<string> {
     try {
       const userObjectId = new mongoose.Types.ObjectId(userId);
@@ -429,9 +450,21 @@ export class ChatService {
           new: true, // Return the new document if upserted
           upsert: true, // Create the document if it doesn't exist
           setDefaultsOnInsert: true,
-          fields: { _id: 1 }, // Only return the _id field
+          fields: { _id: 1, participants: 1 }, // Return _id and participants fields
         }
       ).exec();
+
+      // Check if the chat was newly created
+      if (chat.isNew) {
+        // Emit 'chat:newChat' event to the user and bot's rooms
+        chat.participants.forEach(participantId => {
+          const participantRoomId = `user:${participantId.toString()}`;
+          io.to(participantRoomId).emit("chat:newChat", {
+            chat: chat,
+          });
+          logger.info(`Emitting chat:newChat for newly created chat ${chat._id.toString()}`);
+        });
+      }
 
       logger.debug(`Chat found or created with ID: ${chat._id.toString()}`);
       return chat._id.toString();
@@ -488,7 +521,9 @@ export class ChatService {
   static async sendAutomatedMessageToUsers(
     userIds: string[],
     messageData: Partial<IMessage>,
-    botId: string
+    botId: string,
+    io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any> // Accept io instance here
+
   ): Promise<string[]> {
     // Return type is Promise<string[]>
     const startTime = Date.now(); // For performance logging
@@ -534,7 +569,7 @@ export class ChatService {
     // Prepare bulk operations concurrently
     const chatIdPromises = userObjectIds.map(async (userId) => {
       try {
-        const chatId = await this.findOrCreateChat(userId.toString(), botId);
+        const chatId = await this.findOrCreateChat(userId.toString(), botId, io);
         chatIds.push(chatId);
 
         bulkOperations.push({

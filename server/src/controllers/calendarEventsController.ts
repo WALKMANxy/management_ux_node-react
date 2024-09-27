@@ -1,6 +1,6 @@
 import { Response } from "express";
-import { emitToAdmins, emitToUser } from "../middlewares/webSocket";
-import { AuthenticatedRequest } from "../models/types";
+/* import { emitToAdmins, emitToUser } from "../middlewares/webSocket";
+ */import { AuthenticatedRequest } from "../models/types";
 import { CalendarEventService } from "../services/calendarEventsService";
 import { logger } from "../utils/logger";
 
@@ -34,10 +34,10 @@ export class CalendarEventController {
 
       logger.info(`Calendar event created successfully for user ${userId}`);
 
-      // Emit WebSocket event based on event type
+     /*  // Emit WebSocket event based on event type
       if (event.eventType === "absence") {
         emitToAdmins("calendarEvents:newEvent", event);
-      }
+      } */
 
       return res.status(201).json(event);
     } catch (error) {
@@ -196,12 +196,12 @@ export class CalendarEventController {
 
       logger.info(`Calendar event with ID ${eventId} updated to ${status}`);
 
-      // Emit WebSocket event for status update to the event's user
+      /* // Emit WebSocket event for status update to the event's user
       emitToUser(
         updatedEvent.userId.toString(),
         "calendarEvents:newStatusUpdate",
         updatedEvent
-      );
+      ); */
 
       return res.status(200).json(updatedEvent);
     } catch (error) {
@@ -247,14 +247,14 @@ export class CalendarEventController {
 
       logger.info(`Calendar event with ID ${eventId} updated successfully`);
 
-      // Emit WebSocket event for update
+     /*  // Emit WebSocket event for update
       emitToAdmins("calendarEvents:eventUpdated", updatedEvent);
       emitToUser(
         updatedEvent.userId.toString(),
         "calendarEvents:eventUpdated",
         updatedEvent
       );
-
+ */
       return res.status(200).json(updatedEvent);
     } catch (error) {
       logger.error(
@@ -280,14 +280,14 @@ export class CalendarEventController {
 
       logger.info(`Calendar event with ID ${eventId} deleted successfully`);
 
-      // Emit WebSocket event for deletion
+     /*  // Emit WebSocket event for deletion
       emitToAdmins("calendarEvents:eventDeleted", deletedEvent);
       emitToUser(
         deletedEvent.userId.toString(),
         "calendarEvents:eventDeleted",
         deletedEvent
       );
-
+ */
       return res
         .status(200)
         .json({ message: "Calendar event deleted successfully." });

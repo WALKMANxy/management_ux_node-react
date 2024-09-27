@@ -22,7 +22,7 @@ if (!apiUrl) {
 class WebSocketService {
   private socket: Socket | null = null;
   private reconnectAttempts = 0;
-  private maxReconnectAttempts = 5;
+  private maxReconnectAttempts = 15;
 
   // Queues to handle offline updates
   private offlineReadStatusQueue: Array<{
