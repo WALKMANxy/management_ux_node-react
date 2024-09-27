@@ -1,21 +1,4 @@
-//src/models/dataModels.ts
-
-export type ChatType = "simple" | "group" | "broadcast";
-export type ChatStatus = "pending" | "created" | "failed";
-
-export type EventType = "absence" | "holiday" | "event" | "visit";
-export type EventReason =
-  | "illness"
-  | "day_off"
-  | "unexpected_event"
-  | "medical_visit"
-  | "public_holiday"
-  | "company_holiday"
-  | "company_meeting"
-  | "company_party"
-  | "conference"
-  | "expo"
-  | "generic";
+// models/dataModels.ts
 
 export type MovementDetail = {
   articleId: string;
@@ -54,7 +37,7 @@ export type Visit = {
 
 export interface GlobalVisits {
   [agentId: string]: {
-    visits: Visit[];
+    Visits: Visit[];
   };
 }
 
@@ -80,23 +63,23 @@ export interface IMessage {
   timestamp: Date;
   readBy: string[]; // Array of user IDs who have read the message
   messageType: "message" | "alert" | "promo" | "visit"; // Categorizes the message type
-  attachments?: { url: string; type: "image" }[]; // Array to store image URLs and types
+  attachments: { url: string; type: "image" }[]; // Array to store image URLs and types
   status: "pending" | "sent" | "failed"; // Status indicating the message state
-
+  
 }
 
 export interface IChat {
-  _id?: string;
-  local_id?: string; // Changed to camelCase
-  type: ChatType;
-  name?: string;
-  description?: string;
-  participants: string[];
-  admins?: string[];
-  messages: IMessage[];
+  _id?: string; // Server-generated unique identifier
+  local_id: string; // Client-generated identifier for matching
+  type: "simple" | "group" | "broadcast"; // Type of chat
+  name?: string; // Optional, mainly for group chats
+  description?: string; // Optional, mainly for groups and broadcasts
+  participants: string[]; // List of participant user IDs
+  admins?: string[]; // Admins, mainly for group and broadcast chats
+  messages: IMessage[]; // Array of messages within the chat
   createdAt: Date;
   updatedAt?: Date;
-  status: ChatStatus;
+  status: "pending" | "created" | "failed"; // Status indicating the chat state
 }
 
 export type CalendarEvent = {
@@ -104,9 +87,22 @@ export type CalendarEvent = {
   userId: string;
   startDate: Date;
   endDate: Date;
-  eventType: EventType;
+  eventType: "absence" | "holiday" | "event" | "visit" | "";
   eventName: string;
-  reason: EventReason;
+  reason:
+    | "illness"
+    | "day_off"
+    | "unexpected_event"
+    | "medical_visit"
+    | "public_holiday"
+    | "company_holiday"
+    | "company_meeting"
+    | "company_party"
+    | "conference"
+    | "expo"
+    | "generic"
+    | ""
+    ;
   note?: string;
   status: "pending" | "approved" | "rejected" | "cancelled";
   createdAt: Date;
