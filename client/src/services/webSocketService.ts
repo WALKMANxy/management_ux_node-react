@@ -84,7 +84,7 @@ class WebSocketService {
       this.emitNewChat(chat);
     }
 
-    
+
   };
 
   private handleDisconnect = () => {
@@ -145,9 +145,9 @@ class WebSocketService {
           addMessageReducer({ chatId, message, fromServer: true })
         );
         if (message.sender !== currentUserId) {
+          console.log("handleNewMessage: Dispatching notification for message:", message);
           handleNewNotification(message.sender, message.content, state); // Call the notification handler
         }
-
         // Wait for the message to be fully added to the server
         setTimeout(() => {
           // Check if the message is part of the currently opened chat and hasn't been read

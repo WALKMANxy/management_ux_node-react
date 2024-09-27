@@ -24,7 +24,7 @@ const ChatPage: React.FC = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: isMobile ? "94dvh" : "calc(100vh - 120px)", // Use 95vh when isMobile is true, otherwise subtract the header height
+        height: isMobile ? "100dvh" : "calc(100vh - 80px)", // Use 95vh when isMobile is true, otherwise subtract the header height
         bgcolor: "#f4f5f7",
         overflow: "hidden",
       }}

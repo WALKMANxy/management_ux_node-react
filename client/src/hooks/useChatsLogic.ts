@@ -39,10 +39,11 @@ const useChatLogic = () => {
   const currentChat: IChat | null = useSelector(selectCurrentChat); // Allow null values
   const messages = useSelector(selectMessagesFromCurrentChat); // Use selector to get messages of the current chat
   const [page, setPage] = useState(2); // Start from page 2 since page 1 is already loaded
-  const currentChatId = currentChat?._id;
   const [contactsFetched, setContactsFetched] = useState(false);
 
   const agentClientIds = useSelector(selectClientIds);
+
+  const currentChatId = useMemo(() => currentChat?._id, [currentChat]);
 
   const fetchChats = useCallback(async () => {
     try {
@@ -91,22 +92,39 @@ const useChatLogic = () => {
   // Select a chat
   const selectChat = useCallback(
     (chat: IChat) => {
-      dispatch(setCurrentChatReducer(chat)); // Set current chat in the state
+      // Determine the chat identifier: use _id if available, otherwise local_id
+      const chatId = chat._id ? chat._id.toString() : chat.local_id;
 
-      // Update read status using existing messages, no need to fetch them again
+      if (!chatId) {
+        console.warn('Chat does not have an _id or local_id:', chat);
+        return;
+      }
+
+      console.log(`Selected chat ID: ${chatId}`); // Debug: Log chat ID
+      console.log(`Chat name: ${chat.name}`); // Debug: Log chat name
+      console.log(`Chat with ${chat.participants.length} members`); // Debug: Log the number of members
+
+      // Set the current chat in the state
+      dispatch(setCurrentChatReducer(chat));
+
+      // Identify unread messages
       const unreadMessageIds = chat.messages
         .filter(
           (message: IMessage) =>
-            !message.readBy.includes(currentUserId) &&
-            message.sender !== currentUserId
+            !message.readBy.map(id => id.toString()).includes(currentUserId) &&
+            message.sender.toString() !== currentUserId
         )
-        .map((message) => message.local_id || message._id);
+        .map((message) => message.local_id ? message.local_id.toString() : message._id.toString());
+
+      console.log(
+        `Found ${unreadMessageIds.length} unread messages by ${currentUserId} in chat ${chatId}`
+      ); // Debug: Log the number of unread messages
 
       // Update read status for unread messages
       if (unreadMessageIds.length > 0) {
         dispatch(
           updateReadStatusReducer({
-            chatId: chat._id,
+            chatId: chatId,
             userId: currentUserId,
             messageIds: unreadMessageIds,
           })
@@ -115,6 +133,7 @@ const useChatLogic = () => {
     },
     [currentUserId, dispatch]
   );
+
 
   // Debounced fetch handler to avoid multiple requests
   const handleLoadMoreMessages = debounce(() => {
@@ -196,13 +215,22 @@ const useChatLogic = () => {
     [currentChatId, currentUserId, dispatch]
   );
 
-  // Chat creation handler using createChatThunk
+  /**
+   * Handles the creation of a new chat.
+   *
+   * @param participants - Array of participant user IDs.
+   * @param chatType - Type of chat: "simple", "group", or "broadcast".
+   * @param name - Optional name for the chat.
+   * @param description - Optional description for the chat.
+   * @param admins - Optional array of admin user IDs (only for "group" and "broadcast" chats).
+   */
   const handleCreateChat = useCallback(
     async (
       participants: string[],
       chatType: "simple" | "group" | "broadcast",
       name?: string,
-      description?: string
+      description?: string,
+      admins?: string[] // New optional admins parameter
     ) => {
       if (!participants.length) return;
 
@@ -211,12 +239,12 @@ const useChatLogic = () => {
         chatType,
         name,
         description,
+        admins, // Log admins if provided
       });
 
       const localId = generateId();
 
       const chatData: IChat = {
-        _id: localId, // Temporary local ID
         local_id: localId,
         type: chatType,
         participants,
@@ -226,6 +254,7 @@ const useChatLogic = () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         status: "pending", // Indicate that the chat is pending confirmation
+        ...(admins && { admins }), // Conditionally add admins if provided
       };
 
       console.log("Dispatching to addChatReducer:", chatData);
@@ -258,7 +287,6 @@ const useChatLogic = () => {
         const localId = generateId();
 
         const newChat: IChat = {
-          _id: localId, // Temporary local ID
           local_id: localId,
           type: "simple",
           participants: [currentUserId, contactId],

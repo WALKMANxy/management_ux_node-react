@@ -27,6 +27,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import "animate.css";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
@@ -258,6 +259,7 @@ const Header: React.FC = () => {
           left: "auto",
           maxWidth: "100vw", // Prevents overflowing past the viewport width
         }}
+        className="animate__animated animate__fadeInDown" // Apply the animation class here
       >
         <Toolbar
           sx={{

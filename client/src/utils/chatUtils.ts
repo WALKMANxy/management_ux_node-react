@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { IChat } from "../models/dataModels";
 
 // Utility to sanitize the search term
 export const sanitizeSearchTerm = (term: string) =>
@@ -47,4 +48,38 @@ export const isDifferentDay = (date1?: Date, date2?: Date): boolean => {
   } catch {
     return false;
   }
+};
+
+/**
+ * Determines if a user can send messages in a chat.
+ *
+ * @param chat - The chat object.
+ * @param currentUserId - The ID of the current user.
+ * @returns A boolean indicating if the user can chat.
+ */
+export const canUserChat = (chat: IChat, currentUserId: string): boolean => {
+  // If the chat is pending, disable the input
+  if (chat.status === "pending") {
+    return false;
+  }
+
+  // If the chat type is broadcast, check if the user is an admin
+  if (chat.type === "broadcast") {
+    // Ensure admins array exists
+    if (chat.admins && chat.admins.length > 0) {
+      // Check if currentUserId is in the admins array
+      const isAdmin = chat.admins.some(
+        (adminId) => adminId.toString() === currentUserId
+      );
+      if (!isAdmin) {
+        return false;
+      }
+    } else {
+      // If no admins are defined, treat it as non-admin
+      return false;
+    }
+  }
+
+  // In all other cases, allow chatting
+  return true;
 };

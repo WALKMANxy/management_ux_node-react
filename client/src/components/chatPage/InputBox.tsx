@@ -21,7 +21,7 @@ import { selectUserRole } from "../../features/auth/authSlice"; // Assuming the 
 import useChatLogic from "../../hooks/useChatsLogic";
 
 interface InputBoxProps {
-  chatStatus: string | undefined; // Add chatStatus prop
+  canUserChat: boolean; // Add chatStatus prop
 }
 
 /**
@@ -31,7 +31,7 @@ interface InputBoxProps {
  * @param {InputBoxProps} props - Component props.
  * @returns {JSX.Element} The rendered component.
  */
-const InputBox: React.FC<InputBoxProps> = ({ chatStatus }) => {
+const InputBox: React.FC<InputBoxProps> = ({ canUserChat }) => {
   const { t } = useTranslation();
   const [messageInput, setMessageInput] = useState("");
   const [messageType, setMessageType] = useState<
@@ -88,12 +88,12 @@ const InputBox: React.FC<InputBoxProps> = ({ chatStatus }) => {
 
   return (
     <Paper
-      elevation={3}
+      elevation={0}
       sx={{
         display: "flex",
         alignItems: "center",
         p: 1,
-        borderRadius: isMobile ? "0px" : "1.5em", // Rounded corners for the paper
+        borderRadius: isMobile ? "0px" : "0px", // Rounded corners for the paper
         mt: 0,
         backdropFilter: "blur(10px)", // Frosted glass effect
         backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent background
@@ -134,7 +134,7 @@ const InputBox: React.FC<InputBoxProps> = ({ chatStatus }) => {
           },
           mr: 1, // Margin right to separate from the divider
         }}
-        disabled={chatStatus === "pending"} // Disable input if chat is pending
+        disabled={!canUserChat} // Disable input if chat is pending
       />
 
       {/* Divider */}
@@ -168,7 +168,7 @@ const InputBox: React.FC<InputBoxProps> = ({ chatStatus }) => {
           color="primary"
           onClick={handleSend}
           aria-label={t("inputBox.tooltips.sendMessage")}
-          disabled={chatStatus === "pending"}
+          disabled={!canUserChat}
         >
           <SendIcon />
         </IconButton>
@@ -192,11 +192,10 @@ const InputBox: React.FC<InputBoxProps> = ({ chatStatus }) => {
             backdropFilter: "blur(10px)", // Frosted glass effect
             backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent background
             borderRadius: "8px",
-            padding: 2,
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-around",
-            minWidth: "200px",
+            minWidth: "100px",
           },
         }}
       >
