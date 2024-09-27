@@ -32,6 +32,10 @@ class WebSocketService {
   private offlineMessageQueue: Array<{ chatId: string; message: IMessage }> =
     [];
   private offlineChatQueue: Array<{ chat: IChat }> = [];
+  private offlineAutomatedMessageQueue: Array<{
+    targetIds: string[];
+    message: Partial<IMessage>;
+  }> = [];
 
   // Inject the store reference at runtime
   injectStore(_store: AppStore) {
@@ -84,7 +88,11 @@ class WebSocketService {
       this.emitNewChat(chat);
     }
 
-
+    // Flush queued automated messages
+    while (this.offlineAutomatedMessageQueue.length > 0) {
+      const { targetIds, message } = this.offlineAutomatedMessageQueue.shift()!;
+      this.emitAutomatedMessage(targetIds, message);
+    }
   };
 
   private handleDisconnect = () => {
@@ -145,7 +153,10 @@ class WebSocketService {
           addMessageReducer({ chatId, message, fromServer: true })
         );
         if (message.sender !== currentUserId) {
-          console.log("handleNewMessage: Dispatching notification for message:", message);
+          console.log(
+            "handleNewMessage: Dispatching notification for message:",
+            message
+          );
           handleNewNotification(message.sender, message.content, state); // Call the notification handler
         }
         // Wait for the message to be fully added to the server
@@ -249,6 +260,16 @@ class WebSocketService {
     }
 
     this.socket.emit("chat:create", { chat });
+  }
+
+  public emitAutomatedMessage(targetIds: string[], message: Partial<IMessage>) {
+    if (!this.socket || !this.socket.connected) {
+      console.warn("Socket disconnected. Queuing automated message.");
+      this.offlineAutomatedMessageQueue.push({ targetIds, message });
+      return;
+    }
+
+    this.socket.emit("chat:automatedMessage", { targetIds, message });
   }
 
   // Clean up and disconnect

@@ -50,6 +50,7 @@ export const config = {
   sessionDuration: process.env.SESSION_DURATION || "24d",
   emailHost: process.env.EMAIL_HOST || "",
   emailHostPort: process.env.EMAIL_HOST_PORT || "",
+  botId: process.env.BOT_TOKEN || "",
 };
 
 // Validate required environment variables
