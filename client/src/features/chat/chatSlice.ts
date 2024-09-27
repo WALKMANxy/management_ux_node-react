@@ -380,6 +380,6 @@ export const selectUnreadMessages = createSelector(
   [selectCurrentChat, (_: RootState, userId: string) => userId],
   (currentChat, userId) =>
     currentChat?.messages.filter(
-      (message) => !message.readBy.includes(userId) && message.sender !== userId
+      (message: IMessage) => !message.readBy.includes(userId) && message.sender !== userId
     ) || []
 );

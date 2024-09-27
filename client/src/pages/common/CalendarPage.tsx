@@ -16,7 +16,6 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import CalendarEventComponent from "../../components/calendarPage/CalendarEventComponent";
-import { CustomToolbar } from "../../components/calendarPage/CustomToolbar";
 import { EventForm } from "../../components/calendarPage/EventForm";
 import { EventHistory } from "../../components/calendarPage/EventHistory";
 import PopOverEvent from "../../components/calendarPage/PopOverEvent";
@@ -28,6 +27,7 @@ import { CalendarEvent } from "../../models/dataModels";
 import { localizer } from "../../utils/localizer";
 import { showToast } from "../../utils/toastMessage";
 import "./CalendarPage.css"; // Import the CSS file
+import { CustomToolbar } from "../../components/calendarPage/CustomToolbar";
 
 const CalendarPage: React.FC = () => {
   const { t } = useTranslation();
