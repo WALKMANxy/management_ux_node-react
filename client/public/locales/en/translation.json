@@ -383,7 +383,9 @@
       "selectContact": "Select contact"
     },
     "messages": {
-      "noContactsFound": "No contacts found. Try adjusting your search."
+      "noContactsFound": "No contacts found. Try adjusting your search.",
+      "promoMessage": "You are eligible for a new promotion!\n\nType: {{promoType}}\nName: {{promoName}}\nOffer: {{promoDiscount}}\n\nContact one of our representatives for more information. Have a great day!",
+      "visitMessage": "A new visit has been scheduled for you!\n\nType: {{visitType}}\nReason: {{visitReason}}\nDate: {{visitDate}}\n\nPlease be prepared. Thank you!"
     }
   },
   "dateDivider": {
