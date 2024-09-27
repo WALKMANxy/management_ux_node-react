@@ -68,7 +68,7 @@ export interface IMessage {
 }
 
 export interface IChat {
-  _id: string; // Server-generated unique identifier
+  _id?: string; // Server-generated unique identifier
   local_id: string; // Client-generated identifier for matching
   type: "simple" | "group" | "broadcast"; // Type of chat
   name?: string; // Optional, mainly for group chats

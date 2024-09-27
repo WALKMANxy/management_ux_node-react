@@ -15,12 +15,13 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "../../app/hooks";
 import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 import useLoadOlderMessages from "../../hooks/useChatLoadOlderMessages";
 import useChatView from "../../hooks/useChatView"; // Import the custom hook
+import { canUserChat } from "../../utils/chatUtils";
 import InputBox from "./InputBox";
 import RenderMessage from "./RenderMessage"; // Import the RenderMessage component
 import RenderParticipantsAvatars from "./RenderParticipantsAvatars"; // Import the RenderParticipantsAvatars component
@@ -57,7 +58,13 @@ const ChatView: React.FC = () => {
     dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
   };
 
-  const currentChatStatus = currentChat?.status;
+  // Determine if the user can chat using useMemo for optimization
+  const isUserAllowedToChat = useMemo(() => {
+    if (!currentChat || !currentUserId) {
+      return false;
+    }
+    return canUserChat(currentChat, currentUserId);
+  }, [currentChat, currentUserId]);
 
   // Fallback if currentChat is not set
   if (!currentChat) {
@@ -84,9 +91,9 @@ const ChatView: React.FC = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: isMobile ? "100dvh" : "100%", // Fill the available height
-        p: isMobile ? 0 : 2, // Remove padding on mobile
-        paddingTop: isMobile ? 2 : 0,
+        height: "100dvh", // Fill the available height
+        px: isMobile ? 0 : 1, // Remove padding on mobile
+        paddingTop: isMobile ? 1 : 0,
         bgcolor: "#ffffff",
         borderTopRightRadius: 12, // 16px equivalent
         borderBottomRightRadius: 12, // 16px equivalent
@@ -171,7 +178,7 @@ const ChatView: React.FC = () => {
             display: "none",
           },
           position: "relative",
-          height: isMobile ? "calc(100dvh - 120px)" : "79dvh", // Adjust height based on mobile or desktop
+          height: isMobile ? "100dvh" : "100dvh", // Adjust height based on mobile or desktop
         }}
       >
         <Box
@@ -181,6 +188,8 @@ const ChatView: React.FC = () => {
             borderRadius: 6,
             overflowY: "auto", // Enable scrolling for messages
             display: "flex",
+            pb: 10,
+
             flexDirection: "column",
             "&::-webkit-scrollbar": {
               display: "none",
@@ -203,7 +212,7 @@ const ChatView: React.FC = () => {
       {/* Message Input Box */}
       <Box
         sx={{
-          mt: isMobile ? 3 : 2,
+          mt: isMobile ? -10 : 0,
           flexShrink: 0, // Prevent shrinking of the input box
           borderRadius: isMobile ? "0px" : "25px", // Rounded corners for the input box
           position: "sticky", // Keep the input box sticky at the bottom
@@ -211,7 +220,7 @@ const ChatView: React.FC = () => {
           zIndex: 10,
         }}
       >
-        <InputBox chatStatus={currentChatStatus} />
+        <InputBox canUserChat={isUserAllowedToChat} />
       </Box>
     </Box>
   );

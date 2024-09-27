@@ -100,10 +100,23 @@ const chatSchema = new Schema<IChat>(
   { timestamps: true }
 );
 
-// Create a unique compound index on participants and type for simple chats
+// Unique compound index on type and participants for simple chats
 chatSchema.index(
   { type: 1, participants: 1 },
   { unique: true, partialFilterExpression: { type: "simple" } }
+);
+
+// Unique index for group chats based on type and name
+chatSchema.index(
+  { type: 1, name: 1 },
+  { unique: true, partialFilterExpression: { type: "group" } }
+);
+
+// Unique index for broadcast chats based on type and each admin
+// This ensures that an admin cannot have multiple broadcast chats
+chatSchema.index(
+  { type: 1, admins: 1 },
+  { unique: true, partialFilterExpression: { type: "broadcast" } }
 );
 
 // Additional indexes for optimized querying
