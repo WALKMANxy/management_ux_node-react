@@ -1,7 +1,6 @@
 // src/layout/Layout.tsx
 import { Box, useMediaQuery, useTheme } from "@mui/material";
-import "animate.css";
-import React, { useMemo } from "react";
+import React from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
 import ErrorBoundary from "../components/ErrorBoundary/ErrorBoundary";
@@ -14,54 +13,30 @@ const Layout: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const currentChat = useAppSelector(selectCurrentChat);
 
-  // Define paths in a constants file for maintainability
-  const clientsOrMessagesPaths = useMemo(
-    () => [
-      "/clients",
-      "/messages",
-      "/visits",
-      "/promos",
-      "/calendar",
-      "/movements",
-      "/articles",
-    ],
-    []
-  );
-
-  const isClientsOrMessagesPage = useMemo(
-    () => clientsOrMessagesPaths.includes(location.pathname),
-    [clientsOrMessagesPaths, location.pathname]
-  );
-
-  const isSettingsPage = useMemo(
-    () => location.pathname === "/settings",
-    [location.pathname]
-  );
-
-  // Precompute padding based on page and device type
-  const padding = useMemo(() => {
-    if (isSettingsPage) return { pl: 0, pr: 0 };
-    if (isClientsOrMessagesPage && isMobile) return { p: 0 };
-    return { p: 1 };
-  }, [isSettingsPage, isClientsOrMessagesPage, isMobile]);
-
-  // Determine if the header should be displayed
-  const shouldShowHeader = useMemo(
-    () => !currentChat || !isMobile,
-    [currentChat, isMobile]
-  );
+  // Check if the current path matches specific routes
+  const isClientsOrMessagesPage =
+    location.pathname === "/clients" ||
+    location.pathname === "/messages" ||
+    location.pathname === "/visits" ||
+    location.pathname === "/promos" ||
+    location.pathname === "/calendar" ||
+    location.pathname === "/movements" ||
+    location.pathname === "/articles";
+  const isSettingsPage = location.pathname === "/settings"; // Check if on the /settings page
 
   return (
     <ErrorBoundary>
-      <Box>
-        {shouldShowHeader && <Header />}
+      <Box sx={{}}>
+        {/* Hide Header if currentChat exists and we are in mobile view */}
+        {!currentChat || !isMobile ? <Header /> : null}
         <Box
           component="main"
-          className="animate__animated animate__fadeIn"
-          key={location.pathname}
           sx={{
-            flex: 1, // Allow main content to grow and fill available space
-            ...padding,
+            flex: 1, // Let main content grow to fill available space
+
+            p: isClientsOrMessagesPage && isMobile ? 0 : 1, // Adjust padding for clients and messages pages
+            pl: isSettingsPage ? 0 : undefined, // Remove left padding for settings page
+            pr: isSettingsPage ? 0 : undefined,
           }}
         >
           <Outlet />
