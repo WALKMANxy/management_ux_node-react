@@ -1,12 +1,16 @@
 // src/hooks/useMovementsGrid.ts
 import { AgGridReact } from "ag-grid-react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
 import { Movement } from "../models/dataModels";
 import { Client } from "../models/entityModels";
+import { showToast } from "../utils/toastMessage";
 
 export const useMovementsGrid = () => {
+  const { t } = useTranslation(); // Initialize translation
+
   const clients = Object.values(
     useSelector((state: RootState) => state.data.clients)
   );
@@ -27,7 +31,6 @@ export const useMovementsGrid = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const userRole = useSelector((state: RootState) => state.auth.role);
-  const userId = useSelector((state: RootState) => state.auth.id);
 
   /* useEffect(() => {
     console.log("Clients:", clients);
@@ -36,21 +39,27 @@ export const useMovementsGrid = () => {
     console.log("User ID:", userId);
   }, [clients, agentDetails, userRole, userId]);
  */
-  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+  // Handle menu open
+  const handleMenuOpen = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      setAnchorEl(event.currentTarget);
+    },
+    []
+  );
 
-  const handleMenuClose = () => {
+  // Handle menu close
+  const handleMenuClose = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
 
+  // Export data as CSV
   const exportDataAsCsv = useCallback(() => {
     if (gridRef.current) {
       gridRef.current.api.exportDataAsCsv();
     }
   }, []);
 
-  // Create a map of agent IDs to agent names
+  // Memoize agentMap to prevent unnecessary recalculations
   const agentMap = useMemo(() => {
     const map: Record<string, string> = {};
     agentDetails.forEach((agent) => {
@@ -59,32 +68,46 @@ export const useMovementsGrid = () => {
     return map;
   }, [agentDetails]);
 
-  // Add agent names to clients
+  // Enrich clients with agent names
   const enrichedClients = useMemo(() => {
     return clients.map((client) => ({
       ...client,
-      agentName: agentMap[client.agent] || "Unknown Agent",
+      agentName: agentMap[client.agent] || t("movementsGrid.unknownAgent"),
     }));
-  }, [clients, agentMap]);
+  }, [clients, agentMap, t]);
 
+  // Error Handling: No explicit error-prone operations, but adding try-catch for DOM interactions
   const handleMovementSelect = useCallback(
     (movementId: string) => {
-      const allMovements: Movement[] = enrichedClients.flatMap(
-        (client: Client) => client.movements
-      );
-      const movement =
-        allMovements.find((movement) => movement.id === movementId) || null;
-      setSelectedMovement(movement);
-      setTimeout(() => {
-        if (movementDetailsRef.current) {
-          movementDetailsRef.current.scrollIntoView({ behavior: "smooth" });
+      try {
+        const allMovements: Movement[] = enrichedClients.flatMap(
+          (client: Client) => client.movements
+        );
+        const movement =
+          allMovements.find((movement) => movement.id === movementId) || null;
+        setSelectedMovement(movement);
+        setTimeout(() => {
+          if (movementDetailsRef.current) {
+            movementDetailsRef.current.scrollIntoView({ behavior: "smooth" });
+          }
+        }, 0);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          showToast.error(
+            t("movementsGrid.selectionError", { message: error.message })
+          );
+          console.error("Error selecting movement:", error);
+        } else {
+          showToast.error(t("movementsGrid.unknownError"));
+          console.error("Unknown error selecting movement:", error);
         }
-      }, 0);
+      }
     },
-    [enrichedClients]
+    [enrichedClients, t]
   );
 
-  const filteredMovements = useCallback(() => {
+  // Memoize filteredMovements without role-based filtering
+  const filteredMovements = useMemo(() => {
     type EnrichedMovement = Movement & {
       clientId: string;
       clientName: string;
@@ -97,24 +120,11 @@ export const useMovementsGrid = () => {
           ...movement,
           clientId: client.id,
           clientName: client.name,
-          agentName: client.agentName || "Unknown Agent",
+          agentName: client.agentName || t("movementsGrid.unknownAgent"),
         }))
     );
 
-    if (userRole === "agent") {
-      movements = movements.filter((movement) =>
-        enrichedClients.some(
-          (client) => client.agent === userId && client.id === movement.clientId
-        )
-      );
-    } else if (userRole === "client") {
-      movements = movements.filter((movement) =>
-        enrichedClients.some(
-          (client) => client.id === userId && client.id === movement.clientId
-        )
-      );
-    }
-
+    // Date Filtering
     if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
@@ -124,8 +134,20 @@ export const useMovementsGrid = () => {
       });
     }
 
+    // Sort movements by dateOfOrder, newest first
+    movements.sort(
+      (a, b) =>
+        new Date(b.dateOfOrder).getTime() - new Date(a.dateOfOrder).getTime()
+    );
+
     return movements;
-  }, [enrichedClients, userRole, userId, startDate, endDate]);
+  }, [enrichedClients, startDate, endDate, t]);
+
+  useEffect(() => {
+    if (selectedMovement) {
+      console.log("Selected Movement:", selectedMovement);
+    }
+  }, [selectedMovement]);
 
   return {
     clients: enrichedClients,

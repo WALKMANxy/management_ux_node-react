@@ -26,15 +26,7 @@ const Layout: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <Box
-        sx={{
-          display: "flex",
-          flex: 1, // Let main content grow to fill available space
-
-          flexDirection: "column",
-          height: "100dvh",
-        }}
-      >
+      <Box sx={{}}>
         {/* Hide Header if currentChat exists and we are in mobile view */}
         {!currentChat || !isMobile ? <Header /> : null}
         <Box

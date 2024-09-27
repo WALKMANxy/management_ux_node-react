@@ -61,7 +61,7 @@ const MovementList: React.FC<MovementListProps> = ({
 
   // Memoize filtered movements to prevent unnecessary re-renders
   const memoizedFilteredMovements = useMemo(
-    () => filteredMovements(),
+    () => filteredMovements,
     [filteredMovements]
   );
 
