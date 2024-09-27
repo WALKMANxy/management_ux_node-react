@@ -39,29 +39,29 @@ export class CalendarEventService {
     month: number
   ): Promise<ICalendarEvent[]> {
     try {
-      console.log("Service call to get events by month for admin.");
-      console.log("Parameters received:", { year, month });
+      /*  console.log("Service call to get events by month for admin.");
+      console.log("Parameters received:", { year, month }); */
 
       // Calculate start and end of the month
       const startOfMonth = new Date(year, month - 1, 1);
       const endOfMonth = new Date(year, month, 0, 23, 59, 59);
-      console.log("Calculated start of month:", startOfMonth);
-      console.log("Calculated end of month:", endOfMonth);
+      /*  console.log("Calculated start of month:", startOfMonth);
+      console.log("Calculated end of month:", endOfMonth); */
 
       // Fetch events from the database
-      console.log("Querying the database for events...");
-      const events = await CalendarEvent.find({
+      /*       console.log("Querying the database for events...");
+       */ const events = await CalendarEvent.find({
         startDate: { $gte: startOfMonth, $lte: endOfMonth },
       }).exec();
-      console.log(`Fetched ${events.length} events from the database:`, events);
-
+      /*       console.log(`Fetched ${events.length} events from the database:`, events);
+       */
       return events;
     } catch (error) {
       // Log the error with detailed information
-      console.log(
+      /*  console.error(
         `Error occurred while fetching events for ${month}/${year}:`,
         error
-      );
+      ); */
       logger.error(
         `Service error fetching all calendar events by month: ${
           error instanceof Error ? error.message : error
@@ -70,7 +70,6 @@ export class CalendarEventService {
       throw new Error("Error while fetching calendar events by month");
     }
   }
-
 
   // Get calendar events by status and user ID for a specific month
   static async getEventsByStatusAndUser(
@@ -145,10 +144,12 @@ export class CalendarEventService {
     }
   }
 
-   // Delete a calendar event by its ID
-   static async deleteEvent(eventId: string): Promise<ICalendarEvent | null> {
+  // Delete a calendar event by its ID
+  static async deleteEvent(eventId: string): Promise<ICalendarEvent | null> {
     try {
-      const deletedEvent = await CalendarEvent.findByIdAndDelete(eventId).exec();
+      const deletedEvent = await CalendarEvent.findByIdAndDelete(
+        eventId
+      ).exec();
       return deletedEvent;
     } catch (error) {
       logger.error(
@@ -159,6 +160,4 @@ export class CalendarEventService {
       throw new Error("Error while deleting calendar event");
     }
   }
-
-  
 }

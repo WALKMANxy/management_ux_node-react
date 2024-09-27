@@ -572,7 +572,7 @@ const AdminDashboard: React.FC = () => {
                 aria-label="skeleton"
               />
             ) : (
-              <UpcomingVisits isLoading={isLoading} />
+              <UpcomingVisits />
             )}
           </Grid>
         )}

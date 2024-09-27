@@ -1009,5 +1009,8 @@
         "email": "Email"
       }
     }
+  },
+  "chats": {
+    "error": "An error occured with the chats:"
   }
 }
