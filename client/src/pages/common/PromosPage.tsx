@@ -20,10 +20,14 @@ import EligibleClientsGrid from "../../components/promosPage/EligibleClientsGrid
 import PromoDetailsCard from "../../components/promosPage/PromoDetailsCard";
 import PromosSidebar from "../../components/promosPage/PromosSidebar";
 import usePromos from "../../hooks/usePromos";
+import useLoadingData from "../../hooks/useLoadingData";
 
 const PromosPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const { loading } = useLoadingData();
+
 
   const {
     mode,
@@ -60,7 +64,7 @@ const PromosPage: React.FC = () => {
   }, [selectedPromo, mode]);
 
   // Handle loading state
-  if (status === "loading") {
+  if (loading) {
     return (
       <Box
         sx={{

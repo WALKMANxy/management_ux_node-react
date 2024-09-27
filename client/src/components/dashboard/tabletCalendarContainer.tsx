@@ -7,7 +7,6 @@ import UpcomingVisits from "./UpcomingVisits";
 interface DrawerContainerProps {
   open: boolean;
   onClose: () => void;
-  isLoading: boolean;
   fabPosition?: { top: number; left: number }; // Position of FAB for drawer placement
 }
 

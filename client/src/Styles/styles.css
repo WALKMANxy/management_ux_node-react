@@ -7,6 +7,14 @@
   animation-duration: 0.2s; /* Adjust to desired speed */
 }
 
+.animate_animated.animate_fadein {
+  animation-duration: 0.05s; /* Adjust to desired speed */
+}
+
+.animate_animated.animate_fadeOut {
+  animation-duration: 0.05s; /* Adjust to desired speed */
+}
+
 /* src/Styles/hiddenScrollbar.css */
 
 .hidden-scrollbar {

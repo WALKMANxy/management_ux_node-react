@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { RootState } from "../app/store";
 import {
@@ -6,12 +6,10 @@ import {
   selectAgent,
   selectClient,
 } from "../features/data/dataSlice";
-import { fetchInitialData, getPromos, getVisits } from "../features/data/dataThunks";
 import { Movement } from "../models/dataModels";
 import { TopArticleType } from "../models/dataSetTypes";
-import { Agent, Client, User } from "../models/entityModels";
+import { Agent, Client } from "../models/entityModels";
 import { DataSliceState } from "../models/stateModels";
-import { updateUserEntityNameIfMissing } from "../utils/checkUserName";
 import {
   calculateMonthlyData,
   calculateMonthlyRevenue,
@@ -29,105 +27,28 @@ import {
   getAdjustedClients,
   getMovementsByRole,
 } from "../utils/dataUtils";
+import useLoadingData from "./useLoadingData";
 
 const useStats = (isMobile: boolean) => {
   const dispatch = useAppDispatch();
 
-  const [localError, setLocalError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [retryCount, setRetryCount] = useState<number>(0); // Track retry attempts
+  const {
+    localError,
+    clients,
+    agents,
+    role,
+    currentUserData,
+    currentUserDetails,
+    error,
+  } = useLoadingData();
 
   // Get data from the dataSlice
   const {
-    clients, // List of clients
-    agents,
-    currentUserData, // Current logged-in user's data
-    currentUserDetails, // Current logged-in user's details
     selectedClientId, // ID of the currently selected client
     selectedAgentId, // ID of the currently selected agent
-    status, // Status of data fetch (loading, success, error)
-    error, // Error message if data fetch fails
   } = useAppSelector<RootState, DataSliceState>((state) => state.data);
 
-  // Select currentUser from userSlice
-  const currentUser = useAppSelector<RootState, Partial<User> | null>(
-    (state) => state.users.currentUser
-  );
-
-  // Extract the role from currentUserDetails
-  const role = currentUserDetails?.role;
-
   const agentDetails = agents;
-
-  // Determine if data needs to be fetched
-  const shouldFetchData =
-    status !== "succeeded" &&
-    (Object.keys(clients).length === 0 ||
-      Object.keys(agents).length === 0 ||
-      !currentUserData ||
-      !currentUserDetails);
-
-  useEffect(() => {
-    if (!shouldFetchData) {
-      return; // Data is already fetched; no need to refetch
-    }
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        await dispatch(fetchInitialData()).unwrap();
-
-
-        await Promise.all([
-          dispatch(getVisits()).unwrap(),
-          dispatch(getPromos()).unwrap(),
-        ]);
-        setLocalError(null);
-        setRetryCount(0); // Reset retryCount only when data fetch is successful
-
-        // Call the utility function to update entity name if missing
-        updateUserEntityNameIfMissing(
-          dispatch,
-          currentUser,
-          currentUserDetails
-        );
-      } catch (err: unknown) {
-        console.error("Error fetching initial data:", err); // Debug: Error case
-        if (err instanceof Error) {
-          setLocalError(err.message);
-          console.log(`Error message: ${err.message}`); // Debug: Specific error message
-        } else {
-          setLocalError("An unknown error occurred while fetching data.");
-          console.log("Unknown error occurred while fetching data."); // Debug: Unknown error
-        }
-
-        if (retryCount < 5) {
-          setRetryCount((prevCount) => prevCount + 1);
-          console.log(`Retry count incremented: ${retryCount + 1}`); // Debug: Retry count update
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, );
-
-  // Retry mechanism: Automatically re-attempt fetching data if an error occurs
-  useEffect(() => {
-    if (retryCount > 0 && retryCount <= 5) {
-      console.log(`Retry attempt #${retryCount}`); // Debug: Retry attempt
-      const retryTimeout = setTimeout(() => {
-        console.log("Retrying fetchInitialData"); // Debug: Retrying action
-        fetchInitialData(); // Explicitly call fetchData instead of dispatching again
-      }, 5000); // Retry after 5 seconds
-
-      return () => {
-        console.log("Clearing retry timeout"); // Debug: Clearing timeout
-        clearTimeout(retryTimeout); // Cleanup timeout on unmount or retryCount change
-      };
-    }
-  }, [retryCount]); // Only retryCount should trigger this effect
 
   // Create memoized selectors for selectedClient and selectedAgent
   const selectedClient = useMemo(
@@ -183,6 +104,7 @@ const useStats = (isMobile: boolean) => {
     []
   );
 
+  // Memoized Data Calculations
   const totalRevenue = useMemo<number>(() => {
     if (!currentUserData || !role) return 0;
 
@@ -204,10 +126,16 @@ const useStats = (isMobile: boolean) => {
     return calculateTopBrandsData(movements);
   }, [role, currentUserData, clients]);
 
+      //DIVIDERDIVIDERDIVIDERDIVIDERDIVIDERDIVIDERDIVIDERDIVIDERDIVIDERDIVIDERDIVIDERDIVIDERDIVIDERDIVIDERDIVIDERDIVIDERDIVIDERDIVIDERDIVIDERDIVIDER
+
+
+      
+
   const salesDistributionDataAgents = useMemo(() => {
     if (!currentUserDetails) {
       return { agents: [], data: [] };
     }
+
 
     if (role === "admin") {
       const agentsMap = Object.values(clients).reduce((acc, client) => {
@@ -361,6 +289,7 @@ const useStats = (isMobile: boolean) => {
     return { revenuePercentage, ordersPercentage };
   }, [selectedClient, clients]);
 
+
   const agentComparativeStatistics = useMemo(() => {
     if (!selectedAgent || Object.keys(clients).length === 0) {
       return { revenuePercentage: "0.00", ordersPercentage: "0.00" };
@@ -481,7 +410,6 @@ const useStats = (isMobile: boolean) => {
     clientComparativeStatisticsMonthly,
     agentComparativeStatistics,
     agentComparativeStatisticsMonthly,
-    isLoading: loading || status === "loading",
     error: localError || error, // Prefer local error if set, otherwise Redux error
   };
 };

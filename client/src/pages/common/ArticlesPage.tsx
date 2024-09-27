@@ -1,18 +1,19 @@
-import { Box, useMediaQuery } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import ArticleDetails from "../../components/articlepage/ArticleDetails";
+import Spinner from "../../components/common/Spinner";
 import ArticlesList from "../../components/statistics/grids/ArticlesList";
 import { useArticlesGrid } from "../../hooks/useArticlesGrid";
+import useLoadingData from "../../hooks/useLoadingData";
 import { MovementDetail } from "../../models/dataModels";
 import { ArticleColumnDefinition } from "../../models/propsModels";
 import { currencyFormatter } from "../../utils/dataUtils";
 
 const ArticlesPage: React.FC = () => {
   const { t } = useTranslation();
-  const isMobile = useMediaQuery("(max-width:600px)");
   const userRole = useSelector((state: RootState) => state.auth.role);
 
   const {
@@ -34,6 +35,11 @@ const ArticlesPage: React.FC = () => {
     exportDataAsCsv,
     clientMovements, // Add clientMovements
   } = useArticlesGrid();
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const { loading } = useLoadingData();
 
   useEffect(() => {
     const selectedItem = sessionStorage.getItem("searchedItem");
@@ -108,6 +114,23 @@ const ArticlesPage: React.FC = () => {
 
     return baseColumns;
   }, [handleArticleSelect, t, userRole, totalQuantitySold]);
+
+  // Handle loading state
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          height: "100vh",
+          justifyContent: "center",
+          alignItems: "center",
+          bgcolor: "#f4f5f7",
+        }}
+      >
+        <Spinner />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>

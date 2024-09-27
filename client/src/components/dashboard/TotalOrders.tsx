@@ -18,7 +18,6 @@ import { ChartData } from "../../utils/constants";
 
 interface TotalOrderProps {
   totalOrder: number;
-  isLoading: boolean;
   monthlyOrders: number[];
   yearlyOrders: number[];
   monthlyCategories: string[];

@@ -1,6 +1,7 @@
 // src/hooks/useUserDetails.ts
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useInView } from "react-intersection-observer";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { loadAdminDetailsData } from "../features/data/api/admins";
@@ -11,14 +12,13 @@ import { showToast } from "../utils/toastMessage";
 const useUserDetails = (user: Partial<User>) => {
   const clients = useAppSelector((state) => state.data.clients);
   const agents = useAppSelector((state) => state.data.agents);
+  const { t } = useTranslation();
 
   const dispatch = useAppDispatch();
 
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [role, setRole] = useState<UserRole>(user.role || "guest");
-  const [entityOptions, setEntityOptions] = useState<
-    Client[] | Agent[] | Admin[]
-  >([]);
+
   const [entitySearchText, setEntitySearchText] = useState("");
   const [selectedEntity, setSelectedEntity] = useState<
     Client | Agent | Admin | null
@@ -39,30 +39,57 @@ const useUserDetails = (user: Partial<User>) => {
         setLoadingEntities(false);
       })
       .catch((error: Error) => {
+        showToast.error(
+          t("userDetails.loadAdminsError") + ": " + error.message
+        );
         console.error("Error fetching admin data:", error);
         setLoadingEntities(false);
       });
-  }, []);
+  }, [t]);
 
-  // Update entity options based on the selected role
-  useEffect(() => {
-    setEntityOptions([]); // Clear previous options when changing role
-    setSelectedEntity(null); // Reset selected entity when changing role
+  const sortedAdmins = useMemo(() => {
+    return [...admins].sort((a, b) => a.name.localeCompare(b.name));
+  }, [admins]);
 
-    if (role === "admin") {
-      setEntityOptions(admins.sort((a, b) => a.name.localeCompare(b.name)));
-    } else if (role === "client") {
-      const sortedClients = Object.values(clients).sort((a, b) =>
-        a.name.localeCompare(b.name)
-      );
-      setEntityOptions(sortedClients);
-    } else if (role === "agent") {
-      const sortedAgents = Object.values(agents).sort((a, b) =>
-        a.name.localeCompare(b.name)
-      );
-      setEntityOptions(sortedAgents);
+  const sortedClients = useMemo(() => {
+    return Object.values(clients).sort((a, b) => a.name.localeCompare(b.name));
+  }, [clients]);
+
+  const sortedAgents = useMemo(() => {
+    return Object.values(agents).sort((a, b) => a.name.localeCompare(b.name));
+  }, [agents]);
+
+  const baseEntityOptions = useMemo(() => {
+    switch (role) {
+      case "admin":
+        return sortedAdmins;
+      case "client":
+        return sortedClients;
+      case "agent":
+        return sortedAgents;
+      default:
+        return [];
     }
-  }, [role, admins, clients, agents]);
+  }, [role, sortedAdmins, sortedClients, sortedAgents]);
+
+  /**
+   * Filter entity options based on the search text.
+   */
+  const filteredEntityOptions = useMemo(() => {
+    if (!entitySearchText.trim()) {
+      return baseEntityOptions;
+    }
+    const searchLower = entitySearchText.toLowerCase();
+    return baseEntityOptions.filter(
+      (entity) =>
+        entity.name.toLowerCase().includes(searchLower) ||
+        entity.id.toLowerCase().includes(searchLower)
+    );
+  }, [baseEntityOptions, entitySearchText]);
+
+  const entityOptions = useMemo(() => {
+    return filteredEntityOptions.slice(0, visibleRows);
+  }, [filteredEntityOptions, visibleRows]);
 
   // Dynamically load more rows when scrolled to the bottom
   useEffect(() => {
@@ -71,36 +98,39 @@ const useUserDetails = (user: Partial<User>) => {
     }
   }, [inView, entityOptions.length, visibleRows]);
 
-  // Search entities based on role
-  const handleEntitySearch = (searchText: string) => {
-    setEntitySearchText(searchText);
-    const searchLower = searchText.toLowerCase();
+  /**
+   * Memoize sorted lists to prevent unnecessary recalculations.
+   */
 
-    if (role === "client") {
-      const filteredClients = Object.values(clients).filter(
-        (client) =>
-          client.name.toLowerCase().includes(searchLower) ||
-          client.id.toLowerCase().includes(searchLower)
+  /**
+   * Determine the base entity options based on the user's role.
+   */
+
+  /**
+   * Manage infinite scrolling by loading more rows when in view.
+   */
+  useEffect(() => {
+    if (inView && visibleRows < filteredEntityOptions.length) {
+      setVisibleRows((prev) =>
+        Math.min(prev + 20, filteredEntityOptions.length)
       );
-      setEntityOptions(filteredClients);
-    } else if (role === "agent") {
-      const filteredAgents = Object.values(agents).filter(
-        (agent) =>
-          agent.name.toLowerCase().includes(searchLower) ||
-          agent.id.toLowerCase().includes(searchLower)
-      );
-      setEntityOptions(filteredAgents);
-    } else if (role === "admin") {
-      const filteredAdmins = admins.filter(
-        (admin) =>
-          admin.name.toLowerCase().includes(searchLower) ||
-          admin.id.toLowerCase().includes(searchLower)
-      );
-      setEntityOptions(filteredAdmins);
     }
-  };
+  }, [inView, filteredEntityOptions.length, visibleRows]);
 
-  const handleSaveChanges = () => {
+  /**
+   * Determine the current entity options to display based on visible rows.
+   */
+
+  /**
+   * Handle the search functionality for entities.
+   *
+   * @param {string} searchText - The text input from the user for searching entities.
+   */
+  const handleEntitySearch = useCallback((searchText: string) => {
+    setEntitySearchText(searchText);
+    setVisibleRows(20); // Reset visible rows when a new search is initiated
+  }, []);
+  const handleSaveChanges = useCallback(() => {
     if (!selectedEntity) return;
 
     const updatedData = {
@@ -113,19 +143,21 @@ const useUserDetails = (user: Partial<User>) => {
       setLoading(true);
       dispatch(updateUserById({ id: user._id, updatedData }))
         .then(() => {
-          setAlertMessage("User updated successfully");
+          setAlertMessage(t("userDetails.updateSuccess"));
           setAlertSeverity("success");
-          showToast.success("User updated successfully.");
+          showToast.success(t("userDetails.updateSuccessToast"));
         })
         .catch((error: unknown) => {
           if (error instanceof Error) {
-            setAlertMessage("Failed to update user: " + error.message);
-            showToast.error("Failed to update user: " + error.message);
-          } else {
-            setAlertMessage("Failed to update user. Server error.");
-            showToast.error(
-              "Failed to update user: An unknown error occurred."
+            setAlertMessage(
+              t("userDetails.updateFailed", { message: error.message })
             );
+            showToast.error(
+              t("userDetails.updateFailedToast", { message: error.message })
+            );
+          } else {
+            setAlertMessage(t("userDetails.updateUnknownError"));
+            showToast.error(t("userDetails.updateUnknownErrorToast"));
           }
           setAlertSeverity("error");
           console.error("Error updating user:", error);
@@ -134,12 +166,12 @@ const useUserDetails = (user: Partial<User>) => {
           setLoading(false);
         });
     } else {
-      setAlertMessage("User ID is undefined");
+      setAlertMessage(t("userDetails.userIdUndefined"));
       setAlertSeverity("error");
-      showToast.error("User ID is undefined.");
+      showToast.error(t("userDetails.userIdUndefinedToast"));
       console.error("User ID is undefined");
     }
-  };
+  }, [selectedEntity, role, user._id, dispatch, t]);
 
   return {
     role,

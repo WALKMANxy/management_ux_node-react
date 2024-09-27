@@ -1,13 +1,17 @@
 // useVisitSidebar.ts
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { selectAgent, selectClient } from "../features/data/dataSlice";
 import { getVisits } from "../features/data/dataThunks";
 import { selectVisits } from "../features/promoVisits/promoVisitsSelectors";
 import { Agent, Client } from "../models/entityModels";
+import { showToast } from "../utils/toastMessage";
 
 export const useVisitSidebar = () => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
+
   const clients = useAppSelector((state) => state.data.clients);
   const agents = useAppSelector((state) => state.data.agents);
   const currentUser = useAppSelector((state) => state.data.currentUserDetails);
@@ -107,27 +111,33 @@ export const useVisitSidebar = () => {
     setFilteredList(list);
   }, [searchTerm, clients, agents, userRole, selectedAgentId]);
 
-  const handleAgentSelect = (agentId: string) => {
-    setSelectedAgentId(agentId);
-    dispatch(selectAgent(agentId));
-  };
+  const handleAgentSelect = useCallback(
+    (agentId: string) => {
+      setSelectedAgentId(agentId);
+      dispatch(selectAgent(agentId));
+    },
+    [dispatch, setSelectedAgentId]
+  );
 
-  const handleClientSelect = (clientId: string) => {
-    dispatch(selectClient(clientId));
-  };
+  const handleClientSelect = useCallback(
+    (clientId: string) => {
+      dispatch(selectClient(clientId));
+    },
+    [dispatch]
+  );
 
-  const handleBackToAgents = () => {
+  const handleBackToAgents = useCallback(() => {
     setSelectedAgentId(null);
-  };
-
-  const handleCreateVisit = () => {};
+  }, [setSelectedAgentId]);
 
   // New function to handle refreshing visits
   const handleVisitsRefresh = async () => {
     try {
-      await dispatch(getVisits());
+      await dispatch(getVisits()).unwrap();
+      showToast.success(t("useVisits.visitsRefreshed"));
     } catch (error) {
-      console.error("Failed to refresh visits:", error);
+      console.error(t("useVisits.failedToRefreshVisits"), error);
+      showToast.error(t("useVisits.failedToRefreshVisits"));
     }
   };
 
@@ -139,7 +149,6 @@ export const useVisitSidebar = () => {
     handleAgentSelect,
     handleClientSelect,
     handleBackToAgents,
-    handleCreateVisit,
     setSearchTerm,
     handleVisitsRefresh,
     agentVisitCounts,
