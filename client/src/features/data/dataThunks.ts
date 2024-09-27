@@ -84,7 +84,7 @@ export const getPromos = createAsyncThunk<
 
 // Create Visit Thunk
 export const createVisitAsync = createAsyncThunk<
-  void, // Changed return type to void
+  Visit, // Changed return type to void
   Visit, // Input type
   { state: { data: DataSliceState } }
 >(
@@ -107,6 +107,7 @@ export const createVisitAsync = createAsyncThunk<
           role,
         })
       ).unwrap();
+      return visitData;
     } catch (err: unknown) {
       // Safely handle and type the error
       if (err instanceof Error && "data" in err) {
@@ -163,7 +164,7 @@ export const updateVisitAsync = createAsyncThunk<
 
 // Create Promo Thunk
 export const createPromoAsync = createAsyncThunk<
-  void, // Changed return type to void
+  Promo, // Changed return type to void
   Promo, // Input type
   { state: { data: DataSliceState } }
 >(
@@ -186,6 +187,7 @@ export const createPromoAsync = createAsyncThunk<
           role,
         })
       ).unwrap();
+      return promoData;
     } catch (err: unknown) {
       if (err instanceof Error && "data" in err) {
         return rejectWithValue((err as { data: string }).data);

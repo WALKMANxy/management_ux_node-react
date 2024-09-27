@@ -1,5 +1,6 @@
 import cookie from "cookie";
 import { Socket, Server as SocketIOServer } from "socket.io";
+import { config } from "../config/config";
 import { IChat, IMessage } from "../models/Chat";
 import { User } from "../models/User";
 import { ChatService } from "../services/chatService";
@@ -188,6 +189,83 @@ export const setupWebSocket = (io: SocketIOServer) => {
           });
         } catch (error) {
           logger.error("Error updating read status", { error });
+        }
+      }
+    );
+
+    socket.on(
+      "chat:automatedMessage",
+      async ({
+        targetIds,
+        message,
+      }: {
+        targetIds: string[];
+        message: Partial<IMessage>;
+      }) => {
+        try {
+          const botId = config.botId; // Ensure botId is available in your config
+
+          // Send automated message to users and get corresponding chatIds
+          const chatIds = await ChatService.sendAutomatedMessageToUsers(
+            targetIds,
+            message,
+            botId
+          );
+
+          if (chatIds.length === 0) {
+            logger.warn("No chats found or created for automated messages.");
+            return;
+          }
+
+          // Fetch all chats in bulk
+          const chats = await ChatService.getChatsByIdsArray(chatIds, botId);
+
+          if (chats.length === 0) {
+            logger.warn(
+              "No chats retrieved after sendAutomatedMessageToUsers."
+            );
+            return;
+          }
+
+          // Prepare a map of participantId to their messages
+          const participantToMessagesMap: Map<string, IMessage[]> = new Map();
+
+          chats.forEach((chat) => {
+            const latestMessage = chat.messages[chat.messages.length - 1];
+            if (latestMessage) {
+              chat.participants.forEach((participantId) => {
+                const participantIdStr = participantId.toString();
+                if (participantIdStr === botId) return; // Exclude the bot
+
+                if (!participantToMessagesMap.has(participantIdStr)) {
+                  participantToMessagesMap.set(participantIdStr, []);
+                }
+                participantToMessagesMap
+                  .get(participantIdStr)!
+                  .push(latestMessage);
+              });
+            }
+          });
+
+          // Emit messages per participant
+          participantToMessagesMap.forEach((messages, participantId) => {
+            const sockets = connectedClients.get(participantId);
+            if (sockets) {
+              sockets.forEach((clientSocket) => {
+                clientSocket.emit("chat:newMessage", {
+                  messages,
+                });
+              });
+            }
+          });
+
+          logger.info("Automated messages emitted successfully.", {
+            chatIds,
+            targetIds,
+            totalParticipants: participantToMessagesMap.size,
+          });
+        } catch (error) {
+          logger.error("Error handling automated message", { error });
         }
       }
     );

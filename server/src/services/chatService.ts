@@ -2,6 +2,7 @@
 
 import mongoose, { Types } from "mongoose";
 import { Chat, IChat, IMessage } from "../models/Chat";
+import { logger } from "../utils/logger";
 
 // Custom Error Classes (Optional but Recommended)
 class ValidationError extends Error {
@@ -119,6 +120,28 @@ export class ChatService {
     } catch (error) {
       console.error("Error fetching chat by ID:", error);
       throw new Error("Failed to fetch chat by ID");
+    }
+  }
+  static async getChatsByIdsArray(
+    chatIds: string[],
+    userId: string
+  ): Promise<IChat[]> {
+    try {
+      // Validate and convert chatIds to ObjectId
+      const validChatIds = chatIds.filter((id) =>
+        mongoose.Types.ObjectId.isValid(id)
+      );
+      const objectChatIds = validChatIds.map((id) => new Types.ObjectId(id));
+
+      const chats = await Chat.find({
+        _id: { $in: objectChatIds },
+        participants: userId, // Ensure the user is a participant
+      }).lean();
+
+      return chats;
+    } catch (error) {
+      logger.error("Error fetching chats by IDs array:", { error });
+      throw new Error("Failed to fetch chats by IDs array");
     }
   }
 
@@ -387,6 +410,42 @@ export class ChatService {
     }
   }
 
+  static async findOrCreateChat(
+    userId: string,
+    botId: string
+  ): Promise<string> {
+    try {
+      const userObjectId = new mongoose.Types.ObjectId(userId);
+      const botObjectId = new mongoose.Types.ObjectId(botId);
+
+      // Atomic operation to find or create
+      const chat = await Chat.findOneAndUpdate(
+        {
+          type: "simple",
+          participants: { $all: [userObjectId, botObjectId], $size: 2 },
+        },
+        {}, // No update
+        {
+          new: true, // Return the new document if upserted
+          upsert: true, // Create the document if it doesn't exist
+          setDefaultsOnInsert: true,
+          fields: { _id: 1 }, // Only return the _id field
+        }
+      ).exec();
+
+      logger.debug(`Chat found or created with ID: ${chat._id.toString()}`);
+      return chat._id.toString();
+    } catch (error) {
+      logger.error(
+        `Error in atomic findOrCreateChat for user ${userId} and bot ${botId}: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+      throw error;
+    }
+  }
+
+
   // Add a message to an existing chat
   static async addMessage(
     chatId: string,
@@ -426,7 +485,101 @@ export class ChatService {
     }
   }
 
-  // Update read status for multiple messages in a chat
+  static async sendAutomatedMessageToUsers(
+    userIds: string[],
+    messageData: Partial<IMessage>,
+    botId: string
+  ): Promise<string[]> {
+    // Return type is Promise<string[]>
+    const startTime = Date.now(); // For performance logging
+
+
+
+
+    try {
+      logger.info("sendAutomatedMessageToUsers called with data", {
+        userIds,
+        messageData,
+        botId,
+      });
+
+       // Capture a single timestamp for consistency
+     const currentTimestamp = new Date();
+
+      // Convert userIds to ObjectId with validation
+      const userObjectIds = userIds.map((id) => {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+          logger.error(`Invalid user ID: ${id}`);
+          throw new Error(`Invalid user ID: ${id}`);
+        }
+        return new Types.ObjectId(id);
+      });
+
+      const botObjectId = new Types.ObjectId(botId);
+
+      const bulkOperations: mongoose.AnyBulkWriteOperation<IChat>[] = [];
+      const chatIds: string[] = [];
+
+      // Generate the automated message only once
+      const automatedMessage: Partial<IMessage> = {
+        ...messageData,
+        sender: botObjectId, // Store as string; conversion handled in DB operations
+        readBy: [botObjectId],
+        status: "sent",
+        timestamp: new Date(),
+        messageType: messageData.messageType || "alert",
+        content: messageData.content || "", // Ensure content is always defined
+      };
+
+    // Prepare bulk operations concurrently
+    const chatIdPromises = userObjectIds.map(async (userId) => {
+      try {
+        const chatId = await this.findOrCreateChat(userId.toString(), botId);
+        chatIds.push(chatId);
+
+        bulkOperations.push({
+          updateOne: {
+            filter: { _id: new Types.ObjectId(chatId) },
+            update: {
+              $push: { messages: automatedMessage },
+              $set: { updatedAt: currentTimestamp },
+            },
+          },
+        });
+
+        logger.debug(`Prepared bulk operation for chatId: ${chatId}`);
+      } catch (error) {
+        logger.error(`Error processing user ${userId.toString()}`, { error });
+      }
+    });
+
+     // Await all chatIdPromises
+     await Promise.all(chatIdPromises);
+
+     // Execute bulk operations if any
+     if (bulkOperations.length > 0) {
+       try {
+         await Chat.bulkWrite(bulkOperations, { ordered: false });
+         logger.info(`Successfully sent automated messages to users`, {
+           userIds: userIds,
+           chatIds,
+           durationMs: Date.now() - startTime,
+         });
+       } catch (error) {
+         logger.error("Error executing bulk operations", { error });
+         throw error;
+       }
+     } else {
+       logger.warn("No bulk operations to execute");
+     }
+
+     return chatIds;
+   } catch (error) {
+     logger.error("Error in sendAutomatedMessageToUsers", { error });
+     throw error; // Optionally rethrow if higher-level handling is needed
+   }
+ }
+
   // Function to update read status of messages using findOneAndUpdate
   static async updateReadStatus(
     chatId: string,

@@ -5,9 +5,15 @@ import {
   updateReadStatusReducer,
 } from "../features/chat/chatSlice";
 import { fetchAllChatsThunk } from "../features/chat/chatThunks";
-import { fetchUsersByIds } from "../features/users/userSlice";
+import {
+  createPromoAsync,
+  createVisitAsync,
+} from "../features/data/dataThunks";
+import { fetchUsersByIds, selectAllUsers } from "../features/users/userSlice";
 import { IChat, IMessage } from "../models/dataModels";
 import { webSocketService } from "../services/webSocketService";
+import { generateAutomatedMessage } from "../utils/chatUtils";
+import { RootState } from "./store";
 
 // Create a Redux middleware that listens for specific actions and executes side effects.
 const listenerMiddleware = createListenerMiddleware();
@@ -20,11 +26,14 @@ let readStatusQueue: Array<{
 }> = [];
 let messageQueue: Array<{ chatId: string; messageData: IMessage }> = [];
 let chatQueue: Array<IChat> = [];
+let automatedMessageQueue: Array<{ targetId: string[]; message: Partial<IMessage> }> =
+  [];
 
 // Timers for debouncing WebSocket messages to avoid excessive traffic
 let readStatusTimer: NodeJS.Timeout | null = null;
 let messageTimer: NodeJS.Timeout | null = null;
 let chatTimer: NodeJS.Timeout | null = null;
+let automatedMessageTimer: NodeJS.Timeout | null = null;
 
 // Debounce time in milliseconds to group similar WebSocket messages
 const DEBOUNCE_TIME = 100;
@@ -71,6 +80,16 @@ const processChatQueue = () => {
   }
 };
 
+// Function to process automated message dispatch in batches.
+const processAutomatedMessageQueue = () => {
+  if (automatedMessageQueue.length > 0) {
+    automatedMessageQueue.forEach(({ targetId, message }) => {
+      // Emit the message to all targetIds at once
+      webSocketService.emitAutomatedMessage(targetId, message);
+    });
+    automatedMessageQueue = []; // Clear the queue after processing
+  }
+};
 // Listener for the updateReadStatusReducer action
 listenerMiddleware.startListening({
   actionCreator: updateReadStatusReducer,
@@ -141,6 +160,91 @@ listenerMiddleware.startListening({
     if (participantIds.size > 0) {
       listenerApi.dispatch(fetchUsersByIds(Array.from(participantIds)));
     }
+  },
+});
+
+listenerMiddleware.startListening({
+  actionCreator: createPromoAsync.fulfilled,
+  effect: async (action, listenerApi) => {
+    const promo = action.payload;
+
+    // Get all users from the user slice
+    const allUsers = selectAllUsers(listenerApi.getState() as RootState);
+
+    let targetedUsers = [];
+
+    // If the promo is global, target all clients
+    if (promo.global) {
+      targetedUsers = allUsers.filter(
+        (user) =>
+          user.role === "client" &&
+          user.entityCode !== undefined &&
+          !(promo.excludedClientsId?.includes(user.entityCode))
+      );
+    } else {
+      targetedUsers = allUsers.filter(
+        (user) =>
+          user.role === "client" &&
+          user.entityCode !== undefined &&
+          promo.clientsId.includes(user.entityCode)
+      );
+    }
+
+    // Generate the automated message only once
+    const messageData = generateAutomatedMessage(promo);
+
+    // Add the automated message to the queue for all targeted users
+    targetedUsers.forEach((user) => {
+      if (!user?._id) {
+        console.error("No user found with the given clientId");
+        return;
+      }
+
+      automatedMessageQueue.push({
+        targetId: [user._id], // Ensure targetId is an array of strings
+        message: messageData, // Ensure message is an array of message objects
+      });
+    });
+
+    // Debounce the processing of the automated message queue
+    if (automatedMessageTimer) clearTimeout(automatedMessageTimer);
+    automatedMessageTimer = setTimeout(
+      processAutomatedMessageQueue,
+      DEBOUNCE_TIME
+    );
+  },
+});
+
+
+// Listener for the createVisitAsync action
+listenerMiddleware.startListening({
+  actionCreator: createVisitAsync.fulfilled,
+  effect: async (action, listenerApi) => {
+    const visit = action.payload;
+
+    const allUsers = selectAllUsers(listenerApi.getState() as RootState);
+
+    // Find the user based on the entityCode (which corresponds to the clientId)
+    const targetedUser = allUsers.find(
+      (user) => user.role === "client" &&user.entityCode === visit.clientId
+    );
+
+    if (!targetedUser?._id) {
+      console.error("No user found with the given clientId");
+      return;
+    }
+
+    const messageData = generateAutomatedMessage(visit);
+
+    // Add the automated message to the queue
+    automatedMessageQueue.push({ targetId: [targetedUser._id], message : messageData });
+
+    // Debounce the processing of the automated message queue
+    if (automatedMessageTimer) clearTimeout(automatedMessageTimer);
+    automatedMessageTimer = setTimeout(
+      processAutomatedMessageQueue,
+      DEBOUNCE_TIME
+    );
   },
 });
 
