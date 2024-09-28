@@ -9,7 +9,7 @@ export interface ActivityItem {
   id: string;
   type: "visits" | "sales" | "alerts";
   title: string;
-  time: string;
+  time: number; // Use timestamp for efficient sorting
   details: string;
   subDetails?: string;
 }
@@ -19,66 +19,82 @@ export const generateActivityList = (
   agentId: string, // Accept agentId for filtering visits and alerts
   visits: VisitWithAgent[] // Use visits from the selectVisits selector
 ): ActivityItem[] => {
-  const activities: ActivityItem[] = [];
 
   // Process completed visits for the agent, limit to the first 5
   /* console.log("Generating activity list for agent", agentId);
   console.log("Visits:", visits); */
   const agentVisits = visits
     .filter((visit) => visit.agentId === agentId && visit.completed)
-    .sort((a, b) => {
-      const aDate = typeof a.date === "string" ? new Date(a.date) : a.date;
-      const bDate = typeof b.date === "string" ? new Date(b.date) : b.date;
-      return bDate.getTime() - aDate.getTime();
-    })
-    .slice(0, 5);
-
-  /* console.log("Filtered visits:", agentVisits);
-  console.log("Type of visit.date" + typeof agentVisits[0].date); */
-
-  agentVisits.forEach((visit) => {
-    console.log("Adding visit to activity list:", visit);
-    activities.push({
-      id: visit._id !== undefined ? visit._id : "",
+    .map((visit) => ({
+      ...visit,
+      timestamp:
+        typeof visit.date === "string"
+          ? new Date(visit.date).getTime()
+          : visit.date.getTime(),
+    }))
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, 5)
+    .map<ActivityItem>((visit) => ({
+      id: visit._id || "",
       type: "visits",
       title: `Visit - Agent: ${visit.agentName || visit.agentId}`,
-      time: visit.date ? visit.date.toString() : "",
+      time: visit.timestamp,
       details: `${visit.visitReason} - Client: ${visit.clientId}`,
-      subDetails: visit.notePublic ? visit.notePublic.slice(0, 50) + "..." : "",
-    });
-  });
+      subDetails: visit.notePublic
+        ? visit.notePublic.length > 50
+          ? `${visit.notePublic.slice(0, 50)}...`
+          : visit.notePublic
+        : undefined,
+    }));
 
   // Process sales (movements), limit to the first 5 based on the most recent dateOfOrder
   const recentMovements = clients
     .flatMap((client) =>
-      client.movements.map((movement) => ({ ...movement, client }))
+      client.movements.map((movement) => ({
+        ...movement,
+        client,
+        timestamp: new Date(movement.dateOfOrder).getTime(),
+      }))
     )
-    .sort(
-      (a, b) =>
-        new Date(b.dateOfOrder).getTime() - new Date(a.dateOfOrder).getTime()
-    )
-    .slice(0, 5);
-
-  recentMovements.forEach((movement) => {
-    const revenue = calculateRevenue([movement]);
-    activities.push({
-      id: movement.id,
-      type: "sales",
-      title: "Sale",
-      time: new Date(movement.dateOfOrder).toISOString(),
-      details: `Client: ${movement.client.id}, ${
-        movement.client.name
-      } - Revenue: ${currencyFormatter(revenue)}`,
-      subDetails: `Order Date: ${new Date(
-        movement.dateOfOrder
-      ).toLocaleDateString()}`,
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, 5)
+    .map<ActivityItem>((movement) => {
+      const revenue = calculateRevenue([movement]);
+      return {
+        id: movement.id,
+        type: "sales",
+        title: "Sale",
+        time: movement.timestamp,
+        details: `Client: ${movement.client.id}, ${movement.client.name} - Revenue: ${currencyFormatter(
+          revenue
+        )}`,
+        subDetails: `Order Date: ${new Date(
+          movement.dateOfOrder
+        ).toLocaleDateString()}`,
+      };
     });
-  });
 
-  // Sort all activities by time (most recent first) and limit to 10 items
-  const sortedActivities = activities
-    .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
-    .slice(0, 10);
+ // Merge the two sorted arrays (agentVisits and recentMovements) and limit to 10 items
+ const mergedActivities: ActivityItem[] = [];
+ let i = 0;
+ let j = 0;
 
-  return sortedActivities;
+ while (
+   mergedActivities.length < 10 &&
+   (i < agentVisits.length || j < recentMovements.length)
+ ) {
+   if (
+     i < agentVisits.length &&
+     (j >= recentMovements.length ||
+       agentVisits[i].time >= recentMovements[j].time)
+   ) {
+     mergedActivities.push(agentVisits[i]);
+     i++;
+   } else if (j < recentMovements.length) {
+     mergedActivities.push(recentMovements[j]);
+     j++;
+   }
+ }
+
+ return mergedActivities;
 };

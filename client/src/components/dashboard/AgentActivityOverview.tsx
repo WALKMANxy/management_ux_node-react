@@ -18,17 +18,7 @@ import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
 import { selectVisits } from "../../features/promoVisits/promoVisitsSelectors";
 import { Agent } from "../../models/entityModels";
-import { generateActivityList } from "../../utils/activityUtils";
-
-// Define the structure of an activity item
-interface ActivityItem {
-  id: string;
-  type: "visits" | "sales" | "alerts";
-  title: string;
-  time: string;
-  details: string;
-  subDetails?: string;
-}
+import { ActivityItem, generateActivityList } from "../../utils/activityUtils"; // Import ActivityItem
 
 // Props for the OrderItem component
 interface OrderItemProps {
@@ -50,7 +40,7 @@ const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({
   // Generate activity list using the utility function
   const activityList: ActivityItem[] = useMemo(
     () => generateActivityList(selectedAgent.clients, selectedAgent.id, promos),
-    [selectedAgent, promos]
+    [selectedAgent.id, selectedAgent.clients, promos] // More granular dependencies
   );
 
   return (
@@ -137,7 +127,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ item, lastTimeline }) => {
    * @param {string} time - The ISO date string.
    * @returns {string} The formatted date string (DD/MM/YYYY).
    */
-  const formatDate = (time: string): string => {
+  const formatDate = (time: number): string => {
     return dayjs(time).format("DD/MM/YYYY");
   };
 
