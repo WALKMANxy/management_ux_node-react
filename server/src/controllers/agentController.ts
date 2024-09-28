@@ -48,10 +48,10 @@ export const fetchAgentByClientEntityCode = (
       });
     }
     const clientEntityCode = req.user.entityCode;
-    console.log(
+  /*   console.log(
       "fetchAgentByClientEntityCode called with entityCode:",
       clientEntityCode
-    ); // Debugging
+    ); // Debugging */
 
     const agent = getAgentByClientEntityCode(clientEntityCode);
 
@@ -65,8 +65,8 @@ export const fetchAgentByClientEntityCode = (
         .json({ message: "Agent not found for the given client" });
     }
 
-    console.log("Agent found:", agent); // Debugging
-    res.json(agent);
+/*     console.log("Agent found:", agent); // Debugging
+ */    res.json(agent);
     return;
   } catch (error) {
     console.error("Error in fetchAgentByClientEntityCode:", error); // Debugging

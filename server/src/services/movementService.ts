@@ -12,10 +12,10 @@ export class MovementService {
   static getFilteredMovementsByRole(role: string, entityCode: string): Movement[] {
     const movements = this.getAllMovements();
 
-    console.log("Filtering movements for role:", role, "with entityCode:", entityCode); // Debugging
-
+/*     console.log("Filtering movements for role:", role, "with entityCode:", entityCode); // Debugging
+ */
     let filteredMovements: Movement[];
-  
+
     if (role === "client") {
       filteredMovements = movements.filter(
         (movement) => movement["Codice Cliente"].toString() === entityCode
@@ -30,8 +30,8 @@ export class MovementService {
       );
     }
 
-    console.log("Filtered movements count:", filteredMovements.length); // Debugging
-    return filteredMovements;
+/*     console.log("Filtered movements count:", filteredMovements.length); // Debugging
+ */    return filteredMovements;
   }
 
 

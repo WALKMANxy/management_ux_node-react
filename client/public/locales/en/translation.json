@@ -1089,5 +1089,11 @@
     "errorMessage": "Error: {{message}}",
     "unknownError": "An unknown error occurred while fetching data. Try refreshing the page or contact IT.",
     "retryingData": "Retrying to fetch initial data... (Attempt #{{attempt}})"
+  },
+  "webSocketService": {
+      "lostConnection": "Lost connection to the server, attempting to reconnect...",
+      "connectionEstablished": "Connection to the server established.",
+      "connectionLost": "Connection to the server lost, refresh the page or try again later."
+    }
   }
-}
+

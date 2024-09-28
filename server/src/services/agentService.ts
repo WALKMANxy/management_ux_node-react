@@ -21,21 +21,21 @@ export const getAgentByClientEntityCode = (
 
   // Convert clientEntityCode to a string to ensure consistent comparison
   const entityCodeAsString = String(clientEntityCode);
-  console.log(
+ /*  console.log(
     "getAgentByClientEntityCode called with entityCode:",
     entityCodeAsString
-  ); // Debugging
+  ); // Debugging */
 
   // Find the agent whose clients array contains the given clientEntityCode
   const agent = agents.find((agent) =>
     agent.clients.some((client) => {
       const clientCodeAsString = String(client.CODICE);
-      console.log(
+    /*   console.log(
         "Comparing client.CODICE:",
         clientCodeAsString,
         "with entityCode:",
         entityCodeAsString
-      ); // Debugging
+      ); // Debugging */
       return clientCodeAsString === entityCodeAsString;
     })
   );
@@ -46,8 +46,8 @@ export const getAgentByClientEntityCode = (
       (client) => String(client.CODICE) === entityCodeAsString
     );
 
-    console.log("Filtered clients for agent:", filteredClients); // Debugging
-    return {
+/*     console.log("Filtered clients for agent:", filteredClients); // Debugging
+ */    return {
       ...agent,
       clients: filteredClients,
     };
