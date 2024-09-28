@@ -233,12 +233,12 @@ export class ChatService {
     limit: number // Include limit parameter
   ) {
     try {
-      console.log("Fetching older messages for:", {
+     /*  console.log("Fetching older messages for:", {
         chatId,
         userId,
         oldestTimestamp,
         limit,
-      });
+      }); */
 
       const chatObjectId = new Types.ObjectId(chatId);
 
@@ -254,8 +254,8 @@ export class ChatService {
         throw new Error("Chat not found or access denied.");
       }
 
-      console.log("Chat found:", chat);
-
+/*       console.log("Chat found:", chat);
+ */
       const userObjectId = new Types.ObjectId(userId);
 
       // Check if the user is a participant in the chat
@@ -282,8 +282,8 @@ export class ChatService {
       // Extract messages from the aggregation result
       const messages = olderMessages.map((chat) => chat.messages);
 
-      console.log("Fetched Older Messages:", messages);
-
+/*       console.log("Fetched Older Messages:", messages);
+ */
       return messages;
     } catch (error) {
       console.error("Error fetching older messages:", error);

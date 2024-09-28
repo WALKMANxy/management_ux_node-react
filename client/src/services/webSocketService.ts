@@ -1,4 +1,6 @@
+import { t } from "i18next";
 import { io, Socket } from "socket.io-client";
+import { toast } from "sonner";
 import { AppStore } from "../app/store";
 import { getApiUrl } from "../config/config";
 import { fetchChatById } from "../features/chat/api/chats";
@@ -19,23 +21,38 @@ if (!apiUrl) {
   console.error("API URL is not defined inside webSocket.ts.");
 }
 
+type ReadStatusQueueItem = {
+  chatId: string;
+  messageIds: string[];
+};
+
+type MessageQueueItem = {
+  chatId: string;
+  message: IMessage;
+};
+
+type ChatQueueItem = {
+  chat: IChat;
+};
+
+type AutomatedMessageQueueItem = {
+  targetIds: string[];
+  message: Partial<IMessage>;
+};
+
 class WebSocketService {
   private socket: Socket | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 15;
 
   // Queues to handle offline updates
-  private offlineReadStatusQueue: Array<{
-    chatId: string;
-    messageIds: string[];
-  }> = [];
-  private offlineMessageQueue: Array<{ chatId: string; message: IMessage }> =
-    [];
-  private offlineChatQueue: Array<{ chat: IChat }> = [];
-  private offlineAutomatedMessageQueue: Array<{
-    targetIds: string[];
-    message: Partial<IMessage>;
-  }> = [];
+  private offlineReadStatusQueue: ReadStatusQueueItem[] = [];
+  private offlineMessageQueue: MessageQueueItem[] = [];
+  private offlineChatQueue: ChatQueueItem[] = [];
+  private offlineAutomatedMessageQueue: AutomatedMessageQueueItem[] = [];
+  private reconnectToastId: string | null = null;
+  private maxReconnectToastId = "maxrectoast";
+  private toastId = "reconnectionToast";
 
   // Inject the store reference at runtime
   injectStore(_store: AppStore) {
@@ -43,12 +60,21 @@ class WebSocketService {
   }
 
   connect() {
+    if (this.socket && this.socket.connected) {
+      console.warn("WebSocket is already connected.");
+      return;
+    }
+
     this.socket = io(apiUrl, {
       withCredentials: true, // This allows the cookie to be sent
       transports: ["websocket"],
     });
 
     this.setupEventListeners();
+  }
+
+  isConnected(): boolean {
+    return this.socket?.connected ?? false;
   }
 
   private setupEventListeners() {
@@ -66,33 +92,33 @@ class WebSocketService {
   }
 
   // On connect, flush the offline queues
+  // On connect, flush the offline queues
   private handleConnect = () => {
-    /*     console.log("WebSocket connected");
-     */ this.reconnectAttempts = 0;
+    this.reconnectAttempts = 0;
 
     // Flush read status updates
-    while (this.offlineReadStatusQueue.length > 0) {
-      const { chatId, messageIds } = this.offlineReadStatusQueue.shift()!;
+    for (const { chatId, messageIds } of this.offlineReadStatusQueue) {
       this.emitMessageRead(chatId, messageIds);
     }
+    this.offlineReadStatusQueue = [];
 
     // Flush queued messages
-    while (this.offlineMessageQueue.length > 0) {
-      const { chatId, message } = this.offlineMessageQueue.shift()!;
+    for (const { chatId, message } of this.offlineMessageQueue) {
       this.emitNewMessage(chatId, message);
     }
+    this.offlineMessageQueue = [];
 
     // Flush queued chat creations
-    while (this.offlineChatQueue.length > 0) {
-      const { chat } = this.offlineChatQueue.shift()!;
+    for (const { chat } of this.offlineChatQueue) {
       this.emitNewChat(chat);
     }
+    this.offlineChatQueue = [];
 
     // Flush queued automated messages
-    while (this.offlineAutomatedMessageQueue.length > 0) {
-      const { targetIds, message } = this.offlineAutomatedMessageQueue.shift()!;
+    for (const { targetIds, message } of this.offlineAutomatedMessageQueue) {
       this.emitAutomatedMessage(targetIds, message);
     }
+    this.offlineAutomatedMessageQueue = [];
   };
 
   private handleDisconnect = () => {
@@ -108,10 +134,31 @@ class WebSocketService {
   private tryReconnect() {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
+
+      // Show loading toast only once
+      if (!this.reconnectToastId) {
+        toast.loading(t("webSocketService.lostConnection"), {
+          id: this.toastId,
+        });
+      }
+
       setTimeout(() => this.socket?.connect(), 5000 * this.reconnectAttempts);
     } else {
       console.error(
         "Max reconnection attempts reached. Please refresh the page."
+      );
+
+      // Dismiss the reconnect loading toast if it exists
+      if (this.reconnectToastId) {
+        toast.dismiss(this.reconnectToastId);
+        this.reconnectToastId = null;
+      }
+
+      // Show error toast
+      toast.error(
+        t("webSocketService.connectionLost", {
+          id: this.maxReconnectToastId,
+        })
       );
     }
   }
@@ -136,51 +183,43 @@ class WebSocketService {
     const currentUserId = state.auth.userId; // Access the current user ID
 
     if (!chatExists) {
-      // Chat does not exist, fetch the entire chat data
-      /*       console.log(`Chat with ID ${chatId} not found. Fetching chat data...`);
-       */
       try {
         const chat = await fetchChatById(chatId);
         store.dispatch(addChatReducer({ chat }));
       } catch (error) {
         console.error("Failed to fetch and add chat:", error);
+        return;
       }
-    } else {
-      // Add a slight delay before dispatching the server-confirmed message
-      setTimeout(() => {
-        // Chat exists, dispatch the action to add the message as usual
-        store.dispatch(
-          addMessageReducer({ chatId, message, fromServer: true })
-        );
-        if (message.sender !== currentUserId) {
-          console.log(
-            "handleNewMessage: Dispatching notification for message:",
-            message
-          );
-          handleNewNotification(message.sender, message.content, state); // Call the notification handler
-        }
-        // Wait for the message to be fully added to the server
-        setTimeout(() => {
-          // Check if the message is part of the currently opened chat and hasn't been read
-          if (
-            currentChatId === chatId && // Check if the message belongs to the current chat
-            message.sender !== currentUserId && // Ensure it's a received message
-            !message.readBy.includes(currentUserId) // Check if it hasn't been read by the current user
-          ) {
-            // Dispatch the read status update
-            store.dispatch(
-              updateReadStatusReducer({
-                chatId,
-                userId: currentUserId,
-                messageIds: [message.local_id || message._id], // Update the read status of the new message
-              })
-            );
-
-            // Show notification if the sender is not the current user
-          }
-        }, 50); // Add an additional delay to ensure the server processes the message
-      }, 50); // Initial delay for adding the message
     }
+
+    // Add a slight delay before dispatching the server-confirmed message
+    setTimeout(() => {
+      // Chat exists, dispatch the action to add the message as usual
+      store.dispatch(addMessageReducer({ chatId, message, fromServer: true }));
+      if (message.sender !== currentUserId) {
+        handleNewNotification(message.sender, message.content, state); // Call the notification handler
+      }
+      // Wait for the message to be fully added to the server
+      setTimeout(() => {
+        // Check if the message is part of the currently opened chat and hasn't been read
+        if (
+          currentChatId === chatId && // Check if the message belongs to the current chat
+          message.sender !== currentUserId && // Ensure it's a received message
+          !message.readBy.includes(currentUserId) // Check if it hasn't been read by the current user
+        ) {
+          // Dispatch the read status update
+          store.dispatch(
+            updateReadStatusReducer({
+              chatId,
+              userId: currentUserId,
+              messageIds: [message.local_id || message._id], // Update the read status of the new message
+            })
+          );
+
+          // Show notification if the sender is not the current user
+        }
+      }, 50); // Add an additional delay to ensure the server processes the message
+    }, 50); // Initial delay for adding the message
   };
 
   // Handle incoming message read event
