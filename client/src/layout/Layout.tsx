@@ -1,6 +1,8 @@
 // src/layout/Layout.tsx
 import { Box, useMediaQuery, useTheme } from "@mui/material";
-import React from "react";
+import "animate.css";
+
+import React, { useMemo } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
 import ErrorBoundary from "../components/ErrorBoundary/ErrorBoundary";
@@ -26,25 +28,34 @@ const Layout: React.FC = () => {
   const isMessagesPage = location.pathname === "/messages";
 
   // Determine padding based on current page and device type
-  const determinePadding = () => {
-    if (isMessagesPage) {
-      return isMobile ? 0 : 1; // Messages Page: 0 on mobile, 1 on desktop
-    } else if (isOtherPage) {
-      return isMobile ? 0 : 2; // Other Pages: 0 on mobile, 4 on desktop
-    } else {
-      return 4; // Default padding for unspecified pages on desktop
-    }
-  };
+  const determinePadding = useMemo(() => {
+    return () => {
+      if (isMessagesPage) {
+        return isMobile ? 0 : 1; // Messages Page: 0 on mobile, 1 on desktop
+      } else if (isOtherPage) {
+        return isMobile ? 0 : 2; // Other Pages: 0 on mobile, 4 on desktop
+      } else {
+        return 4; // Default padding for unspecified pages on desktop
+      }
+    };
+  }, [isMessagesPage, isOtherPage, isMobile]);
 
+  // Determine if the header should be displayed
+  const shouldShowHeader = useMemo(
+    () => !currentChat || !isMobile,
+    [currentChat, isMobile]
+  );
   return (
     <ErrorBoundary>
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
         {/* Hide Header if currentChat exists and we are in mobile view */}
-        {!currentChat || !isMobile ? <Header /> : null}
+        {shouldShowHeader && <Header />}
         <Box
           component="main"
+          key={location.pathname}
+          className="animate__animated animate__fadeIn"
           sx={{
             flex: 1, // Let main content grow to fill available space
 

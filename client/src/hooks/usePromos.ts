@@ -61,7 +61,7 @@ const usePromos = () => {
     );
   }, [selectedPromo, allClients]);
 
-  const [mode, setMode] = useState<PromoMode>("view");
+  const [mode, setMode] = useState<PromoMode | null>(null);
 
   // Handle promo selection and set mode to 'view'
   const handlePromoSelect = useCallback(

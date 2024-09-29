@@ -11,20 +11,30 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
-import ClientDetailsCard from "../../components/visitPage/ClientDetailsCard";
-import CreateVisitForm from "../../components/visitPage/CreateVisitForm";
 import VisitsSidebar from "../../components/visitPage/VisitsSidebar";
-import VisitsTable from "../../components/visitPage/VisitsTable";
-import VisitView from "../../components/visitPage/VisitView";
 import {
   clearSelectedVisit,
   clearSelection,
   selectClient,
 } from "../../features/data/dataSlice";
 import useLoadingData from "../../hooks/useLoadingData";
+
+// Lazy load the non-immediate components
+const ClientDetailsCard = React.lazy(
+  () => import("../../components/visitPage/ClientDetailsCard")
+);
+const CreateVisitForm = React.lazy(
+  () => import("../../components/visitPage/CreateVisitForm")
+);
+const VisitsTable = React.lazy(
+  () => import("../../components/visitPage/VisitsTable")
+);
+const VisitView = React.lazy(
+  () => import("../../components/visitPage/VisitView")
+);
 
 const VisitsPage: React.FC = () => {
   const theme = useTheme();
@@ -64,7 +74,7 @@ const VisitsPage: React.FC = () => {
     if (userRole === "client" && currentUser?.id) {
       dispatch(selectClient(currentUser.id));
     }
-  }, [userRole, currentUser, dispatch]);
+  }, [userRole, currentUser?.id, dispatch]);
 
   // Automatically collapse VisitsTable when a visit is selected or creating a visit
   useEffect(() => {
@@ -198,11 +208,13 @@ const VisitsPage: React.FC = () => {
               </IconButton>
             </Box>
             <Collapse in={!isClientDetailsCollapsed}>
-              <ClientDetailsCard
-                clientId={selectedClientId}
-                onCreateVisit={handleOpenCreateVisit}
-                onDeselectClient={() => dispatch(clearSelection())}
-              />
+              <Suspense>
+                <ClientDetailsCard
+                  clientId={selectedClientId}
+                  onCreateVisit={handleOpenCreateVisit}
+                  onDeselectClient={() => dispatch(clearSelection())}
+                />
+              </Suspense>
             </Collapse>
 
             {/* Visits Table Collapsible Container */}
@@ -242,22 +254,28 @@ const VisitsPage: React.FC = () => {
               sx={{ mb: isCreatingVisit && !isVisitsTableCollapsed ? 25 : 0 }}
               in={!isVisitsTableCollapsed}
             >
-              <VisitsTable clientId={selectedClientId} />
+              <Suspense>
+                <VisitsTable clientId={selectedClientId} />
+              </Suspense>
             </Collapse>
 
             {/* Visit View (conditionally rendered) */}
             {selectedVisitId && (
-              <VisitView
-                visitId={selectedVisitId}
-                onDeselectVisit={() => dispatch(clearSelectedVisit())}
-              />
+              <Suspense>
+                <VisitView
+                  visitId={selectedVisitId}
+                  onDeselectVisit={() => dispatch(clearSelectedVisit())}
+                />
+              </Suspense>
             )}
             {/* Create Visit Form (conditionally rendered) */}
             {isCreatingVisit && selectedVisitId === null && (
-              <CreateVisitForm
-                clientId={selectedClientId}
-                onClose={handleCloseCreateVisit}
-              />
+              <Suspense>
+                <CreateVisitForm
+                  clientId={selectedClientId}
+                  onClose={handleCloseCreateVisit}
+                />
+              </Suspense>
             )}
           </Grid>
         )}
