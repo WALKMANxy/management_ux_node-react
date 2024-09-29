@@ -13,21 +13,28 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import { useAppSelector } from "../../app/hooks";
-import CreatePromoForm from "../../components/promosPage/CreatePromoForm";
-import EligibleClientsGrid from "../../components/promosPage/EligibleClientsGrid";
-import PromoDetailsCard from "../../components/promosPage/PromoDetailsCard";
 import PromosSidebar from "../../components/promosPage/PromosSidebar";
-import usePromos from "../../hooks/usePromos";
 import useLoadingData from "../../hooks/useLoadingData";
+import usePromos from "../../hooks/usePromos";
+
+// Lazy load other components
+const CreatePromoForm = React.lazy(
+  () => import("../../components/promosPage/CreatePromoForm")
+);
+const EligibleClientsGrid = React.lazy(
+  () => import("../../components/promosPage/EligibleClientsGrid")
+);
+const PromoDetailsCard = React.lazy(
+  () => import("../../components/promosPage/PromoDetailsCard")
+);
 
 const PromosPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const { loading } = useLoadingData();
-
 
   const {
     mode,
@@ -132,80 +139,86 @@ const PromosPage: React.FC = () => {
           md={9}
           sx={{ display: "flex", flexDirection: "column", p: 2 }}
         >
-          {mode === "create" ? (
-            <Paper
-              elevation={3}
-              sx={{ mb: 2, p: 2, borderRadius: 2, overflow: "hidden" }}
-            >
-              <CreatePromoForm
-                onClose={handlePromoDeselect}
-                isCreating={true}
-                onSubmit={handleCreatePromo}
-              />
-            </Paper>
-          ) : mode === "edit" && selectedPromo ? (
-            <>
-              <CollapsibleSection
-                title="Promo Details"
-                isCollapsed={isPromoDetailsCollapsed}
-                setIsCollapsed={setIsPromoDetailsCollapsed}
-              >
-                <PromoDetailsCard
-                  onEditPromo={initiateEditPromo}
-                  onDeselectPromo={handlePromoDeselect}
-                  onTerminatePromo={handleSunsetPromo}
-                />
-              </CollapsibleSection>
-              <CollapsibleSection
-                title="Edit Promo"
-                isCollapsed={isEditFormCollapsed}
-                setIsCollapsed={setIsEditFormCollapsed}
+          <Suspense>
+            {mode === "create" ? (
+              <Paper
+                elevation={3}
+                sx={{ mb: 2, p: 2, borderRadius: 2, overflow: "hidden" }}
               >
                 <CreatePromoForm
                   onClose={handlePromoDeselect}
-                  promoData={selectedPromo}
-                  isCreating={false}
-                  onSubmit={handleUpdatePromo}
+                  isCreating={true}
+                  onSubmit={handleCreatePromo}
                 />
-              </CollapsibleSection>
-            </>
-          ) : mode === "view" && selectedPromo ? (
-            <>
-              <CollapsibleSection
-                title="Promo Details"
-                isCollapsed={isPromoDetailsCollapsed}
-                setIsCollapsed={setIsPromoDetailsCollapsed}
-              >
-                <PromoDetailsCard
-                  onEditPromo={initiateEditPromo}
-                  onDeselectPromo={handlePromoDeselect}
-                  onTerminatePromo={handleSunsetPromo}
-                />
-              </CollapsibleSection>
-              <CollapsibleSection
-                title={
-                  selectedPromo.global ? "Excluded Clients" : "Eligible Clients"
-                }
-                isCollapsed={isEligibleClientsCollapsed}
-                setIsCollapsed={setIsEligibleClientsCollapsed}
-              >
-                <EligibleClientsGrid
-                  isViewing={true}
-                  selectedClients={
-                    selectedPromo.global ? [] : selectedPromo.clientsId
+              </Paper>
+            ) : mode === "edit" && selectedPromo ? (
+              <>
+                <CollapsibleSection
+                  title="Promo Details"
+                  isCollapsed={isPromoDetailsCollapsed}
+                  setIsCollapsed={setIsPromoDetailsCollapsed}
+                >
+                  <PromoDetailsCard
+                    onEditPromo={initiateEditPromo}
+                    onDeselectPromo={handlePromoDeselect}
+                    onTerminatePromo={handleSunsetPromo}
+                  />
+                </CollapsibleSection>
+                <CollapsibleSection
+                  title="Edit Promo"
+                  isCollapsed={isEditFormCollapsed}
+                  setIsCollapsed={setIsEditFormCollapsed}
+                >
+                  <CreatePromoForm
+                    onClose={handlePromoDeselect}
+                    promoData={selectedPromo}
+                    isCreating={false}
+                    onSubmit={handleUpdatePromo}
+                  />
+                </CollapsibleSection>
+              </>
+            ) : mode === "view" && selectedPromo ? (
+              <>
+                <CollapsibleSection
+                  title="Promo Details"
+                  isCollapsed={isPromoDetailsCollapsed}
+                  setIsCollapsed={setIsPromoDetailsCollapsed}
+                >
+                  <PromoDetailsCard
+                    onEditPromo={initiateEditPromo}
+                    onDeselectPromo={handlePromoDeselect}
+                    onTerminatePromo={handleSunsetPromo}
+                  />
+                </CollapsibleSection>
+                <CollapsibleSection
+                  title={
+                    selectedPromo.global
+                      ? "Excluded Clients"
+                      : "Eligible Clients"
                   }
-                  excludedClients={
-                    selectedPromo.global ? selectedPromo.excludedClientsId : []
-                  }
-                  global={selectedPromo.global}
-                />
-              </CollapsibleSection>
-            </>
-          ) : isMobile ? null : (
-            <Typography variant="h6" sx={{ mt: 2 }}>
-              Please select a promo from the sidebar or create a new one.
-            </Typography>
-          )}
+                  isCollapsed={isEligibleClientsCollapsed}
+                  setIsCollapsed={setIsEligibleClientsCollapsed}
+                >
+                  <EligibleClientsGrid
+                    isViewing={true}
+                    selectedClients={
+                      selectedPromo.global ? [] : selectedPromo.clientsId
+                    }
+                    excludedClients={
+                      selectedPromo.global
+                        ? selectedPromo.excludedClientsId
+                        : []
+                    }
+                    global={selectedPromo.global}
+                  />
+                </CollapsibleSection>
+              </>
+            ) : isMobile ? null : (
+              <Typography variant="h6" sx={{ mt: 2 }}>
+                Please select a promo from the sidebar or create a new one.
+              </Typography>
+            )}
+          </Suspense>
         </Grid>
       </Grid>
     </Box>

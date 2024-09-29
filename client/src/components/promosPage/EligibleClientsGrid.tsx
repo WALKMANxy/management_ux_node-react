@@ -7,6 +7,8 @@ import {
   SizeColumnsToContentStrategy,
 } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css"; // Ensure this is imported
+
 import { AgGridReact } from "ag-grid-react";
 import React, { useCallback, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,6 +17,7 @@ import { selectCurrentUser } from "../../features/users/userSlice";
 import usePromos from "../../hooks/usePromos";
 import { numberComparator } from "../../utils/dataUtils";
 import { showToast } from "../../utils/toastMessage";
+import "../statistics/grids/AGGridTable.css";
 
 interface EligibleClientsGridProps {
   selectedClients?: string[];
