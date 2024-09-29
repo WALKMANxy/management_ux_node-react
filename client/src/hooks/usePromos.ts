@@ -20,6 +20,7 @@ const usePromos = () => {
   const dispatch = useAppDispatch();
   const promos = useAppSelector(selectPromos);
   const { t } = useTranslation(); // Initialize translation
+  const [searchTerm, setSearchTerm] = useState("");
 
   const allClients = useAppSelector((state) => state.data.clients);
   const agents = useAppSelector((state) => state.data.agents);
@@ -87,7 +88,9 @@ const usePromos = () => {
         dispatch(getPromos()); // Refresh the list of promos
       } catch (error: unknown) {
         if (error instanceof Error) {
-          showToast.error(t("usePromos.createFailed", { message: error.message }));
+          showToast.error(
+            t("usePromos.createFailed", { message: error.message })
+          );
           console.error("Failed to create promo:", error);
         } else {
           showToast.error(t("usePromos.createUnknownError"));
@@ -116,7 +119,9 @@ const usePromos = () => {
         dispatch(getPromos()); // Refresh the list of promos
       } catch (error: unknown) {
         if (error instanceof Error) {
-          showToast.error(t("usePromos.updateFailed", { message: error.message }));
+          showToast.error(
+            t("usePromos.updateFailed", { message: error.message })
+          );
           console.error("Failed to update promo:", error);
         } else {
           showToast.error(t("usePromos.updateUnknownError"));
@@ -166,7 +171,9 @@ const usePromos = () => {
       dispatch(getPromos());
     } catch (error: unknown) {
       if (error instanceof Error) {
-        showToast.error(t("usePromos.sunsetFailed", { message: error.message }));
+        showToast.error(
+          t("usePromos.sunsetFailed", { message: error.message })
+        );
         console.error("Failed to sunset promo:", error);
       } else {
         showToast.error(t("usePromos.sunsetUnknownError"));
@@ -205,7 +212,28 @@ const usePromos = () => {
     showToast.success(t("usePromos.refreshSuccess"));
   }, [dispatch, t]);
 
+  const handleSearchChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchTerm(event.target.value);
+    },
+    []
+  );
+  // Determine if a promo is active based on its end date
+  const isPromoActive = useCallback((promo: Promo) => {
+    return new Date(promo.endDate) > new Date();
+  }, []);
+
+  const filteredPromos = useMemo(() => {
+    return promos.filter((promo) =>
+      promo.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [promos, searchTerm]);
+
   return {
+    isPromoActive,
+    searchTerm,
+    handleSearchChange,
+    filteredPromos,
     clients,
     agents,
     userId,

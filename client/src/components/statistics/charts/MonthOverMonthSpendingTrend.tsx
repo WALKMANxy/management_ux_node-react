@@ -12,14 +12,14 @@ import { ApexOptions } from "apexcharts";
 import React, { useMemo } from "react";
 import Chart from "react-apexcharts";
 import { useTranslation } from "react-i18next";
+import { UserRole } from "../../../models/entityModels";
 import { monthMap } from "../../../utils/constants";
 import { currencyFormatter } from "../../../utils/dataUtils";
 
 const MonthOverMonthSpendingTrend: React.FC<{
   months: string[];
   revenueData: number[];
-  userRole: "agent" | "client" | "admin";
-  isAgentSelected: boolean;
+  userRole: UserRole;
 }> = ({ months, revenueData, userRole }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -61,7 +61,7 @@ const MonthOverMonthSpendingTrend: React.FC<{
           formatter: (val: number) => currencyFormatter(val),
           title: {
             formatter: () =>
-              userRole === "agent"
+              userRole === "agent" || userRole === "admin"
                 ? t("monthOverMonthSpendingTrend.revenue")
                 : t("monthOverMonthSpendingTrend.expense"),
           },
@@ -107,7 +107,7 @@ const MonthOverMonthSpendingTrend: React.FC<{
     () => [
       {
         name:
-          userRole === "agent"
+          userRole === "agent" || userRole === "admin"
             ? t("monthOverMonthSpendingTrend.revenue")
             : t("monthOverMonthSpendingTrend.expense"),
         data: data.map((d) => d.revenue),

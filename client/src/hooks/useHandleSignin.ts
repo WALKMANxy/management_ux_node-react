@@ -117,7 +117,7 @@ export const useHandleSignin = (onClose: () => void) => {
 
   const handleLoginWithGoogleClick = useCallback(async () => {
     try {
-      await handleLoginWithGoogle();
+      handleLoginWithGoogle();
       onClose();
       showToast.success(t("signin.loginWithGoogleSuccess"));
     } catch (error: unknown) {

@@ -11,6 +11,8 @@ import { setCurrentUser } from "../features/users/userSlice";
 import { User } from "../models/entityModels";
 
 import { useTranslation } from "react-i18next";
+import { getTimeMs } from "../config/config";
+import { initializeUserEncryption } from "../utils/cacheUtils";
 import {
   FetchUserRoleError,
   LoginError,
@@ -18,6 +20,8 @@ import {
 } from "../utils/errorHandling";
 import { saveAuthState } from "../utils/localStorage";
 import { showToast } from "../utils/toastMessage";
+
+const timeMS = getTimeMs(); // Ensure this is set in your .env file
 
 export const useAuth = () => {
   const dispatch = useAppDispatch();
@@ -84,12 +88,17 @@ export const useAuth = () => {
       const userId = id;
 
       if (userId) {
+        // Derive the encryption key using userId, userAgent, and salt
+
+        await initializeUserEncryption({
+          userId,
+          timeMS,
+        });
+
         // Dispatch an action to get the user role by ID
         const result = await dispatch(
           authApi.endpoints.getUserRoleById.initiate(userId)
         );
-
-        // Check if the fetch was successful
         if ("data" in result) {
           const user = result.data as User;
 
@@ -203,7 +212,7 @@ export const useAuth = () => {
   };
 
   useEffect(() => {
-    const messageListener = (event: MessageEvent) => {
+    const messageListener = async (event: MessageEvent) => {
       if (event.origin !== import.meta.env.VITE_API_BASE_URL) {
         return;
       }
@@ -219,7 +228,15 @@ export const useAuth = () => {
 
       if (status === "success" && user) {
         showToast.success(t("auth.googleLoginSuccess")); // Toast for Google OAuth success
-        dispatch(
+        // Derive the encryption key using Google ID and email
+        // Derive the encryption key using userId, userAgent, and salt
+        const userId = user._id; // Adjust based on your user model
+        await initializeUserEncryption({
+          userId,
+          timeMS,
+        });
+
+        await dispatch(
           handleLogin({
             role: user.role,
             id: user.entityCode,

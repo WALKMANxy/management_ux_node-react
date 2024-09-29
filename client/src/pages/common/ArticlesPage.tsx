@@ -60,7 +60,7 @@ const ArticlesPage: React.FC = () => {
         cellRenderer: (params: { data: MovementDetail; value: string }) => {
           return (
             <span
-              onDoubleClick={() => handleArticleSelect(params.data.articleId)}
+              onClick={() => handleArticleSelect(params.data.articleId)}
               style={{
                 cursor: "pointer",
               }}

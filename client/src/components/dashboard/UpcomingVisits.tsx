@@ -16,13 +16,14 @@ const UpcomingVisits: React.FC = () => {
   const navigate = useNavigate();
   const visits = useAppSelector(selectVisits);
 
-  /**
-   * Computes the top 3 upcoming visits that are pending and not completed.
-   */
+  const now = useMemo(() => new Date(), []);
   const upcomingVisits = useMemo(() => {
     // Filter visits to include only those that are pending and not completed
     const filteredVisits = visits.filter(
-      (visit) => visit.pending === true && visit.completed === false
+      (visit) =>
+        visit.pending === true &&
+        visit.completed === false &&
+        new Date(visit.date) >= now
     );
 
     // Sort the visits by date (earliest first)
@@ -32,7 +33,7 @@ const UpcomingVisits: React.FC = () => {
 
     // Return the top 3 upcoming visits
     return sortedVisits.slice(0, 3);
-  }, [visits]);
+  }, [visits, now]);
 
   return (
     <Paper

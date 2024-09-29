@@ -20,7 +20,6 @@ import AGGridTable from "./AGGridTable";
 
 const MovementList: React.FC<MovementListProps> = ({
   quickFilterText,
-  setQuickFilterText,
   startDate,
   setStartDate,
   endDate,
@@ -38,15 +37,6 @@ const MovementList: React.FC<MovementListProps> = ({
   movementDetailsRef,
 }) => {
   const { t } = useTranslation();
-
-  // Memoized handler for filter text change
-  const onFilterTextBoxChanged = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const value = event.target.value || "";
-      setQuickFilterText(value);
-    },
-    [setQuickFilterText]
-  );
 
   // Memoized handler for collapsing/expanding the movements list
   const handleCollapseToggle = useCallback(() => {
@@ -69,7 +59,7 @@ const MovementList: React.FC<MovementListProps> = ({
   const memoizedColumnDefs = useMemo(() => columnDefs, [columnDefs]);
 
   return (
-    <Paper elevation={8} sx={{ mb: 2 }}>
+    <Paper elevation={8} sx={{ mb: 2, borderRadius: 2 }}>
       {/* Header Section */}
       <Box
         sx={{
@@ -79,7 +69,9 @@ const MovementList: React.FC<MovementListProps> = ({
           p: 2,
         }}
       >
-        <Typography variant="h6">{t("movementList.title")}</Typography>
+        <Typography variant="h4" sx={{ pl: 2, pt: 2, mb: -4 }}>
+          {t("movementList.title")}
+        </Typography>
         <Tooltip
           title={
             isMovementListCollapsed
@@ -101,42 +93,27 @@ const MovementList: React.FC<MovementListProps> = ({
       </Box>
 
       {/* Collapsible Content */}
-      <Collapse in={!isMovementListCollapsed}>
+      <Collapse in={!isMovementListCollapsed} sx={{ pt: 2, pb: 4 }}>
         <Box sx={{ p: 2 }}>
           {/* Filter and Menu Section */}
           <Box
             sx={{
               display: "flex",
-              flexDirection: isMobile ? "column" : "row",
+              flexDirection: isMobile ? "column" : "row-reverse",
               gap: 2,
               mb: 2,
             }}
           >
             {/* Quick Filter and Options Menu */}
-            <Box
-              sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}
-            >
-              <TextField
-                id="filter-text-box"
-                placeholder={t("movementList.quickFilterPlaceholder")}
-                variant="outlined"
-                size="small"
-                fullWidth
-                value={quickFilterText}
-                onChange={onFilterTextBoxChanged}
-                InputProps={{
-                  "aria-label": t("movementList.quickFilterAriaLabel"),
-                }}
-              />
-              <Tooltip title={t("movementList.options")}>
-                <IconButton
-                  onClick={handleMenuOpen}
-                  aria-label={t("movementList.options")}
-                >
-                  <MoreVertIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
+
+            <Tooltip title={t("movementList.options")}>
+              <IconButton
+                onClick={handleMenuOpen}
+                aria-label={t("movementList.options")}
+              >
+                <MoreVertIcon />
+              </IconButton>
+            </Tooltip>
 
             {/* Start Date Filter */}
             <TextField

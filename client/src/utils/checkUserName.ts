@@ -14,22 +14,22 @@ export const updateUserEntityNameIfMissing = (
   currentUser: Partial<User> | null,
   currentUserDetails: { name?: string } | null
 ) => {
-  // Check if the currentUser is defined and the entityName is missing or empty
   if (
-    currentUser &&
-    (!currentUser.entityName || currentUser.entityName.trim() === "")
+    !currentUser ||
+    currentUser.entityName?.trim()
   ) {
-    // Get the name from currentUserDetails
-    const entityName = currentUserDetails?.name;
+    return;
+  }
 
-    // If entityName exists, dispatch updateUserById to update the user entity name
-    if (entityName && currentUser._id) {
-      dispatch(
-        updateUserById({
-          id: currentUser._id,
-          updatedData: { entityName },
-        })
-      );
-    }
+  const entityName = currentUserDetails?.name?.trim();
+  const userId = currentUser?._id;
+
+  if (entityName && userId) {
+    dispatch(
+      updateUserById({
+        id: userId,
+        updatedData: { entityName },
+      })
+    );
   }
 };

@@ -18,68 +18,66 @@ function isErrorWithStatus(error: unknown): error is ErrorWithStatus {
   );
 }
 
-class NetworkError extends Error {
-  constructor(message: string) {
+class AppError extends Error {
+  constructor(message: string, name: string) {
     super(message);
-    this.name = "NetworkError";
+    this.name = name;
+    Object.setPrototypeOf(this, new.target.prototype); // Restore prototype chain
   }
 }
 
-class ServerError extends Error {
+class NetworkError extends AppError {
+  constructor(message: string) {
+    super(`NetworkError: ${message}`, "NetworkError");
+  }
+}
+
+class ServerError extends AppError {
   status: number;
 
   constructor(status: number, message: string) {
-    super(`Server Error (Status ${status}): ${message}`);
-    this.name = "ServerError";
+    super(`ServerError (Status ${status}): ${message}`, "ServerError");
     this.status = status;
   }
 }
 
-class RegistrationError extends Error {
+class RegistrationError extends AppError {
   constructor(message: string) {
-    super(`Registration failed: ${message}`);
-    this.name = "RegistrationError";
+    super(`RegistrationError: ${message}`, "RegistrationError");
   }
 }
 
-class LoginError extends Error {
+class LoginError extends AppError {
   constructor(message: string) {
-    super(`Login failed: ${message}`);
-    this.name = "LoginError";
+    super(`LoginError: ${message}`, "LoginError");
   }
 }
 
-class FetchUserRoleError extends Error {
+class FetchUserRoleError extends AppError {
   constructor(message: string) {
-    super(`Failed to fetch user role: ${message}`);
-    this.name = "FetchUserRoleError";
+    super(`FetchUserRoleError: ${message}`, "FetchUserRoleError");
   }
 }
 
 // Logger utility function
 const logError = (error: Error): void => {
-  console.error(
-    `[${new Date().toISOString()}] ${error.name}: ${error.message}`
-  );
+  console.error(`[${new Date().toISOString()}] ${error.name}: ${error.message}`);
 };
 
 const handleApiError = (error: unknown, operation: string): void => {
   if (isErrorWithStatus(error)) {
-    // This is a response error from the server
     const serverError = new ServerError(
       error.status,
       `Error during ${operation}: ${error.data?.message || "Unknown error"}`
     );
     logError(serverError);
   } else if (error instanceof Error) {
-    // This is likely a network or other type of error
     const networkError = new NetworkError(
       `Network error during ${operation}: ${error.message}`
     );
     logError(networkError);
   } else {
-    // Unexpected error type
-    const unknownError = new Error(`Unknown error during ${operation}`);
+    const unknownError = new AppError(`Unknown error during ${operation}`, "UnknownError");
     logError(unknownError);
   }
 };
@@ -96,7 +94,6 @@ const generateErrorResponse = (
       },
     };
   } else if (error instanceof Error) {
-    // Assuming network errors should be treated as FETCH_ERROR
     return {
       error: {
         status: "FETCH_ERROR",
@@ -104,7 +101,6 @@ const generateErrorResponse = (
       },
     };
   } else if (typeof error === "string") {
-    // Handling string errors as FETCH_ERROR
     return {
       error: {
         status: "FETCH_ERROR",
@@ -112,7 +108,6 @@ const generateErrorResponse = (
       },
     };
   } else {
-    // Default case for truly unknown errors
     return {
       error: {
         status: "FETCH_ERROR",
@@ -121,8 +116,6 @@ const generateErrorResponse = (
     };
   }
 };
-
-// Type guard to check if the error is of type ErrorWithStatus
 
 export {
   FetchUserRoleError,
