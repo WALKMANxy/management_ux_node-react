@@ -92,3 +92,21 @@ export interface DecodedToken extends jwt.JwtPayload {
   id: string;
   authType: "email" | "google";
 }
+
+// Adjusted serverMovement interface
+export interface serverMovement {
+  "Data Documento Precedente": string; // Consider using Date if possible
+  "Numero Lista": number;
+  Mese: number;
+  Anno: number;
+  "Ragione Sociale Cliente": string;
+  "Codice Cliente": number; // Changed from string to number
+  "Codice Agente": number; // Changed from string to number
+  "Codice Articolo": string;
+  "Marca Articolo": string;
+  "Descrizione Articolo": string;
+  Quantita: number;
+  Valore: number;
+  Costo: number;
+  "Prezzo Articolo": number;
+}

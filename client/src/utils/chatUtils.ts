@@ -3,52 +3,45 @@ import i18next from "i18next";
 import { IChat, IMessage, Promo, Visit } from "../models/dataModels";
 
 // Utility to sanitize the search term
+const sanitizeRegex = /[^\w\s]/gi;
+
 export const sanitizeSearchTerm = (term: string) =>
-  term.replace(/[^\w\s]/gi, "").toLowerCase();
+  term.replace(sanitizeRegex, "").toLowerCase();
 
 // Format date for the chat preview
 export const formatDate = (date: Date) => {
-  const dayDifference = dayjs().diff(dayjs(date), "day");
+  const dayjsDate = dayjs(date);
+  const dayDifference = dayjs().diff(dayjsDate, "day");
   if (dayDifference === 0) {
-    return dayjs(date).format("hh:mm A");
+    return dayjsDate.format("hh:mm A");
   } else if (dayDifference === 1) {
     return "Yesterday";
   } else {
-    return dayjs(date).format("MMM D");
+    return dayjsDate.format("MMM D");
   }
 };
 
 export const formatDateForDivider = (date: Date) => {
-  const dayDifference = dayjs().diff(dayjs(date), "day");
+  const dayjsDate = dayjs(date);
+  const dayDifference = dayjs().diff(dayjsDate, "day");
   if (dayDifference === 0) {
     return "Today";
   } else if (dayDifference === 1) {
     return "Yesterday";
   } else if (dayDifference > 1) {
-    return dayjs(date).format("dddd");
+    return dayjsDate.format("dddd");
   } else {
-    return dayjs(date).format("MMM D");
+    return dayjsDate.format("MMM D");
   }
 };
 
 // chatUtils.ts
 
 export const isDifferentDay = (date1?: Date, date2?: Date): boolean => {
-  if (!date1 || !date2) {
+  if (!date1 || !date2 || isNaN(date1.getTime()) || isNaN(date2.getTime())) {
     return false;
   }
-  if (isNaN(date1.getTime()) || isNaN(date2.getTime())) {
-    return false;
-  }
-
-  try {
-    return (
-      dayjs(date1).isBefore(dayjs(date2), "day") ||
-      dayjs(date2).isBefore(dayjs(date1), "day")
-    );
-  } catch {
-    return false;
-  }
+  return !dayjs(date1).isSame(dayjs(date2), "day");
 };
 
 /**
@@ -59,31 +52,15 @@ export const isDifferentDay = (date1?: Date, date2?: Date): boolean => {
  * @returns A boolean indicating if the user can chat.
  */
 export const canUserChat = (chat: IChat, currentUserId: string): boolean => {
-  // If the chat is pending, disable the input
-  if (chat.status === "pending") {
-    return false;
-  }
+  if (chat.status === "pending") return false;
 
-  // If the chat type is broadcast, check if the user is an admin
   if (chat.type === "broadcast") {
-    // Ensure admins array exists
-    if (chat.admins && chat.admins.length > 0) {
-      // Check if currentUserId is in the admins array
-      const isAdmin = chat.admins.some(
-        (adminId) => adminId.toString() === currentUserId
-      );
-      if (!isAdmin) {
-        return false;
-      }
-    } else {
-      // If no admins are defined, treat it as non-admin
-      return false;
-    }
+    return chat.admins?.some(adminId => adminId.toString() === currentUserId) || false;
   }
 
-  // In all other cases, allow chatting
   return true;
 };
+
 
 // Type guard for Promo
 function isPromo(data: Promo | Visit): data is Promo {

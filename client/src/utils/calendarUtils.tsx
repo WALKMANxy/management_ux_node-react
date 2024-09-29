@@ -11,44 +11,38 @@ import WorkOffIcon from "@mui/icons-material/WorkOff";
 import React from "react";
 import { CalendarEvent } from "../models/dataModels";
 
+const iconMap: Record<string, React.ReactNode> = {
+  illness: <SickIcon fontSize="small" style={{ marginRight: 4 }} />,
+  day_off: <WorkOffIcon fontSize="small" style={{ marginRight: 4 }} />,
+  unexpected_event: <ReportOffIcon fontSize="small" style={{ marginRight: 4 }} />,
+  medical_visit: <LocalHospitalIcon fontSize="small" style={{ marginRight: 4 }} />,
+  company_party: <AirplaneTicketIcon fontSize="small" style={{ marginRight: 4 }} />,
+  conference: <VideocamIcon fontSize="small" style={{ marginRight: 4 }} />,
+  company_holiday: <BlindsClosedIcon fontSize="small" style={{ marginRight: 4 }} />,
+  expo: <MediationIcon fontSize="small" style={{ marginRight: 4 }} />,
+};
+
+const backgroundColorMap: Record<string, Record<string, string>> = {
+  absence: {
+    pending: "#BDBDBD",
+    approved: "#FFA726",
+    other: "#FFEBEE",
+  },
+  holiday: { default: "#E8F5E9" },
+  event: { default: "#E3F2FD" },
+};
+
+
 export const getIconForReason = (reason: string): React.ReactNode => {
-  switch (reason) {
-    case "illness":
-      return <SickIcon fontSize="small" style={{ marginRight: 4 }} />;
-    case "day_off":
-      return <WorkOffIcon fontSize="small" style={{ marginRight: 4 }} />;
-    case "unexpected_event":
-      return <ReportOffIcon fontSize="small" style={{ marginRight: 4 }} />;
-    case "medical_visit":
-      return <LocalHospitalIcon fontSize="small" style={{ marginRight: 4 }} />;
-    case "company_party":
-      return <AirplaneTicketIcon fontSize="small" style={{ marginRight: 4 }} />;
-    case "conference":
-      return <VideocamIcon fontSize="small" style={{ marginRight: 4 }} />;
-    case "company_holiday":
-      return <BlindsClosedIcon fontSize="small" style={{ marginRight: 4 }} />;
-    case "expo":
-      return <MediationIcon fontSize="small" style={{ marginRight: 4 }} />;
-    default:
-      return null;
-  }
+  return iconMap[reason] || null;
 };
 
 export const getBackgroundColorForEvent = (event: CalendarEvent): string => {
-  if (event.eventType === "absence") {
-    if (event.status === "pending") {
-      return "#BDBDBD"; // Gray background for pending absences
-    } else if (event.status === "approved") {
-      return "#FFA726"; // Orange background for approved absences
-    } else {
-      return "#FFEBEE"; // Light red for other absences
-    }
-  } else if (event.eventType === "holiday") {
-    return "#E8F5E9"; // Light green for holidays
-  } else if (event.eventType === "event") {
-    return "#E3F2FD"; // Light blue for events
+  const typeColors = backgroundColorMap[event.eventType];
+  if (typeColors) {
+    return typeColors[event.status] || typeColors.default || "";
   }
-  return ""; // Default background color if none match
+  return "";
 };
 
 // Utility function to convert strings to Date objects

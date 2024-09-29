@@ -27,13 +27,16 @@ const AGGridTable = forwardRef<AgGridReact, AGGridTableProps>(
     );
 
     return (
-      <div className="ag-theme-quartz" style={{ height: 600, width: "100%" }}>
+      <div
+        className="ag-theme-quartz"
+        style={{ height: 600, width: "100%" }}
+      >
         <AgGridReact
           ref={ref}
           columnDefs={memoizedColumnDefs}
           rowData={memoizedRowData}
           pagination={true}
-          paginationPageSize={20}
+          paginationPageSize={100}
           paginationPageSizeSelector={paginationPageSizeSelector}
           quickFilterText={quickFilterText} // Pass quickFilterText to AgGridReact
           enableCellTextSelection={true}

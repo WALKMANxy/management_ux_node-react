@@ -93,14 +93,8 @@ const useStats = (isMobile: boolean) => {
   const salesDistributionDataClients = useMemo(() => {
     if (!currentUserData) return [];
 
-    if (role === "admin") {
-      return calculateSalesDistributionData(Object.values(clients), isMobile);
-    } else if (role === "agent") {
-      const agentClients = agentClientsMap.get(currentUserData.id) || [];
-      return calculateSalesDistributionData(agentClients, isMobile);
-    }
-    return [];
-  }, [role, currentUserData, clients, agentClientsMap, isMobile]);
+    return calculateSalesDistributionData(Object.values(clients), isMobile);
+  }, [currentUserData, clients, isMobile]);
 
   // Create memoized selectors for selectedClient and selectedAgent
   const selectedClient = useMemo(
@@ -264,8 +258,8 @@ const useStats = (isMobile: boolean) => {
     }
 
     const clientRevenue = parseFloat(selectedClient.totalRevenue);
-    const totalRevenueAllClients = parseFloat(
-      calculateTotalRevenue(Object.values(clients))
+    const totalRevenueAllClients = calculateTotalRevenue(
+      Object.values(clients)
     );
     const revenuePercentage = calculatePercentageCached(
       clientRevenue,
@@ -328,9 +322,9 @@ const useStats = (isMobile: boolean) => {
 
     const agentClients = agentClientsMap.get(selectedAgent.id) || [];
 
-    const agentRevenue = parseFloat(calculateTotalRevenue(agentClients));
-    const totalRevenueAllClients = parseFloat(
-      calculateTotalRevenue(Object.values(clients))
+    const agentRevenue = calculateTotalRevenue(agentClients);
+    const totalRevenueAllClients = calculateTotalRevenue(
+      Object.values(clients)
     );
     const revenuePercentage = calculatePercentageCached(
       agentRevenue,
@@ -437,7 +431,7 @@ const useStats = (isMobile: boolean) => {
     if (!currentUserData || !role) return 0;
 
     const clientList = getAdjustedClients(role, currentUserData, clients);
-    return parseFloat(calculateTotalRevenue(clientList));
+    return calculateTotalRevenue(clientList);
   }, [role, currentUserData, clients]);
 
   const totalOrders = useMemo<number>(() => {

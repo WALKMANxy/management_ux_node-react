@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../app/store";
@@ -37,47 +37,41 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({
     );
   }, [clientMovements, clients, articleId]);
 
-  // Abstract valueGetter to reduce redundancy
-  const createValueGetter = useCallback(
-    (field: keyof MovementDetail) => (params: { data: Movement }) => {
-      const detail = params.data.details?.find(
-        (detail: MovementDetail) => detail.articleId === articleId
-      );
-      return detail ? detail[field] : 0;
-    },
-    [articleId]
-  );
-
   const columnDefinitions = useMemo(
     () => [
       {
         headerName: t("movementsHistory.date"),
         field: "dateOfOrder",
         sortable: true,
-        filter: "agDateColumnFilter",
       },
       {
         headerName: t("movementsHistory.client"),
         field: "clientName",
         sortable: true,
-        filter: "agTextColumnFilter",
       },
       {
         headerName: t("movementsHistory.quantity"),
-        valueGetter: createValueGetter("quantity"),
-
+        valueGetter: (params: { data: Movement }) => {
+          const detail = params.data.details.find(
+            (detail: MovementDetail) => detail.articleId === articleId
+          );
+          return detail ? detail.quantity : 0;
+        },
         comparator: numberComparator,
         sortable: true,
-        filter: "agNumberColumnFilter",
       },
       {
         headerName: t("movementsHistory.revenue"),
-        valueGetter: createValueGetter("priceBought"),
+        valueGetter: (params: { data: Movement }) => {
+          const detail = params.data.details.find(
+            (detail: MovementDetail) => detail.articleId === articleId
+          );
+          return detail ? detail.priceSold : 0;
+        },
         valueFormatter: (params: { value: number }) =>
           currencyFormatter(params.value),
         comparator: numberComparator,
         sortable: true,
-        filter: "agNumberColumnFilter",
       },
       {
         headerName: t("movementsHistory.cost"),
@@ -92,8 +86,25 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({
         comparator: numberComparator,
         sortable: true,
       },
+      {
+        headerName: t("movementsHistory.unitPrice"),
+        valueGetter: (params: { data: Movement }) => {
+          const detail = params.data.details.find(
+            (detail: MovementDetail) => detail.articleId === articleId
+          );
+          return detail && detail.quantity > 0
+            ? typeof detail.priceSold === "string"
+              ? parseFloat(detail.priceSold) / detail.quantity
+              : detail.priceSold / detail.quantity
+            : 0;
+        },
+        valueFormatter: (params: { value: number }) =>
+          currencyFormatter(params.value),
+        comparator: numberComparator,
+        sortable: true,
+      },
     ],
-    [t, articleId, createValueGetter]
+    [t, articleId]
   );
 
   return (

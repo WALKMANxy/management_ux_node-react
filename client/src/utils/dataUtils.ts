@@ -11,45 +11,28 @@ export const getMonthYear = (dateString: string) => {
 };
 
 // Calculate total revenue for a list of clients
-export const calculateTotalRevenue = (clients: Client[]): string => {
-  return clients
-    .reduce((total, client) => total + parseFloat(client.totalRevenue), 0)
-    .toFixed(2);
+export const calculateTotalRevenue = (clients: Client[]): number => {
+  let total = 0;
+  for (let i = 0; i < clients.length; i++) {
+    total += parseFloat(clients[i].totalRevenue); // Assuming you store it as a string
+  }
+  return Number(total.toFixed(2));
 };
 
 export const calculateNetRevenue = (clients: Client[]): string => {
-  return clients
-    .reduce((netTotal, client) => {
-      const clientNetRevenue = client.movements.reduce((sum, movement) => {
-        const movementNetRevenue = movement.details.reduce(
-          (detailSum, detail) => {
-            const priceSold = parseFloat(detail.priceSold) || 0;
-            const priceBought =
-              Math.abs(parseFloat(detail.priceBought) || 0) *
-              (detail.quantity || 0);
-
-            /*  // Log details for debugging
-             console.log("Detail:", detail);
-             console.log("priceSold:", priceSold);
-             console.log("priceBought:", priceBought);
-             console.log("quantity:", Math.abs(detail.quantity || 0));
-             console.log("netRevenue for this detail:", detailSum + priceSold - priceBought);
-
- */
-            return detailSum + priceSold - priceBought;
-          },
-          0
-        );
-        // Log movementNetRevenue for debugging
-        //console.log("movementNetRevenue:", movementNetRevenue);
-        return sum + movementNetRevenue;
-      }, 0);
-
-      // Log clientNetRevenue for debugging
-      //console.log("clientNetRevenue:", clientNetRevenue);
-      return netTotal + clientNetRevenue;
-    }, 0)
-    .toFixed(2);
+  let netTotal = 0;
+  for (const client of clients) {
+    for (const movement of client.movements) {
+      for (const detail of movement.details) {
+        const priceSold = parseFloat(detail.priceSold) || 0;
+        const priceBought =
+          Math.abs(parseFloat(detail.priceBought) || 0) *
+          (detail.quantity || 0);
+        netTotal += priceSold - priceBought;
+      }
+    }
+  }
+  return netTotal.toFixed(2);
 };
 
 // Calculate sales distribution data for agents
@@ -87,44 +70,40 @@ const groupByOrderId = (
 
 // Calculate total orders for a list of clients based on unique order IDs
 export const calculateTotalOrders = (clients: Client[]): number => {
-  const allMovements = clients.flatMap((client) => client.movements);
-  const groupedMovements = groupByOrderId(allMovements);
-  return Object.keys(groupedMovements).length;
+  const orderIds = new Set<string>();
+  for (const client of clients) {
+    for (const movement of client.movements) {
+      orderIds.add(movement.id);
+    }
+  }
+  return orderIds.size;
 };
 
 export const calculateTopBrandsData = (movements: Movement[]): BrandData[] => {
-  // Ensure the return type is BrandData[]
-  const brandCount: { [key: string]: { name: string; quantity: number } } = {};
+  const brandCount = new Map<string, { name: string; quantity: number }>();
 
-  // Iterate over each movement
-  movements.forEach((movement) => {
-    // Iterate over each detail in the movement
-    movement.details.forEach((detail) => {
+  for (const movement of movements) {
+    for (const detail of movement.details) {
       if (detail.brand && !ignoreArticleNames.has(detail.name)) {
-        // Normalize the brand name
         const normalizedBrand = detail.brand.trim().toLowerCase();
-        // Initialize the brandCount entry if it doesn't exist
-        if (!brandCount[normalizedBrand]) {
-          brandCount[normalizedBrand] = {
-            name: detail.brand, // Use the original brand name for display
-            quantity: 0,
-          };
+        if (!brandCount.has(normalizedBrand)) {
+          brandCount.set(normalizedBrand, { name: detail.brand, quantity: 0 });
         }
-        // Accumulate the quantity sold
-        brandCount[normalizedBrand].quantity += detail.quantity;
+        brandCount.get(normalizedBrand)!.quantity += detail.quantity;
       }
-    });
-  });
+    }
+  }
 
-  // Sort the brands by quantity in descending order and return the top 10
-  return Object.values(brandCount)
+  const topBrands = Array.from(brandCount.values())
+    .sort((a, b) => b.quantity - a.quantity)
+    .slice(0, 10)
     .map((brand, index) => ({
-      id: `${brand.name}-${index}`, // Ensure unique keys by adding an index
+      id: `${brand.name}-${index}`,
       label: brand.name,
       value: brand.quantity,
-    }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 10);
+    }));
+
+  return topBrands;
 };
 
 // Calculate sales distribution data for a list of clients
@@ -350,40 +329,31 @@ export const calculateTotalPriceSold = (movement: Movement): string => {
   return total.toFixed(2);
 };
 
-export const currencyFormatter = (value: number | string): string => {
-  // Parse the value to a float if it's a string; keep it as is if it's already a number
-  const numberValue = typeof value === "string" ? parseFloat(value) : value;
+const currencyFormatterInstance = new Intl.NumberFormat("de-DE", {
+  style: "currency",
+  currency: "EUR",
+  minimumFractionDigits: 2,
+});
 
-  // Check if the parsed value is a valid number
+export const currencyFormatter = (value: number | string): string => {
+  const numberValue = typeof value === "string" ? parseFloat(value) : value;
   if (isNaN(numberValue)) {
     return "";
   }
-
-  // Format the number as currency with commas as thousand separators
-  return `€${numberValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,")}`;
+  return currencyFormatterInstance.format(numberValue);
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const customCurrencyFormatter = (params: any): string => {
   const value = params.value;
-
-/*   console.log("Custom Formatter - Processing value:", value);
- */
   if (value === null || value === undefined || value === "") {
-    return "€0.00"; // Handle empty or null values
+    return currencyFormatterInstance.format(0);
   }
-
-  // If value is a string, try to parse it to a float
   const parsedValue = typeof value === "string" ? parseFloat(value) : value;
-
-  // If parsing fails (resulting in NaN), return the original value as a string
   if (isNaN(parsedValue)) {
-    console.warn("Custom Formatter - Invalid number format for value:", value);
     return value.toString();
   }
-
-  // Format the number as currency
-  return `€${parsedValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,")}`;
+  return currencyFormatterInstance.format(parsedValue);
 };
 
 export const numberComparator = (valueA: number, valueB: number) => {
@@ -397,15 +367,10 @@ export const getAdjustedClients = (
   role: UserRole,
   currentUserData: Client | Admin | Agent | null,
   clients: Record<string, Client>
-) => {
-  if (role === "employee" || role === "guest") {
-    return [];
-  }
-  if (role === "client" && currentUserData) {
-    return [currentUserData as Client]; // Adjusted clients for client role
-  } else {
-    return Object.values(clients); // Adjusted clients for other roles
-  }
+): Client[] => {
+  if (role === "employee" || role === "guest") return [];
+  if (role === "client" && currentUserData) return [currentUserData as Client];
+  return Object.values(clients);
 };
 
 export const getMovementsByRole = (
@@ -413,21 +378,19 @@ export const getMovementsByRole = (
   currentUserData: Admin | Client | Agent | null,
   clients: Record<string, Client>
 ): Movement[] => {
-  if (!currentUserData) return [];
-  else if (role === "employee" || role === "guest") {
-    return [];
+  if (!currentUserData || role === "employee" || role === "guest") return [];
+
+  if (role === "agent" || role === "admin") {
+    return clients
+      ? Object.values(clients).flatMap((client) => client.movements)
+      : [];
   }
 
-  switch (role) {
-    case "agent":
-      return Object.values(clients).flatMap((client) => client.movements);
-    case "client":
-      return (currentUserData as Client).movements;
-    case "admin":
-      return Object.values(clients).flatMap((client) => client.movements);
-    default:
-      return [];
+  if (role === "client") {
+    return (currentUserData as Client).movements || [];
   }
+
+  return [];
 };
 
 export const filterCurrentMonthMovements = (

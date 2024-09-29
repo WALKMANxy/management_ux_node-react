@@ -7,6 +7,7 @@
     "name": "Name",
     "phone": "Phone",
     "totalRevenue": "Total Revenue",
+    "extendedName": "Extended Name",
     "pec": "PEC",
     "extendedTaxCode": "Extended Tax Code",
     "paymentMethod": "Payment Method",
@@ -32,9 +33,6 @@
     "promo2": "Promo 2",
     "promo3": "Promo 3",
     "viewMore": "View More"
-  },
-  "dashboard": {
-    "totalEarning": "Total Earning"
   },
   "globalSearch": {
     "placeholder": "Search..."
@@ -80,7 +78,8 @@
     "name": "Name",
     "revenue": "Revenue",
     "cost": "Cost",
-    "quantity": "Quantity"
+    "quantity": "Quantity",
+    "unitPrice": "Unity Price"
   },
   "movementDetailHistory": {
     "articleId": "ID",
@@ -111,7 +110,9 @@
     "name": "Name",
     "province": "Province",
     "phone": "Phone Number",
-
+    "netRevenueThisMonth": "Net Revenue",
+    "totalOrders": "Orders",
+    "totalNetRevenue": "Net Revenue",
     "ordersThisMonth": "Orders This Month",
     "totalRevenue": "Total Revenue",
     "revenueThisMonth": "Revenue This Month",
@@ -457,8 +458,8 @@
     "occurredAt": "Occurred at"
   },
   "spentThisMonth": {
-    "titleAgent": "Earned This Month:",
-    "titleClient": "Spent This Month:",
+    "titleAgent": "Earned This Month",
+    "titleClient": "Spent This Month",
     "iconAlt": "Money Icon",
     "more": "more",
     "neutral": "neutral",
@@ -467,8 +468,8 @@
     "comparedToOtherClients": "compared to other clients."
   },
   "spentThisYear": {
-    "titleAgent": "Earned This Year:",
-    "titleClient": "Spent This Year:",
+    "titleAgent": "Earned This Year",
+    "titleClient": "Spent This Year",
     "iconAlt": "Money Bag Icon",
     "more": "more",
     "neutral": "neutral",
@@ -1091,9 +1092,48 @@
     "retryingData": "Retrying to fetch initial data... (Attempt #{{attempt}})"
   },
   "webSocketService": {
-      "lostConnection": "Lost connection to the server, attempting to reconnect...",
-      "connectionEstablished": "Connection to the server established.",
-      "connectionLost": "Connection to the server lost, refresh the page or try again later."
-    }
+    "lostConnection": "Lost connection to the server, attempting to reconnect...",
+    "connectionEstablished": "Connection to the server established.",
+    "connectionLost": "Connection to the server lost, refresh the page or try again later."
+  },
+  "dashboard": {
+    "welcomeBack": "Welcome back, {{name}}!",
+    "statisticsFor": "Statistics for {{name}}",
+    "yourStatistics": "Your Statistics",
+    "calendar": "Calendar",
+    "loadingWelcome": "Loading welcome",
+    "skeleton": "Loading content",
+    "loadingStatistics": "Loading statistics",
+    "loadingText": "Loading text",
+    "calendarButton": "Open Calendar",
+    "closeButton": "Close Selection",
+    "activePromotions": "Active Promotions",
+    "agentActivityOverview": "Agent Activity Overview",
+    "spentThisMonth": "Spent This Month",
+    "spentThisYear": "Spent This Year",
+    "topArticleType": "Top Article Types",
+    "monthOverMonthSpendingTrend": "Month Over Month Spending Trend",
+    "topBrandsSold": "Top Brands Sold",
+    "totalEarning": "Total Earnings",
+    "totalOrders": "Total Orders",
+    "salesDistribution": "Sales Distribution",
+    "upcomingVisits": "Upcoming Visits",
+    "yourCalendar": "Your Calendar"
+  },
+  "articlesPage": {
+    "name": "Name",
+    "brand": "Brand",
+    "oemId": "OEM ID",
+    "unitPrice": "Unit Price",
+    "cost": "Cost",
+    "quantitySold": "Quantity Sold"
+  },
+  "movementsPage": {
+    "id": "List ID",
+    "clientName": "Client",
+    "agentName": "Agent",
+    "dateOfOrder": "Date",
+    "totalQuantity": "Items sold",
+    "totalPriceSold": "Total"
   }
-
+}
