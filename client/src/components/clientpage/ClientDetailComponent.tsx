@@ -1,5 +1,6 @@
 // src/components/chatPage/DetailComponent.tsx
-
+import FingerprintIcon from "@mui/icons-material/Fingerprint";
+import ContactEmergencyIcon from '@mui/icons-material/ContactEmergency';
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
@@ -39,7 +40,6 @@ const DetailComponent: React.FC<DetailComponentProps> = ({
 
   // Keys to exclude from rendering
   const excludedKeys: (keyof ClientProp["detail"])[] = [
-    "id",
     "movements",
     "agent",
     "agentData",
@@ -47,7 +47,9 @@ const DetailComponent: React.FC<DetailComponentProps> = ({
 
   // Mapping of detail keys to their display labels with translations
   const keyMap: { [K in keyof ClientProp["detail"]]?: string } = {
+    id: t("details.id", "ID"),
     name: t("details.name", "Name"),
+    extendedName: t("details.extendedName", "Extended Name"),
     phone: t("details.phone", "Phone"),
     totalRevenue: t("details.totalRevenue", "Total Revenue"),
     pec: t("details.pec", "PEC"),
@@ -65,7 +67,9 @@ const DetailComponent: React.FC<DetailComponentProps> = ({
 
   // Mapping of detail keys to corresponding icons
   const icons: { [key: string]: JSX.Element } = {
+    id: <FingerprintIcon />,
     name: <PersonIcon />,
+    extendedName: <ContactEmergencyIcon />,
     phone: <PhoneIcon />,
     email: <EmailIcon />,
     pec: <EmailIcon />,

@@ -62,22 +62,40 @@ const CalendarComponent: React.FC = () => {
    */
   const updateHighlightedDays = useCallback(
     (month: Dayjs) => {
-      const days = visits
+      const now = dayjs(); // Current date and time
+
+      // Create a map to ensure one color per date, prioritizing red
+      const dateColorMap: { [date: number]: string } = {};
+
+      visits
         .filter(
           (visit: VisitWithAgent) =>
-            visit.pending === true && // Ensure visit is pending
-            visit.completed === false && // Ensure visit is not completed
-            visit.date && // Ensure visit has a date
-            dayjs(visit.date).isSame(month, "month") // Ensure visit is in the current month
+            visit.pending === true &&
+            visit.completed === false &&
+            visit.date &&
+            dayjs(visit.date).isSame(month, "month")
         )
-        .map((visit: VisitWithAgent) => {
+        .forEach((visit: VisitWithAgent) => {
+          const visitDay = dayjs(visit.date);
+          const date = visitDay.date();
+
+          // Check if the visit is in the past
+          const isPast = visitDay.isBefore(now, "day");
+
+          if (isPast) {
+            // Prioritize a fainter red color for past pending visits
+            dateColorMap[date] = "#FFA8B8"; // Slightly less faint pastel red
+            return;
+          }
+
+          // If not past, assign color based on role
           let color = "#ADD8E6"; // Default pastel blue
 
           if (currentUserDetails) {
             if (currentUserDetails.role === "admin") {
               // Admin view: color by agent
               color = visit.agentId
-                ? agentColorMap[visit.agentId] ?? color
+                ? agentColorMap[String(visit.agentId)] ?? color
                 : color;
             } else if (currentUserDetails.role === "agent") {
               // Agent view: color by client
@@ -87,8 +105,17 @@ const CalendarComponent: React.FC = () => {
             // Clients have a single default color; no change needed
           }
 
-          return { date: dayjs(visit.date).date(), color };
+          // Only set the color if it hasn't been set to red
+          if (!dateColorMap[date]) {
+            dateColorMap[date] = color;
+          }
         });
+
+      // Convert the map to an array
+      const days = Object.entries(dateColorMap).map(([date, color]) => ({
+        date: Number(date),
+        color,
+      }));
 
       setHighlightedDays(days);
     },

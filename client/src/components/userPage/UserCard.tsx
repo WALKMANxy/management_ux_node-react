@@ -8,16 +8,16 @@ import { useTranslation } from "react-i18next";
 // Define styled components for better maintainability
 const CardContainer = styled(Box)(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ({ theme, isnew }: { theme: any; isnew: boolean }) => ({
+  ({ theme, isnew }: { theme: any; isnew: string }) => ({
     display: "flex",
     alignItems: "center",
     padding: theme.spacing(2),
     gap: theme.spacing(2),
-    backgroundColor: isnew
+    backgroundColor: isnew === "true"
       ? "rgba(76,175,80,0.1)"
       : theme.palette.background.paper,
     borderRadius: theme.shape.borderRadius,
-    boxShadow: isnew ? theme.shadows[4] : theme.shadows[1],
+    boxShadow: isnew === "true" ? theme.shadows[4] : theme.shadows[1],
     width: "100%",
     maxWidth: 400,
     transition: "box-shadow 0.3s, background-color 0.3s",
@@ -55,18 +55,18 @@ interface UserCardProps {
     code?: string;
     name?: string;
   };
-  isNew?: boolean; // Indicates if this is a new entity
+  isnew?: string; // Indicates if this is a new entity
 }
 
 // Functional Component with React.memo for performance optimization
 const UserCard: React.FC<UserCardProps> = React.memo(
-  ({ email, avatar, details, isNew = false }) => {
+  ({ email, avatar, details, isnew = "false" }) => {
     const theme = useTheme();
     const { t } = useTranslation();
 
     return (
       <CardContainer
-        isnew={isNew}
+        isnew={isnew}
         theme={theme}
         sx={{ borderRadius: 6, width: "fit-content" }}
       >

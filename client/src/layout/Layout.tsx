@@ -14,9 +14,8 @@ const Layout: React.FC = () => {
   const currentChat = useAppSelector(selectCurrentChat);
 
   // Check if the current path matches specific routes
-  const isClientsOrMessagesPage =
+  const isOtherPage =
     location.pathname === "/clients" ||
-    location.pathname === "/messages" ||
     location.pathname === "/visits" ||
     location.pathname === "/promos" ||
     location.pathname === "/calendar" ||
@@ -24,9 +23,24 @@ const Layout: React.FC = () => {
     location.pathname === "/articles";
   const isSettingsPage = location.pathname === "/settings"; // Check if on the /settings page
 
+  const isMessagesPage = location.pathname === "/messages";
+
+  // Determine padding based on current page and device type
+  const determinePadding = () => {
+    if (isMessagesPage) {
+      return isMobile ? 0 : 1; // Messages Page: 0 on mobile, 1 on desktop
+    } else if (isOtherPage) {
+      return isMobile ? 0 : 2; // Other Pages: 0 on mobile, 4 on desktop
+    } else {
+      return 4; // Default padding for unspecified pages on desktop
+    }
+  };
+
   return (
     <ErrorBoundary>
-      <Box sx={{}}>
+      <Box
+        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+      >
         {/* Hide Header if currentChat exists and we are in mobile view */}
         {!currentChat || !isMobile ? <Header /> : null}
         <Box
@@ -34,9 +48,9 @@ const Layout: React.FC = () => {
           sx={{
             flex: 1, // Let main content grow to fill available space
 
-            p: isClientsOrMessagesPage && isMobile ? 0 : 1, // Adjust padding for clients and messages pages
+            p: determinePadding(), // Apply dynamic padding
             pl: isSettingsPage ? 0 : undefined, // Remove left padding for settings page
-            pr: isSettingsPage ? 0 : undefined,
+            pr: isSettingsPage ? 0 : undefined, // Remove right padding for settings page
           }}
         >
           <Outlet />

@@ -20,7 +20,6 @@ import AGGridTable from "./AGGridTable";
 
 const ClientList: React.FC<ClientListProps> = ({
   quickFilterText,
-  setQuickFilterText,
   startDate,
   setStartDate,
   endDate,
@@ -39,14 +38,6 @@ const ClientList: React.FC<ClientListProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Memoized handler for filter text change
-  const onFilterTextBoxChanged = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setQuickFilterText(event.target.value);
-    },
-    [setQuickFilterText]
-  );
-
   // Memoized handler for collapsing/expanding the clients list
   const handleCollapseToggle = useCallback(() => {
     setClientListCollapsed(!isClientListCollapsed);
@@ -58,13 +49,11 @@ const ClientList: React.FC<ClientListProps> = ({
     handleMenuClose();
   }, [exportDataAsCsv, handleMenuClose]);
 
-
-
   // Memoize column definitions
   const memoizedColumnDefs = useMemo(() => columnDefs, [columnDefs]);
 
   return (
-    <Paper elevation={8} sx={{ mb: 2 }}>
+    <Paper elevation={8} sx={{ mb: 2, borderRadius: 2 }}>
       <Box
         sx={{
           display: "flex",
@@ -73,7 +62,9 @@ const ClientList: React.FC<ClientListProps> = ({
           p: 2,
         }}
       >
-        <Typography variant="h6">{t("clientList.title")}</Typography>
+        <Typography variant="h4" sx={{ pl: 2, pt: 2, mb: -4 }}>
+          {t("clientList.title")}
+        </Typography>
         <Tooltip
           title={
             isClientListCollapsed
@@ -94,7 +85,7 @@ const ClientList: React.FC<ClientListProps> = ({
         </Tooltip>
       </Box>
       {/* Collapsible Content */}
-      <Collapse in={!isClientListCollapsed}>
+      <Collapse in={!isClientListCollapsed} sx={{ pt: 2, pb: 4 }}>
         <Box sx={{ p: 2 }}>
           {/* Filter and Menu Section */}
           <Box
@@ -106,20 +97,14 @@ const ClientList: React.FC<ClientListProps> = ({
             }}
           >
             <Box
-              sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}
+              sx={{
+                display: "flex",
+                flexDirection: "row-reverse",
+                alignItems: "center",
+                gap: 1,
+                flex: 1,
+              }}
             >
-              <TextField
-                id="filter-text-box"
-                placeholder={t("clientList.quickFilterPlaceholder")}
-                variant="outlined"
-                size="small"
-                fullWidth
-                value={quickFilterText}
-                onChange={onFilterTextBoxChanged}
-                InputProps={{
-                  "aria-label": t("clientList.quickFilterAriaLabel"),
-                }}
-              />
               <Tooltip title={t("clientList.options")}>
                 <IconButton
                   onClick={handleMenuOpen}

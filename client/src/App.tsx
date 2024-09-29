@@ -1,7 +1,7 @@
 // src/App.tsx
 import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import React, { useEffect } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import {
   createBrowserRouter,
   Navigate,
@@ -9,48 +9,61 @@ import {
 } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { RootState } from "./app/store";
+import "./components/statistics/grids/AGGridTable.css"; // Import the custom AG Grid CSS
+import { getTimeMs } from "./config/config";
 import { handleLogout } from "./features/auth/authSlice";
 import { fetchUserById, setCurrentUser } from "./features/users/userSlice";
 import Layout from "./layout/Layout";
 import { UserRole } from "./models/entityModels";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AgentDashboard from "./pages/agent/AgentDashboard";
-import ClientDashboard from "./pages/client/ClientDashboard";
-import ArticlesPage from "./pages/common/ArticlesPage";
-import ChatPage from "./pages/common/ChatPage";
-import ClientsPage from "./pages/common/ClientsPage";
-import MovementsPage from "./pages/common/MovementsPage";
-import PromosPage from "./pages/common/PromosPage";
-import UserPage from "./pages/common/UserPage";
-import VisitsPage from "./pages/common/VisitsPage";
-import LandingPage from "./pages/landing/LandingPage";
 import { refreshSession } from "./services/sessionService";
-import "./components/statistics/grids/AGGridTable.css"; // Import the custom AG Grid CSS
-import CalendarPage from "./pages/common/CalendarPage";
+import { initializeUserEncryption } from "./utils/cacheUtils";
+import { showToast } from "./utils/toastMessage";
+import LandingPage from "./pages/landing/LandingPage";
+import LoadingSpinner from "./components/common/LoadingSpinner";
 /* console.log("Vite mode:", import.meta.env.MODE);
  */
 
-// Enhanced ProtectedRoute to include role-based protection
-const ProtectedRoute: React.FC<{
-  children: JSX.Element;
-  requiredRole?: UserRole;
-}> = ({ children, requiredRole }) => {
-  const isLoggedIn = useAppSelector(
-    (state: RootState) => state.auth.isLoggedIn
-  );
-  const userRole = useAppSelector((state: RootState) => state.auth.role);
+// Lazy load components for performance optimization
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AgentDashboard = lazy(() => import("./pages/agent/AgentDashboard"));
+const ClientDashboard = lazy(() => import("./pages/client/ClientDashboard"));
+const ArticlesPage = lazy(() => import("./pages/common/ArticlesPage"));
+const CalendarPage = lazy(() => import("./pages/common/CalendarPage"));
+const ChatPage = lazy(() => import("./pages/common/ChatPage"));
+const ClientsPage = lazy(() => import("./pages/common/ClientsPage"));
+const MovementsPage = lazy(() => import("./pages/common/MovementsPage"));
+const PromosPage = lazy(() => import("./pages/common/PromosPage"));
+const UserPage = lazy(() => import("./pages/common/UserPage"));
+const VisitsPage = lazy(() => import("./pages/common/VisitsPage"));
 
-  // Check if the user is logged in and has the correct role, if a role is required
+const timeMS = getTimeMs(); // Ensure this is set in your .env file
+
+const ALLOWED_ROLES_FOR_PROTECTED_ROUTES: UserRole[] = ["admin", "client", "agent"];
+
+
+// Enhanced ProtectedRoute to include role-based protection
+interface ProtectedRouteProps {
+  children: JSX.Element;
+  requiredRoles?: UserRole[]; // Allow multiple roles
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles }) => {
+  const { isLoggedIn, role } = useAppSelector((state: RootState) => ({
+    isLoggedIn: state.auth.isLoggedIn,
+    role: state.auth.role,
+  }));
+
   if (!isLoggedIn) {
-    return <Navigate to="/" />;
+    return <Navigate to="/" replace />;
   }
 
-  if (requiredRole && userRole !== requiredRole) {
-    return <Navigate to="/" />;
+  if (requiredRoles && !requiredRoles.includes(role)) {
+    return <Navigate to="/" replace />;
   }
 
   return children;
 };
+
 
 const router = createBrowserRouter([
   {
@@ -64,56 +77,70 @@ const router = createBrowserRouter([
       {
         path: "agent-dashboard",
         element: (
-          <ProtectedRoute requiredRole="agent">
-            <AgentDashboard />
+          <ProtectedRoute requiredRoles={["agent"]}>
+            <Suspense fallback={<LoadingSpinner />}>
+              <AgentDashboard />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
       {
         path: "admin-dashboard",
         element: (
-          <ProtectedRoute requiredRole="admin">
-            <AdminDashboard />
+          <ProtectedRoute requiredRoles={["admin"]}>
+            <Suspense fallback={<LoadingSpinner />}>
+              <AdminDashboard />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
       {
         path: "client-dashboard",
         element: (
-          <ProtectedRoute requiredRole="client">
-            <ClientDashboard />
+          <ProtectedRoute requiredRoles={["client"]}>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ClientDashboard />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
       {
         path: "clients",
         element: (
-          <ProtectedRoute>
-            <ClientsPage />
+          <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ClientsPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
       {
         path: "articles",
         element: (
-          <ProtectedRoute>
-            <ArticlesPage />
+          <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ArticlesPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
       {
         path: "movements",
         element: (
-          <ProtectedRoute>
-            <MovementsPage />
+          <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
+            <Suspense fallback={<LoadingSpinner />}>
+              <MovementsPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
       {
         path: "messages",
         element: (
-          <ProtectedRoute>
-            <ChatPage />
+          <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ChatPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
@@ -121,31 +148,39 @@ const router = createBrowserRouter([
         path: "settings",
         element: (
           <ProtectedRoute>
-            <UserPage />
+            <Suspense fallback={<LoadingSpinner />}>
+              <UserPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
       {
         path: "visits",
         element: (
-          <ProtectedRoute>
-            <VisitsPage />
+          <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
+            <Suspense fallback={<LoadingSpinner />}>
+              <VisitsPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
       {
         path: "promos",
         element: (
-          <ProtectedRoute>
-            <PromosPage />
+          <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
+            <Suspense fallback={<LoadingSpinner />}>
+              <PromosPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
       {
         path: "calendar",
         element: (
-          <ProtectedRoute>
-            <CalendarPage />
+          <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
+            <Suspense fallback={<LoadingSpinner />}>
+              <CalendarPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
@@ -160,7 +195,6 @@ const theme = createTheme({
       paper: "#ffffff",
     },
   },
-
 });
 
 function App() {
@@ -190,8 +224,20 @@ function App() {
                 ).unwrap();
 
                 dispatch(setCurrentUser(user)); // Update the userSlice with the fetched user
+                // Derive and initialize the encryption key
+                const userId = user._id; // Assuming user._id is the unique identifier
+
+                // Initialize encryption using the custom utility
+                await initializeUserEncryption({
+                  userId,
+                  timeMS,
+                });
+
+
               } catch (error) {
                 console.error("Failed to fetch current user:", error);
+                showToast.error("Failed to initialize user data.");
+                dispatch(handleLogout()); // Force logout if fetching user fails
               }
             }
           } else {
@@ -202,6 +248,7 @@ function App() {
           console.warn(
             "User is either not logged in or has an invalid role ('guest')."
           );
+          dispatch(handleLogout()); // Ensure logout if role is invalid
         }
       }
     };

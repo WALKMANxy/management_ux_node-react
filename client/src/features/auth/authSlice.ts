@@ -4,7 +4,9 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
 import { AuthState } from "../../models/stateModels";
 import { webSocketService } from "../../services/webSocketService";
+import { initializeEncryption } from "../../utils/cacheUtils";
 import { showToast } from "../../utils/toastMessage";
+
 
 const initialState: AuthState = {
   isLoggedIn: false,
@@ -53,6 +55,9 @@ export const handleLogout = createAsyncThunk(
       localStorage.clear();
       webSocketService.disconnect();
       Cookies.remove("token");
+
+      // Clear the encryption key
+      initializeEncryption(null); // Modify initializeEncryption to handle null
 
       return; // No payload needed
     } catch (error: unknown) {

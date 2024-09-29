@@ -8,9 +8,9 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 } from "../../models/dataModels"; */
 import { Admin, Agent, Client } from "../../models/entityModels";
 import {
-  loadAgentDetailsData,
-  loadClientDetailsData,
-  loadJsonData,
+  loadAgentsDataWithCache,
+  loadClientsDataWithCache,
+  loadMovementsDataWithCache,
 } from "../../utils/apiUtils";
 import { mapDataToAgents, mapDataToModels } from "../../utils/dataLoader";
 import {
@@ -36,9 +36,9 @@ export const dataApi = createApi({
         try {
           const [data, clientDetails, agentDetails, adminDetails] =
             await Promise.all([
-              loadJsonData(),
-              loadClientDetailsData(),
-              loadAgentDetailsData(),
+              loadMovementsDataWithCache(),
+              loadClientsDataWithCache(),
+              loadAgentsDataWithCache(),
               getAdminById(entityCode),
             ]);
 
@@ -92,7 +92,7 @@ export const dataApi = createApi({
           // Construct the clientData object without embedding alerts
           const clientData: Client = {
             ...clients[0], // Spread the original client data
-            agentData:[ agentDetails], // Add the agent data directly to clientData
+            agentData: [agentDetails], // Add the agent data directly to clientData
           };
 
           // Return clientData along with visits, promos, and alerts separately

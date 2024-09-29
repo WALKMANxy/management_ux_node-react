@@ -5,8 +5,10 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import ClientDetails from "../../components/clientpage/ClientDetails";
+import Spinner from "../../components/common/Spinner";
 import ClientList from "../../components/statistics/grids/ClientList";
 import { useClientsGrid } from "../../hooks/useClientGrid";
+import useLoadingData from "../../hooks/useLoadingData";
 import {
   ClientColumnDefinition,
   EnrichedClient,
@@ -17,8 +19,6 @@ import {
   currencyFormatter,
   numberComparator,
 } from "../../utils/dataUtils";
-import useLoadingData from "../../hooks/useLoadingData";
-import Spinner from "../../components/common/Spinner";
 
 const ClientsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -27,7 +27,6 @@ const ClientsPage: React.FC = () => {
   const loggedInClientId = useSelector((state: RootState) => state.auth.id);
 
   const { loading } = useLoadingData();
-
 
   const {
     filteredClients,
@@ -72,7 +71,7 @@ const ClientsPage: React.FC = () => {
         cellRenderer: (params: { data: EnrichedClient; value: string }) => {
           return (
             <span
-              onDoubleClick={() => handleClientSelect(params.data.id)}
+              onClick={() => handleClientSelect(params.data.id)}
               style={{
                 cursor: "pointer",
               }}
@@ -147,18 +146,19 @@ const ClientsPage: React.FC = () => {
         valueFormatter: (params) => currencyFormatter(params.value),
         sortable: true,
       },
+
+      {
+        headerName: t("clientsPage.paymentMethod"),
+        field: "paymentMethod",
+        filter: "agTextColumnFilter",
+        sortable: true,
+      },
       {
         headerName: t("clientsPage.unpaidRevenue"),
         field: "unpaidRevenue",
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
         valueFormatter: (params) => currencyFormatter(params.value),
-        sortable: true,
-      },
-      {
-        headerName: t("clientsPage.paymentMethod"),
-        field: "paymentMethod",
-        filter: "agTextColumnFilter",
         sortable: true,
       },
     ];
@@ -180,8 +180,8 @@ const ClientsPage: React.FC = () => {
     (client) => client.id === loggedInClientId
   );
 
-   // Handle loading state
-   if (loading) {
+  // Handle loading state
+  if (loading) {
     return (
       <Box
         sx={{
@@ -196,7 +196,6 @@ const ClientsPage: React.FC = () => {
       </Box>
     );
   }
-
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>

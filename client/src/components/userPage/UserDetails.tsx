@@ -220,7 +220,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
                 code: selectedEntity.id,
                 name: selectedEntity.name,
               }}
-              isNew={true} // Apply faint green styling for new entity details
+              isnew={"true"} // Apply faint green styling for new entity details
             />
           </Box>
         )}

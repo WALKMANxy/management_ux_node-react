@@ -9,7 +9,6 @@ import {
   Menu,
   MenuItem,
   Paper,
-  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -20,7 +19,6 @@ import AGGridTable from "./AGGridTable";
 
 const ArticlesList: React.FC<ArticlesListProps> = ({
   quickFilterText,
-  setQuickFilterText,
   filteredArticles,
   columnDefs,
   gridRef,
@@ -35,14 +33,6 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const onFilterTextBoxChanged = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const value = event.target.value || ""; // Ensure value is not null
-      setQuickFilterText(value);
-    },
-    [setQuickFilterText]
-  );
-
   const handleCollapseToggle = useCallback(() => {
     setArticleListCollapsed(!isArticleListCollapsed);
   }, [isArticleListCollapsed, setArticleListCollapsed]);
@@ -52,15 +42,11 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
     handleMenuClose();
   }, [exportDataAsCsv, handleMenuClose]);
 
-  const memoizedFilteredArticles = useMemo(
-    () => filteredArticles,
-    [filteredArticles]
-  );
 
   const memoizedColumnDefs = useMemo(() => columnDefs, [columnDefs]);
 
   return (
-    <Paper elevation={8} sx={{ mb: 2 }}>
+    <Paper elevation={8} sx={{ mb: 2, borderRadius: 2 }}>
       <Box
         sx={{
           display: "flex",
@@ -69,7 +55,7 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
           p: 2,
         }}
       >
-        <Typography variant="h6">{t("articleList.title")}</Typography>
+        <Typography variant="h4" sx={{ pl: 2, pt: 2, mb: -4}}>{t("articleList.title")}</Typography>
         <Tooltip
           title={
             isArticleListCollapsed
@@ -89,7 +75,7 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
           </IconButton>
         </Tooltip>
       </Box>
-      <Collapse in={!isArticleListCollapsed}>
+      <Collapse in={!isArticleListCollapsed} sx={{ pt: 2, pb: 4 }}>
         <Box sx={{ p: 2 }}>
           <Box
             sx={{
@@ -100,20 +86,14 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
             }}
           >
             <Box
-              sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}
+              sx={{
+                display: "flex",
+                flexDirection: "row-reverse",
+                alignItems: "center",
+                gap: 1,
+                flex: 1,
+              }}
             >
-              <TextField
-                id="filter-text-box"
-                placeholder={t("articleList.quickFilterPlaceholder")}
-                variant="outlined"
-                size="small"
-                fullWidth
-                value={quickFilterText}
-                onChange={onFilterTextBoxChanged}
-                InputProps={{
-                  "aria-label": t("articleList.quickFilterAriaLabel"),
-                }}
-              />
               <Tooltip title={t("articleList.options")}>
                 <IconButton
                   onClick={handleMenuOpen}
@@ -144,7 +124,7 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
           <AGGridTable
             ref={gridRef}
             columnDefs={memoizedColumnDefs}
-            rowData={memoizedFilteredArticles}
+            rowData={filteredArticles}
             paginationPageSize={100} // Adjusted to a more manageable number
             quickFilterText={quickFilterText}
           />

@@ -12,7 +12,6 @@ axios.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       // Token expired or unauthorized
       store.dispatch(handleLogout());
-      window.location.href = "/"; //
     }
     return Promise.reject(error);
   }

@@ -10,8 +10,12 @@ import {
 } from "../features/data/dataThunks";
 import { selectCurrentUser } from "../features/users/userSlice";
 import { DataSliceState } from "../models/stateModels";
+import { ensureEncryptionInitialized } from "../utils/cacheUtils";
 import { updateUserEntityNameIfMissing } from "../utils/checkUserName";
-import { showToast } from "../utils/toastMessage";
+import { getTimeMs } from "../config/config";
+
+const timeMS = getTimeMs(); // Ensure this is set in your .env file
+
 
 const useLoadingData = () => {
   const dispatch = useAppDispatch();
@@ -23,7 +27,6 @@ const useLoadingData = () => {
   const [fakeLoading, setFakeLoading] = useState(true);
 
   const toastId = "loadingDataToast";
-
 
   // Get data from the dataSlice
   const {
@@ -51,8 +54,17 @@ const useLoadingData = () => {
   const fetchData = useCallback(async () => {
     try {
       toast.loading(t("useStatsToasts.loadingData"), { id: toastId });
-
       setLoading(true);
+
+      
+
+      // Ensure encryption is initialized with necessary params
+      await ensureEncryptionInitialized({
+        userId: currentUser?._id || "",
+        userAgent: navigator.userAgent,
+        timeMS: timeMS,
+      });
+
       await dispatch(fetchInitialData()).unwrap();
       await Promise.all([
         dispatch(getVisits()).unwrap(),
@@ -61,7 +73,7 @@ const useLoadingData = () => {
       setLocalError(null);
       setRetryCount(0);
 
-      showToast.success(t("useStatsToasts.successData"));
+      toast.success(t("useStatsToasts.successData"));
 
       updateUserEntityNameIfMissing(dispatch, currentUser, currentUserDetails);
     } catch (err: unknown) {
@@ -84,7 +96,7 @@ const useLoadingData = () => {
       }
     } finally {
       setLoading(false);
-      toast.dismiss(toastId); // Dismiss the toast when the operation is complete
+      toast.dismiss(toastId);
     }
   }, [dispatch, retryCount, currentUser, currentUserDetails, t]);
 
@@ -96,13 +108,7 @@ const useLoadingData = () => {
 
   useEffect(() => {
     if (retryCount > 0 && retryCount <= 5) {
-      console.log(`Retry attempt #${retryCount}`);
-      showToast.loading(
-        t("useStatsToasts.retryingData", { attempt: retryCount })
-      );
-
       const retryTimeout = setTimeout(() => {
-        console.log("Retrying fetchData");
         fetchData();
       }, 5000);
 
@@ -111,7 +117,7 @@ const useLoadingData = () => {
         clearTimeout(retryTimeout);
       };
     }
-  }, [retryCount, fetchData, t]);
+  }, [retryCount, fetchData, t, shouldFetchData]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
