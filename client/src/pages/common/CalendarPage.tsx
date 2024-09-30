@@ -58,6 +58,17 @@ const CalendarPage: React.FC = () => {
     selectedDays,
   } = useCalendar();
 
+  useEffect(() => {
+    console.log("viewMode changed to:", viewMode);
+  }, [viewMode]);
+
+  useEffect(() => {
+    console.log("openForm changed to:", openForm);
+  }, [openForm]);
+
+  useEffect(() => {
+    console.log("isEditing changed to:", isEditing);
+  }, [isEditing]);
   const { holidayEvents, isHolidaysLoading, holidaysError } =
     useCalendarWithHolidays(currentDate);
 
@@ -228,15 +239,6 @@ const CalendarPage: React.FC = () => {
               }}
             />
           </Paper>
-          <EventForm
-            key={editingEvent ? editingEvent._id : "new-event"}
-            open={openForm}
-            selectedDays={selectedDays}
-            onSubmit={handleFormSubmit}
-            onCancel={handleFormCancel}
-            isSubmitting={isCreating || isEditing}
-            initialData={editingEvent}
-          />
         </Fragment>
       ) : (
         <EventHistory
@@ -245,6 +247,16 @@ const CalendarPage: React.FC = () => {
           handleDeleteEvent={handleDeleteEventWithConfirmation}
         />
       )}
+
+      <EventForm
+        key={editingEvent ? editingEvent._id : "new-event"}
+        open={openForm}
+        selectedDays={selectedDays}
+        onSubmit={handleFormSubmit}
+        onCancel={handleFormCancel}
+        isSubmitting={isCreating || isEditing}
+        initialData={editingEvent}
+      />
 
       {/* PopOverEvent Component */}
       {selectedEvent && (

@@ -206,6 +206,7 @@
   },
   "eventForm": {
     "title": "Create New Event",
+    "editTitle": "Edit Event",
     "titleMarkAbsence": "Mark Absence",
     "labels": {
       "startTime": "Start Time",
@@ -993,7 +994,7 @@
     "editingEvent": "Editing event: {{reason}}",
     "formCanceled": "Form canceled.",
     "switchedToView": "Switched to {{view}} view.",
-    "visitEventName": "Visit, ID: {{clientId}}",
+    "visitEventName": "Visit for ID: {{clientId}}",
     "selectedVisit": "Selected Visit: {{reason}} on {{date}}.",
     "visitsNotEditable": "Visits cannot be edited from the calendar.",
     "selectedEvent": "Selected {{reason}} on {{date}}.",
