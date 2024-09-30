@@ -141,6 +141,7 @@ export const useCalendar = () => {
           : "pending",
         createdAt: new Date(visit.createdAt),
         updatedAt: new Date(),
+        visitClientId: visit.clientId,
       };
     },
     [t]
@@ -292,7 +293,9 @@ export const useCalendar = () => {
       setEditingEvent(event);
       setSelectedDays([new Date(event.startDate), new Date(event.endDate)]);
       setOpenForm(true);
+      console.log("Opening form for editing event", event);
       showToast.info(t("calendarHook.editingEvent", { reason: event.reason }));
+      
     },
     [t]
   );

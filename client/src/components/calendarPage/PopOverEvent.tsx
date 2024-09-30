@@ -1,13 +1,17 @@
 // src/components/calendarPage/PopOverEvent.tsx
 
+import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
 import DeleteIcon from "@mui/icons-material/Delete";
+
 import EditIcon from "@mui/icons-material/Edit";
 import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import Popover from "@mui/material/Popover";
 import dayjs from "dayjs";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useAppSelector } from "../../app/hooks";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { selectClient, selectVisit } from "../../features/data/dataSlice";
 import { selectUserById } from "../../features/users/userSlice";
 import { CalendarEvent } from "../../models/dataModels";
 import { isNotDefaultTime } from "../../utils/calendarUtils";
@@ -44,9 +48,21 @@ const PopOverEvent: React.FC<PopOverEventProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   // Select the user associated with the event
   const user = useAppSelector((state) => selectUserById(state, event.userId));
   const entityName = user?.entityName || t("popOverEvent.unknown");
+
+  // Function to handle visit navigation
+  const handleGoToVisit = () => {
+    if (event.eventType === "visit") {
+      dispatch(selectClient(event.visitClientId!)); // Select client
+      dispatch(selectVisit(event._id!)); // Select visit
+      navigate("/visits"); // Navigate to /visits
+    }
+  };
 
   return (
     <Popover
@@ -126,41 +142,67 @@ const PopOverEvent: React.FC<PopOverEventProps> = ({
         )}
 
         {/* Edit and Delete Buttons (Visible Only to Admins and Non-Holiday Events) */}
-        {userRole === "admin" && event.eventType !== "holiday" && (
-          <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-            {/* Edit Button */}
-            <Tooltip title={t("popOverEvent.edit")}>
-              <IconButton
-                color="primary"
-                sx={{
-                  bgcolor: "primary.main",
-                  color: "white",
-                  borderRadius: "50%",
-                  "&:hover": { bgcolor: "primary.dark" },
-                }}
-                onClick={() => onEdit && onEdit(event)}
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
+        {/* Edit, Go to Visit, and Delete Buttons (Visible based on roles and event types) */}
+        <Stack direction="row" justifyContent={"flex-end"} spacing={2} sx={{ mt: 2 }}>
+          {/* Go to Visit Button for Visit Events (Visible for admin, agent, client roles) */}
+          {["admin", "agent", "client"].includes(userRole) &&
+            event.eventType === "visit" && (
+              <Tooltip title={t("popOverEvent.goToVisit")}>
+                <IconButton
+                  color="primary"
+                  sx={{
+                    bgcolor: "primary.main",
+                    color: "white",
+                    borderRadius: "50%",
+                    "&:hover": { bgcolor: "primary.dark" },
+                  }}
+                  onClick={handleGoToVisit} // Call handleGoToVisit for visits
+                >
+                  <AirplaneTicketIcon />
+                </IconButton>
+              </Tooltip>
+            )}
 
-            {/* Delete Button */}
-            <Tooltip title={t("popOverEvent.delete")}>
-              <IconButton
-                color="secondary"
-                sx={{
-                  bgcolor: "error.main",
-                  color: "white",
-                  borderRadius: "50%",
-                  "&:hover": { bgcolor: "error.dark" },
-                }}
-                onClick={() => onDelete && onDelete(event)}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-        )}
+          {/* Edit Button (Visible if eventType is not visit or if roles don't match Go to Visit conditions) */}
+          {userRole === "admin" &&
+            event.eventType !== "holiday" &&
+            event.eventType !== "visit" && (
+              <Tooltip title={t("popOverEvent.edit")}>
+                <IconButton
+                  color="primary"
+                  sx={{
+                    bgcolor: "primary.main",
+                    color: "white",
+                    borderRadius: "50%",
+                    "&:hover": { bgcolor: "primary.dark" },
+                  }}
+                  onClick={() => onEdit && onEdit(event)}
+                >
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+
+          {/* Delete Button (Always visible for admins and non-holiday events) */}
+          {userRole === "admin" &&
+            event.eventType !== "holiday" &&
+            event.eventType !== "visit" && (
+              <Tooltip title={t("popOverEvent.delete")}>
+                <IconButton
+                  color="secondary"
+                  sx={{
+                    bgcolor: "error.main",
+                    color: "white",
+                    borderRadius: "50%",
+                    "&:hover": { bgcolor: "error.dark" },
+                  }}
+                  onClick={() => onDelete && onDelete(event)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+        </Stack>
       </Box>
     </Popover>
   );

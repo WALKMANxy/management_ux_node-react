@@ -159,7 +159,7 @@ const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({
             direction={"row"}
             spacing={2}
             justifyContent="flex-end"
-            sx={{ pt: 1 }}
+            sx={{ pt: 1, mr: -2 }}
           >
             <Tooltip
               title={t(

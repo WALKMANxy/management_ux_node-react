@@ -71,23 +71,6 @@ export const getBackgroundColorForEvent = (
   }
   return "";
 };
-// Utility function to convert strings to Date objects
-export const normalizeDate = (date: string | Date): Date => {
-  // Only convert if the date is a string
-  return typeof date === "string" ? new Date(date) : date;
-};
-
-export const transformCalendarEvents = (
-  events: CalendarEvent[]
-): CalendarEvent[] => {
-  return events.map((event) => ({
-    ...event,
-    createdAt: normalizeDate(event.createdAt),
-    startDate: normalizeDate(event.startDate),
-    endDate: normalizeDate(event.endDate),
-    updatedAt: normalizeDate(event.updatedAt),
-  }));
-};
 
 export const getComparator = (
   order: "asc" | "desc",
@@ -138,4 +121,33 @@ export const actionComparator = (
 // Helper function to check if the time is different from the default 12:00 AM
 export const isNotDefaultTime = (date: Date | undefined) => {
   return date && dayjs(date).format("HH:mm") !== "00:00";
+};
+
+export const isPastEvent = (event: CalendarEvent) => {
+  return dayjs(event.endDate).isBefore(dayjs());
+};
+
+export const getEditButtonStyles = (event: CalendarEvent) => {
+  if (isPastEvent(event)) {
+    return {
+      backgroundColor: "gray", // Grayed out background
+      color: "white",
+      marginRight: 1,
+      borderRadius: "50%",
+
+      cursor: "not-allowed", // Change cursor to indicate disabled state
+      "&:hover": {
+        backgroundColor: "gray", // Keep the button gray when hovered
+      },
+    };
+  }
+  return {
+    backgroundColor: "blue", // Regular background color for editable events
+    color: "white",
+    marginRight: 1,
+    borderRadius: "50%",
+    "&:hover": {
+      backgroundColor: "darkblue",
+    },
+  };
 };
