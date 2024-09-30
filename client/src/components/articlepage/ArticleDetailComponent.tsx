@@ -1,32 +1,62 @@
+// src/components/articlepage/ArticleDetailComponent.tsx
+
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import FingerprintIcon from "@mui/icons-material/Fingerprint";
 import HomeIcon from "@mui/icons-material/Home";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import PersonIcon from "@mui/icons-material/Person";
 import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
-import { Box, Grid, Skeleton, Typography } from "@mui/material";
-import React from "react";
+import { Box, Grid, Skeleton, Tooltip, Typography } from "@mui/material";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { ArticleProp } from "../../models/propsModels";
 import { currencyFormatter } from "../../utils/dataUtils";
 
-const DetailComponent: React.FC<ArticleProp> = ({ detail, isLoading }) => {
+/**
+ * DetailValue Type
+ * Represents the possible types of detail values.
+ */
+type DetailValue = string | number | undefined;
+
+/**
+ * ArticleDetailComponent Props Interface
+ */
+interface ArticleDetailComponentProps {
+  detail: ArticleProp["detail"];
+  isLoading: boolean;
+}
+
+/**
+ * ArticleDetailComponent
+ * Displays various article details with corresponding icons and formatted values.
+ *
+ * @param {ArticleDetailComponentProps} props - Component props.
+ * @returns {JSX.Element} The rendered component.
+ */
+const ArticleDetailComponent: React.FC<ArticleDetailComponentProps> = ({
+  detail,
+  isLoading,
+}) => {
   const { t } = useTranslation();
 
-  // Keys to exclude from rendering
+  // Keys to exclude from rendering (if any)
+  const excludedKeys: (keyof ArticleProp["detail"])[] = [
+    // Add keys to exclude if necessary
+  ];
 
-  // Map of detail keys to their translation keys
-  const keyMap: { [key: string]: string } = {
-    articleId: t("articleDetail.id"),
-    name: t("articleDetail.name"),
-    brand: t("articleDetail.brand"),
-    quantity: t("articleDetail.quantity"),
-    unitPrice: t("articleDetail.unitPrice"),
-    priceSold: t("articleDetail.priceSold"),
-    priceBought: t("articleDetail.priceBought"),
+  // Mapping of detail keys to their display labels with translations
+  const keyMap: { [K in keyof ArticleProp["detail"]]?: string } = {
+    articleId: t("articleDetails.id", "Article ID"),
+    name: t("articleDetails.name", "Name"),
+    brand: t("articleDetails.brand", "Brand"),
+    quantity: t("articleDetails.quantity", "Quantity"),
+    unitPrice: t("articleDetails.unitPrice", "Unit Price"),
+    priceSold: t("articleDetails.priceSold", "Price Sold"),
+    priceBought: t("articleDetails.priceBought", "Price Bought"),
+    // Add more mappings as necessary
   };
 
-  // Icons associated with specific keys
+  // Mapping of detail keys to corresponding icons
   const icons: { [key: string]: JSX.Element } = {
     articleId: <FingerprintIcon />,
     name: <PersonIcon />,
@@ -35,31 +65,89 @@ const DetailComponent: React.FC<ArticleProp> = ({ detail, isLoading }) => {
     unitPrice: <LocalOfferIcon />,
     priceSold: <AttachMoneyIcon />,
     priceBought: <AttachMoneyIcon />,
+    // Add more icons as necessary
   };
 
-  return (
-    <Box sx={{ p: 3, borderRadius: "30px", background: "transparent" }}>
-      <Grid container spacing={2}>
-        {Object.keys(detail).map((key) => {
-          const value = detail[key];
-          const displayKey = keyMap[key] || key; // Use translated key or fallback to the original
-          let displayValue;
+  /**
+   * Formats price values to the desired currency format.
+   *
+   * @param {number} value - The price value to format.
+   * @returns {string} The formatted price string.
+   */
+  const formatPrice = (value: number): string => {
+    return currencyFormatter(value);
+  };
 
-          if (isLoading) {
-            displayValue = <Skeleton width="80%" />;
-          } else {
-            // Format prices or display the raw value
-            if (["priceSold", "priceBought"].includes(key)) {
-              displayValue = currencyFormatter(Number(value));
-            } else {
-              displayValue = value;
-            }
-          }
+  /**
+   * Renders the value for a given detail key with appropriate formatting and links.
+   *
+   * @param {keyof ArticleProp["detail"]} key - The detail key.
+   * @param {DetailValue} value - The detail value.
+   * @returns {React.ReactNode} The rendered value.
+   */
+  const renderValue = (
+    key: keyof ArticleProp["detail"],
+    value: DetailValue
+  ): React.ReactNode => {
+    if (isLoading) {
+      return <Skeleton width="80%" />;
+    }
+
+    if (value === undefined || value === null || value === "") {
+      return (
+        <Typography variant="body2" color="textSecondary" component="span">
+          -
+        </Typography>
+      );
+    }
+
+    switch (key) {
+      case "unitPrice":
+      case "priceSold":
+      case "priceBought":
+        return formatPrice(Number(value));
+      // Add more cases if specific formatting is needed
+      default:
+        return value;
+    }
+  };
+
+  /**
+   * Memoized list of detail keys to render, excluding certain keys.
+   */
+  const detailKeys = useMemo(() => {
+    return Object.keys(detail) as Array<keyof ArticleProp["detail"]>;
+  }, [detail]);
+
+  return (
+    <Box
+      sx={{
+        p: 3,
+        borderRadius: "30px",
+        background: "rgba(255, 255, 255, 0.7)", // Frosted glass effect
+        backdropFilter: "blur(10px)", // Frosted glass effect
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+      }}
+    >
+      <Grid container spacing={2}>
+        {detailKeys.map((key) => {
+          if (excludedKeys.includes(key)) return null;
+
+          const value = detail[key] as DetailValue;
+          const displayKey = keyMap[key] || key; // Use translated key or fallback to the original
+
+          const displayValue = renderValue(key, value);
 
           return (
             <Grid item xs={12} sm={6} key={key} p={1}>
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                {icons[key] && <Box sx={{ mr: 1 }}>{icons[key]}</Box>}
+                {icons[key] && (
+                  <Tooltip title={displayKey} arrow>
+                    <Box sx={{ mr: 1, display: "flex", alignItems: "center" }}>
+                      {icons[key]}
+                    </Box>
+                  </Tooltip>
+                )}
                 <Typography variant="body1">
                   <strong>{displayKey}:</strong> {displayValue}
                 </Typography>
@@ -72,4 +160,4 @@ const DetailComponent: React.FC<ArticleProp> = ({ detail, isLoading }) => {
   );
 };
 
-export default DetailComponent;
+export default React.memo(ArticleDetailComponent);
