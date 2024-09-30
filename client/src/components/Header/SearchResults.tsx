@@ -100,15 +100,12 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         key={`${result.id}-${generateRandomString()}`}
         onClick={() => onSelect(result)}
         sx={{
-          backgroundColor: isSelected
-            ? "rgba(0, 0, 0, 0.08)"
-            : getBackgroundColor(result.type),
           cursor: "pointer",
-          paddingY: 0.5,
           height: "100%",
           position: "relative",
           borderRadius: 2,
-          overflow: "hidden",
+          py: 0.5,
+          zIndex: 5000,
         }}
       >
         <Card
@@ -118,7 +115,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             height: "100%",
             borderRadius: 2,
             boxShadow: "none",
-            backgroundColor: "transparent", // Transparent to allow Box backgroundColor to show
+            backgroundColor: isSelected
+              ? "rgba(0, 0, 0, 0.08)"
+              : getBackgroundColor(result.type),
             overflow: "hidden",
             "&:hover": {
               boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
