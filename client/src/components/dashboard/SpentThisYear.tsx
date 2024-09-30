@@ -46,6 +46,12 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
           icon: <ArrowUpwardIcon fontSize="inherit" />,
           text: t("spentThisYear.neutral", "neutral"),
         };
+      } else if (value === 0) {
+        return {
+          color: theme.palette.grey[500],
+          icon: <ArrowDownwardIcon fontSize="inherit" />,
+          text: t("spentThisYear.even", "neutral"),
+        };
       } else {
         return {
           color: theme.palette.error.main,
@@ -65,6 +71,12 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
           color: theme.palette.grey[500],
           icon: <ArrowUpwardIcon fontSize="inherit" />,
           text: t("spentThisYear.neutral", "neutral"),
+        };
+      } else if (value === 0) {
+        return {
+          color: theme.palette.grey[500],
+          icon: <ArrowDownwardIcon fontSize="inherit" />,
+          text: t("spentThisYear.even", "neutral"),
         };
       } else {
         return {

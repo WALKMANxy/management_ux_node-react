@@ -49,6 +49,12 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
           icon: <ArrowUpwardIcon fontSize="inherit" />,
           text: t("spentThisMonth.neutral", "neutral"),
         };
+      if (value === 0)
+        return {
+          color: theme.palette.grey[500],
+          icon: <ArrowDownwardIcon fontSize="inherit" />,
+          text: t("spentThisMonth.even", "neutral"),
+        };
       return {
         color: theme.palette.error.main,
         icon: <ArrowDownwardIcon fontSize="inherit" />,
@@ -66,6 +72,12 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
           color: theme.palette.grey[500],
           icon: <ArrowUpwardIcon fontSize="inherit" />,
           text: t("spentThisMonth.neutral", "neutral"),
+        };
+      if (value === 0)
+        return {
+          color: theme.palette.grey[500],
+          icon: <ArrowDownwardIcon fontSize="inherit" />,
+          text: t("spentThisMonth.even", "neutral"),
         };
       return {
         color: theme.palette.error.main,
@@ -194,8 +206,14 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
               >
                 {Math.abs(comparison!.value)}% {comparisonResult.text}{" "}
                 {userRole === "admin" && isAgentSelected
-                  ? t("spentThisMonth.comparedToOtherAgents", "compared to other agents")
-                  : t("spentThisMonth.comparedToOtherClients", "compared to other clients")}
+                  ? t(
+                      "spentThisMonth.comparedToOtherAgents",
+                      "compared to other agents"
+                    )
+                  : t(
+                      "spentThisMonth.comparedToOtherClients",
+                      "compared to other clients"
+                    )}
               </Typography>
             )}
           </Grid>

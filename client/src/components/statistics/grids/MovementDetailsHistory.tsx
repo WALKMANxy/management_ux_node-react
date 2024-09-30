@@ -27,31 +27,31 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
   const columnDefinitions = useMemo(() => {
     const baseColumns = [
       {
-        headerName: t("movementDetailsHistory.articleId"),
+        headerName: t("movementDetails.articleId"),
         field: "articleId",
         filter: "agTextColumnFilter",
         sortable: true,
       },
       {
-        headerName: t("movementDetailsHistory.name"),
+        headerName: t("movementDetails.name"),
         field: "name",
         filter: "agTextColumnFilter",
         sortable: true,
       },
       {
-        headerName: t("movementDetailsHistory.brand"),
+        headerName: t("movementDetails.brand"),
         field: "brand",
         filter: "agTextColumnFilter",
         sortable: true,
       },
       {
-        headerName: t("movementDetailsHistory.quantity"),
+        headerName: t("movementDetails.quantity"),
         field: "quantity",
         comparator: numberComparator,
         sortable: true,
       },
       {
-        headerName: t("movementDetailsHistory.priceSold"),
+        headerName: t("movementDetails.priceSold"),
         field: "priceSold",
         valueFormatter: customCurrencyFormatter,
         comparator: numberComparator,
@@ -62,14 +62,14 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
     if (userRole === "admin" || userRole === "agent") {
       baseColumns.push(
         {
-          headerName: t("movementDetailsHistory.unitPrice"),
+          headerName: t("movementDetails.unitPrice"),
           field: "unitPrice",
           valueFormatter: customCurrencyFormatter,
           comparator: numberComparator,
           sortable: true,
         },
         {
-          headerName: t("movementDetailsHistory.priceBought"),
+          headerName: t("movementDetails.priceBought"),
           field: "priceBought",
           valueFormatter: customCurrencyFormatter,
           comparator: numberComparator,
