@@ -26,7 +26,12 @@ import { useAppSelector } from "../../app/hooks";
 import { selectAllUsers } from "../../features/users/userSlice";
 import { useCalendar } from "../../hooks/useCalendar";
 import { CalendarEvent } from "../../models/dataModels";
-import { getComparator } from "../../utils/calendarUtils";
+import {
+  getComparator,
+  getEditButtonStyles,
+  isPastEvent,
+} from "../../utils/calendarUtils";
+import { EventForm } from "./EventForm";
 
 interface EventHistoryProps {
   events: CalendarEvent[];
@@ -41,8 +46,25 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const { handleEditEvent, handleApprove, handleReject, isLoading } =
-    useCalendar();
+  const {
+    openForm,
+    handleApprove,
+    handleReject,
+    handleFormSubmit,
+    handleFormCancel,
+    isCreating,
+    handleEditEvent, // Exposed edit handler
+    isEditing,
+    editingEvent,
+    selectedDays,
+    isLoading,
+  } = useCalendar();
+
+  const getEditButtonTooltip = (event: CalendarEvent) => {
+    return isPastEvent(event)
+      ? t("eventHistoryTooltips.editDisabled") // New tooltip for past events
+      : t("eventHistoryTooltips.edit");
+  };
 
   const users = useAppSelector(selectAllUsers);
 
@@ -274,27 +296,23 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                       ) : event.status === "approved" ||
                         event.status === "rejected" ? (
                         <>
-                          <Tooltip title={t("eventHistoryTooltips.edit")}>
-                            <IconButton
-                              onClick={() => handleEditEvent(event)}
-                              sx={{
-                                backgroundColor: "blue",
-                                color: "white",
-                                marginRight: 1,
-                                borderRadius: "50%",
-                                "&:hover": {
-                                  backgroundColor: "darkblue",
-                                },
-                              }}
-                            >
-                              <EditIcon />
-                            </IconButton>
+                          <Tooltip title={getEditButtonTooltip(event)}>
+                            <span>
+                              <IconButton
+                                onClick={() => handleEditEvent(event)}
+                                sx={getEditButtonStyles(event)}
+                                disabled={isPastEvent(event)} // Disable button for past events
+                              >
+                                <EditIcon />
+                              </IconButton>
+                            </span>
                           </Tooltip>
+
                           <Tooltip title={t("eventHistoryTooltips.delete")}>
                             <IconButton
                               onClick={() => handleDeleteEvent(event)}
                               sx={{
-                                backgroundColor: "gray",
+                                backgroundColor: "brown",
                                 color: "white",
                                 borderRadius: "50%",
                                 "&:hover": {
@@ -331,6 +349,15 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
             alignItems: "center", // Center actions vertically
           },
         }}
+      />
+      <EventForm
+        key={editingEvent ? editingEvent._id : "new-event"}
+        open={openForm}
+        selectedDays={selectedDays}
+        onSubmit={handleFormSubmit}
+        onCancel={handleFormCancel}
+        isSubmitting={isCreating || isEditing}
+        initialData={editingEvent}
       />
     </Paper>
   );

@@ -153,9 +153,13 @@ export const EventForm: React.FC<EventFormProps> = ({
         }}
       >
         <DialogTitle>
-          {userRole === "admin"
-            ? t("eventForm.title")
-            : t("eventForm.titleMarkAbsence")}
+          {
+            initialData
+              ? t("eventForm.editTitle") // Use editTitle if initialData exists
+              : userRole === "admin"
+              ? t("eventForm.title") // Default title for admin
+              : t("eventForm.titleMarkAbsence") // Default title for non-admin users
+          }
         </DialogTitle>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <DialogContent sx={{ padding: 2 }}>

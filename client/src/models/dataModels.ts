@@ -106,6 +106,7 @@ export type CalendarEvent = {
     | "";
   note?: string;
   status: "pending" | "approved" | "rejected" | "cancelled";
+  visitClientId?: string;
   createdAt: Date;
   updatedAt: Date;
 };
