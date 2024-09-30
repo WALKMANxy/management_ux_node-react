@@ -110,7 +110,7 @@
     "name": "Name",
     "province": "Province",
     "phone": "Phone Number",
-    "netRevenueThisMonth": "Net Revenue",
+    "netRevenueThisMonth": "Net Revenue This Month",
     "totalOrders": "Orders",
     "totalNetRevenue": "Net Revenue",
     "ordersThisMonth": "Orders This Month",
@@ -475,20 +475,22 @@
     "titleClient": "Spent This Month",
     "iconAlt": "Money Icon",
     "more": "more",
-    "neutral": "neutral",
+    "neutral": "more",
     "less": "less",
-    "comparedToOtherAgents": "compared to other agents.",
-    "comparedToOtherClients": "compared to other clients."
+    "even" : "even",
+    "comparedToOtherAgents": "compared to average.",
+    "comparedToOtherClients": "compared to average."
   },
   "spentThisYear": {
     "titleAgent": "Earned This Year",
     "titleClient": "Spent This Year",
     "iconAlt": "Money Bag Icon",
     "more": "more",
-    "neutral": "neutral",
+    "neutral": "more",
     "less": "less",
-    "comparedToOtherAgents": "compared to other agents.",
-    "comparedToOtherClients": "compared to other clients."
+    "even": "even",
+    "comparedToOtherAgents": "compared to average.",
+    "comparedToOtherClients": "compared to average."
   },
   "topArticleType": {
     "titleAgent": "Top Sold",
@@ -597,7 +599,14 @@
     "dateOfOrder": "Date of Order",
     "title": "Movement Details",
     "expand": "Expand details",
-    "collapse": "Collapse details"
+    "collapse": "Collapse details",
+    "articleId": "OEM ID",
+    "name": "Name",
+    "brand": "Brand",
+    "quantity": "Quantity",
+    "priceSold": "Sold At",
+    "unitPrice:": "Unit Price",
+    "priceBought": "Bought At"
   },
 
   "createPromoForm": {

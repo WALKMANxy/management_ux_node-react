@@ -60,6 +60,13 @@ const ClientsPage: React.FC = () => {
     }
   }, [handleClientSelect]);
 
+  const monthYear = useMemo(() => {
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+    const year = now.getFullYear();
+    return `${year}-${month}`;
+  }, []);
+
   const columnDefinitions: ClientColumnDefinition[] = useMemo(() => {
     const baseColumns: ClientColumnDefinition[] = [
       {
@@ -96,8 +103,7 @@ const ClientsPage: React.FC = () => {
       {
         headerName: t("clientsPage.ordersThisMonth"),
         valueGetter: (params) => {
-          const { months, ordersData } = calculateMonthlyData([params.data]);
-          return ordersData[months.length - 1] || 0; // Get the latest month's data
+          return params.data.monthlyData[monthYear]?.orders || 0;
         },
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
@@ -170,7 +176,7 @@ const ClientsPage: React.FC = () => {
     }
 
     return baseColumns;
-  }, [handleClientSelect, t, userRole]);
+  }, [handleClientSelect, t, userRole, monthYear]);
 
   // Find the logged-in client details from clients array
   const loggedInClientDetails = filteredClients.find(
