@@ -1,4 +1,4 @@
-import { Movement } from "./dataModels";
+import { MonthlyData, Movement } from "./dataModels";
 
 export type UserRole = "admin" | "agent" | "client" | "employee" | "guest";
 
@@ -47,6 +47,7 @@ export type Client = {
   agent: string;
   agentName?: string;
   movements: Movement[];
+  monthlyData: { [monthYear: string]: MonthlyData }; // Added
   colour?: string;
   agentData?: Agent[];
 };

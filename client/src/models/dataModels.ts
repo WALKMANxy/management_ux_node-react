@@ -122,3 +122,9 @@ export interface Holiday {
   launchYear: number | null;
   types: string[];
 }
+
+export interface MonthlyData {
+  revenue: number;
+  netRevenue: number;
+  orders: number;
+}
