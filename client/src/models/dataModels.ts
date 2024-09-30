@@ -65,7 +65,6 @@ export interface IMessage {
   messageType: "message" | "alert" | "promo" | "visit"; // Categorizes the message type
   attachments: { url: string; type: "image" }[]; // Array to store image URLs and types
   status: "pending" | "sent" | "failed"; // Status indicating the message state
-  
 }
 
 export interface IChat {
@@ -100,9 +99,11 @@ export type CalendarEvent = {
     | "company_party"
     | "conference"
     | "expo"
+    | "issues"
+    | "routine"
+    | "new_client"
     | "generic"
-    | ""
-    ;
+    | "";
   note?: string;
   status: "pending" | "approved" | "rejected" | "cancelled";
   createdAt: Date;

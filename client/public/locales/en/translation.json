@@ -148,7 +148,14 @@
     "conference": "Conference",
     "expo": "Expo",
     "illness": "Illness",
-    "day_off": "Day Off"
+    "day_off": "Day Off",
+    "public_holiday": "Public Holiday",
+    "Issue": "Issue",
+    "Routine": "Routine",
+    "New Client": "New Client",
+    "unexpected_event": "Unexpected Event",
+    "company_meeting": "Company Meeting",
+    "medical_visit": "Medical Visit"
   },
   "confirmDialog": {
     "cancel": "Cancel",
@@ -199,6 +206,7 @@
   },
   "eventForm": {
     "title": "Create New Event",
+    "titleMarkAbsence": "Mark Absence",
     "labels": {
       "startTime": "Start Time",
       "endTime": "End Time",
@@ -210,7 +218,8 @@
     },
     "options": {
       "absence": "Absence",
-      "event": "Event"
+      "event": "Event",
+      "holiday": "Holiday"
     },
     "reasons": {
       "illness": "Illness",
@@ -319,23 +328,26 @@
     }
   },
   "popOverEvent": {
-    "labels": {
-      "type": "Type",
-      "reason": "Reason",
-      "note": "Note",
-      "unknown": "Unknown",
-      "visit": "Visit"
-    },
-    "tooltips": {
-      "edit": "Edit Event",
-      "delete": "Delete Event"
-    }
+    "type": "Type",
+    "reason": "Reason",
+    "note": "Note",
+    "unknown": "Unknown",
+    "visit": "Visit",
+    "issue": "Issue",
+    "routine": "Routine",
+    "newClient": "New Client",
+    "edit": "Edit Event",
+    "delete": "Delete Event",
+    "status": "Status",
+    "startsAt": "Starts At",
+    "endsAt": "Ends At"
   },
   "eventTypes": {
     "absence": "Absence",
     "holiday": "Holiday",
     "event": "Event",
-    "generic": "Generic"
+    "generic": "Generic",
+    "visit": "Visit"
   },
   "chatList": {
     "noChatsFound": "No chats found.",
@@ -968,6 +980,7 @@
   },
   "calendarHook": {
     "weekendsNotSelectable": "Weekends are not selectable.",
+    "pastDateError": "You can't create an event in the past.",
     "selectedDateRange": "Selected date range from {{start}} to {{end}}.",
     "eventUpdatedSuccess": "Event updated successfully!",
     "eventCreatedSuccess": "Event created successfully!",
@@ -980,7 +993,7 @@
     "editingEvent": "Editing event: {{reason}}",
     "formCanceled": "Form canceled.",
     "switchedToView": "Switched to {{view}} view.",
-    "visitEventName": "Visit for {{clientId}}",
+    "visitEventName": "Visit, ID: {{clientId}}",
     "selectedVisit": "Selected Visit: {{reason}} on {{date}}.",
     "visitsNotEditable": "Visits cannot be edited from the calendar.",
     "selectedEvent": "Selected {{reason}} on {{date}}.",
@@ -1135,5 +1148,37 @@
     "dateOfOrder": "Date",
     "totalQuantity": "Items sold",
     "totalPriceSold": "Total"
+  },
+  "status": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled"
+  },
+  "eventHistoryTooltips": {
+    "approve": "Approve Event",
+    "reject": "Reject Event"
+  },
+  "eventHistory": {
+    "title": "Event History",
+    "headers": {
+      "user": "User",
+      "eventType": "Event Type",
+      "reason": "Reason",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "actions": {
+      "na": "N/A"
+    },
+    "toast": {
+      "approveSuccess": "Event approved successfully.",
+      "approveFailure": "Failed to approve the event.",
+      "rejectSuccess": "Event rejected successfully.",
+      "rejectFailure": "Failed to reject the event.",
+      "genericError": "An error occurred."
+    }
   }
 }

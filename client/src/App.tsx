@@ -8,18 +8,21 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
-import { RootState } from "./app/store";
+import LoadingSpinner from "./components/common/LoadingSpinner";
 import "./components/statistics/grids/AGGridTable.css"; // Import the custom AG Grid CSS
 import { getTimeMs } from "./config/config";
-import { handleLogout } from "./features/auth/authSlice";
+import {
+  handleLogout,
+  selectIsLoggedIn,
+  selectUserRole,
+} from "./features/auth/authSlice";
 import { fetchUserById, setCurrentUser } from "./features/users/userSlice";
 import Layout from "./layout/Layout";
 import { UserRole } from "./models/entityModels";
+import LandingPage from "./pages/landing/LandingPage";
 import { refreshSession } from "./services/sessionService";
 import { initializeUserEncryption } from "./utils/cacheUtils";
 import { showToast } from "./utils/toastMessage";
-import LandingPage from "./pages/landing/LandingPage";
-import LoadingSpinner from "./components/common/LoadingSpinner";
 /* console.log("Vite mode:", import.meta.env.MODE);
  */
 
@@ -38,8 +41,11 @@ const VisitsPage = lazy(() => import("./pages/common/VisitsPage"));
 
 const timeMS = getTimeMs(); // Ensure this is set in your .env file
 
-const ALLOWED_ROLES_FOR_PROTECTED_ROUTES: UserRole[] = ["admin", "client", "agent"];
-
+const ALLOWED_ROLES_FOR_PROTECTED_ROUTES: UserRole[] = [
+  "admin",
+  "client",
+  "agent",
+];
 
 // Enhanced ProtectedRoute to include role-based protection
 interface ProtectedRouteProps {
@@ -47,11 +53,13 @@ interface ProtectedRouteProps {
   requiredRoles?: UserRole[]; // Allow multiple roles
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles }) => {
-  const { isLoggedIn, role } = useAppSelector((state: RootState) => ({
-    isLoggedIn: state.auth.isLoggedIn,
-    role: state.auth.role,
-  }));
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  requiredRoles,
+}) => {
+  // Separate the selectors to avoid returning a new object reference on each render
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const role = useAppSelector(selectUserRole);
 
   if (!isLoggedIn) {
     return <Navigate to="/" replace />;
@@ -63,7 +71,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
 
   return children;
 };
-
 
 const router = createBrowserRouter([
   {
@@ -232,8 +239,6 @@ function App() {
                   userId,
                   timeMS,
                 });
-
-
               } catch (error) {
                 console.error("Failed to fetch current user:", error);
                 showToast.error("Failed to initialize user data.");

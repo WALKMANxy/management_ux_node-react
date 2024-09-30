@@ -16,6 +16,11 @@ export class CalendarEventService {
         status = "approved";
       }
 
+
+    // Debugging: Log the start and end dates
+    console.log("Service Start Date:", data.startDate);
+    console.log("Service End Date:", data.endDate);
+
       const newEvent = new CalendarEvent({
         ...data,
         status, // Set the status based on the event type and user role
