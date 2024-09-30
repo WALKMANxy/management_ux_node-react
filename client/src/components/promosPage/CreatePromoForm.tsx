@@ -12,7 +12,6 @@ import {
   InputLabel,
   MenuItem,
   OutlinedInput,
-  Paper,
   Select,
   TextField,
   Tooltip,
@@ -90,15 +89,15 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
           height: "100%",
         }}
       >
-        <Typography
-          variant="h3"
-          gutterBottom
-          sx={{ fontWeight: 600, mb: 4, color: "#4d4b5f", mt: 1, ml: 2 }}
-        >
-          {isCreating
-            ? t("createPromoForm.createTitle")
-            : t("createPromoForm.editTitle")}
-        </Typography>
+        {isCreating && (
+          <Typography
+            variant="h3"
+            gutterBottom
+            sx={{ fontWeight: 600, mb: 4, color: "#4d4b5f", mt: 1, ml: 2 }}
+          >
+            {t("createPromoForm.createTitle")}
+          </Typography>
+        )}
 
         <Grid container spacing={2}>
           {/* Promo Type Selector */}
@@ -173,25 +172,23 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
               control={control}
               rules={{ required: t("createPromoForm.startDateRequired") }}
               render={({ field }) => (
-                <Paper elevation={1} sx={{ p: 2, borderRadius: 6 }}>
-                  <StaticDatePicker
-                    {...field}
-                    value={field.value}
-                    disablePast={true}
-                    onChange={(date) => field.onChange(date)}
-                    slotProps={{
-                      toolbar: {
-                        hidden: false,
-                      },
-                      actionBar: {
-                        hidden: true,
-                      },
-                    }}
-                    localeText={{
-                      toolbarTitle: t("createPromoForm.startDateLabel"),
-                    }}
-                  />
-                </Paper>
+                <StaticDatePicker
+                  {...field}
+                  value={field.value}
+                  disablePast={true}
+                  onChange={(date) => field.onChange(date)}
+                  slotProps={{
+                    toolbar: {
+                      hidden: false,
+                    },
+                    actionBar: {
+                      hidden: true,
+                    },
+                  }}
+                  localeText={{
+                    toolbarTitle: t("createPromoForm.startDateLabel"),
+                  }}
+                />
               )}
             />
             {errors.startDate && (
@@ -217,25 +214,23 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
                 },
               }}
               render={({ field }) => (
-                <Paper elevation={1} sx={{ p: 2, borderRadius: 6 }}>
-                  <StaticDatePicker
-                    {...field}
-                    value={field.value}
-                    disablePast={true}
-                    onChange={(date) => field.onChange(date)}
-                    slotProps={{
-                      toolbar: {
-                        hidden: false,
-                      },
-                      actionBar: {
-                        hidden: true,
-                      },
-                    }}
-                    localeText={{
-                      toolbarTitle: t("createPromoForm.endDateLabel"),
-                    }}
-                  />
-                </Paper>
+                <StaticDatePicker
+                  {...field}
+                  value={field.value}
+                  disablePast={true}
+                  onChange={(date) => field.onChange(date)}
+                  slotProps={{
+                    toolbar: {
+                      hidden: false,
+                    },
+                    actionBar: {
+                      hidden: true,
+                    },
+                  }}
+                  localeText={{
+                    toolbarTitle: t("createPromoForm.endDateLabel"),
+                  }}
+                />
               )}
             />
             {errors.endDate && (

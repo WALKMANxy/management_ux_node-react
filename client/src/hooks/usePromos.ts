@@ -1,6 +1,6 @@
 // src/hooks/usePromos.ts
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { clearSelectedPromo, selectPromo } from "../features/data/dataSlice";
@@ -22,7 +22,7 @@ const usePromos = () => {
   const { t } = useTranslation(); // Initialize translation
   const [searchTerm, setSearchTerm] = useState("");
 
-  const allClients = useAppSelector((state) => state.data.clients);
+  const clients = useAppSelector((state) => state.data.clients);
   const agents = useAppSelector((state) => state.data.agents);
   const currentUser = useAppSelector(selectCurrentUser);
   const userRole = currentUser?.role;
@@ -34,32 +34,22 @@ const usePromos = () => {
     [promos, selectedPromoId]
   );
 
-  const clients = useMemo(() => {
-    return allClients;
-    // Optionally, you can add conditions to filter or transform clients
-  }, [allClients]); // Depend on `allClients` so it only recalculates when `allClients` changes
-
-  // Get the eligible or excluded clients based on the promo type
+  // Filtered Clients based on selectedPromo
   const filteredClients = useMemo(() => {
     if (!selectedPromo) return [];
 
-    let clientIds: string[] = [];
+    const clientIds: string[] = selectedPromo.global
+      ? selectedPromo.excludedClientsId || []
+      : selectedPromo.clientsId || [];
 
-    if (selectedPromo.global) {
-      clientIds = selectedPromo.excludedClientsId || [];
-      // If there are no excluded clients, return all clients
-      if (clientIds.length === 0) {
-        return Object.values(allClients);
-      }
-    } else {
-      clientIds = selectedPromo.clientsId || [];
+    if (selectedPromo.global && clientIds.length === 0) {
+      return Object.values(clients);
     }
 
-    // Filter clients based on the IDs in the selected promo
-    return Object.values(allClients).filter((client) =>
+    return Object.values(clients).filter((client) =>
       clientIds.includes(client.id)
     );
-  }, [selectedPromo, allClients]);
+  }, [selectedPromo, clients]);
 
   const [mode, setMode] = useState<PromoMode | null>(null);
 
@@ -137,7 +127,6 @@ const usePromos = () => {
   );
 
   // Handle promo sunset
-  // Handle promo sunset
   const handleSunsetPromo = useCallback(async () => {
     // Check if selectedPromo is defined
     if (!selectedPromo) {
@@ -201,31 +190,32 @@ const usePromos = () => {
     }
   }, [selectedPromo, t]);
 
-  // Fetch promos on component mount
-  useEffect(() => {
-    dispatch(getPromos());
-  }, [dispatch]);
-
   // Handle promo refresh
   const handleRefreshPromos = useCallback(() => {
     dispatch(getPromos());
     showToast.success(t("usePromos.refreshSuccess"));
   }, [dispatch, t]);
 
+  // Handle search input change
   const handleSearchChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setSearchTerm(event.target.value);
     },
     []
   );
+
   // Determine if a promo is active based on its end date
   const isPromoActive = useCallback((promo: Promo) => {
     return new Date(promo.endDate) > new Date();
   }, []);
 
+  // Filter promos based on search term
   const filteredPromos = useMemo(() => {
-    return promos.filter((promo) =>
-      promo.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const lowerSearch = searchTerm.toLowerCase();
+    return promos.filter(
+      (promo) =>
+        promo.name.toLowerCase().includes(lowerSearch) ||
+        promo.promoType.toLowerCase().includes(lowerSearch)
     );
   }, [promos, searchTerm]);
 

@@ -80,7 +80,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
             aria-label={t("dashboard.calendarButton")}
             onClick={handleToggleDrawer}
             sx={{
-              zIndex: 1000,
+              zIndex: 0,
             }}
           >
             <CalendarMonthIcon />

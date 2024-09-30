@@ -36,20 +36,25 @@ const SearchInput = styled(TextField)(({ theme }) => ({
 const SearchResultsContainer = styled(Paper)(({ theme }) => ({
   position: "absolute",
   top: "100%",
-  left: 0,
-  right: 0,
+  left: "50%",
+  transform: "translateX(-50%)",
   zIndex: 10,
   maxHeight: 500,
   overflowY: "auto",
   marginTop: theme.spacing(1),
-  backdropFilter: "blur(15px)", // Increased blur for a more pronounced frosted effect
-  backgroundColor: "rgba(255, 255, 255, 0.8)", // Slightly more transparent for a frosty look
-  borderRadius: "12px", // Rounded corners for a smoother look
+  backdropFilter: "blur(15px)", // Ensure this is effective
+  WebkitBackdropFilter: "blur(15px)", // For Safari support
+  backgroundColor: "rgba(255, 255, 255, 0.97)", // Reduced opacity for better blur effect
+  borderRadius: "12px",
   padding: theme.spacing(2),
-  border: `1px solid rgba(255, 255, 255, 0.3)`, // Light border to enhance the frosted effect
-  boxShadow: `0px 4px 12px rgba(0, 0, 0, 0.1)`, // Soft shadow for depth
+  border: `1px solid rgba(255, 255, 255, 0.3)`,
+  boxShadow: `0px 4px 12px rgba(0, 0, 0, 0.1)`,
   "&::-webkit-scrollbar": {
     display: "none",
+  },
+  width: "100%", // Default width
+  [theme.breakpoints.down("sm")]: {
+    width: "80vw", // 80% of the viewport width on small screens
   },
 }));
 
