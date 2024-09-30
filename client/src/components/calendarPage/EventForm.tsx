@@ -42,7 +42,7 @@ interface EventFormProps {
   initialData?: CalendarEvent | null; // For editing
 }
 
-const reasonOptions: Record<"absence" | "event", string[]> = {
+const reasonOptions: Record<"absence" | "event" | "holiday", string[]> = {
   absence: [
     "illness",
     "day_off",
@@ -51,6 +51,7 @@ const reasonOptions: Record<"absence" | "event", string[]> = {
     "generic",
   ],
   event: ["company_meeting", "company_party", "conference", "expo", "generic"],
+  holiday: ["company_holiday"],
 };
 
 export const EventForm: React.FC<EventFormProps> = ({
@@ -74,7 +75,7 @@ export const EventForm: React.FC<EventFormProps> = ({
   } = useForm<CreateEventPayload>({
     defaultValues: {
       eventType:
-        initialData?.eventType || (userRole === "admin" ? "" : "absence"),
+        initialData?.eventType || (userRole === "admin" ? "event" : "absence"),
       reason: initialData?.reason || "",
       note: initialData?.note || "",
       startDate: initialData?.startDate || selectedDays[0],
@@ -100,12 +101,12 @@ export const EventForm: React.FC<EventFormProps> = ({
             date: dayjs(twoMonthsFromNow).format("MMMM D, YYYY"),
           })
         );
-        onCancel(); // Close the form immediately
+        onCancel();
         return;
       }
 
       const eventTypeValue =
-        initialData?.eventType || (userRole === "admin" ? "" : "absence");
+        initialData?.eventType || (userRole === "admin" ? "event" : "absence");
 
       reset({
         eventType: eventTypeValue,
@@ -117,16 +118,24 @@ export const EventForm: React.FC<EventFormProps> = ({
           (selectedDays.length > 1 ? selectedDays[1] : selectedDays[0]),
       });
 
-      // Explicitly set the eventType to ensure it's updated
       setValue("eventType", eventTypeValue as CreateEventPayload["eventType"]);
     }
   }, [open, reset, userRole, selectedDays, onCancel, t, initialData, setValue]);
 
+  useEffect(() => {
+    if (eventType === "holiday") {
+      setValue("reason", "company_holiday");
+    }
+  }, [eventType, setValue]);
+
   const handleFormSubmit = (data: CreateEventPayload) => {
+    const formattedStartDate = dayjs(data.startDate).toDate();
+    const formattedEndDate = dayjs(data.endDate).toDate();
+
     onSubmit({
       ...data,
-      startDate: dayjs(data.startDate).toDate(), // Ensure Date object is passed
-      endDate: dayjs(data.endDate).toDate(), // Ensure Date object is passed
+      startDate: formattedStartDate,
+      endDate: formattedEndDate,
     });
   };
 
@@ -143,7 +152,11 @@ export const EventForm: React.FC<EventFormProps> = ({
           },
         }}
       >
-        <DialogTitle>{t("eventForm.title")}</DialogTitle>
+        <DialogTitle>
+          {userRole === "admin"
+            ? t("eventForm.title")
+            : t("eventForm.titleMarkAbsence")}
+        </DialogTitle>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <DialogContent sx={{ padding: 2 }}>
             {/* Start Time Picker */}
@@ -212,45 +225,44 @@ export const EventForm: React.FC<EventFormProps> = ({
                   }}
                   sx={{ mt: 2, mb: 1, width: "100%" }}
                   disablePast={true}
-
                 />
               )}
             />
 
-            {/* Event Type Field (Visible Only to Admins) */}
-            {userRole === "admin" && (
-              <FormControl fullWidth margin="normal">
-                <InputLabel id="event-type-label">
-                  {t("eventForm.labels.eventType")}
-                </InputLabel>
-                <Controller
-                  name="eventType"
-                  control={control}
-                  rules={{
-                    required: t("eventForm.validation.eventTypeRequired"),
-                  }}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      labelId="event-type-label"
-                      label={t("eventForm.labels.eventType")}
-                    >
-                      <MenuItem value="absence">
-                        {t("eventForm.options.absence")}
-                      </MenuItem>
-                      <MenuItem value="event">
-                        {t("eventForm.options.event")}
-                      </MenuItem>
-                    </Select>
-                  )}
-                />
-                {errors.eventType && (
-                  <span style={{ color: "red" }}>
-                    {errors.eventType.message}
-                  </span>
+            {/* Event Type Field */}
+            <FormControl fullWidth margin="normal">
+              <InputLabel id="event-type-label">
+                {t("eventForm.labels.eventType")}
+              </InputLabel>
+              <Controller
+                name="eventType"
+                control={control}
+                rules={{
+                  required: t("eventForm.validation.eventTypeRequired"),
+                }}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    labelId="event-type-label"
+                    label={t("eventForm.labels.eventType")}
+                    disabled={userRole !== "admin"} // Disable for non-admin users
+                  >
+                    <MenuItem value="absence">
+                      {t("eventForm.options.absence")}
+                    </MenuItem>
+                    <MenuItem value="event">
+                      {t("eventForm.options.event")}
+                    </MenuItem>
+                    <MenuItem value="holiday">
+                      {t("eventForm.options.holiday")}
+                    </MenuItem>
+                  </Select>
                 )}
-              </FormControl>
-            )}
+              />
+              {errors.eventType && (
+                <span style={{ color: "red" }}>{errors.eventType.message}</span>
+              )}
+            </FormControl>
 
             {/* Reason Field */}
             <FormControl fullWidth margin="normal">
@@ -268,7 +280,9 @@ export const EventForm: React.FC<EventFormProps> = ({
                     label={t("eventForm.labels.reason")}
                     disabled={userRole === "admin" ? !eventType : false} // Disable only if admin and eventType not selected
                   >
-                    {(eventType === "absence" || eventType === "event") &&
+                    {(eventType === "absence" ||
+                      eventType === "event" ||
+                      eventType === "holiday") &&
                       reasonOptions[eventType]?.map((reason) => (
                         <MenuItem key={reason} value={reason}>
                           {t(`eventForm.reasons.${reason}`)}

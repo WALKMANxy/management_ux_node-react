@@ -310,11 +310,13 @@ export interface CreateEventPayload {
     | "medical_visit"
     | "public_holiday"
     | "company_holiday"
-    | "religious_holiday"
     | "company_meeting"
     | "company_party"
     | "conference"
     | "expo"
+    | "issues"
+    | "routine"
+    | "new_client"
     | "generic"
     | "";
   note?: string;

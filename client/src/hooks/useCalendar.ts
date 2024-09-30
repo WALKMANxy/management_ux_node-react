@@ -1,6 +1,5 @@
 // hooks/useCalendar.ts
 
-import { useMediaQuery, useTheme } from "@mui/material";
 import dayjs from "dayjs";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { SlotInfo } from "react-big-calendar";
@@ -14,6 +13,7 @@ import {
   useEditEventMutation,
   useGetEventsByMonthForAdminQuery,
   useGetEventsByStatusAndUserQuery,
+  useUpdateEventStatusMutation,
 } from "../features/calendar/calendarQuery";
 import { selectVisits } from "../features/promoVisits/promoVisitsSelectors";
 import { selectCurrentUser } from "../features/users/userSlice";
@@ -41,9 +41,6 @@ export const useCalendar = () => {
   // Get visits from the state
   const visits = useSelector(selectVisits);
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null); // State for editing
 
   const { t } = useTranslation();
@@ -57,6 +54,15 @@ export const useCalendar = () => {
 
   const [deleteEventMutation, { isLoading: isDeleting, error: deletingError }] =
     useDeleteEventMutation();
+
+  const [updateEventStatus, { isLoading }] = useUpdateEventStatusMutation();
+
+  interface ApiError {
+    data?: {
+      message?: string;
+    };
+    message?: string;
+  }
 
   const {
     data: adminEventsData,
@@ -152,6 +158,13 @@ export const useCalendar = () => {
   const handleSelectSlot = useCallback(
     (slotInfo: SlotInfo) => {
       const day = dayjs(slotInfo.start).day(); // 0 = Sunday, 6 = Saturday
+      const now = dayjs();
+
+      // Check if the selected slot is in the past
+      if (dayjs(slotInfo.start).isBefore(now, "day")) {
+        showToast.error(t("calendarHook.pastDateError")); // Toast message for past dates
+        return;
+      }
 
       // Only non-admin users are restricted from selecting weekends
       if ((day === 0 || day === 6) && userRole !== "admin") {
@@ -180,11 +193,23 @@ export const useCalendar = () => {
     setSelectedEvent(null);
   };
 
+  const handleEventPopoverClose = (event: React.MouseEvent | Event) => {
+    event.stopPropagation(); // Prevent the click from propagating to other elements
+    setAnchorEl(null);
+    setSelectedEvent(null);
+  };
+
   const handleFormSubmit = async (data: CreateEventPayload) => {
     if (!user?._id) {
       showToast.error(t("calendarHook.userNotAuthenticated"));
       return;
     }
+
+    // Debugging: Log the start and end dates before submission
+    console.log("Submitting Event:");
+    console.log("Start Date (before submission):", data.startDate);
+    console.log("End Date (before submission):", data.endDate);
+
     try {
       if (editingEvent && editingEvent._id) {
         // Update existing event
@@ -205,23 +230,14 @@ export const useCalendar = () => {
         // Create new event
         const payload: CreateEventPayload = {
           userId: user._id,
-          startDate: isMobile
-            ? selectedDays.reduce(
-                (earliest, date) =>
-                  dayjs(date).isBefore(earliest) ? date : earliest,
-                selectedDays[0]
-              )
-            : selectedDays[0],
-          endDate: isMobile
-            ? selectedDays.reduce(
-                (latest, date) => (dayjs(date).isAfter(latest) ? date : latest),
-                selectedDays[0]
-              )
-            : selectedDays[1],
+          startDate: data.startDate,
+          endDate: data.endDate,
           eventType: data.eventType,
           reason: data.reason as CalendarEvent["reason"],
           note: data.note?.trim() || undefined,
         };
+
+        console.log("Creating Event Payload:", payload);
 
         await createEvent(payload).unwrap();
         showToast.success(t("calendarHook.eventCreatedSuccess"));
@@ -285,7 +301,6 @@ export const useCalendar = () => {
     setOpenForm(false);
     setSelectedDays([]);
     setEditingEvent(null); // Clear any currently editing event to reset the form
-    showToast.info(t("calendarHook.formCanceled"));
   };
 
   const toggleViewMode = () => {
@@ -308,7 +323,57 @@ export const useCalendar = () => {
     return [...allServerEvents, ...visitEvents];
   }, [allServerEvents, visitEvents]);
 
+  const handleApprove = async (eventId: string) => {
+    try {
+      await updateEventStatus({ eventId, status: "approved" }).unwrap();
+      showToast.success(t("eventHistory.toast.approveSuccess"));
+
+      // Update local state to reflect the status change
+      setAllServerEvents((prevEvents) =>
+        prevEvents.map((event) =>
+          event._id === eventId ? { ...event, status: "approved" } : event
+        )
+      );
+    } catch (error) {
+      const apiError = error as ApiError;
+      showToast.error(
+        `${t("eventHistory.toast.approveFailure")}: ${
+          apiError.data?.message ||
+          apiError.message ||
+          t("eventHistory.toast.genericError")
+        }`
+      );
+    }
+  };
+
+  const handleReject = async (eventId: string) => {
+    try {
+      await updateEventStatus({ eventId, status: "rejected" }).unwrap();
+      showToast.success(t("eventHistory.toast.rejectSuccess"));
+
+      // Update local state to reflect the status change
+      setAllServerEvents((prevEvents) =>
+        prevEvents.map((event) =>
+          event._id === eventId ? { ...event, status: "rejected" } : event
+        )
+      );
+    } catch (error) {
+      const apiError = error as ApiError;
+      showToast.error(
+        `${t("eventHistory.toast.rejectFailure")}: ${
+          apiError.data?.message ||
+          apiError.message ||
+          t("eventHistory.toast.genericError")
+        }`
+      );
+    }
+  };
+
   return {
+    isLoading,
+    handleEventPopoverClose,
+    handleApprove,
+    handleReject,
     creatingError,
     selectedDays,
     viewMode,

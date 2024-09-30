@@ -2,6 +2,8 @@
 
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import {
   IconButton,
   Paper,
@@ -12,6 +14,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  TableSortLabel,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -20,58 +23,41 @@ import dayjs from "dayjs";
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
-import { useUpdateEventStatusMutation } from "../../features/calendar/calendarQuery";
 import { selectAllUsers } from "../../features/users/userSlice";
+import { useCalendar } from "../../hooks/useCalendar";
 import { CalendarEvent } from "../../models/dataModels";
-import { showToast } from "../../utils/toastMessage";
+import { getComparator } from "../../utils/calendarUtils";
 
 interface EventHistoryProps {
   events: CalendarEvent[];
   userRole: string;
+  handleDeleteEvent: (event: CalendarEvent) => void;
 }
 
-interface ApiError {
-  data?: {
-    message?: string;
-  };
-  message?: string;
-}
-
-/**
- * EventHistory Component
- * Displays a paginated table of calendar events with administrative actions.
- *
- * @param {EventHistoryProps} props - Component props.
- * @returns {JSX.Element} The rendered component.
- */
 export const EventHistory: React.FC<EventHistoryProps> = ({
   events,
   userRole,
+  handleDeleteEvent,
 }) => {
   const { t } = useTranslation();
-  const [updateEventStatus, { isLoading }] = useUpdateEventStatusMutation();
+
+  const { handleEditEvent, handleApprove, handleReject, isLoading } =
+    useCalendar();
 
   const users = useAppSelector(selectAllUsers);
 
+  const [order, setOrder] = useState<"asc" | "desc">("asc");
+  const [orderBy, setOrderBy] = useState<keyof CalendarEvent | "actions">(
+    "updatedAt"
+  );
   // Pagination state
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
 
-  /**
-   * Handles page change in pagination.
-   *
-   * @param {unknown} _event - The event source of the callback.
-   * @param {number} newPage - The new page number.
-   */
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  /**
-   * Handles change in rows per page.
-   *
-   * @param {React.ChangeEvent<HTMLInputElement>} event - The change event.
-   */
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -79,9 +65,6 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
     setPage(0);
   };
 
-  /**
-   * Filters out holiday events and sorts the remaining events by updatedAt in descending order.
-   */
   const filteredEvents = useMemo(
     () =>
       events
@@ -93,9 +76,6 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
     [events]
   );
 
-  /**
-   * Associates each event with its corresponding user.
-   */
   const eventsWithUsers = useMemo(() => {
     return filteredEvents.map((event) => {
       const user = users.find((u) => u._id === event.userId);
@@ -103,46 +83,15 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
     });
   }, [filteredEvents, users]);
 
-  /**
-   * Handles the approval of an event.
-   *
-   * @param {string} eventId - The ID of the event to approve.
-   */
-  const handleApprove = async (eventId: string) => {
-    try {
-      await updateEventStatus({ eventId, status: "approved" }).unwrap();
-      showToast.success(t("eventHistory.toast.approveSuccess"));
-    } catch (error) {
-      const apiError = error as ApiError;
-      showToast.error(
-        `${t("eventHistory.toast.approveFailure")}: ${
-          apiError.data?.message ||
-          apiError.message ||
-          t("eventHistory.toast.genericError")
-        }`
-      );
-    }
-  };
+  // Sorting logic
+  const sortedEvents = useMemo(() => {
+    return [...eventsWithUsers].sort(getComparator(order, orderBy));
+  }, [eventsWithUsers, order, orderBy]);
 
-  /**
-   * Handles the rejection of an event.
-   *
-   * @param {string} eventId - The ID of the event to reject.
-   */
-  const handleReject = async (eventId: string) => {
-    try {
-      await updateEventStatus({ eventId, status: "rejected" }).unwrap();
-      showToast.success(t("eventHistory.toast.rejectSuccess"));
-    } catch (error) {
-      const apiError = error as ApiError;
-      showToast.error(
-        `${t("eventHistory.toast.rejectFailure")}: ${
-          apiError.data?.message ||
-          apiError.message ||
-          t("eventHistory.toast.genericError")
-        }`
-      );
-    }
+  const handleRequestSort = (property: keyof CalendarEvent | "actions") => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
   };
 
   /**
@@ -185,54 +134,110 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell>{t("eventHistory.headers.user")}</TableCell>
-              <TableCell>{t("eventHistory.headers.eventType")}</TableCell>
-              <TableCell>{t("eventHistory.headers.reason")}</TableCell>
-              <TableCell>{t("eventHistory.headers.startDate")}</TableCell>
-              <TableCell>{t("eventHistory.headers.endDate")}</TableCell>
-              <TableCell>{t("eventHistory.headers.status")}</TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === "userId"}
+                  direction={orderBy === "userId" ? order : "asc"}
+                  onClick={() => handleRequestSort("userId")}
+                >
+                  {t("eventHistory.headers.user")}
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === "eventType"}
+                  direction={orderBy === "eventType" ? order : "asc"}
+                  onClick={() => handleRequestSort("eventType")}
+                >
+                  {t("eventHistory.headers.eventType")}
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === "reason"}
+                  direction={orderBy === "reason" ? order : "asc"}
+                  onClick={() => handleRequestSort("reason")}
+                >
+                  {t("eventHistory.headers.reason")}
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === "startDate"}
+                  direction={orderBy === "startDate" ? order : "asc"}
+                  onClick={() => handleRequestSort("startDate")}
+                >
+                  {t("eventHistory.headers.startDate")}
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === "endDate"}
+                  direction={orderBy === "endDate" ? order : "asc"}
+                  onClick={() => handleRequestSort("endDate")}
+                >
+                  {t("eventHistory.headers.endDate")}
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === "status"}
+                  direction={orderBy === "status" ? order : "asc"}
+                  onClick={() => handleRequestSort("status")}
+                >
+                  {t("eventHistory.headers.status")}
+                </TableSortLabel>
+              </TableCell>
               {userRole === "admin" && (
-                <TableCell>{t("eventHistory.headers.actions")}</TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={orderBy === "actions"}
+                    direction={orderBy === "actions" ? order : "asc"}
+                    onClick={() => handleRequestSort("actions")}
+                  >
+                    {t("eventHistory.headers.actions")}
+                  </TableSortLabel>
+                </TableCell>
               )}
             </TableRow>
           </TableHead>
           <TableBody>
-            {eventsWithUsers
+            {sortedEvents
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((event) => (
                 <TableRow
                   key={event._id}
                   sx={{ backgroundColor: getBackgroundColor(event) }}
                 >
-                  <TableCell>
+                  <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
                     {event.user?.entityName || t("eventHistory.unknown")}
                   </TableCell>
-                  <TableCell>
-                    {t(
-                      `eventHistory.eventTypes.${event.eventType || "generic"}`
-                    )}
+                  <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
+                    {t(`eventTypes.${event.eventType || "generic"}`)}
                   </TableCell>
-                  <TableCell>
-                    {t(`eventHistory.reasons.${event.reason || "generic"}`)}
+                  <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
+                    {t(`reasons.${event.reason || "generic"}`)}
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
                     {event.startDate
                       ? dayjs(event.startDate).format("MMMM D, YYYY h:mm A")
                       : t("eventHistory.na")}
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
                     {event.endDate
                       ? dayjs(event.endDate).format("MMMM D, YYYY h:mm A")
                       : t("eventHistory.na")}
                   </TableCell>
-                  <TableCell>
-                    {t(`eventHistory.statuses.${event.status}`)}
+                  <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
+                    {t(`status.${event.status}`)}
                   </TableCell>
                   {userRole === "admin" && (
-                    <TableCell>
-                      {event.status === "pending" ? (
+                    <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
+                      {event.eventType === "visit" ? (
+                        t("eventHistory.actions.na")
+                      ) : event.status === "pending" ? (
                         <>
-                          <Tooltip title={t("eventHistory.tooltips.approve")}>
+                          <Tooltip title={t("eventHistoryTooltips.approve")}>
                             <IconButton
                               onClick={() => handleApprove(event._id!)}
                               disabled={isLoading}
@@ -249,7 +254,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                               <CheckIcon />
                             </IconButton>
                           </Tooltip>
-                          <Tooltip title={t("eventHistory.tooltips.reject")}>
+                          <Tooltip title={t("eventHistoryTooltips.reject")}>
                             <IconButton
                               onClick={() => handleReject(event._id!)}
                               disabled={isLoading}
@@ -266,6 +271,41 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                             </IconButton>
                           </Tooltip>
                         </>
+                      ) : event.status === "approved" ||
+                        event.status === "rejected" ? (
+                        <>
+                          <Tooltip title={t("eventHistoryTooltips.edit")}>
+                            <IconButton
+                              onClick={() => handleEditEvent(event)}
+                              sx={{
+                                backgroundColor: "blue",
+                                color: "white",
+                                marginRight: 1,
+                                borderRadius: "50%",
+                                "&:hover": {
+                                  backgroundColor: "darkblue",
+                                },
+                              }}
+                            >
+                              <EditIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={t("eventHistoryTooltips.delete")}>
+                            <IconButton
+                              onClick={() => handleDeleteEvent(event)}
+                              sx={{
+                                backgroundColor: "gray",
+                                color: "white",
+                                borderRadius: "50%",
+                                "&:hover": {
+                                  backgroundColor: "darkgray",
+                                },
+                              }}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </>
                       ) : (
                         t("eventHistory.actions.na")
                       )}
@@ -277,7 +317,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[10, 20, 50]}
+        rowsPerPageOptions={[50]}
         component="div"
         count={eventsWithUsers.length}
         rowsPerPage={rowsPerPage}

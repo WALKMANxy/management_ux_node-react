@@ -16,24 +16,23 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import CalendarEventComponent from "../../components/calendarPage/CalendarEventComponent";
+import { CustomToolbar } from "../../components/calendarPage/CustomToolbar";
 import { EventForm } from "../../components/calendarPage/EventForm";
 import { EventHistory } from "../../components/calendarPage/EventHistory";
 import PopOverEvent from "../../components/calendarPage/PopOverEvent";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
-import { selectUserRole } from "../../features/auth/authSlice";
+import { selectCurrentUser } from "../../features/users/userSlice";
 import { useCalendar } from "../../hooks/useCalendar";
 import { useCalendarWithHolidays } from "../../hooks/useCalendarWithHolidays";
 import { CalendarEvent } from "../../models/dataModels";
 import { localizer } from "../../utils/localizer";
 import { showToast } from "../../utils/toastMessage";
 import "./CalendarPage.css"; // Import the CSS file
-import { CustomToolbar } from "../../components/calendarPage/CustomToolbar";
 
 const CalendarPage: React.FC = () => {
   const { t } = useTranslation();
 
   const {
-    selectedDays,
     viewMode,
     openForm,
     serverEvents,
@@ -55,12 +54,14 @@ const CalendarPage: React.FC = () => {
     handleDeleteEvent, // Exposed delete handler
     isEditing,
     editingEvent,
+    handleEventPopoverClose,
+    selectedDays,
   } = useCalendar();
 
   const { holidayEvents, isHolidaysLoading, holidaysError } =
     useCalendarWithHolidays(currentDate);
 
-  const userRole = useSelector(selectUserRole);
+  const userRole = useSelector(selectCurrentUser)?.role;
 
   const theme = useTheme();
 
@@ -115,10 +116,6 @@ const CalendarPage: React.FC = () => {
     handlePopoverClose();
     setConfirmDelete(event);
   };
-
-  /*   useEffect(() => {
-    console.log(serverEvents?.length, holidayEvents?.length);
-  }, [serverEvents, holidayEvents]); */
 
   // Optional: Show a loading spinner
   if (isLoading) {
@@ -242,7 +239,11 @@ const CalendarPage: React.FC = () => {
           />
         </Fragment>
       ) : (
-        <EventHistory events={serverEvents!} userRole={userRole} />
+        <EventHistory
+          events={displayEvents}
+          userRole={userRole!}
+          handleDeleteEvent={handleDeleteEventWithConfirmation}
+        />
       )}
 
       {/* PopOverEvent Component */}
@@ -250,9 +251,9 @@ const CalendarPage: React.FC = () => {
         <PopOverEvent
           open={Boolean(anchorEl)}
           anchorEl={anchorEl}
-          handleClose={handlePopoverClose}
+          handleClose={handleEventPopoverClose}
           event={selectedEvent}
-          userRole={userRole}
+          userRole={userRole!}
           onEdit={handleEditEvent} // Connect to edit handler
           onDelete={handleDeleteEventWithConfirmation} // Connect to delete handler with confirmation
         />

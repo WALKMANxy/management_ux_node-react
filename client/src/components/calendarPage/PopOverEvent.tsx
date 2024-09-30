@@ -4,11 +4,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import Popover from "@mui/material/Popover";
+import dayjs from "dayjs";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
 import { selectUserById } from "../../features/users/userSlice";
 import { CalendarEvent } from "../../models/dataModels";
+import { isNotDefaultTime } from "../../utils/calendarUtils";
 import EventTitle from "./EventTitle";
 
 /**
@@ -17,7 +19,7 @@ import EventTitle from "./EventTitle";
 interface PopOverEventProps {
   open: boolean;
   anchorEl: HTMLElement | null;
-  handleClose: () => void;
+  handleClose: (event: React.MouseEvent | Event) => void;
   event: CalendarEvent;
   onEdit?: (event: CalendarEvent) => void;
   onDelete?: (event: CalendarEvent) => void;
@@ -44,7 +46,7 @@ const PopOverEvent: React.FC<PopOverEventProps> = ({
 
   // Select the user associated with the event
   const user = useAppSelector((state) => selectUserById(state, event.userId));
-  const entityName = user?.entityName || t("popOverEvent.labels.unknown");
+  const entityName = user?.entityName || t("popOverEvent.unknown");
 
   return (
     <Popover
@@ -77,23 +79,49 @@ const PopOverEvent: React.FC<PopOverEventProps> = ({
         {/* Event Type */}
         <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
           <Typography variant="body1">
-            <strong>{t("popOverEvent.labels.type")}:</strong>{" "}
-            {t(`popOverEvent.labels.${event.eventType}`)}
+            <strong>{t("popOverEvent.type")}:</strong>{" "}
+            {t(`eventTypes.${event.eventType}`)}
           </Typography>
         </Box>
 
         {/* Event Reason */}
         <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
           <Typography variant="body1">
-            <strong>{t("popOverEvent.labels.reason")}:</strong>{" "}
+            <strong>{t("popOverEvent.reason")}:</strong>{" "}
             {t(`reasons.${event.reason}`)}
           </Typography>
         </Box>
 
+        {/* Conditionally Render Start Time if not 12:00 AM */}
+        {isNotDefaultTime(event.startDate) && event.eventType !== "holiday" && (
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            <strong>{t("popOverEvent.startsAt")}:</strong>{" "}
+            {dayjs(event.startDate).format("h:mm A")}
+          </Typography>
+        )}
+
+        {/* Conditionally Render End Time if not 12:00 AM */}
+        {isNotDefaultTime(event.endDate) &&
+          event.eventType !== "holiday" &&
+          event.eventType !== "visit" && (
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              <strong>{t("popOverEvent.endsAt")}:</strong>{" "}
+              {dayjs(event.endDate).format("h:mm A")}
+            </Typography>
+          )}
+
         {/* Event Note (Optional) */}
         {event.note && (
           <Typography variant="body2" sx={{ mt: 1 }}>
-            <strong>{t("popOverEvent.labels.note")}:</strong> {event.note}
+            <strong>{t("popOverEvent.note")}:</strong> {event.note}
+          </Typography>
+        )}
+
+        {/* Event Status (Optional) */}
+        {event.status && event.eventType === "absence" && (
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            <strong>{t("popOverEvent.status")}:</strong>{" "}
+            {t(`status.${event.status}`)}
           </Typography>
         )}
 
@@ -101,7 +129,7 @@ const PopOverEvent: React.FC<PopOverEventProps> = ({
         {userRole === "admin" && event.eventType !== "holiday" && (
           <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
             {/* Edit Button */}
-            <Tooltip title={t("popOverEvent.tooltips.edit")}>
+            <Tooltip title={t("popOverEvent.edit")}>
               <IconButton
                 color="primary"
                 sx={{
@@ -117,7 +145,7 @@ const PopOverEvent: React.FC<PopOverEventProps> = ({
             </Tooltip>
 
             {/* Delete Button */}
-            <Tooltip title={t("popOverEvent.tooltips.delete")}>
+            <Tooltip title={t("popOverEvent.delete")}>
               <IconButton
                 color="secondary"
                 sx={{
