@@ -15,6 +15,7 @@ import {
 } from "../../models/propsModels";
 import {
   calculateMonthlyData,
+  calculateNetRevenue,
   currencyFormatter,
   numberComparator,
 } from "../../utils/dataUtils";
@@ -60,13 +61,6 @@ const ClientsPage: React.FC = () => {
     }
   }, [handleClientSelect]);
 
-  const monthYear = useMemo(() => {
-    const now = new Date();
-    const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
-    const year = now.getFullYear();
-    return `${year}-${month}`;
-  }, []);
-
   const columnDefinitions: ClientColumnDefinition[] = useMemo(() => {
     const baseColumns: ClientColumnDefinition[] = [
       {
@@ -103,7 +97,8 @@ const ClientsPage: React.FC = () => {
       {
         headerName: t("clientsPage.ordersThisMonth"),
         valueGetter: (params) => {
-          return params.data.monthlyData[monthYear]?.orders || 0;
+          const { months, ordersData } = calculateMonthlyData([params.data]);
+          return ordersData[months.length - 1] || 0; // Get the latest month's data
         },
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
@@ -119,7 +114,9 @@ const ClientsPage: React.FC = () => {
       },
       {
         headerName: t("clientsPage.totalNetRevenue"),
-        field: "totalNetRevenue", // Use the pre-calculated field
+        valueGetter: (params) => {
+          return calculateNetRevenue([params.data]);
+        },
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
         valueFormatter: (params) => currencyFormatter(params.value),
@@ -176,7 +173,7 @@ const ClientsPage: React.FC = () => {
     }
 
     return baseColumns;
-  }, [handleClientSelect, t, userRole, monthYear]);
+  }, [handleClientSelect, t, userRole]);
 
   // Find the logged-in client details from clients array
   const loggedInClientDetails = filteredClients.find(
