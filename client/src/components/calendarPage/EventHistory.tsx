@@ -1,9 +1,11 @@
 // src/components/calendarPage/EventHistory.tsx
 
+import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+
 import {
   IconButton,
   Paper,
@@ -22,7 +24,9 @@ import "animate.css"; // Add animate.css for animations
 import dayjs from "dayjs";
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAppSelector } from "../../app/hooks";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { selectClient, selectVisit } from "../../features/data/dataSlice";
 import { selectAllUsers } from "../../features/users/userSlice";
 import { useCalendar } from "../../hooks/useCalendar";
 import { CalendarEvent } from "../../models/dataModels";
@@ -45,6 +49,15 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
   handleDeleteEvent,
 }) => {
   const { t } = useTranslation();
+
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  const handleGoToVisit = (event: CalendarEvent) => {
+    dispatch(selectClient(event.visitClientId!)); // Select client
+    dispatch(selectVisit(event._id!)); // Select visit
+    navigate("/visits"); // Navigate to /visits
+  };
 
   const {
     openForm,
@@ -253,82 +266,98 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                   <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
                     {t(`status.${event.status}`)}
                   </TableCell>
-                  {userRole === "admin" && (
-                    <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
-                      {event.eventType === "visit" ? (
-                        t("eventHistory.actions.na")
-                      ) : event.status === "pending" ? (
-                        <>
-                          <Tooltip title={t("eventHistoryTooltips.approve")}>
+                  <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
+                    {event.eventType === "visit" ? (
+                      <>
+                        {/* Go to Visit Button for Visit Events (Visible for admin, agent, client roles) */}
+                        {["admin", "agent", "client"].includes(userRole) && (
+                          <Tooltip title={t("popOverEvent.goToVisit")}>
                             <IconButton
-                              onClick={() => handleApprove(event._id!)}
-                              disabled={isLoading}
+                              color="primary"
                               sx={{
-                                backgroundColor: "green",
-                                color: "white",
-                                marginRight: 1,
-                                borderRadius: "50%",
-                                "&:hover": {
-                                  backgroundColor: "darkgreen",
-                                },
-                              }}
-                            >
-                              <CheckIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title={t("eventHistoryTooltips.reject")}>
-                            <IconButton
-                              onClick={() => handleReject(event._id!)}
-                              disabled={isLoading}
-                              sx={{
-                                backgroundColor: "red",
+                                bgcolor: "primary.main",
                                 color: "white",
                                 borderRadius: "50%",
-                                "&:hover": {
-                                  backgroundColor: "darkred",
-                                },
+                                "&:hover": { bgcolor: "primary.dark" },
                               }}
+                              onClick={() => handleGoToVisit(event)} // Call handleGoToVisit for visits
                             >
-                              <CloseIcon />
+                              <AirplaneTicketIcon />
                             </IconButton>
                           </Tooltip>
-                        </>
-                      ) : event.status === "approved" ||
-                        event.status === "rejected" ? (
-                        <>
-                          <Tooltip title={getEditButtonTooltip(event)}>
-                            <span>
-                              <IconButton
-                                onClick={() => handleEditEvent(event)}
-                                sx={getEditButtonStyles(event)}
-                                disabled={isPastEvent(event)} // Disable button for past events
-                              >
-                                <EditIcon />
-                              </IconButton>
-                            </span>
-                          </Tooltip>
+                        )}
+                      </>
+                    ) : event.status === "pending" && userRole === "admin" ? (
+                      <>
+                        <Tooltip title={t("eventHistoryTooltips.approve")}>
+                          <IconButton
+                            onClick={() => handleApprove(event._id!)}
+                            disabled={isLoading}
+                            sx={{
+                              backgroundColor: "green",
+                              color: "white",
+                              marginRight: 1,
+                              borderRadius: "50%",
+                              "&:hover": {
+                                backgroundColor: "darkgreen",
+                              },
+                            }}
+                          >
+                            <CheckIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t("eventHistoryTooltips.reject")}>
+                          <IconButton
+                            onClick={() => handleReject(event._id!)}
+                            disabled={isLoading}
+                            sx={{
+                              backgroundColor: "red",
+                              color: "white",
+                              borderRadius: "50%",
+                              "&:hover": {
+                                backgroundColor: "darkred",
+                              },
+                            }}
+                          >
+                            <CloseIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </>
+                    ) : event.status === "approved" ||
+                      event.status === "rejected" && userRole === "admin" ? (
+                      <>
+                        <Tooltip title={getEditButtonTooltip(event)}>
+                          <span>
+                            <IconButton
+                              onClick={() => handleEditEvent(event)}
+                              sx={getEditButtonStyles(event)}
+                              disabled={isPastEvent(event)} // Disable button for past events
+                            >
+                              <EditIcon />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
 
-                          <Tooltip title={t("eventHistoryTooltips.delete")}>
-                            <IconButton
-                              onClick={() => handleDeleteEvent(event)}
-                              sx={{
-                                backgroundColor: "brown",
-                                color: "white",
-                                borderRadius: "50%",
-                                "&:hover": {
-                                  backgroundColor: "darkgray",
-                                },
-                              }}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </Tooltip>
-                        </>
-                      ) : (
-                        t("eventHistory.actions.na")
-                      )}
-                    </TableCell>
-                  )}
+                        <Tooltip title={t("eventHistoryTooltips.delete")}>
+                          <IconButton
+                            onClick={() => handleDeleteEvent(event)}
+                            sx={{
+                              backgroundColor: "brown",
+                              color: "white",
+                              borderRadius: "50%",
+                              "&:hover": {
+                                backgroundColor: "darkgray",
+                              },
+                            }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </>
+                    ) : (
+                      t("eventHistory.actions.na")
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
           </TableBody>

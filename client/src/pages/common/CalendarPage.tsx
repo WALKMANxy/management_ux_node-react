@@ -58,17 +58,6 @@ const CalendarPage: React.FC = () => {
     selectedDays,
   } = useCalendar();
 
-  useEffect(() => {
-    console.log("viewMode changed to:", viewMode);
-  }, [viewMode]);
-
-  useEffect(() => {
-    console.log("openForm changed to:", openForm);
-  }, [openForm]);
-
-  useEffect(() => {
-    console.log("isEditing changed to:", isEditing);
-  }, [isEditing]);
   const { holidayEvents, isHolidaysLoading, holidaysError } =
     useCalendarWithHolidays(currentDate);
 
