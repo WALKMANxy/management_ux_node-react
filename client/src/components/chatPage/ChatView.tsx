@@ -5,6 +5,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
   Avatar,
   Box,
+  ClickAwayListener,
   Divider,
   IconButton,
   Menu,
@@ -31,6 +32,7 @@ const ChatView: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const dispatch = useAppDispatch();
+  const [open, setOpen] = React.useState(false);
 
   const {
     currentChat,
@@ -65,6 +67,31 @@ const ChatView: React.FC = () => {
     }
     return canUserChat(currentChat, currentUserId);
   }, [currentChat, currentUserId]);
+
+  // Construct the tooltip content with participant names
+  const tooltipContent = (
+    <Box>
+      {participantsData
+        .filter((user) => user.entityName) // Ensure entityName exists
+        .map((user, index) => (
+          <Typography
+            key={index}
+            variant="body2"
+            sx={{ whiteSpace: "pre-line" }}
+          >
+            {user.entityName}
+          </Typography>
+        ))}
+    </Box>
+  );
+
+  const handleTooltipClose = () => {
+    setOpen(false);
+  };
+
+  const handleTooltipOpen = () => {
+    setOpen(true);
+  };
 
   // Fallback if currentChat is not set
   if (!currentChat) {
@@ -139,10 +166,31 @@ const ChatView: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <RenderParticipantsAvatars
-            participantsData={participantsData}
-            chatType={currentChat.type}
-          />
+          {/* Wrap RenderParticipantsAvatars with Tooltip */}
+          <ClickAwayListener onClickAway={handleTooltipClose}>
+            <div>
+              <Tooltip
+                PopperProps={{
+                  disablePortal: true,
+                }}
+                onClose={handleTooltipClose}
+                open={open}
+                disableFocusListener
+                disableHoverListener
+                disableTouchListener
+                title={tooltipContent}
+                arrow
+              >
+                <Box onClick={handleTooltipOpen} sx={{ cursor: "pointer" }}>
+                  <RenderParticipantsAvatars
+                    participantsData={participantsData}
+                    chatType={currentChat.type}
+                  />
+                </Box>
+              </Tooltip>
+            </div>
+          </ClickAwayListener>
+
           <Tooltip title={t("chatView.tooltips.moreOptions")}>
             <IconButton
               onClick={handleMenuOpen}

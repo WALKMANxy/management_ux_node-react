@@ -477,7 +477,7 @@
     "more": "more",
     "neutral": "more",
     "less": "less",
-    "even" : "even",
+    "even": "even",
     "comparedToOtherAgents": "compared to average.",
     "comparedToOtherClients": "compared to average."
   },
@@ -605,7 +605,7 @@
     "brand": "Brand",
     "quantity": "Quantity",
     "priceSold": "Sold At",
-    "unitPrice:": "Unit Price",
+    "unitPrice": "Unit Price",
     "priceBought": "Bought At"
   },
 
@@ -1034,7 +1034,8 @@
       "broadcastName": "Broadcast Name",
       "selectParticipants": "Select Participants",
       "cancel": "Cancel",
-      "create": "Create Chat"
+      "create": "Create Chat",
+      "searchUsers": "Search Users"
     },
     "errors": {
       "noParticipants": "Please select at least one participant.",

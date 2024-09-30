@@ -1,5 +1,5 @@
 //src/components/statistics/grids/MovementsHistory.tsx
-import { Box, Paper } from "@mui/material";
+import { Box } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { MovementsHistoryProps } from "../../../models/propsModels";
@@ -15,10 +15,10 @@ const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
  */
   // Flatten the movements array and filter out invalid articles
   const flattenedMovements = useMemo(() => {
-/*     console.log("Processing movements:");
- */    return movements.flatMap((movement) => {
-/*       console.log("Processing movement:", movement);
- */      return movement.details
+    /*     console.log("Processing movements:");
+     */ return movements.flatMap((movement) => {
+      /*       console.log("Processing movement:", movement);
+       */ return movement.details
         .filter((detail) => detail.brand && detail.brand !== ".")
         .map((detail) => ({
           ...detail,
@@ -79,27 +79,14 @@ const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
   );
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: 3,
-        borderRadius: "12px",
-        background: "transparent",
-        color: "#000",
-        position: "relative",
-        overflow: "hidden",
-        height: "100%",
-      }}
-    >
-      <Box sx={{ height: 600, width: "100%" }}>
-        <AGGridTable
-          columnDefs={columnDefinitions}
-          rowData={flattenedMovements}
-          paginationPageSize={20}
-          quickFilterText=""
-        />
-      </Box>
-    </Paper>
+    <Box sx={{ height: 600, width: "100%" }}>
+      <AGGridTable
+        columnDefs={columnDefinitions}
+        rowData={flattenedMovements}
+        paginationPageSize={20}
+        quickFilterText=""
+      />
+    </Box>
   );
 };
 
