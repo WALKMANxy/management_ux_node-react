@@ -11,6 +11,22 @@
 }
 
 .rbc-date-cell {
-padding-top: 0.5rem;
-text-align: center;
+  padding-top: 0.5rem;
+  text-align: center;
+}
+
+/* Default height for larger screens */
+.rbc-event {
+  height: 40px !important;
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+  .rbc-event {
+    height: 30px !important;
+  }
+}
+
+.rbc-event-label {
+  display: none;
 }

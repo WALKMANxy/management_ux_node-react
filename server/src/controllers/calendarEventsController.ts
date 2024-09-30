@@ -12,6 +12,10 @@ export class CalendarEventController {
       const userId = req.user?.id;
       const userRole = req.user?.role;
 
+       // Debugging: Log incoming dates
+    console.log("Incoming Start Date:", startDate);
+    console.log("Incoming End Date:", endDate);
+
       if (!startDate || !endDate || !eventType || !reason) {
         logger.warn(`Missing required fields in calendar event creation`);
         return res.status(400).json({
