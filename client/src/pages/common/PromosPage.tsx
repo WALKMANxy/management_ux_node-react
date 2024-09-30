@@ -112,19 +112,25 @@ const PromosPage: React.FC = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: isMobile ? "100dvh" : "calc(100vh - 120px)",
+        height: isMobile ? "100dvh" : "calc(100vh - 120px)", // Use 100vh for mobile
         bgcolor: "#f4f5f7",
+        boxSizing: "border-box", // Include padding and borders in height
       }}
     >
-      <Grid container sx={{ flexGrow: 1, height: "100%" }}>
+      <Grid container sx={{ flexGrow: 1 }}>
         <Grid
           item
           xs={12}
           md={3}
           sx={{
-            display: { xs: isMobile && selectedPromo ? "none" : "block" },
+            display: {
+              xs:
+                isMobile && (selectedPromo || mode === "create")
+                  ? "none"
+                  : "block",
+            },
             borderRight: "1px solid #e0e0e0",
-            height: "100%",
+            height: "auto", // Ensure it fills the parent Grid container
             overflowY: "auto",
           }}
         >
@@ -141,16 +147,13 @@ const PromosPage: React.FC = () => {
         >
           <Suspense>
             {mode === "create" ? (
-              <Paper
-                elevation={3}
-                sx={{ mb: 2, p: 2, borderRadius: 2, overflow: "hidden" }}
-              >
+              <Box sx={{ mb: 2, p: 2, borderRadius: 2, overflow: "hidden" }}>
                 <CreatePromoForm
                   onClose={handlePromoDeselect}
                   isCreating={true}
                   onSubmit={handleCreatePromo}
                 />
-              </Paper>
+              </Box>
             ) : mode === "edit" && selectedPromo ? (
               <>
                 <CollapsibleSection
