@@ -1,3 +1,5 @@
+// src/workers/clientWorker.js or clientWorker.ts
+
 onmessage = function (event) {
   const { data, clientDetailsMap } = event.data;
 
@@ -31,20 +33,33 @@ onmessage = function (event) {
       return map;
     }, new Map());
 
-    // Convert movementsMap to an array of Movement objects and sort by dateOfOrder
-    let latestMovementTimestamp = 0; // Track the latest timestamp for sorting
+    // Initialize variables for calculations
+    let latestMovementTimestamp = 0; // For sorting
+    let totalRevenue = 0; // Initialize total revenue
+    let totalNetRevenue = 0; // Initialize total net revenue
 
+    // Process each movement
     const movements = Array.from(movementsMap.values()).map((movementData) => {
       const movementInfo = movementData[0];
-      const details = movementData.map((item) => ({
-        articleId: item["Codice Articolo"].toString(),
-        name: item["Descrizione Articolo"],
-        brand: item["Marca Articolo"],
-        quantity: parseFloat(item["Quantita"]),
-        unitPrice: parseFloat(item["Prezzo Articolo"]).toFixed(2),
-        priceSold: parseFloat(item["Valore"]).toFixed(2),
-        priceBought: parseFloat(item["Costo"]).toFixed(2),
-      }));
+      const details = movementData.map((item) => {
+        const quantity = parseFloat(item["Quantita"]) || 0;
+        const priceSold = parseFloat(item["Valore"]) || 0;
+        const priceBought = Math.abs(parseFloat(item["Costo"]) || 0) * quantity;
+
+        // Accumulate total revenue and net revenue
+        totalRevenue += priceSold;
+        totalNetRevenue += priceSold - priceBought;
+
+        return {
+          articleId: item["Codice Articolo"].toString(),
+          name: item["Descrizione Articolo"],
+          brand: item["Marca Articolo"],
+          quantity,
+          unitPrice: parseFloat(item["Prezzo Articolo"]).toFixed(2),
+          priceSold: priceSold.toFixed(2),
+          priceBought: parseFloat(item["Costo"]).toFixed(2),
+        };
+      });
 
       const movementTimestamp = new Date(
         movementInfo["Data Documento Precedente"]
@@ -71,18 +86,6 @@ onmessage = function (event) {
       latestMovementTimestamp
     );
 
-    const totalRevenue = movements
-      .reduce(
-        (acc, movement) =>
-          acc +
-          movement.details.reduce(
-            (sum, detail) => sum + parseFloat(detail.priceSold),
-            0
-          ),
-        0
-      )
-      .toFixed(2);
-
     return {
       id: clientInfo["Codice Cliente"].toString(),
       name: clientInfo["Ragione Sociale Cliente"],
@@ -90,7 +93,8 @@ onmessage = function (event) {
       province: clientDetail ? clientDetail["C.A.P. - COMUNE (PROV.)"] : "",
       phone: clientDetail ? clientDetail["TELEFONO"] : "",
       totalOrders: movementsMap.size,
-      totalRevenue,
+      totalRevenue: totalRevenue.toFixed(2), // Add total revenue
+      totalNetRevenue: totalNetRevenue.toFixed(2), // Add total net revenue
       unpaidRevenue: "",
       address: clientDetail ? clientDetail["INDIRIZZO"] : "",
       email: clientDetail ? clientDetail["EMAIL"] : "",

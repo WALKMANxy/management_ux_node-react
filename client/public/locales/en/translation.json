@@ -1158,7 +1158,10 @@
   },
   "eventHistoryTooltips": {
     "approve": "Approve Event",
-    "reject": "Reject Event"
+    "reject": "Reject Event",
+    "delete": "Delete Event",
+    "edit": "Edit Event",
+    "visit": "Go To Visit"
   },
   "eventHistory": {
     "title": "Event History",

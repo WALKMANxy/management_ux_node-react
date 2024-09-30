@@ -142,7 +142,7 @@ export const getEditButtonStyles = (event: CalendarEvent) => {
     };
   }
   return {
-    backgroundColor: "blue", // Regular background color for editable events
+    bgcolor: "primary.main", // Regular background color for editable events
     color: "white",
     marginRight: 1,
     borderRadius: "50%",

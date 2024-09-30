@@ -35,6 +35,7 @@ export type Client = {
   phone?: string;
   totalOrders: number;
   totalRevenue: string;
+  totalNetRevenue: string;
   unpaidRevenue: string;
   address?: string;
   email?: string;

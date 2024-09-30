@@ -5,7 +5,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { SlotInfo } from "react-big-calendar";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { useAppSelector } from "../app/hooks";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { selectUserRole } from "../features/auth/authSlice";
 import {
   useCreateEventMutation,
@@ -15,6 +16,7 @@ import {
   useGetEventsByStatusAndUserQuery,
   useUpdateEventStatusMutation,
 } from "../features/calendar/calendarQuery";
+import { selectClient, selectVisit } from "../features/data/dataSlice";
 import { selectVisits } from "../features/promoVisits/promoVisitsSelectors";
 import { selectCurrentUser } from "../features/users/userSlice";
 import { CalendarEvent, Visit } from "../models/dataModels";
@@ -56,6 +58,9 @@ export const useCalendar = () => {
     useDeleteEventMutation();
 
   const [updateEventStatus, { isLoading }] = useUpdateEventStatusMutation();
+
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   interface ApiError {
     data?: {
@@ -295,7 +300,6 @@ export const useCalendar = () => {
       setOpenForm(true);
       console.log("Opening form for editing event", event);
       showToast.info(t("calendarHook.editingEvent", { reason: event.reason }));
-      
     },
     [t]
   );
@@ -372,7 +376,16 @@ export const useCalendar = () => {
     }
   };
 
+  const handleGoToVisit = (event: CalendarEvent) => {
+    if (event.eventType === "visit") {
+      dispatch(selectClient(event.visitClientId!)); // Select client
+      dispatch(selectVisit(event._id!)); // Select visit
+      navigate("/visits"); // Navigate to /visits
+    }
+  };
+
   return {
+    handleGoToVisit,
     isLoading,
     handleEventPopoverClose,
     handleApprove,
