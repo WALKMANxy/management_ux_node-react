@@ -50,6 +50,7 @@ const PopOverEvent: React.FC<PopOverEventProps> = ({
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  
 
   // Select the user associated with the event
   const user = useAppSelector((state) => selectUserById(state, event.userId));

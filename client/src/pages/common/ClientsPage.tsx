@@ -15,7 +15,6 @@ import {
 } from "../../models/propsModels";
 import {
   calculateMonthlyData,
-  calculateNetRevenue,
   currencyFormatter,
   numberComparator,
 } from "../../utils/dataUtils";
@@ -114,9 +113,7 @@ const ClientsPage: React.FC = () => {
       },
       {
         headerName: t("clientsPage.totalNetRevenue"),
-        valueGetter: (params) => {
-          return calculateNetRevenue([params.data]);
-        },
+        field: "totalNetRevenue", // Use the pre-calculated field
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
         valueFormatter: (params) => currencyFormatter(params.value),
