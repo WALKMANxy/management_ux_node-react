@@ -30,6 +30,7 @@ export class UserService {
     }
   }
 
+
   static async updateUser(
     id: string,
     userData: Partial<IUser>

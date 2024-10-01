@@ -7,25 +7,22 @@ import fs from "fs";
 import helmet from "helmet";
 import https from "https";
 import localtunnel from "localtunnel";
-/* import localtunnel from "localtunnel";
- */ import mongoose from "mongoose";
+import mongoose from "mongoose";
 import { Server as SocketIOServer } from "socket.io";
 import { config } from "./config/config";
 import { authenticateUser } from "./middlewares/authentication";
 import { setupWebSocket } from "./middlewares/webSocket";
-/* import { setupWebSocket } from "./middlewares/oldWebSocket";
- */ import adminRoutes from "./routes/admins";
+import adminRoutes from "./routes/admins";
 import agentRoutes from "./routes/agents";
-/* import setupAlertRoutes from "./routes/alerts";
- */ import authRoutes from "./routes/auth";
+import authRoutes from "./routes/auth";
+import calendarEventsRoutes from "./routes/calendarEvents"; // Import the new day-off request routes
 import chatRoutes from "./routes/chats"; // Import chat routes
 import clientRoutes from "./routes/clients";
+import employeeRoutes from "./routes/employees";
 import movementsRoutes from "./routes/movements";
 import oauthRoutes from "./routes/OAuth";
 import promosRoutes from "./routes/promos";
 import usersRoutes from "./routes/users";
-import calendarEventsRoutes from "./routes/calendarEvents"; // Import the new day-off request routes
-
 import visitsRoutes from "./routes/visits";
 import { errorHandler } from "./utils/errorHandler";
 import { logger, logRequestsIp } from "./utils/logger";
@@ -40,18 +37,13 @@ mongoose
   .then(() => logger.info("MongoDB connected"))
   .catch((err) => logger.error("MongoDB connection error:", { error: err }));
 
+const corsOptions: cors.CorsOptions = {
+  origin: config.appUrl,
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
 
-
-  const corsOptions: cors.CorsOptions = {
-    origin: config.appUrl,
-    credentials: true,
-    optionsSuccessStatus: 200,
-  };
-
-  console.log("CORS Origin:", corsOptions.origin);
-
-
-
+console.log("CORS Origin:", corsOptions.origin);
 
 app.use(helmet());
 app.use(cors(corsOptions));
@@ -82,8 +74,8 @@ app.use("/promos", promosRoutes);
 app.use("/visits", visitsRoutes);
 app.use("/users", usersRoutes);
 app.use("/calendar", calendarEventsRoutes); // Register the day-off request routes
-
 app.use("/chats", chatRoutes); // Add chat routes
+app.use("/employees", employeeRoutes);
 
 app.use(errorHandler);
 
@@ -104,11 +96,8 @@ const io = new SocketIOServer(server, {
 // Set up WebSocket with chat functionality
 setupWebSocket(io);
 
-
 // Log when the WebSocket server starts
 logger.info("WebSocket server initialized");
-
-
 
 server.listen(PORT, async () => {
   logger.info(`Server is running on port ${PORT}`, {
