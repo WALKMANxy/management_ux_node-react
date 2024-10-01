@@ -25,6 +25,10 @@ const normalizeDate = (date: string | Date): Date => {
 const baseQueryWithCredentials = fetchBaseQuery({
   baseUrl,
   credentials: "include",
+  headers: {
+    "bypass-tunnel-reminder": "true",
+    "Content-Type": "application/json",
+  },
 });
 
 export const calendarApi = createApi({
@@ -59,8 +63,8 @@ export const calendarApi = createApi({
       { year: number; month: number }
     >({
       query: ({ year, month }) => {
-/*         console.log("Fetching User Events:", { year, month });
- */        return `calendar/events/user?year=${year}&month=${month}`;
+        /*         console.log("Fetching User Events:", { year, month });
+         */ return `calendar/events/user?year=${year}&month=${month}`;
       },
       transformResponse: (response: GetEventsByMonthResponse) => {
         // Normalize date strings to Date objects
@@ -74,8 +78,8 @@ export const calendarApi = createApi({
       },
       providesTags: (result) => {
         if (result && Array.isArray(result)) {
-/*           console.log("User Events Fetched:", result);
- */          return result.map(
+          /*           console.log("User Events Fetched:", result);
+           */ return result.map(
             ({ _id }) => ({ type: "CalendarEvent", _id: _id } as const)
           );
         } else {
@@ -87,7 +91,6 @@ export const calendarApi = createApi({
 
     createEvent: builder.mutation<CalendarEvent, CreateEventPayload>({
       query: (newEvent) => ({
-
         url: "calendar/events",
         method: "POST",
         body: newEvent,
