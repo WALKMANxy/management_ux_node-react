@@ -3,13 +3,13 @@
 import express from "express";
 import { ChatController } from "../controllers/chatController";
 import { authenticateUser } from "../middlewares/authentication";
-import { checkAgentOrAdminOrClientRole } from "../middlewares/roleChecker";
+import {  checkAllowedRole } from "../middlewares/roleChecker";
 
 const router = express.Router();
 
 // Protect all routes with authenticateUser middleware
 router.use(authenticateUser);
-router.use(checkAgentOrAdminOrClientRole);
+router.use(checkAllowedRole);
 
 // Route to fetch all chats for the authenticated user
 router.get("/", ChatController.fetchAllChats);
