@@ -140,6 +140,22 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
               {t("userDetails.admin", "Admin")}
             </Button>
           </Tooltip>
+          {/* New Employee Button */}
+          <Tooltip
+            title={t("userDetails.selectEmployee", "Select Employee role")}
+            placement="top"
+          >
+            <Button
+              onClick={() => setRole("employee")}
+              sx={{
+                backgroundColor: role === "employee" ? "orange" : "black",
+                color: "white",
+                minWidth: "100px",
+              }}
+            >
+              {t("userDetails.employee", "Employee")}
+            </Button>
+          </Tooltip>
         </ButtonGroup>
 
         {/* Info message for selecting an entity */}
@@ -183,7 +199,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {entityOptions.slice(0, visibleRows).map((entity) => (
+                {entityOptions.slice(0, visibleRows).map((entity, index) => (
                   <TableRow
                     hover
                     key={entity.id}
@@ -196,6 +212,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
                           ? "rgba(0, 0, 0, 0.08)"
                           : "inherit",
                     }}
+                    ref={index === visibleRows - 1 ? ref : null} // Attach ref to the last row
                   >
                     <TableCell>{entity.name}</TableCell>
                     <TableCell>{entity.id}</TableCell>

@@ -37,7 +37,7 @@ export interface DataSliceState {
   currentUserData: Client | Agent | Admin | null;
   currentUserDetails: {
     id: string;
-    role: "client" | "agent" | "admin";
+    role: "client" | "agent" | "admin" | "employee";
     name: string;
     userId: string;
   } | null;

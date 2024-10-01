@@ -38,6 +38,9 @@ const MovementsPage = lazy(() => import("./pages/common/MovementsPage"));
 const PromosPage = lazy(() => import("./pages/common/PromosPage"));
 const UserPage = lazy(() => import("./pages/common/UserPage"));
 const VisitsPage = lazy(() => import("./pages/common/VisitsPage"));
+const EmployeeDashboard = lazy(
+  () => import("./pages/employee/EmployeeDashboard")
+);
 
 const timeMS = getTimeMs(); // Ensure this is set in your .env file
 
@@ -45,6 +48,13 @@ const ALLOWED_ROLES_FOR_PROTECTED_ROUTES: UserRole[] = [
   "admin",
   "client",
   "agent",
+];
+
+const ALLOWED_ROLES_FOR_UNPROTECTED_ROUTES: UserRole[] = [
+  "admin",
+  "client",
+  "agent",
+  "employee",
 ];
 
 // Enhanced ProtectedRoute to include role-based protection
@@ -112,6 +122,16 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "employee-dashboard",
+        element: (
+          <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_UNPROTECTED_ROUTES}>
+            <Suspense fallback={<LoadingSpinner />}>
+              <EmployeeDashboard />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "clients",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
@@ -144,7 +164,7 @@ const router = createBrowserRouter([
       {
         path: "messages",
         element: (
-          <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
+          <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_UNPROTECTED_ROUTES}>
             <Suspense fallback={<LoadingSpinner />}>
               <ChatPage />
             </Suspense>
@@ -184,7 +204,7 @@ const router = createBrowserRouter([
       {
         path: "calendar",
         element: (
-          <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
+          <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_UNPROTECTED_ROUTES}>
             <Suspense fallback={<LoadingSpinner />}>
               <CalendarPage />
             </Suspense>

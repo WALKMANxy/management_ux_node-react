@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { RootState } from "../app/store";
+import { getTimeMs } from "../config/config";
 import {
   fetchInitialData,
   getPromos,
@@ -12,10 +13,8 @@ import { selectCurrentUser } from "../features/users/userSlice";
 import { DataSliceState } from "../models/stateModels";
 import { ensureEncryptionInitialized } from "../utils/cacheUtils";
 import { updateUserEntityNameIfMissing } from "../utils/checkUserName";
-import { getTimeMs } from "../config/config";
 
 const timeMS = getTimeMs(); // Ensure this is set in your .env file
-
 
 const useLoadingData = () => {
   const dispatch = useAppDispatch();
@@ -44,19 +43,18 @@ const useLoadingData = () => {
   const shouldFetchData = useMemo(() => {
     return (
       status !== "succeeded" &&
+      role !== "employee" &&
       (Object.keys(clients).length === 0 ||
         Object.keys(agents).length === 0 ||
         !currentUserData ||
         !currentUserDetails)
     );
-  }, [status, clients, agents, currentUserData, currentUserDetails]);
+  }, [status, clients, agents, currentUserData, currentUserDetails, role]);
 
   const fetchData = useCallback(async () => {
     try {
       toast.loading(t("useStatsToasts.loadingData"), { id: toastId });
       setLoading(true);
-
-      
 
       // Ensure encryption is initialized with necessary params
       await ensureEncryptionInitialized({
@@ -101,10 +99,10 @@ const useLoadingData = () => {
   }, [dispatch, retryCount, currentUser, currentUserDetails, t]);
 
   useEffect(() => {
-    if (shouldFetchData) {
+    if (role !== "employee" && shouldFetchData) {
       fetchData();
     }
-  }, [shouldFetchData, fetchData]);
+  }, [shouldFetchData, fetchData, role]);
 
   useEffect(() => {
     if (retryCount > 0 && retryCount <= 5) {

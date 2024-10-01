@@ -22,6 +22,7 @@ const Layout: React.FC = () => {
     location.pathname === "/promos" ||
     location.pathname === "/calendar" ||
     location.pathname === "/movements" ||
+    location.pathname === "/employee-dashboard" ||
     location.pathname === "/articles";
   const isSettingsPage = location.pathname === "/settings"; // Check if on the /settings page
 

@@ -27,6 +27,12 @@ export type Admin = {
   clients: Client[];
 };
 
+export interface Employee {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export type Client = {
   id: string;
   name: string;

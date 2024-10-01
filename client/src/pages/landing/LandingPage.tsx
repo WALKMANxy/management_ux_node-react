@@ -53,6 +53,9 @@ const LandingPage: React.FC = () => {
         case "client":
           navigate("/client-dashboard");
           break;
+        case "employee":
+          navigate("/employee-dashboard");
+          break;
         default:
           break;
       }

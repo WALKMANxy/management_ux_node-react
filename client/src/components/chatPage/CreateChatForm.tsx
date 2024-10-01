@@ -230,7 +230,7 @@ const CreateChatForm: React.FC<CreateChatFormProps> = ({ open, onClose }) => {
             />
           )}
           <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>
-            {t("createChatForm.labels.selectParticipants")}
+            {t("createChatForm.labels.findParticipants")}
           </Typography>
           {/* Search Input for Filtering Users */}
           <TextField
