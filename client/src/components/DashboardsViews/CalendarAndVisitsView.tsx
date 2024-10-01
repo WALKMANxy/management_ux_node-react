@@ -7,10 +7,12 @@ import UpcomingVisits from "../dashboard/UpcomingVisits";
 interface CalendarAndVisitsSectionProps {
   loadingState: boolean;
   t: (key: string) => string;
+  disableUpcomingVisits?: boolean; // New prop
 }
 
 const CalendarAndVisitsSection: React.FC<CalendarAndVisitsSectionProps> = ({
   loadingState,
+  disableUpcomingVisits = false,
   t,
 }) => {
   return (
@@ -45,17 +47,21 @@ const CalendarAndVisitsSection: React.FC<CalendarAndVisitsSectionProps> = ({
           </Box>
         )}
       </Box>
-      {loadingState ? (
-        <Skeleton
-          animation="wave"
-          variant="rectangular"
-          width="100%"
-          height={150}
-          sx={{ borderRadius: "12px" }}
-          aria-label={t("dashboard.skeleton")}
-        />
-      ) : (
-        <UpcomingVisits />
+      {!disableUpcomingVisits && (
+        <>
+          {loadingState ? (
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width="100%"
+              height={150}
+              sx={{ borderRadius: "12px" }}
+              aria-label={t("dashboard.skeleton")}
+            />
+          ) : (
+            <UpcomingVisits />
+          )}
+        </>
       )}
     </Grid>
   );

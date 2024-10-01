@@ -108,8 +108,8 @@ export const dataSlice = createSlice({
       const newPromo = action.payload;
       const role = state.currentUserDetails?.role;
 
-/*       console.log("addOrUpdatePromo called with:", action.payload); // Debugging
- */
+      /*       console.log("addOrUpdatePromo called with:", action.payload); // Debugging
+       */
       if (role === "admin") {
         if (!Array.isArray(state.currentUserPromos)) {
           state.currentUserPromos = [];
@@ -138,7 +138,7 @@ export const dataSlice = createSlice({
         state.status = "succeeded";
         const { role, userData, userId } = action.payload;
 
-        if (role === "client" && "clientData" in userData) {
+        if (role === "client" && "clientData" in userData!) {
           const { clientData } = userData;
 
           // Store client data
@@ -156,7 +156,7 @@ export const dataSlice = createSlice({
               state.agents[agent.id] = agent; // Store each agent in the state
             });
           }
-        } else if (role === "agent" && "agentData" in userData) {
+        } else if (role === "agent" && "agentData" in userData!) {
           // Handle agent data
           const { agentData /* visits, promos */ } = userData;
 
@@ -183,7 +183,7 @@ export const dataSlice = createSlice({
             name: agentData.name,
             userId: userId,
           };
-        } else if (role === "admin" && "adminData" in userData) {
+        } else if (role === "admin" && "adminData" in userData!) {
           // Handle admin data
           const { adminData } = userData;
 
@@ -205,6 +205,16 @@ export const dataSlice = createSlice({
             name: adminData.name,
             userId: userId,
           };
+        } else if (role === "employee") {
+          // Handle employee role
+          state.currentUserDetails = {
+            id: userId, // Assuming userId is unique for employees
+            role: "employee",
+            name: "Employee Name", // Replace with actual name if available
+            userId: userId,
+          };
+          state.currentUserData = null;
+          // Optionally, you can reset other state properties if needed
         } else {
           // Handle unexpected data structure
           console.error(
