@@ -1,5 +1,3 @@
-// src/components/chatPage/UserList.tsx
-
 import {
   Checkbox,
   Table,
@@ -35,8 +33,33 @@ const UserList: React.FC<UserListProps> = ({
     [users, currentUserId]
   );
 
+  // Function to determine row color based on user role
+  const getRowColor = (role: string | undefined) => {
+    switch (role) {
+      case "admin":
+        return "rgba(255, 165, 0, 0.1)"; // Faint orange
+      case "agent":
+      case "employee":
+        return "rgba(173, 216, 230, 0.2)"; // Faint blue
+      case "client":
+        return "rgba(255, 255, 0, 0.2)"; // Faint yellow
+      default:
+        return ""; // No color
+    }
+  };
+
   return (
-    <TableContainer sx={{ maxHeight: 300 }}>
+    <TableContainer
+      sx={{
+        maxHeight: 300,
+        overflowY: "auto", // Enable vertical scrolling
+        scrollbarWidth: "none", // Hide scrollbar in Firefox
+        "&::-webkit-scrollbar": {
+          display: "none", // Hide scrollbar in WebKit-based browsers
+        },
+      }}
+    >
+      {" "}
       <Table
         stickyHeader
         aria-label={t("userList.table", "User Selection Table")}
@@ -59,6 +82,7 @@ const UserList: React.FC<UserListProps> = ({
                 selected={user._id ? selectedUserIds.includes(user._id) : false}
                 sx={{
                   cursor: "pointer",
+                  backgroundColor: getRowColor(user.role), // Apply color based on role
                   "&.Mui-selected": {
                     backgroundColor: theme.palette.action.selected,
                   },

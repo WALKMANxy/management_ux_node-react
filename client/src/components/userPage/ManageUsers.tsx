@@ -191,7 +191,7 @@ const ManageUsers: React.FC = () => {
                       role="checkbox"
                       tabIndex={-1}
                       key={user._id}
-                      onDoubleClick={() => handleRowDoubleClick(user)}
+                      onClick={() => handleRowDoubleClick(user)}
                       sx={{
                         cursor: "pointer",
                         "&:last-child td, &:last-child th": { border: 0 },
@@ -210,17 +210,19 @@ const ManageUsers: React.FC = () => {
                       >
                         {user.email}
                       </TableCell>
+
+                      <TableCell>{user.role}</TableCell>
+                      <TableCell>{user.entityCode}</TableCell>
+                      <TableCell>
+                        {user.entityName || t("manageUsers.na", "N/A")}
+                      </TableCell>
                       <TableCell>{user.authType}</TableCell>
                       <TableCell>
                         {user.isEmailVerified
                           ? t("manageUsers.yes", "Yes")
                           : t("manageUsers.no", "No")}
                       </TableCell>
-                      <TableCell>{user.role}</TableCell>
-                      <TableCell>{user.entityCode}</TableCell>
-                      <TableCell>
-                        {user.entityName || t("manageUsers.na", "N/A")}
-                      </TableCell>
+
                       <TableCell>
                         {user.createdAt
                           ? new Date(user.createdAt).toLocaleDateString()

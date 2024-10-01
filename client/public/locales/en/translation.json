@@ -846,6 +846,17 @@
     "entityName": "Name",
     "entityId": "ID",
     "saveChanges": "Save",
+    "success": "Changes saved successfully!",
+    "error": "An error occurred. Please try again.",
+    "updateSuccess": "User updated successfully.",
+    "updateSuccessToast": "User updated successfully.",
+    "updateFailed": "Failed to update user: {{message}}",
+    "updateFailedToast": "Failed to update user: {{message}}",
+    "updateUnknownError": "Failed to update user: An unknown error occurred.",
+    "updateUnknownErrorToast": "Failed to update user: An unknown error occurred.",
+    "userIdUndefined": "User ID is undefined.",
+    "userIdUndefinedToast": "User ID is undefined.",
+    "loadAdminsErrror": "Failed to load admins. Please try again.",
     "alerts": {
       "success": "Changes saved successfully!",
       "error": "An error occurred. Please try again.",
@@ -1035,7 +1046,8 @@
       "selectParticipants": "Select Participants",
       "cancel": "Cancel",
       "create": "Create Chat",
-      "searchUsers": "Search Users"
+      "searchUsers": "Search Users",
+      "findParticipants": "Find Participants"
     },
     "errors": {
       "noParticipants": "Please select at least one participant.",

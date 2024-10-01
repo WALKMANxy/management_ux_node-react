@@ -5,8 +5,16 @@ import { useTranslation } from "react-i18next";
 import { useInView } from "react-intersection-observer";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { loadAdminDetailsData } from "../features/data/api/admins";
+import { getAllEmployees } from "../features/data/api/employees";
 import { updateUserById } from "../features/users/userSlice";
-import { Admin, Agent, Client, User, UserRole } from "../models/entityModels";
+import {
+  Admin,
+  Agent,
+  Client,
+  Employee,
+  User,
+  UserRole,
+} from "../models/entityModels";
 import { showToast } from "../utils/toastMessage";
 
 const useUserDetails = (user: Partial<User>) => {
@@ -17,11 +25,13 @@ const useUserDetails = (user: Partial<User>) => {
   const dispatch = useAppDispatch();
 
   const [admins, setAdmins] = useState<Admin[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]); // New state for employees
+
   const [role, setRole] = useState<UserRole>(user.role || "guest");
 
   const [entitySearchText, setEntitySearchText] = useState("");
   const [selectedEntity, setSelectedEntity] = useState<
-    Client | Agent | Admin | null
+    Client | Agent | Admin | Employee | null
   >(null);
   const [loadingEntities, setLoadingEntities] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -33,16 +43,19 @@ const useUserDetails = (user: Partial<User>) => {
   // Fetch admins only once when the component mounts
   useEffect(() => {
     setLoadingEntities(true);
-    loadAdminDetailsData()
-      .then((data: Admin[]) => {
-        setAdmins(data); // Store fetched admins
+
+    // Load both admins and employees in parallel
+    Promise.all([loadAdminDetailsData(), getAllEmployees()])
+      .then(([adminData, employeeData]) => {
+        setAdmins(adminData); // Store fetched admins
+        setEmployees(employeeData); // Store fetched employees
         setLoadingEntities(false);
       })
       .catch((error: Error) => {
         showToast.error(
           t("userDetails.loadAdminsError") + ": " + error.message
         );
-        console.error("Error fetching admin data:", error);
+        console.error("Error fetching admin or employee data:", error);
         setLoadingEntities(false);
       });
   }, [t]);
@@ -50,6 +63,10 @@ const useUserDetails = (user: Partial<User>) => {
   const sortedAdmins = useMemo(() => {
     return [...admins].sort((a, b) => a.name.localeCompare(b.name));
   }, [admins]);
+
+  const sortedEmployees = useMemo(() => {
+    return [...employees].sort((a, b) => a.name.localeCompare(b.name));
+  }, [employees]);
 
   const sortedClients = useMemo(() => {
     return Object.values(clients).sort((a, b) => a.name.localeCompare(b.name));
@@ -67,10 +84,12 @@ const useUserDetails = (user: Partial<User>) => {
         return sortedClients;
       case "agent":
         return sortedAgents;
+      case "employee": // New role check for employees
+        return sortedEmployees;
       default:
         return [];
     }
-  }, [role, sortedAdmins, sortedClients, sortedAgents]);
+  }, [role, sortedAdmins, sortedClients, sortedAgents, sortedEmployees]);
 
   /**
    * Filter entity options based on the search text.
@@ -98,17 +117,8 @@ const useUserDetails = (user: Partial<User>) => {
     }
   }, [inView, entityOptions.length, visibleRows]);
 
-  /**
-   * Memoize sorted lists to prevent unnecessary recalculations.
-   */
+  // Manage infinite scrolling by loading more rows when in view.
 
-  /**
-   * Determine the base entity options based on the user's role.
-   */
-
-  /**
-   * Manage infinite scrolling by loading more rows when in view.
-   */
   useEffect(() => {
     if (inView && visibleRows < filteredEntityOptions.length) {
       setVisibleRows((prev) =>
@@ -117,19 +127,11 @@ const useUserDetails = (user: Partial<User>) => {
     }
   }, [inView, filteredEntityOptions.length, visibleRows]);
 
-  /**
-   * Determine the current entity options to display based on visible rows.
-   */
-
-  /**
-   * Handle the search functionality for entities.
-   *
-   * @param {string} searchText - The text input from the user for searching entities.
-   */
   const handleEntitySearch = useCallback((searchText: string) => {
     setEntitySearchText(searchText);
     setVisibleRows(20); // Reset visible rows when a new search is initiated
   }, []);
+
   const handleSaveChanges = useCallback(() => {
     if (!selectedEntity) return;
 

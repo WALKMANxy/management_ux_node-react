@@ -13,6 +13,11 @@ export const fetchInitialData = createAsyncThunk(
     };
     const { role, id, userId } = state.auth;
 
+    if (role === "employee") {
+      // For employees, skip data fetching
+      return { role, userData: null, userId };
+    }
+
     let userData;
     if (role === "client") {
       userData = await dispatch(
@@ -42,6 +47,11 @@ export const getVisits = createAsyncThunk<
     const state = getState().data;
     const entity = state.currentUserData;
     const role = state.currentUserDetails?.role;
+    if (role === "employee") {
+      // Employees should not fetch visits
+      return;
+    }
+
 
     if (!entity || !role) {
       throw new Error("No entity or role found in the state.");
@@ -67,6 +77,11 @@ export const getPromos = createAsyncThunk<
     const state = getState().data;
     const entity = state.currentUserData;
     const role = state.currentUserDetails?.role;
+
+    if (role === "employee") {
+      // Employees should not fetch visits
+      return;
+    }
 
     if (!entity || !role) {
       throw new Error("No entity or role found in the state.");
@@ -94,6 +109,11 @@ export const createVisitAsync = createAsyncThunk<
       const state = getState().data;
       const entity = state.currentUserData;
       const role = state.currentUserDetails?.role;
+
+      if (role === "employee") {
+        // Employees should not fetch visits
+        return rejectWithValue("You can't create visits.");
+      }
 
       if (!entity || !role) {
         throw new Error("No entity or role found in the state.");
@@ -137,6 +157,11 @@ export const updateVisitAsync = createAsyncThunk<
       const entity = state.currentUserData;
       const role = state.currentUserDetails?.role;
 
+      if (role === "employee") {
+        // Employees should not fetch visits
+        return rejectWithValue("You can't update visits.");
+      }
+
       if (!entity || !role) {
         throw new Error("No entity or role found in the state.");
       }
@@ -174,6 +199,11 @@ export const createPromoAsync = createAsyncThunk<
       const state = getState().data;
       const entity = state.currentUserData;
       const role = state.currentUserDetails?.role;
+
+      if (role === "employee") {
+        // Employees should not fetch visits
+        return rejectWithValue("You can't create promos.");
+      }
 
       if (!entity || !role) {
         throw new Error("No entity or role found in the state.");
@@ -215,6 +245,11 @@ export const updatePromoAsync = createAsyncThunk<
       const state = getState().data;
       const entity = state.currentUserData;
       const role = state.currentUserDetails?.role;
+
+      if (role === "employee") {
+        // Employees should not fetch visits
+        return rejectWithValue("You can't update promos.");
+      }
 
       if (!entity || !role) {
         throw new Error("No entity or role found in the state.");

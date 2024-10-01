@@ -7,13 +7,15 @@ import UpcomingVisits from "./UpcomingVisits";
 interface DrawerContainerProps {
   open: boolean;
   onClose: () => void;
-  fabPosition?: { top: number; left: number }; // Position of FAB for drawer placement
+  fabPosition?: { top: number; left: number };
+  disableUpcomingVisits?: boolean; // Position of FAB for drawer placement
 }
 
 const DrawerContainer: React.FC<DrawerContainerProps> = ({
   open,
   onClose,
   fabPosition = { top: 0, left: 0 },
+  disableUpcomingVisits = false,
 }) => {
   return (
     <Drawer
@@ -53,7 +55,7 @@ const DrawerContainer: React.FC<DrawerContainerProps> = ({
         }}
       >
         <CalendarComponent />
-        <UpcomingVisits />
+        {!disableUpcomingVisits && <UpcomingVisits />}
       </Box>
     </Drawer>
   );
