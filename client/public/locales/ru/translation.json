@@ -1,161 +1,1203 @@
 {
-    "welcome": "Добро пожаловать",
-    "login": "Войти",
-    "logout": "Выйти",
-    "headerDashboard": "Панель управления",
+  "welcome": "Добро пожаловать",
+  "login": "Вход",
+  "statistics": "Статистика",
+  "alerts": "Оповещения",
+  "details": {
+    "name": "Имя",
+    "phone": "Телефон",
+    "totalRevenue": "Общий доход",
+    "extendedName": "Расширенное имя",
+    "pec": "PEC",
+    "extendedTaxCode": "Расширенный налоговый код",
+    "paymentMethod": "Способ оплаты",
+    "province": "Провинция",
+    "totalOrders": "Всего заказов",
+    "unpaidRevenue": "Непогашенный доход",
+    "email": "Электронная почта",
+    "taxCode": "Налоговый код",
+    "paymentMethodID": "ID способа оплаты",
+    "address": "Адрес",
+    "agentName": "Имя агента",
+    "labels": {
+      "call": "Позвонить",
+      "email": "Отправить email",
+      "viewOnMap": "Посмотреть на карте",
+      "unknownSender": "Неизвестный отправитель"
+    }
+  },
+  "promotions": {
+    "activePromotionsFor": "Активные акции для",
+    "activePromotionsWithClients": "Активные акции с вашими клиентами",
+    "promo1": "Акция 1",
+    "promo2": "Акция 2",
+    "promo3": "Акция 3",
+    "viewMore": "Просмотреть больше"
+  },
+  "globalSearch": {
+    "placeholder": "Поиск..."
+  },
+  "monthOverMonthSpendingTrend": {
+    "title": "Месячный тренд",
+    "revenue": "Доход",
+    "expense": "Расходы"
+  },
+  "salesDistribution": {
+    "title": "Распределение продаж",
+    "revenue": "Доход",
+    "viewClients": "Просмотреть клиентов",
+    "viewAgents": "Просмотреть агентов",
+    "clients": "Клиенты",
+    "agents": "Агенты"
+  },
+  "topBrandsSold": {
+    "titleAgent": "Лучшие проданные бренды",
+    "titleClient": "Лучшие купленные бренды",
+    "brandLabel": "Бренд"
+  },
+  "clientList": {
+    "title": "Список клиентов",
+    "quickFilterPlaceholder": "Поиск клиентов...",
+    "quickFilterAriaLabel": "Быстрый фильтр для списка клиентов.",
+    "exportCSV": "Экспорт в CSV",
+    "startDate": "Дата начала",
+    "endDate": "Дата окончания",
+    "expand": "Развернуть список клиентов.",
+    "collapse": "Свернуть список клиентов.",
+    "options": "Опции",
+    "startDateAriaLabel": "Фильтр по дате начала для списка клиентов.",
+    "endDateAriaLabel": "Фильтр по дате окончания для списка клиентов.",
+    "noClients": "Клиенты не найдены."
+  },
+  "movementsHistory": {
+    "date": "Дата",
+    "client": "Клиент",
+    "brand": "Бренд",
+    "oemId": "OEM ID",
+    "name": "Имя",
+    "revenue": "Доход",
+    "cost": "Стоимость",
+    "quantity": "Количество",
+    "unitPrice": "Цена за единицу"
+  },
+  "movementDetailHistory": {
+    "articleId": "ID",
+    "name": "Имя",
+    "brand": "Бренд",
+    "quantity": "Количество",
+    "unitPrice": "Цена за единицу",
+    "priceSold": "Продано за",
+    "priceBought": "Куплено за"
+  },
+  "agentDashboard": {
+    "welcomeBack": "С возвращением, {{name}}",
+    "statisticsFor": "Статистика для {{name}}",
+    "yourStatistics": "Ваша статистика",
+    "calendar": "Календарь",
+    "viewMore": "Просмотреть больше",
+    "totalEarning": "Общий заработок",
+    "spentThisMonth": "Потрачено в этом месяце",
+    "spentThisYear": "Потрачено в этом году",
+    "topArticleType": "Самые покупаемые статьи",
+    "monthOverMonthSpendingTrend": "Месячный тренд расходов",
+    "topBrandsSold": "Лучшие проданные бренды",
+    "salesDistribution": "Распределение продаж по клиентам",
+    "upcomingVisits": "Предстоящие визиты для {{name}}"
+  },
+  "clientsPage": {
+    "name": "Имя",
+    "province": "Провинция",
+    "phone": "Номер телефона",
+    "netRevenueThisMonth": "Чистый доход в этом месяце",
+    "totalOrders": "Заказы",
+    "totalNetRevenue": "Чистый доход",
+    "ordersThisMonth": "Заказы в этом месяце",
+    "totalRevenue": "Общий доход",
+    "revenueThisMonth": "Доход в этом месяце",
+    "unpaidRevenue": "Непогашенный доход",
+    "paymentMethod": "Способ оплаты",
+    "id": "ID",
+    "address": "Адрес",
+    "agent": "Агент"
+  },
+  "landingPage": {
+    "welcome": "Добро пожаловать обратно, {name}",
+    "login": "Вход",
+    "enter": "Войти",
+    "userRole": "Роль пользователя",
+    "admin": "Администратор",
+    "agent": "Агент",
+    "client": "Клиент",
+    "selectAgent": "Выбрать агента",
+    "selectClient": "Выбрать клиента",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "googleMaps": "Google Карты",
+    "linkedIn": "LinkedIn",
+    "workingHours": "Пн - Пт, 8:30 - 13:00 и 14:30 - 18:30",
+    "address": "Via Alessandro Volta 17, Катания",
+    "phone": "Телефон",
+    "email": "Электронная почта",
+    "vat": "НДС-номер",
+    "credits": "кредиты: @2024"
+  },
+  "reasons": {
+    "company_party": "Корпоратив",
+    "conference": "Конференция",
+    "expo": "Экспо",
+    "illness": "Болезнь",
+    "day_off": "Выходной",
+    "public_holiday": "Праздничный день",
+    "Issue": "Проблема",
+    "Routine": "Рутина",
+    "New Client": "Новый клиент",
+    "unexpected_event": "Неожиданное событие",
+    "company_meeting": "Совещание компании",
+    "medical_visit": "Медицинский визит"
+  },
+  "confirmDialog": {
+    "cancel": "Отмена",
+    "confirm": "Подтвердить",
+    "defaultTitle": "Вы уверены?",
+    "defaultMessage": "Пожалуйста, подтвердите своё действие.",
+    "deleteEvent": "Удалить событие?"
+  },
+  "articleDetail": {
+    "id": "ID",
+    "name": "Имя",
+    "brand": "Бренд",
+    "quantity": "Количество",
+    "unitPrice": "Цена за единицу",
+    "priceSold": "Продано за",
+    "priceBought": "Куплено за"
+  },
+  "articleDetails": {
+    "title": "Детали статьи",
+    "noHistory": "История отсутствует"
+  },
+  "calendarEvent": {
+    "unknown": "Неизвестно",
+    "reasons": {
+      "illness": "Болезнь",
+      "day_off": "Выходной",
+      "unexpected_event": "Неожиданное событие",
+      "medical_visit": "Медицинский визит",
+      "public_holiday": "Праздничный день",
+      "company_holiday": "Корпоративный праздник",
+      "company_meeting": "Совещание компании",
+      "company_party": "Корпоратив",
+      "conference": "Конференция",
+      "expo": "Экспо",
+      "generic": "Общее"
+    }
+  },
+  "customToolbar": {
+    "today": "Сегодня",
+    "previous": "Предыдущий",
+    "next": "Следующий",
+    "view": {
+      "month": "Месяц",
+      "week": "Неделя",
+      "day": "День"
+    }
+  },
+  "eventForm": {
+    "title": "Создать новое событие",
+    "editTitle": "Редактировать событие",
+    "titleMarkAbsence": "Отметить отсутствие",
+    "labels": {
+      "startTime": "Время начала",
+      "endTime": "Время окончания",
+      "eventType": "Тип события",
+      "reason": "Причина",
+      "note": "Примечание (необязательно)",
+      "cancel": "Отмена",
+      "create": "Создать"
+    },
+    "options": {
+      "absence": "Отсутствие",
+      "event": "Событие",
+      "holiday": "Праздник"
+    },
+    "reasons": {
+      "illness": "Болезнь",
+      "day_off": "Выходной",
+      "unexpected_event": "Неожиданное событие",
+      "medical_visit": "Медицинский визит",
+      "public_holiday": "Праздничный день",
+      "company_holiday": "Корпоративный праздник",
+      "company_meeting": "Совещание компании",
+      "company_party": "Корпоратив",
+      "conference": "Конференция",
+      "expo": "Экспо",
+      "generic": "Общее"
+    },
+    "validation": {
+      "startTimeRequired": "Требуется время начала",
+      "endTimeRequired": "Требуется время окончания",
+      "eventTypeRequired": "Требуется тип события",
+      "reasonRequired": "Требуется причина",
+      "dateTooFar": "Вы не можете выбрать дату отсутствия, которая превышает два месяца от сегодняшней. Пожалуйста, выберите дату отсутствия до {{date}}."
+    },
+    "tooltips": {
+      "cancel": "Отмена",
+      "create": "Создать событие"
+    },
+    "eventHistory": {
+      "title": "История событий",
+      "headers": {
+        "user": "Пользователь",
+        "eventType": "Тип события",
+        "reason": "Причина",
+        "startDate": "Дата начала",
+        "endDate": "Дата окончания",
+        "status": "Статус",
+        "actions": "Действия"
+      },
+      "unknown": "Неизвестно",
+      "na": "Н/Д",
+      "eventTypes": {
+        "absence": "Отсутствие",
+        "event": "Событие",
+        "holiday": "Праздник",
+        "generic": "Общее"
+      },
+      "reasons": {
+        "illness": "Болезнь",
+        "day_off": "Выходной",
+        "unexpected_event": "Неожиданное событие",
+        "medical_visit": "Медицинский визит",
+        "company_meeting": "Совещание компании",
+        "company_party": "Корпоратив",
+        "conference": "Конференция",
+        "expo": "Экспо",
+        "generic": "Общее"
+      },
+      "statuses": {
+        "pending": "В ожидании",
+        "approved": "Одобрено",
+        "rejected": "Отклонено",
+        "cancelled": "Отменено"
+      },
+      "actions": {
+        "na": "Н/Д"
+      },
+      "tooltips": {
+        "approve": "Одобрить событие",
+        "reject": "Отклонить событие"
+      },
+      "toast": {
+        "approveSuccess": "Событие успешно одобрено!",
+        "approveFailure": "Не удалось одобрить событие",
+        "rejectSuccess": "Событие успешно отклонено!",
+        "rejectFailure": "Не удалось отклонить событие",
+        "genericError": "Произошла непредвиденная ошибка"
+      }
+    }
+  },
+  "eventTitle": {
+    "unknown": "Неизвестно",
+    "reasons": {
+      "illness": "Болезнь",
+      "day_off": "Выходной",
+      "unexpected_event": "Неожиданное событие",
+      "medical_visit": "Медицинский визит",
+      "public_holiday": "Праздничный день",
+      "company_holiday": "Корпоративный праздник",
+      "company_meeting": "Совещание компании",
+      "company_party": "Корпоратив",
+      "conference": "Конференция",
+      "expo": "Экспо",
+      "generic": "Общее"
+    },
+    "tooltips": {
+      "illness": "Причина: Болезнь",
+      "day_off": "Причина: Выходной",
+      "unexpected_event": "Причина: Неожиданное событие",
+      "medical_visit": "Причина: Медицинский визит",
+      "public_holiday": "Причина: Праздничный день",
+      "company_holiday": "Причина: Корпоративный праздник",
+      "company_meeting": "Причина: Совещание компании",
+      "company_party": "Причина: Корпоратив",
+      "conference": "Причина: Конференция",
+      "expo": "Причина: Экспо",
+      "generic": "Причина: Общее",
+      "unknown": "Неизвестная сущность"
+    }
+  },
+  "popOverEvent": {
+    "type": "Тип",
+    "reason": "Причина",
+    "note": "Примечание",
+    "unknown": "Неизвестно",
+    "visit": "Визит",
+    "issue": "Проблема",
+    "routine": "Рутина",
+    "newClient": "Новый клиент",
+    "edit": "Редактировать событие",
+    "delete": "Удалить событие",
+    "status": "Статус",
+    "startsAt": "Начинается в",
+    "endsAt": "Заканчивается в"
+  },
+  "eventTypes": {
+    "absence": "Отсутствие",
+    "holiday": "Праздник",
+    "event": "Событие",
+    "generic": "Общее",
+    "visit": "Визит"
+  },
+  "chatList": {
+    "noChatsFound": "Чаты не найдены.",
+    "noMessages": "Нет сообщений",
+    "na": "Н/Д"
+  },
+  "chatSidebar": {
+    "labels": {
+      "chats": "Чаты",
+      "contacts": "Контакты"
+    },
+    "tooltips": {
+      "refreshContacts": "Обновить контакты",
+      "showChats": "Показать чаты",
+      "showContacts": "Показать контакты"
+    },
+    "placeholders": {
+      "searchChats": "Поиск чатов...",
+      "searchContacts": "Поиск контактов..."
+    }
+  },
+  "chatView": {
+    "labels": {
+      "noChatSelected": "Чат не выбран. Пожалуйста, выберите чат для просмотра.",
+      "type": "Тип",
+      "reason": "Причина",
+      "note": "Примечание",
+      "moreOptions": "Больше опций"
+    },
+    "tooltips": {
+      "backToChats": "Вернуться к чатам",
+      "moreOptions": "Больше опций"
+    },
+    "menuOptions": {
+      "mute": "Отключить звук чата",
+      "block": "Заблокировать пользователя",
+      "report": "Пожаловаться на чат",
+      "delete": "Удалить чат",
+      "archive_chat": "Архивировать чат"
+    }
+  },
+  "contactsList": {
+    "labels": {
+      "unknownContact": "Неизвестный контакт",
+      "contact": "Контакт",
+      "selectContact": "Выбрать контакт"
+    },
+    "messages": {
+      "noContactsFound": "Контакты не найдены. Попробуйте изменить поиск.",
+      "promoMessage": "Вы имеете право на новую акцию!\n\nТип: {{promoType}}\nНазвание: {{promoName}}\nПредложение: {{promoDiscount}}\n\nСвяжитесь с одним из наших представителей для получения дополнительной информации. Хорошего дня!",
+      "visitMessage": "Для вас запланирован новый визит!\n\nТип: {{visitType}}\nПричина: {{visitReason}}\nДата: {{visitDate}}\n\nПожалуйста, будьте готовы. Спасибо!"
+    }
+  },
+  "dateDivider": {
+    "labels": {
+      "dateDivider": "{{date}}"
+    }
+  },
+  "inputBox": {
+    "labels": {
+      "chatInput": "Поле ввода чата",
+      "message": "Сообщение",
+      "alert": "Оповещение",
+      "promo": "Акция",
+      "visit": "Визит"
+    },
+    "tooltips": {
+      "selectMessageType": "Выбрать тип сообщения",
+      "sendMessage": "Отправить сообщение"
+    },
+    "placeholders": {
+      "typeMessage": "Введите сообщение..."
+    }
+  },
+  "messageBubble": {
+    "labels": {
+      "unknownSender": "Неизвестный отправитель"
+    }
+  },
+  "labels": {
+    "chatInput": "Поле ввода чата",
+    "message": "Сообщение",
+    "alert": "Оповещение",
+    "promo": "Акция",
+    "visit": "Визит"
+  },
+  "tooltips": {
+    "selectMessageType": "Выбрать тип сообщения",
+    "sendMessage": "Отправить сообщение"
+  },
+  "messageStatus": {
+    "sent": "Отправлено",
+    "delivered": "Доставлено",
+    "read": "Прочитано",
+    "pending": "В ожидании"
+  },
+  "clientDetails": {
+    "title": "Детали клиента",
+    "expand": "Развернуть детали",
+    "collapse": "Свернуть детали",
+    "noClientSelected": "Клиент не выбран."
+  },
+  "activePromotions": {
+    "title": "Активные акции",
+    "noActivePromotions": "Нет активных акций.",
+    "endsAt": "Заканчивается в",
+    "viewAllPromotions": "Просмотреть все акции"
+  },
+  "agentActivity": {
+    "title": "Последняя активность",
+    "noRecentActivities": "Нет последних активностей.",
+    "occurredAt": "Произошло в",
+    "viewAllPromotions": "Просмотреть все акции"
+  },
+  "calendarComponent": {
+    "recentActivity": "Последняя активность",
+    "selectVisit": "Выбрать визит",
+    "noVisits": "Нет доступных визитов.",
+    "close": "Закрыть",
+    "occurredAt": "Произошло в"
+  },
+  "spentThisMonth": {
+    "titleAgent": "Заработано в этом месяце",
+    "titleClient": "Потрачено в этом месяце",
+    "iconAlt": "Иконка денег",
+    "more": "больше",
+    "neutral": "нейтрально",
+    "less": "меньше",
+    "even": "равно",
+    "comparedToOtherAgents": "по сравнению со средним.",
+    "comparedToOtherClients": "по сравнению со средним."
+  },
+  "spentThisYear": {
+    "titleAgent": "Заработано в этом году",
+    "titleClient": "Потрачено в этом году",
+    "iconAlt": "Иконка сумки с деньгами",
+    "more": "больше",
+    "neutral": "нейтрально",
+    "less": "меньше",
+    "even": "равно",
+    "comparedToOtherAgents": "по сравнению со средним.",
+    "comparedToOtherClients": "по сравнению со средним."
+  },
+  "topArticleType": {
+    "titleAgent": "Топ продаж",
+    "titleClient": "Топ покупок",
+    "amountPurchased": "Количество покупок",
+    "iconAlt": "Иконка, представляющая топовый тип статьи"
+  },
+  "totalOrder": {
+    "month": "Месяц",
+    "year": "Год",
+    "ordersThisMonth": "Заказы в этом месяце",
+    "totalOrders": "Заказы в этом году",
+    "iconAlt": "Иконка заказов"
+  },
+  "upcomingVisits": {
+    "title": "Предстоящие визиты",
+    "visitType": "Тип",
+    "visitReason": "Причина",
+    "clientId": "ID клиента",
+    "noProgrammedVisits": "Предстоящие визиты не запланированы.",
+    "viewDetails": "Просмотреть детали",
+    "viewAllVisits": "Просмотреть все визиты",
+    "iconAlt": "Иконка предстоящих визитов"
+  },
+  "errorBoundary": {
+    "title": "Упс! Что-то пошло не так.",
+    "message": "Приносим извинения за неудобства. Пожалуйста, попробуйте снова или свяжитесь с поддержкой, если проблема не устранена.",
+    "backToHome": "Вернуться на главную"
+  },
+  "headerDashboard": "Панель управления",
+  "movements": "Движения",
+  "clients": "Клиенты",
+  "articles": "Статьи",
+  "visits": "Визиты",
+  "promos": "Акции",
+  "calendar": "Календарь",
+  "logout": "Выйти",
+  "search": "Поиск",
+  "notifications": "Уведомления",
+  "no_notifications": "Новых уведомлений нет",
+  "no_messages": "Нет сообщений",
+  "loggingOut": "Выход...",
+  "userAvatar": {
+    "defaultUser": "Пользователь",
+    "chats": "Чаты",
+    "settings": "Настройки",
+    "logout": "Выйти"
+  },
+  "auth": {
+    "signIn": "Войти",
+    "register": "Зарегистрироваться",
+    "continueToApp": "Продолжить в {{appName}}",
+    "email": "Электронная почта",
+    "password": "Пароль",
+    "keepMeSignedIn": "Оставаться в системе",
+    "recommendedOnTrustedDevices": "Рекомендуется на доверенных устройствах",
+    "enterPassword": "Введите ваш пароль",
+    "forgotPassword": "Забыли пароль?",
+    "newToApp": "Новый в {{appName}}?",
+    "createAccount": "Создать аккаунт",
+    "alreadyHaveAccount": "Уже есть аккаунт?",
+    "hidePassword": "Скрыть пароль",
+    "showPassword": "Показать пароль",
+    "continueWithGoogle": "Продолжить с Google",
+    "resetPassword": "Сбросить пароль",
+    "resetInstructions": "Если вы забыли пароль, вы можете сбросить его, введя вашу электронную почту.",
+    "requestResetCode": "Запросить код сброса",
+    "verifyCode": "Проверить код",
+    "newPassword": "Новый пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "updatePassword": "Обновить пароль",
+    "passwordUppercaseError": "Пароль должен содержать как минимум одну заглавную букву.",
+    "passwordLowercaseError": "Пароль должен содержать как минимум одну строчную букву.",
+    "passwordNumberError": "Пароль должен содержать как минимум одну цифру.",
+    "passwordSpecialCharError": "Пароль должен содержать как минимум один специальный символ.",
+    "resetCodeSent": "Если аккаунт с этой электронной почтой существует, код сброса был отправлен.",
+    "requestResetFailed": "Не удалось запросить сброс пароля. Пожалуйста, попробуйте снова.",
+    "codeVerified": "Код успешно проверен. Пожалуйста, установите новый пароль.",
+    "invalidCode": "Неверный или истёкший код. Пожалуйста, попробуйте снова.",
+    "passwordsDoNotMatch": "Пароли не совпадают. Пожалуйста, попробуйте снова.",
+    "passwordUpdated": "Пароль успешно обновлён. Теперь вы можете войти в систему.",
+    "updatePasswordFailed": "Не удалось обновить пароль. Пожалуйста, проверьте ваши данные.",
+    "enterEmail": "Введите вашу электронную почту",
+    "enterNewPassword": "Введите ваш новый пароль",
+    "enterVerificationCode": "Введите код подтверждения из вашей электронной почты",
+    "passwordUpdatedToast": "Пароль успешно обновлён. Теперь вы можете войти в систему!",
+    "registrationSuccess": "Регистрация прошла успешно!",
+    "registrationFailed": "Регистрация не удалась: {{error}}",
+    "loginFailed": "Вход не удался: {{message}}",
+    "roleNotAssigned": "Пожалуйста, дождитесь назначения роли вашему аккаунту перед попыткой входа.",
+    "accountVerificationPending": "Ваш аккаунт всё ещё проходит проверку администраторами.",
+    "roleFetchingError": "Не удалось получить роль пользователя: {{error}}",
+    "userNotFound": "Не удалось получить информацию о пользователе.",
+    "errorDuringLogin": "Произошла ошибка во время входа.",
+    "serverUnreachable": "Сервер сейчас недоступен, пожалуйста, попробуйте позже.",
+    "logoutSuccess": "Пользователь успешно вышел из системы.",
+    "logoutFailed": "Не удалось выйти из системы.",
+    "unexpectedError": "Произошла непредвиденная ошибка.",
+    "googleLoginSuccess": "Пользователь успешно вошёл в систему через Google OAuth.",
+    "googleLoginFailed": "Аутентификация через Google OAuth не удалась.",
+    "invalidStateParameter": "Неверный параметр состояния"
+  },
+  "movementDetails": {
+    "id": "ID списка",
+    "dateOfOrder": "Дата заказа",
+    "title": "Детали движения",
+    "expand": "Развернуть детали",
+    "collapse": "Свернуть детали",
+    "articleId": "OEM ID",
+    "name": "Имя",
+    "brand": "Бренд",
+    "quantity": "Количество",
+    "priceSold": "Продано за",
+    "unitPrice": "Цена за единицу",
+    "priceBought": "Куплено за"
+  },
+  "createPromoForm": {
+    "createTitle": "Создать новую акцию",
+    "editTitle": "Редактировать акцию",
+    "promoTypeLabel": "Тип акции",
+    "promoTypeContract": "Контракт",
+    "promoTypeSale": "Продажа",
+    "promoTypeExtra": "Дополнительная",
+    "promoTypeRequired": "Тип акции обязателен",
+    "promoNameLabel": "Название акции",
+    "promoNameRequired": "Название акции обязательно",
+    "startDateLabel": "Дата начала",
+    "startDateRequired": "Дата начала обязательна",
+    "endDateLabel": "Дата окончания",
+    "endDateRequired": "Дата окончания обязательна",
+    "endDateValidation": "Дата окончания не может быть раньше даты начала.",
+    "discountLabel": "Описание скидки",
+    "discountRequired": "Описание скидки обязательно",
+    "discountHelperText": "например, 'За каждые потраченные 100 евро вы получаете купон на 10 евро'",
+    "eligibleClientsLabel": "Допустимые клиенты",
+    "excludedClientsLabel": "Исключенные клиенты",
+    "createPromo": "Создать акцию",
+    "updatePromo": "Обновить акцию",
+    "cancel": "Отмена"
+  },
+  "searchResults": {
+    "id": "ID",
+    "idUnknown": "Неизвестный ID",
+    "phone": "Телефон",
+    "phoneUnknown": "Неизвестный телефон",
+    "email": "Электронная почта",
+    "emailUnknown": "Неизвестная электронная почта",
+    "promoType": "Тип акции",
+    "promoTypeUnknown": "Неизвестный тип акции",
+    "discount": "Скидка",
+    "discountUnknown": "Неизвестная скидка",
+    "startDate": "Дата начала",
+    "startDateUnknown": "Неизвестная дата начала",
+    "endDate": "Дата окончания",
+    "endDateUnknown": "Неизвестная дата окончания",
+    "province": "Провинция",
+    "provinceUnknown": "Неизвестная провинция",
+    "paymentMethod": "Способ оплаты",
+    "paymentMethodUnknown": "Неизвестный способ оплаты",
+    "types": {
+      "client": "Клиент",
+      "agent": "Агент",
+      "article": "Статья",
+      "promo": "Акция",
+      "visit": "Визит",
+      "alert": "Оповещение"
+    },
+    "noResults": "Результатов не найдено.",
+    "articleId": "OEM",
+    "brand": "Бренд",
+    "brandUnknown": "Неизвестный бренд",
+    "lastSoldDate": "Дата последней продажи",
+    "lastSoldDateUnknown": "Неизвестная дата последней продажи",
+    "promoIssuedBy": "Выдано"
+  },
+  "promoDetails": {
+    "notFound": "Детали акции не найдены."
+  },
+  "promo": {
+    "type": "Тип",
+    "discount": "Скидка",
+    "startDate": "Дата начала",
+    "endDate": "Дата окончания",
+    "global": "Глобальная",
+    "notGlobal": "Не глобальная",
+    "issuedBy": "Выдано",
+    "edit": "Редактировать акцию",
+    "editTooltip": "Редактировать акцию",
+    "terminate": "Завершить акцию",
+    "terminateTooltip": "Завершить акцию",
+    "deselect": "Отменить выбор акции",
+    "deselectTooltip": "Отменить выбор акции"
+  },
+  "eligibleClients": {
+    "includedClients": "Включённые клиенты",
+    "excludedClients": "Исключённые клиенты",
+    "switchToManual": "Переключиться на ручной выбор",
+    "switchToGlobal": "Переключиться на глобальный выбор",
+    "globalPromo": "Глобальная акция",
+    "manualSelection": "Ручной выбор",
+    "noClients": "Нет клиентов для отображения"
+  },
+  "promosSidebar": {
+    "title": "Акции",
+    "refreshPromos": "Обновить акции",
+    "createPromo": "Создать акцию",
+    "searchPlaceholder": "Поиск акций",
+    "noPromosFound": "Акции не найдены.",
+    "type": "Тип"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "errorFetchingArticles": "Ошибка при получении статей.",
+    "errorUpdatingSettings": "Не удалось обновить настройки",
+    "unknownError": "Произошла неизвестная ошибка"
+  },
+  "articleList": {
+    "title": "Список статей",
+    "quickFilterPlaceholder": "Поиск статей...",
+    "quickFilterAriaLabel": "Быстрый фильтр для списка статей.",
+    "exportCSV": "Экспорт в CSV",
+    "expand": "Развернуть список статей.",
+    "collapse": "Свернуть список статей.",
+    "options": "Опции"
+  },
+  "movementList": {
+    "title": "Список движений",
+    "quickFilterPlaceholder": "Поиск движений...",
+    "startDate": "Дата начала",
+    "endDate": "Дата окончания",
+    "exportCSV": "Экспорт в CSV",
+    "expand": "Развернуть список движений.",
+    "collapse": "Свернуть список движений.",
+    "options": "Опции"
+  },
+  "appSettings": {
+    "title": "Настройки приложения",
+    "toggleNotifications": "Переключить уведомления",
+    "enableNotificationsAria": "Включить уведомления",
+    "receiveBrowserNotifications": "Получать уведомления браузера",
+    "notificationsInfo": "Чтобы получать уведомления, пожалуйста, разрешите разрешение на уведомления в настройках вашего браузера.",
+    "notificationsEnabled": "Уведомления были включены.",
+    "notificationsDisabled": "Уведомления были отключены.",
+    "notificationGranted": "Разрешение на уведомления предоставлено.",
+    "notificationDenied": "Разрешение на уведомления отклонено.",
+    "chooseTheme": "Выбрать тему",
+    "themePreference": "Предпочтение темы",
+    "themePreferenceTooltip": "Если вы выберете \"Авто\", тема будет соответствовать предпочтениям вашей системы.",
+    "light": "Светлая",
+    "dark": "Тёмная",
+    "auto": "Авто",
+    "themeChanged": "Тема изменена на {{theme}}."
+  },
+  "modifyAccount": {
+    "invalidEmail": "Электронная почта недействительна.",
+    "passwordUppercase": "Пароль должен содержать как минимум одну заглавную букву.",
+    "passwordLowercase": "Пароль должен содержать как минимум одну строчную букву.",
+    "passwordNumber": "Пароль должен содержать как минимум одну цифру.",
+    "passwordSpecialChar": "Пароль должен содержать как минимум один специальный символ.",
+    "emailUpdated": "Информация об аккаунте обновлена. Теперь вы будете выведены из системы.",
+    "passwordUpdated": "Пароль обновлён. Теперь вы будете выведены из системы.",
+    "updateEmailFailed": "Не удалось обновить информацию об аккаунте: {{message}}",
+    "updatePasswordFailed": "Не удалось обновить пароль: {{message}}",
+    "updateEmailUnknownError": "Не удалось обновить информацию об аккаунте: Произошла неизвестная ошибка.",
+    "updatePasswordUnknownError": "Не удалось обновить пароль: Произошла неизвестная ошибка.",
+    "title": "Изменить аккаунт",
+    "modifyEmail": "Изменить электронную почту",
+    "currentEmail": "Текущая электронная почта",
+    "currentPassword": "Текущий пароль",
+    "newEmail": "Новая электронная почта",
+    "updateEmailButton": "Обновить электронную почту",
+    "updateEmailButtonTooltip": "Нажмите, чтобы обновить вашу электронную почту",
+    "updateEmailButtonAria": "Обновить электронную почту",
+    "modifyPassword": "Изменить пароль",
+    "newPassword": "Новый пароль",
+    "updatePasswordButton": "Обновить пароль",
+    "updatePasswordButtonTooltip": "Нажмите, чтобы обновить ваш пароль",
+    "updatePasswordButtonAria": "Обновить пароль",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль",
+    "showNewPassword": "Показать новый пароль",
+    "hideNewPassword": "Скрыть новый пароль",
+    "currentEmailAria": "Текущая электронная почта",
+    "newEmailAria": "Новая электронная почта",
+    "currentPasswordAria": "Текущий пароль",
+    "newPasswordAria": "Новый пароль",
+    "emailErrors": {
+      "invalidEmail": "Неверный адрес электронной почты.",
+      "emailRequired": "Электронная почта обязательна."
+    },
+    "passwordErrors": {
+      "invalidPassword": "Пароль не соответствует требованиям.",
+      "passwordRequired": "Пароль обязателен."
+    },
+    "googleManagedTitle": "Аккаунт, управляемый Google",
+    "googleManagedDescription": "Ваш аккаунт управляется Google. Пожалуйста, используйте сервисы Google для изменения вашего аккаунта.",
+    "alerts": {
+      "error": "Произошла ошибка.",
+      "success": "Операция выполнена успешно."
+    }
+  },
+  "sidebar": {
+    "userSettings": "Настройки пользователя",
+    "accountSettings": "Настройки аккаунта",
+    "appSettings": "Настройки приложения",
+    "manageUsers": "Управление пользователями"
+  },
+  "manageUsers": {
+    "title": "Управление пользователями",
+    "columns": {
+      "email": "Электронная почта",
+      "authType": "Тип аутентификации",
+      "emailVerified": "Электронная почта подтверждена",
+      "role": "Роль",
+      "entityCode": "Код сущности",
+      "entityName": "Имя сущности",
+      "createdAt": "Создано"
+    },
+    "infoTooltip": "Чтобы пользователь мог использовать приложение, ему необходимо назначить сущность. Вы можете использовать таблицу ниже, чтобы выбрать пользователя двойным щелчком по электронной почте, а затем продолжить назначение сущности.",
+    "selectUserPrompt": "Выберите пользователя для назначения сущности",
+    "selectedUser": "Выбранный пользователь: ",
+    "userDeselected": "Пользователь отменён",
+    "yes": "Да",
+    "no": "Нет",
+    "na": "Н/Д",
+    "userTable": "Таблица пользователей"
+  },
+  "userCard": {
+    "avatarAlt": "Аватар для",
+    "role": "Роль",
+    "code": "Код",
+    "name": "Имя",
+    "none": "Нет"
+  },
+  "userDetails": {
+    "goBack": "Вернуться",
+    "selectRole": "Выберите новую роль.",
+    "roleSelection": "Выбор роли",
+    "selectClient": "Выбрать роль клиента",
+    "selectAgent": "Выбрать роль агента",
+    "selectAdmin": "Выбрать роль администратора",
+    "client": "Клиент",
+    "agent": "Агент",
+    "admin": "Администратор",
+    "selectEntity": "Выберите сущность, дважды щёлкнув по ней.",
+    "searchPlaceholder": "Поиск {{role}} по имени или ID",
+    "loadingEntities": "Загрузка сущностей...",
+    "startTyping": "Начните ввод для поиска",
+    "entityName": "Имя",
+    "entityId": "ID",
+    "saveChanges": "Сохранить",
+    "success": "Изменения успешно сохранены!",
+    "error": "Произошла ошибка. Пожалуйста, попробуйте снова.",
+    "updateSuccess": "Пользователь успешно обновлён.",
+    "updateSuccessToast": "Пользователь успешно обновлён.",
+    "updateFailed": "Не удалось обновить пользователя: {{message}}",
+    "updateFailedToast": "Не удалось обновить пользователя: {{message}}",
+    "updateUnknownError": "Не удалось обновить пользователя: Произошла неизвестная ошибка.",
+    "updateUnknownErrorToast": "Не удалось обновить пользователя: Произошла неизвестная ошибка.",
+    "userIdUndefined": "ID пользователя не определён.",
+    "userIdUndefinedToast": "ID пользователя не определён.",
+    "loadAdminsErrror": "Не удалось загрузить администраторов. Пожалуйста, попробуйте снова.",
+    "alerts": {
+      "success": "Изменения успешно сохранены!",
+      "error": "Произошла ошибка. Пожалуйста, попробуйте снова.",
+      "updateSuccess": "Пользователь успешно обновлён.",
+      "updateSuccessToast": "Пользователь успешно обновлён.",
+      "updateFailed": "Не удалось обновить пользователя: {{message}}",
+      "updateFailedToast": "Не удалось обновить пользователя: {{message}}",
+      "updateUnknownError": "Не удалось обновить пользователя: Произошла неизвестная ошибка.",
+      "updateUnknownErrorToast": "Не удалось обновить пользователя: Произошла неизвестная ошибка.",
+      "userIdUndefined": "ID пользователя не определён.",
+      "userIdUndefinedToast": "ID пользователя не определён.",
+      "loadAdminsErrror": "Не удалось загрузить администраторов. Пожалуйста, попробуйте снова."
+    }
+  },
+  "createVisitForm": {
+    "title": "Создать новый визит",
+    "typeLabel": "Тип",
+    "regular": "Регулярный",
+    "urgent": "Срочный",
+    "reasonLabel": "Причина",
+    "issue": "Проблема",
+    "routine": "Рутина",
+    "newClient": "Новый клиент",
+    "publicNoteLabel": "Публичная заметка",
+    "publicNoteTooltip": "Введите публичную заметку для визита.",
+    "privateNoteLabel": "Приватная заметка*",
+    "privateNoteTooltip": "Приватная заметка видна только вам и администраторам.",
+    "privateNotePlaceholder": "Приватная заметка видна только вам и администраторам.",
+    "selectDateTime": "Выбрать дату и время",
+    "sendVisitTooltip": "Отправить визит",
+    "sendVisit": "Отправить визит",
+    "cancelTooltip": "Отмена",
+    "cancel": "Отмена",
+    "fillAllFields": "Пожалуйста, заполните все обязательные поля.",
+    "visitCreated": "Визит успешно создан.",
+    "creationFailed": "Не удалось создать визит: ",
+    "creationFailedUnknown": "Не удалось создать визит: Произошла неизвестная ошибка.",
+    "cancelDialogTitle": "Отменить создание визита",
+    "cancelDialogDescription": "Вы уверены, что хотите отменить создание этого визита? Вся введённая информация будет потеряна.",
+    "no": "Нет",
+    "yes": "Да"
+  },
+  "clientDetailsCard": {
+    "code": "Код",
+    "address": "Адрес",
+    "province": "Провинция",
+    "na": "Н/Д",
+    "email": "Электронная почта",
+    "phone": "Телефон",
+    "paymentMethod": "Способ оплаты",
+    "agent": "Агент",
+    "createVisitTooltip": "Создать новый визит",
+    "createVisit": "Создать визит",
+    "deselectClientTooltip": "Отменить выбор текущего клиента",
+    "deselectClient": "Отменить выбор клиента",
+    "cancelDialogTitle": "Отменить выбор клиента",
+    "cancelDialogDescription": "Вы уверены, что хотите отменить выбор текущего клиента? Все несохранённые изменения будут потеряны.",
+    "no": "Нет",
+    "yes": "Да"
+  },
+  "visitCard": {
+    "avatarAlt": "Аватар",
+    "visitFor": "Визит для",
+    "type": "Тип",
+    "reason": "Причина",
+    "date": "Дата",
+    "publicNote": "Публичная заметка",
+    "privateNote": "Приватная заметка",
+    "completed": "Завершено",
+    "issuedBy": "Выдано",
+    "na": "Н/Д",
+    "unknown": "Неизвестно",
+    "yes": "Да",
+    "no": "Нет"
+  },
+  "editVisitForm": {
+    "title": "Редактировать Визит",
+    "fillAllFields": "Пожалуйста, заполните все обязательные поля.",
+    "updateSuccess": "Визит успешно обновлен.",
+    "updateFailed": "Не удалось обновить визит: {{message}}",
+    "updateFailedUnknown": "Не удалось обновить визит: произошла неизвестная ошибка.",
+    "dateLabel": "Дата",
+    "publicNoteLabel": "Публичная Заметка",
+    "publicNoteTooltip": "Введите публичную заметку для визита.",
+    "privateNoteLabel": "Приватная Заметка",
+    "privateNoteTooltip": "Введите приватную заметку для визита.",
+    "privateNotePlaceholder": "Приватная заметка видна только вам и администраторам.",
+    "typeLabel": "Тип",
+    "regular": "Обычный",
+    "urgent": "Срочный",
+    "reasonLabel": "Причина",
+    "issue": "Проблема",
+    "routine": "Рутина",
+    "newClient": "Новый Клиент",
+    "saveChangesTooltip": "Сохранить Изменения",
+    "cancelTooltip": "Отмена",
+    "cancelDialogTitle": "Отменить Редактирование",
+    "cancelDialogDescription": "Вы уверены, что хотите отменить редактирование визита? Все несохраненные изменения будут потеряны.",
+    "no": "Нет",
+    "yes": "Да",
+    "completedLabel": "Отметить как Завершенный",
+    "cancelledLabel": "Отметить как Отмененный",
+    "pendingLabel": "В Ожидании",
+    "completedStatus": "Завершено",
+    "cancelledStatus": "Отменено"
+  },
+  "visitsSidebar": {
+    "goBack": "Вернуться Назад",
+    "goBackTooltip": "Вернуться к Агентам",
+    "agents": "Агенты",
     "clients": "Клиенты",
     "visits": "Визиты",
-    "statistics": "Статистика",
-    "promos": "Акции",
-    "alerts": "Оповещения",
-    "notifications": "Уведомления",
-    "no_notifications": "Новых уведомлений нет",
-    "clientDetails": {
-      "title": "Детали клиента"
+    "refresh": "Обновить Визиты",
+    "refreshTooltip": "Обновить Визиты",
+    "searchTooltip": "Поиск",
+    "searchAgents": "Искать Агентов",
+    "searchClients": "Искать Клиентов",
+    "id": "ID",
+    "code": "Код",
+    "province": "Провинция",
+    "na": "Н/Д",
+    "pendingVisits": "Есть Визиты в Ожидании",
+    "incompleteVisits": "Есть Незавершенные Визиты",
+    "pendingCount": "{{count}} Визитов в Ожидании",
+    "incompleteCount": "{{count}} Незавершенных Визитов",
+    "unknown": "Неизвестно"
+  },
+  "visitsTable": {
+    "tableAriaLabel": "Таблица Визитов",
+    "type": "Тип",
+    "reason": "Причина",
+    "date": "Дата",
+    "completed": "Завершено",
+    "pending": "В Ожидании",
+    "createdAt": "Создано",
+    "na": "Н/Д",
+    "yes": "Да",
+    "no": "Нет",
+    "selectVisitError": "Не удалось выбрать визит.",
+    "noVisits": "Не найдено визитов для этого клиента.",
+    "unknown": "Неизвестно"
+  },
+  "calendarHook": {
+    "weekendsNotSelectable": "Невозможно выбрать выходные дни.",
+    "pastDateError": "Нельзя создать событие в прошлом.",
+    "selectedDateRange": "Выбранный диапазон дат с {{start}} по {{end}}.",
+    "eventUpdatedSuccess": "Событие успешно обновлено!",
+    "eventCreatedSuccess": "Событие успешно создано!",
+    "eventSubmitFailedWithError": "Не удалось отправить событие: {{error}}",
+    "eventSubmitFailed": "Не удалось отправить событие.",
+    "eventIdMissing": "Отсутствует ID события.",
+    "eventDeletedSuccess": "Событие успешно удалено!",
+    "eventDeleteFailedWithError": "Не удалось удалить событие: {{error}}",
+    "eventDeleteFailed": "Не удалось удалить событие.",
+    "editingEvent": "Редактирование события: {{reason}}",
+    "formCanceled": "Форма отменена.",
+    "switchedToView": "Переключено на {{view}} вид.",
+    "visitEventName": "Визит для ID: {{clientId}}",
+    "selectedVisit": "Выбранный Визит: {{reason}} на {{date}}.",
+    "visitsNotEditable": "Визиты нельзя редактировать в календаре.",
+    "selectedEvent": "Выбранное событие: {{reason}} на {{date}}.",
+    "roleNotAssigned": "Пожалуйста, дождитесь, пока вашему аккаунту не будет назначена роль, прежде чем пытаться войти.",
+    "accountVerificationPending": "Ваш аккаунт все еще проверяется администраторами.",
+    "roleFetchingError": "Не удалось получить роль пользователя.",
+    "errorDuringLogin": "Произошла ошибка при входе: {{error}}",
+    "registrationSuccess": "Регистрация успешна: {{message}}",
+    "registrationFailed": "Регистрация не удалась: {{message}}",
+    "loginFailed": "Вход не удался: {{message}}",
+    "viewModes": {
+      "calendar": "календарь",
+      "history": "история"
     },
-    "details": {
-      "name": "Имя",
-      "phone": "Номер телефона",
-      "totalRevenue": "Общий доход",
-      "pec": "Электронная почта PEC",
-      "extendedTaxCode": "Дополнительный налоговый код",
-      "paymentMethod": "Способ оплаты",
-      "province": "Местоположение",
-      "totalOrders": "Всего заказов",
-      "unpaidRevenue": "Неоплаченный доход",
-      "email": "Электронная почта",
-      "taxCode": "Налоговый код",
-      "paymentMethodID": "ID способа оплаты",
-      "address": "Адрес",
-      "agent": "Агент"
+    "userNotAuthenticated": "Пользователь не авторизован."
+  },
+  "createChatForm": {
+    "title": "Создать Новый Чат",
+    "tooltips": {
+      "groupChat": "Создать Групповой Чат",
+      "broadcastChat": "Создать Чат Рассылки",
+      "cancel": "Отмена",
+      "create": "Создать Чат"
     },
-    "promotions": {
-      "activePromotionsFor": "Активные акции для",
-      "activePromotionsWithClients": "Активные акции с вашими клиентами",
-      "promo1": "Акция 1",
-      "promo2": "Акция 2",
-      "promo3": "Акция 3",
-      "viewMore": "Показать больше"
+    "labels": {
+      "groupName": "Имя Группы",
+      "broadcastName": "Имя Рассылки",
+      "selectParticipants": "Выберите Участников",
+      "cancel": "Отмена",
+      "create": "Создать Чат",
+      "searchUsers": "Поиск Пользователей",
+      "findParticipants": "Найти Участников"
     },
-    "spentThisMonth": {
-      "title": "Потрачено в этом месяце",
-      "iconAlt": "Иконка расходов"
+    "errors": {
+      "noParticipants": "Пожалуйста, выберите хотя бы одного участника.",
+      "chatNameRequired": "Имя чата обязательно.",
+      "createChatFailed": "Не удалось создать чат. Пожалуйста, попробуйте еще раз."
     },
-    "spentThisYear": {
-      "title": "Потрачено в этом году",
-      "iconAlt": "Иконка расходов"
+    "success": {
+      "createChat": "Чат успешно создан!"
     },
-    "topArticleType": {
-      "title": "Самые покупаемые статьи",
-      "iconAlt": "Иконка статей",
-      "amountPurchased": "Количество покупок"
+    "userList": {
+      "table": "Таблица Выбора Пользователей",
+      "unknownUser": "Неизвестный Пользователь",
+      "unknownEmail": "Неизвестный Email",
+      "headers": {
+        "name": "Имя",
+        "email": "Email"
+      }
+    }
+  },
+  "chats": {
+    "error": "Произошла ошибка с чатами:",
+    "defaultTitle": "Чат",
+    "groupTitle": "Групповой Чат"
+  },
+  "errors": {
+    "userNotFound": "Пользователь с ID {{id}} не найден.",
+    "adminNotFound": "Администратор с ID {{id}} не найден.",
+    "unknown": "Произошла неизвестная ошибка.",
+    "unknownAgent": "Неизвестный Агент",
+    "searchFailed": "Поиск не удался. Пожалуйста, попробуйте снова."
+  },
+  "signin": {
+    "loginSuccess": "Вход выполнен успешно!",
+    "registrationSuccess": "Регистрация успешна!",
+    "loginWithGoogleSuccess": "Вход через Google выполнен успешно!",
+    "passwordMismatch": "Пароли не совпадают."
+  },
+  "promoForm": {
+    "success": "Промоакция успешно отправлена!",
+    "updateFailed": "Не удалось отправить промоакцию: {{message}}",
+    "unknownError": "Не удалось отправить промоакцию: произошла неизвестная ошибка."
+  },
+  "usePromos": {
+    "createSuccess": "Промоакция успешно создана!",
+    "createFailed": "Не удалось создать промоакцию: {{message}}",
+    "createUnknownError": "Не удалось создать промоакцию: произошла неизвестная ошибка.",
+    "updateMissingId": "Отсутствует ID промоакции для обновления.",
+    "updateSuccess": "Промоакция успешно обновлена!",
+    "updateFailed": "Не удалось обновить промоакцию: {{message}}",
+    "updateUnknownError": "Не удалось обновить промоакцию: произошла неизвестная ошибка.",
+    "sunsetNoPromoSelected": "Не выбрана промоакция для завершения.",
+    "sunsetMissingId": "Отсутствует ID промоакции для завершения.",
+    "sunsetSuccess": "Промоакция успешно завершена.",
+    "sunsetFailed": "Не удалось завершить промоакцию: {{message}}",
+    "sunsetUnknownError": "Не удалось завершить промоакцию: произошла неизвестная ошибка.",
+    "editNoPromoSelected": "Не выбрана промоакция для редактирования.",
+    "refreshSuccess": "Промоакции успешно обновлены."
+  },
+  "resizeObserver": {
+    "unsupported": "ResizeObserver не поддерживается в вашем браузере. Пожалуйста, обновите или используйте другой браузер."
+  },
+  "useVisits": {
+    "agentSelected": "Агент успешно выбран.",
+    "clientSelected": "Клиент успешно выбран.",
+    "backToAgents": "Возвращено к списку агентов.",
+    "visitCreated": "Визит успешно создан.",
+    "failedToCreateVisit": "Не удалось создать визит. Пожалуйста, попробуйте снова.",
+    "visitsRefreshed": "Визиты успешно обновлены.",
+    "failedToRefreshVisits": "Не удалось обновить визиты. Пожалуйста, попробуйте снова.",
+    "agentNotFound": "Выбранный агент не найден."
+  },
+  "useStatsToasts": {
+    "loadingData": "Загрузка данных...",
+    "successData": "Данные успешно загружены!",
+    "failedData": "Не удалось загрузить данные. Пожалуйста, обновите страницу или вернитесь позже.",
+    "errorMessage": "Ошибка: {{message}}",
+    "unknownError": "Произошла неизвестная ошибка при загрузке данных. Попробуйте обновить страницу или обратитесь в техподдержку.",
+    "retryingData": "Повторная попытка загрузки данных... (Попытка №{{attempt}})"
+  },
+  "webSocketService": {
+    "lostConnection": "Потеряно соединение с сервером, пытаемся подключиться снова...",
+    "connectionEstablished": "Соединение с сервером установлено.",
+    "connectionLost": "Соединение с сервером потеряно, обновите страницу или попробуйте позже."
+  },
+
+  "dashboard": {
+    "welcomeBack": "С возвращением, {{name}}!",
+    "statisticsFor": "Статистика для {{name}}",
+    "yourStatistics": "Ваша Статистика",
+    "calendar": "Календарь",
+    "loadingWelcome": "Загрузка приветствия",
+    "skeleton": "Загрузка контента",
+    "loadingStatistics": "Загрузка статистики",
+    "loadingText": "Загрузка текста",
+    "calendarButton": "Открыть Календарь",
+    "closeButton": "Закрыть Выбор",
+    "activePromotions": "Активные Промоакции",
+    "agentActivityOverview": "Обзор Активности Агента",
+    "spentThisMonth": "Потрачено в Этом Месяце",
+    "spentThisYear": "Потрачено в Этом Году",
+    "topArticleType": "Самые Популярные Товары",
+    "monthOverMonthSpendingTrend": "Тенденция Расходов Месяц за Месяцем",
+    "topBrandsSold": "Самые Популярные Бренды",
+    "totalEarning": "Общий Заработок",
+    "totalOrders": "Общее Количество Заказов",
+    "salesDistribution": "Распределение Продаж",
+    "upcomingVisits": "Предстоящие Визиты",
+    "yourCalendar": "Ваш Календарь"
+  },
+  "articlesPage": {
+    "name": "Название",
+    "brand": "Бренд",
+    "oemId": "ID OEM",
+    "unitPrice": "Цена за единицу",
+    "cost": "Стоимость",
+    "quantitySold": "Количество Продано"
+  },
+  "movementsPage": {
+    "id": "ID списка",
+    "clientName": "Клиент",
+    "agentName": "Агент",
+    "dateOfOrder": "Дата Заказа",
+    "totalQuantity": "Количество проданных товаров",
+    "totalPriceSold": "Общая Стоимость Продажи"
+  },
+  "status": {
+    "pending": "Ожидает",
+    "approved": "Одобрено",
+    "rejected": "Отклонено",
+    "cancelled": "Отменено"
+  },
+  "eventHistoryTooltips": {
+    "approve": "Одобрить Событие",
+    "reject": "Отклонить Событие",
+    "delete": "Удалить Событие",
+    "edit": "Редактировать Событие",
+    "visit": "Перейти к Визиту"
+  },
+  "eventHistory": {
+    "title": "История Событий",
+    "headers": {
+      "user": "Пользователь",
+      "eventType": "Тип События",
+      "reason": "Причина",
+      "startDate": "Дата Начала",
+      "endDate": "Дата Окончания",
+      "status": "Статус",
+      "actions": "Действия"
     },
-    "totalOrder": {
-      "month": "Месяц",
-      "year": "Год",
-      "totalOrders": "Всего заказов"
+    "actions": {
+      "na": "Н/Д"
     },
-    "dashboard": {
-      "totalEarning": "Общий доход"
-    },
-    "upcomingVisits": {
-      "titleForClient": "Предстоящие визиты для {{clientName}}",
-      "titleForAgent": "Ваши предстоящие визиты",
-      "visitPlaceholder1": "Визит 1",
-      "visitPlaceholder2": "Визит 2",
-      "visitPlaceholder3": "Визит 3",
-      "planVisit": "Запланировать визит"
-    },
-    "globalSearch": {
-      "placeholder": "Поиск..."
-    },
-    "searchResults": {
-      "articleId": "OEM статьи: {{articleId}}",
-      "brand": "Бренд: {{brand}}",
-      "lastSoldDate": "Последняя продажа: {{lastSoldDate}}",
-      "province": "Провинция: {{province}}",
-      "phone": "Телефон: {{phone}}",
-      "paymentMethod": "Способ оплаты: {{paymentMethod}}",
-      "discountAmount": "Сумма скидки: {{discountAmount}}",
-      "startDate": "Дата начала: {{startDate}}",
-      "endDate": "Дата окончания: {{endDate}}",
-      "type": "Тип: {{type}}",
-      "noResults": "Результатов не найдено"
-    },
-    "monthOverMonthSpendingTrend": {
-      "title": "Месячная тенденция расходов",
-      "revenue": "Доход"
-    },
-    "salesDistribution": {
-      "title": "Распределение продаж среди клиентов",
-      "revenue": "Доход"
-    },
-    "topBrandsSold": {
-      "title": "Самые продаваемые бренды",
-      "brandLabel": "Бренд"
-    },
-    "clientList": {
-      "title": "Клиенты",
-      "quickFilterPlaceholder": "Быстрый фильтр...",
-      "startDate": "Дата начала",
-      "endDate": "Дата окончания",
-      "exportCSV": "Экспорт CSV"
-    },
-    "movementsHistory": {
-      "date": "Дата",
-      "brand": "Бренд",
-      "oemId": "OEM ID",
-      "name": "Имя",
-      "revenue": "Доход",
-      "cost": "Стоимость"
-    },
-    "agentDashboard": {
-      "welcomeBack": "Добро пожаловать, {{name}}",
-      "statisticsFor": "Статистика для {{name}}",
-      "yourStatistics": "Ваша статистика",
-      "calendar": "Календарь",
-      "viewMore": "Показать больше",
-      "totalEarning": "Общий доход",
-      "totalOrder": "Всего заказов",
-      "spentThisMonth": "Потрачено в этом месяце",
-      "spentThisYear": "Потрачено в этом году",
-      "topArticleType": "Самые покупаемые статьи",
-      "monthOverMonthSpendingTrend": "Месячная тенденция расходов",
-      "topBrandsSold": "Самые продаваемые бренды",
-      "salesDistribution": "Распределение продаж среди клиентов",
-      "upcomingVisits": "Предстоящие визиты для {{name}}"
-    },
-    "clientsPage": {
-      "name": "Имя",
-      "province": "Провинция",
-      "phone": "Номер телефона",
-      "totalOrders": "Всего заказов",
-      "ordersThisMonth": "Заказы в этом месяце",
-      "totalRevenue": "Общий доход",
-      "revenueThisMonth": "Доход в этом месяце",
-      "unpaidRevenue": "Неоплаченный доход",
-      "paymentMethod": "Способ оплаты"
-    },
-    "landingPage": {
-      "welcome": "Добро пожаловать, {name}",
-      "login": "Войти",
-      "enter": "Войти",
-      "userRole": "Роль пользователя",
-      "admin": "Администратор",
-      "agent": "Агент",
-      "client": "Клиент",
-      "selectAgent": "Выбрать агента",
-      "selectClient": "Выбрать клиента",
-      "facebook": "Facebook",
-      "instagram": "Instagram",
-      "googleMaps": "Google Maps",
-      "linkedIn": "LinkedIn",
-      "workingHours": "Пн - Пт, 8:30 - 13:00 и 14:30 - 18:30",
-      "address": "Виа Алессандро Вольта 17, Катания",
-      "phone": "Телефон",
-      "email": "Электронная почта",
-      "vat": "Номер НДС",
-      "credits": "Кредиты: @2024"
+    "toast": {
+      "approveSuccess": "Событие успешно одобрено.",
+      "approveFailure": "Не удалось одобрить событие.",
+      "rejectSuccess": "Событие успешно отклонено.",
+      "rejectFailure": "Не удалось отклонить событие.",
+      "genericError": "Произошла ошибка."
     }
   }
-  
+}
