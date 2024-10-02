@@ -1,11 +1,15 @@
 import os
 
-import numpy as np
-import pandas as pd
-from tqdm import tqdm
+# Set to True for development, False for production
+DEBUG_MODE = False
+
+if DEBUG_MODE:
+    from tqdm import tqdm
 
 
 def vectorized_get_oem_number(df, oem_lookup, IGNORED_BRANDS):
+    import numpy as np
+
     ignored_mask = df["BRAND"].isin(IGNORED_BRANDS)
     keys = list(zip(df["CODICE PRODOTTO"], df["BRAND"].str[:5]))
     oem_numbers = np.array(
@@ -29,24 +33,37 @@ def find_additional_cross_codes(codice_prodotto, padded_oe, cleaned_df, IGNORED_
 
 
 def update_brands(df_output, brands_file_path):
+    import pandas as pd
+
     brands_df = pd.read_csv(brands_file_path, dtype=str)
     brands_df["Brand"] = brands_df["Brand"].astype(str).str.strip()
     brands_df["Match"] = brands_df["Match"].astype(str).str.strip()
-
     brand_lookup = dict(zip(brands_df["Brand"], brands_df["Match"]))
 
-    tqdm.pandas(desc="Updating brands")
-    df_output["BRAND"] = df_output["BRAND"].progress_apply(
-        lambda x: brand_lookup.get(x, x)
-    )
+    if DEBUG_MODE:
+        tqdm.pandas(desc="Updating brands")
+        df_output["BRAND"] = df_output["BRAND"].progress_apply(
+            lambda x: brand_lookup.get(x, x)
+        )
+    else:
+        df_output["BRAND"] = df_output["BRAND"].apply(lambda x: brand_lookup.get(x, x))
+
     return df_output
 
 
 def optimized_cross_code_generation(cleaned_df, ignored_brands):
+    import pandas as pd
+
     cross_references = {}
-    for _, row in tqdm(
-        cleaned_df.iterrows(), total=len(cleaned_df), desc="Generating cross codes"
-    ):
+    iterrows = (
+        tqdm(
+            cleaned_df.iterrows(), total=len(cleaned_df), desc="Generating cross codes"
+        )
+        if DEBUG_MODE
+        else cleaned_df.iterrows()
+    )
+
+    for _, row in iterrows:
         codice_oe = row["CODICE OE"]
         codice_prodotto = row["CODICE PRODOTTO"]
         brand = row["BRAND"]
@@ -57,21 +74,34 @@ def optimized_cross_code_generation(cleaned_df, ignored_brands):
             cross_references[codice_oe].append(codice_prodotto)
 
     cross_codes_series = pd.Series(index=cleaned_df.index, dtype=str)
-    for codice_oe, prodotti in tqdm(
-        cross_references.items(), desc="Updating CODICI CROSS"
-    ):
-        cross_codes = {
-            prodotto: " | ".join([code for code in prodotti if code != prodotto])
-            for prodotto in prodotti
-        }
-        cross_codes_series.update(pd.Series(cross_codes))
+
+    if DEBUG_MODE:
+        for codice_oe, prodotti in tqdm(
+            cross_references.items(), desc="Updating CODICI CROSS"
+        ):
+            cross_codes = {
+                prodotto: " | ".join([code for code in prodotti if code != prodotto])
+                for prodotto in prodotti
+            }
+            cross_codes_series.update(pd.Series(cross_codes))
+    else:
+        for codice_oe, prodotti in cross_references.items():
+            cross_codes = {
+                prodotto: " | ".join([code for code in prodotti if code != prodotto])
+                for prodotto in prodotti
+            }
+            cross_codes_series.update(pd.Series(cross_codes))
 
     return cross_codes_series.fillna("")
 
 
-def process_tulero(merged_df, brands_file_path, old_oems_folder, ignored_brands):
-    # print("process_tulero function started")
+def process_tulero(
+    merged_df, brands_file_path, old_oems_folder, ignored_brands, markup, shipping_cost
+):
+    import numpy as np
+    import pandas as pd
 
+    # print("process_tulero function started")
     # Proceed with the rest of the processing
     merged_df["CODICE OE"] = pd.NA
     merged_df["CODICI CROSS"] = pd.NA
@@ -118,7 +148,13 @@ def process_tulero(merged_df, brands_file_path, old_oems_folder, ignored_brands)
     ]
     all_oem_mappings = pd.DataFrame()
 
-    for file_name in tqdm(old_oems_files, desc="Building old OEM mappings"):
+    iter_old_oems_files = (
+        tqdm(old_oems_files, desc="Building old OEM mappings")
+        if DEBUG_MODE
+        else old_oems_files
+    )
+
+    for file_name in iter_old_oems_files:
         file_path = os.path.join(old_oems_folder, file_name)
         oems_df = pd.read_csv(file_path, dtype=str)
         oems_df["article_altc"] = oems_df["article_altc"].astype(str).str.strip()
@@ -139,15 +175,19 @@ def process_tulero(merged_df, brands_file_path, old_oems_folder, ignored_brands)
         .to_dict()
     )
 
-    # Update CODICE OE using the get_oem_number function
-    tqdm.pandas(desc="Updating CODICE OE with old OEMs")
-    merged_df["CODICE OE"] = vectorized_get_oem_number(
-        merged_df, oem_lookup, ignored_brands
-    )
+    if DEBUG_MODE:
+        tqdm.pandas(desc="Updating CODICE OE with old OEMs")
+        merged_df["CODICE OE"] = vectorized_get_oem_number(
+            merged_df, oem_lookup, ignored_brands
+        )
+    else:
+        merged_df["CODICE OE"] = vectorized_get_oem_number(
+            merged_df, oem_lookup, ignored_brands
+        )
 
     # Update PREZZO based on PRZ. ULT. ACQ.
     merged_df["PREZZO"] = merged_df["PRZ. ULT. ACQ."].apply(
-        lambda x: round(float(x) * 1.25, 2) if pd.notnull(x) else x
+        lambda x: round(float(x) * markup, 2) if pd.notnull(x) else x
     )
     merged_df.drop(columns=["PRZ. ULT. ACQ."], inplace=True)
 
@@ -249,7 +289,7 @@ def process_tulero(merged_df, brands_file_path, old_oems_folder, ignored_brands)
     # print("Filtered out all rows where PREZZO is less than 4.50")
 
     # Add 7.50 to all remaining PREZZO
-    merged_df["PREZZO"] = merged_df["PREZZO"] + 7.50
+    merged_df["PREZZO"] = merged_df["PREZZO"] + shipping_cost
 
     # print("Added 7.50 to all remaining PREZZO")
 

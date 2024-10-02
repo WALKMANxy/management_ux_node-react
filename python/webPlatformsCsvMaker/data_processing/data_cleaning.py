@@ -2,7 +2,11 @@ import os
 import re
 
 import pandas as pd
-from tqdm import tqdm
+
+DEBUG_MODE = False
+
+if DEBUG_MODE:
+    from tqdm import tqdm
 
 
 def is_unnamed(header):
@@ -30,13 +34,18 @@ def validate_other_sheet(df):
 
 
 def load_and_clean_excel_file(file_path, file_type):
-    """print(f"Loading and cleaning the {file_type} file...")
-    print(f"{file_type.capitalize()} file path:", file_path)"""
+    # print(f"Loading and cleaning the {file_type} file...")
+    # print(f"{file_type.capitalize()} file path:", file_path)
     xls = pd.ExcelFile(file_path)
     relevant_sheets = []
     first_sheet_validated = False
 
-    for sheet_name in tqdm(xls.sheet_names, desc=f"Validating {file_type} sheets"):
+    iter_sheets = (
+        tqdm(xls.sheet_names, desc=f"Validating {file_type} sheets")
+        if DEBUG_MODE
+        else xls.sheet_names
+    )
+    for sheet_name in iter_sheets:
         df = pd.read_excel(xls, sheet_name=sheet_name, header=0, dtype=str)
         if not first_sheet_validated:
             if validate_first_sheet(df):
@@ -112,33 +121,22 @@ def load_and_clean_excel_file(file_path, file_type):
             df_combined["GIACENZA"].str.replace(",", "."), errors="coerce"
         )
 
-        # Strip leading/trailing whitespaces from UBICAZIONE
         df_combined["UBICAZIONE"] = df_combined["UBICAZIONE"].astype(str).str.strip()
-
-        # Debugging: Print UBICAZIONE values before filtering
-        """ print("UBICAZIONE values before filtering:")
-        print(df_combined["UBICAZIONE"].unique()) """
 
         # Keep only small items (A, B, C)
         pattern = r"^[A-Ca-c](?:\.|[0-9])"
         valid_small_items = df_combined["UBICAZIONE"].str.match(pattern)
         df_filtered = df_combined[valid_small_items]
 
-        # Debugging: Print the UBICAZIONE values that are being kept
-        """ print("UBICAZIONE values after filtering:")
-        print(df_filtered["UBICAZIONE"].unique()) """
-
-        # Identify and log the rows being filtered out
         filtered_out = df_combined[~valid_small_items]
         if not filtered_out.empty:
-            # print("Rows being filtered out due to UBICAZIONE not matching the pattern:")
-            print(filtered_out[["CODICE PRODOTTO", "BRAND", "UBICAZIONE"]])
+            if DEBUG_MODE:
+                print(filtered_out[["CODICE PRODOTTO", "BRAND", "UBICAZIONE"]])
 
         df_combined = df_filtered
 
     # For articles file, process GIACENZA and PRZ. ULT. ACQ.
     elif file_type == "articles":
-        # Correct GIACENZA conversion for numbers with thousands separators
         df_combined["GIACENZA"] = (
             df_combined["GIACENZA"]
             .str.replace(".", "", regex=False)
@@ -158,16 +156,11 @@ def load_and_clean_excel_file(file_path, file_type):
         df_combined = df_combined[df_combined["GIACENZA"] > 0]
         df_combined = df_combined[df_combined["PRZ. ULT. ACQ."].notna()]
 
-    # Print the cleaned DataFrame
-    """ print(f"\nCleaned {file_type.capitalize()} DataFrame:")
-    print(df_combined) """
-
+    # print(f"\nCleaned {file_type.capitalize()} DataFrame:")
     output_path = "Z:/My Drive/rcs/"
-    # Save the cleaned DataFrame
     output_filename = f"{file_type}File.csv"
     output_file_path = os.path.join(output_path, output_filename)
     df_combined.to_csv(output_file_path, index=False)
-    # print(f"\nSaved cleaned {file_type} file to: {output_file_path}")
 
     return df_combined
 
@@ -220,22 +213,12 @@ def merge_files(articles_file_path, warehouse_file_path):
         descrizione_contains_keywords = any(kw in row["DESCRIZIONE"] for kw in keywords)
         return not (ubicazione_match and not descrizione_contains_keywords)
 
-    tqdm.pandas(desc="Applying additional filtering")
-    merged_df = merged_df[merged_df.progress_apply(filter_condition, axis=1)]
+    if DEBUG_MODE:
+        tqdm.pandas(desc="Applying additional filtering")
+        merged_df = merged_df.progress_apply(filter_condition, axis=1)
+    else:
+        merged_df = merged_df[merged_df.apply(filter_condition, axis=1)]
 
-    # Debugging: Check if specific CODICE PRODOTTO and BRAND are in the final merged_df
-    # print("Checking for specific CODICE PRODOTTO and BRAND in final merged_df:")
-    """ print(
-        merged_df[
-            (merged_df["CODICE PRODOTTO"].isin(test_codes))
-            & (merged_df["BRAND"].isin(test_brands))
-        ]
-    ) """
-
-    # print("Columns in merged_df after merge:", merged_df.columns)
-    # print("Rows in merged_df after merge:", merged_df.shape[0])
-
-    # Drop 'UBICAZIONE' column if not needed in the final output
     merged_df.drop(columns=["UBICAZIONE"], inplace=True)
 
     return merged_df

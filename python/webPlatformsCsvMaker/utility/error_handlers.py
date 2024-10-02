@@ -1,6 +1,7 @@
-# utils/error_handlers.py
 from PyQt6.QtWidgets import QMessageBox
 
+# Set up translation
+from translations import _
 
 def processing_error(main_window, error_message):
     main_window.timer.stop()
@@ -9,11 +10,13 @@ def processing_error(main_window, error_message):
     # Reset button style as needed
 
     msg_box = QMessageBox(main_window)
-    msg_box.setWindowTitle("Processing Complete with Errors")
-    msg_box.setText(f"The following errors occurred:\n{error_message}")
+    msg_box.setWindowTitle(_("Processing Complete with Errors"))
+    msg_box.setText(_("The following errors occurred:\n") + error_message)
     msg_box.setIcon(QMessageBox.Icon.Warning)
-    retry_button = msg_box.addButton("Retry Upload", QMessageBox.ButtonRole.ActionRole)
-    exit_button = msg_box.addButton("Exit", QMessageBox.ButtonRole.ActionRole)
+
+    # Translate the button labels
+    retry_button = msg_box.addButton(_("Retry Upload"), QMessageBox.ButtonRole.ActionRole)
+    exit_button = msg_box.addButton(_("Exit"), QMessageBox.ButtonRole.ActionRole)
     msg_box.exec()
 
     # Check which button was clicked

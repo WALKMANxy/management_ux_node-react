@@ -36,6 +36,14 @@ app_stylesheet = """
         background-color: rgba(0, 255, 0, 1.0);  /* bright green */
         border-radius: 10px;
     }
+    /* Valid input */
+    QLineEdit.valid {
+        border: 2px solid green;
+    }
+    /* Invalid input */
+    QLineEdit.invalid {
+        border: 2px solid red;
+    }
 """
 
 light_stylesheet = """
@@ -73,5 +81,13 @@ light_stylesheet = """
     QProgressBar::chunk {
         background-color: rgba(0, 122, 204, 1.0);  /* blue */
         border-radius: 10px;
+    }
+    /* Valid input */
+    QLineEdit.valid {
+        border: 2px solid green;
+    }
+    /* Invalid input */
+    QLineEdit.invalid {
+        border: 2px solid red;
     }
 """
