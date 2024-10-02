@@ -92,7 +92,7 @@ To build a standalone executable for the application without UPX compression, fo
 3. **Install Required Packages**
 
    ```bash
-   pip install pyinstaller openpyxl PyQt6 pandas xlrd pandarallel
+   pip install pyinstaller openpyxl PyQt6 pandas xlrd pandarallel babel tqdm
    ```
 
 4. **Create the Executable**
@@ -103,7 +103,7 @@ To build a standalone executable for the application without UPX compression, fo
    pyinstaller --clean --onefile --noconsole --noupx --icon=icons/icon256.ico --add-data "icons;icons" --name "TuleroStockUpdater" main.py
 
       console
-   pyinstaller --clean --onefile  --noupx --icon=icons/icon256.ico --add-data "icons;icons" --name "TuleroStockUpdater" main.py
+pyinstaller --clean --onefile --noupx --icon=icons/icon256.ico --add-data "icons;icons" --add-data "translations;translations" --name "WebStockUpdater" main.py
 
 
    ```
