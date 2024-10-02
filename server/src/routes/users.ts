@@ -5,26 +5,24 @@ import { authenticateUser } from "../middlewares/authentication";
 import {
   checkAdminRole,
   checkAgentOrAdminOrClientRole,
+  checkAllowedRole,
 } from "../middlewares/roleChecker";
 import { checkValidation } from "../middlewares/validate";
 
 const router = express.Router();
+router.use(checkAllowedRole);
 
 // Middleware to authenticate user
 router.use(authenticateUser);
 
 // GET method to retrieve all users (Admin only)
-router.get("/", checkAdminRole, UserController.getAllUsers);
+router.get("/", checkAllowedRole, UserController.getAllUsers);
 
 // GET method to retrieve a user by ID
-router.get("/:id", checkAgentOrAdminOrClientRole, UserController.getUserById);
+router.get("/:id", checkAllowedRole, UserController.getUserById);
 
 // POST method to retrieve users by batch of IDs
-router.post(
-  "/batch",
-  checkAgentOrAdminOrClientRole,
-  UserController.getUsersByBatchIds
-);
+router.post("/batch", checkAllowedRole, UserController.getUsersByBatchIds);
 
 // PUT method to replace a user (Admin only)
 router.put(
@@ -61,7 +59,5 @@ router.patch(
   checkValidation,
   UserController.updateUserPassword // Controller method to update password
 );
-
-
 
 export default router;

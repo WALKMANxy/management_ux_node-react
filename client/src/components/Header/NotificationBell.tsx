@@ -1,4 +1,3 @@
-// NotificationBell.tsx
 import { Notifications as NotificationsIcon } from "@mui/icons-material";
 import {
   Badge,
@@ -11,11 +10,20 @@ import {
   Popover,
   Typography,
 } from "@mui/material";
+import { keyframes } from "@mui/system";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import useChatLogic from "../../hooks/useChatsLogic"; // Import the custom hook
 import { formatDateForDivider } from "../../utils/chatUtils";
+import { showToast } from "../../utils/toastMessage";
+
+const shakeAnimation = keyframes`
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+  75% { transform: translateX(-2px); }
+`;
 
 const NotificationBell: React.FC = () => {
   const { t } = useTranslation();
@@ -28,11 +36,16 @@ const NotificationBell: React.FC = () => {
   const unreadChats = getUnreadChats().filter(
     (chat) => chat._id !== currentChat?._id
   );
+
   const handleBellClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget); // Anchor the popover to the bell icon
   };
 
-  const handleChatClick = (chatId: string) => {
+  const handleChatClick = (chatId: string | undefined) => {
+    if (!chatId) {
+      showToast.error("Chat ID is missing.");
+      return;
+    }
     handleSelectChat(chatId); // Select chat using the handler from the hook
     setAnchorEl(null);
     navigate("/messages"); // Navigate to the chat view page
@@ -47,9 +60,22 @@ const NotificationBell: React.FC = () => {
       <IconButton
         color="inherit"
         onClick={handleBellClick}
-        sx={{ color: "white" }}
+        sx={{
+          color: "white",
+          "&:hover": {
+            animation: `${shakeAnimation} 0.3s ease-in-out`,
+          },
+        }}
       >
-        <Badge badgeContent={unreadChats.length} color="secondary">
+        <Badge
+          badgeContent={unreadChats.length}
+          color="secondary"
+          sx={{
+            "& .MuiBadge-badge": {
+              backgroundColor: unreadChats.length > 0 ? "red" : "inherit", // Set to red if there are unread notifications
+            },
+          }}
+        >
           <NotificationsIcon />
         </Badge>
       </IconButton>
@@ -67,11 +93,19 @@ const NotificationBell: React.FC = () => {
           vertical: "top",
           horizontal: "right",
         }}
+        PaperProps={{
+          sx: {
+            backdropFilter: "blur(10px)", // Frosted glass effect
+            backgroundColor: "rgba(255, 255, 255, 0.4)", // Semi-transparent background
+            borderRadius: "8px",
+          },
+        }}
       >
         <Box sx={{ p: 2 }}>
           <Typography variant="h6" component="h2">
             {t("notifications")}
           </Typography>
+          <Divider sx={{ my: 1 }} />
           {unreadChats.length > 0 ? (
             <List>
               {unreadChats.map((chat, index) => (
@@ -79,7 +113,12 @@ const NotificationBell: React.FC = () => {
                   <ListItem
                     button
                     onClick={() => handleChatClick(chat._id)}
-                    sx={{ display: "flex", alignItems: "flex-start" }}
+                    sx={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      boxShadow: "0 1px 4px rgba(0, 0, 0, 0.4)",
+                      borderRadius: "8px"
+                    }}
                   >
                     <ListItemText
                       primary={getChatTitle(chat)}

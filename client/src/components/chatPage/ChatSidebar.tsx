@@ -1,15 +1,20 @@
-//Src/components/chatPage/ChatSidebar.tsx
+// src/components/chatPage/ChatSidebar.tsx
+
+import AddIcon from "@mui/icons-material/Add";
 import ChatIcon from "@mui/icons-material/Chat";
 import ContactsIcon from "@mui/icons-material/Contacts";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SearchIcon from "@mui/icons-material/Search";
+
 import {
   Box,
   IconButton,
   InputAdornment,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
+import "animate.css";
 import React, {
   useCallback,
   useEffect,
@@ -17,16 +22,22 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useAppDispatch } from "../../app/hooks";
-import useChatLogic from "../../hooks/useChatsLogic"; // Hook to manage chat logic
-import ChatList from "./ChatList"; // ChatList Component
-import ContactsList from "./ContactsList";
+import { useTranslation } from "react-i18next";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { selectUserRole } from "../../features/auth/authSlice";
 import { fetchMessagesFromMultipleChatsThunk } from "../../features/chat/chatThunks";
+import useChatLogic from "../../hooks/useChatsLogic";
+import ChatList from "./ChatList";
+import ContactsList from "./ContactsList";
+import CreateChatForm from "./CreateChatForm";
 
 const ChatSidebar: React.FC = () => {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [showContacts, setShowContacts] = useState(false);
-  const animationClass = useRef("animate__fadeInLeft");
+  const [animationClass, setAnimationClass] = useState("animate__fadeInLeft");
+  const [isFirstMount, setIsFirstMount] = useState(true);
+
   const {
     chats,
     filteredContacts,
@@ -35,28 +46,35 @@ const ChatSidebar: React.FC = () => {
     loadingContacts,
   } = useChatLogic();
   const messagesFetched = useRef(false);
-  const contactsFetched = useRef(false); // Ref to track if contacts have been fetched
+  const contactsFetched = useRef(false);
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
+  const [isCreateChatFormOpen, setIsCreateChatFormOpen] = useState(false);
+  const userRole = useAppSelector(selectUserRole);
 
-/*   console.log("ChatSidebar rendering now")
- */
+  // Handle first mount animation
+  useEffect(() => {
+    // After the first mount, set isFirstMount to false
+    setIsFirstMount(false);
+    // Cleanup animation class if necessary
+    return () => {};
+  }, []);
 
-  // Handle toggling between contacts and chats with animations
+  // Determine the animation class
+  const appliedAnimationClass = isFirstMount
+    ? "animate__fadeInLeft animate_faster"
+    : animationClass;
+
   const handleToggleContacts = useCallback(() => {
-    animationClass.current = showContacts
-      ? "animate__fadeOut"
-      : "animate__fadeOut";
-
+    // Apply fadeOut animation
+    setAnimationClass("animate__fadeOut");
+    // After fadeOut, toggle the view and apply fadeIn
     setTimeout(() => {
       setShowContacts((prev) => !prev);
-      animationClass.current = showContacts
-        ? "animate__fadeIn"
-        : "animate__fadeIn";
-    }, 200);
-  }, [showContacts]);
+      setAnimationClass("animate__fadeIn");
+    }, 50); // Duration should match the animation duration
+  }, []);
 
-  // Fetch contacts only once when the component is first rendered
   useEffect(() => {
     if (!contactsFetched.current) {
       fetchContacts();
@@ -64,12 +82,10 @@ const ChatSidebar: React.FC = () => {
     }
   }, [fetchContacts]);
 
-  // Handle manual refresh of contacts when refresh button is clicked
   const handleRefreshContacts = useCallback(() => {
     fetchContacts();
   }, [fetchContacts]);
 
-  // Handle search term changes
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setSearchTerm(e.target.value);
@@ -77,7 +93,6 @@ const ChatSidebar: React.FC = () => {
     []
   );
 
-  // Fetch messages when chats are visible and search term changes
   useEffect(() => {
     if (
       searchTerm &&
@@ -85,7 +100,9 @@ const ChatSidebar: React.FC = () => {
       !showContacts &&
       !messagesFetched.current
     ) {
-      const chatIds = chats.map((chat) => chat._id).filter(Boolean);
+      const chatIds = chats
+        .map((chat) => chat._id || chat.local_id)
+        .filter(Boolean);
       if (chatIds.length > 0) {
         setLoading(true);
         dispatch(fetchMessagesFromMultipleChatsThunk(chatIds)).finally(() =>
@@ -96,7 +113,6 @@ const ChatSidebar: React.FC = () => {
     }
   }, [searchTerm, showContacts, chats, dispatch]);
 
-  // Memoized components for chat and contact lists to avoid unnecessary renders
   const chatList = useMemo(() => {
     return <ChatList searchTerm={searchTerm} loading={loading} />;
   }, [searchTerm, loading]);
@@ -114,18 +130,19 @@ const ChatSidebar: React.FC = () => {
 
   return (
     <Box
-      className={`animate__animated animate_faster ${animationClass.current}`}
+      className={`animate__animated  ${appliedAnimationClass}`}
       sx={{
         p: 2,
         bgcolor: "#ffffff",
         height: "100%",
-        overflowY: "auto",
-        borderTopLeftRadius: 12, // Apply radius to the top-left corner
-        borderBottomLeftRadius: 12, // Apply radius to the bottom-left corner
+        display: "flex",
+        flexDirection: "column",
+        borderTopLeftRadius: 12,
+        borderBottomLeftRadius: 12,
         transition: "all 0.2s ease-in-out",
       }}
     >
-      {/* Header with title and toggle icon */}
+      {/* Header with title and toggle icons */}
       <Box
         display="flex"
         justifyContent="space-between"
@@ -133,17 +150,49 @@ const ChatSidebar: React.FC = () => {
         mb={2}
       >
         <Typography variant="h6" sx={{ fontSize: "2rem" }}>
-          {showContacts ? "Contacts" : "Chats"}
+          {showContacts
+            ? t("chatSidebar.labels.contacts")
+            : t("chatSidebar.labels.chats")}
         </Typography>
         <Box display="flex" alignItems="center">
           {showContacts && (
-            <IconButton onClick={handleRefreshContacts}>
-              <RefreshIcon />
-            </IconButton>
+            <Tooltip title={t("chatSidebar.tooltips.refreshContacts")}>
+              <IconButton
+                onClick={handleRefreshContacts}
+                aria-label={t("chatSidebar.tooltips.refreshContacts")}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
           )}
-          <IconButton onClick={handleToggleContacts}>
-            {showContacts ? <ChatIcon /> : <ContactsIcon />}
-          </IconButton>
+          {userRole === "admin" && !showContacts && (
+            <Tooltip title={t("chatSidebar.tooltips.createChat")}>
+              <IconButton
+                onClick={() => setIsCreateChatFormOpen(true)}
+                aria-label={t("chatSidebar.tooltips.createChat")}
+              >
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+          <Tooltip
+            title={
+              showContacts
+                ? t("chatSidebar.tooltips.showChats")
+                : t("chatSidebar.tooltips.showContacts")
+            }
+          >
+            <IconButton
+              onClick={handleToggleContacts}
+              aria-label={
+                showContacts
+                  ? t("chatSidebar.tooltips.showChats")
+                  : t("chatSidebar.tooltips.showContacts")
+              }
+            >
+              {showContacts ? <ChatIcon /> : <ContactsIcon />}
+            </IconButton>
+          </Tooltip>
         </Box>
       </Box>
 
@@ -151,24 +200,16 @@ const ChatSidebar: React.FC = () => {
       <TextField
         id="outlined-search"
         variant="outlined"
-        placeholder={`Search ${showContacts ? "contacts" : "chats"}`}
+        placeholder={
+          showContacts
+            ? t("chatSidebar.placeholders.searchContacts")
+            : t("chatSidebar.placeholders.searchChats")
+        }
         fullWidth
         value={searchTerm}
-        autoComplete="off" // Prevents autofill suggestions
-        type="search" // Ensures minimal autofill interference
+        autoComplete="off"
+        type="search"
         onChange={handleSearchChange}
-        onFocus={() => {
-          if (!showContacts && chats.length > 0 && !messagesFetched.current) {
-            setLoading(true);
-            const chatIds = chats.map((chat) => chat._id).filter(Boolean);
-            if (chatIds.length > 0) {
-              dispatch(fetchMessagesFromMultipleChatsThunk(chatIds)).finally(
-                () => setLoading(false)
-              );
-              messagesFetched.current = true;
-            }
-          }
-        }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -178,34 +219,56 @@ const ChatSidebar: React.FC = () => {
         }}
         sx={{
           mb: 2,
-          mx: 1, // Adds small margins on the left and right
-          borderRadius: "15px", // Rounded corners
-          width: "calc(100% - 16px)", // Adjusts width to account for the margins
+          mx: 1,
+          borderRadius: "15px",
+          width: "calc(100% - 16px)",
           "& .MuiOutlinedInput-root": {
-            borderRadius: "25px", // Ensure the input itself has rounded corners
+            borderRadius: "25px",
           },
         }}
       />
 
-      {/* Render the memoized components based on the current view */}
+      {/* Scrollable content */}
       <Box
         sx={{
-          position: "relative",
-          display: showContacts ? "none" : "block",
-          opacity: showContacts ? 0 : 1,
+          flex: 1,
+          overflowY: "auto",
+          // Hide the scrollbar
+          "&::-webkitScrollbar": {
+            display: "none",
+          },
+          // For Firefox
+          scrollbarWidth: "none",
+          // For IE and Edge
+          MsOverflowStyle: "none",
         }}
       >
-        {chatList}
+        <Box
+          sx={{
+            position: "relative",
+            display: showContacts ? "none" : "block",
+            opacity: showContacts ? 0 : 1,
+          }}
+        >
+          {chatList}
+        </Box>
+        <Box
+          sx={{
+            position: "relative",
+            display: showContacts ? "block" : "none",
+            opacity: showContacts ? 1 : 0,
+          }}
+        >
+          {contactsList}
+        </Box>
       </Box>
-      <Box
-        sx={{
-          position: "relative",
-          display: showContacts ? "block" : "none",
-          opacity: showContacts ? 1 : 0,
-        }}
-      >
-        {contactsList}
-      </Box>
+
+      {isCreateChatFormOpen && (
+        <CreateChatForm
+          open={isCreateChatFormOpen}
+          onClose={() => setIsCreateChatFormOpen(false)}
+        />
+      )}
     </Box>
   );
 };

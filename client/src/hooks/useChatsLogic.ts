@@ -1,10 +1,10 @@
-import { SerializedError } from "@reduxjs/toolkit";
-import { debounce } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useAppDispatch /* useAppSelector */ } from "../app/hooks";
 import { selectUserId, selectUserRole } from "../features/auth/authSlice";
 import {
+  addChatReducer,
   addMessageReducer,
   clearCurrentChatReducer,
   selectAllChats,
@@ -13,16 +13,13 @@ import {
   setCurrentChatReducer,
   updateReadStatusReducer,
 } from "../features/chat/chatSlice"; // Ensure correct selectors are imported
-import {
-  fetchAllChatsThunk,
-  fetchMessagesThunk,
-} from "../features/chat/chatThunks";
+import { fetchAllChatsThunk } from "../features/chat/chatThunks";
 import { selectClientIds } from "../features/data/dataSlice";
 import { getAllUsersThunk, selectAllUsers } from "../features/users/userSlice";
 import { IChat, IMessage } from "../models/dataModels";
-import { webSocketService } from "../services/webSocketService";
 import { sanitizeSearchTerm } from "../utils/chatUtils";
 import { generateId } from "../utils/deviceUtils";
+import { showToast } from "../utils/toastMessage";
 
 const useChatLogic = () => {
   const dispatch = useAppDispatch();
@@ -38,12 +35,14 @@ const useChatLogic = () => {
   const chats: IChat[] = useSelector(selectAllChats); // Use selector to get all chats
   const currentChat: IChat | null = useSelector(selectCurrentChat); // Allow null values
   const messages = useSelector(selectMessagesFromCurrentChat); // Use selector to get messages of the current chat
-  const [page, setPage] = useState(2); // Start from page 2 since page 1 is already loaded
-  const currentChatId = currentChat?._id;
   const [contactsFetched, setContactsFetched] = useState(false);
-
+  const { t } = useTranslation();
 
   const agentClientIds = useSelector(selectClientIds);
+
+  const currentChatId = useMemo(() => currentChat?._id, [currentChat]);
+
+  
 
   const fetchChats = useCallback(async () => {
     try {
@@ -79,7 +78,7 @@ const useChatLogic = () => {
       const retryDelay = Math.min(32000, 1000 * 2 ** chatRetryCount); // Exponential backoff
 
       const retryTimeout = setTimeout(() => {
-        console.log(`Retry attempt #${chatRetryCount}`);
+        // console.log(`Retry attempt #${chatRetryCount}`);
         fetchChats();
       }, retryDelay);
 
@@ -88,26 +87,48 @@ const useChatLogic = () => {
       };
     }
   }, [chatRetryCount, fetchChats]);
-
   // Select a chat
   const selectChat = useCallback(
     (chat: IChat) => {
-      dispatch(setCurrentChatReducer(chat)); // Set current chat in the state
+      // Determine the chat identifier: use _id if available, otherwise local_id
+      const chatId = chat._id ? chat._id.toString() : chat.local_id;
 
-      // Update read status using existing messages, no need to fetch them again
+      if (!chatId) {
+        console.warn("Chat does not have an _id or local_id:", chat);
+        return;
+      }
+
+      /*   console.log(`Selected chat ID: ${chatId}`); // Debug: Log chat ID
+      console.log(`Chat name: ${chat.name}`); // Debug: Log chat name
+      console.log(`Chat with ${chat.participants.length} members`); // Debug: Log the number of members */
+
+      // Set the current chat in the state
+      dispatch(setCurrentChatReducer(chat));
+
+      // Identify unread messages
       const unreadMessageIds = chat.messages
         .filter(
           (message: IMessage) =>
-            !message.readBy.includes(currentUserId) &&
-            message.sender !== currentUserId
+            !message.readBy
+              .map((id) => id.toString())
+              .includes(currentUserId) &&
+            message.sender.toString() !== currentUserId
         )
-        .map((message) => message.local_id || message._id);
+        .map((message) =>
+          message.local_id
+            ? message.local_id.toString()
+            : message._id.toString()
+        );
+
+      /*   console.log(
+        `Found ${unreadMessageIds.length} unread messages by ${currentUserId} in chat ${chatId}`
+      ); */ // Debug: Log the number of unread messages
 
       // Update read status for unread messages
       if (unreadMessageIds.length > 0) {
         dispatch(
           updateReadStatusReducer({
-            chatId: chat._id,
+            chatId: chatId,
             userId: currentUserId,
             messageIds: unreadMessageIds,
           })
@@ -116,36 +137,6 @@ const useChatLogic = () => {
     },
     [currentUserId, dispatch]
   );
-
-  // Debounced fetch handler to avoid multiple requests
-  const handleLoadMoreMessages = debounce(() => {
-    if (currentChat?._id) {
-      console.log(`Fetching more messages for chat: ${currentChat._id}`); // Debug: Log chat ID
-      console.log(`Current page: ${page}, limit: 20`); // Debug: Log the current page and limit
-
-      // Dispatch the fetchMessagesThunk to load more messages, incrementing the page
-      dispatch(
-        fetchMessagesThunk({
-          chatId: currentChat._id,
-          page: page, // Use the current page
-          limit: 100, // Adjust the limit as needed
-        })
-      )
-        .unwrap()
-        .then(() => {
-          console.log(`Fetched messages successfully for page: ${page}`); // Debug: Log success for current page
-          setPage((prevPage) => {
-            console.log(`Incrementing page to: ${prevPage + 1}`); // Debug: Log next page number
-            return prevPage + 1; // Increment page on successful fetch
-          });
-        })
-        .catch((error: SerializedError) => {
-          console.error("Error loading more messages:", error); // Debug: Log any errors during fetch
-        });
-    } else {
-      console.log("No current chat selected, skipping message fetch."); // Debug: Log when no chat is selected
-    }
-  }, 50);
 
   // Fetch contacts when needed
   const fetchContacts = useCallback(async () => {
@@ -197,20 +188,36 @@ const useChatLogic = () => {
     [currentChatId, currentUserId, dispatch]
   );
 
-  // Chat creation handler using createChatThunk
+  /**
+   * Handles the creation of a new chat.
+   *
+   * @param participants - Array of participant user IDs.
+   * @param chatType - Type of chat: "simple", "group", or "broadcast".
+   * @param name - Optional name for the chat.
+   * @param description - Optional description for the chat.
+   * @param admins - Optional array of admin user IDs (only for "group" and "broadcast" chats).
+   */
   const handleCreateChat = useCallback(
     async (
       participants: string[],
       chatType: "simple" | "group" | "broadcast",
       name?: string,
-      description?: string
+      description?: string,
+      admins?: string[] // New optional admins parameter
     ) => {
       if (!participants.length) return;
+
+      /*  console.log("Create chat:", {
+        participants,
+        chatType,
+        name,
+        description,
+        admins, // Log admins if provided
+      }); */
 
       const localId = generateId();
 
       const chatData: IChat = {
-        _id: localId,
         local_id: localId,
         type: chatType,
         participants,
@@ -219,19 +226,19 @@ const useChatLogic = () => {
         messages: [],
         createdAt: new Date(),
         updatedAt: new Date(),
-        status: "pending",
+        status: "pending", // Indicate that the chat is pending confirmation
+        ...(admins && { admins }), // Conditionally add admins if provided
       };
 
+      /*       console.log("Dispatching to addChatReducer:", chatData);
+       */
       try {
-        // Emit the new chat creation request to the server via WebSocket
-        webSocketService.emitNewChat(chatData);
-        // Alternatively, if using thunks directly:
-        // const createdChat = await dispatch(createChatThunk(chatData)).unwrap();
+        dispatch(addChatReducer({ chat: chatData }));
       } catch (error) {
         console.error("Failed to create chat:", error);
       }
     },
-    []
+    [dispatch]
   );
 
   // Handle selecting a contact to open or create a chat
@@ -249,17 +256,30 @@ const useChatLogic = () => {
         // If chat exists, select it
         selectChat(existingChat);
       } else {
-        // If no chat exists, create a new one
-        handleCreateChat([currentUserId, contactId], "simple");
+        // If no chat exists, create a new one optimistically
+        const localId = generateId();
+
+        const newChat: IChat = {
+          local_id: localId,
+          type: "simple",
+          participants: [currentUserId, contactId],
+          messages: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          status: "pending", // Indicate that the chat is pending confirmation
+        };
+
+        // Optimistically add the new chat to the state
+        dispatch(addChatReducer({ chat: newChat }));
+
+        // Immediately select the new optimistic chat
+        selectChat(newChat);
       }
     },
-    [chats, currentUserId, handleCreateChat, selectChat]
+    [chats, currentUserId, dispatch, selectChat]
   );
 
   const filteredContacts = useMemo(() => {
-    // Log the current user ID for reference
-    /*     console.log("Current User ID:", currentUserId);
-     */
     // Filter contacts based on the user role and exclude the current user
     if (userRole === "admin") {
       // Admin sees all users except themselves
@@ -289,9 +309,9 @@ const useChatLogic = () => {
     }
 
     // Default return if no contacts are found
-    console.log(
+    /* console.log(
       "User role not recognized or no contacts found. Returning empty array."
-    );
+    ); */
     return [];
   }, [users, userRole, agentClientIds, currentUserId]); // Dependencies array
 
@@ -346,12 +366,13 @@ const useChatLogic = () => {
     (chat: IChat) => {
       if (!currentUserId) return 0;
       return chat.messages.filter(
-        (message) => !message.readBy.includes(currentUserId)
+        (message) =>
+          !message.readBy.includes(currentUserId) &&
+          message.sender !== currentUserId
       ).length;
     },
     [currentUserId]
   );
-
   // Function to handle returning to the sidebar on mobile
   const handleBackToChats = () => {
     dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
@@ -381,7 +402,7 @@ const useChatLogic = () => {
     }
   };
 
-  // Custom hook to find the message inside the state by local_id
+  /*  // Custom hook to find the message inside the state by local_id
   const useStateMessage = (
     chatId: string | undefined,
     localId: string | undefined
@@ -405,8 +426,16 @@ const useChatLogic = () => {
           `Message with local_id ${localId} not found in chat ${chatId}.`
         );
       }
+
+      return stateMessage;
     });
-  };
+  }; */
+
+  useEffect(() => {
+    if (chatError) {
+      showToast.error(t("chats.error", { error: chatError }));
+    }
+  }, [chatError, t]);
 
   return {
     chats: Object.values(chats),
@@ -425,11 +454,11 @@ const useChatLogic = () => {
     getFilteredAndSortedChats,
     getChatTitle,
     getUnreadCount,
-    handleLoadMoreMessages,
     handleBackToChats,
     getUnreadChats,
     handleSelectChat,
-    useStateMessage,
+    /*     useStateMessage,
+     */
   };
 };
 

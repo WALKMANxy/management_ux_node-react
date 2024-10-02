@@ -1,5 +1,7 @@
 import { AuthState } from "../models/stateModels";
 
+
+
 /**
  * Loads the authentication state from localStorage.
  * @returns The parsed AuthState or undefined if not found or invalid.
@@ -30,7 +32,8 @@ export const loadAuthState = (): AuthState | undefined => {
  * @param state - The AuthState to be saved.
  */
 export const saveAuthState = (state: AuthState): void => {
-  try {
+  /*   console.debug("Saving auth state to localStorage:", state);
+   */ try {
     const serializedState = JSON.stringify(state);
     localStorage.setItem("authState", serializedState);
   } catch (err) {
@@ -43,19 +46,14 @@ export const saveAuthState = (state: AuthState): void => {
  * @param obj - The object to check.
  * @returns True if the object is a valid AuthState, false otherwise.
  */
-function isAuthState(obj: unknown): obj is AuthState {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const isAuthState = (obj: any): obj is AuthState => {
   return (
     typeof obj === "object" &&
     obj !== null &&
-    "isLoggedIn" in obj &&
-    typeof (obj as AuthState).isLoggedIn === "boolean" &&
-    "role" in obj &&
-    typeof (obj as AuthState).role === "string" && // Assuming userRole is of string type or validate as per actual enum/type
-    "id" in obj &&
-    (typeof (obj as AuthState).id === "string" ||
-      (obj as AuthState).id === null) &&
-    "userId" in obj &&
-    (typeof (obj as AuthState).userId === "string" ||
-      (obj as AuthState).userId === null)
+    typeof obj.isLoggedIn === "boolean" &&
+    typeof obj.role === "string" &&
+    (typeof obj.id === "string" || obj.id === null) &&
+    (typeof obj.userId === "string" || obj.userId === null)
   );
-}
+};

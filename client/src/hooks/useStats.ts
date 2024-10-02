@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { RootState } from "../app/store";
 import {
@@ -6,12 +6,10 @@ import {
   selectAgent,
   selectClient,
 } from "../features/data/dataSlice";
-import { fetchInitialData, getPromos, getVisits } from "../features/data/dataThunks";
 import { Movement } from "../models/dataModels";
 import { TopArticleType } from "../models/dataSetTypes";
-import { Agent, Client, User } from "../models/entityModels";
+import { Agent, Client } from "../models/entityModels";
 import { DataSliceState } from "../models/stateModels";
-import { updateUserEntityNameIfMissing } from "../utils/checkUserName";
 import {
   calculateMonthlyData,
   calculateMonthlyRevenue,
@@ -29,105 +27,74 @@ import {
   getAdjustedClients,
   getMovementsByRole,
 } from "../utils/dataUtils";
+import useLoadingData from "./useLoadingData";
+
+interface SalesDistributionData {
+  agents: Agent[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any[]; // Replace `any` with the actual type
+}
+
+interface ComparativeStatistics {
+  revenuePercentage: string;
+  ordersPercentage: string;
+}
 
 const useStats = (isMobile: boolean) => {
   const dispatch = useAppDispatch();
 
-  const [localError, setLocalError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [retryCount, setRetryCount] = useState<number>(0); // Track retry attempts
+  const {
+    localError,
+    clients,
+    agents,
+    role,
+    currentUserData,
+    currentUserDetails,
+    error,
+  } = useLoadingData();
 
   // Get data from the dataSlice
   const {
-    clients, // List of clients
-    agents,
-    currentUserData, // Current logged-in user's data
-    currentUserDetails, // Current logged-in user's details
     selectedClientId, // ID of the currently selected client
     selectedAgentId, // ID of the currently selected agent
-    status, // Status of data fetch (loading, success, error)
-    error, // Error message if data fetch fails
   } = useAppSelector<RootState, DataSliceState>((state) => state.data);
 
-  // Select currentUser from userSlice
-  const currentUser = useAppSelector<RootState, Partial<User> | null>(
-    (state) => state.users.currentUser
-  );
+  // Precompute current date details
+  const currentDate = useMemo(() => new Date(), []);
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
 
-  // Extract the role from currentUserDetails
-  const role = currentUserDetails?.role;
+  // Precompute maps for agents and their clients
+  const agentsMap = useMemo<Map<string, Agent>>(() => {
+    const map = new Map<string, Agent>();
 
-  const agentDetails = agents;
+    Object.values(agents).forEach((agent) => {
+      map.set(agent.id, agent);
+    });
 
-  // Determine if data needs to be fetched
-  const shouldFetchData =
-    status !== "succeeded" &&
-    (Object.keys(clients).length === 0 ||
-      Object.keys(agents).length === 0 ||
-      !currentUserData ||
-      !currentUserDetails);
+    return map;
+  }, [agents]);
 
-  useEffect(() => {
-    if (!shouldFetchData) {
-      return; // Data is already fetched; no need to refetch
-    }
+  const agentClientsMap = useMemo<Map<string, Client[]>>(() => {
+    const map = new Map<string, Client[]>();
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        await dispatch(fetchInitialData()).unwrap();
-
-
-        await Promise.all([
-          dispatch(getVisits()).unwrap(),
-          dispatch(getPromos()).unwrap(),
-        ]);
-        setLocalError(null);
-        setRetryCount(0); // Reset retryCount only when data fetch is successful
-
-        // Call the utility function to update entity name if missing
-        updateUserEntityNameIfMissing(
-          dispatch,
-          currentUser,
-          currentUserDetails
-        );
-      } catch (err: unknown) {
-        console.error("Error fetching initial data:", err); // Debug: Error case
-        if (err instanceof Error) {
-          setLocalError(err.message);
-          console.log(`Error message: ${err.message}`); // Debug: Specific error message
-        } else {
-          setLocalError("An unknown error occurred while fetching data.");
-          console.log("Unknown error occurred while fetching data."); // Debug: Unknown error
-        }
-
-        if (retryCount < 5) {
-          setRetryCount((prevCount) => prevCount + 1);
-          console.log(`Retry count incremented: ${retryCount + 1}`); // Debug: Retry count update
-        }
-      } finally {
-        setLoading(false);
+    Object.values(clients).forEach((client) => {
+      const agentId = client.agent;
+      if (!map.has(agentId)) {
+        map.set(agentId, []);
       }
-    };
+      map.get(agentId)!.push(client);
+    });
 
-    fetchData();
-  }, );
+    return map;
+  }, [clients]);
 
-  // Retry mechanism: Automatically re-attempt fetching data if an error occurs
-  useEffect(() => {
-    if (retryCount > 0 && retryCount <= 5) {
-      console.log(`Retry attempt #${retryCount}`); // Debug: Retry attempt
-      const retryTimeout = setTimeout(() => {
-        console.log("Retrying fetchInitialData"); // Debug: Retrying action
-        fetchInitialData(); // Explicitly call fetchData instead of dispatching again
-      }, 5000); // Retry after 5 seconds
+  // Sales Distribution Data Clients precomputed
+  const salesDistributionDataClients = useMemo(() => {
+    if (!currentUserData) return [];
 
-      return () => {
-        console.log("Clearing retry timeout"); // Debug: Clearing timeout
-        clearTimeout(retryTimeout); // Cleanup timeout on unmount or retryCount change
-      };
-    }
-  }, [retryCount]); // Only retryCount should trigger this effect
+    return calculateSalesDistributionData(Object.values(clients), isMobile);
+  }, [currentUserData, clients, isMobile]);
 
   // Create memoized selectors for selectedClient and selectedAgent
   const selectedClient = useMemo(
@@ -158,22 +125,24 @@ const useStats = (isMobile: boolean) => {
     },
     [dispatch]
   );
+
+  // Calculation Functions
   const calculateTotalSpentThisMonth = useCallback((movements: Movement[]) => {
-    const totalSpent = calculateMonthlyRevenue(movements);
-    return totalSpent;
+    return calculateMonthlyRevenue(movements);
   }, []);
 
-  const calculateTotalSpentThisYear = useCallback((movements: Movement[]) => {
-    const currentYear = new Date().getFullYear();
-    return calculateTotalSpentForYear(movements, currentYear);
-  }, []);
+  const calculateTotalSpentThisYear = useCallback(
+    (movements: Movement[]) => {
+      return calculateTotalSpentForYear(movements, currentYear);
+    },
+    [currentYear]
+  );
 
   const calculateTotalSpentThisYearForAgents = useCallback(
     (clients: Client[]) => {
-      const currentYear = new Date().getFullYear();
       return calculateTotalSpentForYearForClients(clients, currentYear);
     },
-    []
+    [currentYear]
   );
 
   const calculateTopArticleType = useCallback(
@@ -183,56 +152,47 @@ const useStats = (isMobile: boolean) => {
     []
   );
 
-  const totalRevenue = useMemo<number>(() => {
-    if (!currentUserData || !role) return 0;
+  // Cached Percentage Calculation
+  const calculatePercentageCached = useMemo(() => {
+    const cache = new Map<string, string>();
 
-    const clientList = getAdjustedClients(role, currentUserData, clients);
-    return parseFloat(calculateTotalRevenue(clientList));
-  }, [role, currentUserData, clients]);
+    return (part: number, total: number): string => {
+      const key = `${part}-${total}`;
+      if (cache.has(key)) return cache.get(key)!;
 
-  const totalOrders = useMemo<number>(() => {
-    if (!currentUserData || !role) return 0;
+      const percentage =
+        total === 0 ? "0.00" : calculatePercentage(part, total);
+      cache.set(key, percentage);
+      return percentage;
+    };
+  }, []);
 
-    const clientList = getAdjustedClients(role, currentUserData, clients);
-    return calculateTotalOrders(clientList);
-  }, [role, currentUserData, clients]);
-
-  const topBrandsData = useMemo(() => {
-    if (!currentUserData || !role) return [];
-
-    const movements = getMovementsByRole(role, currentUserData, clients);
-    return calculateTopBrandsData(movements);
-  }, [role, currentUserData, clients]);
-
-  const salesDistributionDataAgents = useMemo(() => {
+  // Sales Distribution Data for Agents
+  const salesDistributionDataAgents = useMemo<SalesDistributionData>(() => {
     if (!currentUserDetails) {
       return { agents: [], data: [] };
     }
 
     if (role === "admin") {
-      const agentsMap = Object.values(clients).reduce((acc, client) => {
-        const agentId = client.agent;
-        if (!acc[agentId]) {
-          const agentDetail = agentDetails[agentId];
-          acc[agentId] = {
-            id: agentId,
-            name: agentDetail ? agentDetail.name : `Agent ${agentId}`,
-            clients: [],
-          };
-        }
-        acc[agentId].clients.push(client);
-        return acc;
-      }, {} as { [key: string]: Agent });
+      const agentsList: Agent[] = [];
 
-      const agents = Object.values(agentsMap);
+      agentClientsMap.forEach((clientsList, agentId) => {
+        const agentDetail = agentsMap.get(agentId);
+        agentsList.push({
+          id: agentId,
+          name: agentDetail ? agentDetail.name : `Agent ${agentId}`,
+          clients: clientsList,
+        });
+      });
 
-      const data = calculateSalesDistributionDataForAgents(agents, isMobile);
-
-      return { agents, data };
-    } else if (role === "agent") {
-      const agentClients = Object.values(clients).filter(
-        (client) => client.agent === currentUserDetails.id
+      const data = calculateSalesDistributionDataForAgents(
+        agentsList,
+        isMobile
       );
+
+      return { agents: agentsList, data };
+    } else if (role === "agent") {
+      const agentClients = agentClientsMap.get(currentUserDetails.id) || [];
 
       const data = calculateSalesDistributionData(agentClients, isMobile);
 
@@ -243,25 +203,13 @@ const useStats = (isMobile: boolean) => {
   }, [
     role,
     currentUserDetails,
-    agentDetails,
-    clients,
+    agentsMap,
+    agentClientsMap,
     currentUserData,
     isMobile,
   ]);
 
-  const salesDistributionDataClients = useMemo(() => {
-    if (!currentUserData) return [];
-
-    if (role === "admin") {
-      return calculateSalesDistributionData(Object.values(clients), isMobile);
-    } else if (role === "agent") {
-      // Use the existing association from agentDetails if available
-      const agentData = agents[currentUserData.id];
-      return calculateSalesDistributionData(agentData?.clients || [], isMobile);
-    }
-    return [];
-  }, [role, currentUserData, clients, agents, isMobile]);
-
+  // Monthly Revenue and Orders Data
   const { months, revenueData, ordersData } = useMemo(() => {
     if (!currentUserData)
       return { months: [], revenueData: [], ordersData: [] };
@@ -270,9 +218,7 @@ const useStats = (isMobile: boolean) => {
 
     switch (role) {
       case "agent":
-        clientData = Object.values(clients).filter(
-          (client) => client.agent === currentUserData.id
-        );
+        clientData = agentClientsMap.get(currentUserData.id) || [];
         break;
       case "client":
         clientData = [currentUserData as Client];
@@ -280,40 +226,42 @@ const useStats = (isMobile: boolean) => {
       case "admin":
         clientData = Object.values(clients);
         break;
+      default:
+        clientData = [];
     }
 
     return calculateMonthlyData(clientData);
-  }, [role, currentUserData, clients]);
+  }, [role, currentUserData, agentClientsMap, clients]);
 
-  const yearlyOrders = useMemo(() => {
-    return ordersData.reduce<{ [key: number]: number }>(
-      (acc, orders, index) => {
-        const year = parseInt(months[index].split("-")[0]);
-        acc[year] = (acc[year] || 0) + orders;
-        return acc;
-      },
-      {}
-    );
+  // Yearly Orders Data
+  const { yearlyCategories, yearlyOrdersData } = useMemo(() => {
+    const ordersByYear: Record<number, number> = {};
+
+    for (let i = 0; i < ordersData.length; i++) {
+      const year = parseInt(months[i].split("-")[0], 10);
+      ordersByYear[year] = (ordersByYear[year] || 0) + ordersData[i];
+    }
+
+    const categories = Object.keys(ordersByYear)
+      .map(Number)
+      .sort((a, b) => a - b)
+      .map(String);
+    const data = categories.map((year) => ordersByYear[Number(year)]);
+
+    return { yearlyCategories: categories, yearlyOrdersData: data };
   }, [ordersData, months]);
 
-  const yearlyCategories = useMemo(() => {
-    return Object.keys(yearlyOrders).map((year) => year);
-  }, [yearlyOrders]);
-
-  const yearlyOrdersData = useMemo(() => {
-    return yearlyCategories.map((year) => yearlyOrders[parseInt(year)]);
-  }, [yearlyCategories, yearlyOrders]);
-
-  const clientComparativeStatistics = useMemo(() => {
+  // Comparative Statistics for Clients
+  const clientComparativeStatistics = useMemo<ComparativeStatistics>(() => {
     if (!selectedClient || Object.keys(clients).length === 0) {
       return { revenuePercentage: "0.00", ordersPercentage: "0.00" };
     }
 
     const clientRevenue = parseFloat(selectedClient.totalRevenue);
-    const totalRevenueAllClients = parseFloat(
-      calculateTotalRevenue(Object.values(clients))
+    const totalRevenueAllClients = calculateTotalRevenue(
+      Object.values(clients)
     );
-    const revenuePercentage = calculatePercentage(
+    const revenuePercentage = calculatePercentageCached(
       clientRevenue,
       totalRevenueAllClients
     );
@@ -322,139 +270,176 @@ const useStats = (isMobile: boolean) => {
       (sum, client) => sum + client.movements.length,
       0
     );
-    const ordersPercentage = calculatePercentage(
+    const ordersPercentage = calculatePercentageCached(
       selectedClient.movements.length,
       totalOrdersAllClients
     );
 
     return { revenuePercentage, ordersPercentage };
-  }, [selectedClient, clients]);
+  }, [selectedClient, clients, calculatePercentageCached]);
 
-  const clientComparativeStatisticsMonthly = useMemo(() => {
-    if (!selectedClient || Object.keys(clients).length === 0) {
-      return { revenuePercentage: "0.00", ordersPercentage: "0.00" };
-    }
+  // Monthly Comparative Statistics for Clients
+  const clientComparativeStatisticsMonthly =
+    useMemo<ComparativeStatistics>(() => {
+      if (!selectedClient || Object.keys(clients).length === 0) {
+        return { revenuePercentage: "0.00", ordersPercentage: "0.00" };
+      }
 
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
+      const selectedMovements = filterCurrentMonthMovements(
+        selectedClient.movements,
+        currentMonth,
+        currentYear
+      );
+      const allMovements = Object.values(clients).flatMap((client) =>
+        filterCurrentMonthMovements(client.movements, currentMonth, currentYear)
+      );
 
-    const selectedMovements = filterCurrentMonthMovements(
-      selectedClient.movements,
+      const selectedMonthlyTotal = calculateRevenue(selectedMovements);
+      const allMonthlyTotal = calculateRevenue(allMovements);
+      const revenuePercentage = calculatePercentageCached(
+        selectedMonthlyTotal,
+        allMonthlyTotal
+      );
+      const ordersPercentage = calculatePercentageCached(
+        selectedMovements.length,
+        allMovements.length
+      );
+
+      return { revenuePercentage, ordersPercentage };
+    }, [
+      selectedClient,
+      clients,
       currentMonth,
-      currentYear
-    );
-    const allMovements = Object.values(clients).flatMap((client) =>
-      filterCurrentMonthMovements(client.movements, currentMonth, currentYear)
-    );
+      currentYear,
+      calculatePercentageCached,
+    ]);
 
-    const selectedMonthlyTotal = calculateRevenue(selectedMovements);
-    const allMonthlyTotal = calculateRevenue(allMovements);
-    const revenuePercentage = calculatePercentage(
-      selectedMonthlyTotal,
-      allMonthlyTotal
-    );
-    const ordersPercentage = calculatePercentage(
-      selectedMovements.length,
-      allMovements.length
-    );
-
-    return { revenuePercentage, ordersPercentage };
-  }, [selectedClient, clients]);
-
-  const agentComparativeStatistics = useMemo(() => {
+  // Comparative Statistics for Agents
+  const agentComparativeStatistics = useMemo<ComparativeStatistics>(() => {
     if (!selectedAgent || Object.keys(clients).length === 0) {
       return { revenuePercentage: "0.00", ordersPercentage: "0.00" };
     }
 
-    const agentClients = Object.values(clients).filter(
-      (client) => client.agent === selectedAgent.id
-    );
+    const agentClients = agentClientsMap.get(selectedAgent.id) || [];
 
-    const agentRevenue = parseFloat(calculateTotalRevenue(agentClients));
-    const totalRevenueAllClients = parseFloat(
-      calculateTotalRevenue(Object.values(clients))
+    const agentRevenue = calculateTotalRevenue(agentClients);
+    const totalRevenueAllClients = calculateTotalRevenue(
+      Object.values(clients)
     );
-    const revenuePercentage = calculatePercentage(
+    const revenuePercentage = calculatePercentageCached(
       agentRevenue,
       totalRevenueAllClients
     );
 
     const agentOrders = calculateTotalOrders(agentClients);
     const totalOrdersAllClients = calculateTotalOrders(Object.values(clients));
-    const ordersPercentage = calculatePercentage(
+    const ordersPercentage = calculatePercentageCached(
       agentOrders,
       totalOrdersAllClients
     );
 
     return { revenuePercentage, ordersPercentage };
-  }, [selectedAgent, clients]);
+  }, [selectedAgent, clients, agentClientsMap, calculatePercentageCached]);
 
-  const agentComparativeStatisticsMonthly = useMemo(() => {
-    if (!selectedAgent || Object.keys(clients).length === 0) {
-      return { revenuePercentage: "0.00", ordersPercentage: "0.00" };
-    }
+  // Monthly Comparative Statistics for Agents
+  const agentComparativeStatisticsMonthly =
+    useMemo<ComparativeStatistics>(() => {
+      if (!selectedAgent || Object.keys(clients).length === 0) {
+        return { revenuePercentage: "0.00", ordersPercentage: "0.00" };
+      }
 
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
+      const agentClients = agentClientsMap.get(selectedAgent.id) || [];
 
-    const agentClients = Object.values(clients).filter(
-      (client) => client.agent === selectedAgent.id
-    );
+      const selectedMonthlyTotal = agentClients.reduce((total, client) => {
+        const movements = filterCurrentMonthMovements(
+          client.movements,
+          currentMonth,
+          currentYear
+        );
+        return total + calculateRevenue(movements);
+      }, 0);
 
-    const selectedMonthlyTotal = agentClients.reduce(
-      (total, client) =>
-        total +
-        calculateRevenue(
+      const allMonthlyTotal = Object.values(clients).reduce((total, client) => {
+        const movements = filterCurrentMonthMovements(
+          client.movements,
+          currentMonth,
+          currentYear
+        );
+        return total + calculateRevenue(movements);
+      }, 0);
+
+      const revenuePercentage = calculatePercentageCached(
+        selectedMonthlyTotal,
+        allMonthlyTotal
+      );
+
+      const selectedOrdersTotal = agentClients.reduce((total, client) => {
+        return (
+          total +
           filterCurrentMonthMovements(
             client.movements,
             currentMonth,
             currentYear
-          )
-        ),
-      0
-    );
+          ).length
+        );
+      }, 0);
 
-    const allMonthlyTotal = Object.values(clients).reduce(
-      (total, client) =>
-        total +
-        calculateRevenue(
+      const allOrdersTotal = Object.values(clients).reduce((total, client) => {
+        return (
+          total +
           filterCurrentMonthMovements(
             client.movements,
             currentMonth,
             currentYear
-          )
-        ),
-      0
-    );
+          ).length
+        );
+      }, 0);
 
-    const revenuePercentage = calculatePercentage(
-      selectedMonthlyTotal,
-      allMonthlyTotal
-    );
+      const ordersPercentage = calculatePercentageCached(
+        selectedOrdersTotal,
+        allOrdersTotal
+      );
 
-    const selectedOrdersTotal = agentClients.reduce(
-      (total, client) =>
-        total +
-        filterCurrentMonthMovements(client.movements, currentMonth, currentYear)
-          .length,
-      0
-    );
+      return { revenuePercentage, ordersPercentage };
+    }, [
+      selectedAgent,
+      clients,
+      agentClientsMap,
+      currentMonth,
+      currentYear,
+      calculatePercentageCached,
+    ]);
 
-    const allOrdersTotal = Object.values(clients).reduce(
-      (total, client) =>
-        total +
-        filterCurrentMonthMovements(client.movements, currentMonth, currentYear)
-          .length,
-      0
-    );
+  // Top Brands Data
+  const topBrandsData = useMemo(() => {
+    if (!currentUserData || !role) return [];
 
-    const ordersPercentage = calculatePercentage(
-      selectedOrdersTotal,
-      allOrdersTotal
-    );
+    const movements = getMovementsByRole(role, currentUserData, clients);
+    return calculateTopBrandsData(movements);
+  }, [role, currentUserData, clients]);
 
-    return { revenuePercentage, ordersPercentage };
-  }, [selectedAgent, clients]);
+  // Top Article Types
+  const topArticleTypes = useMemo<TopArticleType[]>(() => {
+    if (!currentUserData || !role) return [];
+
+    const movements = getMovementsByRole(role, currentUserData, clients);
+    return calculateTopArticleTypeUtil(movements);
+  }, [role, currentUserData, clients]);
+
+  // Total Revenue and Orders
+  const totalRevenue = useMemo<number>(() => {
+    if (!currentUserData || !role) return 0;
+
+    const clientList = getAdjustedClients(role, currentUserData, clients);
+    return calculateTotalRevenue(clientList);
+  }, [role, currentUserData, clients]);
+
+  const totalOrders = useMemo<number>(() => {
+    if (!currentUserData || !role) return 0;
+
+    const clientList = getAdjustedClients(role, currentUserData, clients);
+    return calculateTotalOrders(clientList);
+  }, [role, currentUserData, clients]);
 
   return {
     details: currentUserData,
@@ -470,6 +455,7 @@ const useStats = (isMobile: boolean) => {
     totalRevenue,
     totalOrders,
     topBrandsData,
+    topArticleTypes,
     salesDistributionDataClients,
     salesDistributionDataAgents,
     months,
@@ -481,7 +467,6 @@ const useStats = (isMobile: boolean) => {
     clientComparativeStatisticsMonthly,
     agentComparativeStatistics,
     agentComparativeStatisticsMonthly,
-    isLoading: loading || status === "loading",
     error: localError || error, // Prefer local error if set, otherwise Redux error
   };
 };

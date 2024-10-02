@@ -23,7 +23,6 @@ const useLoadOlderMessages = (currentChatId: string | null) => {
   }, [currentChatId]);
 
   // Scroll to bottom when chat changes
-  // Scroll to bottom when chat changes
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (container) {
@@ -60,17 +59,26 @@ const useLoadOlderMessages = (currentChatId: string | null) => {
     prevMessagesLength.current = messages.length;
   }, [messages, currentUserId]);
 
-  const oldestMessage = useMemo(() => messages[0], [messages]);
+  const oldestMessage = useMemo(() => messages[0] || null, [messages]);
 
   const handleLoadOlderMessages = useCallback(async () => {
-    if (!currentChatId || loading || !hasMoreMessages) return;
+    if (
+      !currentChatId ||
+      loading ||
+      !hasMoreMessages ||
+      !oldestMessage ||
+      messages.length <= 20
+    )
+      return;
 
     const container = messagesContainerRef.current;
     if (container) {
       const scrollHeightBeforeFetch = container.scrollHeight;
       const scrollTopBeforeFetch = container.scrollTop;
 
-      const oldestTimestamp = new Date(oldestMessage.timestamp);
+      const oldestTimestamp = oldestMessage
+        ? new Date(oldestMessage.timestamp)
+        : new Date();
 
       setLoading(true);
       try {
@@ -104,21 +112,28 @@ const useLoadOlderMessages = (currentChatId: string | null) => {
     currentChatId,
     loading,
     hasMoreMessages,
-    oldestMessage.timestamp,
     dispatch,
+    oldestMessage,
+    messages.length,
   ]);
 
   // Use useInView to detect when the top element is in view
   const { ref: topRef, inView } = useInView({
     threshold: 0.1,
-    rootMargin: '100px', // Adjust as needed
+    rootMargin: "100px", // Adjust as needed
   });
   // Load older messages when the top element comes into view
   useEffect(() => {
-    if (inView && hasMoreMessages && !loading) {
+    if (inView && hasMoreMessages && !loading && oldestMessage) {
       handleLoadOlderMessages();
     }
-  }, [inView, hasMoreMessages, loading, handleLoadOlderMessages]);
+  }, [
+    inView,
+    hasMoreMessages,
+    loading,
+    handleLoadOlderMessages,
+    oldestMessage,
+  ]);
 
   return { messagesContainerRef, topRef };
 };

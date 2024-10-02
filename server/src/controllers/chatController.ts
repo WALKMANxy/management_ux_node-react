@@ -127,11 +127,11 @@ export class ChatController {
       };
 
 
-    console.log("Received Request with Parameters:", {
+   /*  console.log("Received Request with Parameters:", {
       chatId,
       oldestTimestamp,
       limit,
-    });
+    }); */
 
 
 
@@ -162,8 +162,8 @@ export class ChatController {
       );
 
       // Debug: Log the messages received from the service
-    console.log("Messages Received from Service:", messages);
-
+/*     console.log("Messages Received from Service:", messages);
+ */
       // Return the fetched messages
       res.status(200).json(messages);
     } catch (error) {

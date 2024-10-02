@@ -1,21 +1,21 @@
 // DrawerContainer.tsx
+import { Box, Drawer, Paper } from "@mui/material";
 import React from "react";
-import { Box, Drawer,  Paper } from "@mui/material";
-import CalendarComponent from "./CalendarComponent"; // Adjust the import path if needed
-import UpcomingVisits from "./UpcomingVisits"; // Adjust the import path if needed
+import CalendarComponent from "./CalendarComponent";
+import UpcomingVisits from "./UpcomingVisits";
 
 interface DrawerContainerProps {
   open: boolean;
   onClose: () => void;
-  isLoading: boolean;
-  fabPosition?: { top: number; left: number }; // Optional position prop for positioning
+  fabPosition?: { top: number; left: number };
+  disableUpcomingVisits?: boolean; // Position of FAB for drawer placement
 }
 
 const DrawerContainer: React.FC<DrawerContainerProps> = ({
   open,
   onClose,
-  isLoading,
-  fabPosition = { top: 0, left: 0 }, // Default position for drawer
+  fabPosition = { top: 0, left: 0 },
+  disableUpcomingVisits = false,
 }) => {
   return (
     <Drawer
@@ -23,26 +23,26 @@ const DrawerContainer: React.FC<DrawerContainerProps> = ({
       open={open}
       onClose={onClose}
       PaperProps={{
-        component: Paper, // To ensure it can have specific styles
+        component: Paper,
         sx: {
           height: "auto",
-          width: "auto", // Allow the width to adjust to the content
-          maxWidth: "85vw", // Set a maximum width for responsiveness
-          borderRadius: "16px", // Rounded corners on all sides
-          position: "fixed", // Position fixed to place it manually
-          top: fabPosition.top + 315, // Adjust the top position based on the button's position + offset
-          backgroundColor: "#FFF5E1", // Warm white background color
-          backdropFilter: "blur(50px)", // iOS-like blur effect
-          margin: "20px", // Adds some margin for a more visually appealing placement
-          overflow: "hidden", // Prevent content overflow
-          boxShadow: 20, // Add shadow for a floating effect
+          width: "auto",
+          maxWidth: "85vw",
+          borderRadius: "16px",
+          position: "fixed",
+          top: fabPosition.top + 315, // Adjust for FAB position + offset
+          backgroundColor: "#FFF5E1",
+          backdropFilter: "blur(50px)", // Enhanced focus on drawer content
+          margin: "20px", // Margin for better spacing and alignment
+          overflow: "hidden",
+          boxShadow: 20,
         },
       }}
       ModalProps={{
         keepMounted: true,
         sx: {
-          backdropFilter: "blur(5px)", // Blur the background when the drawer is open
-          backgroundColor: "rgba(0, 0, 0, 0.1)", // Darken the screen with an overlay
+          backdropFilter: "blur(5px)", // Subtle blur effect on background
+          backgroundColor: "rgba(0, 0, 0, 0.1)", // Light overlay for focus
         },
       }}
     >
@@ -54,9 +54,8 @@ const DrawerContainer: React.FC<DrawerContainerProps> = ({
           gap: 2,
         }}
       >
-
         <CalendarComponent />
-        <UpcomingVisits isLoading={isLoading} />
+        {!disableUpcomingVisits && <UpcomingVisits />}
       </Box>
     </Drawer>
   );

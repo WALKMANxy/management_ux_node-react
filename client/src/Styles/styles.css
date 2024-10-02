@@ -1,0 +1,27 @@
+/* In your CSS file, e.g., animations.css */
+.animate__animated.animate__fadeInUp {
+  animation-duration: 0.2s; /* Adjust to desired speed */
+}
+
+.animate__animated.animate__fadeInDown {
+  animation-duration: 0.2s; /* Adjust to desired speed */
+}
+
+.animate_animated.animate_fadein {
+  animation-duration: 0.05s; /* Adjust to desired speed */
+}
+
+.animate_animated.animate_fadeOut {
+  animation-duration: 0.05s; /* Adjust to desired speed */
+}
+
+/* src/Styles/hiddenScrollbar.css */
+
+.hidden-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}

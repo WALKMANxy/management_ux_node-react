@@ -1,3 +1,5 @@
+// src/components/SpentThisMonth.tsx
+
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
@@ -23,6 +25,12 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
 
   const formattedAmount = currencyFormatter(parseFloat(amount));
 
+  /**
+   * Determines the comparison result based on the value and user role.
+   *
+   * @param {number} value - The comparison value.
+   * @returns {ComparisonResult} The comparison result object.
+   */
   const getComparisonResult = (value: number): ComparisonResult => {
     const isAgentComparison = userRole === "admin" && isAgentSelected;
     const isClientComparison =
@@ -33,36 +41,48 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
         return {
           color: theme.palette.success.main,
           icon: <ArrowUpwardIcon fontSize="inherit" />,
-          text: t("more"),
+          text: t("spentThisMonth.more", "more"),
         };
       if (value >= 5)
         return {
           color: theme.palette.grey[500],
           icon: <ArrowUpwardIcon fontSize="inherit" />,
-          text: t("neutral"),
+          text: t("spentThisMonth.neutral", "neutral"),
+        };
+      if (value === 0)
+        return {
+          color: theme.palette.grey[500],
+          icon: <ArrowDownwardIcon fontSize="inherit" />,
+          text: t("spentThisMonth.even", "neutral"),
         };
       return {
         color: theme.palette.error.main,
         icon: <ArrowDownwardIcon fontSize="inherit" />,
-        text: t("less"),
+        text: t("spentThisMonth.less", "less"),
       };
     } else if (isClientComparison) {
       if (value >= 1.25)
         return {
           color: theme.palette.success.main,
           icon: <ArrowUpwardIcon fontSize="inherit" />,
-          text: t("more"),
+          text: t("spentThisMonth.more", "more"),
         };
       if (value > 0.75)
         return {
           color: theme.palette.grey[500],
           icon: <ArrowUpwardIcon fontSize="inherit" />,
-          text: t("neutral"),
+          text: t("spentThisMonth.neutral", "neutral"),
+        };
+      if (value === 0)
+        return {
+          color: theme.palette.grey[500],
+          icon: <ArrowDownwardIcon fontSize="inherit" />,
+          text: t("spentThisMonth.even", "neutral"),
         };
       return {
         color: theme.palette.error.main,
         icon: <ArrowDownwardIcon fontSize="inherit" />,
-        text: t("less"),
+        text: t("spentThisMonth.less", "less"),
       };
     }
     return { color: "", icon: <></>, text: "" };
@@ -109,16 +129,20 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
       mr: 1,
       mt: 1.75,
       mb: 0.75,
+      wordBreak: "break-word", // Ensure long amounts wrap
     },
     title: {
       fontSize: "1.5rem",
       fontWeight: 500,
       color: "#000",
+      whiteSpace: "normal", // Allow text to wrap
+      wordBreak: "break-word", // Ensure long titles wrap
     },
     comparison: {
       fontSize: "1.65rem",
       fontWeight: 500,
       paddingTop: 1,
+      wordBreak: "break-word", // Ensure long comparison texts wrap
     },
   };
 
@@ -139,7 +163,7 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
                 >
                   <img
                     src="/icons/money.svg"
-                    alt={t("spentThisMonth.iconAlt")}
+                    alt={t("spentThisMonth.iconAlt", "Money Icon")}
                     style={{ width: "100%", height: "100%" }}
                   />
                 </Avatar>
@@ -169,7 +193,12 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
           </Grid>
           <Grid item sx={{ mb: 1.25 }}>
             <Typography sx={styles.title}>
-            {t(isAgentSelected ? "spentThisMonth.titleAgent" : "spentThisMonth.titleClient")}
+              {t(
+                isAgentSelected
+                  ? "spentThisMonth.titleAgent"
+                  : "spentThisMonth.titleClient",
+                isAgentSelected ? "Earned this month:" : "Spent this month:"
+              )}
             </Typography>
             {userRole !== "client" && comparisonResult && (
               <Typography
@@ -177,8 +206,14 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
               >
                 {Math.abs(comparison!.value)}% {comparisonResult.text}{" "}
                 {userRole === "admin" && isAgentSelected
-                  ? t("comparedToOtherAgents")
-                  : t("comparedToOtherClients")}
+                  ? t(
+                      "spentThisMonth.comparedToOtherAgents",
+                      "compared to other agents"
+                    )
+                  : t(
+                      "spentThisMonth.comparedToOtherClients",
+                      "compared to other clients"
+                    )}
               </Typography>
             )}
           </Grid>
@@ -188,5 +223,5 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
   );
 };
 
-export default SpentThisMonth;
-React.memo(SpentThisMonth);
+// Correct usage of React.memo with export
+export default React.memo(SpentThisMonth);

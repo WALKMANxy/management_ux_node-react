@@ -4,7 +4,7 @@ import { WritableDraft } from "immer";
 import { createSelector } from "reselect";
 import { RootState } from "../../app/store";
 import { User } from "../../models/entityModels";
-import { getAllUsers } from "./api/users";
+import { getAllUsers, getUsersByBatchIds } from "./api/users";
 import { userApi } from "./userQueries";
 
 // Define the initial state
@@ -25,13 +25,12 @@ const initialState: UserState = {
 // Async thunk to fetch users by IDs using userApi
 export const fetchUsersByIds = createAsyncThunk(
   "users/fetchUsersByIds",
-  async (ids: string[], { dispatch, rejectWithValue }) => {
+  async (ids: string[], { rejectWithValue }) => {
     try {
-      const result = await dispatch(
-        userApi.endpoints.fetchUsersByIds.initiate(ids)
-      ).unwrap();
+      const result = await getUsersByBatchIds(ids);
       return result;
     } catch (error) {
+      console.error("fetchUsersByIds error:", error); // Debugging: Log any errors
       return rejectWithValue(
         error instanceof Error ? error.message : "Failed to fetch users"
       );
@@ -231,6 +230,9 @@ export const selectAllUsers = createSelector(
   (state: RootState) => state.users.users,
   (users) => Object.values(users)
 );
+
+export const selectUsersLoading = (state: RootState) =>
+  state.users.status === "loading";
 
 // Replace with a simple selector
 export const selectUsersStatus = (state: RootState) => state.users.status;

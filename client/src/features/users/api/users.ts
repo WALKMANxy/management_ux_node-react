@@ -17,9 +17,19 @@ export const updateUserById = async (
 };
 
 // New API call to fetch users by a batch of IDs
-export const getUsersByBatchIds = async (ids: string[]): Promise<Partial<User>[]> => {
-  return apiCall<Partial<User>[]>(`users/batch`, "POST", { ids });
+export const getUsersByBatchIds = async (
+  ids: string[]
+): Promise<Partial<User>[]> => {
+
+  try {
+    const response = await apiCall<Partial<User>[]>(`users/batch`, "POST", { ids });
+    return response;
+  } catch (error) {
+    console.error("getUsersByBatchIds error:", error); // Debugging: Log any errors
+    throw error; // Re-throw the error to ensure it propagates correctly
+  }
 };
+
 
 // API call to update the user's email
 export const updateUserEmail = async (
@@ -34,7 +44,6 @@ export const updateUserEmail = async (
   });
 };
 
-
 // API call to update the user's password
 export const updateUserPassword = async (
   currentEmail: string,
@@ -47,4 +56,3 @@ export const updateUserPassword = async (
     newPassword,
   });
 };
-

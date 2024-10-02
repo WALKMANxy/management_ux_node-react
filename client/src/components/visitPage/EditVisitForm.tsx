@@ -1,10 +1,12 @@
 // src/components/visitPage/EditVisitForm.tsx
+
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -21,16 +23,43 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { StaticDateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { StaticDateTimePicker } from "@mui/x-date-pickers/StaticDateTimePicker";
 import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
 import dayjs, { Dayjs } from "dayjs";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "../../app/hooks";
 import { updateVisitAsync } from "../../features/data/dataThunks";
 import { Visit } from "../../models/dataModels";
+import { showToast } from "../../utils/toastMessage";
 import VisitCard from "./VisitCard";
+
+// Styled IconButton for Save and Cancel actions
+const StyledSaveButton = styled(IconButton)(({ theme }) => ({
+  backgroundColor: theme.palette.success.main,
+  color: theme.palette.common.white,
+  "&:hover": {
+    backgroundColor: theme.palette.success.dark,
+  },
+  borderRadius: "50%",
+  width: 48,
+  height: 48,
+}));
+
+// Styled Cancel Button
+const StyledCancelButton = styled(IconButton)(({ theme }) => ({
+  backgroundColor: theme.palette.error.main,
+  color: theme.palette.common.white,
+  "&:hover": {
+    backgroundColor: theme.palette.error.dark,
+  },
+  borderRadius: "50%",
+  width: 48,
+  height: 48,
+}));
 
 interface EditVisitFormProps {
   visit: Visit;
@@ -40,6 +69,9 @@ interface EditVisitFormProps {
 const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
   const dispatch = useAppDispatch();
 
+  const { t } = useTranslation();
+
+  // Form state
   const [date, setDate] = useState<Dayjs | null>(dayjs(visit.date));
   const [notePublic, setNotePublic] = useState<string>(visit.notePublic || "");
   const [notePrivate, setNotePrivate] = useState<string>(
@@ -48,19 +80,22 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
   const [pending, setPending] = useState<boolean>(visit.pending);
   const [completed, setCompleted] = useState<boolean>(visit.completed);
 
+  // Snackbar state
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success"
   );
 
+  // Confirmation Dialog state
   const [openConfirm, setOpenConfirm] = useState<boolean>(false);
 
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!date) {
-      setSnackbarMessage("Please select a date.");
+      setSnackbarMessage(t("editVisitForm.fillDate", "Please select a date."));
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
       return;
@@ -82,19 +117,34 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
           updateVisitAsync({ _id: updatedVisit._id, visitData: updatedVisit })
         ).unwrap();
       }
-      setSnackbarMessage("Visit updated successfully!");
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
+      showToast.success(
+        t("editVisitForm.visitUpdated", "Visit updated successfully.")
+      );
       onClose();
     } catch (error: unknown) {
-      setSnackbarMessage(
-        error instanceof Error ? error.message : "Failed to update visit."
-      );
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+      if (error instanceof Error) {
+        showToast.error(
+          t("editVisitForm.updateFailed", "Failed to update visit: ") +
+            error.message
+        );
+        console.error("Failed to update visit:", error);
+      } else {
+        showToast.error(
+          t(
+            "editVisitForm.updateFailedUnknown",
+            "Failed to update visit: An unknown error occurred."
+          )
+        );
+        console.error(
+          "Failed to update visit: An unknown error occurred",
+          error
+        );
+      }
+      throw error; // Re-throw to handle in the component
     }
   };
 
+  // Handle Snackbar close
   const handleSnackbarClose = (
     _event?: React.SyntheticEvent | Event,
     reason?: string
@@ -105,24 +155,29 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
     setSnackbarOpen(false);
   };
 
+  // Handle Cancel button click
   const handleCancelClick = () => {
     setOpenConfirm(true);
   };
 
-  const handleConfirmCancel = () => {
+  // Confirm cancellation
+  const handleConfirmCancel = useCallback(() => {
     setOpenConfirm(false);
     onClose();
-  };
+  }, [onClose]);
 
-  const handleDenyCancel = () => {
+  // Deny cancellation
+  const handleDenyCancel = useCallback(() => {
     setOpenConfirm(false);
-  };
+  }, []);
 
+  // Toggle Completed status
   const handleToggleCompleted = () => {
     setCompleted(true);
     setPending(false);
   };
 
+  // Toggle Cancelled status
   const handleToggleCancelled = () => {
     setCompleted(false);
     setPending(false);
@@ -151,24 +206,30 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
             gutterBottom
             sx={{ fontWeight: 600, mb: 2, color: "#4d4b5f" }}
           >
-            Edit Visit
+            {t("editVisitForm.title", "Edit Visit")}
           </Typography>
           <Grid container spacing={2} sx={{ flexGrow: 1 }}>
             {/* Type Field (Disabled) */}
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth variant="outlined" disabled>
-                <InputLabel id="visit-type-label">Type</InputLabel>
+                <InputLabel id="edit-visit-type-label">
+                  {t("editVisitForm.typeLabel", "Type")}
+                </InputLabel>
                 <Select
-                  labelId="visit-type-label"
-                  id="visit-type"
+                  labelId="edit-visit-type-label"
+                  id="edit-visit-type"
                   value={visit.type}
-                  label="Type"
+                  label={t("editVisitForm.typeLabel", "Type")}
                   sx={{
                     borderRadius: 2,
                   }}
                 >
-                  <MenuItem value="Regular">Regular</MenuItem>
-                  <MenuItem value="Urgent">Urgent</MenuItem>
+                  <MenuItem value="Regular">
+                    {t("editVisitForm.regular", "Regular")}
+                  </MenuItem>
+                  <MenuItem value="Urgent">
+                    {t("editVisitForm.urgent", "Urgent")}
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -176,26 +237,33 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
             {/* Reason Field (Disabled) */}
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth variant="outlined" disabled>
-                <InputLabel id="visit-reason-label">Reason</InputLabel>
+                <InputLabel id="edit-visit-reason-label">
+                  {t("editVisitForm.reasonLabel", "Reason")}
+                </InputLabel>
                 <Select
-                  labelId="visit-reason-label"
-                  id="visit-reason"
+                  labelId="edit-visit-reason-label"
+                  id="edit-visit-reason"
                   value={visit.visitReason}
-                  label="Reason"
+                  label={t("editVisitForm.reasonLabel", "Reason")}
                   sx={{
                     borderRadius: 2,
                   }}
                 >
-                  <MenuItem value="Issue">Issue</MenuItem>
-                  <MenuItem value="Routine">Routine</MenuItem>
-                  <MenuItem value="New Client">New Client</MenuItem>
+                  <MenuItem value="Issue">
+                    {t("editVisitForm.issue", "Issue")}
+                  </MenuItem>
+                  <MenuItem value="Routine">
+                    {t("editVisitForm.routine", "Routine")}
+                  </MenuItem>
+                  <MenuItem value="New Client">
+                    {t("editVisitForm.newClient", "New Client")}
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
 
-            {/* Date and Notes */}
+            {/* Date and Time Field */}
             <Grid item xs={12} sm={6}>
-              {/* Date and Time Field */}
               <StaticDateTimePicker
                 value={date}
                 disablePast={true}
@@ -209,83 +277,126 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
                   hours: renderTimeViewClock,
                   minutes: renderTimeViewClock,
                 }}
+                renderLoading={() => <CircularProgress />}
+                slotProps={{
+                  actionBar: { hidden: true },
+                }}
               />
             </Grid>
+
+            {/* Notes Section */}
             <Grid item xs={12} sm={6}>
-              {/* Notes */}
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Grid container spacing={2}>
                 {/* Public Note */}
-                <TextField
-                  label="Public Note"
-                  value={notePublic}
-                  onChange={(e) => setNotePublic(e.target.value)}
-                  fullWidth
-                  multiline
-                  minRows={2}
-                  maxRows={10}
-                  variant="outlined"
-                  sx={{
-                    borderRadius: 2,
-                  }}
-                />
+                <Grid item xs={12}>
+                  <Tooltip
+                    title={t(
+                      "editVisitForm.publicNoteTooltip",
+                      "Enter a public note for the visit."
+                    )}
+                    arrow
+                  >
+                    <TextField
+                      label={t("editVisitForm.publicNoteLabel", "Public Note")}
+                      value={notePublic}
+                      onChange={(e) => setNotePublic(e.target.value)}
+                      fullWidth
+                      multiline
+                      minRows={2}
+                      maxRows={10} // Allow expansion up to 10 rows
+                      variant="outlined"
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          "& fieldset": {
+                            borderRadius: 2, // Adjust border radius
+                          },
+                        },
+                      }}
+                    />
+                  </Tooltip>
+                </Grid>
+
                 {/* Private Note */}
-                <TextField
-                  label="Private Note"
-                  value={notePrivate}
-                  onChange={(e) => setNotePrivate(e.target.value)}
-                  fullWidth
-                  multiline
-                  minRows={2}
-                  maxRows={10}
-                  variant="outlined"
-                  sx={{
-                    borderRadius: 2,
-                  }}
-                />
-              </Box>
-              <Grid item xs={12}>
-                <Box
-                  sx={{
-                    mt: 2,
-                    display: "flex",
-                    justifyContent: { xs: "flex-start", sm: "flex-end" },
-                    gap: 2,
-                  }}
-                >
-                  <Button
-                    variant="contained"
-                    color={completed ? "success" : "info"}
-                    onClick={handleToggleCompleted}
-                    sx={{
-                      backgroundColor: completed ? "green" : "grey",
-                      color: "white",
-                      "&:hover": {
-                        backgroundColor: completed ? "darkgreen" : "darkgrey",
-                      },
-                    }}
+                <Grid item xs={12}>
+                  <Tooltip
+                    title={t(
+                      "editVisitForm.privateNoteTooltip",
+                      "The private note is visible only to you and the administrators."
+                    )}
+                    arrow
                   >
-                    Mark as Completed
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color={!pending && !completed ? "error" : "info"}
-                    onClick={handleToggleCancelled}
-                    sx={{
-                      backgroundColor: !pending && !completed ? "red" : "grey",
-                      color: "white",
-                      "&:hover": {
-                        backgroundColor:
-                          !pending && !completed ? "darkred" : "darkgrey",
-                      },
-                    }}
-                  >
-                    Mark as Cancelled
-                  </Button>
-                </Box>
+                    <TextField
+                      label={t(
+                        "editVisitForm.privateNoteLabel",
+                        "Private Note"
+                      )}
+                      placeholder={t(
+                        "editVisitForm.privateNotePlaceholder",
+                        "The private note is visible only to you and the administrators."
+                      )}
+                      value={notePrivate}
+                      onChange={(e) => setNotePrivate(e.target.value)}
+                      fullWidth
+                      multiline
+                      minRows={2}
+                      maxRows={10}
+                      variant="outlined"
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          "& fieldset": {
+                            borderRadius: 2, // Adjust border radius
+                          },
+                        },
+                      }}
+                    />
+                  </Tooltip>
+                </Grid>
               </Grid>
             </Grid>
 
             {/* Status Buttons */}
+            <Grid item xs={12}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 2,
+                  flexWrap: "wrap",
+                }}
+              >
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={handleToggleCompleted}
+                  disabled={completed}
+                  sx={{
+                    backgroundColor: completed ? "green" : "grey",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: completed ? "darkgreen" : "darkgrey",
+                    },
+                  }}
+                >
+                  {t("editVisitForm.markAsCompleted", "Mark as Completed")}
+                </Button>
+
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleToggleCancelled}
+                  disabled={!pending && !completed}
+                  sx={{
+                    backgroundColor: !pending && !completed ? "red" : "grey",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor:
+                        !pending && !completed ? "darkred" : "darkgrey",
+                    },
+                  }}
+                >
+                  {t("editVisitForm.markAsCancelled", "Mark as Cancelled")}
+                </Button>
+              </Box>
+            </Grid>
 
             {/* Visit Preview Card */}
             <Grid item xs={12}>
@@ -295,7 +406,7 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
                 reason={visit.visitReason}
                 date={date}
                 notePublic={notePublic}
-                notePrivate={notePrivate}
+                notePrivate={notePrivate} // Pass private note
                 pending={pending}
                 completed={completed}
                 visitIssuedBy={visit.visitIssuedBy}
@@ -314,83 +425,76 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
             gap: 2,
           }}
         >
-          <Tooltip title="Save Changes">
-            <IconButton
+          {/* Save Changes Button */}
+          <Tooltip
+            title={t("editVisitForm.saveChangesTooltip", "Save Changes")}
+            arrow
+          >
+            <StyledSaveButton
               type="submit"
               form="edit-visit-form"
-              color="primary"
-              sx={{
-                backgroundColor: "blue",
-                color: "white",
-                "&:hover": { backgroundColor: "darkblue" },
-                borderRadius: "50%",
-                width: 48,
-                height: 48,
-              }}
-              aria-label="Save Changes"
+              aria-label={t("editVisitForm.saveChanges", "Save Changes")}
             >
               <SaveIcon />
-            </IconButton>
+            </StyledSaveButton>
           </Tooltip>
-          <Tooltip title="Cancel">
-            <IconButton
+
+          {/* Cancel Button */}
+          <Tooltip title={t("editVisitForm.cancelTooltip", "Cancel")} arrow>
+            <StyledCancelButton
               color="error"
               onClick={handleCancelClick}
-              sx={{
-                backgroundColor: "red",
-                color: "white",
-                "&:hover": { backgroundColor: "darkred" },
-                borderRadius: "50%",
-                width: 48,
-                height: 48,
-              }}
-              aria-label="Cancel"
+              aria-label={t("editVisitForm.cancel", "Cancel")}
             >
               <CloseIcon />
-            </IconButton>
+            </StyledCancelButton>
           </Tooltip>
         </Box>
-      </Box>
 
-      {/* Snackbar for feedback */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
+        {/* Snackbar for feedback */}
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
           onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+          <Alert
+            onClose={handleSnackbarClose}
+            severity={snackbarSeverity}
+            sx={{ width: "100%" }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
 
-      {/* Confirmation Dialog */}
-      <Dialog
-        open={openConfirm}
-        onClose={handleDenyCancel}
-        aria-labelledby="confirm-cancel-title"
-        aria-describedby="confirm-cancel-description"
-      >
-        <DialogTitle id="confirm-cancel-title">Cancel Edit</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="confirm-cancel-description">
-            Are you sure you want to cancel editing this visit? All unsaved
-            changes will be lost.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDenyCancel} color="primary">
-            No
-          </Button>
-          <Button onClick={handleConfirmCancel} color="error" autoFocus>
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
+        {/* Confirmation Dialog */}
+        <Dialog
+          open={openConfirm}
+          onClose={handleDenyCancel}
+          aria-labelledby="confirm-cancel-title"
+          aria-describedby="confirm-cancel-description"
+        >
+          <DialogTitle id="confirm-cancel-title">
+            {t("editVisitForm.cancelDialogTitle", "Cancel Edit")}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="confirm-cancel-description">
+              {t(
+                "editVisitForm.cancelDialogDescription",
+                "Are you sure you want to cancel editing this visit? All unsaved changes will be lost."
+              )}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDenyCancel} color="primary">
+              {t("editVisitForm.no", "No")}
+            </Button>
+            <Button onClick={handleConfirmCancel} color="error" autoFocus>
+              {t("editVisitForm.yes", "Yes")}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
     </LocalizationProvider>
   );
 };

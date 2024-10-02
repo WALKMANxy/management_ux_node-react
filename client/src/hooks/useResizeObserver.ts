@@ -1,11 +1,42 @@
+// src/hooks/useResizeObserver.ts
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { showToast } from "../utils/toastMessage";
 
+/**
+ * Interface representing the dimensions of an element.
+ */
+interface Dimensions {
+  width: number;
+  height: number;
+}
+
+/**
+ * Custom hook to observe the size of a DOM element using ResizeObserver.
+ *
+ * @template T - The type of the HTML element to observe.
+ * @param {Dimensions} [initialDimensions] - The initial dimensions of the element.
+ * @returns {{
+ *   containerRef: React.RefObject<T>;
+ *   dimensions: Dimensions;
+ * }} An object containing the ref to attach to the element and its current dimensions.
+ *
+ * @example
+ * const { containerRef, dimensions } = useResizeObserver<HTMLDivElement>();
+ * return <div ref={containerRef}>Width: {dimensions.width}, Height: {dimensions.height}</div>;
+ */
 const useResizeObserver = <T extends HTMLElement>(
-  initialDimensions = { width: 0, height: 0 }
+  initialDimensions: Dimensions = { width: 0, height: 0 }
 ) => {
-  const [dimensions, setDimensions] = useState(initialDimensions);
+  const { t } = useTranslation(); // Initialize translation
+  const [dimensions, setDimensions] = useState<Dimensions>(initialDimensions);
   const containerRef = useRef<T>(null);
 
+  /**
+   * Callback to handle resize events from ResizeObserver.
+   *
+   * @param {ResizeObserverEntry[]} entries - The entries observed by ResizeObserver.
+   */
   const handleResize = useCallback((entries: ResizeObserverEntry[]) => {
     if (entries[0]?.contentRect) {
       const { width, height } = entries[0].contentRect;
@@ -23,7 +54,8 @@ const useResizeObserver = <T extends HTMLElement>(
 
   useEffect(() => {
     if (typeof ResizeObserver === "undefined") {
-      console.error("ResizeObserver is not supported in this browser.");
+      showToast.error(t("resizeObserver.unsupported"));
+      console.error(t("resizeObserver.unsupported"));
       return;
     }
 
@@ -38,8 +70,9 @@ const useResizeObserver = <T extends HTMLElement>(
       if (currentContainer) {
         observer.unobserve(currentContainer);
       }
+      observer.disconnect();
     };
-  }, [handleResize]);
+  }, [handleResize, t]);
 
   return { containerRef, dimensions };
 };

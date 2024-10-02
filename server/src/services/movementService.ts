@@ -9,26 +9,31 @@ export class MovementService {
     return movements;
   }
 
-  static getFilteredMovementsByRole(
-    role: string,
-    entityCode: string
-  ): Movement[] {
+  static getFilteredMovementsByRole(role: string, entityCode: string): Movement[] {
     const movements = this.getAllMovements();
 
+/*     console.log("Filtering movements for role:", role, "with entityCode:", entityCode); // Debugging
+ */
+    let filteredMovements: Movement[];
+
     if (role === "client") {
-      return movements.filter(
-        (movement) => movement["Codice Cliente"] === entityCode
+      filteredMovements = movements.filter(
+        (movement) => movement["Codice Cliente"].toString() === entityCode
       );
     } else if (role === "agent") {
-      return movements.filter(
-        (movement) => movement["Codice Agente"] === entityCode
+      filteredMovements = movements.filter(
+        (movement) => movement["Codice Agente"].toString() === entityCode
       );
     } else {
       throw new Error(
         "Forbidden: You're neither an agent nor client, so you shouldn't be here."
       );
     }
+
+/*     console.log("Filtered movements count:", filteredMovements.length); // Debugging
+ */    return filteredMovements;
   }
+
 
   static replaceMovement(
     id: number,

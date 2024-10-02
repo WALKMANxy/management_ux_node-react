@@ -12,6 +12,7 @@ import {
   Menu as MenuIcon,
   People as PeopleIcon,
 } from "@mui/icons-material";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import {
   AppBar,
   Box,
@@ -26,6 +27,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import "animate.css";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
@@ -33,6 +35,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../app/hooks";
 import { RootState } from "../../app/store";
 import { handleLogout } from "../../features/auth/authSlice";
+import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 import { clearSelection } from "../../features/data/dataSlice";
 import GlobalSearch from "./GlobalSearch";
 import NotificationBell from "./NotificationBell";
@@ -56,23 +59,40 @@ const Header: React.FC = () => {
   };
 
   useEffect(() => {
-    // Check if navigating away from /visits
     if (
       prevLocationRef.current === "/visits" &&
       location.pathname !== "/visits"
     ) {
       dispatch(clearSelection());
     }
-
-    // Update the previous location to the current one
     prevLocationRef.current = location.pathname;
-  });
+  }, [location.pathname, dispatch]);
+
+  useEffect(() => {
+    if (
+      prevLocationRef.current === "/messages" &&
+      location.pathname !== "/messages"
+    ) {
+      dispatch(clearCurrentChatReducer());
+    }
+    prevLocationRef.current = location.pathname;
+  }, [location.pathname, dispatch]);
+
+  useEffect(() => {
+    if (
+      prevLocationRef.current === "/promos" &&
+      location.pathname !== "/promos"
+    ) {
+      dispatch(clearSelection());
+    }
+    prevLocationRef.current = location.pathname;
+  }, [location.pathname, dispatch]);
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
     setTimeout(() => {
       setIconChange(!drawerOpen);
-    }, 500); // 500ms delay for icon change
+    }, 500);
   };
 
   const handleLogoClick = () => {
@@ -86,6 +106,9 @@ const Header: React.FC = () => {
         break;
       case "client":
         dashboardLink = "/client-dashboard";
+        break;
+      case "employee":
+        dashboardLink = "/employee-dashboard";
         break;
       default:
         dashboardLink = "/";
@@ -105,6 +128,9 @@ const Header: React.FC = () => {
       case "client":
         dashboardLink = "/client-dashboard";
         break;
+      case "employee":
+        dashboardLink = "/employee-dashboard";
+        break;
       default:
         dashboardLink = "/";
     }
@@ -120,54 +146,82 @@ const Header: React.FC = () => {
           <ListItemIcon sx={{ color: "white" }}>
             <HomeIcon />
           </ListItemIcon>
-          <ListItemText primary={t("headerDashboard")} />
+          <ListItemText primary={t("headerDashboard", "Dashboard")} />
         </ListItem>
-        <ListItem
-          button
-          component={Link}
-          to="/movements"
-          onClick={toggleDrawer}
-        >
-          <ListItemIcon sx={{ color: "white" }}>
-            <HistoryIcon />
-          </ListItemIcon>
-          <ListItemText primary={t("movements")} />
-        </ListItem>
-        <ListItem button component={Link} to="/clients" onClick={toggleDrawer}>
-          <ListItemIcon sx={{ color: "white" }}>
-            <PeopleIcon />
-          </ListItemIcon>
-          <ListItemText primary={t("clients")} />
-        </ListItem>
-        <ListItem button component={Link} to="/articles" onClick={toggleDrawer}>
-          <ListItemIcon sx={{ color: "white" }}>
-            <CategoryIcon />
-          </ListItemIcon>
-          <ListItemText primary={t("articles")} />
-        </ListItem>
-        <ListItem button component={Link} to="/visits" onClick={toggleDrawer}>
-          <ListItemIcon sx={{ color: "white" }}>
-            <EventNoteIcon />
-          </ListItemIcon>
-          <ListItemText primary={t("visits")} />
-        </ListItem>
-        {/* <ListItem
-          button
-          component={Link}
-          to="/statistics"
-          onClick={toggleDrawer}
-        >
-          <ListItemIcon sx={{ color: "white" }}>
-            <BarChartIcon />
-          </ListItemIcon>
-          <ListItemText primary={t("statistics")} />
-        </ListItem> */}
-        <ListItem button component={Link} to="/promos" onClick={toggleDrawer}>
-          <ListItemIcon sx={{ color: "white" }}>
-            <LocalOfferIcon />
-          </ListItemIcon>
-          <ListItemText primary={t("promos")} />
-        </ListItem>
+
+        {userRole !== "employee" && (
+          <ListItem
+            button
+            component={Link}
+            to="/movements"
+            onClick={toggleDrawer}
+          >
+            <ListItemIcon sx={{ color: "white" }}>
+              <HistoryIcon />
+            </ListItemIcon>
+            <ListItemText primary={t("movements", "Movements")} />
+          </ListItem>
+        )}
+
+        {userRole !== "employee" && (
+          <ListItem
+            button
+            component={Link}
+            to="/clients"
+            onClick={toggleDrawer}
+          >
+            <ListItemIcon sx={{ color: "white" }}>
+              <PeopleIcon />
+            </ListItemIcon>
+            <ListItemText primary={t("clients", "Clients")} />
+          </ListItem>
+        )}
+
+        {userRole !== "employee" && (
+          <ListItem
+            button
+            component={Link}
+            to="/articles"
+            onClick={toggleDrawer}
+          >
+            <ListItemIcon sx={{ color: "white" }}>
+              <CategoryIcon />
+            </ListItemIcon>
+            <ListItemText primary={t("articles", "Articles")} />
+          </ListItem>
+        )}
+
+        {userRole !== "employee" && (
+          <ListItem button component={Link} to="/visits" onClick={toggleDrawer}>
+            <ListItemIcon sx={{ color: "white" }}>
+              <EventNoteIcon />
+            </ListItemIcon>
+            <ListItemText primary={t("visits", "Visits")} />
+          </ListItem>
+        )}
+
+        {userRole !== "employee" && (
+          <ListItem button component={Link} to="/promos" onClick={toggleDrawer}>
+            <ListItemIcon sx={{ color: "white" }}>
+              <LocalOfferIcon />
+            </ListItemIcon>
+            <ListItemText primary={t("promos", "Promos")} />
+          </ListItem>
+        )}
+
+        {userRole !== "client" && (
+          <ListItem
+            button
+            component={Link}
+            to="/calendar"
+            onClick={toggleDrawer}
+          >
+            <ListItemIcon sx={{ color: "white" }}>
+              <CalendarMonthIcon />
+            </ListItemIcon>
+            <ListItemText primary={t("calendar", "Calendar")} />
+          </ListItem>
+        )}
       </>
     );
   };
@@ -179,6 +233,7 @@ const Header: React.FC = () => {
       to="/"
       onClick={() => {
         initiateLogout();
+
         toggleDrawer(); // Close the drawer on logout
       }}
       sx={{ color: "white", paddingBottom: "20px" }}
@@ -195,13 +250,16 @@ const Header: React.FC = () => {
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor: "black",
-          color: "black",
+          backgroundColor: "rgba(0, 0, 0, 1)", // Slightly more transparent for a frosty look
+          borderBottomLeftRadius: "32px", // Rounded corners for a smoother look
+          borderBottomRightRadius: "32px", // Rounded corners for a smoother look
+          boxShadow: `0px 4px 12px rgba(0, 0, 0, 0.1)`, // Soft shadow for depth
           width: "100%",
           right: "auto",
           left: "auto",
           maxWidth: "100vw", // Prevents overflowing past the viewport width
         }}
+        className="animate__animated animate__fadeInDown" // Apply the animation class here
       >
         <Toolbar
           sx={{
@@ -224,6 +282,7 @@ const Header: React.FC = () => {
             alt="Logo"
             style={{ height: "40px", marginRight: "16px", cursor: "pointer" }}
             onClick={handleLogoClick}
+
           />
           <GlobalSearch
             filter="all"
@@ -263,6 +322,8 @@ const Header: React.FC = () => {
             color: "white",
             width: isMobile ? "auto" : "250px", // Conditional width based on screen size
             height: "100vh",
+            borderBottomRightRadius: "32px",
+            borderTopRightRadius: "32px",
           },
         }}
         ModalProps={{

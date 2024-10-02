@@ -1,6 +1,8 @@
 // src/utils/constants.ts
 
 import { keyframes } from "@emotion/react";
+import { memoize } from "lodash";
+
 
 export const gradients = [
   "linear-gradient(135deg, #fffde7 30%, #fff9c4 100%)",
@@ -65,13 +67,13 @@ export const fadeIn = keyframes`
   }
 `;
 
-export const ChartData = (categories: string[], data: number[]) => ({
+export const ChartData = memoize((categories: string[], data: number[]) => ({
   options: {
     chart: {
       id: "basic-bar",
       toolbar: {
         show: false,
-      }
+      },
     },
     xaxis: {
       categories,
@@ -95,7 +97,7 @@ export const ChartData = (categories: string[], data: number[]) => ({
       data,
     },
   ],
-});
+}));
 
 export const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 6);
@@ -103,26 +105,42 @@ export const generateRandomString = () => {
 
 export const paginationPageSizeSelector = [20, 50, 100, 200, 500];
 
-export const ignoreArticleNames = new Set([
+export const ignoreArticleNames = Object.freeze(new Set([
   "RESO CARCASSA",
   "TRASPORTO ",
   "TRASPORTO URGENTE",
-]);
+]));
 
-export const agentColorMap: { [key: string]: string } = {
-  "10": "#FFD700", // Fazio Adriano Salvatore
-  "11": "#FFB6C1", // Salvatore Spinella
-  "12": "#ADD8E6", // Riccardo Carpentiere
-  "13": "#90EE90", // Vito D'Antonio
-  "14": "#FF69B4", // G.C.
-  "15": "#FFA07A", // Luddeni Renato
-  "16": "#20B2AA", // Luca Scaffo
-  "50": "#9370DB", // Marco Coppola
-  "60": "#C0C0C0", // Web
-  "90": "#8A2BE2", // Direzionale
-  "91": "#FF4500", // Direzionale Diesel
-  "92": "#B0C4DE", // Direzionale D
-  "95": "#FA8072", // Cliente Agente
-  "99": "#D2691E", // Seguito da Avvocato
-  "100": "#808080", // Non Assegnato
-};
+
+
+export const agentColorMap: { [key: string]: string } = Object.freeze({
+  "10": "#FFFACD", // Lemon Chiffon (Fazio Adriano Salvatore)
+  "11": "#FFB6C1", // Light Pink (Salvatore Spinella)
+  "12": "#B0E0E6", // Powder Blue (Riccardo Carpentiere)
+  "13": "#98FB98", // Pale Green (Vito D'Antonio)
+  "14": "#FFB6C1", // Light Pink (G.C.)
+  "15": "#FFDAB9", // Peach Puff (Luddeni Renato)
+  "16": "#20B2AA", // Light Sea Green (Luca Scaffo) *Kept as is since it's already relatively light
+  "50": "#E6E6FA", // Lavender (Marco Coppola)
+  "60": "#D3D3D3", // Light Grey (Web)
+  "90": "#E6E6FA", // Lavender (Direzionale)
+  "91": "#FFA07A", // Light Salmon (Direzionale Diesel)
+  "92": "#B0C4DE", // Light Steel Blue (Direzionale D)
+  "95": "#FFA07A", // Light Salmon (Cliente Agente)
+  "99": "#F4A460", // Sandy Brown (Seguito da Avvocato)
+  "100": "#D3D3D3", // Light Grey (Non Assegnato)
+});
+
+
+// src/constants/routes.ts
+export const CLIENTS_OR_MESSAGES_PATHS = [
+  "/clients",
+  "/messages",
+  "/visits",
+  "/promos",
+  "/calendar",
+  "/movements",
+  "/articles",
+];
+
+export const SETTINGS_PATH = "/settings";

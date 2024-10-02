@@ -3,8 +3,10 @@
 import { Box, useMediaQuery } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import Spinner from "../../components/common/Spinner";
 import MovementDetails from "../../components/movementsPage/movementsDetails";
 import MovementList from "../../components/statistics/grids/MovementList";
+import useLoadingData from "../../hooks/useLoadingData";
 import { useMovementsGrid } from "../../hooks/useMovementsGrid";
 import { Movement } from "../../models/dataModels";
 import { MovementColumnDefinition } from "../../models/propsModels"; // Import the new type
@@ -18,6 +20,8 @@ import {
 const MovementsPage: React.FC = () => {
   const { t } = useTranslation();
   const isMobile = useMediaQuery("(max-width:600px)");
+
+  const { loading } = useLoadingData();
 
   const {
     selectedMovement,
@@ -52,7 +56,7 @@ const MovementsPage: React.FC = () => {
           sortable: true,
           cellRenderer: (params: { data: Movement; value: string }) => (
             <span
-              onDoubleClick={() => handleMovementSelect(params.data.id)}
+              onClick={() => handleMovementSelect(params.data.id)}
               style={{ cursor: "pointer" }}
             >
               {params.value}
@@ -102,6 +106,23 @@ const MovementsPage: React.FC = () => {
     [handleMovementSelect, t, userRole]
   );
 
+  // Handle loading state
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          height: "100vh",
+          justifyContent: "center",
+          alignItems: "center",
+          bgcolor: "#f4f5f7",
+        }}
+      >
+        <Spinner />
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
       <MovementList
@@ -123,13 +144,15 @@ const MovementsPage: React.FC = () => {
         isMobile={isMobile}
         movementDetailsRef={movementDetailsRef}
       />
-      <MovementDetails
-        ref={movementDetailsRef}
-        isLoading={false}
-        selectedMovement={selectedMovement}
-        isMovementDetailsCollapsed={isMovementDetailsCollapsed}
-        setMovementDetailsCollapsed={setMovementDetailsCollapsed}
-      />
+      {selectedMovement && (
+        <MovementDetails
+          ref={movementDetailsRef}
+          isLoading={false}
+          selectedMovement={selectedMovement}
+          isMovementDetailsCollapsed={isMovementDetailsCollapsed}
+          setMovementDetailsCollapsed={setMovementDetailsCollapsed}
+        />
+      )}
     </Box>
   );
 };

@@ -2,12 +2,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createSelector } from "reselect";
 import { RootState } from "../../app/store";
-import {
-  GlobalPromos,
-  GlobalVisits,
-  Promo,
-  Visit,
-} from "../../models/dataModels";
+import { GlobalVisits, Promo, Visit } from "../../models/dataModels";
 import { Agent, Client } from "../../models/entityModels";
 import { DataSliceState } from "../../models/stateModels";
 import { fetchInitialData } from "./dataThunks";
@@ -59,7 +54,7 @@ export const dataSlice = createSlice({
     setCurrentUserVisits(state, action: PayloadAction<Visit[] | GlobalVisits>) {
       state.currentUserVisits = action.payload;
     },
-    setCurrentUserPromos(state, action: PayloadAction<Promo[] | GlobalPromos>) {
+    setCurrentUserPromos(state, action: PayloadAction<Promo[]>) {
       state.currentUserPromos = action.payload;
     },
     addOrUpdateVisit(state, action: PayloadAction<Visit>) {
@@ -113,50 +108,24 @@ export const dataSlice = createSlice({
       const newPromo = action.payload;
       const role = state.currentUserDetails?.role;
 
-      if (role === "client" || role === "agent") {
-        if (Array.isArray(state.currentUserPromos)) {
-          const index = state.currentUserPromos.findIndex(
-            (promo) => promo._id === newPromo._id
-          );
-          if (index !== -1) {
-            state.currentUserPromos[index] = newPromo;
-          } else {
-            state.currentUserPromos.push(newPromo);
-          }
-        }
-      } else if (role === "admin") {
-        // Ensure currentUserPromos is initialized and of type GlobalPromos
-        if (
-          !state.currentUserPromos ||
-          Array.isArray(state.currentUserPromos)
-        ) {
-          // Initialize currentUserPromos as GlobalPromos
-          state.currentUserPromos = {};
+      /*       console.log("addOrUpdatePromo called with:", action.payload); // Debugging
+       */
+      if (role === "admin") {
+        if (!Array.isArray(state.currentUserPromos)) {
+          state.currentUserPromos = [];
         }
 
-        // At this point, state.currentUserPromos is GlobalPromos
-        const currentUserPromos = state.currentUserPromos as GlobalPromos;
+        const index = state.currentUserPromos.findIndex(
+          (promo: Promo) => promo._id === newPromo._id
+        );
 
-        newPromo.clientsId.forEach((clientId) => {
-          const agent = Object.values(state.agents).find((agent) =>
-            agent.clients.some((client) => client.id === clientId)
-          );
-
-          if (agent) {
-            if (!currentUserPromos[agent.id]) {
-              currentUserPromos[agent.id] = { Promos: [] };
-            }
-            const agentPromos = currentUserPromos[agent.id].Promos;
-            const index = agentPromos.findIndex(
-              (promo) => promo._id === newPromo._id
-            );
-            if (index !== -1) {
-              agentPromos[index] = newPromo;
-            } else {
-              agentPromos.push(newPromo);
-            }
-          }
-        });
+        if (index !== -1) {
+          state.currentUserPromos[index] = newPromo;
+        } else {
+          state.currentUserPromos.push(newPromo);
+        }
+      } else {
+        throw new Error("Only admins can add or update promos");
       }
     },
   },
@@ -167,10 +136,12 @@ export const dataSlice = createSlice({
       })
       .addCase(fetchInitialData.fulfilled, (state, action) => {
         state.status = "succeeded";
-        const { role, userData, userId /* , agentData */ } = action.payload;
+        const { role, userData, userId } = action.payload;
 
-        if (role === "client" && "clientData" in userData) {
-          const { clientData /*  visits, promos */ } = userData;
+        if (role === "client" && "clientData" in userData!) {
+          const { clientData } = userData;
+
+          // Store client data
           state.clients[clientData.id] = clientData;
           state.currentUserData = clientData;
           state.currentUserDetails = {
@@ -179,9 +150,13 @@ export const dataSlice = createSlice({
             name: clientData.name,
             userId: userId,
           };
-          /* state.currentUserPromos = promos;
-          state.currentUserVisits = visits; */
-        } else if (role === "agent" && "agentData" in userData) {
+          // Check if agentData exists within clientData and store it
+          if (clientData.agentData) {
+            clientData.agentData.forEach((agent: Agent) => {
+              state.agents[agent.id] = agent; // Store each agent in the state
+            });
+          }
+        } else if (role === "agent" && "agentData" in userData!) {
           // Handle agent data
           const { agentData /* visits, promos */ } = userData;
 
@@ -193,7 +168,7 @@ export const dataSlice = createSlice({
 
           // Explicitly associate clients, visits, and promos with the agent
           const agentClients = agentData.clients.map(
-            (client) => state.clients[client.id]
+            (client: Client) => state.clients[client.id]
           );
           state.agents[agentData.id] = {
             ...agentData,
@@ -208,22 +183,14 @@ export const dataSlice = createSlice({
             name: agentData.name,
             userId: userId,
           };
-          /*  state.currentUserPromos = promos;
-          state.currentUserVisits = visits; */
-        } else if (role === "admin" && "adminData" in userData) {
+        } else if (role === "admin" && "adminData" in userData!) {
           // Handle admin data
-          const { adminData /*  globalVisits, globalPromos  */ } = userData;
+          const { adminData } = userData;
 
           // Populate the clients in the state
           adminData.clients.forEach((client: Client) => {
             state.clients[client.id] = client;
           });
-
-          /* if (agentData) {
-            agentData.forEach((agent: Agent) => {
-              state.agents[agent.id] = agent;
-            });
-          } */
 
           // Populate the agents in the state
           adminData.agents.forEach((agent: Agent) => {
@@ -238,8 +205,16 @@ export const dataSlice = createSlice({
             name: adminData.name,
             userId: userId,
           };
-          /* state.currentUserPromos = globalPromos;
-          state.currentUserVisits = globalVisits; */
+        } else if (role === "employee") {
+          // Handle employee role
+          state.currentUserDetails = {
+            id: userId, // Assuming userId is unique for employees
+            role: "employee",
+            name: "Employee Name", // Replace with actual name if available
+            userId: userId,
+          };
+          state.currentUserData = null;
+          // Optionally, you can reset other state properties if needed
         } else {
           // Handle unexpected data structure
           console.error(

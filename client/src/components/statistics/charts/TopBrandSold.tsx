@@ -9,7 +9,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { BrandData } from "../../../models/propsModels";
 
@@ -18,10 +18,18 @@ const TopBrandsSold: React.FC<{
   brandColors: string[];
   isMobile: boolean;
   isAgentSelected: boolean;
-}> = ({ topBrandsData, brandColors, isMobile,  isAgentSelected }) => {
+}> = ({ topBrandsData, brandColors, isMobile, isAgentSelected }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const loading = topBrandsData.length === 0;
+
+  // Memoize data transformation
+  const data = useMemo(() => {
+    return topBrandsData.map((brand) => ({
+      label: brand.label,
+      value: brand.value,
+    }));
+  }, [topBrandsData]);
 
   return (
     <Paper
@@ -34,6 +42,7 @@ const TopBrandsSold: React.FC<{
         alignItems: "center",
         position: "relative",
         overflow: "hidden",
+        minHeight: "100%",
         background: "linear-gradient(135deg, #E6F1F4 30%, #AEC6CF 100%)",
         "&::after": {
           content: '""',
@@ -121,7 +130,7 @@ const TopBrandsSold: React.FC<{
             colors={brandColors}
             series={[
               {
-                data: topBrandsData,
+                data: data,
                 outerRadius: 100,
                 highlightScope: {
                   faded: "global",

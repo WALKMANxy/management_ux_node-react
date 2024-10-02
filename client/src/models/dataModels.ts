@@ -44,6 +44,8 @@ export interface GlobalVisits {
 export type Promo = {
   _id?: string;
   clientsId: string[]; // Array of client IDs this promo applies to
+  global?: boolean;
+  excludedClientsId?: string[];
   promoType: string;
   name: string;
   discount: string;
@@ -52,12 +54,6 @@ export type Promo = {
   endDate: Date;
   promoIssuedBy: string;
 };
-
-export interface GlobalPromos {
-  [agentId: string]: {
-    Promos: Promo[];
-  };
-}
 
 export interface IMessage {
   _id: string; // Server-generated unique identifier
@@ -72,7 +68,7 @@ export interface IMessage {
 }
 
 export interface IChat {
-  _id: string; // Server-generated unique identifier
+  _id?: string; // Server-generated unique identifier
   local_id: string; // Client-generated identifier for matching
   type: "simple" | "group" | "broadcast"; // Type of chat
   name?: string; // Optional, mainly for group chats
@@ -83,4 +79,52 @@ export interface IChat {
   createdAt: Date;
   updatedAt?: Date;
   status: "pending" | "created" | "failed"; // Status indicating the chat state
+}
+
+export type CalendarEvent = {
+  _id?: string;
+  userId: string;
+  startDate: Date;
+  endDate: Date;
+  eventType: "absence" | "holiday" | "event" | "visit" | "";
+  eventName: string;
+  reason:
+    | "illness"
+    | "day_off"
+    | "unexpected_event"
+    | "medical_visit"
+    | "public_holiday"
+    | "company_holiday"
+    | "company_meeting"
+    | "company_party"
+    | "conference"
+    | "expo"
+    | "issues"
+    | "routine"
+    | "new_client"
+    | "generic"
+    | "";
+  note?: string;
+  status: "pending" | "approved" | "rejected" | "cancelled";
+  visitClientId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export interface Holiday {
+  date: string; // ISO date string (e.g., "2024-01-01")
+  localName: string;
+  name: string;
+  countryCode: string;
+  fixed: boolean;
+  global: boolean;
+  counties: string[] | null;
+  launchYear: number | null;
+  types: string[];
+}
+
+export interface MonthlyData {
+  revenue: number;
+  netRevenue: number;
+  orders: number;
 }

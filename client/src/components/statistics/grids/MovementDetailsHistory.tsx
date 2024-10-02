@@ -1,11 +1,14 @@
 // src/components/movementsPage/MovementDetailsHistory.tsx
-import { Box, Paper } from "@mui/material";
+import { Box } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../app/store";
 import { MovementDetailsHistoryProps } from "../../../models/propsModels";
-import { currencyFormatter, numberComparator } from "../../../utils/dataUtils";
+import {
+  customCurrencyFormatter,
+  numberComparator,
+} from "../../../utils/dataUtils";
 import AGGridTable from "./AGGridTable";
 
 const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
@@ -14,41 +17,43 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
   const { t } = useTranslation();
   const userRole = useSelector((state: RootState) => state.auth.role);
 
-  /* useEffect(() => {
+  /*  // Log the movementDetails to inspect the data structure
+  useEffect(() => {
     console.log("Movement Details:", movementDetails);
   }, [movementDetails]); */
+
+  // Define a stable formatter function to prevent unnecessary re-creations
 
   const columnDefinitions = useMemo(() => {
     const baseColumns = [
       {
-        headerName: t("movementDetailsHistory.articleId"),
+        headerName: t("movementDetails.articleId"),
         field: "articleId",
         filter: "agTextColumnFilter",
         sortable: true,
       },
       {
-        headerName: t("movementDetailsHistory.name"),
+        headerName: t("movementDetails.name"),
         field: "name",
         filter: "agTextColumnFilter",
         sortable: true,
       },
       {
-        headerName: t("movementDetailsHistory.brand"),
+        headerName: t("movementDetails.brand"),
         field: "brand",
         filter: "agTextColumnFilter",
         sortable: true,
       },
       {
-        headerName: t("movementDetailsHistory.quantity"),
+        headerName: t("movementDetails.quantity"),
         field: "quantity",
         comparator: numberComparator,
         sortable: true,
       },
       {
-        headerName: t("movementDetailsHistory.priceSold"),
+        headerName: t("movementDetails.priceSold"),
         field: "priceSold",
-        valueFormatter: (params: { value: string }) =>
-          currencyFormatter(parseFloat(params.value)),
+        valueFormatter: customCurrencyFormatter,
         comparator: numberComparator,
         sortable: true,
       },
@@ -57,18 +62,16 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
     if (userRole === "admin" || userRole === "agent") {
       baseColumns.push(
         {
-          headerName: t("movementDetailsHistory.unitPrice"),
+          headerName: t("movementDetails.unitPrice"),
           field: "unitPrice",
-          valueFormatter: (params: { value: string }) =>
-            currencyFormatter(parseFloat(params.value)),
+          valueFormatter: customCurrencyFormatter,
           comparator: numberComparator,
           sortable: true,
         },
         {
-          headerName: t("movementDetailsHistory.priceBought"),
+          headerName: t("movementDetails.priceBought"),
           field: "priceBought",
-          valueFormatter: (params: { value: string }) =>
-            currencyFormatter(parseFloat(params.value)),
+          valueFormatter: customCurrencyFormatter,
           comparator: numberComparator,
           sortable: true,
         }
@@ -79,27 +82,14 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
   }, [t, userRole]);
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: 3,
-        borderRadius: "12px",
-        background: "transparent",
-        color: "#000",
-        position: "relative",
-        overflow: "hidden",
-        height: "100%",
-      }}
-    >
-      <Box sx={{ height: 600, width: "100%" }}>
-        <AGGridTable
-          columnDefs={columnDefinitions}
-          rowData={movementDetails}
-          paginationPageSize={20}
-          quickFilterText=""
-        />
-      </Box>
-    </Paper>
+    <Box sx={{ height: 600, width: "100%" }}>
+      <AGGridTable
+        columnDefs={columnDefinitions}
+        rowData={movementDetails}
+        paginationPageSize={20}
+        quickFilterText=""
+      />
+    </Box>
   );
 };
 

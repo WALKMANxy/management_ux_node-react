@@ -1,11 +1,12 @@
-// RenderMessage.tsx
+// src/components/chatPage/RenderMessage.tsx
+
 import { Box } from "@mui/material";
 import React from "react";
 import { IMessage } from "../../models/dataModels";
 import { User } from "../../models/entityModels";
-import MessageBubble from "./MessageBubble";
 import { isDifferentDay } from "../../utils/chatUtils";
 import DateDivider from "./DateDivider";
+import MessageBubble from "./MessageBubble";
 
 interface RenderMessageProps {
   messages: IMessage[];
@@ -14,29 +15,49 @@ interface RenderMessageProps {
   participantsData: Partial<User>[];
 }
 
+/**
+ * RenderMessages Component
+ * Renders a list of messages, inserting date dividers where necessary.
+ *
+ * @param {RenderMessageProps} props - Component props.
+ * @returns {JSX.Element} The rendered component.
+ */
 const RenderMessages: React.FC<RenderMessageProps> = ({
-  messages,
+  messages = [],
   currentUserId,
   chatType,
   participantsData,
 }) => {
+  /**
+   * Determines whether to show a date divider before the current message.
+   *
+   * @param {number} index - The current message index.
+   * @returns {boolean} Whether to show the date divider.
+   */
+  const shouldShowDivider = (index: number): boolean => {
+    if (index === 0) return true; // Always show divider for the first message
+    const currentMessageDate = new Date(messages[index].timestamp);
+    const previousMessageDate = new Date(messages[index - 1].timestamp);
+    return isDifferentDay(currentMessageDate, previousMessageDate);
+  };
 
-/*   console.log("RenderingMessages rendering now")
- */
   return (
     <Box>
       {messages.map((message, index) => {
-        const showDivider =
-          index === 0 ||
-          isDifferentDay(new Date(message.timestamp), new Date(messages[index - 1].timestamp));
+        const showDivider = shouldShowDivider(index);
 
         return (
-          <React.Fragment key={message.local_id || message._id}>
-            {showDivider && <DateDivider date={new Date(message.timestamp)} />}
+          <React.Fragment
+            key={message.local_id || message._id || `message-${index}`}
+          >
+            {showDivider && message.timestamp && (
+              <DateDivider date={new Date(message.timestamp)} />
+            )}
             <Box
               sx={{
                 display: "flex",
-                justifyContent: message.sender === currentUserId ? "flex-end" : "flex-start",
+                justifyContent:
+                  message.sender === currentUserId ? "flex-end" : "flex-start",
                 mb: 2,
               }}
             >

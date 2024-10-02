@@ -92,12 +92,12 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // Log the cookie being set
-    console.log("Setting session cookie with attributes:", {
+   /*  console.log("Setting session cookie with attributes:", {
       sessionToken,
       httpOnly: true,
       secure: true,
       sameSite: "none",
-    });
+    }); */
 
     // Set the session token in the cookie
     res.cookie("sessionToken", sessionToken, {

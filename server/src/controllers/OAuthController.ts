@@ -4,10 +4,22 @@ import { IUser } from "../models/User";
 import { OAuthService } from "../services/OAuthService";
 import { generateSessionToken } from "../utils/jwtUtils";
 import { createSession, renewSession } from "../utils/sessionUtils";
+import { config } from "../config/config";
 
 export class OAuthController {
+
+  static initiateGoogleOAuth(req: Request, res: Response) {
+    const { state } = req.query;
+
+    const redirectUri = `${config.appUrl}/auth/google/callback`;
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${config.googleClientId}&redirect_uri=${redirectUri}&response_type=code&scope=email%20profile&state=${state}`;
+
+    res.redirect(googleAuthUrl);
+  }
+
+
   static async handleOAuthCallback(req: Request, res: Response) {
-    const { code } = req.body;
+    const { code, state } = req.query;
 
     if (typeof code !== "string") {
       return res.status(400).json({ message: "Invalid authorization code" });
@@ -33,9 +45,22 @@ export class OAuthController {
         secure: true,
         sameSite: "none",
       });
+
+      // Send a message to the opener window
+      res.send(`
+        <script>
+          window.opener.postMessage({ status: "success", state: "${state}", user: ${JSON.stringify(user)} }, "${process.env.CLIENT_URL}");
+          window.close();
+        </script>
+      `);
     } catch (error) {
       console.error("Error during OAuth callback", error);
-      res.status(500).send("Authentication failed");
+      res.send(`
+        <script>
+          window.opener.postMessage({ status: "error", state: "${state}" }, "${process.env.CLIENT_URL}");
+          window.close();
+        </script>
+      `);
     }
   }
 
@@ -72,7 +97,7 @@ export class OAuthController {
   }
 
   static async linkGoogleAccount(req: AuthenticatedRequest, res: Response) {
-    const { code } = req.query;
+    const { code } = req.body;
     const user = req.user as IUser;
 
     if (typeof code !== "string") {
@@ -97,13 +122,24 @@ export class OAuthController {
         email,
         picture
       );
+
+      // Create a new session for the user
+      const sessionToken = generateSessionToken(updatedUser);
+      await createSession(updatedUser.id.toString(), sessionToken, req);
+
+      res.cookie("sessionToken", sessionToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
+
       res.status(200).json({
         message: "Google account linked successfully",
         user: updatedUser,
       });
     } catch (error) {
       console.error("Error during Google account linking", error);
-      res.status(500).json({ message: "Failed to link Google account", error });
+      res.status(500).json({ message: "Failed to link Google account" });
     }
   }
 }

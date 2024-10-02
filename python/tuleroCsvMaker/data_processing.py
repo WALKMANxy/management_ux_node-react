@@ -3,93 +3,11 @@ import re
 
 import numpy as np
 import pandas as pd
+from ignored_brands import IGNORED_BRANDS
 from pandarallel import pandarallel
 from tqdm import tqdm
 
 pandarallel.initialize(progress_bar=True, verbose=0)
-
-
-IGNORED_BRANDS = [
-    "AP",
-    "AREXONS",
-    "ASSO",
-    "ATE",
-    "ATECSO",
-    "AUTOCLIMA",
-    "BIRTH",
-    "BOSCH",
-    "BREMBO",
-    "BUGATTI",
-    "CASCO",
-    "CASTROL",
-    "CEI",
-    "CORTECO",
-    "COVIND",
-    "DAF",
-    "DAYCO",
-    "DELPHI",
-    "DENSO",
-    "DOLZ",
-    "ELRING",
-    "EMMERRE",
-    "ERA",
-    "EXIDE",
-    "FAG",
-    "FEBI",
-    "FERODO",
-    "FIAT",
-    "FORD",
-    "FRAP",
-    "FTE",
-    "GATES",
-    "HELLA",
-    "HOFFER",
-    "IMASAF",
-    "INA",
-    "ISUZU",
-    "IVECO",
-    "JAPANPARTS",
-    "JAPKO",
-    "KNECHT",
-    "KRIOS",
-    "LEMFORDER",
-    "LUK",
-    "MAHLE",
-    "MAN",
-    "METELLI",
-    "MEYLE",
-    "MOBIL",
-    "MONROE",
-    "MOOG",
-    "MULLER FILTER",
-    "NISSAN",
-    "NISSENS",
-    "NK",
-    "NRF",
-    "OLSA",
-    "OMP",
-    "PEUGEOT",
-    "PIAGGIO",
-    "PIERBURG",
-    "RAICAM",
-    "RENAULT",
-    "SACHS",
-    "SCANIA",
-    "SELENIA",
-    "SIDAT",
-    "SKF",
-    "TEXTAR",
-    "TRW",
-    "TUDOR",
-    "UFI",
-    "VALEO",
-    "VEMA",
-    "VITAL SUSPENSIONS",
-    "VOLVO",
-    "VOLKSWAGEN",
-    "ZETA-ERRE",
-    "ZF",
-]
 
 
 def is_unnamed(header):
@@ -113,9 +31,6 @@ def validate_other_sheet(df):
         df.shape[1] == 6
         and not is_unnamed(df.columns[1])
         and not is_unnamed(df.columns[2])
-        and not is_unnamed(df.columns[3])
-        and not is_unnamed(df.columns[4])
-        and is_unnamed(df.columns[0])
     )
 
 
@@ -194,14 +109,14 @@ def optimized_cross_code_generation(cleaned_df, ignored_brands):
     return cross_codes_series.fillna("")
 
 
-def load_and_clean_warehouse_file(warehouse_file_path):
-    print("Loading and cleaning the warehouse file...")
-    print("Warehouse file path:", warehouse_file_path)
-    xls = pd.ExcelFile(warehouse_file_path)
+def load_and_clean_excel_file(file_path, file_type):
+    print(f"Loading and cleaning the {file_type} file...")
+    print(f"{file_type.capitalize()} file path:", file_path)
+    xls = pd.ExcelFile(file_path)
     relevant_sheets = []
     first_sheet_validated = False
 
-    for sheet_name in tqdm(xls.sheet_names, desc="Validating sheets"):
+    for sheet_name in tqdm(xls.sheet_names, desc=f"Validating {file_type} sheets"):
         df = pd.read_excel(xls, sheet_name=sheet_name, header=0, dtype=str)
         if not first_sheet_validated:
             if validate_first_sheet(df):
@@ -214,7 +129,7 @@ def load_and_clean_warehouse_file(warehouse_file_path):
                 relevant_sheets.append((sheet_name, df))
 
     if not relevant_sheets:
-        raise ValueError("No relevant sheets found in the Excel file")
+        raise ValueError(f"No relevant sheets found in the {file_type} Excel file")
 
     # Identify and drop the column that starts with 'mgs'
     first_sheet_df = relevant_sheets[0][1]
@@ -230,38 +145,109 @@ def load_and_clean_warehouse_file(warehouse_file_path):
     df_combined = pd.concat(aligned_sheets, ignore_index=True)
     df_combined = df_combined[~df_combined.iloc[:, 2].isin(["", "."])]
 
-    # Drop unnecessary column
-    df_combined = df_combined.drop(columns=["STAMPA ANAGRAFICA ARTICOLI"])
+    # Drop unnecessary columns
+    if file_type == "warehouse":
+        drop_column = "STAMPA ANAGRAFICA ARTICOLI"
+    elif file_type == "articles":
+        drop_column = "STAMPA LISTINI"
+    else:
+        raise ValueError("Invalid file type specified.")
+
+    df_combined.drop(columns=[drop_column], inplace=True)
 
     # Assign column names based on the number of columns
     if len(df_combined.columns) == 5:
-        df_combined.columns = [
-            "CODICE PRODOTTO",
-            "MARCA",
-            "DESCRIZIONE",
-            "UBICAZIONE",
-            "GIACENZA",
-        ]
+        if file_type == "warehouse":
+            df_combined.columns = [
+                "CODICE PRODOTTO",
+                "BRAND",
+                "DESCRIZIONE",
+                "UBICAZIONE",
+                "GIACENZA",
+            ]
+        else:
+            df_combined.columns = [
+                "CODICE PRODOTTO",
+                "BRAND",
+                "DESCRIZIONE",
+                "GIACENZA",
+                "PRZ. ULT. ACQ.",
+            ]
     else:
         raise ValueError(f"Unexpected number of columns: {len(df_combined.columns)}")
 
     # Ensure specific columns are treated as strings
-    df_combined["CODICE PRODOTTO"] = df_combined["CODICE PRODOTTO"].astype(str)
-    df_combined["MARCA"] = df_combined["MARCA"].astype(str)
-    df_combined["DESCRIZIONE"] = df_combined["DESCRIZIONE"].astype(str)
-    df_combined["UBICAZIONE"] = (
-        df_combined["UBICAZIONE"]
-        .fillna("Location Unknown")
-        .replace("", "Location Unknown")
-    )
-    df_combined["GIACENZA"] = pd.to_numeric(
-        df_combined["GIACENZA"].str.replace(",", "."), errors="coerce"
-    )
+    string_columns = ["CODICE PRODOTTO", "DESCRIZIONE", "BRAND"]
+    if file_type == "warehouse":
+        string_columns.append("UBICAZIONE")
+    for col in string_columns:
+        df_combined[col] = df_combined[col].astype(str).str.strip()
 
-    # Keep only small items (A, B, C)
-    pattern = r"^[A-Ca-c](?:\.|[0-9])"
-    valid_small_items = df_combined["UBICAZIONE"].str.match(pattern)
-    df_combined = df_combined[valid_small_items]
+    # For warehouse file, process UBICAZIONE and GIACENZA
+    if file_type == "warehouse":
+        df_combined["UBICAZIONE"] = (
+            df_combined["UBICAZIONE"].fillna("").replace("", "Location Unknown")
+        )
+        df_combined["GIACENZA"] = pd.to_numeric(
+            df_combined["GIACENZA"].str.replace(",", "."), errors="coerce"
+        )
+
+        # Strip leading/trailing whitespaces from UBICAZIONE
+        df_combined["UBICAZIONE"] = df_combined["UBICAZIONE"].astype(str).str.strip()
+
+        # Debugging: Print UBICAZIONE values before filtering
+        print("UBICAZIONE values before filtering:")
+        print(df_combined["UBICAZIONE"].unique())
+
+        # Keep only small items (A, B, C)
+        pattern = r"^[A-Ca-c](?:\.|[0-9])"
+        valid_small_items = df_combined["UBICAZIONE"].str.match(pattern)
+        df_filtered = df_combined[valid_small_items]
+
+        # Debugging: Print the UBICAZIONE values that are being kept
+        print("UBICAZIONE values after filtering:")
+        print(df_filtered["UBICAZIONE"].unique())
+
+        # Identify and log the rows being filtered out
+        filtered_out = df_combined[~valid_small_items]
+        if not filtered_out.empty:
+            print("Rows being filtered out due to UBICAZIONE not matching the pattern:")
+            print(filtered_out[["CODICE PRODOTTO", "BRAND", "UBICAZIONE"]])
+
+        df_combined = df_filtered
+
+    # For articles file, process GIACENZA and PRZ. ULT. ACQ.
+    elif file_type == "articles":
+        # Correct GIACENZA conversion for numbers with thousands separators
+        df_combined["GIACENZA"] = (
+            df_combined["GIACENZA"]
+            .str.replace(".", "", regex=False)
+            .str.replace(",", ".", regex=False)
+        )
+        df_combined["GIACENZA"] = pd.to_numeric(
+            df_combined["GIACENZA"], errors="coerce"
+        )
+
+        df_combined["PRZ. ULT. ACQ."] = df_combined["PRZ. ULT. ACQ."].str.replace(
+            ",", ".", regex=False
+        )
+        df_combined["PRZ. ULT. ACQ."] = pd.to_numeric(
+            df_combined["PRZ. ULT. ACQ."], errors="coerce"
+        )
+
+        df_combined = df_combined[df_combined["GIACENZA"] > 0]
+        df_combined = df_combined[df_combined["PRZ. ULT. ACQ."].notna()]
+
+    # Print the cleaned DataFrame
+    print(f"\nCleaned {file_type.capitalize()} DataFrame:")
+    print(df_combined)
+
+    output_path = "Z:/My Drive/rcs/"
+    # Save the cleaned DataFrame
+    output_filename = f"{file_type}File.csv"
+    output_file_path = os.path.join(output_path, output_filename)
+    df_combined.to_csv(output_file_path, index=False)
+    print(f"\nSaved cleaned {file_type} file to: {output_file_path}")
 
     return df_combined
 
@@ -276,69 +262,58 @@ def process_files(
     update_progress=None,
 ):
     # Load and clean the warehouse file
-    warehouse_df = load_and_clean_warehouse_file(warehouse_file_path)
+    warehouse_df = load_and_clean_excel_file(warehouse_file_path, "warehouse")
 
     # Load and clean the articles file
+    articles_df = load_and_clean_excel_file(articles_file_path, "articles")
 
-    xls = pd.ExcelFile(articles_file_path)
-    relevant_sheets = []
-    first_sheet_validated = False
+    # Merge the warehouse data with articles data on 'CODICE PRODOTTO' and 'BRAND'
+    warehouse_df["BRAND"] = warehouse_df["BRAND"].str.strip()
+    articles_df["BRAND"] = articles_df["BRAND"].str.strip()
+    warehouse_df["CODICE PRODOTTO"] = warehouse_df["CODICE PRODOTTO"].str.strip()
+    articles_df["CODICE PRODOTTO"] = articles_df["CODICE PRODOTTO"].str.strip()
 
-    for sheet_name in tqdm(xls.sheet_names, desc="Validating sheets"):
-        df = pd.read_excel(
-            xls, sheet_name=sheet_name, header=0, dtype=str
-        )  # Ensure all columns are read as strings
-        if not first_sheet_validated:
-            if validate_first_sheet(df):
-                relevant_sheets.append((sheet_name, df))
-                first_sheet_validated = True
-            else:
-                raise ValueError("First sheet is not valid")
-        else:
-            if validate_other_sheet(df):
-                relevant_sheets.append((sheet_name, df))
+    # Debugging: Check if specific CODICE PRODOTTO and BRAND exist in both DataFrames
+    test_codes = ["1905983", "27.564.00"]
+    test_brands = ["IVECO", "UFI"]
+    print("Checking for specific CODICE PRODOTTO and BRAND in warehouse_df:")
+    print(
+        warehouse_df[
+            (warehouse_df["CODICE PRODOTTO"].isin(test_codes))
+            & (warehouse_df["BRAND"].isin(test_brands))
+        ]
+    )
+    print("Checking for specific CODICE PRODOTTO and BRAND in articles_df:")
+    print(
+        articles_df[
+            (articles_df["CODICE PRODOTTO"].isin(test_codes))
+            & (articles_df["BRAND"].isin(test_brands))
+        ]
+    )
 
-    if not relevant_sheets:
-        raise ValueError("No relevant sheets found in the Excel file")
+    merged_df = pd.merge(
+        articles_df,
+        warehouse_df[["CODICE PRODOTTO", "BRAND", "UBICAZIONE"]],
+        on=["CODICE PRODOTTO", "BRAND"],
+        how="inner",  # Use 'inner' to get only successful matches
+    )
 
-    first_sheet_df = relevant_sheets[0][1]
-    mgs_column = [col for col in first_sheet_df.columns if col.startswith("mgs")]
-    if mgs_column:
-        first_sheet_df = first_sheet_df.drop(columns=mgs_column)
+    print("Columns in merged_df after merge:", merged_df.columns)
+    print("Rows in merged_df after merge:", merged_df.shape[0])
 
-    aligned_sheets = [first_sheet_df]
-    for sheet_name, df in relevant_sheets[1:]:
-        df.columns = first_sheet_df.columns
-        aligned_sheets.append(df)
-
-    df_combined = pd.concat(aligned_sheets, ignore_index=True)
-    df_combined = df_combined[~df_combined.iloc[:, 2].isin(["", "."])]
-    df_combined.drop(columns=["STAMPA LISTINI"], inplace=True)
-
-    df_combined.columns = [
-        "CODICE PRODOTTO",
-        "BRAND",
-        "DESCRIZIONE",
-        "GIACENZA",
-        "PRZ. ULT. ACQ.",
-    ]
-
-    for col in [
-        "CODICE OE",
-        "CODICI CROSS",
-        "LINK IMMAGINE",
-        "CATEGORIA",
-        "SCHEDA TECNICA",
-        "SCHEDA DI SICUREZZA",
-        "CONFEZIONE",
-        "QUANTITÀ MINIMA",
-        "META.LUNGHEZZA",
-        "META.LARGHEZZA",
-        "META.PROFONDITA'",
-        "META. ...",
-        "UBICAZIONE",
-    ]:
-        df_combined[col] = pd.NA
+    # Proceed with the rest of the processing
+    merged_df["CODICE OE"] = pd.NA
+    merged_df["CODICI CROSS"] = pd.NA
+    merged_df["LINK IMMAGINE"] = pd.NA
+    merged_df["CATEGORIA"] = pd.NA
+    merged_df["SCHEDA TECNICA"] = pd.NA
+    merged_df["SCHEDA DI SICUREZZA"] = pd.NA
+    merged_df["CONFEZIONE"] = pd.NA
+    merged_df["QUANTITÀ MINIMA"] = pd.NA
+    merged_df["META.LUNGHEZZA"] = pd.NA
+    merged_df["META.LARGHEZZA"] = pd.NA
+    merged_df["META.PROFONDITA'"] = pd.NA
+    merged_df["META. ..."] = pd.NA
 
     # Ensure specified columns are treated as strings
     columns_to_ensure_as_strings = [
@@ -358,48 +333,13 @@ def process_files(
         "META. ...",
         "UBICAZIONE",
     ]
-    df_combined[columns_to_ensure_as_strings] = df_combined[
+    merged_df[columns_to_ensure_as_strings] = merged_df[
         columns_to_ensure_as_strings
     ].astype(str)
 
-    df_combined["GIACENZA"] = pd.to_numeric(
-        df_combined["GIACENZA"].str.replace(",", "."), errors="coerce"
-    )
-    df_combined["PRZ. ULT. ACQ."] = pd.to_numeric(
-        df_combined["PRZ. ULT. ACQ."].str.replace(",", "."), errors="coerce"
-    )
-
-    df_combined = df_combined[df_combined["GIACENZA"] > 0]
-    df_combined = df_combined[df_combined["PRZ. ULT. ACQ."].notna()]
-
-    # Merge with warehouse data
-    df_combined = df_combined.merge(
-        warehouse_df[["CODICE PRODOTTO", "MARCA", "UBICAZIONE"]],
-        left_on=["CODICE PRODOTTO", "BRAND"],
-        right_on=["CODICE PRODOTTO", "MARCA"],
-        how="left",
-    )
-
-    df_combined.drop(columns=["UBICAZIONE_x"], inplace=True)
-    df_combined.rename(columns={"UBICAZIONE_y": "UBICAZIONE"}, inplace=True)
-
-    print("Columns in df_combined after merge:", df_combined.columns)
-
-    df_combined.drop(columns=["MARCA"], inplace=True)
-
-    # Assign shipping category based on UBICAZIONE
-    df_combined["SHIPPING_CAT"] = df_combined["UBICAZIONE"].apply(
-        lambda x: "9.90" if pd.notna(x) and re.match(r"^[A-Ca-c]", x) else "UNKNOWN"
-    )
-
-    # Drop the UBICAZIONE column since it's no longer needed
-    df_combined.drop(columns=["UBICAZIONE"], inplace=True)
-
-    # No need to save and reload, continue with the DataFrame in memory
-    cleaned_df = df_combined
-    cleaned_df["CODICE PRODOTTO"] = cleaned_df["CODICE PRODOTTO"].str.strip()
-    cleaned_df["CODICE OE"] = cleaned_df["CODICE OE"].str.strip()
-    cleaned_df["BRAND"] = cleaned_df["BRAND"].str.strip()
+    # Update CODICE OE using the get_oem_number function
+    merged_df["CODICE PRODOTTO"] = merged_df["CODICE PRODOTTO"].str.strip()
+    merged_df["BRAND"] = merged_df["BRAND"].str.strip()
 
     old_oems_files = [
         file
@@ -431,26 +371,24 @@ def process_files(
 
     # Update CODICE OE using the get_oem_number function
     tqdm.pandas(desc="Updating CODICE OE with old OEMs")
-    cleaned_df["CODICE OE"] = vectorized_get_oem_number(
-        cleaned_df, oem_lookup, IGNORED_BRANDS
+    merged_df["CODICE OE"] = vectorized_get_oem_number(
+        merged_df, oem_lookup, IGNORED_BRANDS
     )
 
     # Update PREZZO based on PRZ. ULT. ACQ.
-    cleaned_df["PRZ. ULT. ACQ."] = pd.to_numeric(
-        cleaned_df["PRZ. ULT. ACQ."], errors="coerce"
+    merged_df["PREZZO"] = merged_df["PRZ. ULT. ACQ."].apply(
+        lambda x: round(float(x) * 1.25, 2) if pd.notnull(x) else x
     )
-    cleaned_df["PREZZO"] = cleaned_df["PRZ. ULT. ACQ."].apply(
-        lambda x: round(x * 1.25, 2) if pd.notnull(x) else x
-    )
-    cleaned_df["SHIPPING_CAT"] = pd.to_numeric(
-        cleaned_df["SHIPPING_CAT"], errors="coerce"
-    )
-    cleaned_df.drop(columns=["PRZ. ULT. ACQ."], inplace=True)
+    merged_df.drop(columns=["PRZ. ULT. ACQ."], inplace=True)
 
-    """ # Ensure specified columns are treated as strings before reordering
-    cleaned_df[columns_to_ensure_as_strings] = cleaned_df[
-        columns_to_ensure_as_strings
-    ].astype(str) """
+    # Debugging: Check if specific CODICE PRODOTTO and BRAND are in the final merged_df
+    print("Checking for specific CODICE PRODOTTO and BRAND in final merged_df:")
+    print(
+        merged_df[
+            (merged_df["CODICE PRODOTTO"].isin(test_codes))
+            & (merged_df["BRAND"].isin(test_brands))
+        ]
+    )
 
     # Reorder columns
     columns_order = [
@@ -467,42 +405,51 @@ def process_files(
         "SCHEDA DI SICUREZZA",
         "CONFEZIONE",
         "QUANTITÀ MINIMA",
-        "SHIPPING_CAT",  # Include SHIPPING_CAT
         "META.LUNGHEZZA",
         "META.LARGHEZZA",
         "META.PROFONDITA'",
         "META. ...",
+        "UBICAZIONE",  # Include UBICAZIONE for filtering
     ]
-    cleaned_df = cleaned_df[columns_order]
-    cleaned_df["CODICI CROSS"] = ""
+    merged_df = merged_df[columns_order]
+    merged_df["CODICI CROSS"] = ""
 
     # Apply optimized cross-code generation function
-    cleaned_df["CODICI CROSS"] = optimized_cross_code_generation(
-        cleaned_df, IGNORED_BRANDS
+    merged_df["CODICI CROSS"] = optimized_cross_code_generation(
+        merged_df, IGNORED_BRANDS
     )
 
     # Handle cases where CODICE OE is unknown and brand is not ignored
-    cleaned_df["padded_oe"] = " " + cleaned_df["CODICE OE"].str.strip() + " "
-    unknown_oe_mask = (cleaned_df["CODICE OE"] == "Unknown OE") & (
-        ~cleaned_df["BRAND"].isin(IGNORED_BRANDS)
+    merged_df["padded_oe"] = " " + merged_df["CODICE OE"].str.strip() + " "
+    unknown_oe_mask = (merged_df["CODICE OE"] == "Unknown OE") & (
+        ~merged_df["BRAND"].isin(IGNORED_BRANDS)
     )
-    cleaned_df.loc[unknown_oe_mask, "CODICI CROSS"] = cleaned_df.loc[
+    merged_df.loc[unknown_oe_mask, "CODICI CROSS"] = merged_df.loc[
         unknown_oe_mask, "CODICE PRODOTTO"
     ].parallel_apply(
         lambda codice_prodotto: find_additional_cross_codes(
-            codice_prodotto, cleaned_df["padded_oe"], cleaned_df, IGNORED_BRANDS
+            codice_prodotto, merged_df["padded_oe"], merged_df, IGNORED_BRANDS
         )
     )
 
+    # Debugging: Check if specific CODICE PRODOTTO and BRAND are in the final merged_df
+    print("Checking for specific CODICE PRODOTTO and BRAND in final merged_df:")
+    print(
+        merged_df[
+            (merged_df["CODICE PRODOTTO"].isin(test_codes))
+            & (merged_df["BRAND"].isin(test_brands))
+        ]
+    )
+
     # Drop the 'padded_oe' column
-    cleaned_df.drop(columns=["padded_oe"], inplace=True)
+    merged_df.drop(columns=["padded_oe"], inplace=True)
 
     # Fill the "CONFEZIONE" column with "1 pz" and the "QUANTITÀ MINIMA" column with "1"
-    cleaned_df["CONFEZIONE"] = "1 pz"
-    cleaned_df["QUANTITÀ MINIMA"] = "1"
+    merged_df["CONFEZIONE"] = "1 pz"
+    merged_df["QUANTITÀ MINIMA"] = "1"
 
     # Set CATEGORIA to "Ricambio"
-    cleaned_df["CATEGORIA"] = "Ricambio"
+    merged_df["CATEGORIA"] = "Ricambio"
 
     # Ensure specified columns remain empty
     columns_to_keep_empty = [
@@ -514,21 +461,64 @@ def process_files(
         "META.PROFONDITA'",
         "META. ...",
     ]
-    cleaned_df[columns_to_keep_empty] = ""
+    merged_df[columns_to_keep_empty] = ""
 
-    # Step 4: Update brands
-    cleaned_df = update_brands(cleaned_df, brands_file_path)
+    # Additional filtering step based on your requirements
+    # Filter out all rows where UBICAZIONE starts with 'c.00' or 'C.00' and DESCRIZIONE does not contain 'FILTRO', 'FILTRI', 'filtro', 'filtri'
+    pattern = r"^[cC]\.00"
+    keywords = ["FILTRO", "FILTRI", "filtro", "filtri"]
+
+    def filter_condition(row):
+        ubicazione_match = re.match(pattern, row["UBICAZIONE"])
+        descrizione_contains_keywords = any(kw in row["DESCRIZIONE"] for kw in keywords)
+        return not (ubicazione_match and not descrizione_contains_keywords)
+
+    tqdm.pandas(desc="Applying additional filtering")
+    merged_df = merged_df[merged_df.progress_apply(filter_condition, axis=1)]
+
+    # Debugging: Check if specific CODICE PRODOTTO and BRAND are in the final merged_df
+    print("Checking for specific CODICE PRODOTTO and BRAND in final merged_df:")
+    print(
+        merged_df[
+            (merged_df["CODICE PRODOTTO"].isin(test_codes))
+            & (merged_df["BRAND"].isin(test_brands))
+        ]
+    )
+
+    # Update brands
+    merged_df = update_brands(merged_df, brands_file_path)
 
     # After updating brands, set CODICE OE and CODICI CROSS to empty for ignored brands
-    ignored_brands_mask = cleaned_df["BRAND"].isin(IGNORED_BRANDS)
-    cleaned_df.loc[ignored_brands_mask, ["CODICE OE", "CODICI CROSS"]] = ""
+    ignored_brands_mask = merged_df["BRAND"].isin(IGNORED_BRANDS)
+    merged_df.loc[ignored_brands_mask, ["CODICE OE", "CODICI CROSS"]] = ""
 
-    # Temporarily remove all rows that lack a shipping category.
+    # Drop 'UBICAZIONE' column if not needed in the final output
+    merged_df.drop(columns=["UBICAZIONE"], inplace=True)
 
-    cleaned_df.dropna(subset=["SHIPPING_CAT"], inplace=True)
+    # **Add the custom rules here**
 
+    # Convert 'PREZZO' to numeric if it's not already
+    merged_df["PREZZO"] = pd.to_numeric(merged_df["PREZZO"], errors="coerce")
 
-    # Save the final output directly
-    cleaned_df.to_csv(final_output_with_brands_path, index=False)
-    print(f"Brands updated and final file saved at {final_output_with_brands_path}")
+    # Filter out all rows where PREZZO is less than 4.50
+    merged_df = merged_df[merged_df["PREZZO"] >= 4.50]
+
+    # Add 7.50 to all remaining PREZZO
+    merged_df["PREZZO"] = merged_df["PREZZO"] + 7.50
+
+    # Define the custom rounding function
+    def custom_round(price):
+        if pd.isnull(price):
+            return price
+        decimal_part = price % 1
+        if decimal_part <= 0.5:
+            return np.floor(price - 1) + 0.9
+        else:
+            return np.floor(price) + 0.9
+
+    # Apply the custom rounding to 'PREZZO'
+    merged_df["PREZZO"] = merged_df["PREZZO"].apply(custom_round)
+
+    # Save the final output
+    merged_df.to_csv(final_output_with_brands_path, index=False)
     print(f"Brands updated and final file saved at {final_output_with_brands_path}")

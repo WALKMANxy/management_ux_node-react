@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useAppDispatch } from "../app/hooks";
 import store from "../app/store";
 import {
@@ -9,17 +10,24 @@ import { handleLogin, handleLogout } from "../features/auth/authSlice";
 import { setCurrentUser } from "../features/users/userSlice";
 import { User } from "../models/entityModels";
 
+import { useTranslation } from "react-i18next";
+import { getTimeMs } from "../config/config";
+import { initializeUserEncryption } from "../utils/cacheUtils";
 import {
   FetchUserRoleError,
   LoginError,
   RegistrationError,
 } from "../utils/errorHandling";
 import { saveAuthState } from "../utils/localStorage";
+import { showToast } from "../utils/toastMessage";
+
+const timeMS = getTimeMs(); // Ensure this is set in your .env file
 
 export const useAuth = () => {
   const dispatch = useAppDispatch();
   const [registerUser] = useRegisterUserMutation();
   const [loginUser] = useLoginUserMutation();
+  const { t } = useTranslation();
 
   const initiateRegister = async (
     email: string,
@@ -33,12 +41,12 @@ export const useAuth = () => {
         email,
         password,
       }).unwrap();
-      setAlertMessage(message);
+      setAlertMessage(t("auth.registrationSuccess" + message)); // translation key
       setAlertSeverity(statusCode === 201 ? "success" : "error");
       setAlertOpen(true);
     } catch (error) {
       const registrationError = new RegistrationError((error as Error).message);
-      setAlertMessage(registrationError.message);
+      setAlertMessage(t("auth.registrationFailed" + registrationError.message)); // translation key
       setAlertSeverity("error");
       setAlertOpen(true);
     }
@@ -48,19 +56,12 @@ export const useAuth = () => {
     email: string,
     password: string,
     setAlertMessage: (message: string) => void,
-    setAlertSeverity: (severity: "success" | "error") => void,
+    setAlertSeverity: (severity: "success" | "error" | "info") => void, // Added "info" severity
     setAlertOpen: (open: boolean) => void,
     onClose: () => void,
     keepMeSignedIn: boolean
   ) => {
-    /* console.log("Initiate login started with the following parameters:", {
-      email,
-      keepMeSignedIn,
-    }); */
-
     try {
-      /*       console.log("Attempting to log in user with email:", email);
-       */
       // Attempt to log in the user
       const { id, message, statusCode } = await loginUser({
         email,
@@ -68,11 +69,6 @@ export const useAuth = () => {
       }).unwrap();
 
       // Logging the response from loginUser API
-      /* console.log("Login response received:", {
-        id,
-        message,
-        statusCode,
-      }); */
 
       // Check if the login was unsuccessful
       if (statusCode !== 200) {
@@ -82,7 +78,7 @@ export const useAuth = () => {
           "Message:",
           message
         );
-        setAlertMessage(message);
+        setAlertMessage(t("auth.loginFailed" + message)); // translation key
         setAlertSeverity("error");
         setAlertOpen(true);
         return;
@@ -90,45 +86,39 @@ export const useAuth = () => {
 
       // Proceed if the login was successful
       const userId = id;
-      /*       console.log("User ID received after login:", userId);
-       */
+
       if (userId) {
-        /*         console.log("Fetching user role for user ID:", userId);
-         */
+        // Derive the encryption key using userId, userAgent, and salt
+
+        await initializeUserEncryption({
+          userId,
+          timeMS,
+        });
+
         // Dispatch an action to get the user role by ID
         const result = await dispatch(
           authApi.endpoints.getUserRoleById.initiate(userId)
         );
-
-        // Log the result of the fetch user role action
-        /*         console.log("Fetch user role result:", result);
-         */
-        // Check if the fetch was successful
         if ("data" in result) {
           const user = result.data as User;
-          /*           console.log("User data retrieved:", user);
-           */
-          // Check if the user's role is 'guest'
+
+          if (!user.role) {
+            setAlertMessage(t("auth.roleNotAssigned" + message)); // translation key
+
+            setAlertSeverity("info"); // Changed to "info" severity
+            setAlertOpen(true);
+            return;
+          }
+
           if (user.role === "guest") {
-            console.warn(
-              "User has a 'guest' role, account verification required."
-            );
-            setAlertMessage(
-              "Your account is still being verified by the admins."
-            );
+            setAlertMessage(t("auth.accountVerificationPending" + message)); // translation key
+
             setAlertSeverity("error");
             setAlertOpen(true);
             return;
           }
 
-          // Dispatch login action with user data
-          /* console.log("Dispatching handleLogin with user data:", {
-            role: user.role,
-            id: user.entityCode,
-            userId: user._id,
-          }); */
-
-          dispatch(
+          await dispatch(
             handleLogin({
               role: user.role,
               id: user.entityCode,
@@ -141,37 +131,38 @@ export const useAuth = () => {
 
           // Save auth state if 'Keep me signed in' is selected
           if (keepMeSignedIn) {
-            /* console.log(
-              "Saving auth state due to 'Keep me signed in' selection."
-            ); */
             saveAuthState(store.getState().auth);
           }
 
-          // Log the updated authentication state
-          /* const state = store.getState();
-          console.log("Updated auth state after handleLogin:", state.auth);
- */
-         
           onClose();
         } else if ("error" in result) {
-          // Handle the error when fetching the user role
-          console.error("Error fetching user role:", result.error);
-          throw new FetchUserRoleError("Failed to fetch user role");
+          showToast.error(t("auth.roleFetchingError", { error: result.error })); // Toast for role fetching error
+          throw new FetchUserRoleError(t("auth.roleFetchingError"));
         }
       } else {
-        console.error("User ID is missing after successful login.");
-        setAlertMessage("Failed to retrieve user information.");
+        showToast.error(t("auth.userNotFound")); // Toast for user ID missing
+        setAlertMessage(t("auth.userNotFound"));
         setAlertSeverity("error");
         setAlertOpen(true);
       }
     } catch (error) {
-      // Catch and log any errors during the login process
-      console.error("An error occurred during the login process:", error);
+      let errorMessage = t("auth.errorDuringLogin");
+      let errorSeverity: "error" | "info" = "error";
 
-      // Create a new LoginError with the error message
-      const loginError = new LoginError((error as Error).message);
+      if (error instanceof FetchUserRoleError) {
+        errorMessage = t("auth.roleNotAssigned");
+        errorSeverity = "info";
+      } else if (
+        error instanceof Error &&
+        error.message.includes("undefined")
+      ) {
+        errorMessage = t("auth.serverUnreachable");
+      }
+
+      showToast.error(errorMessage); // Toast for general login error
+      const loginError = new LoginError(errorMessage);
       setAlertMessage(loginError.message);
-      setAlertSeverity("error");
+      setAlertSeverity(errorSeverity);
       setAlertOpen(true);
     }
   };
@@ -183,22 +174,91 @@ export const useAuth = () => {
   ) => {
     try {
       dispatch(handleLogout());
-      setAlertMessage("User logged out successfully.");
+      showToast.success(t("auth.logoutSuccess")); // Toast for successful logout
+      setAlertMessage(t("auth.logoutSuccess"));
       setAlertSeverity("success");
       setAlertOpen(true);
     } catch (error: unknown) {
+      showToast.error(t("auth.logoutFailed")); // Toast for logout failure
       if (error instanceof Error) {
-        const logoutError = new Error("Failed to log out.");
-        setAlertMessage(logoutError.message);
+        setAlertMessage(t("auth.logoutFailed"));
         setAlertSeverity("error");
         setAlertOpen(true);
       } else {
-        setAlertMessage("An unexpected error occurred.");
+        setAlertMessage(t("auth.unexpectedError"));
         setAlertSeverity("error");
         setAlertOpen(true);
       }
     }
   };
 
-  return { initiateRegister, initiateLogin, initiateLogout };
+  const handleLoginWithGoogle = () => {
+    const state = Math.random().toString(36).substring(2, 15);
+    sessionStorage.setItem("oauth_state", state);
+
+    const googleAuthUrl = `${
+      import.meta.env.VITE_API_BASE_URL
+    }/oauth2/google?state=${state}`;
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2.5;
+
+    window.open(
+      googleAuthUrl,
+      "GoogleLogin",
+      `width=${width},height=${height},left=${left},top=${top}`
+    );
+  };
+
+  useEffect(() => {
+    const messageListener = async (event: MessageEvent) => {
+      if (event.origin !== import.meta.env.VITE_API_BASE_URL) {
+        return;
+      }
+
+      const { status, state, user } = event.data;
+      const expectedState = sessionStorage.getItem("oauth_state");
+      sessionStorage.removeItem("oauth_state");
+
+      if (state !== expectedState) {
+        showToast.error(t("auth.invalidStateParameter")); // Toast for invalid OAuth state
+        return;
+      }
+
+      if (status === "success" && user) {
+        showToast.success(t("auth.googleLoginSuccess")); // Toast for Google OAuth success
+        // Derive the encryption key using Google ID and email
+        // Derive the encryption key using userId, userAgent, and salt
+        const userId = user._id; // Adjust based on your user model
+        await initializeUserEncryption({
+          userId,
+          timeMS,
+        });
+
+        await dispatch(
+          handleLogin({
+            role: user.role,
+            id: user.entityCode,
+            userId: user._id,
+          })
+        );
+      } else {
+        showToast.error(t("auth.googleLoginFailed")); // Toast for Google OAuth failure
+      }
+    };
+
+    window.addEventListener("message", messageListener);
+
+    return () => {
+      window.removeEventListener("message", messageListener);
+    };
+  }, [dispatch, t]);
+
+  return {
+    initiateRegister,
+    initiateLogin,
+    initiateLogout,
+    handleLoginWithGoogle,
+  };
 };

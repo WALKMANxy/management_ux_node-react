@@ -9,6 +9,7 @@ const ChatPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+
   // Get currentChat from Redux state
   const currentChat = useAppSelector(
     (state: RootState) => state.chats.currentChat
@@ -24,12 +25,12 @@ const ChatPage: React.FC = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: isMobile ? "94dvh" : "calc(100vh - 120px)", // Use 95vh when isMobile is true, otherwise subtract the header height
+        height: isMobile ? "100dvh" : "calc(100vh - 80px)", // Use 95vh when isMobile is true, otherwise subtract the header height
         bgcolor: "#f4f5f7",
         overflow: "hidden",
       }}
     >
-      <Grid container sx={{ flexGrow: 1, height: "100%" }}>
+      <Grid container sx={{ flexGrow: 1, height: "100%"}}>
         {/* Sidebar for chat list, hidden on mobile when chat view is active */}
         {!currentChat || !isMobile ? (
           <Grid
@@ -41,6 +42,7 @@ const ChatPage: React.FC = () => {
               borderRight: "1px solid #e0e0e0",
               height: "100%", // Ensure sidebar fills available height
               overflowY: "auto", // Enable scrolling if content overflows
+              minWidth: "20dvh"
             }}
           >
             <ChatSidebar />
@@ -52,7 +54,7 @@ const ChatPage: React.FC = () => {
           <Grid
             item
             xs={12}
-            md={9}
+            md={true}
             sx={{
               display: "flex",
               flexDirection: "column",
