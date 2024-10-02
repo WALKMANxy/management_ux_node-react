@@ -1,33 +1,30 @@
 {
   "welcome": "Welcome",
   "login": "Login",
-  "logout": "Logout",
-  "headerDashboard": "Dashboard",
-  "clients": "Clients",
-  "visits": "Visits",
   "statistics": "Statistics",
-  "promos": "Promos",
   "alerts": "Alerts",
-  "notifications": "Notifications",
-  "no_notifications": "No new notifications",
-  "clientDetails": {
-    "title": "Client Details"
-  },
   "details": {
     "name": "Name",
-    "phone": "Phone Number",
+    "phone": "Phone",
     "totalRevenue": "Total Revenue",
-    "pec": "E-mail PEC",
-    "extendedTaxCode": "Additional Tax Code",
+    "extendedName": "Extended Name",
+    "pec": "PEC",
+    "extendedTaxCode": "Extended Tax Code",
     "paymentMethod": "Payment Method",
-    "province": "Location",
+    "province": "Province",
     "totalOrders": "Total Orders",
     "unpaidRevenue": "Unpaid Revenue",
-    "email": "E-mail",
+    "email": "Email",
     "taxCode": "Tax Code",
-    "paymentMethodID": "PMID",
+    "paymentMethodID": "Payment Method ID",
     "address": "Address",
-    "agent": "Agent"
+    "agentName": "Agent Name",
+    "labels": {
+      "call": "Call",
+      "email": "Send Email",
+      "viewOnMap": "View on Map",
+      "unknownSender": "Unknown Sender"
+    }
   },
   "promotions": {
     "activePromotionsFor": "Active Promotions for",
@@ -37,59 +34,22 @@
     "promo3": "Promo 3",
     "viewMore": "View More"
   },
-  "spentThisMonth": {
-    "title": "Spent This Month",
-    "iconAlt": "Spent Icon"
-  },
-  "spentThisYear": {
-    "title": "Spent This Year",
-    "iconAlt": "Spent Icon"
-  },
-  "topArticleType": {
-    "title": "Most bought articles",
-    "iconAlt": "Articles Icon",
-    "amountPurchased": "Amount Purchased"
-  },
-  "totalOrder": {
-    "month": "Month",
-    "year": "Year",
-    "totalOrders": "Total Orders"
-  },
-  "dashboard": {
-    "totalEarning": "Total Earning"
-  },
-  "upcomingVisits": {
-    "titleForClient": "Upcoming Visits for {{clientName}}",
-    "titleForAgent": "Your Upcoming Visits",
-    "visitPlaceholder1": "Visit 1",
-    "visitPlaceholder2": "Visit 2",
-    "visitPlaceholder3": "Visit 3",
-    "planVisit": "Plan Visit"
-  },
   "globalSearch": {
     "placeholder": "Search..."
   },
-  "searchResults": {
-    "articleId": "Article OEM: {{articleId}}",
-    "brand": "Brand: {{brand}}",
-    "lastSoldDate": "Last Sold: {{lastSoldDate}}",
-    "province": "Province: {{province}}",
-    "phone": "Phone: {{phone}}",
-    "paymentMethod": "Payment Method: {{paymentMethod}}",
-    "discountAmount": "Discount Amount: {{discountAmount}}",
-    "startDate": "Start Date: {{startDate}}",
-    "endDate": "End Date: {{endDate}}",
-    "type": "Type: {{type}}",
-    "noResults": "No results found"
-  },
+
   "monthOverMonthSpendingTrend": {
-    "title": "Monthly Spending Trend",
+    "title": "Monthly Trend",
     "revenue": "Revenue",
     "expense": "Expense"
   },
   "salesDistribution": {
-    "title": "Sales Distribution Through Clients",
-    "revenue": "Revenue"
+    "title": "Sales Distribution",
+    "revenue": "Revenue",
+    "viewClients": "View Clients",
+    "viewAgents": "View Agents",
+    "clients": "Clients",
+    "agents": "Agents"
   },
   "topBrandsSold": {
     "titleAgent": "Top Brands Sold",
@@ -97,19 +57,38 @@
     "brandLabel": "Brand"
   },
   "clientList": {
-    "title": "Clients",
-    "quickFilterPlaceholder": "Quick Filter...",
+    "title": "Clients List",
+    "quickFilterPlaceholder": "Search clients...",
+    "quickFilterAriaLabel": "Quick filter for clients list.",
+    "exportCSV": "Export as CSV",
     "startDate": "Start Date",
     "endDate": "End Date",
-    "exportCSV": "Export CSV"
+    "expand": "Expand clients list.",
+    "collapse": "Collapse clients list.",
+    "options": "Options",
+    "startDateAriaLabel": "Start date filter for clients list.",
+    "endDateAriaLabel": "End date filter for clients list.",
+    "noClients": "No clients found."
   },
   "movementsHistory": {
     "date": "Date",
+    "client": "Client",
     "brand": "Brand",
     "oemId": "OEM ID",
     "name": "Name",
     "revenue": "Revenue",
-    "cost": "Cost"
+    "cost": "Cost",
+    "quantity": "Quantity",
+    "unitPrice": "Unity Price"
+  },
+  "movementDetailHistory": {
+    "articleId": "ID",
+    "name": "Name",
+    "brand": "Brand",
+    "quantity": "Quantity",
+    "unitPrice": "Unit Price",
+    "priceSold": "Price Sold",
+    "priceBought": "Price Bought"
   },
   "agentDashboard": {
     "welcomeBack": "Welcome back, {{name}}",
@@ -118,7 +97,7 @@
     "calendar": "Calendar",
     "viewMore": "View More",
     "totalEarning": "Total Earning",
-    "totalOrder": "Total Orders",
+
     "spentThisMonth": "Spent This Month",
     "spentThisYear": "Spent This Year",
     "topArticleType": "Most Bought Articles",
@@ -131,12 +110,17 @@
     "name": "Name",
     "province": "Province",
     "phone": "Phone Number",
-    "totalOrders": "Total Orders",
+    "netRevenueThisMonth": "Net Revenue This Month",
+    "totalOrders": "Orders",
+    "totalNetRevenue": "Net Revenue",
     "ordersThisMonth": "Orders This Month",
     "totalRevenue": "Total Revenue",
     "revenueThisMonth": "Revenue This Month",
     "unpaidRevenue": "Unpaid Revenue",
-    "paymentMethod": "Payment Method"
+    "paymentMethod": "Payment Method",
+    "id": "ID",
+    "address": "Address",
+    "agent": "Agent"
   },
   "landingPage": {
     "welcome": "Welcome back, {name}",
@@ -158,5 +142,1069 @@
     "email": "E-mail",
     "vat": "VAT Number",
     "credits": "credits: @2024"
+  },
+  "reasons": {
+    "company_party": "Company Party",
+    "conference": "Conference",
+    "expo": "Expo",
+    "illness": "Illness",
+    "day_off": "Day Off",
+    "public_holiday": "Public Holiday",
+    "Issue": "Issue",
+    "Routine": "Routine",
+    "New Client": "New Client",
+    "unexpected_event": "Unexpected Event",
+    "company_meeting": "Company Meeting",
+    "medical_visit": "Medical Visit"
+  },
+  "confirmDialog": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "defaultTitle": "Are you sure?",
+    "defaultMessage": "Please confirm your action.",
+    "deleteEvent": "Delete Event?"
+  },
+  "articleDetail": {
+    "id": "ID",
+    "name": "Name",
+    "brand": "Brand",
+    "quantity": "Quantity",
+    "unitPrice": "Price per item",
+    "priceSold": "Sold at",
+    "priceBought": "Bought at"
+  },
+
+  "articleDetails": {
+    "title": "Article Details",
+    "noHistory": "No history available"
+  },
+  "calendarEvent": {
+    "unknown": "Unknown",
+    "reasons": {
+      "illness": "Illness",
+      "day_off": "Day Off",
+      "unexpected_event": "Unexpected Event",
+      "medical_visit": "Medical Visit",
+      "public_holiday": "Public Holiday",
+      "company_holiday": "Company Holiday",
+      "company_meeting": "Company Meeting",
+      "company_party": "Company Party",
+      "conference": "Conference",
+      "expo": "Expo",
+      "generic": "Generic"
+    }
+  },
+  "customToolbar": {
+    "today": "Today",
+    "previous": "Previous",
+    "next": "Next",
+    "view": {
+      "month": "Month",
+      "week": "Week",
+      "day": "Day"
+    }
+  },
+  "eventForm": {
+    "title": "Create New Event",
+    "editTitle": "Edit Event",
+    "titleMarkAbsence": "Mark Absence",
+    "labels": {
+      "startTime": "Start Time",
+      "endTime": "End Time",
+      "eventType": "Event Type",
+      "reason": "Reason",
+      "note": "Note (Optional)",
+      "cancel": "Cancel",
+      "create": "Create"
+    },
+    "options": {
+      "absence": "Absence",
+      "event": "Event",
+      "holiday": "Holiday"
+    },
+    "reasons": {
+      "illness": "Illness",
+      "day_off": "Day Off",
+      "unexpected_event": "Unexpected Event",
+      "medical_visit": "Medical Visit",
+      "public_holiday": "Public Holiday",
+      "company_holiday": "Company Holiday",
+      "company_meeting": "Company Meeting",
+      "company_party": "Company Party",
+      "conference": "Conference",
+      "expo": "Expo",
+      "generic": "Generic"
+    },
+    "validation": {
+      "startTimeRequired": "Start time is required",
+      "endTimeRequired": "End time is required",
+      "eventTypeRequired": "Event type is required",
+      "reasonRequired": "Reason is required",
+      "dateTooFar": "You can't pick an absence date further than two months from today. Please, select an absence date before {{date}}."
+    },
+    "tooltips": {
+      "cancel": "Cancel",
+      "create": "Create Event"
+    },
+    "eventHistory": {
+      "title": "Event History",
+      "headers": {
+        "user": "User",
+        "eventType": "Event Type",
+        "reason": "Reason",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "unknown": "Unknown",
+      "na": "N/A",
+      "eventTypes": {
+        "absence": "Absence",
+        "event": "Event",
+        "holiday": "Holiday",
+        "generic": "Generic"
+      },
+      "reasons": {
+        "illness": "Illness",
+        "day_off": "Day Off",
+        "unexpected_event": "Unexpected Event",
+        "medical_visit": "Medical Visit",
+        "company_meeting": "Company Meeting",
+        "company_party": "Company Party",
+        "conference": "Conference",
+        "expo": "Expo",
+        "generic": "Generic"
+      },
+      "statuses": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled"
+      },
+      "actions": {
+        "na": "N/A"
+      },
+      "tooltips": {
+        "approve": "Approve Event",
+        "reject": "Reject Event"
+      },
+      "toast": {
+        "approveSuccess": "Event approved successfully!",
+        "approveFailure": "Failed to approve event",
+        "rejectSuccess": "Event rejected successfully!",
+        "rejectFailure": "Failed to reject event",
+        "genericError": "An unexpected error occurred"
+      }
+    }
+  },
+  "eventTitle": {
+    "unknown": "Unknown",
+    "reasons": {
+      "illness": "Illness",
+      "day_off": "Day Off",
+      "unexpected_event": "Unexpected Event",
+      "medical_visit": "Medical Visit",
+      "public_holiday": "Public Holiday",
+      "company_holiday": "Company Holiday",
+      "company_meeting": "Company Meeting",
+      "company_party": "Company Party",
+      "conference": "Conference",
+      "expo": "Expo",
+      "generic": "Generic"
+    },
+    "tooltips": {
+      "illness": "Reason: Illness",
+      "day_off": "Reason: Day Off",
+      "unexpected_event": "Reason: Unexpected Event",
+      "medical_visit": "Reason: Medical Visit",
+      "public_holiday": "Reason: Public Holiday",
+      "company_holiday": "Reason: Company Holiday",
+      "company_meeting": "Reason: Company Meeting",
+      "company_party": "Reason: Company Party",
+      "conference": "Reason: Conference",
+      "expo": "Reason: Expo",
+      "generic": "Reason: Generic",
+      "unknown": "Unknown Entity"
+    }
+  },
+  "popOverEvent": {
+    "type": "Type",
+    "reason": "Reason",
+    "note": "Note",
+    "unknown": "Unknown",
+    "visit": "Visit",
+    "issue": "Issue",
+    "routine": "Routine",
+    "newClient": "New Client",
+    "edit": "Edit Event",
+    "delete": "Delete Event",
+    "status": "Status",
+    "startsAt": "Starts At",
+    "endsAt": "Ends At"
+  },
+  "eventTypes": {
+    "absence": "Absence",
+    "holiday": "Holiday",
+    "event": "Event",
+    "generic": "Generic",
+    "visit": "Visit"
+  },
+  "chatList": {
+    "noChatsFound": "No chats found.",
+    "noMessages": "No messages",
+    "na": "N/A"
+  },
+  "chatSidebar": {
+    "labels": {
+      "chats": "Chats",
+      "contacts": "Contacts"
+    },
+    "tooltips": {
+      "refreshContacts": "Refresh Contacts",
+      "showChats": "Show Chats",
+      "showContacts": "Show Contacts"
+    },
+    "placeholders": {
+      "searchChats": "Search chats...",
+      "searchContacts": "Search contacts..."
+    }
+  },
+  "chatView": {
+    "labels": {
+      "noChatSelected": "No chat selected. Please select a chat to view.",
+      "type": "Type",
+      "reason": "Reason",
+      "note": "Note",
+      "moreOptions": "More Options"
+    },
+    "tooltips": {
+      "backToChats": "Back to Chats",
+      "moreOptions": "More Options"
+    },
+    "menuOptions": {
+      "mute": "Mute Chat",
+      "block": "Block User",
+      "report": "Report Chat",
+      "delete": "Delete Chat",
+      "archive_chat": "Archive Chat"
+    }
+  },
+  "contactsList": {
+    "labels": {
+      "unknownContact": "Unknown Contact",
+      "contact": "Contact",
+      "selectContact": "Select contact"
+    },
+    "messages": {
+      "noContactsFound": "No contacts found. Try adjusting your search.",
+      "promoMessage": "You are eligible for a new promotion!\n\nType: {{promoType}}\nName: {{promoName}}\nOffer: {{promoDiscount}}\n\nContact one of our representatives for more information. Have a great day!",
+      "visitMessage": "A new visit has been scheduled for you!\n\nType: {{visitType}}\nReason: {{visitReason}}\nDate: {{visitDate}}\n\nPlease be prepared. Thank you!"
+    }
+  },
+  "dateDivider": {
+    "labels": {
+      "dateDivider": "{{date}}"
+    }
+  },
+  "inputBox": {
+    "labels": {
+      "chatInput": "Chat input box",
+      "message": "Message",
+      "alert": "Alert",
+      "promo": "Promo",
+      "visit": "Visit"
+    },
+    "tooltips": {
+      "selectMessageType": "Select message type",
+      "sendMessage": "Send message"
+    },
+    "placeholders": {
+      "typeMessage": "Type a message..."
+    }
+  },
+  "messageBubble": {
+    "labels": {
+      "unknownSender": "Unknown Sender"
+    }
+  },
+  "labels": {
+    "chatInput": "Chat input box",
+    "message": "Message",
+    "alert": "Alert",
+    "promo": "Promo",
+    "visit": "Visit"
+  },
+  "tooltips": {
+    "selectMessageType": "Select message type",
+    "sendMessage": "Send message"
+  },
+  "messageStatus": {
+    "sent": "Sent",
+    "delivered": "Delivered",
+    "read": "Read",
+    "pending": "Pending"
+  },
+  "clientDetails": {
+    "title": "Client Details",
+    "expand": "Expand Details",
+    "collapse": "Collapse Details",
+    "noClientSelected": "No client selected."
+  },
+  "activePromotions": {
+    "title": "Active Promotions",
+    "noActivePromotions": "No active promotions.",
+    "endsAt": "Ends at",
+    "viewAllPromotions": "View All Promotions"
+  },
+  "agentActivity": {
+    "title": "Recent Activity",
+    "noRecentActivities": "No recent activities.",
+    "occurredAt": "Occurred at",
+    "viewAllPromotions": "View All Promotions"
+  },
+  "calendarComponent": {
+    "recentActivity": "Recent Activity",
+    "selectVisit": "Select a Visit",
+    "noVisits": "No visits available.",
+    "close": "Close",
+    "occurredAt": "Occurred at"
+  },
+  "spentThisMonth": {
+    "titleAgent": "Earned This Month",
+    "titleClient": "Spent This Month",
+    "iconAlt": "Money Icon",
+    "more": "more",
+    "neutral": "more",
+    "less": "less",
+    "even": "even",
+    "comparedToOtherAgents": "compared to average.",
+    "comparedToOtherClients": "compared to average."
+  },
+  "spentThisYear": {
+    "titleAgent": "Earned This Year",
+    "titleClient": "Spent This Year",
+    "iconAlt": "Money Bag Icon",
+    "more": "more",
+    "neutral": "more",
+    "less": "less",
+    "even": "even",
+    "comparedToOtherAgents": "compared to average.",
+    "comparedToOtherClients": "compared to average."
+  },
+  "topArticleType": {
+    "titleAgent": "Top Sold",
+    "titleClient": "Top Bought",
+    "amountPurchased": "Amount Purchased",
+    "iconAlt": "Icon representing top article type"
+  },
+  "totalOrder": {
+    "month": "Month",
+    "year": "Year",
+    "ordersThisMonth": "Orders This Month",
+    "totalOrders": "Orders This Year",
+    "iconAlt": "Orders Icon"
+  },
+  "upcomingVisits": {
+    "title": "Upcoming Visits",
+    "visitType": "Type",
+    "visitReason": "Reason",
+    "clientId": "Client ID",
+    "noProgrammedVisits": "No upcoming visits scheduled.",
+    "viewDetails": "View Details",
+    "viewAllVisits": "View All Visits",
+    "iconAlt": "Upcoming Visits Icon"
+  },
+  "errorBoundary": {
+    "title": "Oops! Something went wrong.",
+    "message": "We're sorry for the inconvenience. Please try again or contact support if the problem persists.",
+    "backToHome": "Back to Home"
+  },
+  "headerDashboard": "Dashboard",
+  "movements": "Movements",
+  "clients": "Clients",
+  "articles": "Articles",
+  "visits": "Visits",
+  "promos": "Promotions",
+  "calendar": "Calendar",
+  "logout": "Logout",
+  "search": "Search",
+  "notifications": "Notifications",
+  "no_notifications": "No new notifications",
+  "no_messages": "No messages",
+  "loggingOut": "Logging out...",
+
+  "userAvatar": {
+    "defaultUser": "User",
+    "chats": "Chats",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "register": "Register",
+    "continueToApp": "Continue to {{appName}}",
+    "email": "Email",
+    "password": "Password",
+    "keepMeSignedIn": "Keep me signed in",
+    "recommendedOnTrustedDevices": "Recommended on trusted devices",
+    "enterPassword": "Enter your password",
+    "forgotPassword": "Forgot password?",
+    "newToApp": "New to {{appName}}?",
+    "createAccount": "Create an account",
+    "alreadyHaveAccount": "Already have an account?",
+    "hidePassword": "Hide password",
+    "showPassword": "Show password",
+    "continueWithGoogle": "Continue with Google",
+    "resetPassword": "Reset Password",
+    "resetInstructions": "If you forgot the password, you can reset it by entering your email.",
+    "requestResetCode": "Request Reset Code",
+    "verifyCode": "Verify Code",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "updatePassword": "Update Password",
+    "passwordUppercaseError": "Password must include at least one uppercase letter.",
+    "passwordLowercaseError": "Password must include at least one lowercase letter.",
+    "passwordNumberError": "Password must include at least one number.",
+    "passwordSpecialCharError": "Password must include at least one special character.",
+    "resetCodeSent": "If an account with that email exists, a reset code has been sent.",
+    "requestResetFailed": "Failed to request password reset. Please try again.",
+    "codeVerified": "Code verified successfully. Please set a new password.",
+    "invalidCode": "Invalid or expired code. Please try again.",
+    "passwordsDoNotMatch": "Passwords do not match. Please try again.",
+    "passwordUpdated": "Password updated successfully. You can now log in.",
+    "updatePasswordFailed": "Failed to update password. Please check your inputs.",
+    "enterEmail": "Enter your email",
+    "enterNewPassword": "Enter your new password",
+    "enterVerificationCode": "Enter the verification code provided in your email",
+    "passwordUpdatedToast": "Password updated successfully. You can now log in!",
+    "registrationSuccess": "Registration successful!",
+    "registrationFailed": "Registration failed: {{error}}",
+    "loginFailed": "Login failed: {{message}}",
+    "roleNotAssigned": "Please wait for your account to be assigned a role before attempting to log in.",
+    "accountVerificationPending": "Your account is still being verified by the admins.",
+    "roleFetchingError": "Failed to fetch user role: {{error}}",
+    "userNotFound": "Failed to retrieve user information.",
+    "errorDuringLogin": "An error occurred during login.",
+    "serverUnreachable": "The server is currently unreachable, please try again later.",
+    "logoutSuccess": "User logged out successfully.",
+    "logoutFailed": "Failed to log out.",
+    "unexpectedError": "An unexpected error occurred.",
+    "googleLoginSuccess": "User logged in successfully via Google OAuth.",
+    "googleLoginFailed": "Authentication failed via Google OAuth.",
+    "invalidStateParameter": "Invalid state parameter"
+  },
+  "movementDetails": {
+    "id": "List ID",
+    "dateOfOrder": "Date of Order",
+    "title": "Movement Details",
+    "expand": "Expand details",
+    "collapse": "Collapse details",
+    "articleId": "OEM ID",
+    "name": "Name",
+    "brand": "Brand",
+    "quantity": "Quantity",
+    "priceSold": "Sold At",
+    "unitPrice": "Unit Price",
+    "priceBought": "Bought At"
+  },
+
+  "createPromoForm": {
+    "createTitle": "Create New Promo",
+    "editTitle": "Edit Promo",
+    "promoTypeLabel": "Promo Type",
+    "promoTypeContract": "Contract",
+    "promoTypeSale": "Sale",
+    "promoTypeExtra": "Extra",
+    "promoTypeRequired": "Promo Type is required",
+    "promoNameLabel": "Promo Name",
+    "promoNameRequired": "Promo Name is required",
+    "startDateLabel": "Start Date",
+    "startDateRequired": "Start Date is required",
+    "endDateLabel": "End Date",
+    "endDateRequired": "End Date is required",
+    "endDateValidation": "End Date cannot be before Start Date.",
+    "discountLabel": "Discount Description",
+    "discountRequired": "Discount Description is required",
+    "discountHelperText": "e.g., 'Every 100 euros spent, you get a 10 euros coupon'",
+    "eligibleClientsLabel": "Eligible Clients",
+    "excludedClientsLabel": "Excluded Clients",
+    "createPromo": "Create Promo",
+    "updatePromo": "Update Promo",
+    "cancel": "Cancel"
+  },
+
+  "searchResults": {
+    "id": "ID",
+    "idUnknown": "Unknown ID",
+    "phone": "Phone",
+    "phoneUnknown": "Unknown Phone",
+    "email": "Email",
+    "emailUnknown": "Unknown Email",
+    "promoType": "Promo Type",
+    "promoTypeUnknown": "Unknown Promo Type",
+    "discount": "Discount",
+    "discountUnknown": "Unknown Discount",
+    "startDate": "Start Date",
+    "startDateUnknown": "Unknown Start Date",
+    "endDate": "End Date",
+    "endDateUnknown": "Unknown End Date",
+    "province": "Province",
+    "provinceUnknown": "Unknown Province",
+    "paymentMethod": "Payment Method",
+    "paymentMethodUnknown": "Unknown Payment Method",
+    "types": {
+      "client": "Client",
+      "agent": "Agent",
+      "article": "Article",
+      "promo": "Promo",
+      "visit": "Visit",
+      "alert": "Alert"
+    },
+    "noResults": "No results found.",
+    "articleId": "OEM",
+    "brand": "Brand",
+    "brandUnknown": "Unknown Brand",
+    "lastSoldDate": "Last Sold Date",
+    "lastSoldDateUnknown": "Unknown Last Sold Date",
+    "promoIssuedBy": "Issued By"
+  },
+  "promoDetails": {
+    "notFound": "Promo details not found."
+  },
+  "promo": {
+    "type": "Type",
+    "discount": "Discount",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "global": "Global",
+    "notGlobal": "Not Global",
+    "issuedBy": "Issued By",
+    "edit": "Edit Promo",
+    "editTooltip": "Edit Promo",
+    "terminate": "Terminate Promo",
+    "terminateTooltip": "Terminate Promo",
+    "deselect": "Deselect Promo",
+    "deselectTooltip": "Deselect Promo"
+  },
+  "eligibleClients": {
+    "includedClients": "Included clients",
+    "excludedClients": "Excluded clients",
+    "switchToManual": "Switch to manual selection",
+    "switchToGlobal": "Switch to global selection",
+    "globalPromo": "Global Promo",
+    "manualSelection": "Manual Selection",
+    "noClients": "No clients to display"
+  },
+
+  "promosSidebar": {
+    "title": "Promos",
+    "refreshPromos": "Refresh Promos",
+    "createPromo": "Create Promo",
+    "searchPlaceholder": "Search Promos",
+    "noPromosFound": "No promos found.",
+    "type": "Type"
+  },
+  "common": {
+    "loading": "Loading...",
+    "errorFetchingArticles": "Error fetching articles.",
+    "errorUpdatingSettings": "Failed to update settings",
+    "unknownError": "An unknown error occurred"
+  },
+  "articleList": {
+    "title": "Articles List",
+    "quickFilterPlaceholder": "Search articles...",
+    "quickFilterAriaLabel": "Quick filter for articles list.",
+    "exportCSV": "Export as CSV",
+    "expand": "Expand articles list.",
+    "collapse": "Collapse articles list.",
+    "options": "Options"
+  },
+  "movementList": {
+    "title": "Movements List",
+    "quickFilterPlaceholder": "Search movements...",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "exportCSV": "Export as CSV",
+    "expand": "Expand movements list.",
+    "collapse": "Collapse movements list.",
+    "options": "Options"
+  },
+  "appSettings": {
+    "title": "App Settings",
+    "toggleNotifications": "Toggle Notifications",
+    "enableNotificationsAria": "Enable Notifications",
+    "receiveBrowserNotifications": "Receive browser notifications",
+    "notificationsInfo": "In order to receive notifications, please allow the notification permission in your browser settings.",
+    "notificationsEnabled": "Notifications have been enabled.",
+    "notificationsDisabled": "Notifications have been disabled.",
+    "notificationGranted": "Notification permission granted.",
+    "notificationDenied": "Notification permission denied.",
+    "chooseTheme": "Choose Theme",
+    "themePreference": "Theme Preference",
+    "themePreferenceTooltip": "If you select \"Auto\", the theme will match your system's preferences.",
+    "light": "Light",
+    "dark": "Dark",
+    "auto": "Auto",
+    "themeChanged": "Theme changed to {{theme}}."
+  },
+  "modifyAccount": {
+    "invalidEmail": "Email is not valid.",
+    "passwordUppercase": "Password must include at least one uppercase letter.",
+    "passwordLowercase": "Password must include at least one lowercase letter.",
+    "passwordNumber": "Password must include at least one number.",
+    "passwordSpecialChar": "Password must include at least one special character.",
+    "emailUpdated": "Account information updated. You will now be logged out.",
+    "passwordUpdated": "Password updated. You will now be logged out.",
+    "updateEmailFailed": "Failed to update account information: {{message}}",
+    "updatePasswordFailed": "Failed to update password: {{message}}",
+    "updateEmailUnknownError": "Failed to update account information: An unknown error occurred.",
+    "updatePasswordUnknownError": "Failed to update password: An unknown error occurred.",
+    "title": "Modify Account",
+    "modifyEmail": "Modify Email",
+    "currentEmail": "Current Email",
+    "currentPassword": "Current Password",
+    "newEmail": "New Email",
+    "updateEmailButton": "Update Email",
+    "updateEmailButtonTooltip": "Click to update your email",
+    "updateEmailButtonAria": "Update Email",
+    "modifyPassword": "Modify Password",
+    "newPassword": "New Password",
+    "updatePasswordButton": "Update Password",
+    "updatePasswordButtonTooltip": "Click to update your password",
+    "updatePasswordButtonAria": "Update Password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "showNewPassword": "Show new password",
+    "hideNewPassword": "Hide new password",
+    "currentEmailAria": "Current Email",
+    "newEmailAria": "New Email",
+    "currentPasswordAria": "Current Password",
+    "newPasswordAria": "New Password",
+    "emailErrors": {
+      "invalidEmail": "Invalid email address.",
+      "emailRequired": "Email is required."
+    },
+    "passwordErrors": {
+      "invalidPassword": "Password does not meet criteria.",
+      "passwordRequired": "Password is required."
+    },
+    "googleManagedTitle": "Google Managed Account",
+    "googleManagedDescription": "Your account is managed by Google. Please use Google services to modify your account.",
+    "alerts": {
+      "error": "An error occurred.",
+      "success": "Operation successful."
+    }
+  },
+  "sidebar": {
+    "userSettings": "User Settings",
+    "accountSettings": "Account Settings",
+    "appSettings": "App Settings",
+    "manageUsers": "Manage Users"
+  },
+  "manageUsers": {
+    "title": "Manage Users",
+    "columns": {
+      "email": "Email",
+      "authType": "Auth Type",
+      "emailVerified": "Email Verified",
+      "role": "Role",
+      "entityCode": "Entity Code",
+      "entityName": "Entity Name",
+      "createdAt": "Created At"
+    },
+    "infoTooltip": "In order for a user to use the app, they need to be assigned an entity. You can use the table below to select a user by double-clicking on the email, and then proceed with the entity assignment.",
+    "selectUserPrompt": "Select a user to assign an entity",
+    "selectedUser": "Selected user: ",
+    "userDeselected": "User deselected",
+    "yes": "Yes",
+    "no": "No",
+    "na": "N/A",
+    "userTable": "User Table"
+  },
+  "userCard": {
+    "avatarAlt": "Avatar for",
+    "role": "Role",
+    "code": "Code",
+    "name": "Name",
+    "none": "None"
+  },
+  "userDetails": {
+    "goBack": "Go back",
+    "selectRole": "Select a new role.",
+    "roleSelection": "Role selection",
+    "selectClient": "Select Client role",
+    "selectAgent": "Select Agent role",
+    "selectAdmin": "Select Admin role",
+    "client": "Client",
+    "agent": "Agent",
+    "admin": "Admin",
+    "selectEntity": "Select an entity by double-clicking them.",
+    "searchPlaceholder": "Search {{role}}s by name or ID",
+    "loadingEntities": "Loading entities...",
+    "startTyping": "Start typing to search",
+    "entityName": "Name",
+    "entityId": "ID",
+    "saveChanges": "Save",
+    "success": "Changes saved successfully!",
+    "error": "An error occurred. Please try again.",
+    "updateSuccess": "User updated successfully.",
+    "updateSuccessToast": "User updated successfully.",
+    "updateFailed": "Failed to update user: {{message}}",
+    "updateFailedToast": "Failed to update user: {{message}}",
+    "updateUnknownError": "Failed to update user: An unknown error occurred.",
+    "updateUnknownErrorToast": "Failed to update user: An unknown error occurred.",
+    "userIdUndefined": "User ID is undefined.",
+    "userIdUndefinedToast": "User ID is undefined.",
+    "loadAdminsErrror": "Failed to load admins. Please try again.",
+    "alerts": {
+      "success": "Changes saved successfully!",
+      "error": "An error occurred. Please try again.",
+      "updateSuccess": "User updated successfully.",
+      "updateSuccessToast": "User updated successfully.",
+      "updateFailed": "Failed to update user: {{message}}",
+      "updateFailedToast": "Failed to update user: {{message}}",
+      "updateUnknownError": "Failed to update user: An unknown error occurred.",
+      "updateUnknownErrorToast": "Failed to update user: An unknown error occurred.",
+      "userIdUndefined": "User ID is undefined.",
+      "userIdUndefinedToast": "User ID is undefined.",
+      "loadAdminsErrror": "Failed to load admins. Please try again."
+    }
+  },
+  "createVisitForm": {
+    "title": "Create New Visit",
+    "typeLabel": "Type",
+    "regular": "Regular",
+    "urgent": "Urgent",
+    "reasonLabel": "Reason",
+    "issue": "Issue",
+    "routine": "Routine",
+    "newClient": "New Client",
+    "publicNoteLabel": "Public Note",
+    "publicNoteTooltip": "Enter a public note for the visit.",
+    "privateNoteLabel": "Private Note*",
+    "privateNoteTooltip": "The private note is visible only to you and the administrators.",
+    "privateNotePlaceholder": "The private note is visible only to you and the administrators.",
+    "selectDateTime": "Select Date & Time",
+    "sendVisitTooltip": "Send Visit",
+    "sendVisit": "Send Visit",
+    "cancelTooltip": "Cancel",
+    "cancel": "Cancel",
+    "fillAllFields": "Please fill in all required fields.",
+    "visitCreated": "Visit created successfully.",
+    "creationFailed": "Failed to create visit: ",
+    "creationFailedUnknown": "Failed to create visit: An unknown error occurred.",
+    "cancelDialogTitle": "Cancel Visit Creation",
+    "cancelDialogDescription": "Are you sure you want to cancel creating this visit? All entered information will be lost.",
+    "no": "No",
+    "yes": "Yes"
+  },
+  "clientDetailsCard": {
+    "code": "Code",
+    "address": "Address",
+    "province": "Province",
+    "na": "N/A",
+    "email": "Email",
+    "phone": "Phone",
+    "paymentMethod": "Payment Method",
+    "agent": "Agent",
+    "createVisitTooltip": "Create a new visit",
+    "createVisit": "Create Visit",
+    "deselectClientTooltip": "Deselect current client",
+    "deselectClient": "Deselect Client",
+    "cancelDialogTitle": "Deselect Client",
+    "cancelDialogDescription": "Are you sure you want to deselect the current client? All unsaved changes will be lost.",
+    "no": "No",
+    "yes": "Yes"
+  },
+  "visitCard": {
+    "avatarAlt": "Avatar",
+    "visitFor": "Visit for",
+    "type": "Type",
+    "reason": "Reason",
+    "date": "Date",
+    "publicNote": "Public Note",
+    "privateNote": "Private Note",
+    "completed": "Completed",
+    "issuedBy": "Issued by",
+    "na": "N/A",
+    "unknown": "Unknown",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "editVisitForm": {
+    "title": "Edit Visit",
+    "fillAllFields": "Please fill in all required fields.",
+    "updateSuccess": "Visit updated successfully.",
+    "updateFailed": "Failed to update visit: {{message}}",
+    "updateFailedUnknown": "Failed to update visit: An unknown error occurred.",
+    "dateLabel": "Date",
+    "publicNoteLabel": "Public Note",
+    "publicNoteTooltip": "Enter a public note for the visit.",
+    "privateNoteLabel": "Private Note",
+    "privateNoteTooltip": "Enter a private note for the visit.",
+    "privateNotePlaceholder": "The private note is visible only to you and the administrators.",
+    "typeLabel": "Type",
+    "regular": "Regular",
+    "urgent": "Urgent",
+    "reasonLabel": "Reason",
+    "issue": "Issue",
+    "routine": "Routine",
+    "newClient": "New Client",
+    "saveChangesTooltip": "Save Changes",
+    "cancelTooltip": "Cancel",
+    "cancelDialogTitle": "Cancel Edit",
+    "cancelDialogDescription": "Are you sure you want to cancel editing this visit? All unsaved changes will be lost.",
+    "no": "No",
+    "yes": "Yes",
+    "completedLabel": "Mark as Completed",
+    "cancelledLabel": "Mark as Cancelled",
+    "pendingLabel": "Pending",
+    "completedStatus": "Completed",
+    "cancelledStatus": "Cancelled"
+  },
+  "visitsSidebar": {
+    "goBack": "Go Back",
+    "goBackTooltip": "Go back to Agents",
+    "agents": "Agents",
+    "clients": "Clients",
+    "visits": "Visits",
+    "refresh": "Refresh Visits",
+    "refreshTooltip": "Refresh Visits",
+    "searchTooltip": "Search",
+    "searchAgents": "Search Agents",
+    "searchClients": "Search Clients",
+    "id": "ID",
+    "code": "Code",
+    "province": "Province",
+    "na": "N/A",
+    "pendingVisits": "Has Pending Visits",
+    "incompleteVisits": "Has Incomplete Visits",
+    "pendingCount": "{{count}} Pending Visits",
+    "incompleteCount": "{{count}} Incomplete Visits",
+    "unknown": "Unknown"
+  },
+  "visitsTable": {
+    "tableAriaLabel": "Visits Table",
+    "type": "Type",
+    "reason": "Reason",
+    "date": "Date",
+    "completed": "Completed",
+    "pending": "Pending",
+    "createdAt": "Created At",
+    "na": "N/A",
+    "yes": "Yes",
+    "no": "No",
+    "selectVisitError": "Unable to select visit.",
+    "noVisits": "No visits found for this client.",
+    "unknown": "Unknown"
+  },
+  "calendarHook": {
+    "weekendsNotSelectable": "Weekends are not selectable.",
+    "pastDateError": "You can't create an event in the past.",
+    "selectedDateRange": "Selected date range from {{start}} to {{end}}.",
+    "eventUpdatedSuccess": "Event updated successfully!",
+    "eventCreatedSuccess": "Event created successfully!",
+    "eventSubmitFailedWithError": "Failed to submit event: {{error}}",
+    "eventSubmitFailed": "Failed to submit event.",
+    "eventIdMissing": "Event ID is missing.",
+    "eventDeletedSuccess": "Event deleted successfully!",
+    "eventDeleteFailedWithError": "Failed to delete event: {{error}}",
+    "eventDeleteFailed": "Failed to delete event.",
+    "editingEvent": "Editing event: {{reason}}",
+    "formCanceled": "Form canceled.",
+    "switchedToView": "Switched to {{view}} view.",
+    "visitEventName": "Visit for ID: {{clientId}}",
+    "selectedVisit": "Selected Visit: {{reason}} on {{date}}.",
+    "visitsNotEditable": "Visits cannot be edited from the calendar.",
+    "selectedEvent": "Selected {{reason}} on {{date}}.",
+    "roleNotAssigned": "Please wait for your account to be assigned a role before attempting to log in.",
+    "accountVerificationPending": "Your account is still being verified by the admins.",
+    "roleFetchingError": "Failed to fetch user role.",
+    "errorDuringLogin": "An error occurred during login: {{error}}",
+    "registrationSuccess": "Registration successful: {{message}}",
+    "registrationFailed": "Registration failed: {{message}}",
+    "loginFailed": "Login failed: {{message}}",
+    "viewModes": {
+      "calendar": "calendar",
+      "history": "history"
+    },
+    "userNotAuthenticated": "User is not authenticated."
+  },
+
+  "createChatForm": {
+    "title": "Create New Chat",
+    "tooltips": {
+      "groupChat": "Create Group Chat",
+      "broadcastChat": "Create Broadcast Chat",
+      "cancel": "Cancel",
+      "create": "Create Chat"
+    },
+    "labels": {
+      "groupName": "Group Name",
+      "broadcastName": "Broadcast Name",
+      "selectParticipants": "Select Participants",
+      "cancel": "Cancel",
+      "create": "Create Chat",
+      "searchUsers": "Search Users",
+      "findParticipants": "Find Participants"
+    },
+    "errors": {
+      "noParticipants": "Please select at least one participant.",
+      "chatNameRequired": "Chat name is required.",
+      "createChatFailed": "Failed to create chat. Please try again."
+    },
+    "success": {
+      "createChat": "Chat created successfully!"
+    },
+    "userList": {
+      "table": "User Selection Table",
+      "unknownUser": "Unknown User",
+      "unknownEmail": "Unknown Email",
+      "headers": {
+        "name": "Name",
+        "email": "Email"
+      }
+    }
+  },
+  "chats": {
+    "error": "An error occured with the chats:",
+    "defaultTitle": "Chat",
+    "groupTitle": "Group Chat"
+  },
+  "errors": {
+    "userNotFound": "User with ID {{id}} not found.",
+    "adminNotFound": "Admin with ID {{id}} not found.",
+    "unknown": "An unknown error occurred.",
+    "unknownAgent": "Unknown Agent",
+    "searchFailed": "Search failed. Please try again."
+  },
+  "signin": {
+    "loginSuccess": "Logged in successfully!",
+    "registrationSuccess": "Registered successfully!",
+    "loginWithGoogleSuccess": "Logged in with Google successfully!",
+    "passwordMismatch": "Passwords do not match."
+  },
+  "promoForm": {
+    "success": "Promo submitted successfully!",
+    "updateFailed": "Failed to submit promo: {{message}}",
+    "unknownError": "Failed to submit promo: An unknown error occurred."
+  },
+  "usePromos": {
+    "createSuccess": "Promo created successfully!",
+    "createFailed": "Failed to create promo: {{message}}",
+    "createUnknownError": "Failed to create promo: An unknown error occurred.",
+    "updateMissingId": "Promo ID is missing for update.",
+    "updateSuccess": "Promo updated successfully!",
+    "updateFailed": "Failed to update promo: {{message}}",
+    "updateUnknownError": "Failed to update promo: An unknown error occurred.",
+    "sunsetNoPromoSelected": "No promo selected for sunset.",
+    "sunsetMissingId": "Promo ID is missing for sunset.",
+    "sunsetSuccess": "Promo sunset successfully.",
+    "sunsetFailed": "Failed to sunset promo: {{message}}",
+    "sunsetUnknownError": "Failed to sunset promo: An unknown error occurred.",
+    "editNoPromoSelected": "No promo selected to edit.",
+    "refreshSuccess": "Promos refreshed successfully."
+  },
+  "resizeObserver": {
+    "unsupported": "ResizeObserver is not supported in your browser. Please update or use a different browser."
+  },
+  "useVisits": {
+    "agentSelected": "Agent selected successfully.",
+    "clientSelected": "Client selected successfully.",
+    "backToAgents": "Returned to agents list.",
+    "visitCreated": "Visit created successfully.",
+    "failedToCreateVisit": "Failed to create visit. Please try again.",
+    "visitsRefreshed": "Visits refreshed successfully.",
+    "failedToRefreshVisits": "Failed to refresh visits. Please try again.",
+    "agentNotFound": "Selected agent not found."
+  },
+  "useStatsToasts": {
+    "loadingData": "Loading data...",
+    "successData": "Data fetched successfully!",
+    "failedData": "Failed to fetch data. Please try refreshing the page, or come back later.",
+    "errorMessage": "Error: {{message}}",
+    "unknownError": "An unknown error occurred while fetching data. Try refreshing the page or contact IT.",
+    "retryingData": "Retrying to fetch initial data... (Attempt #{{attempt}})"
+  },
+  "webSocketService": {
+    "lostConnection": "Lost connection to the server, attempting to reconnect...",
+    "connectionEstablished": "Connection to the server established.",
+    "connectionLost": "Connection to the server lost, refresh the page or try again later."
+  },
+  "dashboard": {
+    "welcomeBack": "Welcome back, {{name}}!",
+    "statisticsFor": "Statistics for {{name}}",
+    "yourStatistics": "Your Statistics",
+    "calendar": "Calendar",
+    "loadingWelcome": "Loading welcome",
+    "skeleton": "Loading content",
+    "loadingStatistics": "Loading statistics",
+    "loadingText": "Loading text",
+    "calendarButton": "Open Calendar",
+    "closeButton": "Close Selection",
+    "activePromotions": "Active Promotions",
+    "agentActivityOverview": "Agent Activity Overview",
+    "spentThisMonth": "Spent This Month",
+    "spentThisYear": "Spent This Year",
+    "topArticleType": "Top Article Types",
+    "monthOverMonthSpendingTrend": "Month Over Month Spending Trend",
+    "topBrandsSold": "Top Brands Sold",
+    "totalEarning": "Total Earnings",
+    "totalOrders": "Total Orders",
+    "salesDistribution": "Sales Distribution",
+    "upcomingVisits": "Upcoming Visits",
+    "yourCalendar": "Your Calendar"
+  },
+  "articlesPage": {
+    "name": "Name",
+    "brand": "Brand",
+    "oemId": "OEM ID",
+    "unitPrice": "Unit Price",
+    "cost": "Cost",
+    "quantitySold": "Quantity Sold"
+  },
+  "movementsPage": {
+    "id": "List ID",
+    "clientName": "Client",
+    "agentName": "Agent",
+    "dateOfOrder": "Date",
+    "totalQuantity": "Items sold",
+    "totalPriceSold": "Total"
+  },
+  "status": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled"
+  },
+  "eventHistoryTooltips": {
+    "approve": "Approve Event",
+    "reject": "Reject Event",
+    "delete": "Delete Event",
+    "edit": "Edit Event",
+    "visit": "Go To Visit"
+  },
+  "eventHistory": {
+    "title": "Event History",
+    "headers": {
+      "user": "User",
+      "eventType": "Event Type",
+      "reason": "Reason",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "actions": {
+      "na": "N/A"
+    },
+    "toast": {
+      "approveSuccess": "Event approved successfully.",
+      "approveFailure": "Failed to approve the event.",
+      "rejectSuccess": "Event rejected successfully.",
+      "rejectFailure": "Failed to reject the event.",
+      "genericError": "An error occurred."
+    }
   }
 }

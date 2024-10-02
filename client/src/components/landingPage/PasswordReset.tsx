@@ -15,6 +15,7 @@ import {
   updatePassword,
   verifyResetCode,
 } from "../../features/auth/api/auth";
+import { showToast } from "../../utils/toastMessage";
 
 interface PasswordResetProps {
   onClose: () => void;
@@ -37,16 +38,16 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
   const validatePassword = (password: string) => {
     const errors: string[] = [];
     if (!/[A-Z]/.test(password)) {
-      errors.push("Password must include at least one uppercase letter.");
+      errors.push(t("auth.passwordUppercaseError"));
     }
     if (!/[a-z]/.test(password)) {
-      errors.push("Password must include at least one lowercase letter.");
+      errors.push(t("auth.passwordLowercaseError"));
     }
     if (!/[0-9]/.test(password)) {
-      errors.push("Password must include at least one number.");
+      errors.push(t("auth.passwordNumberError"));
     }
     if (!/[\W_]/.test(password)) {
-      errors.push("Password must include at least one special character.");
+      errors.push(t("auth.passwordSpecialCharError"));
     }
 
     setPasswordErrors(errors);
@@ -57,13 +58,11 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
     setLoading(true);
     try {
       await requestPasswordReset(email);
-      setAlertMessage(
-        "If an account with that email exists, a reset code has been sent."
-      );
+      setAlertMessage(t("auth.resetCodeSent"));
       setAlertSeverity("success");
       setStep(2); // Move to the code verification step
     } catch {
-      setAlertMessage("Failed to request password reset. Please try again.");
+      setAlertMessage(t("auth.requestResetFailed"));
       setAlertSeverity("error");
     } finally {
       setLoading(false);
@@ -74,11 +73,11 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
     setLoading(true);
     try {
       await verifyResetCode(email, code);
-      setAlertMessage("Code verified successfully. Please set a new password.");
+      setAlertMessage(t("auth.codeVerified"));
       setAlertSeverity("success");
       setStep(3); // Move to the password update step
     } catch {
-      setAlertMessage("Invalid or expired code. Please try again.");
+      setAlertMessage(t("auth.invalidCode"));
       setAlertSeverity("error");
     } finally {
       setLoading(false);
@@ -90,7 +89,7 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
       return;
     }
     if (newPassword !== confirmPassword) {
-      setAlertMessage("Passwords do not match. Please try again.");
+      setAlertMessage(t("auth.passwordsDoNotMatch"));
       setAlertSeverity("error");
       return;
     }
@@ -98,11 +97,12 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
     setLoading(true);
     try {
       await updatePassword(email, code, newPassword);
-      setAlertMessage("Password updated successfully. You can now log in.");
+      setAlertMessage(t("auth.passwordUpdated"));
       setAlertSeverity("success");
+      showToast.info(t("auth.passwordUpdatedToast"));
       setTimeout(onClose, 3000); // Close modal after success message
     } catch {
-      setAlertMessage("Failed to update password. Please check your inputs.");
+      setAlertMessage(t("auth.updatePasswordFailed"));
       setAlertSeverity("error");
     } finally {
       setLoading(false);
@@ -111,7 +111,11 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
 
   return (
     <DialogContent
-      sx={{ textAlign: "center", padding: "32px", borderRadius: "24px" }}
+      sx={{
+        textAlign: "center",
+        padding: "32px",
+        borderRadius: "24px",
+      }}
     >
       <Typography
         variant="h4"
@@ -130,7 +134,7 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
           whiteSpace: "normal",
         }}
       >
-        {t("auth.IfYouForgotThePasswordYouCanResetItByEnteringYourEmail")}
+        {t("auth.resetInstructions")}
       </Typography>
 
       <Collapse in={!!alertMessage}>
@@ -153,10 +157,16 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
           </Typography>
           <TextField
             fullWidth
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             variant="outlined"
-            sx={{ marginBottom: "16px", borderRadius: "12px" }}
+            sx={{ mb: 4, borderRadius: "12px" }}
+            placeholder={t("auth.enterEmail")}
+            inputProps={{
+              autoComplete: "email",
+              spellCheck: false,
+            }}
           />
           <Button
             onClick={handleRequestReset}
@@ -189,15 +199,24 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
               fontWeight: "bold",
             }}
           >
-            Enter the verification code provided in your email.
+            {t("auth.enterVerificationCode")}
           </Typography>
           <Box display="flex" justifyContent="center" gap={1}>
             {[...Array(6)].map((_, index) => (
               <TextField
                 key={index}
-                inputProps={{ maxLength: 1 }}
+                inputProps={{
+                  maxLength: 1,
+                  sx: {
+                    textAlign: "center",
+                  },
+                }}
                 variant="outlined"
-                sx={{ width: "40px", textAlign: "center" }}
+                sx={{
+                  width: "40px",
+                  textAlign: "center",
+                  borderRadius: "12px",
+                }}
                 onChange={(e) =>
                   setCode(
                     (prev) =>
@@ -249,6 +268,10 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
             onChange={(e) => setNewPassword(e.target.value)}
             variant="outlined"
             sx={{ marginBottom: "16px", borderRadius: "12px" }}
+            placeholder={t("auth.enterNewPassword")}
+            inputProps={{
+              autoComplete: "new-password",
+            }}
           />
           <Typography
             variant="subtitle2"
@@ -263,6 +286,10 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
             onChange={(e) => setConfirmPassword(e.target.value)}
             variant="outlined"
             sx={{ marginBottom: "16px", borderRadius: "12px" }}
+            placeholder={t("auth.confirmPassword")}
+            inputProps={{
+              autoComplete: "new-password",
+            }}
           />
           <Button
             onClick={handleUpdatePassword}

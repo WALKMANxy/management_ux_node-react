@@ -7,11 +7,12 @@ import {
   Grid,
   IconButton,
   Paper,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { MovementDetailsProps } from "../../models/propsModels";
 import MovementDetailsHistory from "../statistics/grids/MovementDetailsHistory";
@@ -31,41 +32,51 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
     const theme = useTheme();
     const isMobile = useMediaQuery("(max-width:600px)");
 
+    // Memoize the toggle function to avoid recreating it on every render
+    const toggleCollapse = useMemo(
+      () => () => {
+        setMovementDetailsCollapsed(!isMovementDetailsCollapsed);
+      },
+      [isMovementDetailsCollapsed, setMovementDetailsCollapsed]
+    );
+
+    // Memoize styles to avoid recreating them on every render
+    const paperStyles = useMemo(
+      () => ({
+        p: 3,
+        borderRadius: "12px",
+        background: "linear-gradient(135deg, #e3f2fd 30%, #bbdefb 100%)",
+        color: "#000",
+        position: "relative" as const,
+        overflow: "hidden",
+        height: "100%",
+        "&:after": {
+          content: '""',
+          position: "absolute",
+          width: 210,
+          height: 210,
+          background: theme.palette.primary.main,
+          borderRadius: "50%",
+          top: -85,
+          right: -95,
+        },
+        "&:before": {
+          content: '""',
+          position: "absolute",
+          width: 210,
+          height: 210,
+          background: theme.palette.primary.main,
+          borderRadius: "50%",
+          top: -125,
+          right: -15,
+          opacity: 0.5,
+        },
+      }),
+      [theme.palette.primary.main]
+    );
+
     return (
-      <Paper
-        elevation={3}
-        ref={ref}
-        sx={{
-          p: 3,
-          borderRadius: "12px",
-          background: "linear-gradient(135deg, #e3f2fd 30%, #bbdefb 100%)",
-          color: "#000",
-          position: "relative",
-          overflow: "hidden",
-          height: "100%",
-          "&:after": {
-            content: '""',
-            position: "absolute",
-            width: 210,
-            height: 210,
-            background: theme.palette.primary.main,
-            borderRadius: "50%",
-            top: -85,
-            right: -95,
-          },
-          "&:before": {
-            content: '""',
-            position: "absolute",
-            width: 210,
-            height: 210,
-            background: theme.palette.primary.main,
-            borderRadius: "50%",
-            top: -125,
-            right: -15,
-            opacity: 0.5,
-          },
-        }}
-      >
+      <Paper elevation={3} ref={ref} sx={paperStyles}>
         <Box sx={{ p: 2.25 }}>
           <Grid container direction="column">
             <Grid item>
@@ -76,28 +87,44 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
               >
                 <Grid item>
                   <Typography variant="h2">
-                    {t("movementDetails.title")}
+                    {t("movementDetails.title", "Movement Details")}
                   </Typography>
                 </Grid>
                 <Grid item>
-                  <IconButton
-                    onClick={() =>
-                      setMovementDetailsCollapsed(!isMovementDetailsCollapsed)
+                  <Tooltip
+                    title={
+                      isMovementDetailsCollapsed
+                        ? t("movementDetails.expandTooltip", "Expand details")
+                        : t(
+                            "movementDetails.collapseTooltip",
+                            "Collapse details"
+                          )
                     }
+                    arrow
                   >
-                    {isMovementDetailsCollapsed ? (
-                      <ExpandMoreIcon />
-                    ) : (
-                      <ExpandLessIcon />
-                    )}
-                  </IconButton>
+                    <IconButton
+                      onClick={toggleCollapse}
+                      aria-label={
+                        isMovementDetailsCollapsed
+                          ? t("movementDetails.expand", "Expand details")
+                          : t("movementDetails.collapse", "Collapse details")
+                      }
+                      size="large"
+                    >
+                      {isMovementDetailsCollapsed ? (
+                        <ExpandMoreIcon />
+                      ) : (
+                        <ExpandLessIcon />
+                      )}
+                    </IconButton>
+                  </Tooltip>
                 </Grid>
               </Grid>
             </Grid>
           </Grid>
         </Box>
         <Collapse in={!isMovementDetailsCollapsed}>
-          {selectedMovement ? (
+          {selectedMovement && (
             <Box sx={{ p: 2 }}>
               <Grid
                 container
@@ -120,8 +147,6 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
                 </Grid>
               </Grid>
             </Box>
-          ) : (
-            <Box sx={{ p: 2 }}></Box>
           )}
         </Collapse>
       </Paper>

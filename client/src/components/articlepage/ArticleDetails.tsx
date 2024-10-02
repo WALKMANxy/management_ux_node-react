@@ -1,3 +1,5 @@
+// src/components/articlepage/ArticleDetails.tsx
+
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
@@ -6,6 +8,7 @@ import {
   Grid,
   IconButton,
   Paper,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
@@ -16,6 +19,14 @@ import { ArticleDetailsProps } from "../../models/propsModels";
 import ArticleHistory from "../statistics/grids/ArticleHistory";
 import ArticleDetailComponent from "./ArticleDetailComponent";
 
+/**
+ * ArticleDetails Component
+ * Displays detailed information about a selected article, including its details and history.
+ *
+ * @param {ArticleDetailsProps} props - Component props.
+ * @param {React.Ref<HTMLDivElement>} ref - Forwarded ref.
+ * @returns {JSX.Element} The rendered component.
+ */
 const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
   (
     {
@@ -31,6 +42,9 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
     const theme = useTheme();
     const isMobile = useMediaQuery("(max-width:600px)");
 
+    /**
+     * Determines if there is history related to the selected article.
+     */
     const hasHistory = clientMovements
       ? clientMovements.some((movement) =>
           movement.details.some(
@@ -39,8 +53,12 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
         )
       : false;
 
-    /* console.log("selectedArticle: ", selectedArticle);
-    console.log("clientMovements: ", clientMovements); */
+    /**
+     * Handles the toggle of the article details collapse state.
+     */
+    const handleToggleCollapse = () => {
+      setArticleDetailsCollapsed(!isArticleDetailsCollapsed);
+    };
 
     return (
       <Paper
@@ -77,6 +95,7 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
           },
         }}
       >
+        {/* Header Section */}
         <Box sx={{ p: 2.25 }}>
           <Grid container direction="column">
             <Grid item>
@@ -86,27 +105,42 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
                 alignItems="center"
               >
                 <Grid item>
-                  <Typography variant="h2">
-                    {t("articleDetails.title")}
+                  <Typography variant="h4" component="h2">
+                    {t("articleDetails.title", "Article Details")}
                   </Typography>
                 </Grid>
                 <Grid item>
-                  <IconButton
-                    onClick={() =>
-                      setArticleDetailsCollapsed(!isArticleDetailsCollapsed)
+                  <Tooltip
+                    title={
+                      isArticleDetailsCollapsed
+                        ? t("articleDetails.expand", "Expand Details")
+                        : t("articleDetails.collapse", "Collapse Details")
                     }
+                    arrow
                   >
-                    {isArticleDetailsCollapsed ? (
-                      <ExpandMoreIcon />
-                    ) : (
-                      <ExpandLessIcon />
-                    )}
-                  </IconButton>
+                    <IconButton
+                      onClick={handleToggleCollapse}
+                      aria-label={
+                        isArticleDetailsCollapsed
+                          ? t("articleDetails.expand", "Expand Details")
+                          : t("articleDetails.collapse", "Collapse Details")
+                      }
+                      size="large"
+                    >
+                      {isArticleDetailsCollapsed ? (
+                        <ExpandMoreIcon />
+                      ) : (
+                        <ExpandLessIcon />
+                      )}
+                    </IconButton>
+                  </Tooltip>
                 </Grid>
               </Grid>
             </Grid>
           </Grid>
         </Box>
+
+        {/* Collapsible Content */}
         <Collapse in={!isArticleDetailsCollapsed}>
           {selectedArticle ? (
             <Box sx={{ p: 2 }}>
@@ -115,12 +149,15 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
                 spacing={2}
                 direction={isMobile ? "column" : "row"}
               >
+                {/* Article Details */}
                 <Grid item xs={12} md={6}>
                   <ArticleDetailComponent
                     detail={selectedArticle}
                     isLoading={isLoading}
                   />
                 </Grid>
+
+                {/* Article History */}
                 <Grid item xs={12} md={6}>
                   {hasHistory ? (
                     <ArticleHistory
@@ -136,8 +173,12 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
                         height: "100%",
                       }}
                     >
-                      <Typography variant="h6" sx={{ textAlign: "center" }}>
-                        {t("articleDetails.noHistory")}
+                      <Typography
+                        variant="body1"
+                        color="textSecondary"
+                        sx={{ textAlign: "center" }}
+                      >
+                        {t("articleDetails.noHistory", "No history available.")}
                       </Typography>
                     </Box>
                   )}
@@ -145,7 +186,16 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
               </Grid>
             </Box>
           ) : (
-            <Box sx={{ p: 2 }}></Box>
+            <Box sx={{ p: 2 }}>
+              {/* Placeholder or Empty State */}
+              <Typography
+                variant="body1"
+                color="textSecondary"
+                sx={{ textAlign: "center" }}
+              >
+                {t("articleDetails.noArticleSelected", "No article selected.")}
+              </Typography>
+            </Box>
           )}
         </Collapse>
       </Paper>
@@ -153,4 +203,4 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
   }
 );
 
-export default ArticleDetails;
+export default React.memo(ArticleDetails);

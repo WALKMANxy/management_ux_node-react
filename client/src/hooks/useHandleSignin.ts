@@ -1,7 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { showToast } from "../utils/toastMessage";
 import { useAuth } from "./useAuth";
 
 export const useHandleSignin = (onClose: () => void) => {
+  const { t } = useTranslation(); // Initialize translation
+
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -10,18 +14,22 @@ export const useHandleSignin = (onClose: () => void) => {
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertOpen, setAlertOpen] = useState(false);
-  const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
-    "error"
-  );
+  const [alertSeverity, setAlertSeverity] = useState<
+    "success" | "error" | "info"
+  >("error");
   const [shakeEmail, setShakeEmail] = useState(false);
   const [shakePassword, setShakePassword] = useState(false);
   const [shakeConfirmPassword, setShakeConfirmPassword] = useState(false); // For confirming password shake effect
 
-  const { initiateLogin, initiateRegister } = useAuth();
+  const { initiateLogin, initiateRegister, handleLoginWithGoogle } = useAuth();
 
-  const toggleMode = () => {
-    setIsLoginMode(!isLoginMode);
-  };
+  const toggleMode = useCallback(() => {
+    setIsLoginMode((prevMode) => !prevMode);
+    // Reset form fields and errors when toggling mode
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+  }, []);
 
   useEffect(() => {
     // Watch for changes in alertMessage and trigger the shake effect
@@ -66,7 +74,7 @@ export const useHandleSignin = (onClose: () => void) => {
       } else {
         let hasError = false;
         if (password !== confirmPassword) {
-          setAlertMessage("Passwords do not match.");
+          setAlertMessage(t("signin.passwordMismatch"));
           setAlertSeverity("error");
           setAlertOpen(true);
           setShakePassword(true);
@@ -93,12 +101,12 @@ export const useHandleSignin = (onClose: () => void) => {
     } catch (error: unknown) {
       // Handling the error with proper type checking
       if (error instanceof Error) {
-        setAlertMessage("An unexpected error occurred");
+        setAlertMessage(t("errors.unknown"));
         setAlertSeverity("error");
         setAlertOpen(true);
       } else {
         // Fallback in case error is not an instance of Error
-        setAlertMessage("An unknown error occurred");
+        setAlertMessage(t("errors.unknown"));
         setAlertSeverity("error");
         setAlertOpen(true);
       }
@@ -106,6 +114,20 @@ export const useHandleSignin = (onClose: () => void) => {
       setLoading(false);
     }
   };
+
+  const handleLoginWithGoogleClick = useCallback(async () => {
+    try {
+      handleLoginWithGoogle();
+      onClose();
+      showToast.success(t("signin.loginWithGoogleSuccess"));
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        showToast.error(error.message);
+      } else {
+        showToast.error(t("errors.unknown"));
+      }
+    }
+  }, [handleLoginWithGoogle, onClose, t]);
 
   return {
     isLoginMode,
@@ -127,5 +149,6 @@ export const useHandleSignin = (onClose: () => void) => {
     shakeConfirmPassword,
     toggleMode,
     handleSubmit,
+    handleLoginWithGoogleClick,
   };
 };

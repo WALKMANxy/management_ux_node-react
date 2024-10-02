@@ -9,17 +9,16 @@ import {
   Menu,
   MenuItem,
   Paper,
-  TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { ArticlesListProps } from "../../../models/propsModels";
 import AGGridTable from "./AGGridTable";
 
 const ArticlesList: React.FC<ArticlesListProps> = ({
   quickFilterText,
-  setQuickFilterText,
   filteredArticles,
   columnDefs,
   gridRef,
@@ -34,15 +33,20 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const onFilterTextBoxChanged = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = event.target.value || ""; // Ensure value is not null
-    setQuickFilterText(value);
-  };
+  const handleCollapseToggle = useCallback(() => {
+    setArticleListCollapsed(!isArticleListCollapsed);
+  }, [isArticleListCollapsed, setArticleListCollapsed]);
+
+  const handleExportCSV = useCallback(() => {
+    exportDataAsCsv();
+    handleMenuClose();
+  }, [exportDataAsCsv, handleMenuClose]);
+
+
+  const memoizedColumnDefs = useMemo(() => columnDefs, [columnDefs]);
 
   return (
-    <Paper elevation={8} sx={{ mb: 2 }}>
+    <Paper elevation={8} sx={{ mb: 2, borderRadius: 2 }}>
       <Box
         sx={{
           display: "flex",
@@ -51,14 +55,27 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
           p: 2,
         }}
       >
-        <Typography variant="h6">{t("articleList.title")}</Typography>
-        <IconButton
-          onClick={() => setArticleListCollapsed(!isArticleListCollapsed)}
+        <Typography variant="h4" sx={{ pl: 2, pt: 2, mb: -4}}>{t("articleList.title")}</Typography>
+        <Tooltip
+          title={
+            isArticleListCollapsed
+              ? t("articleList.expand")
+              : t("articleList.collapse")
+          }
         >
-          {isArticleListCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-        </IconButton>
+          <IconButton
+            onClick={handleCollapseToggle}
+            aria-label={
+              isArticleListCollapsed
+                ? t("articleList.expand")
+                : t("articleList.collapse")
+            }
+          >
+            {isArticleListCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+          </IconButton>
+        </Tooltip>
       </Box>
-      <Collapse in={!isArticleListCollapsed}>
+      <Collapse in={!isArticleListCollapsed} sx={{ pt: 2, pb: 4 }}>
         <Box sx={{ p: 2 }}>
           <Box
             sx={{
@@ -69,35 +86,46 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
             }}
           >
             <Box
-              sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}
+              sx={{
+                display: "flex",
+                flexDirection: "row-reverse",
+                alignItems: "center",
+                gap: 1,
+                flex: 1,
+              }}
             >
-              <TextField
-                id="filter-text-box"
-                placeholder={t("articleList.quickFilterPlaceholder")}
-                variant="outlined"
-                size="small"
-                fullWidth
-                onChange={onFilterTextBoxChanged}
-              />
-              <IconButton onClick={handleMenuOpen}>
-                <MoreVertIcon />
-              </IconButton>
+              <Tooltip title={t("articleList.options")}>
+                <IconButton
+                  onClick={handleMenuOpen}
+                  aria-label={t("articleList.options")}
+                >
+                  <MoreVertIcon />
+                </IconButton>
+              </Tooltip>
             </Box>
           </Box>
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
           >
-            <MenuItem onClick={exportDataAsCsv}>
+            <MenuItem onClick={handleExportCSV}>
               {t("articleList.exportCSV")}
             </MenuItem>
           </Menu>
           <AGGridTable
             ref={gridRef}
-            columnDefs={columnDefs}
-            rowData={filteredArticles()}
-            paginationPageSize={500}
+            columnDefs={memoizedColumnDefs}
+            rowData={filteredArticles}
+            paginationPageSize={100} // Adjusted to a more manageable number
             quickFilterText={quickFilterText}
           />
         </Box>

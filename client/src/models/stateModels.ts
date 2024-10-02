@@ -1,4 +1,4 @@
-import {  GlobalPromos, GlobalVisits, Promo, Visit } from "./dataModels";
+import { GlobalVisits, Promo, Visit } from "./dataModels";
 import { Admin, Agent, Client, UserRole } from "./entityModels";
 import { SearchResult } from "./searchModels";
 
@@ -37,16 +37,16 @@ export interface DataSliceState {
   currentUserData: Client | Agent | Admin | null;
   currentUserDetails: {
     id: string;
-    role: "client" | "agent" | "admin";
+    role: "client" | "agent" | "admin" | "employee";
     name: string;
     userId: string;
   } | null;
-  currentUserPromos: Promo[] | GlobalPromos | null;
+  currentUserPromos: Promo[] | null;
   currentUserVisits: Visit[] | GlobalVisits | null;
   selectedClientId: string | null;
   selectedAgentId: string | null;
-  selectedVisitId: string | null,
-  selectedPromoId: string | null,
+  selectedVisitId: string | null;
+  selectedPromoId: string | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }

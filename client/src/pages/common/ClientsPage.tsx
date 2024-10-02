@@ -5,8 +5,10 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import ClientDetails from "../../components/clientpage/ClientDetails";
+import Spinner from "../../components/common/Spinner";
 import ClientList from "../../components/statistics/grids/ClientList";
 import { useClientsGrid } from "../../hooks/useClientGrid";
+import useLoadingData from "../../hooks/useLoadingData";
 import {
   ClientColumnDefinition,
   EnrichedClient,
@@ -23,6 +25,8 @@ const ClientsPage: React.FC = () => {
   const isMobile = useMediaQuery("(max-width:600px)");
   const userRole = useSelector((state: RootState) => state.auth.role);
   const loggedInClientId = useSelector((state: RootState) => state.auth.id);
+
+  const { loading } = useLoadingData();
 
   const {
     filteredClients,
@@ -67,7 +71,7 @@ const ClientsPage: React.FC = () => {
         cellRenderer: (params: { data: EnrichedClient; value: string }) => {
           return (
             <span
-              onDoubleClick={() => handleClientSelect(params.data.id)}
+              onClick={() => handleClientSelect(params.data.id)}
               style={{
                 cursor: "pointer",
               }}
@@ -142,18 +146,19 @@ const ClientsPage: React.FC = () => {
         valueFormatter: (params) => currencyFormatter(params.value),
         sortable: true,
       },
+
+      {
+        headerName: t("clientsPage.paymentMethod"),
+        field: "paymentMethod",
+        filter: "agTextColumnFilter",
+        sortable: true,
+      },
       {
         headerName: t("clientsPage.unpaidRevenue"),
         field: "unpaidRevenue",
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
         valueFormatter: (params) => currencyFormatter(params.value),
-        sortable: true,
-      },
-      {
-        headerName: t("clientsPage.paymentMethod"),
-        field: "paymentMethod",
-        filter: "agTextColumnFilter",
         sortable: true,
       },
     ];
@@ -171,9 +176,26 @@ const ClientsPage: React.FC = () => {
   }, [handleClientSelect, t, userRole]);
 
   // Find the logged-in client details from clients array
-  const loggedInClientDetails = filteredClients().find(
+  const loggedInClientDetails = filteredClients.find(
     (client) => client.id === loggedInClientId
   );
+
+  // Handle loading state
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          height: "100vh",
+          justifyContent: "center",
+          alignItems: "center",
+          bgcolor: "#f4f5f7",
+        }}
+      >
+        <Spinner />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -196,7 +218,7 @@ const ClientsPage: React.FC = () => {
             setStartDate={setStartDate}
             endDate={endDate}
             setEndDate={setEndDate}
-            filteredClients={filteredClients()}
+            filteredClients={filteredClients}
             columnDefs={columnDefinitions}
             gridRef={gridRef}
             handleMenuOpen={handleMenuOpen}

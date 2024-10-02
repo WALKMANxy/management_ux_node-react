@@ -21,8 +21,15 @@ export class PromoController {
     res: Response
   ): Promise<void> {
     try {
-      const promo = await PromoService.createPromo(req.body);
-      res.status(201).json({ message: "Promo created successfully", promo });
+      const promoData = req.body;
+
+      // Ensure clientsId is empty if the promo is global
+      if (promoData.global) {
+        promoData.clientsId = [];
+      }
+
+      const promo = await PromoService.createPromo(promoData);
+      res.status(201).json(promo);
     } catch (err) {
       if (err instanceof Error) {
         res.status(500).json({ message: err.message });
@@ -37,12 +44,19 @@ export class PromoController {
     res: Response
   ): Promise<void> {
     try {
-      const promo = await PromoService.replacePromo(req.params.id, req.body);
+      const promoData = req.body;
+
+      // Ensure clientsId is empty if the promo is global
+      if (promoData.global) {
+        promoData.clientsId = [];
+      }
+
+      const promo = await PromoService.replacePromo(req.params.id, promoData);
       if (!promo) {
         res.status(200).json({ message: "Promo not found" });
         return; // Ensure the function stops execution here
       }
-      res.status(200).json({ message: "Promo updated successfully", promo });
+      res.status(200).json(promo);
     } catch (err) {
       if (err instanceof Error) {
         res.status(500).json({ message: err.message });
@@ -52,17 +66,25 @@ export class PromoController {
     }
   }
 
+
   static async updatePromo(
     req: AuthenticatedRequest,
     res: Response
   ): Promise<void> {
     try {
-      const promo = await PromoService.updatePromo(req.params.id, req.body);
+      const promoData = req.body;
+
+      // Ensure clientsId is empty if the promo is global
+      if (promoData.global) {
+        promoData.clientsId = [];
+      }
+
+      const promo = await PromoService.updatePromo(req.params.id, promoData);
       if (!promo) {
         res.status(200).json({ message: "Promo not found" });
         return; // Ensure the function stops execution here
       }
-      res.status(200).json({ message: "Promo updated successfully", promo });
+      res.status(200).json(promo);
     } catch (err) {
       if (err instanceof Error) {
         res.status(500).json({ message: err.message });

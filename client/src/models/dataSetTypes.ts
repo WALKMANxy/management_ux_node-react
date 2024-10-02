@@ -1,3 +1,5 @@
+//src/models/dataSetTypes.ts
+
 import { Agent, Client } from "./entityModels";
 import { SearchResult } from "./searchModels";
 
@@ -35,7 +37,7 @@ export interface serverMovement {
   "Prezzo Articolo": number;
 }
 
-export interface serverAgent {
+export interface ServerAgent {
   id: string;
   name: string;
   email: string;
@@ -59,25 +61,19 @@ export type TopArticleType = {
   quantity: number;
 };
 
+// Define a reusable type for comparative statistics
+export interface ComparativeStatistics {
+  revenuePercentage: string; // Consider using number if unformatted
+  ordersPercentage: string; // Consider using number if unformatted
+}
+
 export interface UseSelectionStateReturn {
   selectedClient: Client | null;
   selectedAgent: Agent | null;
   handleSelect: (item: SearchResult) => void;
   clearSelection: () => void;
-  clientComparativeStatistics: {
-    revenuePercentage: string;
-    ordersPercentage: string;
-  };
-  clientComparativeStatisticsMonthly: {
-    revenuePercentage: string;
-    ordersPercentage: string;
-  };
-  agentComparativeStatistics: {
-    revenuePercentage: string;
-    ordersPercentage: string;
-  };
-  agentComparativeStatisticsMonthly: {
-    revenuePercentage: string;
-    ordersPercentage: string;
-  };
+  clientComparativeStatistics: ComparativeStatistics;
+  clientComparativeStatisticsMonthly: ComparativeStatistics;
+  agentComparativeStatistics: ComparativeStatistics;
+  agentComparativeStatisticsMonthly: ComparativeStatistics;
 }

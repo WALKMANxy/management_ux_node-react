@@ -12,16 +12,15 @@ import { ApexOptions } from "apexcharts";
 import React, { useMemo } from "react";
 import Chart from "react-apexcharts";
 import { useTranslation } from "react-i18next";
+import { UserRole } from "../../../models/entityModels";
 import { monthMap } from "../../../utils/constants";
 import { currencyFormatter } from "../../../utils/dataUtils";
 
 const MonthOverMonthSpendingTrend: React.FC<{
   months: string[];
   revenueData: number[];
-  userRole: "agent" | "client" | "admin";
-  isAgentSelected: boolean;
-  // New prop to determine user role
-}> = ({ months, revenueData, userRole, isAgentSelected }) => {
+  userRole: UserRole;
+}> = ({ months, revenueData, userRole }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const loading = revenueData.length === 0;
@@ -62,7 +61,7 @@ const MonthOverMonthSpendingTrend: React.FC<{
           formatter: (val: number) => currencyFormatter(val),
           title: {
             formatter: () =>
-              userRole === "agent"
+              userRole === "agent" || userRole === "admin"
                 ? t("monthOverMonthSpendingTrend.revenue")
                 : t("monthOverMonthSpendingTrend.expense"),
           },
@@ -108,7 +107,7 @@ const MonthOverMonthSpendingTrend: React.FC<{
     () => [
       {
         name:
-          userRole === "agent"
+          userRole === "agent" || userRole === "admin"
             ? t("monthOverMonthSpendingTrend.revenue")
             : t("monthOverMonthSpendingTrend.expense"),
         data: data.map((d) => d.revenue),
@@ -149,6 +148,7 @@ const MonthOverMonthSpendingTrend: React.FC<{
         },
       }}
     >
+      {/* Header with Icon */}
       <Box
         sx={{
           display: "flex",
@@ -171,6 +171,8 @@ const MonthOverMonthSpendingTrend: React.FC<{
           <ShowChartIcon fontSize="inherit" />
         </Avatar>
       </Box>
+
+      {/* Title */}
       <Box
         sx={{
           display: "flex",
@@ -185,20 +187,17 @@ const MonthOverMonthSpendingTrend: React.FC<{
         }}
       >
         <Typography variant="h6" gutterBottom>
-
-          {t(
-                isAgentSelected
-                  ? "monthOverMonthSpendingTrend.titleAgent"
-                  : "monthOverMonthSpendingTrend.titleClient"
-              )}
+          {t("monthOverMonthSpendingTrend.title", "Monthly Trend")}
         </Typography>
       </Box>
 
+      {/* Divider */}
       <Divider
         sx={{ width: "100%", mt: 2, zIndex: 1, position: "relative", top: 10 }}
       />
 
-      <Box sx={{ width: "100%", height: "auto" }}>
+      {/* Chart or Skeleton */}
+      <Box sx={{ width: "100%", height: "auto", p: 2 }}>
         {loading ? (
           <Skeleton
             variant="rectangular"

@@ -1,6 +1,6 @@
-import { Movement } from "./dataModels";
+import { MonthlyData, Movement } from "./dataModels";
 
-export type UserRole = "admin" | "agent" | "client" | "guest";
+export type UserRole = "admin" | "agent" | "client" | "employee" | "guest";
 
 export type User = {
   _id: string; // Corresponds to MongoDB's _id
@@ -13,10 +13,8 @@ export type User = {
   entityCode: string; // Code linking to admin, agent, or client
   entityName?: string;
   avatar?: string;
-
   authType: "email" | "google"; // New field to distinguish authentication type
   isEmailVerified?: boolean;
-
   createdAt?: Date;
   updatedAt?: Date;
 };
@@ -29,6 +27,12 @@ export type Admin = {
   clients: Client[];
 };
 
+export interface Employee {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export type Client = {
   id: string;
   name: string;
@@ -37,6 +41,7 @@ export type Client = {
   phone?: string;
   totalOrders: number;
   totalRevenue: string;
+  totalNetRevenue: string;
   unpaidRevenue: string;
   address?: string;
   email?: string;
@@ -48,7 +53,9 @@ export type Client = {
   agent: string;
   agentName?: string;
   movements: Movement[];
+  monthlyData: { [monthYear: string]: MonthlyData }; // Added
   colour?: string;
+  agentData?: Agent[];
 };
 
 export type Agent = {

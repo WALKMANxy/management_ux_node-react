@@ -1,24 +1,29 @@
+// src/components/UpcomingVisits.tsx
+
 import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
 import { Timeline, timelineItemClasses } from "@mui/lab";
-import { Box, IconButton, Paper, Skeleton, Typography } from "@mui/material";
+import { Box, IconButton, Paper, Tooltip, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
-import { selectVisits } from "../../features/data/dataSelectors";
-import { UpcomingVisitsProps } from "../../models/propsModels";
+import { selectVisits } from "../../features/promoVisits/promoVisitsSelectors";
 import { VisitItem } from "./VisitItem";
 
-const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
+const UpcomingVisits: React.FC = () => {
   const { t } = useTranslation();
+
   const navigate = useNavigate();
   const visits = useAppSelector(selectVisits);
 
-  // Memoize the upcoming visits computation
+  const now = useMemo(() => new Date(), []);
   const upcomingVisits = useMemo(() => {
     // Filter visits to include only those that are pending and not completed
     const filteredVisits = visits.filter(
-      (visit) => visit.pending === true && visit.completed === false
+      (visit) =>
+        visit.pending === true &&
+        visit.completed === false &&
+        new Date(visit.date) >= now
     );
 
     // Sort the visits by date (earliest first)
@@ -28,7 +33,7 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
 
     // Return the top 3 upcoming visits
     return sortedVisits.slice(0, 3);
-  }, [visits]);
+  }, [visits, now]);
 
   return (
     <Paper
@@ -36,9 +41,10 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
       sx={{
         p: 3,
         borderRadius: "12px",
+        background: "linear-gradient(135deg, #e8f5e9 30%, #c8e6c9 100%)",
+        color: "#000",
         position: "relative",
         overflow: "hidden",
-        background: "linear-gradient(135deg, #e8f5e9 30%, #c8e6c9 100%)",
         height: "auto",
         "&::before": {
           content: '""',
@@ -54,23 +60,24 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
         },
       }}
     >
-      <Box sx={{ position: "relative", zIndex: 1,  }}>
-        <Typography variant="h5" gutterBottom>
-          {t("upcomingVisits.title")}
+      <Box sx={{ position: "relative", zIndex: 1 }}>
+        {/* Title */}
+        <Typography variant="h5" gutterBottom sx={{ wordBreak: "break-word" }}>
+          {t("upcomingVisits.title", "Upcoming Visits")}
         </Typography>
+
+        {/* Content Area */}
         <Box sx={{ maxHeight: 420, overflow: "auto" }}>
-          {isLoading ? (
-            <Skeleton
-              variant="rectangular"
-              width="100%"
-              height={200}
-              sx={{ borderRadius: 2 }}
-            />
-          ) : upcomingVisits.length === 0 ? (
+          {upcomingVisits.length === 0 ? (
+            // No Upcoming Visits
             <Typography variant="body1">
-              {t("upcomingVisits.noProgrammedVisits")}
+              {t(
+                "upcomingVisits.noProgrammedVisits",
+                "No upcoming visits scheduled."
+              )}
             </Typography>
           ) : (
+            // Display Upcoming Visits
             <Timeline
               position="left"
               sx={{
@@ -94,20 +101,30 @@ const UpcomingVisits: React.FC<UpcomingVisitsProps> = ({ isLoading }) => {
             </Timeline>
           )}
         </Box>
-        <IconButton
-          onClick={() => navigate("/visits")}
-          sx={{
-            mt: 3,
-            borderRadius: 2,
-            backgroundColor: "gray",
-            color: "#fff",
-            "&:hover": {
-              backgroundColor: "#c8e6c9",
-            },
-          }}
-        >
-          <AirplaneTicketIcon />
-        </IconButton>
+
+        {/* Navigate to All Visits */}
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <Tooltip
+            title={t("upcomingVisits.viewAllVisits", "View All Visits")}
+            arrow
+          >
+            <IconButton
+              onClick={() => navigate("/visits")}
+              sx={{
+                mt: 3,
+                borderRadius: 2,
+                backgroundColor: (theme) => theme.palette.grey[700],
+                color: "#fff",
+                "&:hover": {
+                  backgroundColor: (theme) => theme.palette.grey[500],
+                },
+              }}
+              aria-label={t("upcomingVisits.viewAllVisits", "View All Visits")}
+            >
+              <AirplaneTicketIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Box>
     </Paper>
   );

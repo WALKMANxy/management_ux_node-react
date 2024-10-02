@@ -2,8 +2,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Promo, Visit } from "../../models/dataModels";
 import { DataSliceState } from "../../models/stateModels";
-import { promoVisitApi } from "./promosVisitsQueries";
-import { dataApi } from "./dataQueries";
+import { promoVisitApi } from "../promoVisits/promosVisitsQueries";
+import { dataApi } from "./dataQueries.ts";
 
 export const fetchInitialData = createAsyncThunk(
   "data/fetchInitialData",
@@ -13,8 +13,12 @@ export const fetchInitialData = createAsyncThunk(
     };
     const { role, id, userId } = state.auth;
 
+    if (role === "employee") {
+      // For employees, skip data fetching
+      return { role, userData: null, userId };
+    }
+
     let userData;
-    /* let agentData = null; */
     if (role === "client") {
       userData = await dispatch(
         dataApi.endpoints.getUserClientData.initiate({ entityCode: id, userId })
@@ -24,18 +28,13 @@ export const fetchInitialData = createAsyncThunk(
         dataApi.endpoints.getUserAgentData.initiate({ entityCode: id, userId })
       ).unwrap();
     } else if (role === "admin") {
-      // Fetch clients, agents, and agent details using the CRA API endpoints
-
-      /* agentData = await dispatch(
-        superApi.endpoints.getAgentDetails.initiate()
-      ).unwrap(); */
       userData = await dispatch(
         dataApi.endpoints.getUserAdminData.initiate({ entityCode: id, userId })
       ).unwrap();
     } else {
       throw new Error("Invalid user role");
     }
-    return { role, userData, userId /* agentData */ };
+    return { role, userData, userId };
   }
 );
 // Thunk to update visits
@@ -48,6 +47,11 @@ export const getVisits = createAsyncThunk<
     const state = getState().data;
     const entity = state.currentUserData;
     const role = state.currentUserDetails?.role;
+    if (role === "employee") {
+      // Employees should not fetch visits
+      return;
+    }
+
 
     if (!entity || !role) {
       throw new Error("No entity or role found in the state.");
@@ -74,6 +78,11 @@ export const getPromos = createAsyncThunk<
     const entity = state.currentUserData;
     const role = state.currentUserDetails?.role;
 
+    if (role === "employee") {
+      // Employees should not fetch visits
+      return;
+    }
+
     if (!entity || !role) {
       throw new Error("No entity or role found in the state.");
     }
@@ -90,7 +99,7 @@ export const getPromos = createAsyncThunk<
 
 // Create Visit Thunk
 export const createVisitAsync = createAsyncThunk<
-  void, // Changed return type to void
+  Visit, // Changed return type to void
   Visit, // Input type
   { state: { data: DataSliceState } }
 >(
@@ -100,6 +109,11 @@ export const createVisitAsync = createAsyncThunk<
       const state = getState().data;
       const entity = state.currentUserData;
       const role = state.currentUserDetails?.role;
+
+      if (role === "employee") {
+        // Employees should not fetch visits
+        return rejectWithValue("You can't create visits.");
+      }
 
       if (!entity || !role) {
         throw new Error("No entity or role found in the state.");
@@ -113,6 +127,7 @@ export const createVisitAsync = createAsyncThunk<
           role,
         })
       ).unwrap();
+      return visitData;
     } catch (err: unknown) {
       // Safely handle and type the error
       if (err instanceof Error && "data" in err) {
@@ -142,6 +157,11 @@ export const updateVisitAsync = createAsyncThunk<
       const entity = state.currentUserData;
       const role = state.currentUserDetails?.role;
 
+      if (role === "employee") {
+        // Employees should not fetch visits
+        return rejectWithValue("You can't update visits.");
+      }
+
       if (!entity || !role) {
         throw new Error("No entity or role found in the state.");
       }
@@ -169,7 +189,7 @@ export const updateVisitAsync = createAsyncThunk<
 
 // Create Promo Thunk
 export const createPromoAsync = createAsyncThunk<
-  void, // Changed return type to void
+  Promo, // Changed return type to void
   Promo, // Input type
   { state: { data: DataSliceState } }
 >(
@@ -179,6 +199,11 @@ export const createPromoAsync = createAsyncThunk<
       const state = getState().data;
       const entity = state.currentUserData;
       const role = state.currentUserDetails?.role;
+
+      if (role === "employee") {
+        // Employees should not fetch visits
+        return rejectWithValue("You can't create promos.");
+      }
 
       if (!entity || !role) {
         throw new Error("No entity or role found in the state.");
@@ -192,6 +217,7 @@ export const createPromoAsync = createAsyncThunk<
           role,
         })
       ).unwrap();
+      return promoData;
     } catch (err: unknown) {
       if (err instanceof Error && "data" in err) {
         return rejectWithValue((err as { data: string }).data);
@@ -219,6 +245,11 @@ export const updatePromoAsync = createAsyncThunk<
       const state = getState().data;
       const entity = state.currentUserData;
       const role = state.currentUserDetails?.role;
+
+      if (role === "employee") {
+        // Employees should not fetch visits
+        return rejectWithValue("You can't update promos.");
+      }
 
       if (!entity || !role) {
         throw new Error("No entity or role found in the state.");

@@ -1,23 +1,38 @@
-// InputBox.tsx
+// src/components/chatPage/InputBox.tsx
+
 import SendIcon from "@mui/icons-material/Send";
 import TuneIcon from "@mui/icons-material/Tune";
 import {
+  Box,
   Divider,
-  Grid,
   IconButton,
   Menu,
-  MenuItem,
   Paper,
   TextField,
+  Tooltip,
+  Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { selectUserRole } from "../../features/auth/authSlice"; // Assuming the selector is defined in the auth slice
 import useChatLogic from "../../hooks/useChatsLogic";
 
-const InputBox: React.FC = () => {
+interface InputBoxProps {
+  canUserChat: boolean; // Add chatStatus prop
+}
+
+/**
+ * InputBox Component
+ * Allows users to input and send messages, and select message types.
+ *
+ * @param {InputBoxProps} props - Component props.
+ * @returns {JSX.Element} The rendered component.
+ */
+const InputBox: React.FC<InputBoxProps> = ({ canUserChat }) => {
+  const { t } = useTranslation();
   const [messageInput, setMessageInput] = useState("");
   const [messageType, setMessageType] = useState<
     "message" | "alert" | "promo" | "visit"
@@ -31,50 +46,74 @@ const InputBox: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const handleSend = () => {
+  /**
+   * Handles sending the message.
+   */
+  const handleSend = useCallback(() => {
     if (messageInput.trim()) {
       handleSendMessage(messageInput, messageType);
       setMessageInput(""); // Clear the input field
       inputRef.current?.focus(); // Keep focus on the input field
     }
-  };
+  }, [messageInput, messageType, handleSendMessage]);
 
-  // Handler for opening the message type dropdown
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+  /**
+   * Handler for opening the message type dropdown menu.
+   *
+   * @param {React.MouseEvent<HTMLElement>} event - The click event.
+   */
+  const handleMenuOpen = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setMenuAnchorEl(event.currentTarget);
-  };
+  }, []);
 
-  // Handler for closing the dropdown menu
-  const handleMenuClose = () => {
+  /**
+   * Handler for closing the message type dropdown menu.
+   */
+  const handleMenuClose = useCallback(() => {
     setMenuAnchorEl(null);
-  };
+  }, []);
+
+  /**
+   * Handler for selecting a message type.
+   *
+   * @param {("message" | "alert" | "promo" | "visit")} type - The selected message type.
+   */
+  const handleMessageTypeSelect = useCallback(
+    (type: "message" | "alert" | "promo" | "visit") => {
+      setMessageType(type);
+      handleMenuClose();
+    },
+    [handleMenuClose]
+  );
 
   return (
     <Paper
-      elevation={3}
+      elevation={0}
       sx={{
         display: "flex",
         alignItems: "center",
         p: 1,
-        borderRadius: isMobile  ? "0px" : "1.5em", // Rounded corners for the paper
+        borderRadius: isMobile ? "0px" : "0px", // Rounded corners for the paper
         mt: 0,
+        backdropFilter: "blur(10px)", // Frosted glass effect
+        backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent background
       }}
     >
+      {/* Message Input Field */}
       <TextField
         variant="outlined"
         fullWidth
-        placeholder="Type a message..."
+        placeholder={t("inputBox.placeholders.typeMessage")}
         value={messageInput}
         inputRef={inputRef} // Attach the ref to keep focus
         onChange={(e) => setMessageInput(e.target.value)}
         onKeyUp={(e) => e.key === "Enter" && handleSend()}
-        autoComplete="off" // Keep this for desktop browsers
-        type="search"
-        aria-label="Chat input box"
+        autoComplete="off" // Prevents autofill suggestions
+        type="search" // Ensures minimal autofill interference
+        aria-label={t("inputBox.labels.chatInput")}
         role="textbox"
         inputProps={{
           type: "search",
-          //WE HAVE TO FUCKING USE THE SEARCH TYPE BECAUSE SOME CUNT AT FUCKING GOOGLE DECIDED TO SHOW CREDIT CARD, ADDRESS AND PASSWORD AUTOFILL INSIDE OF GBOARD FOR LITERALLY EVERY FUCKING INPUT TYPE EXCEPT SEARCH, JESUS FUCKING CHRIST
           inputMode: "text",
           enterKeyHint: "send",
           autoCorrect: "on",
@@ -90,25 +129,50 @@ const InputBox: React.FC = () => {
           },
           "& .MuiInputBase-input": {
             height: "1.25em",
-            // Add appearance styles properly within the input selector
-            WebkitAppearance: "none", // Safari and Chrome
-            MozAppearance: "none", // Firefox
+            WebkitAppearance: "none",
+            MozAppearance: "none",
           },
+          mr: 1, // Margin right to separate from the divider
         }}
+        disabled={!canUserChat} // Disable input if chat is pending
       />
+
+      {/* Divider */}
       <Divider
         sx={{ height: "1em", marginLeft: 1, marginRight: 1 }}
         orientation="vertical"
       />
 
+      {/* Message Type Selection */}
       {userRole !== "client" && ( // Show the TuneIcon only if the user is not a client
-        <IconButton color="primary" onClick={handleMenuOpen}>
-          <TuneIcon />
-        </IconButton>
+        <Tooltip title={t("inputBox.tooltips.selectMessageType")}>
+          <IconButton
+            color="primary"
+            onClick={handleMenuOpen}
+            aria-label={t("inputBox.tooltips.selectMessageType")}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "6px",
+            }}
+          >
+            <TuneIcon />
+          </IconButton>
+        </Tooltip>
       )}
-      <IconButton color="primary" onClick={handleSend}>
-        <SendIcon />
-      </IconButton>
+
+      {/* Send Message Button */}
+      <Tooltip title={t("inputBox.tooltips.sendMessage")}>
+        <IconButton
+          color="primary"
+          onClick={handleSend}
+          aria-label={t("inputBox.tooltips.sendMessage")}
+          disabled={!canUserChat}
+        >
+          <SendIcon />
+        </IconButton>
+      </Tooltip>
 
       {/* Dropdown Menu for setting message type */}
       <Menu
@@ -125,60 +189,58 @@ const InputBox: React.FC = () => {
         }}
         PaperProps={{
           sx: {
-            borderRadius: "1em", // Rounded corners for the menu
-            padding: "0.5em",
+            backdropFilter: "blur(10px)", // Frosted glass effect
+            backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent background
+            borderRadius: "8px",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-around",
+            minWidth: "100px",
           },
         }}
       >
-        <Grid container spacing={1} sx={{ padding: 1 }}>
-          <Grid item xs={6}>
-            <MenuItem
-              onClick={() => {
-                setMessageType("message");
-                handleMenuClose();
-              }}
-              sx={{ justifyContent: "center" }}
-            >
-              Message
-            </MenuItem>
-          </Grid>
-          <Grid item xs={6}>
-            <MenuItem
-              onClick={() => {
-                setMessageType("alert");
-                handleMenuClose();
-              }}
-              sx={{ justifyContent: "center" }}
-            >
-              Alert
-            </MenuItem>
-          </Grid>
-          <Grid item xs={6}>
-            <MenuItem
-              onClick={() => {
-                setMessageType("promo");
-                handleMenuClose();
-              }}
-              sx={{ justifyContent: "center" }}
-            >
-              Promo
-            </MenuItem>
-          </Grid>
-          <Grid item xs={6}>
-            <MenuItem
-              onClick={() => {
-                setMessageType("visit");
-                handleMenuClose();
-              }}
-              sx={{ justifyContent: "center" }}
-            >
-              Visit
-            </MenuItem>
-          </Grid>
-        </Grid>
+        {/* Message Type Buttons */}
+        <Box sx={{ display: "flex",flexDirection: "column", gap: 1 }}>
+          <IconButton
+            onClick={() => handleMessageTypeSelect("message")}
+            color={messageType === "message" ? "primary" : "default"}
+            aria-label={t("inputBox.labels.message")}
+          >
+            <Typography variant="button">
+              {t("inputBox.labels.message")}
+            </Typography>
+          </IconButton>
+          <IconButton
+            onClick={() => handleMessageTypeSelect("alert")}
+            color={messageType === "alert" ? "primary" : "default"}
+            aria-label={t("inputBox.labels.alert")}
+          >
+            <Typography variant="button">
+              {t("inputBox.labels.alert")}
+            </Typography>
+          </IconButton>
+          <IconButton
+            onClick={() => handleMessageTypeSelect("promo")}
+            color={messageType === "promo" ? "primary" : "default"}
+            aria-label={t("inputBox.labels.promo")}
+          >
+            <Typography variant="button">
+              {t("inputBox.labels.promo")}
+            </Typography>
+          </IconButton>
+          <IconButton
+            onClick={() => handleMessageTypeSelect("visit")}
+            color={messageType === "visit" ? "primary" : "default"}
+            aria-label={t("inputBox.labels.visit")}
+          >
+            <Typography variant="button">
+              {t("inputBox.labels.visit")}
+            </Typography>
+          </IconButton>
+        </Box>
       </Menu>
     </Paper>
   );
 };
 
-export default InputBox;
+export default React.memo(InputBox);

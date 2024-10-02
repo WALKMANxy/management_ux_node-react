@@ -11,3 +11,13 @@ export const getApiUrl = () => {
 
   return apiUrl;
 };
+
+export const getTimeMs = () => {
+  const apiUrl = import.meta.env.VITE_UPDATE_TIME_MS;
+
+  if (!apiUrl) {
+    console.error("API URL is not defined inside config.ts.");
+  }
+
+  return apiUrl;
+};

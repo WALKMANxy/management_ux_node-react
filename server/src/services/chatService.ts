@@ -2,6 +2,88 @@
 
 import mongoose, { Types } from "mongoose";
 import { Chat, IChat, IMessage } from "../models/Chat";
+import { logger } from "../utils/logger";
+import { Server } from "socket.io";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
+
+// Custom Error Classes (Optional but Recommended)
+class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ValidationError";
+  }
+}
+
+class DuplicateChatError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "DuplicateChatError";
+  }
+}
+
+// Utility function to check if a string is a valid ObjectId
+const isValidObjectId = (id: string) => mongoose.Types.ObjectId.isValid(id);
+
+// Refactored findExistingChat function
+async function findExistingChat(
+  chatData: Partial<IChat>
+): Promise<IChat | null> {
+  if (chatData.type === "simple" && chatData.participants) {
+    const sortedParticipants = chatData.participants
+      .map((p) => p.toString())
+      .sort();
+    return Chat.findOne({
+      type: "simple",
+      participants: {
+        $all: sortedParticipants,
+        $size: sortedParticipants.length,
+      },
+    });
+  }
+
+  if (["group", "broadcast"].includes(chatData.type!)) {
+    // Only query by _id if it's a valid ObjectId
+    if (chatData._id && isValidObjectId(chatData._id.toString())) {
+      const chatById = await Chat.findOne({
+        type: chatData.type,
+        _id: chatData._id,
+      });
+      if (chatById) return chatById;
+    }
+
+    // Query by local_id
+    if (chatData.local_id) {
+      const chatByLocalId = await Chat.findOne({
+        type: chatData.type,
+        local_id: chatData.local_id,
+      });
+      if (chatByLocalId) return chatByLocalId;
+    }
+
+    // Additional uniqueness checks based on name or admin
+    if (chatData.type === "group" && chatData.name) {
+      const chatByName = await Chat.findOne({
+        type: "group",
+        name: chatData.name,
+      });
+      if (chatByName) return chatByName;
+    }
+
+    if (
+      chatData.type === "broadcast" &&
+      chatData.admins &&
+      chatData.admins.length > 0
+    ) {
+      const chatByAdmin = await Chat.findOne({
+        type: "broadcast",
+        admins: { $in: chatData.admins },
+      });
+      if (chatByAdmin) return chatByAdmin;
+    }
+  }
+
+  return null;
+}
 
 export class ChatService {
   // Fetch all chats for a user with the latest message preview
@@ -20,6 +102,24 @@ export class ChatService {
       throw new Error("Failed to fetch chats");
     }
   }
+
+  static async getAllChatIds(userId: string): Promise<Types.ObjectId[]> {
+    try {
+      const chatIds = await Chat.find({
+        participants: userId,
+      })
+        .sort({ updatedAt: -1 }) // Sort by the most recently updated chats
+        .select({ _id: 1 }) // Only select the _id field
+        .lean() // Use lean for faster reads as we're not modifying the data
+        .exec(); // Execute the query
+
+      return chatIds.map(chat => chat._id);
+    } catch (error) {
+      console.error("Error fetching chat IDs:", error);
+      throw new Error("Failed to fetch chat IDs");
+    }
+  }
+
 
   // Fetch a specific chat by its ID for the authenticated user
   static async getChatById(
@@ -40,6 +140,28 @@ export class ChatService {
     } catch (error) {
       console.error("Error fetching chat by ID:", error);
       throw new Error("Failed to fetch chat by ID");
+    }
+  }
+  static async getChatsByIdsArray(
+    chatIds: string[],
+    userId: string
+  ): Promise<IChat[]> {
+    try {
+      // Validate and convert chatIds to ObjectId
+      const validChatIds = chatIds.filter((id) =>
+        mongoose.Types.ObjectId.isValid(id)
+      );
+      const objectChatIds = validChatIds.map((id) => new Types.ObjectId(id));
+
+      const chats = await Chat.find({
+        _id: { $in: objectChatIds },
+        participants: userId, // Ensure the user is a participant
+      }).lean();
+
+      return chats;
+    } catch (error) {
+      logger.error("Error fetching chats by IDs array:", { error });
+      throw new Error("Failed to fetch chats by IDs array");
     }
   }
 
@@ -111,12 +233,12 @@ export class ChatService {
     limit: number // Include limit parameter
   ) {
     try {
-      console.log("Fetching older messages for:", {
+     /*  console.log("Fetching older messages for:", {
         chatId,
         userId,
         oldestTimestamp,
         limit,
-      });
+      }); */
 
       const chatObjectId = new Types.ObjectId(chatId);
 
@@ -132,8 +254,8 @@ export class ChatService {
         throw new Error("Chat not found or access denied.");
       }
 
-      console.log("Chat found:", chat);
-
+/*       console.log("Chat found:", chat);
+ */
       const userObjectId = new Types.ObjectId(userId);
 
       // Check if the user is a participant in the chat
@@ -160,8 +282,8 @@ export class ChatService {
       // Extract messages from the aggregation result
       const messages = olderMessages.map((chat) => chat.messages);
 
-      console.log("Fetched Older Messages:", messages);
-
+/*       console.log("Fetched Older Messages:", messages);
+ */
       return messages;
     } catch (error) {
       console.error("Error fetching older messages:", error);
@@ -223,103 +345,139 @@ export class ChatService {
 
   // Create a new chat (simple, group, or broadcast)
 
+  // Revised createChat Function
   static async createChat(chatData: Partial<IChat>): Promise<IChat> {
     try {
-      // Validate chat type and required fields
+      // **Validation Logic**
       if (!chatData.type) {
-        throw new Error("Chat type is required.");
+        throw new ValidationError("Chat type is required.");
       }
 
-      // Validation for group chats: must have a name and participants
       if (
         chatData.type === "group" &&
         (!chatData.name ||
           !chatData.participants ||
           chatData.participants.length === 0)
       ) {
-        throw new Error(
+        throw new ValidationError(
           "Group chats must have a name and at least one participant."
         );
       }
 
-      // Validation for broadcast chats: must have participants
       if (
         chatData.type === "broadcast" &&
         (!chatData.participants || chatData.participants.length === 0)
       ) {
-        throw new Error("Broadcast chats must have participants.");
+        throw new ValidationError("Broadcast chats must have participants.");
       }
 
-      // Ensure local_id is provided, especially when originating from the client
       if (!chatData.local_id) {
-        throw new Error("local_id is required for chat creation.");
+        throw new ValidationError("local_id is required for chat creation.");
       }
 
-      // Check for an existing simple chat with the same participants
-      if (chatData.type === "simple" && chatData.participants) {
-        // Sort participant IDs to ensure the uniqueness check is order-agnostic
-        const sortedParticipants = chatData.participants
-          .map((participant) => participant.toString())
+      // **Duplicate Chat Check**
+      let existingChat: IChat | null = await findExistingChat(chatData);
+
+      if (existingChat) {
+        // If a chat already exists, return it instead of creating a new one
+        return existingChat;
+      }
+
+      // **Exclude _id from chatData to Prevent Casting Errors**
+      const { _id, ...restChatData } = chatData;
+
+      // **Sort Participants for Consistency in Simple Chats**
+      if (restChatData.type === "simple" && restChatData.participants) {
+        restChatData.participants = restChatData.participants
+          .map((p) => p)
           .sort();
-
-        // Attempt to find an existing chat with the same participants
-        const existingChat = await Chat.findOne({
-          type: "simple",
-          participants: {
-            $all: sortedParticipants,
-            $size: sortedParticipants.length,
-          },
-        });
-
-        if (existingChat) {
-          // If a chat already exists, return it instead of creating a new one
-          return existingChat;
-        }
       }
 
-      // Create the new chat instance
+      // **Create the New Chat Instance with Server-Generated _id**
       const chat = new Chat({
-        ...chatData,
-        _id: new mongoose.Types.ObjectId(), // Ensure _id is a valid ObjectId generated by the server
-        messages: chatData.messages || [], // Initialize messages as an empty array if not provided
-        updatedAt: chatData.updatedAt || new Date(),
+        ...restChatData,
+        // Let Mongoose handle _id generation
+        messages: restChatData.messages || [],
         status: "created",
       });
-      // Save the chat to the database
+
+      // **Save the Chat to the Database**
       await chat.save();
 
-      // Return the newly created chat object
+      // **Return the Newly Created Chat Object**
       return chat;
     } catch (error: any) {
-      // Check for duplicate key error (E11000) thrown by MongoDB unique constraint
+      // **Handle Duplicate Key Errors**
       if (error.code === 11000) {
         console.error("Duplicate chat creation attempt detected:", error);
 
-        // Attempt to find and return the existing chat if a duplicate error is thrown
-        if (chatData.type === "simple" && chatData.participants) {
-          const sortedParticipants = chatData.participants
-            .map((participant) => participant.toString())
-            .sort();
+        let existingChat: IChat | null = await findExistingChat(chatData);
 
-          const existingChat = await Chat.findOne({
-            type: "simple",
-            participants: {
-              $all: sortedParticipants,
-              $size: sortedParticipants.length,
-            },
-          });
-
-          if (existingChat) {
-            return existingChat;
-          }
+        if (existingChat) {
+          return existingChat;
         }
+
+        throw new DuplicateChatError(
+          "A chat with the provided details already exists."
+        );
       }
 
-      // Log and rethrow the error if it is not a duplicate error
+      // **Log and Rethrow Other Errors**
       console.error("Error creating chat:", error);
-      throw new Error("Failed to create chat");
+      throw error instanceof ValidationError
+        ? error
+        : new Error("Failed to create chat");
     }
   }
+
+  static async findOrCreateChat(
+    userId: string,
+    botId: string,
+    io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>  // Pass the io instance to emit events
+  ): Promise<string> {
+    try {
+      const userObjectId = new mongoose.Types.ObjectId(userId);
+      const botObjectId = new mongoose.Types.ObjectId(botId);
+
+      // Atomic operation to find or create
+      const chat = await Chat.findOneAndUpdate(
+        {
+          type: "simple",
+          participants: { $all: [userObjectId, botObjectId], $size: 2 },
+        },
+        {}, // No update
+        {
+          new: true, // Return the new document if upserted
+          upsert: true, // Create the document if it doesn't exist
+          setDefaultsOnInsert: true,
+          fields: { _id: 1, participants: 1 }, // Return _id and participants fields
+        }
+      ).exec();
+
+      // Check if the chat was newly created
+      if (chat.isNew) {
+        // Emit 'chat:newChat' event to the user and bot's rooms
+        chat.participants.forEach(participantId => {
+          const participantRoomId = `user:${participantId.toString()}`;
+          io.to(participantRoomId).emit("chat:newChat", {
+            chat: chat,
+          });
+          logger.info(`Emitting chat:newChat for newly created chat ${chat._id.toString()}`);
+        });
+      }
+
+      logger.debug(`Chat found or created with ID: ${chat._id.toString()}`);
+      return chat._id.toString();
+    } catch (error) {
+      logger.error(
+        `Error in atomic findOrCreateChat for user ${userId} and bot ${botId}: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+      throw error;
+    }
+  }
+
 
   // Add a message to an existing chat
   static async addMessage(
@@ -360,7 +518,103 @@ export class ChatService {
     }
   }
 
-  // Update read status for multiple messages in a chat
+  static async sendAutomatedMessageToUsers(
+    userIds: string[],
+    messageData: Partial<IMessage>,
+    botId: string,
+    io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any> // Accept io instance here
+
+  ): Promise<string[]> {
+    // Return type is Promise<string[]>
+    const startTime = Date.now(); // For performance logging
+
+
+
+
+    try {
+      logger.info("sendAutomatedMessageToUsers called with data", {
+        userIds,
+        messageData,
+        botId,
+      });
+
+       // Capture a single timestamp for consistency
+     const currentTimestamp = new Date();
+
+      // Convert userIds to ObjectId with validation
+      const userObjectIds = userIds.map((id) => {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+          logger.error(`Invalid user ID: ${id}`);
+          throw new Error(`Invalid user ID: ${id}`);
+        }
+        return new Types.ObjectId(id);
+      });
+
+      const botObjectId = new Types.ObjectId(botId);
+
+      const bulkOperations: mongoose.AnyBulkWriteOperation<IChat>[] = [];
+      const chatIds: string[] = [];
+
+      // Generate the automated message only once
+      const automatedMessage: Partial<IMessage> = {
+        ...messageData,
+        sender: botObjectId, // Store as string; conversion handled in DB operations
+        readBy: [botObjectId],
+        status: "sent",
+        timestamp: new Date(),
+        messageType: messageData.messageType || "alert",
+        content: messageData.content || "", // Ensure content is always defined
+      };
+
+    // Prepare bulk operations concurrently
+    const chatIdPromises = userObjectIds.map(async (userId) => {
+      try {
+        const chatId = await this.findOrCreateChat(userId.toString(), botId, io);
+        chatIds.push(chatId);
+
+        bulkOperations.push({
+          updateOne: {
+            filter: { _id: new Types.ObjectId(chatId) },
+            update: {
+              $push: { messages: automatedMessage },
+              $set: { updatedAt: currentTimestamp },
+            },
+          },
+        });
+
+        logger.debug(`Prepared bulk operation for chatId: ${chatId}`);
+      } catch (error) {
+        logger.error(`Error processing user ${userId.toString()}`, { error });
+      }
+    });
+
+     // Await all chatIdPromises
+     await Promise.all(chatIdPromises);
+
+     // Execute bulk operations if any
+     if (bulkOperations.length > 0) {
+       try {
+         await Chat.bulkWrite(bulkOperations, { ordered: false });
+         logger.info(`Successfully sent automated messages to users`, {
+           userIds: userIds,
+           chatIds,
+           durationMs: Date.now() - startTime,
+         });
+       } catch (error) {
+         logger.error("Error executing bulk operations", { error });
+         throw error;
+       }
+     } else {
+       logger.warn("No bulk operations to execute");
+     }
+
+     return chatIds;
+   } catch (error) {
+     logger.error("Error in sendAutomatedMessageToUsers", { error });
+     throw error; // Optionally rethrow if higher-level handling is needed
+   }
+ }
+
   // Function to update read status of messages using findOneAndUpdate
   static async updateReadStatus(
     chatId: string,
@@ -369,19 +623,19 @@ export class ChatService {
   ): Promise<IChat | null> {
     try {
       const chatObjectId = new Types.ObjectId(chatId);
-      const userObjectId = new Types.ObjectId(userId);
 
       // Update the readBy array for each message without loading the whole document
       const updateResult = await Chat.findOneAndUpdate(
-        { _id: chatObjectId, "messages.local_id": { $in: messageIds } }, // Match chat and messages
+        { _id: chatObjectId },
         {
           $addToSet: {
-            "messages.$.readBy": userObjectId, // Add the userObjectId to the readBy array if not already present
+            "messages.$[elem].readBy": userId,
           },
         },
         {
-          new: true, // Return the updated document
-          runValidators: true, // Ensure validation rules are respected
+          arrayFilters: [{ "elem.local_id": { $in: messageIds } }],
+          new: true,
+          runValidators: true,
         }
       ).exec();
 

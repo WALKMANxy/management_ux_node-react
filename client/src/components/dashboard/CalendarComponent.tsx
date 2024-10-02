@@ -18,13 +18,18 @@ import { DayCalendarSkeleton } from "@mui/x-date-pickers/DayCalendarSkeleton";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
+  selectAgent,
+  selectClient,
+  selectVisit,
+} from "../../features/data/dataSlice";
+import {
   selectVisits,
   VisitWithAgent,
-} from "../../features/data/dataSelectors";
-import { selectAgent, selectClient, selectVisit } from "../../features/data/dataSlice";
+} from "../../features/promoVisits/promoVisitsSelectors";
 import { ServerDayProps } from "../../models/propsModels";
 import { agentColorMap } from "../../utils/constants";
 import ServerDay from "./ServerDay";
@@ -37,9 +42,9 @@ const CalendarComponent: React.FC = () => {
   const clients = useAppSelector((state) => state.data.clients);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation(); // Initialize translation
 
   const userRole = currentUserDetails?.role; // Extract userRole
-
 
   const [isLoading, setIsLoading] = useState(false);
   const [highlightedDays, setHighlightedDays] = useState<
@@ -57,22 +62,40 @@ const CalendarComponent: React.FC = () => {
    */
   const updateHighlightedDays = useCallback(
     (month: Dayjs) => {
-      const days = visits
+      const now = dayjs(); // Current date and time
+
+      // Create a map to ensure one color per date, prioritizing red
+      const dateColorMap: { [date: number]: string } = {};
+
+      visits
         .filter(
           (visit: VisitWithAgent) =>
-            visit.pending === true && // Ensure visit is pending
-            visit.completed === false && // Ensure visit is not completed
-            visit.date && // Ensure visit has a date
-            dayjs(visit.date).isSame(month, "month") // Ensure visit is in the current month
+            visit.pending === true &&
+            visit.completed === false &&
+            visit.date &&
+            dayjs(visit.date).isSame(month, "month")
         )
-        .map((visit: VisitWithAgent) => {
+        .forEach((visit: VisitWithAgent) => {
+          const visitDay = dayjs(visit.date);
+          const date = visitDay.date();
+
+          // Check if the visit is in the past
+          const isPast = visitDay.isBefore(now, "day");
+
+          if (isPast) {
+            // Prioritize a fainter red color for past pending visits
+            dateColorMap[date] = "#FFA8B8"; // Slightly less faint pastel red
+            return;
+          }
+
+          // If not past, assign color based on role
           let color = "#ADD8E6"; // Default pastel blue
 
           if (currentUserDetails) {
             if (currentUserDetails.role === "admin") {
               // Admin view: color by agent
               color = visit.agentId
-                ? agentColorMap[visit.agentId] ?? color
+                ? agentColorMap[String(visit.agentId)] ?? color
                 : color;
             } else if (currentUserDetails.role === "agent") {
               // Agent view: color by client
@@ -82,8 +105,17 @@ const CalendarComponent: React.FC = () => {
             // Clients have a single default color; no change needed
           }
 
-          return { date: dayjs(visit.date).date(), color };
+          // Only set the color if it hasn't been set to red
+          if (!dateColorMap[date]) {
+            dateColorMap[date] = color;
+          }
         });
+
+      // Convert the map to an array
+      const days = Object.entries(dateColorMap).map(([date, color]) => ({
+        date: Number(date),
+        color,
+      }));
 
       setHighlightedDays(days);
     },
@@ -172,12 +204,15 @@ const CalendarComponent: React.FC = () => {
     <Paper
       elevation={3}
       sx={{
-        p: 3,
+        p: 2,
         borderRadius: "12px",
         position: "relative",
         overflow: "hidden",
         background: "white",
-        height: "100%",
+        flexGrow: 1, // Allow the component to grow and shrink based on available space
+        display: "flex",
+        flexDirection: "column",
+        minHeight: 0, // Allow the component to shrink without constraints
         "&::before": {
           content: '""',
           position: "absolute",
@@ -211,14 +246,22 @@ const CalendarComponent: React.FC = () => {
               highlightedDays,
             } as ServerDayProps,
           }}
-          fixedWeekNumber={6}
-          displayWeekNumber
+          sx={{
+            flexGrow: 1, // Allow the calendar to grow and shrink based on available space
+            minHeight: 0, // Allow the calendar to shrink without constraints
+          }}
         />
       </LocalizationProvider>
 
       {/* Dialog for selecting a visit when multiple visits exist on a day */}
-      <Dialog open={openDialog} onClose={handleDialogClose}>
-        <DialogTitle>{`Select a Visit`}</DialogTitle>
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        aria-labelledby="select-visit-dialog-title"
+      >
+        <DialogTitle id="select-visit-dialog-title">
+          {t("calendarComponent.selectVisit", "Select a Visit")}
+        </DialogTitle>
         <DialogContent>
           {visitsOnSelectedDay.length > 0 ? (
             <List>
@@ -230,20 +273,26 @@ const CalendarComponent: React.FC = () => {
                 >
                   <ListItemText
                     primary={`${visit.type} - ${visit.visitReason}`}
-                    secondary={`Client ID: ${visit.clientId} | Date: ${dayjs(
-                      visit.date
-                    ).format("DD/MM/YYYY HH:mm")}`}
+                    secondary={`${t(
+                      "calendarComponent.clientId",
+                      "Client ID"
+                    )}: ${visit.clientId} | ${t(
+                      "calendarComponent.date",
+                      "Date"
+                    )}: ${dayjs(visit.date).format("DD/MM/YYYY HH:mm")}`}
                   />
                 </ListItem>
               ))}
             </List>
           ) : (
-            <Typography>No visits available.</Typography>
+            <Typography>
+              {t("calendarComponent.noVisitsAvailable", "No visits available.")}
+            </Typography>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose} color="primary">
-            Close
+            {t("calendarComponent.close", "Close")}
           </Button>
         </DialogActions>
       </Dialog>

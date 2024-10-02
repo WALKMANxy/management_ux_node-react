@@ -1,10 +1,12 @@
 // src/components/visitPage/CreateVisitForm.tsx
+
 import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
 import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -21,16 +23,43 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { StaticDateTimePicker } from "@mui/x-date-pickers/StaticDateTimePicker";
 import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
 import dayjs, { Dayjs } from "dayjs";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
 import { createVisitAsync } from "../../features/data/dataThunks";
+import { showToast } from "../../utils/toastMessage";
 import VisitCard from "./VisitCard"; // Import the VisitCard component
+
+// Styled IconButton for Send and Cancel actions
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.common.white,
+  "&:hover": {
+    backgroundColor: theme.palette.primary.dark,
+  },
+  borderRadius: "50%",
+  width: 48,
+  height: 48,
+}));
+
+// Styled Close Button
+const StyledCloseButton = styled(IconButton)(({ theme }) => ({
+  backgroundColor: theme.palette.error.main,
+  color: theme.palette.common.white,
+  "&:hover": {
+    backgroundColor: theme.palette.error.dark,
+  },
+  borderRadius: "50%",
+  width: 48,
+  height: 48,
+}));
 
 interface CreateVisitFormProps {
   clientId: string;
@@ -46,25 +75,36 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
     (state: RootState) => state.data.currentUserDetails
   );
 
+  const { t } = useTranslation();
+
+  // Form state
   const [type, setType] = useState<string>("");
   const [reason, setReason] = useState<string>("");
   const [date, setDate] = useState<Dayjs | null>(dayjs());
   const [notePublic, setNotePublic] = useState<string>("");
-  const [notePrivate, setNotePrivate] = useState<string>(""); // New private note field
+  const [notePrivate, setNotePrivate] = useState<string>(""); // Private note field
 
+  // Snackbar state
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success"
   );
 
-  const [openConfirm, setOpenConfirm] = useState<boolean>(false); // State for confirmation dialog
+  // Confirmation Dialog state
+  const [openConfirm, setOpenConfirm] = useState<boolean>(false);
 
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!type || !reason || !date) {
-      setSnackbarMessage("Please fill in all required fields.");
+      setSnackbarMessage(
+        t(
+          "createVisitForm.fillAllFields",
+          "Please fill in all required fields."
+        )
+      );
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
       return;
@@ -75,7 +115,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
       type,
       visitReason: reason,
       date: dayjs(date).toDate(),
-      createdAt: new Date(), // Add the current date here
+      createdAt: new Date(), // Current date
 
       notePublic: notePublic.trim() === "" ? undefined : notePublic.trim(),
       notePrivate: notePrivate.trim() === "" ? undefined : notePrivate.trim(), // Handle private note
@@ -86,24 +126,40 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
 
     try {
       await dispatch(createVisitAsync(visitData)).unwrap();
-      setSnackbarMessage("Visit created successfully!");
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
+      // Reset form fields
       setType("");
       setReason("");
       setDate(dayjs());
       setNotePublic("");
       setNotePrivate(""); // Reset private note
       onClose();
-    } catch (error: unknown) {
-      setSnackbarMessage(
-        error instanceof Error ? error.message : "Failed to create visit."
+      showToast.success(
+        t("createVisitForm.visitCreated", "Visit created successfully.")
       );
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        showToast.error(
+          t("createVisitForm.creationFailed", "Failed to create visit: ") +
+            error.message
+        );
+        console.error("Failed to create visit:", error);
+      } else {
+        showToast.error(
+          t(
+            "createVisitForm.creationFailedUnknown",
+            "Failed to create visit: An unknown error occurred."
+          )
+        );
+        console.error(
+          "Failed to create visit: An unknown error occurred",
+          error
+        );
+      }
+      throw error; // Re-throw to handle in the component
     }
   };
 
+  // Handle Snackbar close
   const handleSnackbarClose = (
     _event?: React.SyntheticEvent | Event,
     reason?: string
@@ -114,18 +170,21 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
     setSnackbarOpen(false);
   };
 
+  // Handle Cancel button click
   const handleCancelClick = () => {
     setOpenConfirm(true);
   };
 
-  const handleConfirmCancel = () => {
+  // Confirm cancellation
+  const handleConfirmCancel = useCallback(() => {
     setOpenConfirm(false);
     onClose();
-  };
+  }, [onClose]);
 
-  const handleDenyCancel = () => {
+  // Deny cancellation
+  const handleDenyCancel = useCallback(() => {
     setOpenConfirm(false);
-  };
+  }, []);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -148,25 +207,32 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
           gutterBottom
           sx={{ fontWeight: 600, mb: 2, color: "#4d4b5f" }}
         >
-          Create New Visit
+          {t("createVisitForm.title", "Create New Visit")}
         </Typography>
+
         <Grid container spacing={2} sx={{ flexGrow: 1 }}>
           {/* Type Field */}
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth required variant="outlined">
-              <InputLabel id="visit-type-label">Type</InputLabel>
+              <InputLabel id="visit-type-label">
+                {t("createVisitForm.typeLabel", "Type")}
+              </InputLabel>
               <Select
                 labelId="visit-type-label"
                 id="visit-type"
                 value={type}
-                label="Type *"
+                label={t("createVisitForm.typeLabel", "Type") + " *"}
                 onChange={(e) => setType(e.target.value)}
                 sx={{
                   borderRadius: 2,
                 }}
               >
-                <MenuItem value="Regular">Regular</MenuItem>
-                <MenuItem value="Urgent">Urgent</MenuItem>
+                <MenuItem value="Regular">
+                  {t("createVisitForm.regular", "Regular")}
+                </MenuItem>
+                <MenuItem value="Urgent">
+                  {t("createVisitForm.urgent", "Urgent")}
+                </MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -174,20 +240,28 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
           {/* Reason Field */}
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth required variant="outlined">
-              <InputLabel id="visit-reason-label">Reason</InputLabel>
+              <InputLabel id="visit-reason-label">
+                {t("createVisitForm.reasonLabel", "Reason")}
+              </InputLabel>
               <Select
                 labelId="visit-reason-label"
                 id="visit-reason"
                 value={reason}
-                label="Reason *"
+                label={t("createVisitForm.reasonLabel", "Reason") + " *"}
                 onChange={(e) => setReason(e.target.value)}
                 sx={{
                   borderRadius: 2,
                 }}
               >
-                <MenuItem value="Issue">Issue</MenuItem>
-                <MenuItem value="Routine">Routine</MenuItem>
-                <MenuItem value="New Client">New Client</MenuItem>
+                <MenuItem value="Issue">
+                  {t("createVisitForm.issue", "Issue")}
+                </MenuItem>
+                <MenuItem value="Routine">
+                  {t("createVisitForm.routine", "Routine")}
+                </MenuItem>
+                <MenuItem value="New Client">
+                  {t("createVisitForm.newClient", "New Client")}
+                </MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -207,41 +281,81 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
                 hours: renderTimeViewClock,
                 minutes: renderTimeViewClock,
               }}
+              renderLoading={() => <CircularProgress />}
+              slotProps={{
+                actionBar: { hidden: true }, // This hides the toolbar
+              }}
             />
           </Grid>
 
-          {/* Public Note - Expandable TextArea */}
+          {/* Notes Section */}
           <Grid item xs={12} sm={6}>
-            <TextField
-              label="Public Note"
-              value={notePublic}
-              onChange={(e) => setNotePublic(e.target.value)}
-              fullWidth
-              multiline
-              minRows={2}
-              maxRows={10} // Allow expansion up to 10 rows
-              variant="outlined"
-              sx={{
-                borderRadius: 2,
-              }}
-            />
-          </Grid>
+            <Grid container spacing={2}>
+              {/* Public Note */}
+              <Grid item xs={12}>
+                <Tooltip
+                  title={t(
+                    "createVisitForm.publicNoteTooltip",
+                    "Enter a public note for the visit."
+                  )}
+                  arrow
+                >
+                  <TextField
+                    label={t("createVisitForm.publicNoteLabel", "Public Note")}
+                    value={notePublic}
+                    onChange={(e) => setNotePublic(e.target.value)}
+                    fullWidth
+                    multiline
+                    minRows={2}
+                    maxRows={10} // Allow expansion up to 10 rows
+                    variant="outlined"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderRadius: 2, // Adjust this value to change the border radius
+                        },
+                      },
+                    }}
+                  />
+                </Tooltip>
+              </Grid>
 
-          {/* Private Note - Expandable TextArea */}
-          <Grid item xs={12}>
-            <TextField
-              label="Private Note"
-              value={notePrivate}
-              onChange={(e) => setNotePrivate(e.target.value)}
-              fullWidth
-              multiline
-              minRows={2}
-              maxRows={10}
-              variant="outlined"
-              sx={{
-                borderRadius: 2,
-              }}
-            />
+              {/* Private Note */}
+              <Grid item xs={12}>
+                <Tooltip
+                  title={t(
+                    "createVisitForm.privateNoteTooltip",
+                    "The private note is visible only to you and the administrators."
+                  )}
+                  arrow
+                >
+                  <TextField
+                    label={t(
+                      "createVisitForm.privateNoteLabel",
+                      "Private Note"
+                    )}
+                    placeholder={t(
+                      "createVisitForm.privateNotePlaceholder",
+                      "The private note is visible only to you and the administrators."
+                    )}
+                    value={notePrivate}
+                    onChange={(e) => setNotePrivate(e.target.value)}
+                    fullWidth
+                    multiline
+                    minRows={2}
+                    maxRows={10}
+                    variant="outlined"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderRadius: 2, // Adjust this value to change the border radius
+                        },
+                      },
+                    }}
+                  />
+                </Tooltip>
+              </Grid>
+            </Grid>
           </Grid>
 
           {/* Visit Preview Card */}
@@ -270,39 +384,28 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
             gap: 2,
           }}
         >
-          <Tooltip title="Send Visit">
-            <IconButton
+          {/* Send Visit Button */}
+          <Tooltip
+            title={t("createVisitForm.sendVisitTooltip", "Send Visit")}
+            arrow
+          >
+            <StyledIconButton
               type="submit"
-              color="success"
-              sx={{
-                backgroundColor: "green",
-                color: "white",
-                "&:hover": { backgroundColor: "darkgreen" },
-                borderRadius: "50%",
-                width: 48,
-                height: 48,
-              }}
-              aria-label="Send Visit"
+              aria-label={t("createVisitForm.sendVisit", "Send Visit")}
             >
               <SendIcon />
-            </IconButton>
+            </StyledIconButton>
           </Tooltip>
-          <Tooltip title="Cancel">
-            <IconButton
+
+          {/* Cancel Button */}
+          <Tooltip title={t("createVisitForm.cancelTooltip", "Cancel")} arrow>
+            <StyledCloseButton
               color="error"
               onClick={handleCancelClick}
-              sx={{
-                backgroundColor: "red",
-                color: "white",
-                "&:hover": { backgroundColor: "darkred" },
-                borderRadius: "50%",
-                width: 48,
-                height: 48,
-              }}
-              aria-label="Cancel"
+              aria-label={t("createVisitForm.cancel", "Cancel")}
             >
               <CloseIcon />
-            </IconButton>
+            </StyledCloseButton>
           </Tooltip>
         </Box>
 
@@ -330,20 +433,22 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
           aria-describedby="confirm-cancel-description"
         >
           <DialogTitle id="confirm-cancel-title">
-            Cancel Visit Creation
+            {t("createVisitForm.cancelDialogTitle", "Cancel Visit Creation")}
           </DialogTitle>
           <DialogContent>
             <DialogContentText id="confirm-cancel-description">
-              Are you sure you want to cancel creating this visit? All entered
-              information will be lost.
+              {t(
+                "createVisitForm.cancelDialogDescription",
+                "Are you sure you want to cancel creating this visit? All entered information will be lost."
+              )}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleDenyCancel} color="primary">
-              No
+              {t("createVisitForm.no", "No")}
             </Button>
             <Button onClick={handleConfirmCancel} color="error" autoFocus>
-              Yes
+              {t("createVisitForm.yes", "Yes")}
             </Button>
           </DialogActions>
         </Dialog>

@@ -1,4 +1,4 @@
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
@@ -86,49 +86,51 @@ const ArticleHistory: React.FC<ArticleHistoryProps> = ({
         comparator: numberComparator,
         sortable: true,
       },
+      {
+        headerName: t("movementsHistory.unitPrice"),
+        valueGetter: (params: { data: Movement }) => {
+          const detail = params.data.details.find(
+            (detail: MovementDetail) => detail.articleId === articleId
+          );
+          return detail && detail.quantity > 0
+            ? typeof detail.priceSold === "string"
+              ? parseFloat(detail.priceSold) / detail.quantity
+              : detail.priceSold / detail.quantity
+            : 0;
+        },
+        valueFormatter: (params: { value: number }) =>
+          currencyFormatter(params.value),
+        comparator: numberComparator,
+        sortable: true,
+      },
     ],
     [t, articleId]
   );
 
-  /*   console.log("ArticleHistory movements: ", movements);
-   */
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: 3,
-        borderRadius: "12px",
-        background: "transparent",
-        color: "#000",
-        position: "relative",
-        overflow: "hidden",
-        height: "100%",
-      }}
-    >
-      <Box sx={{ height: 600, width: "100%" }}>
-        {movements.length > 0 ? (
-          <AGGridTable
-            columnDefs={columnDefinitions}
-            rowData={movements}
-            paginationPageSize={20}
-            quickFilterText=""
-          />
-        ) : (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: "100%",
-            }}
-          >
-            <Typography variant="h6" sx={{ textAlign: "center" }}>
-              {t("articleDetails.noHistory")}
-            </Typography>
-          </Box>
-        )}
-      </Box>
-    </Paper>
+    <Box sx={{ height: 600, width: "100%" }}>
+      {movements.length > 0 ? (
+        <AGGridTable
+          columnDefs={columnDefinitions}
+          rowData={movements}
+          paginationPageSize={20}
+          quickFilterText=""
+        />
+      ) : (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+          }}
+        >
+          <Typography variant="h6" sx={{ textAlign: "center" }}>
+            {t("articleDetails.noHistory")}
+          </Typography>
+        </Box>
+      )}
+    </Box>
   );
 };
 

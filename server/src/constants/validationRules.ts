@@ -96,7 +96,7 @@ export const movementValidationRules = [
 // Validation rules
 export const promoValidationRules = [
   body("clientsId").isArray().withMessage("Clients ID must be an array"),
-  body("type").notEmpty().withMessage("Type is required"),
+  body("promoType").notEmpty().withMessage("Type is required"),
   body("name").notEmpty().withMessage("Name is required"),
   body("discount").notEmpty().withMessage("Discount is required"),
   body("startDate")
@@ -106,7 +106,6 @@ export const promoValidationRules = [
     .isISO8601()
     .withMessage("End date must be a valid ISO 8601 date"),
   body("promoIssuedBy").notEmpty().withMessage("Promo issued by is required"),
-  
 ];
 
 export const userValidationRules = [
@@ -116,7 +115,7 @@ export const userValidationRules = [
   // Validate role
   body("role")
     .optional()
-    .isIn(["admin", "agent", "client", "guest"])
+    .isIn(["admin", "agent", "client", "guest", "employee"])
     .withMessage("Invalid role"),
 
   // Validate password (if provided)

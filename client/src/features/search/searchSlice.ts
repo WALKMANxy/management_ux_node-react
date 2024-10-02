@@ -1,15 +1,12 @@
 //src/features/search/searchSlice.ts
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import {
-  GlobalPromos,
-  GlobalVisits,
-  Promo,
-  Visit,
-} from "../../models/dataModels";
+import { GlobalVisits, Promo, Visit } from "../../models/dataModels";
 import { Agent, Client } from "../../models/entityModels";
 import { SearchParams, SearchResult } from "../../models/searchModels";
 import { SearchState, ThunkError } from "../../models/stateModels";
+
+// Prepare options for Fuse.js
 
 const initialState: SearchState = {
   query: "",
@@ -26,6 +23,11 @@ export const searchItems = createAsyncThunk<
   "search/searchItems",
   async ({ query, filter }, { getState, rejectWithValue }) => {
     try {
+      if (query.length < 2) {
+        // Early return if query is too short
+        return [];
+      }
+
       const state = getState();
 
       // Access data from the state correctly
@@ -36,6 +38,7 @@ export const searchItems = createAsyncThunk<
       const visits = state.data.currentUserVisits;
 
       const sanitizedQuery = query.toLowerCase();
+
       const seen = new Map<string, string>(); // Track seen IDs
       let searchResults: SearchResult[] = [];
 
@@ -115,39 +118,8 @@ export const searchItems = createAsyncThunk<
 
         searchResults = searchResults.concat(articleResults);
       }
-
-      // Filter and map promos for admins using GlobalPromos
-      if (
-        (filter === "all" || filter === "promo") &&
-        entityRole === "admin" &&
-        promos
-      ) {
-        if ("globalPromos" in promos) {
-          const globalPromoResults = Object.entries(promos as GlobalPromos)
-            .flatMap(([agentId, { Promos }]) =>
-              Promos.filter((promo) =>
-                promo.name?.toLowerCase().includes(sanitizedQuery)
-              )
-                .map((promo) => ({
-                  id: promo._id || "",
-                  name: promo.name,
-                  promoType: promo.promoType,
-                  type: "promo" as SearchResult["type"],
-                  startDate: new Date(promo.startDate),
-                  endDate: new Date(promo.endDate),
-                  issuedBy: promo.promoIssuedBy,
-                  agentId, // Include the agentId if needed
-                }))
-                .filter((promo) => promo.id !== undefined && promo.id !== "")
-            )
-            .filter(
-              (result) => !seen.has(result.id!) && seen.set(result.id!, "")
-            );
-
-          searchResults = searchResults.concat(globalPromoResults);
-        }
-      } else if (filter === "all" || filter === "promo") {
-        // Regular promo handling for non-admin roles
+      // Filter and map promos for admins and other roles
+      if ((filter === "all" || filter === "promo") && promos) {
         const promoResults = Array.isArray(promos)
           ? (promos as Promo[]) // Explicitly assert the type as an array of Promo
               .filter(
@@ -163,10 +135,18 @@ export const searchItems = createAsyncThunk<
                 startDate: new Date(promo.startDate),
                 endDate: new Date(promo.endDate),
                 issuedBy: promo.promoIssuedBy,
+                agentId:
+                  entityRole === "admin" ? promo.promoIssuedBy : undefined, // Include agentId if role is admin
               }))
               .filter((promo) => promo.id !== undefined && promo.id !== "")
           : [];
-        searchResults = searchResults.concat(promoResults);
+
+        // Filter out duplicates using the seen Set
+        const uniquePromoResults = promoResults.filter(
+          (result) => !seen.has(result.id!) && seen.set(result.id!, "")
+        );
+
+        searchResults = searchResults.concat(uniquePromoResults);
       }
 
       // Filter and map visits for admins using GlobalVisits

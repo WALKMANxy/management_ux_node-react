@@ -1,4 +1,4 @@
-// services/api.ts
+// src/services/api.ts
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { User } from "../../models/entityModels";
@@ -65,7 +65,7 @@ export const authApi = createApi({
     }),
 
     loginUser: builder.mutation<
-      {  id: string; message: string; statusCode: number },
+      { id: string; message: string; statusCode: number },
       { email: string; password: string }
     >({
       queryFn: async (credentials) => {
@@ -79,8 +79,6 @@ export const authApi = createApi({
         }
       },
     }),
-
-
 
     getUserRoleById: builder.query<User, string>({
       queryFn: async (id) => {

@@ -7,34 +7,45 @@ import {
   Collapse,
   Grid,
   IconButton,
-  Paper,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
-import ClientDetailsCard from "../../components/visitPage/ClientDetailsCard";
-import CreateVisitForm from "../../components/visitPage/CreateVisitForm";
 import VisitsSidebar from "../../components/visitPage/VisitsSidebar";
-import VisitsTable from "../../components/visitPage/VisitsTable";
-import VisitView from "../../components/visitPage/VisitView";
 import {
   clearSelectedVisit,
   clearSelection,
   selectClient,
 } from "../../features/data/dataSlice";
+import useLoadingData from "../../hooks/useLoadingData";
+
+// Lazy load the non-immediate components
+const ClientDetailsCard = React.lazy(
+  () => import("../../components/visitPage/ClientDetailsCard")
+);
+const CreateVisitForm = React.lazy(
+  () => import("../../components/visitPage/CreateVisitForm")
+);
+const VisitsTable = React.lazy(
+  () => import("../../components/visitPage/VisitsTable")
+);
+const VisitView = React.lazy(
+  () => import("../../components/visitPage/VisitView")
+);
 
 const VisitsPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const dispatch = useAppDispatch();
 
+  const { loading } = useLoadingData();
+
   const selectedVisitId = useAppSelector(
     (state: RootState) => state.data.selectedVisitId
   );
-
 
   const [isCreatingVisit, setIsCreatingVisit] = useState(false);
 
@@ -48,7 +59,6 @@ const VisitsPage: React.FC = () => {
   const selectedClientId = useAppSelector(
     (state: RootState) => state.data.selectedClientId
   );
-
 
   // Get data fetching status and error
   const status = useAppSelector((state: RootState) => state.data.status);
@@ -64,7 +74,7 @@ const VisitsPage: React.FC = () => {
     if (userRole === "client" && currentUser?.id) {
       dispatch(selectClient(currentUser.id));
     }
-  }, [userRole, currentUser, dispatch]);
+  }, [userRole, currentUser?.id, dispatch]);
 
   // Automatically collapse VisitsTable when a visit is selected or creating a visit
   useEffect(() => {
@@ -73,7 +83,14 @@ const VisitsPage: React.FC = () => {
     }
   }, [selectedVisitId, isCreatingVisit]);
 
+  useEffect(() => {
+    if (selectedVisitId) {
+      handleCloseCreateVisit();
+    }
+  });
+
   const handleOpenCreateVisit = () => {
+    dispatch(clearSelectedVisit());
     setIsCreatingVisit(true);
   };
 
@@ -82,7 +99,7 @@ const VisitsPage: React.FC = () => {
   };
 
   // Handle loading state
-  if (status === "loading") {
+  if (loading) {
     return (
       <Box
         sx={{
@@ -158,101 +175,107 @@ const VisitsPage: React.FC = () => {
             }}
           >
             {/* Client Details Collapsible Container */}
-            <Paper
+
+            <Box
               sx={{
-                mb: 2,
-                borderRadius: 2,
-                overflow: "display",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                bgcolor: "#f4f5f7",
+                p: 1,
+                pt: 2,
+                pb: 2,
+                pl: 2,
                 height: "auto",
+                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                borderRadius: 6,
+                mb: 2,
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  bgcolor: "#f4f5f7",
-                  p: 1,
-                  pt: 2,
-                  pb: 2,
-                  pl: 2,
-                  height: "auto",
-
-                }}
+              <Typography variant="h4" sx={{ ml: 1 }}>
+                Client Details
+              </Typography>
+              <IconButton
+                onClick={() =>
+                  setIsClientDetailsCollapsed(!isClientDetailsCollapsed)
+                }
               >
-                <Typography variant="h4" sx={{ ml: 1 }}>Client Details</Typography>
-                <IconButton
-                  onClick={() =>
-                    setIsClientDetailsCollapsed(!isClientDetailsCollapsed)
-                  }
-                >
-                  {isClientDetailsCollapsed ? (
-                    <ExpandMoreIcon />
-                  ) : (
-                    <ExpandLessIcon />
-                  )}
-                </IconButton>
-              </Box>
-              <Collapse in={!isClientDetailsCollapsed}>
+                {isClientDetailsCollapsed ? (
+                  <ExpandMoreIcon />
+                ) : (
+                  <ExpandLessIcon />
+                )}
+              </IconButton>
+            </Box>
+            <Collapse in={!isClientDetailsCollapsed}>
+              <Suspense>
                 <ClientDetailsCard
                   clientId={selectedClientId}
                   onCreateVisit={handleOpenCreateVisit}
                   onDeselectClient={() => dispatch(clearSelection())}
                 />
-              </Collapse>
-            </Paper>
+              </Suspense>
+            </Collapse>
 
             {/* Visits Table Collapsible Container */}
-            <Paper
+
+            <Box
               sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                bgcolor: "#f4f5f7",
+                p: 1,
+                pt: 2,
+                pb: 2,
+                pl: 2,
+                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                borderRadius: 6,
                 mb: 2,
-                borderRadius: 2,
-                overflow: "display",
+                mt: !isClientDetailsCollapsed && isCreatingVisit ? 18 : 2,
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  bgcolor: "#f4f5f7",
-                  p: 1,
-                  pt: 2,
-                  pb: 2,
-                  pl: 2,
-                }}
+              <Typography variant="h4" sx={{ ml: 1 }}>
+                Visits
+              </Typography>
+              <IconButton
+                onClick={() =>
+                  setIsVisitsTableCollapsed(!isVisitsTableCollapsed)
+                }
               >
-                <Typography variant="h4" sx={{ ml: 1 }}>Visits</Typography>
-                <IconButton
-                  onClick={() =>
-                    setIsVisitsTableCollapsed(!isVisitsTableCollapsed)
-                  }
-                >
-                  {isVisitsTableCollapsed ? (
-                    <ExpandMoreIcon />
-                  ) : (
-                    <ExpandLessIcon />
-                  )}
-                </IconButton>
-              </Box>
-              <Collapse in={!isVisitsTableCollapsed}>
+                {isVisitsTableCollapsed ? (
+                  <ExpandMoreIcon />
+                ) : (
+                  <ExpandLessIcon />
+                )}
+              </IconButton>
+            </Box>
+            <Collapse
+              sx={{ mb: isCreatingVisit && !isVisitsTableCollapsed ? 25 : 0 }}
+              in={!isVisitsTableCollapsed}
+            >
+              <Suspense>
                 <VisitsTable clientId={selectedClientId} />
-              </Collapse>
-            </Paper>
+              </Suspense>
+            </Collapse>
 
             {/* Visit View (conditionally rendered) */}
             {selectedVisitId && (
-              <VisitView
-                visitId={selectedVisitId}
-                onDeselectVisit={() => dispatch(clearSelectedVisit())}
-              />
+              <Suspense>
+                <VisitView
+                  visitId={selectedVisitId}
+                  onDeselectVisit={() => dispatch(clearSelectedVisit())}
+                />
+              </Suspense>
             )}
             {/* Create Visit Form (conditionally rendered) */}
-            {isCreatingVisit && (
-              <CreateVisitForm
-                clientId={selectedClientId}
-                onClose={handleCloseCreateVisit}
-              />
+            {isCreatingVisit && selectedVisitId === null && (
+              <Suspense>
+                <CreateVisitForm
+                  clientId={selectedClientId}
+                  onClose={handleCloseCreateVisit}
+                />
+              </Suspense>
             )}
           </Grid>
         )}

@@ -7,7 +7,7 @@ import {
 import { AgGridReact } from "ag-grid-react";
 import { Dayjs } from "dayjs";
 import { ReactNode } from "react";
-import { Movement, MovementDetail } from "./dataModels";
+import { CalendarEvent, Movement, MovementDetail } from "./dataModels";
 import { Agent, Client, UserRole } from "./entityModels";
 import { SearchResult } from "./searchModels";
 
@@ -48,6 +48,8 @@ export type ArticleProp = {
     articleId: string;
     name: string;
     brand: string;
+    quantity: number;
+    unitPrice: string;
     priceSold: string;
     priceBought: string;
     [key: string]: string | number;
@@ -76,6 +78,7 @@ export type ClientProp = {
     agentName?: string;
     movements: Movement[];
     colour?: string;
+    agentData?: Agent[];
   };
   isLoading: boolean;
 };
@@ -199,7 +202,7 @@ export type MovementListProps = {
   setStartDate: (value: string) => void;
   endDate: string;
   setEndDate: (value: string) => void;
-  filteredMovements: () => Movement[];
+  filteredMovements: Movement[];
   columnDefs: ColDef[];
   gridRef: React.RefObject<AgGridReact>;
   handleMenuOpen: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -227,7 +230,6 @@ export type TopArticleTypeProps = {
 
 export type TotalEarningProps = {
   totalEarning: number;
-  isLoading: boolean;
 };
 
 export type UpcomingVisitsProps = {
@@ -237,7 +239,8 @@ export type UpcomingVisitsProps = {
 export type AGGridTableProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columnDefs: any[];
-  rowData: unknown[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  rowData: any;
   paginationPageSize: number;
   quickFilterText: string; // Added quickFilterText prop
 };
@@ -257,7 +260,7 @@ export type ClientDetailsProps = {
 export type ArticlesListProps = {
   quickFilterText: string;
   setQuickFilterText: (value: string) => void;
-  filteredArticles: () => MovementDetail[];
+  filteredArticles: MovementDetail[];
   columnDefs: ColDef[];
   gridRef: React.RefObject<AgGridReact>;
   handleMenuOpen: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -294,3 +297,34 @@ export interface TopBrandsSoldProps {
   isMobile: boolean;
   userRole: UserRole;
 }
+
+export interface CreateEventPayload {
+  userId: string;
+  startDate: Date;
+  endDate: Date;
+  eventType: "absence" | "event" | "holiday" | "visit" | "";
+  reason:
+    | "illness"
+    | "day_off"
+    | "unexpected_event"
+    | "medical_visit"
+    | "public_holiday"
+    | "company_holiday"
+    | "company_meeting"
+    | "company_party"
+    | "conference"
+    | "expo"
+    | "issues"
+    | "routine"
+    | "new_client"
+    | "generic"
+    | "";
+  note?: string;
+}
+
+export interface UpdateEventStatusPayload {
+  eventId: string;
+  status: "pending" | "approved" | "rejected" | "cancelled";
+}
+
+export type GetEventsByMonthResponse = CalendarEvent[];

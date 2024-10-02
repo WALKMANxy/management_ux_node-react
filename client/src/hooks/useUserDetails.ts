@@ -1,26 +1,37 @@
 // src/hooks/useUserDetails.ts
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useInView } from "react-intersection-observer";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { loadAdminDetailsData } from "../features/data/api/admins";
+import { getAllEmployees } from "../features/data/api/employees";
 import { updateUserById } from "../features/users/userSlice";
-import { Admin, Agent, Client, User, UserRole } from "../models/entityModels";
+import {
+  Admin,
+  Agent,
+  Client,
+  Employee,
+  User,
+  UserRole,
+} from "../models/entityModels";
+import { showToast } from "../utils/toastMessage";
 
 const useUserDetails = (user: Partial<User>) => {
   const clients = useAppSelector((state) => state.data.clients);
   const agents = useAppSelector((state) => state.data.agents);
+  const { t } = useTranslation();
 
   const dispatch = useAppDispatch();
 
   const [admins, setAdmins] = useState<Admin[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]); // New state for employees
+
   const [role, setRole] = useState<UserRole>(user.role || "guest");
-  const [entityOptions, setEntityOptions] = useState<
-    Client[] | Agent[] | Admin[]
-  >([]);
+
   const [entitySearchText, setEntitySearchText] = useState("");
   const [selectedEntity, setSelectedEntity] = useState<
-    Client | Agent | Admin | null
+    Client | Agent | Admin | Employee | null
   >(null);
   const [loadingEntities, setLoadingEntities] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,36 +43,72 @@ const useUserDetails = (user: Partial<User>) => {
   // Fetch admins only once when the component mounts
   useEffect(() => {
     setLoadingEntities(true);
-    loadAdminDetailsData()
-      .then((data: Admin[]) => {
-        setAdmins(data); // Store fetched admins
+
+    // Load both admins and employees in parallel
+    Promise.all([loadAdminDetailsData(), getAllEmployees()])
+      .then(([adminData, employeeData]) => {
+        setAdmins(adminData); // Store fetched admins
+        setEmployees(employeeData); // Store fetched employees
         setLoadingEntities(false);
       })
       .catch((error: Error) => {
-        console.error("Error fetching admin data:", error);
+        showToast.error(
+          t("userDetails.loadAdminsError") + ": " + error.message
+        );
+        console.error("Error fetching admin or employee data:", error);
         setLoadingEntities(false);
       });
-  }, []);
+  }, [t]);
 
-  // Update entity options based on the selected role
-  useEffect(() => {
-    setEntityOptions([]); // Clear previous options when changing role
-    setSelectedEntity(null); // Reset selected entity when changing role
+  const sortedAdmins = useMemo(() => {
+    return [...admins].sort((a, b) => a.name.localeCompare(b.name));
+  }, [admins]);
 
-    if (role === "admin") {
-      setEntityOptions(admins.sort((a, b) => a.name.localeCompare(b.name)));
-    } else if (role === "client") {
-      const sortedClients = Object.values(clients).sort((a, b) =>
-        a.name.localeCompare(b.name)
-      );
-      setEntityOptions(sortedClients);
-    } else if (role === "agent") {
-      const sortedAgents = Object.values(agents).sort((a, b) =>
-        a.name.localeCompare(b.name)
-      );
-      setEntityOptions(sortedAgents);
+  const sortedEmployees = useMemo(() => {
+    return [...employees].sort((a, b) => a.name.localeCompare(b.name));
+  }, [employees]);
+
+  const sortedClients = useMemo(() => {
+    return Object.values(clients).sort((a, b) => a.name.localeCompare(b.name));
+  }, [clients]);
+
+  const sortedAgents = useMemo(() => {
+    return Object.values(agents).sort((a, b) => a.name.localeCompare(b.name));
+  }, [agents]);
+
+  const baseEntityOptions = useMemo(() => {
+    switch (role) {
+      case "admin":
+        return sortedAdmins;
+      case "client":
+        return sortedClients;
+      case "agent":
+        return sortedAgents;
+      case "employee": // New role check for employees
+        return sortedEmployees;
+      default:
+        return [];
     }
-  }, [role, admins, clients, agents]);
+  }, [role, sortedAdmins, sortedClients, sortedAgents, sortedEmployees]);
+
+  /**
+   * Filter entity options based on the search text.
+   */
+  const filteredEntityOptions = useMemo(() => {
+    if (!entitySearchText.trim()) {
+      return baseEntityOptions;
+    }
+    const searchLower = entitySearchText.toLowerCase();
+    return baseEntityOptions.filter(
+      (entity) =>
+        entity.name.toLowerCase().includes(searchLower) ||
+        entity.id.toLowerCase().includes(searchLower)
+    );
+  }, [baseEntityOptions, entitySearchText]);
+
+  const entityOptions = useMemo(() => {
+    return filteredEntityOptions.slice(0, visibleRows);
+  }, [filteredEntityOptions, visibleRows]);
 
   // Dynamically load more rows when scrolled to the bottom
   useEffect(() => {
@@ -70,36 +117,22 @@ const useUserDetails = (user: Partial<User>) => {
     }
   }, [inView, entityOptions.length, visibleRows]);
 
-  // Search entities based on role
-  const handleEntitySearch = (searchText: string) => {
-    setEntitySearchText(searchText);
-    const searchLower = searchText.toLowerCase();
+  // Manage infinite scrolling by loading more rows when in view.
 
-    if (role === "client") {
-      const filteredClients = Object.values(clients).filter(
-        (client) =>
-          client.name.toLowerCase().includes(searchLower) ||
-          client.id.toLowerCase().includes(searchLower)
+  useEffect(() => {
+    if (inView && visibleRows < filteredEntityOptions.length) {
+      setVisibleRows((prev) =>
+        Math.min(prev + 20, filteredEntityOptions.length)
       );
-      setEntityOptions(filteredClients);
-    } else if (role === "agent") {
-      const filteredAgents = Object.values(agents).filter(
-        (agent) =>
-          agent.name.toLowerCase().includes(searchLower) ||
-          agent.id.toLowerCase().includes(searchLower)
-      );
-      setEntityOptions(filteredAgents);
-    } else if (role === "admin") {
-      const filteredAdmins = admins.filter(
-        (admin) =>
-          admin.name.toLowerCase().includes(searchLower) ||
-          admin.id.toLowerCase().includes(searchLower)
-      );
-      setEntityOptions(filteredAdmins);
     }
-  };
+  }, [inView, filteredEntityOptions.length, visibleRows]);
 
-  const handleSaveChanges = () => {
+  const handleEntitySearch = useCallback((searchText: string) => {
+    setEntitySearchText(searchText);
+    setVisibleRows(20); // Reset visible rows when a new search is initiated
+  }, []);
+
+  const handleSaveChanges = useCallback(() => {
     if (!selectedEntity) return;
 
     const updatedData = {
@@ -112,11 +145,22 @@ const useUserDetails = (user: Partial<User>) => {
       setLoading(true);
       dispatch(updateUserById({ id: user._id, updatedData }))
         .then(() => {
-          setAlertMessage("User updated successfully");
+          setAlertMessage(t("userDetails.updateSuccess"));
           setAlertSeverity("success");
+          showToast.success(t("userDetails.updateSuccessToast"));
         })
-        .catch((error) => {
-          setAlertMessage("Failed to update user. Server error.");
+        .catch((error: unknown) => {
+          if (error instanceof Error) {
+            setAlertMessage(
+              t("userDetails.updateFailed", { message: error.message })
+            );
+            showToast.error(
+              t("userDetails.updateFailedToast", { message: error.message })
+            );
+          } else {
+            setAlertMessage(t("userDetails.updateUnknownError"));
+            showToast.error(t("userDetails.updateUnknownErrorToast"));
+          }
           setAlertSeverity("error");
           console.error("Error updating user:", error);
         })
@@ -124,11 +168,12 @@ const useUserDetails = (user: Partial<User>) => {
           setLoading(false);
         });
     } else {
-      setAlertMessage("User ID is undefined");
+      setAlertMessage(t("userDetails.userIdUndefined"));
       setAlertSeverity("error");
+      showToast.error(t("userDetails.userIdUndefinedToast"));
       console.error("User ID is undefined");
     }
-  };
+  }, [selectedEntity, role, user._id, dispatch, t]);
 
   return {
     role,

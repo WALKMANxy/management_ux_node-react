@@ -1,7 +1,7 @@
 // src/components/UserPage/UserDetails.tsx
 
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import InfoIcon from "@mui/icons-material/Info"; // Import InfoIcon from MUI
+import InfoIcon from "@mui/icons-material/Info";
 import SaveIcon from "@mui/icons-material/Save";
 import { LoadingButton } from "@mui/lab";
 import {
@@ -19,10 +19,12 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import "animate.css"; // Import Animate.css for animations
+import "animate.css";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import useUserDetails from "../../hooks/useUserDetails";
 import { User } from "../../models/entityModels";
 import UserCard from "./UserCard";
@@ -51,14 +53,18 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
     alertSeverity,
   } = useUserDetails(user);
 
+  const { t } = useTranslation();
+
   return (
     <Box>
-      <Button onClick={onBack} sx={{ mb: 2, color: "black" }}>
-        <ArrowBackIosIcon />
-      </Button>
+      <Tooltip title={t("userDetails.goBack", "Go back")} placement="top">
+        <Button onClick={onBack} sx={{ mb: 2, color: "black" }}>
+          <ArrowBackIosIcon />
+        </Button>
+      </Tooltip>
 
       {/* Current User Details Card */}
-      <Box className="animate__animated animate__bounceIn">
+      <Box className="animate__animated animate__fadeInLeft">
         <UserCard
           email={user.email || "N/A"}
           avatar={user.avatar}
@@ -71,71 +77,113 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
       </Box>
 
       {/* Info message for selecting a new role */}
-      <Box display="flex" alignItems="center" sx={{ mb: 2, mt: 2 }}>
+      <Box display="flex" alignItems="center" sx={{ my: 3 }}>
         <InfoIcon color="info" sx={{ mr: 1, fontSize: "1.2rem" }} />
         <Typography variant="subtitle1" sx={{ color: "gray" }}>
-          Select a new role.
+          {t("userDetails.selectRole", "Select a new role.")}
         </Typography>
       </Box>
 
       <Divider sx={{ mb: 2 }} />
 
-      <Box display="flex" flexDirection="column" gap={2}>
+      <Box display="flex" flexDirection="column" gap={1}>
         {/* Role Selection Buttons */}
         <ButtonGroup
           variant="contained"
-          aria-label="Role selection"
+          aria-label={t("userDetails.roleSelection", "Role selection")}
           sx={{
             boxShadow: "none",
-            gap: 1,
+            gap: 2,
           }}
         >
-          <Button
-            onClick={() => setRole("client")}
-            style={{
-              backgroundColor: role === "client" ? "green" : "black",
-              color: "white",
-            }}
+          <Tooltip
+            title={t("userDetails.selectClient", "Select Client role")}
+            placement="top"
           >
-            Client
-          </Button>
-          <Button
-            onClick={() => setRole("agent")}
-            style={{
-              backgroundColor: role === "agent" ? "blue" : "black",
-              color: "white",
-            }}
+            <Button
+              onClick={() => setRole("client")}
+              sx={{
+                backgroundColor: role === "client" ? "green" : "black",
+                color: "white",
+              }}
+            >
+              {t("userDetails.client", "Client")}
+            </Button>
+          </Tooltip>
+
+          <Tooltip
+            title={t("userDetails.selectAgent", "Select Agent role")}
+            placement="top"
           >
-            Agent
-          </Button>
-          <Button
-            onClick={() => setRole("admin")}
-            style={{
-              backgroundColor: role === "admin" ? "purple" : "black",
-              color: "white",
-            }}
+            <Button
+              onClick={() => setRole("agent")}
+              sx={{
+                backgroundColor: role === "agent" ? "blue" : "black",
+                color: "white",
+              }}
+            >
+              {t("userDetails.agent", "Agent")}
+            </Button>
+          </Tooltip>
+
+          <Tooltip
+            title={t("userDetails.selectAdmin", "Select Admin role")}
+            placement="top"
           >
-            Admin
-          </Button>
+            <Button
+              onClick={() => setRole("admin")}
+              sx={{
+                backgroundColor: role === "admin" ? "purple" : "black",
+                color: "white",
+              }}
+            >
+              {t("userDetails.admin", "Admin")}
+            </Button>
+          </Tooltip>
+          {/* New Employee Button */}
+          <Tooltip
+            title={t("userDetails.selectEmployee", "Select Employee role")}
+            placement="top"
+          >
+            <Button
+              onClick={() => setRole("employee")}
+              sx={{
+                backgroundColor: role === "employee" ? "orange" : "black",
+                color: "white",
+                minWidth: "100px",
+              }}
+            >
+              {t("userDetails.employee", "Employee")}
+            </Button>
+          </Tooltip>
         </ButtonGroup>
 
         {/* Info message for selecting an entity */}
-        <Box display="flex" alignItems="center" sx={{ mb: 2, mt: 2 }}>
+        <Box display="flex" alignItems="center" sx={{ my: 3 }}>
           <InfoIcon color="info" sx={{ mr: 1, fontSize: "1.2rem" }} />
           <Typography variant="subtitle1" sx={{ color: "gray" }}>
-            Select an entity by double-clicking them.
+            {t(
+              "userDetails.selectEntity",
+              "Select an entity by double-clicking them."
+            )}
           </Typography>
         </Box>
 
         <TextField
-          label={`Search ${role}s by name or ID`}
+          label={t(
+            "userDetails.searchPlaceholder",
+            `Search ${role}s by name or ID`
+          )}
           value={entitySearchText}
           onChange={(e) => handleEntitySearch(e.target.value)}
           variant="outlined"
           disabled={loadingEntities}
           helperText={
-            loadingEntities ? "Loading entities..." : "Start typing to search"
+            loadingEntities
+              ? t("userDetails.loadingEntities", "Loading entities...")
+              : t("userDetails.startTyping", "Start typing to search")
           }
+          sx={{ mb: 2 }}
         />
 
         {loadingEntities && <CircularProgress />}
@@ -146,12 +194,12 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>ID</TableCell>
+                  <TableCell>{t("userDetails.entityName", "Name")}</TableCell>
+                  <TableCell>{t("userDetails.entityId", "ID")}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {entityOptions.slice(0, visibleRows).map((entity) => (
+                {entityOptions.slice(0, visibleRows).map((entity, index) => (
                   <TableRow
                     hover
                     key={entity.id}
@@ -164,6 +212,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
                           ? "rgba(0, 0, 0, 0.08)"
                           : "inherit",
                     }}
+                    ref={index === visibleRows - 1 ? ref : null} // Attach ref to the last row
                   >
                     <TableCell>{entity.name}</TableCell>
                     <TableCell>{entity.id}</TableCell>
@@ -174,6 +223,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
             </Table>
           </TableContainer>
         )}
+
         <Divider sx={{ mb: 2 }} />
 
         {/* Confirmation Card below the table */}
@@ -187,7 +237,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
                 code: selectedEntity.id,
                 name: selectedEntity.name,
               }}
-              isNew={true} // Apply faint green styling for new entity details
+              isnew={"true"} // Apply faint green styling for new entity details
             />
           </Box>
         )}
@@ -202,7 +252,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
           startIcon={<SaveIcon />}
           variant="contained"
         >
-          Save
+          {t("userDetails.saveChanges", "Save")}
         </LoadingButton>
 
         {/* Alert for success or error message */}

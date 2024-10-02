@@ -1,5 +1,6 @@
+import dayjs from "dayjs";
 import {
-  GlobalPromos,
+  CalendarEvent,
   GlobalVisits,
   MovementDetail,
   Promo,
@@ -14,10 +15,8 @@ const workerScriptPath = new URL("./worker.js", import.meta.url);
 // Mapping data to models including the new data types (Visits, Promos, Alerts)
 export const mapDataToModels = async (
   data: serverMovement[],
-  clientDetails: serverClient[],
- /*  visits: Visit[] = [],
-  promos: Promo[] = [] */
-): Promise<{ clients: Client[];/*  visits: Visit[]; promos: Promo[] */ }> => {
+  clientDetails: serverClient[]
+): Promise<{ clients: Client[] }> => {
   // Determine the number of workers based on hardware concurrency or default to 4
   const numWorkers = Math.min(navigator.hardwareConcurrency || 4, data.length);
   const chunkSize = Math.ceil(data.length / numWorkers);
@@ -34,12 +33,15 @@ export const mapDataToModels = async (
 
   // Create workers and assign them relevant chunks of data with filtered client details
   const workers = chunks.map((chunk, index) => {
-    // Filter client details that are relevant to the current chunk
-    const relevantClientDetailsMap = Object.fromEntries(
-      [...clientDetailsMap].filter(([clientId]) =>
-        chunk.some((item) => item["Codice Cliente"].toString() === clientId)
-      )
+    // Use Set for faster lookups
+    const relevantClientIds = new Set(
+      chunk.map((item) => item["Codice Cliente"].toString())
     );
+
+    const relevantClientDetailsMap = new Map(
+      [...clientDetailsMap].filter(([clientId]) => relevantClientIds.has(clientId))
+    );
+
 
     return new Promise<Client[]>((resolve, reject) => {
       const worker = new Worker(workerScriptPath);
@@ -58,7 +60,7 @@ export const mapDataToModels = async (
       // Send the chunk of data and the relevant client details map
       worker.postMessage({
         data: chunk,
-        clientDetailsMap: relevantClientDetailsMap, // Send only the relevant client details
+        clientDetailsMap: Object.fromEntries(relevantClientDetailsMap),
       });
     });
   });
@@ -83,111 +85,32 @@ export const mapDataToModels = async (
     }
   });
 
-  // Convert the map back to an array
-  const clients = Array.from(resultsMap.values());
-
- /*  // Filtering visits, promos, and alerts based on client associations
-  const filteredVisits = visits.filter((visit) =>
-    clients.some((client) => client.id === visit.clientId)
-  );
-  const filteredPromos = promos.filter((promo) =>
-    clients.some((client) => promo.clientsId.includes(client.id))
-  ); */
-
   return {
-    clients,
-  /*   visits: filteredVisits,
-    promos: filteredPromos, */
+    clients: Array.from(resultsMap.values()),
   };
 };
 
 // Mapping function for full agent data
 export const mapDataToAgents = async (
-  clients: Client[], // Accept clients already mapped with correct movements
-  agentDetails: Agent[], // Array of agent details including clients' CODICE
-  /* visits: Visit[] = [],
-  promos: Promo[] = [] */
-): Promise<{ agents: Agent[];/*  visits: Visit[]; promos: Promo[] */ }> => {
-  const agentsMap = new Map<string, Agent>();
- /*  const aggregatedVisits: Visit[] = [];
-  const aggregatedPromos: Promo[] = []; */
+  clients: Client[],
+  agentDetails: Agent[]
+): Promise<{ agents: Agent[] }> => {
+  const agentsMap = new Map<string, Agent>(
+    agentDetails.map((agent) => [agent.id, { ...agent, clients: [] }])
+  );
 
-  // Populate agents map using agent details
-  agentDetails.forEach((agentDetail) => {
-    agentsMap.set(agentDetail.id, {
-      ...agentDetail,
-      clients: [], // Initialize with empty clients array
-    });
-  });
-
-  // Map clients to their respective agents
   clients.forEach((client) => {
-    const agent = agentsMap.get(client.agent); // Find the corresponding agent by id
-
+    const agent = agentsMap.get(client.agent);
     if (agent) {
-      // Assign additional client properties like colour if available from agent details
-      const clientDetailsFromAgent = agent.clients.find(
-        (agentClient) => agentClient.id === client.id
-      );
-
-      // Update the client with additional properties from agentDetails if available
-      client.colour = clientDetailsFromAgent
-        ? clientDetailsFromAgent.colour
-        : client.colour;
-
-      // Add client to the corresponding agent's clients array
       agent.clients.push(client);
-
-      /* // Aggregate client's visits and promos
-      const clientVisits = visits.filter(
-        (visit) => visit.clientId === client.id
-      );
-      const clientPromos = promos.filter((promo) =>
-        promo.clientsId.includes(client.id)
-      );
-
-      aggregatedVisits.push(...clientVisits);
-      aggregatedPromos.push(...clientPromos); */
     }
   });
 
-  // Convert the map back to an array of agents
-  const agents = Array.from(agentsMap.values());
-
   return {
-    agents,
-   /*  visits: aggregatedVisits,
-    promos: aggregatedPromos, */
+    agents: Array.from(agentsMap.values()),
   };
 };
 
-/* export const mapVisitsPromosToAdmin = (
-  agents: Agent[],
-  visits: Visit[],
-  promos: Promo[]
-): { globalVisits: GlobalVisits; globalPromos: GlobalPromos } => {
-  const globalVisits: GlobalVisits = {};
-  const globalPromos: GlobalPromos = {};
-
-  agents.forEach((agent) => {
-    globalVisits[agent.id] = {
-      Visits: visits.filter((visit) =>
-        agent.clients.some((client) => client.id === visit.clientId)
-      ),
-    };
-
-    globalPromos[agent.id] = {
-      Promos: promos.filter((promo) =>
-        promo.clientsId.some((clientId) =>
-          agent.clients.some((client) => client.id === clientId)
-        )
-      ),
-    };
-  });
-
-  return { globalVisits, globalPromos };
-};
- */
 // Mapping function for movement details
 export const mapDataToMovementDetails = (
   data: serverMovement[]
@@ -212,21 +135,20 @@ export const mapVisitsToEntity = (
 ): Visit[] | GlobalVisits => {
   switch (role) {
     case "client":
-      // For client, return a flat array of visits
       return visits.filter((visit) => visit.clientId === (entity as Client).id);
 
-    case "agent":
-      // For agent, return visits for all the agent's clients
-      return (entity as Agent).clients.flatMap((client) =>
-        visits.filter((visit) => visit.clientId === client.id)
-      );
+    case "agent": {
+      const clientIds = new Set((entity as Agent).clients.map((c) => c.id));
+      return visits.filter((visit) => clientIds.has(visit.clientId));
+    }
 
     case "admin": {
       const globalVisits: GlobalVisits = {};
-      (entity as Admin).agents.forEach((agent) => {
+      const admin = entity as Admin;
+      admin.agents.forEach((agent) => {
         globalVisits[agent.id] = {
-          Visits: agent.clients.flatMap((client) =>
-            visits.filter((visit) => visit.clientId === client.id)
+          Visits: visits.filter((visit) =>
+            agent.clients.some((client) => client.id === visit.clientId)
           ),
         };
       });
@@ -242,34 +164,60 @@ export const mapPromosToEntity = (
   promos: Promo[],
   entity: Client | Agent | Admin,
   role: "client" | "agent" | "admin"
-): Promo[] | GlobalPromos => {
+): Promo[] => {
+  const today = dayjs();
+
   switch (role) {
     case "client":
-      // For client, return a flat array of promos
-      return promos.filter((promo) =>
-        promo.clientsId.includes((entity as Client).id)
-      );
-
-    case "agent":
-      // For agent, return promos for all the agent's clients
-      return (entity as Agent).clients.flatMap((client) =>
-        promos.filter((promo) => promo.clientsId.includes(client.id))
-      );
-
-    case "admin": {
-      // For admin, group promos by agent ID
-      const globalPromos: GlobalPromos = {};
-      (entity as Admin).agents.forEach((agent) => {
-        globalPromos[agent.id] = {
-          Promos: agent.clients.flatMap((client) =>
-            promos.filter((promo) => promo.clientsId.includes(client.id))
-          ),
-        };
+      return promos.filter((promo) => {
+        if (dayjs(promo.endDate).isBefore(today)) return false;
+        if (
+          promo.global &&
+          !promo.excludedClientsId?.includes((entity as Client).id)
+        ) {
+          return true;
+        }
+        return promo.clientsId?.includes((entity as Client).id) || false;
       });
-      return globalPromos;
+
+    case "agent": {
+      const agentClientIds = new Set(
+        (entity as Agent).clients.map((c) => c.id)
+      );
+      return promos.filter((promo) => {
+        if (promo.global) return true;
+        return promo.clientsId?.some((id) => agentClientIds.has(id)) || false;
+      });
     }
+
+    case "admin":
+      return promos;
 
     default:
       throw new Error("Invalid user role");
   }
+};
+
+// Function to map a Visit to a CalendarEvent
+export const mapVisitToCalendarEvent = (visit: Visit): CalendarEvent => {
+  const date = new Date(visit.date);
+  const createdAt = new Date(visit.createdAt);
+
+  return {
+    _id: visit._id,
+    userId: visit.visitIssuedBy,
+    startDate: date,
+    endDate: date,
+    eventType: "visit",
+    eventName: `Visit for ${visit.clientId}`,
+    reason: visit.visitReason as CalendarEvent["reason"],
+    note: visit.notePublic,
+    status: visit.pending
+      ? "pending"
+      : visit.completed
+      ? "approved"
+      : "pending",
+    createdAt,
+    updatedAt: new Date(), // Consider using visit.updatedAt if available
+  };
 };

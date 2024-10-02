@@ -1,5 +1,6 @@
 /* src/components/common/AGGridTable.css */
 
+/* Common Styles */
 .ag-theme-quartz .ag-paging-panel {
   display: flex;
   justify-content: space-between;
@@ -7,9 +8,6 @@
   font-size: var(--ag-font-size);
   padding: 20px 0;
 }
-/* .ag-theme-quartz .ag-cell {
-  user-select: text !important;
-} */
 
 @media (max-width: 600px) {
   .ag-theme-quartz .ag-paging-panel {
@@ -26,4 +24,14 @@
     display: flex;
     flex-direction: column;
   }
+}
+
+/* Global mode: faint green */
+.ag-theme-quartz.global-mode .ag-root-wrapper {
+  background-color: #e6f4ea;
+}
+
+/* Manual mode: faint orange */
+.ag-theme-quartz.manual-mode .ag-root-wrapper {
+  background-color: #fff3e0;
 }

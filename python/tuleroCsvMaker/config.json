@@ -1,1 +1,11 @@
-{"articles_file": "C:/Users/artor/Downloads/rcs/mgs010_Stampa Anagrafica Articoli al 21-08 con upa e giac.xls", "oem_folder": "Z:/My Drive/rcs/Web/Tulero/app/data/oems", "brands_file": "Z:/My Drive/rcs/Web/Tulero/app/data/BRANDS.csv", "output_folder": "Z:/My Drive/rcs/Web/Tulero/output", "warehouse_file": "C:/Users/artor/Downloads/rcs/mgs010_Stampa Anagrafica Articoli al 21-08 con ubi e giac.xls", "ftp_host": "suppliers.tulero.it", "ftp_user": "s-rcs", "ftp_pass": "n9c6a5?W8", "ftp_dir": "/test/"}
+{
+  "articles_file": "Z:/My Drive/rcs/Web/Tulero/app/data/mgs010_Stampa Anagrafica Articoli al 21-08 con upa e giac.xls",
+  "oem_folder": "Z:/My Drive/rcs/Web/Tulero/app/data/oems",
+  "brands_file": "Z:/My Drive/rcs/Web/Tulero/app/data/BRANDS.csv",
+  "output_folder": "Z:/My Drive/rcs/Web/Tulero/output",
+  "warehouse_file": "Z:/My Drive/rcs/Web/Tulero/app/data/mgs010_Stampa Anagrafica Articoli al 21-08 con ubi e giac.xls",
+  "ftp_host": "suppliers.tulero.it",
+  "ftp_user": "s-rcs",
+  "ftp_pass": "n9c6a5?W8",
+  "ftp_dir": "/test/"
+}
