@@ -1,149 +1,128 @@
 {
   "welcome": "Benvenuto",
   "login": "Accedi",
-  "logout": "Disconnetti",
-  "headerDashboard": "Dashboard",
-  "clients": "Clienti",
-  "visits": "Visite",
   "statistics": "Statistiche",
-  "promos": "Promozioni",
   "alerts": "Avvisi",
-  "notifications": "Notifiche",
-  "no_notifications": "Nessuna nuova notifica",
-  "clientDetails": {
-    "title": "Dettagli Cliente"
-  },
   "details": {
-    "name": "Ragione Sociale",
-    "phone": "Numero di telefono",
-    "totalRevenue": "Entrate totali",
-    "pec": "E-mail PEC",
-    "extendedTaxCode": "Codice fiscale aggiuntivo",
-    "paymentMethod": "Metodo di pagamento",
-    "province": "Località",
-    "totalOrders": "Ordini totali",
-    "unpaidRevenue": "Insoluto",
-    "email": "E-mail",
-    "taxCode": "Codice fiscale",
-    "paymentMethodID": "PMID",
+    "name": "Nome",
+    "phone": "Telefono",
+    "totalRevenue": "Entrate Totali",
+    "extendedName": "Nome Esteso",
+    "pec": "PEC",
+    "extendedTaxCode": "Codice Fiscale Esteso",
+    "paymentMethod": "Metodo di Pagamento",
+    "province": "Provincia",
+    "totalOrders": "Ordini Totali",
+    "unpaidRevenue": "Entrate Non Pagate",
+    "email": "Email",
+    "taxCode": "Codice Fiscale",
+    "paymentMethodID": "ID Metodo di Pagamento",
     "address": "Indirizzo",
-    "agent": "Agente"
+    "agentName": "Nome Agente",
+    "labels": {
+      "call": "Chiama",
+      "email": "Invia Email",
+      "viewOnMap": "Visualizza sulla Mappa",
+      "unknownSender": "Mittente Sconosciuto"
+    }
   },
   "promotions": {
-    "activePromotionsFor": "Promozioni attive per",
-    "activePromotionsWithClients": "Promozioni attive con i tuoi clienti",
-    "promo1": "Promo 1",
-    "promo2": "Promo 2",
-    "promo3": "Promo 3",
-    "viewMore": "Vedi di più"
-  },
-  "spentThisMonth": {
-    "title": "Speso questo mese",
-    "iconAlt": "Icona spese"
-  },
-  "spentThisYear": {
-    "title": "Speso quest'anno",
-    "iconAlt": "Icona spese"
-  },
-  "topArticleType": {
-    "title": "Articoli più acquistati",
-    "iconAlt": "Icona degli articoli",
-    "amountPurchased": "Quantità acquistata"
-  },
-  "totalOrder": {
-    "month": "Mese",
-    "year": "Anno",
-    "totalOrders": "Ordini Totali"
-  },
-  "dashboard": {
-    "totalEarning": "Guadagno Totale"
-  },
-  "upcomingVisits": {
-    "titleForClient": "Prossime Visite per {{clientName}}",
-    "titleForAgent": "Le Tue Prossime Visite",
-    "visitPlaceholder1": "Visita 1",
-    "visitPlaceholder2": "Visita 2",
-    "visitPlaceholder3": "Visita 3",
-    "planVisit": "Pianifica Visita"
+    "activePromotionsFor": "Promozioni Attive per",
+    "activePromotionsWithClients": "Promozioni Attive con i Tuoi Clienti",
+    "promo1": "Promozione 1",
+    "promo2": "Promozione 2",
+    "promo3": "Promozione 3",
+    "viewMore": "Vedi Altro"
   },
   "globalSearch": {
     "placeholder": "Cerca..."
   },
-  "searchResults": {
-    "articleId": "OEM Articolo: {{articleId}}",
-    "brand": "Marca: {{brand}}",
-    "lastSoldDate": "Ultima Vendita: {{lastSoldDate}}",
-    "province": "Provincia: {{province}}",
-    "phone": "Telefono: {{phone}}",
-    "paymentMethod": "Metodo di Pagamento: {{paymentMethod}}",
-    "discountAmount": "Importo Sconto: {{discountAmount}}",
-    "startDate": "Data di Inizio: {{startDate}}",
-    "endDate": "Data di Fine: {{endDate}}",
-    "type": "Tipo: {{type}}",
-    "noResults": "Nessun risultato trovato"
-  },
   "monthOverMonthSpendingTrend": {
-    "title": "Trend Spesa Mensile",
-    "revenue": "Entrate"
+    "title": "Tendenza Mensile",
+    "revenue": "Entrate",
+    "expense": "Spese"
   },
   "salesDistribution": {
-    "title": "Distribuzione delle Vendite tra i Clienti",
-    "revenue": "Entrate"
+    "title": "Distribuzione delle Vendite",
+    "revenue": "Entrate",
+    "viewClients": "Visualizza Clienti",
+    "viewAgents": "Visualizza Agenti",
+    "clients": "Clienti",
+    "agents": "Agenti"
   },
   "topBrandsSold": {
-    "titleAgent": "Marche più vendute",
-    "titleClient": "Marche più acquistate",
-    "brandLabel": "Marca"
+    "titleAgent": "Marchi Più Venduti",
+    "titleClient": "Marchi Più Acquistati",
+    "brandLabel": "Marchio"
   },
   "clientList": {
-    "title": "Clienti",
-    "quickFilterPlaceholder": "Filtro Rapido...",
-    "startDate": "Data  Inizio",
-    "endDate": "Data  Fine",
-    "exportCSV": "Esporta CSV"
+    "title": "Elenco Clienti",
+    "quickFilterPlaceholder": "Cerca clienti...",
+    "quickFilterAriaLabel": "Filtro rapido per l'elenco clienti.",
+    "exportCSV": "Esporta come CSV",
+    "startDate": "Data Inizio",
+    "endDate": "Data Fine",
+    "expand": "Espandi elenco clienti.",
+    "collapse": "Riduci elenco clienti.",
+    "options": "Opzioni",
+    "startDateAriaLabel": "Filtro data inizio per l'elenco clienti.",
+    "endDateAriaLabel": "Filtro data fine per l'elenco clienti.",
+    "noClients": "Nessun cliente trovato."
   },
   "movementsHistory": {
     "date": "Data",
-    "brand": "Marca",
+    "client": "Cliente",
+    "brand": "Marchio",
     "oemId": "ID OEM",
     "name": "Nome",
     "revenue": "Entrate",
-    "cost": "Costo"
+    "cost": "Costo",
+    "quantity": "Quantità",
+    "unitPrice": "Prezzo Unitario"
+  },
+  "movementDetailHistory": {
+    "articleId": "ID",
+    "name": "Nome",
+    "brand": "Marchio",
+    "quantity": "Quantità",
+    "unitPrice": "Prezzo Unitario",
+    "priceSold": "Prezzo Venduto",
+    "priceBought": "Prezzo Acquistato"
   },
   "agentDashboard": {
     "welcomeBack": "Bentornato, {{name}}",
     "statisticsFor": "Statistiche per {{name}}",
     "yourStatistics": "Le Tue Statistiche",
     "calendar": "Calendario",
-    "viewMore": "Vedi di Più",
-    "totalEarning": "Guadagni Totali",
-    "totalOrder": "Ordini Totali",
-    "spentThisMonth": "Speso Questo Mese",
-    "spentThisYear": "Speso Quest'Anno",
-    "topArticleType": "Articoli più Acquistati",
-    "monthOverMonthSpendingTrend": {
-      "title": "Andamento delle spese mensili",
-      "revenue": "Entrate",
-      "expense": "Spese"
-    },
-    "topBrandsSold": "Marche Più Vendute",
-    "salesDistribution": "Distribuzione delle Vendite tra i Clienti",
-    "upcomingVisits": "Visite in Arrivo per {{name}}"
+    "viewMore": "Vedi Altro",
+    "totalEarning": "Guadagno Totale",
+    "spentThisMonth": "Spese Questo Mese",
+    "spentThisYear": "Spese Quest'Anno",
+    "topArticleType": "Articoli Più Acquistati",
+    "monthOverMonthSpendingTrend": "Tendenza Mensile di Spesa",
+    "topBrandsSold": "Marchi Più Venduti",
+    "salesDistribution": "Distribuzione delle Vendite Tramite Clienti",
+    "upcomingVisits": "Prossime Visite per {{name}}"
   },
   "clientsPage": {
     "name": "Nome",
     "province": "Provincia",
     "phone": "Numero di Telefono",
-    "totalOrders": "Ordini Totali",
-    "ordersThisMonth": "Ordini di Questo Mese",
+    "netRevenueThisMonth": "Entrate Nette di Questo Mese",
+    "totalOrders": "Ordini",
+    "totalNetRevenue": "Entrate Nette Totali",
+    "ordersThisMonth": "Ordini Questo Mese",
     "totalRevenue": "Entrate Totali",
-    "revenueThisMonth": "Entrate di Questo Mese",
+    "revenueThisMonth": "Entrate Questo Mese",
     "unpaidRevenue": "Entrate Non Pagate",
-    "paymentMethod": "Metodo di Pagamento"
+    "paymentMethod": "Metodo di Pagamento",
+    "id": "ID",
+    "address": "Indirizzo",
+    "agent": "Agente"
   },
   "landingPage": {
     "welcome": "Bentornato, {name}",
-    "login": "Accesso",
+    "login": "Accedi",
     "enter": "Entra",
     "userRole": "Ruolo Utente",
     "admin": "Amministratore",
@@ -161,5 +140,1053 @@
     "email": "E-mail",
     "vat": "Partita IVA",
     "credits": "crediti: @2024"
+  },
+  "reasons": {
+    "company_party": "Festa Aziendale",
+    "conference": "Conferenza",
+    "expo": "Expo",
+    "illness": "Malattia",
+    "day_off": "Giorno di Riposo",
+    "public_holiday": "Festa Pubblica",
+    "Issue": "Problema",
+    "Routine": "Routine",
+    "New Client": "Nuovo Cliente",
+    "unexpected_event": "Evento Imprevisto",
+    "company_meeting": "Riunione Aziendale",
+    "medical_visit": "Visita Medica"
+  },
+  "confirmDialog": {
+    "cancel": "Annulla",
+    "confirm": "Conferma",
+    "defaultTitle": "Sei sicuro?",
+    "defaultMessage": "Per favore, conferma la tua azione.",
+    "deleteEvent": "Eliminare l'Evento?"
+  },
+  "articleDetail": {
+    "id": "ID",
+    "name": "Nome",
+    "brand": "Marchio",
+    "quantity": "Quantità",
+    "unitPrice": "Prezzo per unità",
+    "priceSold": "Venduto a",
+    "priceBought": "Acquistato a"
+  },
+  "articleDetails": {
+    "title": "Dettagli Articolo",
+    "noHistory": "Nessuna storia disponibile"
+  },
+  "calendarEvent": {
+    "unknown": "Sconosciuto",
+    "reasons": {
+      "illness": "Malattia",
+      "day_off": "Giorno di Riposo",
+      "unexpected_event": "Evento Imprevisto",
+      "medical_visit": "Visita Medica",
+      "public_holiday": "Festa Pubblica",
+      "company_holiday": "Ferie Aziendali",
+      "company_meeting": "Riunione Aziendale",
+      "company_party": "Festa Aziendale",
+      "conference": "Conferenza",
+      "expo": "Expo",
+      "generic": "Generico"
+    }
+  },
+  "customToolbar": {
+    "today": "Oggi",
+    "previous": "Precedente",
+    "next": "Prossimo",
+    "view": {
+      "month": "Mese",
+      "week": "Settimana",
+      "day": "Giorno"
+    },
+
+    "eventForm": {
+      "title": "Crea Nuovo Evento",
+      "editTitle": "Modifica Evento",
+      "titleMarkAbsence": "Segna Assenza",
+      "labels": {
+        "startTime": "Ora di Inizio",
+        "endTime": "Ora di Fine",
+        "eventType": "Tipo di Evento",
+        "reason": "Motivo",
+        "note": "Nota (Opzionale)",
+        "cancel": "Annulla",
+        "create": "Crea"
+      },
+      "options": {
+        "absence": "Assenza",
+        "event": "Evento",
+        "holiday": "Vacanza"
+      },
+      "reasons": {
+        "illness": "Malattia",
+        "day_off": "Giorno di Riposo",
+        "unexpected_event": "Evento Imprevisto",
+        "medical_visit": "Visita Medica",
+        "public_holiday": "Festa Pubblica",
+        "company_holiday": "Ferie Aziendali",
+        "company_meeting": "Riunione Aziendale",
+        "company_party": "Festa Aziendale",
+        "conference": "Conferenza",
+        "expo": "Expo",
+        "generic": "Generico"
+      },
+      "validation": {
+        "startTimeRequired": "L'ora di inizio è obbligatoria",
+        "endTimeRequired": "L'ora di fine è obbligatoria",
+        "eventTypeRequired": "Il tipo di evento è obbligatorio",
+        "reasonRequired": "Il motivo è obbligatorio",
+        "dateTooFar": "Non puoi scegliere una data di assenza oltre due mesi da oggi. Seleziona una data prima di {{date}}."
+      },
+      "tooltips": {
+        "cancel": "Annulla",
+        "create": "Crea Evento"
+      },
+      "eventHistory": {
+        "title": "Storia dell'Evento",
+        "headers": {
+          "user": "Utente",
+          "eventType": "Tipo di Evento",
+          "reason": "Motivo",
+          "startDate": "Data Inizio",
+          "endDate": "Data Fine",
+          "status": "Stato",
+          "actions": "Azioni"
+        },
+        "unknown": "Sconosciuto",
+        "na": "N/A",
+        "eventTypes": {
+          "absence": "Assenza",
+          "event": "Evento",
+          "holiday": "Vacanza",
+          "generic": "Generico"
+        },
+        "reasons": {
+          "illness": "Malattia",
+          "day_off": "Giorno di Riposo",
+          "unexpected_event": "Evento Imprevisto",
+          "medical_visit": "Visita Medica",
+          "company_meeting": "Riunione Aziendale",
+          "company_party": "Festa Aziendale",
+          "conference": "Conferenza",
+          "expo": "Expo",
+          "generic": "Generico"
+        },
+        "statuses": {
+          "pending": "In Attesa",
+          "approved": "Approvato",
+          "rejected": "Respinto",
+          "cancelled": "Annullato"
+        },
+        "actions": {
+          "na": "N/A"
+        },
+        "tooltips": {
+          "approve": "Approva Evento",
+          "reject": "Rifiuta Evento"
+        },
+        "toast": {
+          "approveSuccess": "Evento approvato con successo!",
+          "approveFailure": "Errore durante l'approvazione dell'evento",
+          "rejectSuccess": "Evento rifiutato con successo!",
+          "rejectFailure": "Errore durante il rifiuto dell'evento",
+          "genericError": "Si è verificato un errore imprevisto"
+        }
+      }
+    },
+    "eventTitle": {
+      "unknown": "Sconosciuto",
+      "reasons": {
+        "illness": "Malattia",
+        "day_off": "Giorno di Riposo",
+        "unexpected_event": "Evento Imprevisto",
+        "medical_visit": "Visita Medica",
+        "public_holiday": "Festa Pubblica",
+        "company_holiday": "Ferie Aziendali",
+        "company_meeting": "Riunione Aziendale",
+        "company_party": "Festa Aziendale",
+        "conference": "Conferenza",
+        "expo": "Expo",
+        "generic": "Generico"
+      },
+      "tooltips": {
+        "illness": "Motivo: Malattia",
+        "day_off": "Motivo: Giorno di Riposo",
+        "unexpected_event": "Motivo: Evento Imprevisto",
+        "medical_visit": "Motivo: Visita Medica",
+        "public_holiday": "Motivo: Festa Pubblica",
+        "company_holiday": "Motivo: Ferie Aziendali",
+        "company_meeting": "Motivo: Riunione Aziendale",
+        "company_party": "Motivo: Festa Aziendale",
+        "conference": "Motivo: Conferenza",
+        "expo": "Motivo: Expo",
+        "generic": "Motivo: Generico",
+        "unknown": "Entità Sconosciuta"
+      }
+    },
+    "popOverEvent": {
+      "type": "Tipo",
+      "reason": "Motivo",
+      "note": "Nota",
+      "unknown": "Sconosciuto",
+      "visit": "Visita",
+      "issue": "Problema",
+      "routine": "Routine",
+      "newClient": "Nuovo Cliente",
+      "edit": "Modifica Evento",
+      "delete": "Elimina Evento",
+      "status": "Stato",
+      "startsAt": "Inizia alle",
+      "endsAt": "Finisce alle"
+    },
+    "eventTypes": {
+      "absence": "Assenza",
+      "holiday": "Vacanza",
+      "event": "Evento",
+      "generic": "Generico",
+      "visit": "Visita"
+    }
+  },
+  "chatList": {
+    "noChatsFound": "Nessuna chat trovata.",
+    "noMessages": "Nessun messaggio",
+    "na": "N/A"
+  },
+  "chatSidebar": {
+    "labels": {
+      "chats": "Chat",
+      "contacts": "Contatti"
+    },
+    "tooltips": {
+      "refreshContacts": "Aggiorna Contatti",
+      "showChats": "Mostra Chat",
+      "showContacts": "Mostra Contatti"
+    },
+    "placeholders": {
+      "searchChats": "Cerca chat...",
+      "searchContacts": "Cerca contatti..."
+    }
+  },
+  "chatView": {
+    "labels": {
+      "noChatSelected": "Nessuna chat selezionata. Seleziona una chat per visualizzarla.",
+      "type": "Tipo",
+      "reason": "Motivo",
+      "note": "Nota",
+      "moreOptions": "Altre Opzioni"
+    },
+    "tooltips": {
+      "backToChats": "Torna alle Chat",
+      "moreOptions": "Altre Opzioni"
+    },
+    "menuOptions": {
+      "mute": "Silenzia Chat",
+      "block": "Blocca Utente",
+      "report": "Segnala Chat",
+      "delete": "Elimina Chat",
+      "archive_chat": "Archivia Chat"
+    }
+  },
+  "contactsList": {
+    "labels": {
+      "unknownContact": "Contatto Sconosciuto",
+      "contact": "Contatto",
+      "selectContact": "Seleziona contatto"
+    },
+    "messages": {
+      "noContactsFound": "Nessun contatto trovato. Prova a modificare la tua ricerca.",
+      "promoMessage": "Hai diritto a una nuova promozione!\n\nTipo: {{promoType}}\nNome: {{promoName}}\nOfferta: {{promoDiscount}}\n\nContatta uno dei nostri rappresentanti per ulteriori informazioni. Buona giornata!",
+      "visitMessage": "Una nuova visita è stata programmata per te!\n\nTipo: {{visitType}}\nMotivo: {{visitReason}}\nData: {{visitDate}}\n\nPreparati. Grazie!"
+    }
+  },
+  "dateDivider": {
+    "labels": {
+      "dateDivider": "{{date}}"
+    }
+  },
+  "inputBox": {
+    "labels": {
+      "chatInput": "Casella di input della chat",
+      "message": "Messaggio",
+      "alert": "Avviso",
+      "promo": "Promo",
+      "visit": "Visita"
+    },
+    "tooltips": {
+      "selectMessageType": "Seleziona tipo di messaggio",
+      "sendMessage": "Invia messaggio"
+    },
+    "placeholders": {
+      "typeMessage": "Scrivi un messaggio..."
+    }
+  },
+  "messageBubble": {
+    "labels": {
+      "unknownSender": "Mittente Sconosciuto"
+    }
+  },
+  "labels": {
+    "chatInput": "Casella di input della chat",
+    "message": "Messaggio",
+    "alert": "Avviso",
+    "promo": "Promo",
+    "visit": "Visita"
+  },
+  "tooltips": {
+    "selectMessageType": "Seleziona tipo di messaggio",
+    "sendMessage": "Invia messaggio"
+  },
+  "messageStatus": {
+    "sent": "Inviato",
+    "delivered": "Consegnato",
+    "read": "Letto",
+    "pending": "In attesa"
+  },
+  "clientDetails": {
+    "title": "Dettagli Cliente",
+    "expand": "Espandi Dettagli",
+    "collapse": "Riduci Dettagli",
+    "noClientSelected": "Nessun cliente selezionato."
+  },
+  "activePromotions": {
+    "title": "Promozioni Attive",
+    "noActivePromotions": "Nessuna promozione attiva.",
+    "endsAt": "Termina il",
+    "viewAllPromotions": "Visualizza Tutte le Promozioni"
+  },
+  "agentActivity": {
+    "title": "Attività Recente",
+    "noRecentActivities": "Nessuna attività recente.",
+    "occurredAt": "Si è verificato alle",
+    "viewAllPromotions": "Visualizza Tutte le Promozioni"
+  },
+  "calendarComponent": {
+    "recentActivity": "Attività Recente",
+    "selectVisit": "Seleziona una Visita",
+    "noVisits": "Nessuna visita disponibile.",
+    "close": "Chiudi",
+    "occurredAt": "Si è verificato alle"
+  },
+
+  "spentThisMonth": {
+    "titleAgent": "Guadagnato Questo Mese",
+    "titleClient": "Speso Questo Mese",
+    "iconAlt": "Icona del Denaro",
+    "more": "di più",
+    "neutral": "uguale",
+    "less": "di meno",
+    "even": "pari",
+    "comparedToOtherAgents": "rispetto alla media.",
+    "comparedToOtherClients": "rispetto alla media."
+  },
+  "spentThisYear": {
+    "titleAgent": "Guadagnato Quest'Anno",
+    "titleClient": "Speso Quest'Anno",
+    "iconAlt": "Icona Sacco di Denaro",
+    "more": "di più",
+    "neutral": "uguale",
+    "less": "di meno",
+    "even": "pari",
+    "comparedToOtherAgents": "rispetto alla media.",
+    "comparedToOtherClients": "rispetto alla media."
+  },
+  "topArticleType": {
+    "titleAgent": "Più Venduti",
+    "titleClient": "Più Acquistati",
+    "amountPurchased": "Quantità Acquistata",
+    "iconAlt": "Icona che rappresenta il tipo di articolo più venduto"
+  },
+  "totalOrder": {
+    "month": "Mese",
+    "year": "Anno",
+    "ordersThisMonth": "Ordini Questo Mese",
+    "totalOrders": "Ordini Questo Anno",
+    "iconAlt": "Icona Ordini"
+  },
+  "upcomingVisits": {
+    "title": "Prossime Visite",
+    "visitType": "Tipo di Visita",
+    "visitReason": "Motivo della Visita",
+    "clientId": "ID Cliente",
+    "noProgrammedVisits": "Nessuna visita programmata.",
+    "viewDetails": "Visualizza Dettagli",
+    "viewAllVisits": "Visualizza Tutte le Visite",
+    "iconAlt": "Icona Prossime Visite"
+  },
+  "errorBoundary": {
+    "title": "Oops! Qualcosa è andato storto.",
+    "message": "Ci scusiamo per l'inconveniente. Riprova o contatta il supporto se il problema persiste.",
+    "backToHome": "Torna alla Home"
+  },
+  "headerDashboard": "Dashboard",
+  "movements": "Movimenti",
+  "clients": "Clienti",
+  "articles": "Articoli",
+  "visits": "Visite",
+  "promos": "Promozioni",
+  "calendar": "Calendario",
+  "logout": "Disconnettersi",
+  "search": "Cerca",
+  "notifications": "Notifiche",
+  "no_notifications": "Nessuna nuova notifica",
+  "no_messages": "Nessun messaggio",
+  "loggingOut": "Disconnessione in corso...",
+
+  "userAvatar": {
+    "defaultUser": "Utente",
+    "chats": "Chat",
+    "settings": "Impostazioni",
+    "logout": "Disconnettersi"
+  },
+  "auth": {
+    "signIn": "Accedi",
+    "register": "Registrati",
+    "continueToApp": "Continua su {{appName}}",
+    "email": "Email",
+    "password": "Password",
+    "keepMeSignedIn": "Mantienimi connesso",
+    "recommendedOnTrustedDevices": "Consigliato sui dispositivi attendibili",
+    "enterPassword": "Inserisci la password",
+    "forgotPassword": "Password dimenticata?",
+    "newToApp": "Nuovo su {{appName}}?",
+    "createAccount": "Crea un account",
+    "alreadyHaveAccount": "Hai già un account?",
+    "hidePassword": "Nascondi password",
+    "showPassword": "Mostra password",
+    "continueWithGoogle": "Continua con Google",
+    "resetPassword": "Reimposta Password",
+    "resetInstructions": "Se hai dimenticato la password, puoi reimpostarla inserendo la tua email.",
+    "requestResetCode": "Richiedi Codice di Reimpostazione",
+    "verifyCode": "Verifica Codice",
+    "newPassword": "Nuova Password",
+    "confirmPassword": "Conferma Password",
+    "updatePassword": "Aggiorna Password",
+    "passwordUppercaseError": "La password deve includere almeno una lettera maiuscola.",
+    "passwordLowercaseError": "La password deve includere almeno una lettera minuscola.",
+    "passwordNumberError": "La password deve includere almeno un numero.",
+    "passwordSpecialCharError": "La password deve includere almeno un carattere speciale.",
+    "resetCodeSent": "Se esiste un account con quell'email, è stato inviato un codice di reimpostazione.",
+    "requestResetFailed": "Richiesta di reimpostazione password non riuscita. Riprova.",
+    "codeVerified": "Codice verificato con successo. Si prega di impostare una nuova password.",
+    "invalidCode": "Codice non valido o scaduto. Riprova.",
+    "passwordsDoNotMatch": "Le password non coincidono. Riprova.",
+    "passwordUpdated": "Password aggiornata con successo. Ora puoi accedere.",
+    "updatePasswordFailed": "Aggiornamento della password non riuscito. Controlla i tuoi dati.",
+    "enterEmail": "Inserisci la tua email",
+    "enterNewPassword": "Inserisci la tua nuova password",
+    "enterVerificationCode": "Inserisci il codice di verifica fornito nella tua email",
+    "passwordUpdatedToast": "Password aggiornata con successo. Ora puoi accedere!",
+    "registrationSuccess": "Registrazione avvenuta con successo!",
+    "registrationFailed": "Registrazione fallita: {{error}}",
+    "loginFailed": "Accesso fallito: {{message}}",
+    "roleNotAssigned": "Attendi che al tuo account venga assegnato un ruolo prima di tentare di accedere.",
+    "accountVerificationPending": "Il tuo account è ancora in fase di verifica da parte degli amministratori.",
+    "roleFetchingError": "Impossibile recuperare il ruolo utente: {{error}}",
+    "userNotFound": "Impossibile recuperare le informazioni sull'utente.",
+    "errorDuringLogin": "Si è verificato un errore durante l'accesso.",
+    "serverUnreachable": "Il server non è al momento raggiungibile, riprova più tardi.",
+    "logoutSuccess": "Utente disconnesso con successo.",
+    "logoutFailed": "Disconnessione fallita.",
+    "unexpectedError": "Si è verificato un errore imprevisto.",
+    "googleLoginSuccess": "Utente connesso con successo tramite Google OAuth.",
+    "googleLoginFailed": "Autenticazione fallita tramite Google OAuth.",
+    "invalidStateParameter": "Parametro di stato non valido."
+  },
+  "movementDetails": {
+    "id": "ID Elenco",
+    "dateOfOrder": "Data dell'Ordine",
+    "title": "Dettagli del Movimento",
+    "expand": "Espandi dettagli",
+    "collapse": "Comprimi dettagli",
+    "articleId": "ID OEM",
+    "name": "Nome",
+    "brand": "Marca",
+    "quantity": "Quantità",
+    "priceSold": "Venduto a",
+    "unitPrice": "Prezzo Unitario",
+    "priceBought": "Comprato a"
+  },
+  "createPromoForm": {
+    "createTitle": "Crea Nuova Promo",
+    "editTitle": "Modifica Promo",
+    "promoTypeLabel": "Tipo di Promo",
+    "promoTypeContract": "Contratto",
+    "promoTypeSale": "Vendita",
+    "promoTypeExtra": "Extra",
+    "promoTypeRequired": "Il tipo di Promo è obbligatorio",
+    "promoNameLabel": "Nome Promo",
+    "promoNameRequired": "Il nome della Promo è obbligatorio",
+    "startDateLabel": "Data di Inizio",
+    "startDateRequired": "La data di inizio è obbligatoria",
+    "endDateLabel": "Data di Fine",
+    "endDateRequired": "La data di fine è obbligatoria",
+    "endDateValidation": "La data di fine non può essere precedente alla data di inizio.",
+    "discountLabel": "Descrizione dello Sconto",
+    "discountRequired": "La descrizione dello sconto è obbligatoria",
+    "discountHelperText": "ad es. 'Per ogni 100 euro spesi, ottieni un coupon di 10 euro'",
+    "eligibleClientsLabel": "Clienti Idonei",
+    "excludedClientsLabel": "Clienti Esclusi",
+    "createPromo": "Crea Promo",
+    "updatePromo": "Aggiorna Promo",
+    "cancel": "Annulla"
+  },
+  "searchResults": {
+    "id": "ID",
+    "idUnknown": "ID Sconosciuto",
+    "phone": "Telefono",
+    "phoneUnknown": "Telefono Sconosciuto",
+    "email": "Email",
+    "emailUnknown": "Email Sconosciuta",
+    "promoType": "Tipo di Promo",
+    "promoTypeUnknown": "Tipo di Promo Sconosciuto",
+    "discount": "Sconto",
+    "discountUnknown": "Sconto Sconosciuto",
+    "startDate": "Data di Inizio",
+    "startDateUnknown": "Data di Inizio Sconosciuta",
+    "endDate": "Data di Fine",
+    "endDateUnknown": "Data di Fine Sconosciuta",
+    "province": "Provincia",
+    "provinceUnknown": "Provincia Sconosciuta",
+    "paymentMethod": "Metodo di Pagamento",
+    "paymentMethodUnknown": "Metodo di Pagamento Sconosciuto",
+    "types": {
+      "client": "Cliente",
+      "agent": "Agente",
+      "article": "Articolo",
+      "promo": "Promo",
+      "visit": "Visita",
+      "alert": "Allarme"
+    },
+    "noResults": "Nessun risultato trovato.",
+    "articleId": "OEM",
+    "brand": "Marca",
+    "brandUnknown": "Marca Sconosciuta",
+    "lastSoldDate": "Ultima Data di Vendita",
+    "lastSoldDateUnknown": "Ultima Data di Vendita Sconosciuta",
+    "promoIssuedBy": "Emesso da"
+  },
+  "promoDetails": {
+    "notFound": "Dettagli della promo non trovati."
+  },
+  "promo": {
+    "type": "Tipo",
+    "discount": "Sconto",
+    "startDate": "Data di Inizio",
+    "endDate": "Data di Fine",
+    "global": "Globale",
+    "notGlobal": "Non Globale",
+    "issuedBy": "Emesso da",
+    "edit": "Modifica Promo",
+    "editTooltip": "Modifica Promo",
+    "terminate": "Termina Promo",
+    "terminateTooltip": "Termina Promo",
+    "deselect": "Deseleziona Promo",
+    "deselectTooltip": "Deseleziona Promo"
+  },
+  "eligibleClients": {
+    "includedClients": "Clienti Inclusi",
+    "excludedClients": "Clienti Esclusi",
+    "switchToManual": "Passa alla selezione manuale",
+    "switchToGlobal": "Passa alla selezione globale",
+    "globalPromo": "Promo Globale",
+    "manualSelection": "Selezione Manuale",
+    "noClients": "Nessun cliente da visualizzare"
+  },
+  "promosSidebar": {
+    "title": "Promo",
+    "refreshPromos": "Aggiorna Promo",
+    "createPromo": "Crea Promo",
+    "searchPlaceholder": "Cerca Promo",
+    "noPromosFound": "Nessuna promo trovata.",
+    "type": "Tipo"
+  },
+  "common": {
+    "loading": "Caricamento in corso...",
+    "errorFetchingArticles": "Errore nel recupero degli articoli.",
+    "errorUpdatingSettings": "Aggiornamento delle impostazioni fallito",
+    "unknownError": "Si è verificato un errore sconosciuto"
+  },
+  "articleList": {
+    "title": "Elenco Articoli",
+    "quickFilterPlaceholder": "Cerca articoli...",
+    "quickFilterAriaLabel": "Filtro rapido per l'elenco articoli.",
+    "exportCSV": "Esporta come CSV",
+    "expand": "Espandi elenco articoli.",
+    "collapse": "Comprimi elenco articoli.",
+    "options": "Opzioni"
+  },
+  "movementList": {
+    "title": "Elenco Movimenti",
+    "quickFilterPlaceholder": "Cerca movimenti...",
+    "startDate": "Data di Inizio",
+    "endDate": "Data di Fine",
+    "exportCSV": "Esporta come CSV",
+    "expand": "Espandi elenco movimenti.",
+    "collapse": "Comprimi elenco movimenti.",
+    "options": "Opzioni"
+  },
+  "appSettings": {
+    "title": "Impostazioni App",
+    "toggleNotifications": "Attiva/Disattiva Notifiche",
+    "enableNotificationsAria": "Abilita Notifiche",
+    "receiveBrowserNotifications": "Ricevi notifiche del browser",
+    "notificationsInfo": "Per ricevere notifiche, consenti le notifiche nelle impostazioni del tuo browser.",
+    "notificationsEnabled": "Le notifiche sono state abilitate.",
+    "notificationsDisabled": "Le notifiche sono state disabilitate.",
+    "notificationGranted": "Autorizzazione per le notifiche concessa.",
+    "notificationDenied": "Autorizzazione per le notifiche negata.",
+    "chooseTheme": "Scegli Tema",
+    "themePreference": "Preferenza Tema",
+    "themePreferenceTooltip": "Se selezioni \"Auto\", il tema corrisponderà alle preferenze del sistema.",
+    "light": "Chiaro",
+    "dark": "Scuro",
+    "auto": "Automatico",
+    "themeChanged": "Tema cambiato in {{theme}}."
+  },
+  "modifyAccount": {
+    "invalidEmail": "L'email non è valida.",
+    "passwordUppercase": "La password deve includere almeno una lettera maiuscola.",
+    "passwordLowercase": "La password deve includere almeno una lettera minuscola.",
+    "passwordNumber": "La password deve includere almeno un numero.",
+    "passwordSpecialChar": "La password deve includere almeno un carattere speciale.",
+    "emailUpdated": "Informazioni sull'account aggiornate. Sarai disconnesso.",
+    "passwordUpdated": "Password aggiornata. Sarai disconnesso.",
+    "updateEmailFailed": "Aggiornamento delle informazioni dell'account fallito: {{message}}",
+    "updatePasswordFailed": "Aggiornamento della password fallito: {{message}}",
+    "updateEmailUnknownError": "Aggiornamento delle informazioni dell'account fallito: Si è verificato un errore sconosciuto.",
+    "updatePasswordUnknownError": "Aggiornamento della password fallito: Si è verificato un errore sconosciuto.",
+    "title": "Modifica Account",
+    "modifyEmail": "Modifica Email",
+    "currentEmail": "Email Attuale",
+    "currentPassword": "Password Attuale",
+    "newEmail": "Nuova Email",
+    "updateEmailButton": "Aggiorna Email",
+    "updateEmailButtonTooltip": "Clicca per aggiornare la tua email",
+    "updateEmailButtonAria": "Aggiorna Email",
+    "modifyPassword": "Modifica Password",
+    "newPassword": "Nuova Password",
+    "updatePasswordButton": "Aggiorna Password",
+    "updatePasswordButtonTooltip": "Clicca per aggiornare la tua password",
+    "updatePasswordButtonAria": "Aggiorna Password",
+    "showPassword": "Mostra password",
+    "hidePassword": "Nascondi password",
+    "showNewPassword": "Mostra nuova password",
+    "hideNewPassword": "Nascondi nuova password",
+    "currentEmailAria": "Email Attuale",
+    "newEmailAria": "Nuova Email",
+    "currentPasswordAria": "Password Attuale",
+    "newPasswordAria": "Nuova Password",
+    "emailErrors": {
+      "invalidEmail": "Indirizzo email non valido.",
+      "emailRequired": "L'email è obbligatoria."
+    },
+    "passwordErrors": {
+      "invalidPassword": "La password non soddisfa i criteri.",
+      "passwordRequired": "La password è obbligatoria."
+    },
+    "googleManagedTitle": "Account Gestito da Google",
+    "googleManagedDescription": "Il tuo account è gestito da Google. Utilizza i servizi di Google per modificare il tuo account.",
+    "alerts": {
+      "error": "Si è verificato un errore.",
+      "success": "Operazione avvenuta con successo."
+    }
+  },
+  "sidebar": {
+    "userSettings": "Impostazioni Utente",
+    "accountSettings": "Impostazioni Account",
+    "appSettings": "Impostazioni App",
+    "manageUsers": "Gestisci Utenti"
+  },
+  "manageUsers": {
+    "title": "Gestisci Utenti",
+    "columns": {
+      "email": "Email",
+      "authType": "Tipo di Autenticazione",
+      "emailVerified": "Email Verificata",
+      "role": "Ruolo",
+      "entityCode": "Codice Ente",
+      "entityName": "Nome Ente",
+      "createdAt": "Creato il"
+    },
+    "infoTooltip": "Perché un utente possa utilizzare l'app, deve essere assegnato a un ente. Puoi usare la tabella qui sotto per selezionare un utente facendo doppio clic sull'email, e quindi procedere con l'assegnazione dell'ente.",
+    "selectUserPrompt": "Seleziona un utente per assegnare un ente",
+    "selectedUser": "Utente selezionato: ",
+    "userDeselected": "Utente deselezionato",
+    "yes": "Sì",
+    "no": "No",
+    "na": "N/A",
+    "userTable": "Tabella Utenti"
+  },
+  "userCard": {
+    "avatarAlt": "Avatar di",
+    "role": "Ruolo",
+    "code": "Codice",
+    "name": "Nome",
+    "none": "Nessuno"
+  },
+  "userDetails": {
+    "goBack": "Torna indietro",
+    "selectRole": "Seleziona un nuovo ruolo.",
+    "roleSelection": "Selezione del ruolo",
+    "selectClient": "Seleziona ruolo Cliente",
+    "selectAgent": "Seleziona ruolo Agente",
+    "selectAdmin": "Seleziona ruolo Amministratore",
+    "client": "Cliente",
+    "agent": "Agente",
+    "admin": "Amministratore",
+    "selectEntity": "Seleziona un ente facendo doppio clic su di esso.",
+    "searchPlaceholder": "Cerca {{role}} per nome o ID",
+    "loadingEntities": "Caricamento enti in corso...",
+    "startTyping": "Inizia a digitare per cercare",
+    "entityName": "Nome",
+    "entityId": "ID",
+    "saveChanges": "Salva",
+    "success": "Modifiche salvate con successo!",
+    "error": "Si è verificato un errore. Riprova.",
+    "updateSuccess": "Utente aggiornato con successo.",
+    "updateSuccessToast": "Utente aggiornato con successo.",
+    "updateFailed": "Aggiornamento utente fallito: {{message}}",
+    "updateFailedToast": "Aggiornamento utente fallito: {{message}}",
+    "updateUnknownError": "Aggiornamento utente fallito: Si è verificato un errore sconosciuto.",
+    "updateUnknownErrorToast": "Aggiornamento utente fallito: Si è verificato un errore sconosciuto.",
+    "userIdUndefined": "ID Utente non definito.",
+    "userIdUndefinedToast": "ID Utente non definito.",
+    "loadAdminsErrror": "Errore nel caricamento degli amministratori. Riprova."
+  },
+  "createVisitForm": {
+    "title": "Crea Nuova Visita",
+    "typeLabel": "Tipo",
+    "regular": "Regolare",
+    "urgent": "Urgente",
+    "reasonLabel": "Motivo",
+    "issue": "Problema",
+    "routine": "Routine",
+    "newClient": "Nuovo Cliente",
+    "publicNoteLabel": "Nota Pubblica",
+    "publicNoteTooltip": "Inserisci una nota pubblica per la visita.",
+    "privateNoteLabel": "Nota Privata*",
+    "privateNoteTooltip": "La nota privata è visibile solo a te e agli amministratori.",
+    "privateNotePlaceholder": "La nota privata è visibile solo a te e agli amministratori.",
+    "selectDateTime": "Seleziona Data e Ora",
+    "sendVisitTooltip": "Invia Visita",
+    "sendVisit": "Invia Visita",
+    "cancelTooltip": "Annulla",
+    "cancel": "Annulla",
+    "fillAllFields": "Si prega di compilare tutti i campi richiesti.",
+    "visitCreated": "Visita creata con successo.",
+    "creationFailed": "Creazione della visita fallita: ",
+    "creationFailedUnknown": "Creazione della visita fallita: Si è verificato un errore sconosciuto.",
+    "cancelDialogTitle": "Annulla Creazione Visita",
+    "cancelDialogDescription": "Sei sicuro di voler annullare la creazione di questa visita? Tutte le informazioni inserite andranno perse.",
+    "no": "No",
+    "yes": "Sì"
+  },
+  "clientDetailsCard": {
+    "code": "Codice",
+    "address": "Indirizzo",
+    "province": "Provincia",
+    "na": "N/A",
+    "email": "Email",
+    "phone": "Telefono",
+    "paymentMethod": "Metodo di Pagamento",
+    "agent": "Agente",
+    "createVisitTooltip": "Crea una nuova visita",
+    "createVisit": "Crea Visita",
+    "deselectClientTooltip": "Deseleziona cliente corrente",
+    "deselectClient": "Deseleziona Cliente",
+    "cancelDialogTitle": "Deseleziona Cliente",
+    "cancelDialogDescription": "Sei sicuro di voler deselezionare il cliente corrente? Tutte le modifiche non salvate andranno perse.",
+    "no": "No",
+    "yes": "Sì"
+  },
+  "visitCard": {
+    "avatarAlt": "Avatar",
+    "visitFor": "Visita per",
+    "type": "Tipo",
+    "reason": "Motivo",
+    "date": "Data",
+    "publicNote": "Nota Pubblica",
+    "privateNote": "Nota Privata",
+    "completed": "Completata",
+    "issuedBy": "Emessa da",
+    "na": "N/A",
+    "unknown": "Sconosciuto",
+    "yes": "Sì",
+    "no": "No"
+  },
+  "editVisitForm": {
+    "title": "Modifica Visita",
+    "fillAllFields": "Si prega di compilare tutti i campi richiesti.",
+    "updateSuccess": "Visita aggiornata con successo.",
+    "updateFailed": "Aggiornamento della visita fallito: {{message}}",
+    "updateFailedUnknown": "Aggiornamento della visita fallito: Si è verificato un errore sconosciuto.",
+    "dateLabel": "Data",
+    "publicNoteLabel": "Nota Pubblica",
+    "publicNoteTooltip": "Inserisci una nota pubblica per la visita.",
+    "privateNoteLabel": "Nota Privata",
+    "privateNoteTooltip": "Inserisci una nota privata per la visita.",
+    "privateNotePlaceholder": "La nota privata è visibile solo a te e agli amministratori.",
+    "typeLabel": "Tipo",
+    "regular": "Regolare",
+    "urgent": "Urgente",
+    "reasonLabel": "Motivo",
+    "issue": "Problema",
+    "routine": "Routine",
+    "newClient": "Nuovo Cliente",
+    "saveChangesTooltip": "Salva modifiche",
+    "cancelTooltip": "Annulla",
+    "cancelDialogTitle": "Annulla Modifica",
+    "cancelDialogDescription": "Sei sicuro di voler annullare la modifica di questa visita? Tutte le modifiche non salvate andranno perse.",
+    "no": "No",
+    "yes": "Sì",
+    "completedLabel": "Segna come Completata",
+    "cancelledLabel": "Segna come Annullata",
+    "pendingLabel": "In sospeso",
+    "completedStatus": "Completata",
+    "cancelledStatus": "Annullata"
+  },
+  "visitsSidebar": {
+    "goBack": "Torna Indietro",
+    "goBackTooltip": "Torna agli Agenti",
+    "agents": "Agenti",
+    "clients": "Clienti",
+    "visits": "Visite",
+    "refresh": "Aggiorna Visite",
+    "refreshTooltip": "Aggiorna Visite",
+    "searchTooltip": "Cerca",
+    "searchAgents": "Cerca Agenti",
+    "searchClients": "Cerca Clienti",
+    "id": "ID",
+    "code": "Codice",
+    "province": "Provincia",
+    "na": "N/A",
+    "pendingVisits": "Ha Visite In Sospeso",
+    "incompleteVisits": "Ha Visite Incomplete",
+    "pendingCount": "{{count}} Visite in sospeso",
+    "incompleteCount": "{{count}} Visite incomplete",
+    "unknown": "Sconosciuto"
+  },
+  "visitsTable": {
+    "tableAriaLabel": "Tabella delle Visite",
+    "type": "Tipo",
+    "reason": "Motivo",
+    "date": "Data",
+    "completed": "Completata",
+    "pending": "In sospeso",
+    "createdAt": "Creato il",
+    "na": "N/A",
+    "yes": "Sì",
+    "no": "No",
+    "selectVisitError": "Impossibile selezionare la visita.",
+    "noVisits": "Nessuna visita trovata per questo cliente.",
+    "unknown": "Sconosciuto"
+  },
+  "calendarHook": {
+    "weekendsNotSelectable": "I fine settimana non sono selezionabili.",
+    "pastDateError": "Non puoi creare un evento nel passato.",
+    "selectedDateRange": "Intervallo di date selezionato da {{start}} a {{end}}.",
+    "eventUpdatedSuccess": "Evento aggiornato con successo!",
+    "eventCreatedSuccess": "Evento creato con successo!",
+    "eventSubmitFailedWithError": "Invio dell'evento fallito: {{error}}",
+    "eventSubmitFailed": "Invio dell'evento fallito.",
+    "eventIdMissing": "ID dell'evento mancante.",
+    "eventDeletedSuccess": "Evento eliminato con successo!",
+    "eventDeleteFailedWithError": "Eliminazione dell'evento fallita: {{error}}",
+    "eventDeleteFailed": "Eliminazione dell'evento fallita.",
+    "editingEvent": "Modifica evento: {{reason}}",
+    "formCanceled": "Modulo annullato.",
+    "switchedToView": "Passato alla vista {{view}}.",
+    "visitEventName": "Visita per ID: {{clientId}}",
+    "selectedVisit": "Visita selezionata: {{reason}} il {{date}}.",
+    "visitsNotEditable": "Le visite non possono essere modificate dal calendario.",
+    "selectedEvent": "{{reason}} selezionato il {{date}}.",
+    "roleNotAssigned": "Attendi che al tuo account venga assegnato un ruolo prima di tentare di accedere.",
+    "accountVerificationPending": "Il tuo account è ancora in fase di verifica da parte degli amministratori.",
+    "roleFetchingError": "Impossibile recuperare il ruolo dell'utente.",
+    "errorDuringLogin": "Si è verificato un errore durante l'accesso: {{error}}",
+    "registrationSuccess": "Registrazione avvenuta con successo: {{message}}",
+    "registrationFailed": "Registrazione fallita: {{message}}",
+    "loginFailed": "Accesso fallito: {{message}}",
+    "viewModes": {
+      "calendar": "calendario",
+      "history": "storia"
+    },
+    "userNotAuthenticated": "Utente non autenticato."
+  },
+  "createChatForm": {
+    "title": "Crea Nuova Chat",
+    "tooltips": {
+      "groupChat": "Crea Chat di Gruppo",
+      "broadcastChat": "Crea Chat Broadcast",
+      "cancel": "Annulla",
+      "create": "Crea Chat"
+    },
+    "labels": {
+      "groupName": "Nome Gruppo",
+      "broadcastName": "Nome Broadcast",
+      "selectParticipants": "Seleziona Partecipanti",
+      "cancel": "Annulla",
+      "create": "Crea Chat",
+      "searchUsers": "Cerca Utenti",
+      "findParticipants": "Trova Partecipanti"
+    },
+    "errors": {
+      "noParticipants": "Seleziona almeno un partecipante.",
+      "chatNameRequired": "Il nome della chat è obbligatorio.",
+      "createChatFailed": "Creazione della chat fallita. Riprova."
+    },
+    "success": {
+      "createChat": "Chat creata con successo!"
+    },
+    "userList": {
+      "table": "Tabella di Selezione Utenti",
+      "unknownUser": "Utente Sconosciuto",
+      "unknownEmail": "Email Sconosciuta",
+      "headers": {
+        "name": "Nome",
+        "email": "Email"
+      }
+    }
+  },
+  "chats": {
+    "error": "Si è verificato un errore con le chat:",
+    "defaultTitle": "Chat",
+    "groupTitle": "Chat di Gruppo"
+  },
+  "errors": {
+    "userNotFound": "Utente con ID {{id}} non trovato.",
+    "adminNotFound": "Amministratore con ID {{id}} non trovato.",
+    "unknown": "Si è verificato un errore sconosciuto.",
+    "unknownAgent": "Agente Sconosciuto",
+    "searchFailed": "Ricerca fallita. Riprova."
+  },
+  "signin": {
+    "loginSuccess": "Accesso avvenuto con successo!",
+    "registrationSuccess": "Registrazione avvenuta con successo!",
+    "loginWithGoogleSuccess": "Accesso con Google avvenuto con successo!",
+    "passwordMismatch": "Le password non coincidono."
+  },
+  "promoForm": {
+    "success": "Promo inviata con successo!",
+    "updateFailed": "Invio della promo fallito: {{message}}",
+    "unknownError": "Invio della promo fallito: Si è verificato un errore sconosciuto."
+  },
+  "usePromos": {
+    "createSuccess": "Promo creata con successo!",
+    "createFailed": "Creazione della promo fallita: {{message}}",
+    "createUnknownError": "Creazione della promo fallita: Si è verificato un errore sconosciuto.",
+    "updateMissingId": "ID promo mancante per l'aggiornamento.",
+    "updateSuccess": "Promo aggiornata con successo!",
+    "updateFailed": "Aggiornamento della promo fallito: {{message}}",
+    "updateUnknownError": "Aggiornamento della promo fallito: Si è verificato un errore sconosciuto.",
+    "sunsetNoPromoSelected": "Nessuna promo selezionata per il tramonto.",
+    "sunsetMissingId": "ID promo mancante per il tramonto.",
+    "sunsetSuccess": "Promo terminata con successo.",
+    "sunsetFailed": "Termine della promo fallito: {{message}}",
+    "sunsetUnknownError": "Termine della promo fallito: Si è verificato un errore sconosciuto.",
+    "editNoPromoSelected": "Nessuna promo selezionata per la modifica.",
+    "refreshSuccess": "Promo aggiornate con successo."
+  },
+  "resizeObserver": {
+    "unsupported": "ResizeObserver non è supportato nel tuo browser. Aggiorna o utilizza un browser diverso."
+  },
+  "useVisits": {
+    "agentSelected": "Agente selezionato con successo.",
+    "clientSelected": "Cliente selezionato con successo.",
+    "backToAgents": "Ritornato all'elenco degli agenti.",
+    "visitCreated": "Visita creata con successo.",
+    "failedToCreateVisit": "Creazione della visita fallita. Riprova.",
+    "visitsRefreshed": "Visite aggiornate con successo.",
+    "failedToRefreshVisits": "Aggiornamento delle visite fallito. Riprova.",
+    "agentNotFound": "Agente selezionato non trovato."
+  },
+  "useStatsToasts": {
+    "loadingData": "Caricamento dati in corso...",
+    "successData": "Dati recuperati con successo!",
+    "failedData": "Recupero dei dati fallito. Riprova aggiornando la pagina o torna più tardi.",
+    "errorMessage": "Errore: {{message}}",
+    "unknownError": "Si è verificato un errore sconosciuto durante il recupero dei dati. Prova ad aggiornare la pagina o contatta l'assistenza.",
+    "retryingData": "Tentativo di recuperare i dati iniziali... (Tentativo #{{attempt}})"
+  },
+  "webSocketService": {
+    "lostConnection": "Connessione al server persa, tentativo di riconnessione in corso...",
+    "connectionEstablished": "Connessione al server stabilita.",
+    "connectionLost": "Connessione al server persa, aggiorna la pagina o riprova più tardi."
+  },
+  "dashboard": {
+    "welcomeBack": "Bentornato, {{name}}!",
+    "statisticsFor": "Statistiche per {{name}}",
+    "yourStatistics": "Le Tue Statistiche",
+    "calendar": "Calendario",
+    "loadingWelcome": "Caricamento benvenuto",
+    "skeleton": "Caricamento contenuti",
+    "loadingStatistics": "Caricamento statistiche",
+    "loadingText": "Caricamento testo",
+    "calendarButton": "Apri Calendario",
+    "closeButton": "Chiudi Selezione",
+    "activePromotions": "Promozioni Attive",
+    "agentActivityOverview": "Panoramica Attività Agente",
+    "spentThisMonth": "Speso Questo Mese",
+    "spentThisYear": "Speso Quest'Anno",
+    "topArticleType": "Tipi di Articoli Più Venduti",
+    "monthOverMonthSpendingTrend": "Andamento Mensile della Spesa",
+    "topBrandsSold": "Marchi Più Venduti",
+    "totalEarning": "Guadagni Totali",
+    "totalOrders": "Ordini Totali",
+    "salesDistribution": "Distribuzione delle Vendite",
+    "upcomingVisits": "Visite in Arrivo",
+    "yourCalendar": "Il Tuo Calendario"
+  },
+  "articlesPage": {
+    "name": "Nome",
+    "brand": "Marca",
+    "oemId": "ID OEM",
+    "unitPrice": "Prezzo Unitario",
+    "cost": "Costo",
+    "quantitySold": "Quantità Venduta"
+  },
+  "movementsPage": {
+    "id": "ID Elenco",
+    "clientName": "Cliente",
+    "agentName": "Agente",
+    "dateOfOrder": "Data",
+    "totalQuantity": "Articoli venduti",
+    "totalPriceSold": "Totale"
+  },
+  "status": {
+    "pending": "In Sospeso",
+    "approved": "Approvato",
+    "rejected": "Rifiutato",
+    "cancelled": "Annullato"
+  },
+  "eventHistoryTooltips": {
+    "approve": "Approva Evento",
+    "reject": "Rifiuta Evento",
+    "delete": "Elimina Evento",
+    "edit": "Modifica Evento",
+    "visit": "Vai alla Visita"
+  },
+  "eventHistory": {
+    "title": "Cronologia degli Eventi",
+    "headers": {
+      "user": "Utente",
+      "eventType": "Tipo di Evento",
+      "reason": "Motivo",
+      "startDate": "Data di Inizio",
+      "endDate": "Data di Fine",
+      "status": "Stato",
+      "actions": "Azioni"
+    },
+    "actions": {
+      "na": "N/A"
+    },
+    "toast": {
+      "approveSuccess": "Evento approvato con successo.",
+      "approveFailure": "Approvazione dell'evento fallita.",
+      "rejectSuccess": "Evento rifiutato con successo.",
+      "rejectFailure": "Rifiuto dell'evento fallito.",
+      "genericError": "Si è verificato un errore."
+    }
   }
 }
