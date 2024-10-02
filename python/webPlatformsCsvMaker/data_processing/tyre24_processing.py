@@ -2,11 +2,12 @@ import numpy as np
 import pandas as pd
 
 
-def process_tyre24(
-    merged_df,
-    tecdoc_file_path,
-    update_progress=None,
-):
+def process_tyre24(merged_df, tecdoc_file_path, markup_it, shipping_it, markup_de, shipping_de):
+
+
+
+
+
     # print("process_tyre24 function started")
     # Rename the columns
     merged_df.columns = [
@@ -17,7 +18,6 @@ def process_tyre24(
         "PRZ. ULT. ACQ.",
     ]
     # print("Columns renamed")
-
 
     # Add two new columns and reorder them
     merged_df["Price_Italia"] = pd.NA
@@ -159,8 +159,8 @@ def process_tyre24(
     ] = ""
 
     # Multiply PRZ. ULT. ACQ. by 1.25 for both Price_Italia and Price_Germany
-    merged_df["Price_Italia"] = merged_df["PRZ. ULT. ACQ."] * 1.25
-    merged_df["Price_Germany"] = merged_df["PRZ. ULT. ACQ."] * 1.25
+    merged_df["Price_Italia"] = merged_df["PRZ. ULT. ACQ."] * markup_it
+    merged_df["Price_Germany"] = merged_df["PRZ. ULT. ACQ."] * markup_de
 
     # Apply the custom pricing logic from Tulero
 
@@ -168,8 +168,8 @@ def process_tyre24(
     merged_df = merged_df[merged_df["Price_Italia"] >= 4.50]
 
     # Add 7.50 to Price_Italia and 10.50 to Price_Germany
-    merged_df["Price_Italia"] = merged_df["Price_Italia"] + 7.50
-    merged_df["Price_Germany"] = merged_df["Price_Germany"] + 10.50
+    merged_df["Price_Italia"] = merged_df["Price_Italia"] + shipping_it
+    merged_df["Price_Germany"] = merged_df["Price_Germany"] + shipping_de
 
     # Define the custom rounding function
     def custom_round(price):

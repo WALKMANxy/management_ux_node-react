@@ -1,1 +1,22 @@
-{"articles_file": "Z:/My Drive/rcs/Web/Tulero/app/data/mgs010_Stampa Anagrafica Articoli al 21-08 con upa e giac.xls", "oem_folder": "Z:/My Drive/rcs/Web/Tulero/app/data/oems", "brands_file": "Z:/My Drive/rcs/Web/Tulero/app/data/BRANDS.csv", "output_folder": "D:/coding/rcs_management_project-1/python/webPlatformsCsvMaker/Output", "warehouse_file": "Z:/My Drive/rcs/Web/Tulero/app/data/mgs010_Stampa Anagrafica Articoli al 21-08 con ubi e giac.xls", "tecdoc_file": "X:/artor/Downloads/tecdoc_brand_id.csv", "tulero_ftp_host": "supplier.tulero.it", "tulero_ftp_user": "s-rcs", "tulero_ftp_pass": "n9c6a5?W8", "tulero_ftp_dir": "/test/", "tyre24_ftp_host": "ftps.alzura.com", "tyre24_ftp_user": "ftp204856", "tyre24_ftp_pass": "h1MH5FEL", "tyre24_ftp_dir": "/test/"}
+{
+    "articles_file": "Z:/My Drive/rcs/Web/Tulero/app/data/mgs010_Stampa Anagrafica Articoli al 21-08 con upa e giac.xls",
+    "oem_folder": "Z:/My Drive/rcs/Web/Tulero/app/data/oems",
+    "brands_file": "Z:/My Drive/rcs/Web/Tulero/app/data/BRANDS.csv",
+    "output_folder": "Z:/My Drive/rcs/Web/Web Platforms Stock Uploader/output",
+    "warehouse_file": "Z:/My Drive/rcs/Web/Tulero/app/data/mgs010_Stampa Anagrafica Articoli al 21-08 con ubi e giac.xls",
+    "tecdoc_file": "X:/artor/Downloads/tecdoc_brand_id.csv",
+    "tulero_ftp_host": "supplier.tulero.it",
+    "tulero_ftp_user": "s-rcs",
+    "tulero_ftp_pass": "n9c6a5?W8",
+    "tulero_ftp_dir": "/test/",
+    "tyre24_ftp_host": "ftps.alzura.com",
+    "tyre24_ftp_user": "ftp204856",
+    "tyre24_ftp_pass": "h1MH5FEL",
+    "tyre24_ftp_dir": "/test/",
+    "tulero_markup": 1.25,
+    "tulero_shipping": 7.5,
+    "tyre24_markup_it": 1.25,
+    "tyre24_shipping_it": 7.5,
+    "tyre24_markup_de": 1.25,
+    "tyre24_shipping_de": 10.5
+}
