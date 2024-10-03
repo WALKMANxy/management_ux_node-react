@@ -840,7 +840,7 @@
     "agent": "Agent",
     "admin": "Admin",
     "selectEntity": "Select an entity by double-clicking them.",
-    "searchPlaceholder": "Search {{role}}s by name or ID",
+    "searchPlaceholder": "Search by name or ID",
     "loadingEntities": "Loading entities...",
     "startTyping": "Start typing to search",
     "entityName": "Name",
@@ -996,7 +996,7 @@
     "yes": "Yes",
     "no": "No",
     "selectVisitError": "Unable to select visit.",
-    "noVisits": "No visits found for this client.",
+    "noVisits": "No visits found.",
     "unknown": "Unknown"
   },
   "calendarHook": {
