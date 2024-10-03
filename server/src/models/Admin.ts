@@ -1,4 +1,5 @@
-import { Document, Schema, model } from "mongoose";
+// src/models/AdminModel.ts
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IAdmin extends Document {
   id: string;
@@ -6,10 +7,14 @@ export interface IAdmin extends Document {
   email: string;
 }
 
-const adminSchema = new Schema<IAdmin>({
-  id: { type: String, required: true },
+const AdminSchema: Schema = new Schema({
+  id: { type: String, required: true, unique: true },
   name: { type: String, required: true },
-  email: { type: String, required: false, default: "" },
+  email: { type: String, required: true, unique: true },
 });
 
-export const Admin = model<IAdmin>("Admin", adminSchema);
+AdminSchema.index({ id: 1 });
+AdminSchema.index({ email: 1 });
+
+
+export default mongoose.model<IAdmin>('Admin', AdminSchema);

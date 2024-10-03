@@ -1,115 +1,132 @@
-//src/controllers/agentController.ts
-import { Request, Response } from "express";
-import { AuthenticatedRequest } from "../models/types";
+// src/controllers/agentController.ts
+import { Request, Response } from 'express';
 import {
   getAgentByClientEntityCode,
   getAgentById,
-  getAgentsFromFile,
+  getAllAgents,
   replaceAgentById,
   updateAgentById,
-} from "../services/agentService";
+} from '../services/agentService';
+import { AuthenticatedRequest } from '../models/types'; // Ensure this type is correctly defined
+import { IAgent } from '../models/Agent';
 
-export const fetchAllAgents = (req: Request, res: Response) => {
+/**
+ * Fetch all agents.
+ */
+export const fetchAllAgents = async (req: Request, res: Response) => {
   try {
-    const agents = getAgentsFromFile();
+    const agents = await getAllAgents();
+
+    // Map agents to include empty agents and clients arrays if necessary
+    // Assuming you want to include clients as part of Agent, skip this step
     res.json(agents);
-    return;
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-    return;
+    console.error('Error in fetchAllAgents:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
-export const fetchAgentById = (req: Request, res: Response) => {
+/**
+ * Fetch an agent by ID.
+ */
+export const fetchAgentById = async (req: Request, res: Response) => {
   try {
-    const agent = getAgentById(req.params.id);
+    const agent = await getAgentById(req.params.id);
     if (!agent) {
-      return res.status(404).json({ message: "Agent not found" });
+      return res.status(404).json({ message: 'Agent not found' });
     }
     res.json(agent);
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-    return;
+    console.error(`Error in fetchAgentById for id ${req.params.id}:`, error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
-// New controller function to fetch an agent by client entity code
-export const fetchAgentByClientEntityCode = (
+/**
+ * Fetch an agent by client's entity code.
+ */
+export const fetchAgentByClientEntityCode = async (
   req: AuthenticatedRequest,
   res: Response
 ) => {
   try {
     if (!req.user || !req.user.entityCode) {
       console.error(
-        "Unauthorized access: User information is missing or incomplete."
+        'Unauthorized access: User information is missing or incomplete.'
       );
       return res.status(401).json({
-        message: "Unauthorized: User information is missing or incomplete.",
+        message: 'Unauthorized: User information is missing or incomplete.',
       });
     }
     const clientEntityCode = req.user.entityCode;
-  /*   console.log(
-      "fetchAgentByClientEntityCode called with entityCode:",
-      clientEntityCode
-    ); // Debugging */
 
-    const agent = getAgentByClientEntityCode(clientEntityCode);
+    const agent = await getAgentByClientEntityCode(clientEntityCode);
 
     if (!agent) {
       console.warn(
-        "Agent not found for the given client entity code:",
+        'Agent not found for the given client entity code:',
         clientEntityCode
-      ); // Debugging
+      );
       return res
         .status(404)
-        .json({ message: "Agent not found for the given client" });
+        .json({ message: 'Agent not found for the given client' });
     }
 
-/*     console.log("Agent found:", agent); // Debugging
- */    res.json(agent);
-    return;
+    res.json(agent);
   } catch (error) {
-    console.error("Error in fetchAgentByClientEntityCode:", error); // Debugging
-    res.status(500).json({ message: "Internal Server Error" });
-    return;
+    console.error('Error in fetchAgentByClientEntityCode:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
-export const updateAgent = (req: Request, res: Response) => {
+/**
+ * Update an agent by ID.
+ */
+export const updateAgent = async (req: Request, res: Response) => {
   try {
-    const updatedAgent = updateAgentById(req.params.id, req.body);
+    const updatedAgent = await updateAgentById(req.params.id, req.body);
     if (!updatedAgent) {
-      return res.status(404).json({ message: "Agent not found" });
+      return res.status(404).json({ message: 'Agent not found' });
     }
     res
       .status(200)
-      .json({ message: "Agent updated successfully", updatedAgent });
-    return;
+      .json({ message: 'Agent updated successfully', updatedAgent });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-    return;
+    console.error(`Error in updateAgent for id ${req.params.id}:`, error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
-export const replaceAgent = (req: Request, res: Response) => {
+/**
+ * Replace an agent by ID.
+ */
+export const replaceAgent = async (req: Request, res: Response) => {
   try {
-    const replacedAgent = replaceAgentById(req.params.id, {
+    const { id, name, email, phone, clients } = req.body;
+
+    // Validate required fields
+    if (!id || !name) {
+      return res
+        .status(400)
+        .json({ message: 'Agent ID and name are required for replacement' });
+    }
+
+    const replacedAgent = await replaceAgentById(req.params.id, {
       id: req.params.id,
-      name: req.body.name,
-      email: req.body.email,
-      phone: req.body.phone,
-      clients: req.body.clients,
-    });
+      name,
+      email,
+      phone,
+      clients: clients || [],
+    } as IAgent); // Ensure type casting aligns with your IAgent interface
 
     if (!replacedAgent) {
-      return res.status(404).json({ message: "Agent not found" });
+      return res.status(404).json({ message: 'Agent not found' });
     }
     res
       .status(200)
-      .json({ message: "Agent replaced successfully", replacedAgent });
-    return;
+      .json({ message: 'Agent replaced successfully', replacedAgent });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-    return;
+    console.error(`Error in replaceAgent for id ${req.params.id}:`, error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
