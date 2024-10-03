@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { logger } from "../utils/logger";
 
-const nodeEnv = process.env.NODE_ENV
+const nodeEnv = process.env.NODE_ENV;
 
 // Function to load environment-specific .env file
 const loadEnvFile = () => {
@@ -31,10 +31,6 @@ export const config = {
   smtpPass: process.env.SMTP_PASS || "",
   sslKeyPath: process.env.SSL_KEY_PATH || "",
   sslCertPath: process.env.SSL_CERT_PATH || "",
-  clientDetailsFilePath: process.env.CLIENT_DETAILS_FILE_PATH || "",
-  jsonFilePath: process.env.JSON_FILE_PATH || "",
-  agentDetailsFilePath: process.env.AGENT_DETAILS_FILE_PATH || "",
-  adminDetailsFilePath: process.env.ADMIN_DETAILS_FILE_PATH || "",
   ipinfoToken: process.env.IPINFO_TOKEN || "",
   googleClientId: process.env.GOOGLE_CLIENT_ID || "",
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || "",

@@ -91,14 +91,7 @@ export const login = async (req: Request, res: Response) => {
       session = await createSession(user.id, sessionToken, req);
     }
 
-    // Log the cookie being set
-   /*  console.log("Setting session cookie with attributes:", {
-      sessionToken,
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    }); */
-
+   
     // Set the session token in the cookie
     res.cookie("sessionToken", sessionToken, {
       httpOnly: true,
