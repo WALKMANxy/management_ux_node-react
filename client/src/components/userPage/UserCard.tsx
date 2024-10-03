@@ -13,9 +13,8 @@ const CardContainer = styled(Box)(
     alignItems: "center",
     padding: theme.spacing(2),
     gap: theme.spacing(2),
-    backgroundColor: isnew === "true"
-      ? "rgba(76,175,80,0.1)"
-      : theme.palette.background.paper,
+    backgroundColor:
+      isnew === "true" ? "rgba(76,175,80,0.1)" : theme.palette.background.paper,
     borderRadius: theme.shape.borderRadius,
     boxShadow: isnew === "true" ? theme.shadows[4] : theme.shadows[1],
     width: "100%",
@@ -68,7 +67,7 @@ const UserCard: React.FC<UserCardProps> = React.memo(
       <CardContainer
         isnew={isnew}
         theme={theme}
-        sx={{ borderRadius: 6, width: "fit-content" }}
+        sx={{ borderRadius: 6, width: "auto" }}
       >
         {/* User Avatar */}
         <Avatar
