@@ -833,7 +833,7 @@
     "agent": "Agente",
     "admin": "Administrador",
     "selectEntity": "Selecciona una entidad haciendo doble clic sobre ella.",
-    "searchPlaceholder": "Buscar {{role}}s por nombre o ID",
+    "searchPlaceholder": "Buscar por nombre o ID",
     "loadingEntities": "Cargando entidades...",
     "startTyping": "Empieza a escribir para buscar",
     "entityName": "Nombre",
@@ -989,7 +989,7 @@
     "yes": "Sí",
     "no": "No",
     "selectVisitError": "No se pudo seleccionar la visita.",
-    "noVisits": "No se encontraron visitas para este cliente.",
+    "noVisits": "No se encontraron visitas.",
     "unknown": "Desconocido"
   },
   "calendarHook": {

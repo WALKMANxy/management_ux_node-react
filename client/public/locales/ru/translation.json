@@ -833,7 +833,7 @@
     "agent": "Агент",
     "admin": "Администратор",
     "selectEntity": "Выберите сущность, дважды щёлкнув по ней.",
-    "searchPlaceholder": "Поиск {{role}} по имени или ID",
+    "searchPlaceholder": "Поиск по имени или ID",
     "loadingEntities": "Загрузка сущностей...",
     "startTyping": "Начните ввод для поиска",
     "entityName": "Имя",
@@ -989,7 +989,7 @@
     "yes": "Да",
     "no": "Нет",
     "selectVisitError": "Не удалось выбрать визит.",
-    "noVisits": "Не найдено визитов для этого клиента.",
+    "noVisits": "Не найдено визитов.",
     "unknown": "Неизвестно"
   },
   "calendarHook": {

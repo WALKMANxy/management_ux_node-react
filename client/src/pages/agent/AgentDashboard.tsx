@@ -1,13 +1,4 @@
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-
-import {
-  Box,
-  Fab,
-  Grid,
-  Skeleton,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Box, Grid, Skeleton, useMediaQuery, useTheme } from "@mui/material";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
@@ -87,24 +78,8 @@ const AgentDashboard: React.FC = () => {
           aria-label="skeleton"
         />
       )}
-      {/* FAB Button for Calendar - Positioned Top Right */}
-      {isTablet && (
-        <Fab
-          color="primary"
-          aria-label="calendar"
-          onClick={handleToggleDrawer}
-          sx={{
-            position: "absolute",
-            top: 220, // Adjust as needed based on layout
-            right: 32, // Adjust as needed based on layout
-            zIndex: 1000,
-          }}
-        >
-          <CalendarMonthIcon />
-        </Fab>
-      )}
       <Grid container spacing={6} mt={2}>
-        <Grid item xs={!isTablet ? 12 : 0} md={!isTablet ? 9 : 0}>
+        <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
           {selectedClient ? (
             <ClientView
               loadingState={loadingState}
