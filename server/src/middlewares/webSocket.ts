@@ -235,8 +235,6 @@ export const setupWebSocket = (io: SocketIOServer) => {
       }
     );
 
-
-
     // Handle logout
     socket.on("logout", () => {
       logger.info("Client logout requested", {
@@ -247,14 +245,10 @@ export const setupWebSocket = (io: SocketIOServer) => {
     });
   });
 
-
-
   io.on("connect_error", (error) => {
     logger.error("WebSocket connection error", { error });
   });
 };
-
-
 
 // Function to join all chat rooms the user is part of upon connection
 async function joinUserToChats(
@@ -267,11 +261,6 @@ async function joinUserToChats(
       chatIds.map(async (chatId) => {
         const roomId = `chat:${chatId}`;
         await socket.join(roomId);
-        logger.info("User joined chat room", {
-          userId: socket.userId,
-          chatId,
-          roomId,
-        });
       })
     );
   }
