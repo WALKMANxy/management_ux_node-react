@@ -1,39 +1,43 @@
-//src/models/Movement.ts
+// src/models/MovementModel.ts
+import mongoose, { Document, Schema } from "mongoose";
 
-import { Document, Schema, model } from "mongoose";
-
-interface IMovement extends Document {
-  Data_Documento_Precedente: Date;
-  Numero_Lista: number;
-  Mese: number;
-  Anno: number;
-  Ragione_Sociale_Cliente: string;
-  Codice_Cliente: number;
-  Codice_Agente: number;
-  Codice_Articolo: string;
-  Marca_Articolo: string;
-  Descrizione_Articolo: string;
-  Quantita: number;
-  Valore: number;
-  Costo: number;
-  Prezzo_Articolo: number;
+export interface IMovement extends Document {
+  dataDocumentoPrecedente: string;
+  numeroLista: number;
+  mese: number;
+  anno: number;
+  ragioneSocialeCliente: string;
+  codiceCliente: string;
+  codiceAgente: string;
+  codiceArticolo: string;
+  marcaArticolo: string;
+  descrizioneArticolo: string;
+  quantita: number;
+  valore: number;
+  costo: number;
+  prezzoArticolo: number;
 }
 
-const movementSchema = new Schema<IMovement>({
-  Data_Documento_Precedente: { type: Date, required: true },
-  Numero_Lista: { type: Number, required: true },
-  Mese: { type: Number, required: true },
-  Anno: { type: Number, required: true },
-  Ragione_Sociale_Cliente: { type: String, required: true },
-  Codice_Cliente: { type: Number, required: true },
-  Codice_Agente: { type: Number, required: true },
-  Codice_Articolo: { type: String, required: true },
-  Marca_Articolo: { type: String, required: true },
-  Descrizione_Articolo: { type: String, required: true },
-  Quantita: { type: Number, required: true },
-  Valore: { type: Number, required: true },
-  Costo: { type: Number, required: true },
-  Prezzo_Articolo: { type: Number, required: true },
+const MovementSchema: Schema = new Schema({
+  dataDocumentoPrecedente: { type: String, required: true },
+  numeroLista: { type: Number, required: true },
+  mese: { type: Number, required: true },
+  anno: { type: Number, required: true },
+  ragioneSocialeCliente: { type: String, required: true },
+  codiceCliente: { type: String, required: true, index: true },
+  codiceAgente: { type: String, required: true, index: true },
+  codiceArticolo: { type: String, required: true },
+  marcaArticolo: { type: String, required: true },
+  descrizioneArticolo: { type: String, required: true },
+  quantita: { type: Number, required: true },
+  valore: { type: Number, required: true },
+  costo: { type: Number, required: true },
+  prezzoArticolo: { type: Number, required: true },
 });
 
-export const Movement = model<IMovement>("Movement", movementSchema);
+// Indexes for optimized queries
+MovementSchema.index({ numeroLista: 1 });
+MovementSchema.index({ codiceCliente: 1 });
+MovementSchema.index({ codiceAgente: 1 });
+
+export default mongoose.model<IMovement>("Movement", MovementSchema);
