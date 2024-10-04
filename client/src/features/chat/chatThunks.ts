@@ -2,7 +2,7 @@
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { IChat, IMessage } from "../../models/dataModels";
-import { showToast } from "../../utils/toastMessage";
+import { showToast } from "../../services/toastMessage";
 import {
   createChat,
   fetchAllChats,
@@ -29,6 +29,7 @@ export const fetchAllChatsThunk = createAsyncThunk<
   void,
   { rejectValue: string }
 >("chats/fetchAllChatsThunk", async (_, { rejectWithValue }) => {
+
   try {
     const result = await fetchAllChats(); // Direct API call
     return result; // Return the fetched chats

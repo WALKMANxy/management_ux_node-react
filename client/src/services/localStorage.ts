@@ -1,7 +1,5 @@
 import { AuthState } from "../models/stateModels";
 
-
-
 /**
  * Loads the authentication state from localStorage.
  * @returns The parsed AuthState or undefined if not found or invalid.
@@ -54,6 +52,7 @@ const isAuthState = (obj: any): obj is AuthState => {
     typeof obj.isLoggedIn === "boolean" &&
     typeof obj.role === "string" &&
     (typeof obj.id === "string" || obj.id === null) &&
-    (typeof obj.userId === "string" || obj.userId === null)
+    (typeof obj.userId === "string" || obj.userId === null) &&
+    (typeof obj.refreshToken === "string" || obj.refreshToken === null)
   );
 };

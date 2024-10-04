@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useGetHolidaysQuery } from "../features/calendar/calendarQuery";
 import { CalendarEvent, Holiday } from "../models/dataModels";
-import { showToast } from "../utils/toastMessage";
+import { showToast } from "../services/toastMessage";
 
 export const useCalendarWithHolidays = (currentDate: Date) => {
   const year = currentDate.getFullYear();

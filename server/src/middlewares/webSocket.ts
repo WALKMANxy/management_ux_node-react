@@ -1,11 +1,10 @@
-import cookie from "cookie";
 import { Socket, Server as SocketIOServer } from "socket.io";
 import { config } from "../config/config";
 import { IChat, IMessage } from "../models/Chat";
 import { User } from "../models/User";
 import { ChatService } from "../services/chatService";
 import { logger } from "../utils/logger";
-import { getSessionByToken } from "../utils/sessionUtils";
+import { getSessionByAccessToken } from "../utils/sessionUtils";
 
 interface AuthenticatedSocket extends Socket {
   userId?: string;
@@ -15,35 +14,69 @@ interface AuthenticatedSocket extends Socket {
 }
 
 export const setupWebSocket = (io: SocketIOServer) => {
+  // Middleware to authenticate the WebSocket connection
   io.use(async (socket: AuthenticatedSocket, next) => {
-    const cookies = parseCookie(socket.handshake.headers.cookie || "");
-    const sessionToken = cookies["sessionToken"];
-
-    if (!sessionToken) {
-      const error = new Error(
-        "Authentication error: No session token provided"
-      );
-      logger.warn(error.message, { socketId: socket.id });
-      return next(error);
-    }
-
     try {
-      const session = await getSessionByToken(sessionToken);
-      if (!session) {
-        const error = new Error("Invalid or expired session");
-        logger.warn(
-          `Authentication error: ${error.message} for token: ${sessionToken}`,
-          { socketId: socket.id }
+      // Extract access token from socket handshake headers (e.g., Authorization: Bearer <token>)
+      const accessToken = socket.handshake.auth.authorization?.replace(
+        "Bearer ",
+        ""
+      );
+
+      if (!accessToken) {
+        logger.warn("No access token provided for WebSocket connection", {
+          socketId: socket.id,
+        });
+        return next(
+          new Error("Authentication error: No access token provided")
         );
-        return next(error);
       }
 
-      const userId = session.userId.toString();
-      await authenticateSocket(socket, userId);
-      next();
+      // Retrieve the user-agent from the socket handshake
+      const userAgent = socket.handshake.headers["user-agent"] || "Unknown";
+
+      // Use the same logic from `authenticateUser` middleware
+      const session = await getSessionByAccessToken(accessToken, {
+        get: () => userAgent,
+      } as any);
+
+      if (!session) {
+        logger.warn("Invalid or expired session for WebSocket connection", {
+          socketId: socket.id,
+        });
+        socket.emit("reconnect:unauthorized"); // Notify client of unauthorized connection due to expired token
+        return next(
+          new Error("Authentication error: Invalid or expired session")
+        );
+      }
+      // Retrieve the user associated with the session
+      const user = await User.findById(session.userId);
+
+      if (!user) {
+        logger.warn(
+          "User not found for session during WebSocket authentication",
+          { sessionId: session._id }
+        );
+        return next(new Error("Authentication error: User not found"));
+      }
+
+      // Attach user info to the socket for future use
+      socket.userId = user.id;
+      socket.userRole = user.role;
+      socket.entityCode = user.entityCode;
+      socket.authType = user.authType;
+
+      logger.info("Socket authenticated successfully", {
+        userId: socket.userId,
+        socketId: socket.id,
+      });
+      next(); // Proceed with the connection
     } catch (error) {
-      logger.error("Authentication error", { error, socketId: socket.id });
-      return next(new Error("Authentication error: Invalid session"));
+      logger.error("WebSocket authentication error", {
+        error,
+        socketId: socket.id,
+      });
+      return next(new Error("Authentication error"));
     }
   });
 
@@ -264,37 +297,4 @@ async function joinUserToChats(
       })
     );
   }
-}
-
-// Authenticate the socket based on the session token
-async function authenticateSocket(socket: AuthenticatedSocket, userId: string) {
-  try {
-    const user = await User.findById(userId);
-
-    if (!user) {
-      const error = new Error("User not found");
-      logger.error(error.message, { userId, socketId: socket.id });
-      throw error;
-    }
-
-    socket.userId = user.id.toString();
-    socket.userRole = user.role;
-    socket.entityCode = user.entityCode;
-    socket.authType = user.authType;
-    logger.info("Socket authenticated successfully", {
-      userId: socket.userId,
-      socketId: socket.id,
-    });
-  } catch (error) {
-    logger.error("Error during socket authentication", {
-      error,
-      userId,
-      socketId: socket.id,
-    });
-    throw error;
-  }
-}
-
-function parseCookie(cookieString: string) {
-  return cookie.parse(cookieString);
 }

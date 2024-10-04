@@ -1,7 +1,7 @@
 // src/hooks/useResizeObserver.ts
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { showToast } from "../utils/toastMessage";
+import { showToast } from "../services/toastMessage";
 
 /**
  * Interface representing the dimensions of an element.

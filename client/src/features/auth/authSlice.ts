@@ -1,18 +1,18 @@
 //src/features/auth/authSlice.ts
 
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import Cookies from "js-cookie";
 import { AuthState } from "../../models/stateModels";
+import { showToast } from "../../services/toastMessage";
+import { setAccessToken } from "../../services/tokenService";
 import { webSocketService } from "../../services/webSocketService";
-import { initializeEncryption } from "../../utils/cacheUtils";
-import { showToast } from "../../utils/toastMessage";
-
+import { logoutUser } from "./api/auth";
 
 const initialState: AuthState = {
   isLoggedIn: false,
   role: "guest",
   id: "",
   userId: "",
+  refreshToken: "",
 };
 
 // Thunk to handle login with potential side effects
@@ -23,23 +23,39 @@ export const handleLogin = createAsyncThunk(
       role,
       id,
       userId,
-    }: { role: AuthState["role"]; id: string; userId: string },
+      refreshToken,
+    }: {
+      role: AuthState["role"];
+      id: string;
+      userId: string;
+      refreshToken: string;
+    },
     { rejectWithValue }
   ) => {
     try {
+      console.log("Handling login in Redux with:", {
+        role,
+        id,
+        userId,
+        refreshToken,
+      });
+
       // Perform side effects needed on login
       sessionStorage.setItem(
         "auth",
-        JSON.stringify({ isLoggedIn: true, role, id, userId })
+        JSON.stringify({ isLoggedIn: true, role, id, userId, refreshToken })
       );
+      console.log("Auth state saved in sessionStorage");
 
+      // Connect to WebSocket service
       webSocketService.connect();
+      console.log("WebSocket service connected");
 
       // Return the payload to be used in the fulfilled case
-      return { role, id, userId };
+      return { role, id, userId, refreshToken };
     } catch (error: unknown) {
+      console.error("Error in handleLogin thunk:", error);
       const typedError = error as { message: string };
-
       return rejectWithValue(typedError.message);
     }
   }
@@ -50,19 +66,18 @@ export const handleLogout = createAsyncThunk(
   "auth/handleLogout",
   async (_, { rejectWithValue }) => {
     try {
-      // Perform side effects needed on logout
-      sessionStorage.clear();
-      localStorage.clear();
-      webSocketService.disconnect();
-      Cookies.remove("token");
+      // Call the logout API endpoint
+      await logoutUser();
 
-      // Clear the encryption key
-      initializeEncryption(null); // Modify initializeEncryption to handle null
+      webSocketService.disconnect();
+      // Clear tokens
+      sessionStorage.removeItem("authState");
+      localStorage.removeItem("authState");
+      setAccessToken(null);
 
       return; // No payload needed
     } catch (error: unknown) {
       const typedError = error as { message: string };
-
       return rejectWithValue(typedError.message);
     }
   }
@@ -94,12 +109,14 @@ const authSlice = createSlice({
         state.role = action.payload.role;
         state.id = action.payload.id;
         state.userId = action.payload.userId;
+        state.refreshToken = action.payload.refreshToken;
       })
       .addCase(handleLogout.fulfilled, (state) => {
         state.isLoggedIn = false;
         state.role = "guest";
         state.id = "";
         state.userId = "";
+        state.refreshToken = "";
       })
       .addCase(handleLogin.rejected, (_state, action) => {
         // Optionally, handle login errors

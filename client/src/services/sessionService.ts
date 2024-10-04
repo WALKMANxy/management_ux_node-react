@@ -1,35 +1,55 @@
-// src/services/sessionService.ts
-import store from "../app/store";
-import { handleLogout } from "../features/auth/authSlice";
-import { authApiCall, AuthApiResponse } from "../utils/apiUtils";
-import { webSocketService } from "./webSocketService";
+import axios from "axios";
+import { baseUrl } from "../utils/apiUtils";
+import { showToast } from "./toastMessage";
+import { setAccessToken } from "./tokenService";
 
-export const refreshSession = async (): Promise<boolean> => {
-  try {
-    const response = await authApiCall<AuthApiResponse>(
-      "auth/refresh-session",
-      "POST",
-      { userAgent: navigator.userAgent }
-    );
+/**
+ * Function to refresh the access token using the refresh token.
+ */
+export async function refreshAccessToken(): Promise<boolean> {
+  const localAuthState =
+    JSON.parse(localStorage.getItem("authState")!) ||
+    JSON.parse(sessionStorage.getItem("authState")!);
 
-    if (response.statusCode !== 200) {
-      throw new Error("Session refresh failed");
-    }
+  const refreshToken = localAuthState.refreshToken;
+  const uniqueId = localStorage.getItem("app_unique_identifier");
 
-    // Ensure WebSocket is not already connected
-    if (!webSocketService.isConnected()) { // Implement `isConnected` in your WebSocket service
-      webSocketService.connect();
-    }
-
-    return true;
-  } catch (error) {
-    console.error("Session refresh error:", error);
-
-    // Logout the user and clear auth state on failure
-    store.dispatch(handleLogout());
-    localStorage.removeItem("authState");
-    sessionStorage.clear();
-
+  if (!refreshToken || !uniqueId) {
+    console.error("No refresh token or uniqueId available");
+    showToast.error("No refresh token or uniqueId available, logging out...");
     return false;
   }
-};
+
+  try {
+    // Create a separate Axios instance to avoid interceptor loops
+    const response = await axios.post(
+      `${baseUrl}/auth/refresh-session`,
+      { refreshToken, uniqueId },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "bypass-tunnel-reminder": "true",
+        },
+      }
+    );
+
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+      response.data;
+
+    // Update tokens
+    setAccessToken(newAccessToken);
+    localStorage.setItem(
+      "authState",
+      JSON.stringify({ ...localAuthState, refreshToken: newRefreshToken })
+    );
+    sessionStorage.setItem(
+      "authState",
+      JSON.stringify({ ...localAuthState, refreshToken: newRefreshToken })
+    );
+    return true;
+  } catch (error) {
+    console.error("Failed to refresh access token:", error);
+    showToast.error("No refresh token or uniqueId available, logging out...");
+    return false;
+  }
+}

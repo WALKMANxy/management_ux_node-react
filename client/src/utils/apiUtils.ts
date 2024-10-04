@@ -4,12 +4,14 @@ import axios, {
   AxiosInstance,
   AxiosRequestConfig,
   AxiosResponse,
+  InternalAxiosRequestConfig,
 } from "axios";
 import { Promo, Visit } from "../models/dataModels";
 import { serverClient, serverMovement } from "../models/dataSetTypes";
 import { Admin, Agent } from "../models/entityModels";
+import { showToast } from "../services/toastMessage";
+import { getAccessToken } from "../services/tokenService";
 import { getCachedDataSafe, setCachedDataSafe, StoreName } from "./cacheUtils";
-import { showToast } from "./toastMessage";
 
 // Initialize baseUrl and ensure it's defined
 export const baseUrl: string = import.meta.env.VITE_API_BASE_URL?.trim() || "";
@@ -31,52 +33,33 @@ export interface AuthApiResponse {
 }
 
 // Create an Axios instance with default configurations
-const axiosInstance: AxiosInstance = axios.create({
+export const axiosInstance: AxiosInstance = axios.create({
   baseURL: baseUrl,
   headers: {
     "bypass-tunnel-reminder": "true",
   },
-  withCredentials: true,
   timeout: 10000, // Set a timeout to prevent hanging requests
 });
 
-// Centralized error handling using Axios interceptors
-axiosInstance.interceptors.response.use(
-  (response: AxiosResponse) => response,
-  (error: AxiosError<{ message: string }>) => {
-    if (error.response) {
-      const { status, data } = error.response;
-      const endpoint = error.config?.url || "Unknown Endpoint";
-
-      // Handle 404 for PUT and PATCH methods
-      if (
-        (error.config?.method === "put" || error.config?.method === "patch") &&
-        status === 404
-      ) {
-        showToast.error(`Resource not found at ${endpoint}, cannot update.`);
-        return Promise.reject(
-          new Error(`Resource not found at ${endpoint}, cannot update.`)
-        );
-      }
-
-      const serverMessage = data?.message || "An error occurred";
-      console.error(
-        `Error during ${error.config?.method?.toUpperCase()} request to ${endpoint}:`,
-        serverMessage
-      );
-      return Promise.reject(new Error(serverMessage));
-    } else if (error.request) {
-      // Network error
-      showToast.error("Network Error");
-      console.error("Network Error:", error.message);
-      return Promise.reject(new Error("Network Error"));
-    } else {
-      // Other errors
-      console.error("Axios Error:", error.message);
-      return Promise.reject(new Error(error.message));
+// Request interceptor to attach the access token
+axiosInstance.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    // Check if the request is for the logout endpoint
+    if (config.url === "/auth/logout") {
+      // Skip adding the access token for logout requests
+      return config;
     }
-  }
+
+    // Otherwise, attach the access token as usual
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
 );
+
 
 /**
  * Generic API call function
@@ -90,14 +73,36 @@ export const apiCall = async <T>(
   method: "GET" | "POST" | "PUT" | "PATCH",
   data?: unknown
 ): Promise<T> => {
-  const config: AxiosRequestConfig = {
-    url: endpoint,
-    method,
-    data,
-  };
+  try {
+    const config: AxiosRequestConfig = {
+      url: endpoint,
+      method,
+      data,
+    };
 
-  const response: AxiosResponse<T> = await axiosInstance(config);
-  return response.data;
+    const response: AxiosResponse<T> = await axiosInstance(config);
+    return response.data;
+  } catch (error) {
+    // Log error for debugging purposes
+    console.error(`Error during ${method} request to ${endpoint}:`, error);
+
+    // If the error is an AxiosError, you can retrieve the server error response.
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      const serverMessage =
+        axiosError.message ||
+        axiosError.response?.statusText ||
+        "An error occurred while processing the request";
+
+      // Throwing a new error so that it's easier to handle in the calling function
+      throw new Error(serverMessage);
+    }
+
+    // If it's not an AxiosError, re-throw the original error or a generic one
+    throw new Error(
+      error instanceof Error ? error.message : "Unexpected error occurred"
+    );
+  }
 };
 
 /**
@@ -168,20 +173,20 @@ const fetchAndUpdateCache = async (
 export const loadMovementsDataWithCache = async (): Promise<
   serverMovement[]
 > => {
-/*   console.log("loadMovementsDataWithCache: Attempting to retrieve from cache");
- */  const cachedData = await getCachedDataSafe<serverMovement[]>("movements");
+  /*   console.log("loadMovementsDataWithCache: Attempting to retrieve from cache");
+   */ const cachedData = await getCachedDataSafe<serverMovement[]>("movements");
   if (cachedData) {
-/*     console.log("loadMovementsDataWithCache: Retrieved from cache");
- */    return cachedData;
+    /*     console.log("loadMovementsDataWithCache: Retrieved from cache");
+     */ return cachedData;
   }
 
-/*   console.log("loadMovementsDataWithCache: Cache not found; fetching from API");
- */  try {
+  /*   console.log("loadMovementsDataWithCache: Cache not found; fetching from API");
+   */ try {
     const data = await apiCall<serverMovement[]>("movements", "GET");
-/*     console.log("loadMovementsDataWithCache: Fetched from API");
- */    await setCachedDataSafe("movements", data);
-/*     console.log("loadMovementsDataWithCache: Cached successfully");
- */    return data;
+    /*     console.log("loadMovementsDataWithCache: Fetched from API");
+     */ await setCachedDataSafe("movements", data);
+    /*     console.log("loadMovementsDataWithCache: Cached successfully");
+     */ return data;
   } catch (error) {
     console.error(
       "loadMovementsDataWithCache: Failed to load movements data",

@@ -9,7 +9,6 @@ import {
   verifyResetCodeService,
   verifyUserEmailService,
 } from "../services/authService";
-import { generateSessionToken, verifySessionToken } from "../utils/jwtUtils";
 import { logger } from "../utils/logger";
 import {
   createSession,
@@ -44,12 +43,16 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
-// Modified login endpoint to handle existing session tokens
+// Login endpoint to handle authentication and session creation
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { email, password, uniqueId } = req.body; // Ensure uniqueId is sent from client
+
+  if (!uniqueId) {
+    return res.status(400).json({ message: "uniqueId is required for login." });
+  }
 
   try {
-    // Attempt to log in the user with the provided credentials
+    // Authenticate user credentials
     const user = await loginUserService(email, password);
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials." });
@@ -61,111 +64,100 @@ export const login = async (req: Request, res: Response) => {
         .json({ message: "Please verify your email before logging in." });
     }
 
-    // Check for an existing session token in the request cookies
-    const existingToken = req.cookies.sessionToken;
+    // Create a new session; existing sessions with the same uniqueId will be invalidated
+    const { accessToken, refreshToken } = await createSession(
+      user,
+      req,
+      uniqueId
+    );
 
-    let sessionToken;
-    let session;
-
-    if (existingToken) {
-      try {
-        // Verify the existing token
-        const decoded = verifySessionToken(existingToken);
-        console.log("Existing token found and verified:", decoded);
-
-        // Attempt to renew the session with the existing token
-        session = await createSession(user.id, existingToken, req);
-        sessionToken = existingToken; // Use the existing token for the response
-      } catch (error) {
-        // If token verification fails, log the error and proceed to generate a new token
-        console.warn(
-          "Existing token verification failed, generating a new token.",
-          error
-        );
-        sessionToken = generateSessionToken(user); // Generate a new token
-        session = await createSession(user.id, sessionToken, req);
-      }
-    } else {
-      // No existing token found, generate a new one
-      sessionToken = generateSessionToken(user);
-      session = await createSession(user.id, sessionToken, req);
-    }
-
-   
-    // Set the session token in the cookie
-    res.cookie("sessionToken", sessionToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
-
-    // Redirect URL based on user role
     return res.status(200).json({
       message: "Login successful",
+      accessToken, // Access Token for authenticating requests
+      refreshToken, // Refresh Token for renewing Access Tokens
       id: user.id,
-      sessionId: session._id,
     });
   } catch (error: unknown) {
     logger.error("Login error:", { error });
-    res.status(500).json({ message: "Login failed", error });
+    res
+      .status(500)
+      .json({ message: "Login failed", error: "Internal server error." });
   }
 };
 
+// Logout endpoint to invalidate a single session
 export const logout = async (req: Request, res: Response) => {
-  const sessionToken = req.cookies.sessionToken;
+  const refreshToken = req.header("Authorization")?.replace("Bearer ", "");
+  const uniqueId = req.header("uniqueId");
 
-  if (sessionToken) {
-    try {
-      await invalidateSession(sessionToken);
-    } catch (error) {
-      logger.error("Error invalidating session:", { error });
-    }
+  if (!refreshToken) {
+    return res
+      .status(400)
+      .json({ message: "Refresh token is required for logout." });
   }
 
-  res.clearCookie("sessionToken");
-  res.status(200).json({ message: "Logout successful" });
+  try {
+    const invalidated = await invalidateSession(refreshToken, uniqueId!);
+    if (invalidated) {
+      res.status(200).json({ message: "Logout successful." });
+    } else {
+      res
+        .status(400)
+        .json({ message: "Logout failed. Invalid refresh token." });
+    }
+  } catch (error: unknown) {
+    logger.error("Error during logout:", { error });
+    res
+      .status(500)
+      .json({ message: "Logout failed.", error: "Internal server error." });
+  }
 };
 
+// Logout from all devices by invalidating all sessions for the user
 export const logoutAllDevices = async (
   req: AuthenticatedRequest,
   res: Response
 ) => {
   const userId = req.user?.id;
 
-  if (userId) {
-    try {
-      await invalidateAllUserSessions(userId);
-      res.clearCookie("sessionToken");
-      res
-        .status(200)
-        .json({ message: "Logged out from all devices successfully" });
-    } catch (error) {
-      logger.error("Error logging out from all devices:", { error });
-      res
-        .status(500)
-        .json({ message: "Failed to logout from all devices", error });
-    }
-  } else {
-    res.status(401).json({ message: "User not authenticated" });
+  if (!userId) {
+    return res.status(401).json({ message: "User not authenticated." });
+  }
+
+  try {
+    await invalidateAllUserSessions(userId);
+    res
+      .status(200)
+      .json({ message: "Logged out from all devices successfully." });
+  } catch (error: unknown) {
+    logger.error("Error logging out from all devices:", { error });
+    res.status(500).json({
+      message: "Failed to logout from all devices.",
+      error: "Internal server error.",
+    });
   }
 };
 
+// Retrieve all active sessions for a user
 export const getUserActiveSessions = async (
   req: AuthenticatedRequest,
   res: Response
 ) => {
   const userId = req.user?.id;
 
-  if (userId) {
-    try {
-      const sessions = await getUserSessions(userId);
-      res.status(200).json(sessions);
-    } catch (error) {
-      logger.error("Error fetching user sessions:", { error });
-      res.status(500).json({ message: "Failed to fetch user sessions", error });
-    }
-  } else {
-    res.status(401).json({ message: "User not authenticated" });
+  if (!userId) {
+    return res.status(401).json({ message: "User not authenticated." });
+  }
+
+  try {
+    const sessions = await getUserSessions(userId);
+    res.status(200).json({ sessions });
+  } catch (error: unknown) {
+    logger.error("Error fetching user sessions:", { error });
+    res.status(500).json({
+      message: "Failed to fetch user sessions.",
+      error: "Internal server error.",
+    });
   }
 };
 
@@ -181,38 +173,34 @@ export const verifyEmail = async (req: Request, res: Response) => {
   }
 };
 
-export const refreshSession = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
-  const sessionToken =
-    req.cookies.sessionToken ||
-    req.header("Authorization")?.replace("Bearer ", "");
+// Refresh Access Token using Refresh Token
+export const refreshSession = async (req: Request, res: Response) => {
+  const { refreshToken, uniqueId } = req.body; // Ensure uniqueId is sent from client
 
-  if (!sessionToken) {
-    return res.status(401).json({ message: "No session token provided" });
+  if (!refreshToken || !uniqueId) {
+    return res
+      .status(400)
+      .json({ message: "Refresh token and uniqueId are required." });
   }
 
   try {
-    const renewedSession = await renewSession(sessionToken, req);
-    if (!renewedSession) {
-      return res.status(401).json({ message: "Invalid or expired session" });
+    const renewedTokens = await renewSession(refreshToken, req, uniqueId);
+
+    if (!renewedTokens) {
+      return res.status(401).json({ message: "Invalid or expired session." });
     }
 
-    res.cookie("sessionToken", renewedSession.token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      expires: renewedSession.expiresAt,
-    });
-
     return res.status(200).json({
-      message: "Session renewed successfully",
-      expiresAt: renewedSession.expiresAt,
+      message: "Session renewed successfully.",
+      accessToken: renewedTokens.accessToken,
+      refreshToken: renewedTokens.refreshToken,
     });
-  } catch (error) {
-    console.error("Error renewing session:", error);
-    return res.status(500).json({ message: "Failed to renew session" });
+  } catch (error: unknown) {
+    logger.error("Error renewing session:", { error });
+    res.status(500).json({
+      message: "Failed to renew session.",
+      error: "Internal server error.",
+    });
   }
 };
 
@@ -234,12 +222,10 @@ export const requestPasswordReset = async (
     };
 
     await generateResetCodeService(email, ipInfo);
-    res
-      .status(200)
-      .json({
-        message:
-          "If an account with that email exists, a reset code will be sent.",
-      });
+    res.status(200).json({
+      message:
+        "If an account with that email exists, a reset code will be sent.",
+    });
   } catch (err) {
     res.status(500).json({ message: "Internal Server Error" });
   }

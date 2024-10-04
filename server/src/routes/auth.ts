@@ -16,21 +16,39 @@ import {
   verifyResetCode,
 } from "../controllers/authController";
 import { authenticateUser } from "../middlewares/authentication";
+import { authRateLimiter } from "../middlewares/rateLimiter";
 import { checkValidation } from "../middlewares/validate";
 
 const router = Router();
 
-router.post("/register", registerValidationRules, checkValidation, register);
+router.post(
+  "/register",
+  registerValidationRules,
+  authRateLimiter,
+  checkValidation,
+  register
+);
 router.get("/verify-email", verifyEmail);
-router.post("/login", loginValidationRules, checkValidation, login);
-router.post("/logout", authenticateUser, logout);
-router.post("/logout-all", authenticateUser, logoutAllDevices);
-router.get("/active-sessions", authenticateUser, getUserActiveSessions);
-router.post("/refresh-session", authenticateUser, refreshSession);
+router.post(
+  "/login",
+  loginValidationRules,
+  authRateLimiter,
+  checkValidation,
+  login
+);
+router.post("/logout", authRateLimiter, logout);
+router.post("/logout-all", authenticateUser, authRateLimiter, logoutAllDevices);
+router.get(
+  "/active-sessions",
+  authenticateUser,
+  authRateLimiter,
+  getUserActiveSessions
+);
+router.post("/refresh-session", authRateLimiter, refreshSession);
 
 // Password reset routes
-router.post("/request-password-reset", requestPasswordReset);
-router.post("/verify-reset-code", verifyResetCode);
-router.post("/update-password", updatePassword);
+router.post("/request-password-reset", authRateLimiter, requestPasswordReset);
+router.post("/verify-reset-code", authRateLimiter, verifyResetCode);
+router.post("/update-password", authRateLimiter, updatePassword);
 
 export default router;
