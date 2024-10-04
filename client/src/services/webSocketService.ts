@@ -3,6 +3,7 @@ import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
 import { AppStore } from "../app/store";
 import { getApiUrl } from "../config/config";
+import { handleLogout } from "../features/auth/authSlice";
 import { fetchChatById } from "../features/chat/api/chats";
 import {
   addChatReducer,
@@ -10,7 +11,10 @@ import {
   updateReadStatusReducer,
 } from "../features/chat/chatSlice";
 import { IChat, IMessage } from "../models/dataModels";
+import { getUniqueIdentifier } from "../utils/cryptoUtils";
 import { handleNewNotification } from "./notifications";
+import { refreshAccessToken } from "./sessionService";
+import { getAccessToken } from "./tokenService";
 
 // Define a variable to hold the store reference
 let store: AppStore;
@@ -65,9 +69,15 @@ class WebSocketService {
       return;
     }
 
+    const accessToken = getAccessToken(); // Get the current access token
+
     this.socket = io(apiUrl, {
-      withCredentials: true, // This allows the cookie to be sent
+      withCredentials: true,
       transports: ["websocket"],
+      auth: {
+        authorization: `Bearer ${accessToken}`, // Correct spelling
+      },
+
     });
 
     this.setupEventListeners();
@@ -84,6 +94,9 @@ class WebSocketService {
     this.socket.on("connect", this.handleConnect);
     this.socket.on("disconnect", this.handleDisconnect);
     this.socket.on("connect_error", this.handleConnectError);
+
+    // Handle unauthorized reconnect due to token expiry
+    this.socket.on("reconnect:unauthorized", this.handleTokenExpiry);
 
     // Handle incoming chat events
     this.socket.on("chat:newMessage", this.handleNewMessage);
@@ -131,6 +144,38 @@ class WebSocketService {
     this.tryReconnect();
   };
 
+  private handleTokenExpiry = async () => {
+    console.warn("WebSocket token expired, attempting to refresh token...");
+
+    try {
+      // Refresh the access token using your existing refresh mechanism
+      const refreshSuccess = await refreshAccessToken();
+
+      if (refreshSuccess) {
+        // Update the token and reconnect the WebSocket
+        const newAccessToken = getAccessToken();
+        const uniqueId = getUniqueIdentifier();
+
+        if (this.socket) {
+          this.socket.auth = {
+            token: `Bearer ${newAccessToken}`,
+            uniqueId,
+          };
+          this.socket.connect();
+        }
+      } else {
+        console.error("Token refresh failed. Logging out...");
+        store.dispatch(handleLogout());
+      }
+    } catch (error) {
+      console.error(
+        "Error during token refresh for WebSocket reconnect:",
+        error
+      );
+      store.dispatch(handleLogout()); // Log out user if token refresh fails
+    }
+  };
+
   private tryReconnect() {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
@@ -142,7 +187,15 @@ class WebSocketService {
         });
       }
 
-      setTimeout(() => this.socket?.connect(), 5000 * this.reconnectAttempts);
+      setTimeout(() => {
+        // Check if the token is still valid before reconnecting
+        const accessToken = getAccessToken();
+        if (accessToken) {
+          this.socket?.connect();
+        } else {
+          this.handleTokenExpiry();
+        }
+      }, 5000 * this.reconnectAttempts);
     } else {
       console.error(
         "Max reconnection attempts reached. Please refresh the page."

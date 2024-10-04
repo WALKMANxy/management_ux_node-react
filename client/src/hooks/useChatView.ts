@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../app/hooks";
-import { showToast } from "../utils/toastMessage";
+import { showToast } from "../services/toastMessage";
 
 const useChatView = () => {
   const { t } = useTranslation(); // Initialize translation

@@ -25,8 +25,8 @@ import { selectCurrentUser } from "../../features/users/userSlice";
 import { useCalendar } from "../../hooks/useCalendar";
 import { useCalendarWithHolidays } from "../../hooks/useCalendarWithHolidays";
 import { CalendarEvent } from "../../models/dataModels";
-import { localizer } from "../../utils/localizer";
-import { showToast } from "../../utils/toastMessage";
+import { localizer } from "../../services/localizer";
+import { showToast } from "../../services/toastMessage";
 import "./CalendarPage.css"; // Import the CSS file
 
 const CalendarPage: React.FC = () => {

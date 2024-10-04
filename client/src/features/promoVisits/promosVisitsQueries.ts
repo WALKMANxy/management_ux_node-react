@@ -1,8 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/features/data/promoVisitApi.ts
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { AxiosError } from "axios";
 import { Promo, Visit } from "../../models/dataModels";
 import { Admin, Agent, Client } from "../../models/entityModels";
-import { mapPromosToEntity, mapVisitsToEntity } from "../../utils/dataLoader";
+import {
+  mapPromosToEntity,
+  mapVisitsToEntity,
+} from "../../services/dataLoader";
+import { axiosInstance } from "../../utils/apiUtils";
 import {
   addOrUpdatePromo,
   addOrUpdateVisit,
@@ -10,15 +17,29 @@ import {
   setCurrentUserVisits,
 } from "../data/dataSlice";
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+export const baseQueryWithAxios = async (
+  args: any,
+  _api: any,
+  _extraOptions: any
+) => {
+  try {
+    const result = await axiosInstance.request({ ...args });
+    return { data: result.data };
+  } catch (axiosError) {
+    const err = axiosError as AxiosError;
+    return {
+      error: {
+        status: err.response?.status,
+        data: err.response?.data || err.message,
+      },
+    };
+  }
+};
 
 // Unified API slice for handling visits and promos
 export const promoVisitApi = createApi({
   reducerPath: "promoVisitApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl,
-    credentials: "include", // Ensures credentials (cookies, etc.) are sent with each request
-  }),
+  baseQuery: baseQueryWithAxios,
   tagTypes: ["Visit", "Promo", "Client", "Agent", "Admin"],
   endpoints: (builder) => ({
     // Fetch Visits Query
@@ -29,10 +50,6 @@ export const promoVisitApi = createApi({
       query: () => ({
         url: "/visits",
         method: "GET",
-        headers: {
-          "bypass-tunnel-reminder": "true",
-          "Content-Type": "application/json",
-        },
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
@@ -64,10 +81,6 @@ export const promoVisitApi = createApi({
       query: () => ({
         url: "/promos",
         method: "GET",
-        headers: {
-          "bypass-tunnel-reminder": "true",
-          "Content-Type": "application/json",
-        },
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
@@ -103,10 +116,7 @@ export const promoVisitApi = createApi({
       query: ({ visitData }) => ({
         url: `/visits`,
         method: "POST",
-        headers: {
-          "bypass-tunnel-reminder": "true",
-          "Content-Type": "application/json",
-        },
+
         body: {
           ...visitData,
           date: visitData.date.toISOString(),
@@ -144,10 +154,7 @@ export const promoVisitApi = createApi({
       query: ({ _id, visitData }) => ({
         url: `/visits/${_id}`,
         method: "PATCH",
-        headers: {
-          "bypass-tunnel-reminder": "true",
-          "Content-Type": "application/json",
-        },
+
         body: {
           ...visitData,
           date: visitData.date.toISOString(),
@@ -184,10 +191,7 @@ export const promoVisitApi = createApi({
       query: ({ promoData }) => ({
         url: `/promos`,
         method: "POST",
-        headers: {
-          "bypass-tunnel-reminder": "true",
-          "Content-Type": "application/json",
-        },
+
         body: {
           ...promoData,
           startDate: promoData.startDate.toISOString(),
@@ -227,10 +231,7 @@ export const promoVisitApi = createApi({
       query: ({ _id, promoData }) => ({
         url: `/promos/${_id}`,
         method: "PATCH",
-        headers: {
-          "bypass-tunnel-reminder": "true",
-          "Content-Type": "application/json",
-        },
+
         body: {
           ...promoData,
           startDate: promoData.startDate.toISOString(),

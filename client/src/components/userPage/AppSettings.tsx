@@ -16,7 +16,7 @@ import {
 import { styled } from "@mui/material/styles";
 import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next"; // Ensure react-i18next is imported
-import { showToast } from "../../utils/toastMessage";
+import { showToast } from "../../services/toastMessage";
 
 const Section = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),

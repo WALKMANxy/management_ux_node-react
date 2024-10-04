@@ -2,13 +2,11 @@
 
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
-import { authApi } from "../features/auth/authQueries";
 import { calendarApi } from "../features/calendar/calendarQuery";
-import { chatApi } from "../features/chat/chatQueries";
 import { dataApi } from "../features/data/dataQueries.ts";
 import { promoVisitApi } from "../features/promoVisits/promosVisitsQueries";
 import { userApi } from "../features/users/userQueries";
-import { loadAuthState, saveAuthState } from "../utils/localStorage";
+import { loadAuthState, saveAuthState } from "../services/localStorage.ts";
 import listenerMiddleware from "./listeners";
 import rootReducer from "./rootReducer";
 
@@ -36,9 +34,7 @@ const store = configureStore({
       serializableCheck: false, // Disables checks for non-serializable data, useful for certain API payloads
       immutableCheck: false, // Disables checks for state immutability, which can be performance-intensive
     })
-      .concat(authApi.middleware)
       .concat(userApi.middleware)
-      .concat(chatApi.middleware)
       .concat(dataApi.middleware)
       .concat(promoVisitApi.middleware)
       .concat(listenerMiddleware.middleware)

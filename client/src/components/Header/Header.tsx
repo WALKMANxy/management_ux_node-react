@@ -38,8 +38,8 @@ import { handleLogout } from "../../features/auth/authSlice";
 import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 import { clearSelection } from "../../features/data/dataSlice";
 import GlobalSearch from "./GlobalSearch";
-import NotificationBell from "./NotificationBell";
-import UserAvatar from "./UserAvatar";
+const NotificationBell = React.lazy(() => import("./NotificationBell"));
+const UserAvatar = React.lazy(() => import("./UserAvatar"));
 
 const Header: React.FC = () => {
   const theme = useTheme();
@@ -55,6 +55,7 @@ const Header: React.FC = () => {
   const prevLocationRef = useRef<string>(location.pathname); // Initialize previous location
 
   const initiateLogout = () => {
+
     dispatch(handleLogout());
   };
 
@@ -282,7 +283,6 @@ const Header: React.FC = () => {
             alt="Logo"
             style={{ height: "40px", marginRight: "16px", cursor: "pointer" }}
             onClick={handleLogoClick}
-
           />
           <GlobalSearch
             filter="all"

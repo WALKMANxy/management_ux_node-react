@@ -15,7 +15,7 @@ import {
   updatePassword,
   verifyResetCode,
 } from "../../features/auth/api/auth";
-import { showToast } from "../../utils/toastMessage";
+import { showToast } from "../../services/toastMessage";
 
 interface PasswordResetProps {
   onClose: () => void;

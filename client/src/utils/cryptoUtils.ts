@@ -12,7 +12,7 @@ const keyCache = new Map<string, CryptoKey>();
 
 const STORAGE_KEY = 'app_unique_identifier';
 
-const getUniqueIdentifier = (): string => {
+export const getUniqueIdentifier = (): string => {
   let uniqueId = localStorage.getItem(STORAGE_KEY);
   if (!uniqueId) {
     uniqueId = crypto.randomUUID();

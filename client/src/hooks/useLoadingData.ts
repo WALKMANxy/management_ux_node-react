@@ -12,7 +12,7 @@ import {
 import { selectCurrentUser } from "../features/users/userSlice";
 import { DataSliceState } from "../models/stateModels";
 import { ensureEncryptionInitialized } from "../utils/cacheUtils";
-import { updateUserEntityNameIfMissing } from "../utils/checkUserName";
+import { updateUserEntityNameIfMissing } from "../services/checkUserName";
 
 const timeMS = getTimeMs(); // Ensure this is set in your .env file
 

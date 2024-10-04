@@ -6,7 +6,7 @@ import { selectAgent, selectClient } from "../features/data/dataSlice";
 import { getVisits } from "../features/data/dataThunks";
 import { selectVisits } from "../features/promoVisits/promoVisitsSelectors";
 import { Agent, Client } from "../models/entityModels";
-import { showToast } from "../utils/toastMessage";
+import { showToast } from "../services/toastMessage";
 
 export const useVisitSidebar = () => {
   const dispatch = useAppDispatch();

@@ -9,8 +9,8 @@ import store from "./app/store";
 import i18n from "./i18n";
 import "./main.css";
 import { registerPWA } from "./pwa";
+import "./services/axiosInterceptor";
 import { webSocketService } from "./services/webSocketService";
-import "./utils/tokenIntercept";
 
 webSocketService.injectStore(store);
 
