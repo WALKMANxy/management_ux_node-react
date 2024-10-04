@@ -1,4 +1,27 @@
 {
+  "footer": {
+    "about": "Acerca de",
+    "ourStory": "Nuestra historia",
+    "team": "Equipo",
+    "followUs": "Síguenos",
+    "facebook": "Síguenos en Facebook",
+    "instagram": "Síguenos en Instagram",
+    "legal": "Legal",
+    "privacyPolicy": "Política de privacidad",
+    "termsOfService": "Términos de servicio",
+    "close": "Cerrar",
+    "hours": "Horas"
+
+  },
+  "ourStory": {
+    "title": "Nuestra historia",
+    "content": {
+      "part1": "<0>Ricambi Centro Sud S.r.l.</0> opera en los sectores de vehículos comerciales, autobuses, camiones y repuestos para automóviles con motores diésel y gasolina, también ocupándose de carrocería y vehículos industriales, agrícolas, marítimos y ferroviarios. Desde 1995 en Catania, ofrece servicios para elegir y vender los productos propuestos con profesionalismo y competencia, satisfaciendo las necesidades de entidades públicas y privadas, concesionarios de repuestos, especialistas en bombas, mecánicos y electricistas.",
+      "part2": "La empresa, ahora en expansión, está ansiosa por ofrecer este servicio cada vez más competente y efectivo directamente a particulares, brindando una oportunidad y ofreciendo soluciones para grandes y pequeños problemas de vehículos. Encontrarás personal calificado en formación continua, capaz de analizar el problema y ofrecer asesoramiento sobre las alternativas correctas. Puedes beneficiarte de la entrega a domicilio y de servicios completos de 360 grados.",
+      "part3": "La empresa es distribuidora de marcas de repuestos originales, así como de productos oficialmente reacondicionados directamente por el fabricante. La calidad del servicio en relación con el precio, el área técnica calificada y la gestión/proyecto más allá de la simple venta directa son los tres puntos fuertes y distintivos de Ricambi Centro Sud S.r.l. El área técnica, equipada con herramientas y formación continua, promueve la red funcional en la zona, garantizando actualizaciones y asistencia postventa a los clientes.",
+      "part4": "<0>Una empresa que no ha perdido su carácter abierto y familiar</0> pero que hoy está en plena expansión, enfrentando nuevos desafíos. La nueva estructura, que abarca 3.800 metros cuadrados en tres niveles, incluidos oficinas, almacén y punto de venta, con un total de 25 empleados, es capaz de garantizar servicios en diferentes áreas de experiencia en el territorio gracias a agentes de ventas especializados por tipo de producto y marca."
+    }
+  },
   "welcome": "Bienvenido",
   "login": "Iniciar sesión",
   "statistics": "Estadísticas",

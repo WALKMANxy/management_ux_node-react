@@ -63,12 +63,11 @@ export const loginUser = async (credentials: {
   }
 };
 
-
 export const logoutUser = async (): Promise<void> => {
   // First check sessionStorage, then fallback to localStorage
   const localAuthState =
-    JSON.parse(localStorage.getItem("authState")!) ||
-    JSON.parse(sessionStorage.getItem("authState")!);
+    JSON.parse(sessionStorage.getItem("auth")!) ||
+    JSON.parse(localStorage.getItem("authState")!);
   if (!localAuthState) {
     throw new Error("No auth state found for logout.");
   }
