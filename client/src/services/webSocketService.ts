@@ -3,7 +3,7 @@ import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
 import { AppStore } from "../app/store";
 import { getApiUrl } from "../config/config";
-import { handleLogout } from "../features/auth/authSlice";
+import { handleLogout } from "../features/auth/authThunks";
 import { fetchChatById } from "../features/chat/api/chats";
 import {
   addChatReducer,
@@ -77,7 +77,6 @@ class WebSocketService {
       auth: {
         authorization: `Bearer ${accessToken}`, // Correct spelling
       },
-
     });
 
     this.setupEventListeners();

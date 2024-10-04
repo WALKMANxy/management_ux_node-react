@@ -26,7 +26,7 @@ export const loginUser = async (credentials: {
   refreshToken: string;
 }> => {
   const uniqueId = getUniqueIdentifier();
-  console.log("Generated uniqueId for login:", uniqueId);
+  // console.log("Generated uniqueId for login:", uniqueId);
 
   try {
     // Make the login API call and pass the uniqueId
@@ -39,7 +39,7 @@ export const loginUser = async (credentials: {
       uniqueId,
     });
 
-    console.log("Login API response:", response);
+    // console.log("Login API response:", response);
 
     // Validate tokens
     if (!response.accessToken || !response.refreshToken) {
@@ -49,7 +49,7 @@ export const loginUser = async (credentials: {
 
     // Store the access token in memory
     setAccessToken(response.accessToken);
-    console.log("Access token set successfully in memory");
+    // console.log("Access token set successfully in memory");
 
     return {
       id: response.id,
@@ -87,7 +87,7 @@ export const logoutUser = async (): Promise<void> => {
       {}, // No body required
       {
         headers: {
-          Authorization: `Bearer ${refreshToken}`, 
+          Authorization: `Bearer ${refreshToken}`,
           "bypass-tunnel-reminder": "true",
           "Content-Type": "application/json",
           uniqueId: uniqueId,

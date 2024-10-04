@@ -2,13 +2,13 @@ import { useEffect } from "react";
 import { useAppDispatch } from "../app/hooks";
 import store from "../app/store";
 
-import { handleLogin, handleLogout } from "../features/auth/authSlice";
 import { setCurrentUser } from "../features/users/userSlice";
 import { User } from "../models/entityModels";
 
 import { useTranslation } from "react-i18next";
 import { getTimeMs } from "../config/config";
 import { loginUser, registerUser } from "../features/auth/api/auth";
+import { handleLogin, handleLogout } from "../features/auth/authThunks";
 import { getUserById } from "../features/users/api/users";
 import {
   FetchUserRoleError,
@@ -60,7 +60,7 @@ export const useAuth = () => {
     keepMeSignedIn: boolean
   ) => {
     try {
-      console.log("Attempting to log in with credentials:", { email });
+      // console.log("Attempting to log in with credentials:", { email });
 
       // Attempt to log in the user
       const { id, message, statusCode, refreshToken } = await loginUser({
@@ -68,12 +68,12 @@ export const useAuth = () => {
         password,
       });
 
-      console.log("Response from loginUser:", {
+      /* console.log("Response from loginUser:", {
         id,
         message,
         statusCode,
         refreshToken,
-      });
+      }); */
 
       // Check if the login was unsuccessful
       if (statusCode !== 200) {
@@ -93,7 +93,7 @@ export const useAuth = () => {
       const userId = id;
 
       if (userId) {
-        console.log("User ID retrieved from login response:", userId);
+        // console.log("User ID retrieved from login response:", userId);
 
         // Derive the encryption key using userId, userAgent, and salt
         await initializeUserEncryption({
@@ -102,16 +102,16 @@ export const useAuth = () => {
           // Check if the
         });
 
-        console.log("Encryption initialized for user:", userId);
+        // console.log("Encryption initialized for user:", userId);
 
         // Dispatch an action to get the user role by ID
         const result = await getUserById(userId);
-        console.log("Response from getUserById:", result);
+        // console.log("Response from getUserById:", result);
 
         if (result) {
           const user = result as User;
 
-          console.log("User role retrieved:", user.role);
+          // console.log("User role retrieved:", user.role);
 
           if (!user.role) {
             setAlertMessage(t("auth.roleNotAssigned" + message));
@@ -136,7 +136,7 @@ export const useAuth = () => {
             })
           );
 
-          console.log("Login dispatched successfully.");
+          // console.log("Login dispatched successfully.");
 
           // Set the current user in the userSlice for consistent state management
           dispatch(setCurrentUser(user));
@@ -144,7 +144,7 @@ export const useAuth = () => {
           // Save auth state if 'Keep me signed in' is selected
           if (keepMeSignedIn) {
             saveAuthState(store.getState().auth);
-            console.log("Auth state saved in local storage");
+            // console.log("Auth state saved in local storage");
           }
 
           onClose();
