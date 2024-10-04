@@ -17,7 +17,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { handleLogout } from "../../features/auth/authSlice";
+import { handleLogout } from "../../features/auth/authThunks";
 import { selectCurrentUser } from "../../features/users/userSlice";
 
 const UserAvatar: React.FC = () => {
@@ -30,8 +30,6 @@ const UserAvatar: React.FC = () => {
   const { t } = useTranslation();
 
   const initiateLogout = () => {
-    window.location.href = "/";
-
     dispatch(handleLogout());
   };
 

@@ -1,12 +1,12 @@
 // src/services/api/apiUtils.ts
 
 import { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import store from "../app/store";
+import { handleLogout } from "../features/auth/authThunks";
 import { axiosInstance } from "../utils/apiUtils";
 import { refreshAccessToken } from "./sessionService";
 import { showToast } from "./toastMessage";
 import { getAccessToken } from "./tokenService";
-import store from "../app/store";
-import { handleLogout } from "../features/auth/authSlice";
 
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];

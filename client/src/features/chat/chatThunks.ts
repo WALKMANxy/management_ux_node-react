@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Async thunk to fetch all chats for the user
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { RootState } from "../../app/store";
 import { IChat, IMessage } from "../../models/dataModels";
 import { showToast } from "../../services/toastMessage";
 import {
@@ -24,21 +26,40 @@ interface chatThunkError extends Error {
   message: string;
 }
 
-export const fetchAllChatsThunk = createAsyncThunk<
-  IChat[],
-  void,
-  { rejectValue: string }
->("chats/fetchAllChatsThunk", async (_, { rejectWithValue }) => {
+// Helper function to create authenticated thunks
+const createAuthenticatedThunk = <Returned, ThunkArg>(
+  type: string,
+  payloadCreator: (arg: ThunkArg, thunkAPI: any) => Promise<Returned>
+) => {
+  return createAsyncThunk<Returned, ThunkArg, { rejectValue: string }>(
+    type,
+    payloadCreator,
+    {
+      condition: (_, { getState }) => {
+        const state = getState() as RootState;
+        if (!state.auth.isLoggedIn) {
+          return false; // Prevent the thunk from executing
+        }
+        return true; // Allow the thunk to execute
+      },
+    }
+  );
+};
 
-  try {
-    const result = await fetchAllChats(); // Direct API call
-    return result; // Return the fetched chats
-  } catch (error) {
-    const typedError = error as chatThunkError;
-    showToast.error(`Failed to fetch chats: ${typedError.message}`);
-    return rejectWithValue(typedError.message || "Failed to fetch chats");
+// Refactored async thunk to fetch all chats for the user
+export const fetchAllChatsThunk = createAuthenticatedThunk<IChat[], void>(
+  "chats/fetchAllChatsThunk",
+  async (_, { rejectWithValue }) => {
+    try {
+      const result = await fetchAllChats(); // Direct API call
+      return result; // Return the fetched chats
+    } catch (error) {
+      const typedError = error as chatThunkError;
+      showToast.error(`Failed to fetch chats: ${typedError.message}`);
+      return rejectWithValue(typedError.message || "Failed to fetch chats");
+    }
   }
-});
+);
 
 // Refactored async thunk to fetch messages for a specific chat
 export const fetchMessagesThunk = createAsyncThunk<

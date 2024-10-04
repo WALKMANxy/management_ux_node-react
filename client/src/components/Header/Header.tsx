@@ -34,7 +34,7 @@ import { useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../app/hooks";
 import { RootState } from "../../app/store";
-import { handleLogout } from "../../features/auth/authSlice";
+import { handleLogout } from "../../features/auth/authThunks";
 import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 import { clearSelection } from "../../features/data/dataSlice";
 import GlobalSearch from "./GlobalSearch";
@@ -55,7 +55,6 @@ const Header: React.FC = () => {
   const prevLocationRef = useRef<string>(location.pathname); // Initialize previous location
 
   const initiateLogout = () => {
-
     dispatch(handleLogout());
   };
 
