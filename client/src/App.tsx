@@ -12,11 +12,8 @@ import Loader from "./components/common/Loader";
 import LoadingSpinner from "./components/common/LoadingSpinner";
 import "./components/statistics/grids/AGGridTable.css"; // Import the custom AG Grid CSS
 import { getTimeMs } from "./config/config";
-import {
-  handleLogout,
-  selectIsLoggedIn,
-  selectUserRole,
-} from "./features/auth/authSlice";
+import { selectIsLoggedIn, selectUserRole } from "./features/auth/authSlice";
+import { handleLogout } from "./features/auth/authThunks";
 import { fetchUserById, setCurrentUser } from "./features/users/userSlice";
 import Layout from "./layout/Layout";
 import { UserRole } from "./models/entityModels";

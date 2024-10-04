@@ -40,26 +40,29 @@ const LandingPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (isLoggedIn && userRole !== "guest") {
-      setIsRedirected(true); // Set the flag as redirected
-      // Redirect based on user role
-      switch (userRole) {
-        case "admin":
-          navigate("/admin-dashboard");
-          break;
-        case "agent":
-          navigate("/agent-dashboard");
-          break;
-        case "client":
-          navigate("/client-dashboard");
-          break;
-        case "employee":
-          navigate("/employee-dashboard");
-          break;
-        default:
-          break;
+    const timer = setTimeout(() => {
+      if (isLoggedIn && userRole !== "guest") {
+        setIsRedirected(true); // Set the flag as redirected
+        // Redirect based on user role
+        switch (userRole) {
+          case "admin":
+            navigate("/admin-dashboard");
+            break;
+          case "agent":
+            navigate("/agent-dashboard");
+            break;
+          case "client":
+            navigate("/client-dashboard");
+            break;
+          case "employee":
+            navigate("/employee-dashboard");
+            break;
+          default:
+            break;
+        }
       }
-    }
+    }, 500);
+    return () => clearTimeout(timer);
   }, [isLoggedIn, userRole, isRedirected, navigate]);
 
   return (
