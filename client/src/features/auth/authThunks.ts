@@ -22,19 +22,19 @@ export const handleLogin = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      console.log("Handling login in Redux with:", {
+      /*  console.log("Handling login in Redux with:", {
         role,
         id,
         userId,
         refreshToken,
-      });
+      }); */
 
       // Perform side effects needed on login
       sessionStorage.setItem(
         "auth",
         JSON.stringify({ isLoggedIn: true, role, id, userId, refreshToken })
       );
-    //   console.log("Auth state saved in sessionStorage");
+      //   console.log("Auth state saved in sessionStorage");
 
       // Connect to WebSocket service
       webSocketService.connect();
@@ -61,11 +61,11 @@ export const handleLogout = createAsyncThunk(
       webSocketService.disconnect();
 
       // Clear tokens
-    //   console.log("Removing auth state from sessionStorage");
+      //   console.log("Removing auth state from sessionStorage");
       sessionStorage.removeItem("authState");
-    //   console.log("Removing auth state from localStorage");
+      //   console.log("Removing auth state from localStorage");
       localStorage.removeItem("authState");
-    //   console.log("Clearing access token");
+      //   console.log("Clearing access token");
       setAccessToken(null);
 
       return; // No payload needed

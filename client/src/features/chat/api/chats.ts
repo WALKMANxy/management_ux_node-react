@@ -74,10 +74,11 @@ export const fetchMessagesFromMultipleChats = async (
     if (!chatIds || !Array.isArray(chatIds) || chatIds.length === 0) {
       throw new Error("Invalid chat IDs array.");
     }
-    const query = chatIds.map((id) => `chatIds[]=${id}`).join("&");
+    // Send chatIds in the request body instead of query params
     return await apiCall<{ chatId: string; messages: IMessage[] }[]>(
-      `/chats/messages?${query}`,
-      "GET"
+      `/chats/messages`,
+      "POST",
+      { chatIds } // Pass chatIds in the body
     );
   } catch (error) {
     console.error("Error fetching messages from multiple chats:", error);
