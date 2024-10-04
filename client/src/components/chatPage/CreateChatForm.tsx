@@ -26,7 +26,7 @@ import {
   selectCurrentUser,
 } from "../../features/users/userSlice";
 import useChatLogic from "../../hooks/useChatsLogic";
-import { showToast } from "../../utils/toastMessage";
+import { showToast } from "../../services/toastMessage";
 import UserList from "./UserList";
 
 interface CreateChatFormProps {
@@ -104,50 +104,51 @@ const CreateChatForm: React.FC<CreateChatFormProps> = ({ open, onClose }) => {
   // Handle form submission
   const onSubmit = async (data: CreateChatFormData) => {
     if (!chatType) {
-        showToast.error(t("createChatForm.errors.chatTypeRequired"));
-        return;
-      }
-      if (selectedUserIds.length === 0) {
-        showToast.error(t("createChatForm.errors.noParticipants"));
-        return;
-      }
+      showToast.error(t("createChatForm.errors.chatTypeRequired"));
+      return;
+    }
+    if (selectedUserIds.length === 0) {
+      showToast.error(t("createChatForm.errors.noParticipants"));
+      return;
+    }
 
-      if (!currentUserId) {
-        showToast.error(t("createChatForm.errors.userNotLoggedIn"));
-        return;
-      }
-
+    if (!currentUserId) {
+      showToast.error(t("createChatForm.errors.userNotLoggedIn"));
+      return;
+    }
 
     setIsSubmitting(true);
 
     try {
-        // Determine if the current user should be an admin
-        let admins: string[] | undefined;
-        if (chatType === "group" || chatType === "broadcast") {
-          admins = [currentUserId];
-        }
-
-        // Prepare the participants array, ensuring the current user is included
-        const participants = Array.from(new Set([currentUserId, ...selectedUserIds]));
-
-        await handleCreateChat(
-          participants,
-          data.chatType,
-          data.chatName,
-          data.chatType === "broadcast" ? data.chatName : undefined,
-          admins // Pass the admins array
-        );
-
-        showToast.success(t("createChatForm.success.createChat"));
-        onClose();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        console.error("Failed to create chat:", error);
-        showToast.error(t("createChatForm.errors.createChatFailed"));
-      } finally {
-        setIsSubmitting(false);
+      // Determine if the current user should be an admin
+      let admins: string[] | undefined;
+      if (chatType === "group" || chatType === "broadcast") {
+        admins = [currentUserId];
       }
-    };
+
+      // Prepare the participants array, ensuring the current user is included
+      const participants = Array.from(
+        new Set([currentUserId, ...selectedUserIds])
+      );
+
+      await handleCreateChat(
+        participants,
+        data.chatType,
+        data.chatName,
+        data.chatType === "broadcast" ? data.chatName : undefined,
+        admins // Pass the admins array
+      );
+
+      showToast.success(t("createChatForm.success.createChat"));
+      onClose();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Failed to create chat:", error);
+      showToast.error(t("createChatForm.errors.createChatFailed"));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <Dialog

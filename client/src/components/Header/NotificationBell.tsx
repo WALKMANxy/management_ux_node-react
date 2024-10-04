@@ -15,8 +15,8 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import useChatLogic from "../../hooks/useChatsLogic"; // Import the custom hook
+import { showToast } from "../../services/toastMessage";
 import { formatDateForDivider } from "../../utils/chatUtils";
-import { showToast } from "../../utils/toastMessage";
 
 const shakeAnimation = keyframes`
   0%, 100% { transform: translateX(0); }
@@ -117,7 +117,7 @@ const NotificationBell: React.FC = () => {
                       display: "flex",
                       alignItems: "flex-start",
                       boxShadow: "0 1px 4px rgba(0, 0, 0, 0.4)",
-                      borderRadius: "8px"
+                      borderRadius: "8px",
                     }}
                   >
                     <ListItemText

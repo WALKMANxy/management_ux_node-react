@@ -15,8 +15,8 @@ import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
 import { selectCurrentUser } from "../../features/users/userSlice";
 import usePromos from "../../hooks/usePromos";
+import { showToast } from "../../services/toastMessage";
 import { numberComparator } from "../../utils/dataUtils";
-import { showToast } from "../../utils/toastMessage";
 import "../statistics/grids/AGGridTable.css";
 
 interface EligibleClientsGridProps {

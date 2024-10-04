@@ -26,6 +26,7 @@ import usersRoutes from "./routes/users";
 import visitsRoutes from "./routes/visits";
 import { errorHandler } from "./utils/errorHandler";
 import { logger, logRequestsIp } from "./utils/logger";
+import { csp } from "./middlewares/csp";
 
 const app = express();
 const PORT = config.port || "3000";
@@ -45,6 +46,7 @@ const corsOptions: cors.CorsOptions = {
 
 console.log("CORS Origin:", corsOptions.origin);
 
+app.use(csp);
 app.use(helmet());
 app.use(cors(corsOptions));
 app.use(compression());

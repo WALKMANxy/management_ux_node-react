@@ -14,11 +14,11 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { handleLogout } from "../../features/auth/authSlice";
 import { selectCurrentUser } from "../../features/users/userSlice";
-import { useTranslation } from "react-i18next";
 
 const UserAvatar: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -30,6 +30,8 @@ const UserAvatar: React.FC = () => {
   const { t } = useTranslation();
 
   const initiateLogout = () => {
+    window.location.href = "/";
+
     dispatch(handleLogout());
   };
 
@@ -120,7 +122,6 @@ const UserAvatar: React.FC = () => {
                 boxShadow: 1,
                 borderRadius: 2,
                 mb: 1,
-
               }}
             >
               <ListItemIcon>

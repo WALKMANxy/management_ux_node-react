@@ -43,10 +43,16 @@ export const config = {
   passwordResetExpiresIn: process.env.PASSWORD_RESET_EXPIRES_IN || "1h",
   tunnelSubdomain: process.env.TUNNEL_SUBDOMAIN || "",
   refreshTokenDuration: process.env.REFRESH_TOKEN_DURATION || "7d",
-  sessionDuration: process.env.SESSION_DURATION || "24d",
   emailHost: process.env.EMAIL_HOST || "",
   emailHostPort: process.env.EMAIL_HOST_PORT || "",
   botId: process.env.BOT_TOKEN || "",
+  jwt: {
+    accessTokenSecret: process.env.ACCESS_TOKEN_SECRET || "",
+    refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET || "",
+    accessTokenExpiry: process.env.ACCESS_TOKEN_EXPIRY || "15m",
+    refreshTokenExpiry: process.env.REFRESH_TOKEN_EXPIRY || "7d",
+  },
+  sessionDuration: process.env.SESSION_DURATION || "7d",
 };
 
 // Validate required environment variables

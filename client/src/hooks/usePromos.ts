@@ -12,7 +12,7 @@ import {
 import { selectPromos } from "../features/promoVisits/promoVisitsSelectors";
 import { selectCurrentUser } from "../features/users/userSlice";
 import { Promo } from "../models/dataModels";
-import { showToast } from "../utils/toastMessage";
+import { showToast } from "../services/toastMessage";
 
 type PromoMode = "view" | "create" | "edit";
 

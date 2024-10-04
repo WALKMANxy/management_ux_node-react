@@ -21,7 +21,7 @@ import { selectVisits } from "../features/promoVisits/promoVisitsSelectors";
 import { selectCurrentUser } from "../features/users/userSlice";
 import { CalendarEvent, Visit } from "../models/dataModels";
 import { CreateEventPayload } from "../models/propsModels";
-import { showToast } from "../utils/toastMessage";
+import { showToast } from "../services/toastMessage";
 
 export const useCalendar = () => {
   const [selectedDays, setSelectedDays] = useState<Date[]>([]);

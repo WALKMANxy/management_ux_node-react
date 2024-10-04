@@ -17,9 +17,9 @@ import { fetchAllChatsThunk } from "../features/chat/chatThunks";
 import { selectClientIds } from "../features/data/dataSlice";
 import { getAllUsersThunk, selectAllUsers } from "../features/users/userSlice";
 import { IChat, IMessage } from "../models/dataModels";
+import { showToast } from "../services/toastMessage";
 import { sanitizeSearchTerm } from "../utils/chatUtils";
 import { generateId } from "../utils/deviceUtils";
-import { showToast } from "../utils/toastMessage";
 
 const useChatLogic = () => {
   const dispatch = useAppDispatch();
@@ -41,8 +41,6 @@ const useChatLogic = () => {
   const agentClientIds = useSelector(selectClientIds);
 
   const currentChatId = useMemo(() => currentChat?._id, [currentChat]);
-
-  
 
   const fetchChats = useCallback(async () => {
     try {

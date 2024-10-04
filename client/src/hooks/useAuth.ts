@@ -1,32 +1,30 @@
 import { useEffect } from "react";
 import { useAppDispatch } from "../app/hooks";
 import store from "../app/store";
-import {
-  authApi,
-  useLoginUserMutation,
-  useRegisterUserMutation,
-} from "../features/auth/authQueries";
+
 import { handleLogin, handleLogout } from "../features/auth/authSlice";
 import { setCurrentUser } from "../features/users/userSlice";
 import { User } from "../models/entityModels";
 
 import { useTranslation } from "react-i18next";
 import { getTimeMs } from "../config/config";
-import { initializeUserEncryption } from "../utils/cacheUtils";
+import { loginUser, registerUser } from "../features/auth/api/auth";
+import { getUserById } from "../features/users/api/users";
 import {
   FetchUserRoleError,
   LoginError,
   RegistrationError,
-} from "../utils/errorHandling";
-import { saveAuthState } from "../utils/localStorage";
-import { showToast } from "../utils/toastMessage";
+} from "../services/errorHandling";
+import { saveAuthState } from "../services/localStorage";
+import { showToast } from "../services/toastMessage";
+import { setAccessToken } from "../services/tokenService";
+import { initializeUserEncryption } from "../utils/cacheUtils";
+import { getUniqueIdentifier } from "../utils/cryptoUtils";
 
 const timeMS = getTimeMs(); // Ensure this is set in your .env file
 
 export const useAuth = () => {
   const dispatch = useAppDispatch();
-  const [registerUser] = useRegisterUserMutation();
-  const [loginUser] = useLoginUserMutation();
   const { t } = useTranslation();
 
   const initiateRegister = async (
@@ -40,7 +38,7 @@ export const useAuth = () => {
       const { message, statusCode } = await registerUser({
         email,
         password,
-      }).unwrap();
+      });
       setAlertMessage(t("auth.registrationSuccess" + message)); // translation key
       setAlertSeverity(statusCode === 201 ? "success" : "error");
       setAlertOpen(true);
@@ -62,13 +60,20 @@ export const useAuth = () => {
     keepMeSignedIn: boolean
   ) => {
     try {
+      console.log("Attempting to log in with credentials:", { email });
+
       // Attempt to log in the user
-      const { id, message, statusCode } = await loginUser({
+      const { id, message, statusCode, refreshToken } = await loginUser({
         email,
         password,
-      }).unwrap();
+      });
 
-      // Logging the response from loginUser API
+      console.log("Response from loginUser:", {
+        id,
+        message,
+        statusCode,
+        refreshToken,
+      });
 
       // Check if the login was unsuccessful
       if (statusCode !== 200) {
@@ -78,7 +83,7 @@ export const useAuth = () => {
           "Message:",
           message
         );
-        setAlertMessage(t("auth.loginFailed" + message)); // translation key
+        setAlertMessage(t("auth.loginFailed" + message));
         setAlertSeverity("error");
         setAlertOpen(true);
         return;
@@ -88,31 +93,35 @@ export const useAuth = () => {
       const userId = id;
 
       if (userId) {
-        // Derive the encryption key using userId, userAgent, and salt
+        console.log("User ID retrieved from login response:", userId);
 
+        // Derive the encryption key using userId, userAgent, and salt
         await initializeUserEncryption({
           userId,
           timeMS,
+          // Check if the
         });
 
+        console.log("Encryption initialized for user:", userId);
+
         // Dispatch an action to get the user role by ID
-        const result = await dispatch(
-          authApi.endpoints.getUserRoleById.initiate(userId)
-        );
-        if ("data" in result) {
-          const user = result.data as User;
+        const result = await getUserById(userId);
+        console.log("Response from getUserById:", result);
+
+        if (result) {
+          const user = result as User;
+
+          console.log("User role retrieved:", user.role);
 
           if (!user.role) {
-            setAlertMessage(t("auth.roleNotAssigned" + message)); // translation key
-
-            setAlertSeverity("info"); // Changed to "info" severity
+            setAlertMessage(t("auth.roleNotAssigned" + message));
+            setAlertSeverity("info");
             setAlertOpen(true);
             return;
           }
 
           if (user.role === "guest") {
-            setAlertMessage(t("auth.accountVerificationPending" + message)); // translation key
-
+            setAlertMessage(t("auth.accountVerificationPending" + message));
             setAlertSeverity("error");
             setAlertOpen(true);
             return;
@@ -123,8 +132,11 @@ export const useAuth = () => {
               role: user.role,
               id: user.entityCode,
               userId: user._id,
+              refreshToken,
             })
           );
+
+          console.log("Login dispatched successfully.");
 
           // Set the current user in the userSlice for consistent state management
           dispatch(setCurrentUser(user));
@@ -132,20 +144,20 @@ export const useAuth = () => {
           // Save auth state if 'Keep me signed in' is selected
           if (keepMeSignedIn) {
             saveAuthState(store.getState().auth);
+            console.log("Auth state saved in local storage");
           }
 
           onClose();
-        } else if ("error" in result) {
-          showToast.error(t("auth.roleFetchingError", { error: result.error })); // Toast for role fetching error
-          throw new FetchUserRoleError(t("auth.roleFetchingError"));
         }
       } else {
-        showToast.error(t("auth.userNotFound")); // Toast for user ID missing
+        console.error("User ID not found in login response");
+        showToast.error(t("auth.userNotFound"));
         setAlertMessage(t("auth.userNotFound"));
         setAlertSeverity("error");
         setAlertOpen(true);
       }
     } catch (error) {
+      console.error("Error during initiateLogin:", error);
       let errorMessage = t("auth.errorDuringLogin");
       let errorSeverity: "error" | "info" = "error";
 
@@ -159,7 +171,7 @@ export const useAuth = () => {
         errorMessage = t("auth.serverUnreachable");
       }
 
-      showToast.error(errorMessage); // Toast for general login error
+      showToast.error(errorMessage);
       const loginError = new LoginError(errorMessage);
       setAlertMessage(loginError.message);
       setAlertSeverity(errorSeverity);
@@ -196,9 +208,11 @@ export const useAuth = () => {
     const state = Math.random().toString(36).substring(2, 15);
     sessionStorage.setItem("oauth_state", state);
 
+    const uniqueId = getUniqueIdentifier(); // Fetch or generate the uniqueId for the device
+
     const googleAuthUrl = `${
       import.meta.env.VITE_API_BASE_URL
-    }/oauth2/google?state=${state}`;
+    }/oauth2/google?state=${state}&uniqueId=${uniqueId}`;
     const width = 500;
     const height = 600;
     const left = window.screenX + (window.outerWidth - width) / 2;
@@ -217,7 +231,7 @@ export const useAuth = () => {
         return;
       }
 
-      const { status, state, user } = event.data;
+      const { status, state, user, refreshToken, accessToken } = event.data;
       const expectedState = sessionStorage.getItem("oauth_state");
       sessionStorage.removeItem("oauth_state");
 
@@ -236,11 +250,14 @@ export const useAuth = () => {
           timeMS,
         });
 
+        setAccessToken(accessToken);
+
         await dispatch(
           handleLogin({
             role: user.role,
             id: user.entityCode,
             userId: user._id,
+            refreshToken,
           })
         );
       } else {

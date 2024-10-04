@@ -7,16 +7,16 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
   Visit,
 } from "../../models/dataModels"; */
 import { Admin, Agent, Client } from "../../models/entityModels";
+import { mapDataToAgents, mapDataToModels } from "../../services/dataLoader";
+import {
+  generateErrorResponse,
+  handleApiError,
+} from "../../services/errorHandling";
 import {
   loadAgentsDataWithCache,
   loadClientsDataWithCache,
   loadMovementsDataWithCache,
 } from "../../utils/apiUtils";
-import { mapDataToAgents, mapDataToModels } from "../../utils/dataLoader";
-import {
-  generateErrorResponse,
-  handleApiError,
-} from "../../utils/errorHandling";
 import { getAdminById } from "./api/admins";
 import { getAgentByClientEntityCode, getAgentById } from "./api/agents";
 import { getClientByCodice, getClientsByAgent } from "./api/clients";

@@ -2,163 +2,308 @@ import { Request } from "express";
 import { config } from "../config/config";
 import { ISession, Session } from "../models/Session";
 import { AuthenticatedRequest } from "../models/types";
-import { verifySessionToken } from "./jwtUtils"; // Only keep the verifySessionToken function
+import { IUser } from "../models/User";
+import { UserService } from "../services/userService";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyAccessToken,
+} from "./jwtUtils";
 import { logger } from "./logger";
 
 const ms = require("ms");
 
-const sessionDurationMs = ms(config.sessionDuration);
+const refreshTokenDurationMs = ms(config.jwt.refreshTokenExpiry); // e.g., "7d"
 
-// Create or renew a session using the provided session token
+/**
+ * Creates a new session for the user, handling token generation and existing session invalidation.
+ * @param user - The user object.
+ * @param req - The authenticated request.
+ * @param uniqueId - Unique identifier for the client instance.
+ * @returns An object containing the Access Token and Refresh Token.
+ */
 export const createSession = async (
-  userId: string,
-  token: string,
-  req: AuthenticatedRequest
-): Promise<ISession> => {
+  user: Partial<IUser>,
+  req: AuthenticatedRequest,
+  uniqueId: string
+): Promise<{ accessToken: string; refreshToken: string }> => {
   try {
-    // Attempt to find an existing session
+    // Validate inputs
+    if (!user || !uniqueId) {
+      logger.error("Validation failed: user or uniqueId missing.", {
+        user,
+        uniqueId,
+      });
+      throw new Error("userId and uniqueId are required to create a session.");
+    }
+
+    const userId = user?._id?.toString();
+
+    logger.info("Attempting to create session", { userId, uniqueId });
+
+    const userAgent = req.get("User-Agent") || "Unknown";
+    logger.info("Retrieved User-Agent from request", { userAgent });
+
+    // Check if a session with the same userId, uniqueId, and userAgent exists
     const existingSession = await Session.findOne({
       userId,
-      userAgent: req.get("User-Agent"),
+      uniqueId,
+      userAgent,
       expiresAt: { $gt: new Date() },
     });
 
     if (existingSession) {
-      // Verify the existing session's token
-      try {
-        verifySessionToken(existingSession.token); // Ensure stored token is still valid
-      } catch (error) {
-        logger.warn("Stored session token verification failed", {
-          userId,
-          sessionId: existingSession._id,
-          error,
-        });
-        // If verification fails, proceed to create a new session
-      }
-
-      // Verify the incoming token
-      try {
-        verifySessionToken(token);
-      } catch (error) {
-        logger.error("Incoming token verification failed", { userId, error });
-        throw new Error("Invalid session token.");
-      }
-
-      // Compare tokens and update if different
-      if (existingSession.token !== token) {
-        logger.info(
-          "Session token mismatch detected. Updating session token.",
-          {
-            userId,
-            sessionId: existingSession._id,
-          }
-        );
-
-        // Update the session with the new token
-        existingSession.token = token;
-      }
-
-      // Renew the session expiration
-      existingSession.expiresAt = new Date(Date.now() + sessionDurationMs);
-      const renewedSession = await existingSession.save();
-
-      logger.info("Existing session renewed successfully", {
+      logger.info("Existing session found, invalidating", {
+        sessionId: existingSession._id,
         userId,
-        sessionId: renewedSession._id,
-        ipAddress: req.ip,
-        userAgent: req.get("User-Agent"),
       });
-
-      return renewedSession;
+      await invalidateSession(
+        existingSession.refreshToken,
+        existingSession.uniqueId!
+      );
+    } else {
+      logger.info("No existing session found for user", { userId, uniqueId });
     }
 
-    // No existing session found, create a new one
-    const expiresAt = new Date(Date.now() + sessionDurationMs);
+    // Generate tokens
+    logger.info("Generating new tokens for user", { userId });
+    const newAccessToken = generateAccessToken(user as IUser, uniqueId);
+    const newRefreshToken = generateRefreshToken(user as IUser);
+
+    // Create session
+    logger.info("Saving new session to database", { userId, uniqueId });
     const session = new Session({
       userId,
-      token,
-      expiresAt,
+      refreshToken: newRefreshToken,
+      expiresAt: new Date(Date.now() + refreshTokenDurationMs),
       ipAddress: req.ip,
-      userAgent: req.get("User-Agent"),
+      userAgent,
+      uniqueId,
     });
 
-    const savedSession = await session.save();
+    console.log("Saved session:", session.toObject());
+
+    await session.save();
     logger.info("Session created successfully", {
       userId,
-      sessionId: savedSession._id,
+      sessionId: session._id,
       ipAddress: req.ip,
-      userAgent: req.get("User-Agent"),
+      userAgent,
+      uniqueId,
     });
 
-    return savedSession;
-  } catch (error) {
-    logger.error("Error creating session", { error });
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+  } catch (error: unknown) {
+    const typedError = error as { message: string; stack?: string };
+    console.error("Error creating session", {
+      error: typedError.message,
+      stack: typedError.stack,
+      userId: user?._id,
+      uniqueId,
+    });
     throw error;
   }
 };
 
-// Validate a session by verifying the JWT token
-// Example of enhanced logging during token validation
-export const getSessionByToken = async (
-  token: string
+/**
+ * Validates the Access Token and retrieves the corresponding session.
+ * @param accessToken - The Access Token provided by the client.
+ * @param req - The request object containing userAgent and uniqueId.
+ * @returns The session if valid, otherwise null.
+ */
+export const getSessionByAccessToken = async (
+  accessToken: string,
+  req: Request
 ): Promise<ISession | null> => {
   try {
-    const decoded = verifySessionToken(token);
-/*     console.log("Decoded token from client:", decoded);
- */
-    // Fetch the session by the token and compare
-    const session = await Session.findOne({
-      userId: decoded.userId,
-      token, // Match the exact token from the cookie
-      expiresAt: { $gt: new Date() },
+    const decoded = verifyAccessToken(accessToken);
+    const userId = decoded.userId;
+    const userAgent = req.get("User-Agent");
+    const uniqueId = decoded.uniqueId;
+
+    logger.info("Retrieving session by Access Token", {
+      accessToken,
+      userId,
+      userAgent,
+      uniqueId,
     });
 
-    /* console.log("Session details:", {
-      clientToken: token,
-      storedToken: session?.token,
-      sessionExists: !!session,
-    }); */
+    if (!uniqueId && !userAgent) {
+      logger.warn(
+        "Session identifiers not provided in the request for session retrieval.",
+        { userId }
+      );
+      return null;
+    }
 
-    /* if (!session || session.token !== token) {
-      console.warn("Token mismatch or session not found", {
-        clientToken: token,
-        storedToken: session?.token,
-        sessionExists: !!session,
+
+    // Find sessions for the user that are still valid, match userAgent and uniqueId
+    const session = await Session.findOne(
+      {
+        userId,
+        userAgent,
+        uniqueId,
+        expiresAt: { $gt: new Date() },
+      },
+      { _id: 1, userId: 1, userAgent: 1, uniqueId: 1, expiresAt: 1 }
+    );
+
+
+    if (!session) {
+      logger.warn("No valid session found for the provided access token", {
+        userId: userId,
+        userAgent: userAgent,
+        uniqueId: uniqueId,
       });
-    } */
+      return null;
+    }
+
+    logger.info("Session found by Access Token", {
+      sessionId: session._id,
+      userId,
+      userAgent,
+      uniqueId,
+    });
 
     return session;
-  } catch (error) {
-    logger.error("Error fetching session by token", { token, error });
-    throw error;
+  } catch (error: unknown) {
+    const typedError = error as { message: string; stack?: string };
+    logger.error("Error fetching session by Access Token", {
+      accessToken,
+      error: typedError.message,
+      stack: typedError.stack,
+    });
+    return null;
   }
 };
 
-// Invalidate a session by deleting it from the database
-export const invalidateSession = async (token: string): Promise<void> => {
+/**
+ * Renews a session by validating the Refresh Token and issuing new tokens.
+ * @param refreshToken - The Refresh Token provided by the client.
+ * @param req - The request object containing userAgent and possibly uniqueId.
+ * @param uniqueId - Unique identifier for the client instance.
+ * @returns An object containing the new Access Token and Refresh Token, or null if renewal fails.
+ */
+export const renewSession = async (
+  refreshToken: string,
+  req: Request,
+  uniqueId: string // Now mandatory to ensure consistent session binding
+): Promise<{ accessToken: string; refreshToken: string } | null> => {
   try {
-    await Session.deleteOne({ token });
-    logger.info("Session invalidated", { token });
+    if (!refreshToken) {
+      logger.warn("No refresh token provided");
+      return null;
+    }
+
+    // Find session with the hashed refresh token
+    const session = await Session.findOne({ refreshToken, uniqueId });
+
+    if (!session) {
+      logger.warn("Invalid refresh token", { refreshToken });
+      return null;
+    }
+
+    // Optional: Validate uniqueId, IP, User-Agent
+    if (uniqueId && session.uniqueId !== uniqueId) {
+      logger.warn("Unique identifier mismatch during token refresh", {
+        sessionId: session._id,
+        storedUniqueId: session.uniqueId,
+        incomingUniqueId: uniqueId,
+      });
+      return null;
+    }
+
+    if (session.expiresAt < new Date()) {
+      logger.warn("Refresh token expired", { sessionId: session._id });
+      await invalidateSession(refreshToken, uniqueId);
+      return null;
+    }
+
+    // Validate userAgent
+    const incomingUserAgent = req.get("User-Agent");
+    if (session.userAgent !== incomingUserAgent) {
+      logger.warn("User-Agent mismatch during token refresh", {
+        sessionId: session._id,
+        storedUserAgent: session.userAgent,
+        incomingUserAgent,
+      });
+      return null;
+    }
+
+    // Retrieve the user details using UserService
+    const user = await UserService.getUserById(session.userId.toString());
+    if (!user) {
+      logger.warn("User not found for session", { sessionId: session._id });
+      return null;
+    }
+
+    // Generate new tokens (Rotate refresh token)
+    const newAccessToken = generateAccessToken(user, uniqueId);
+    const newRefreshToken = generateRefreshToken(user);
+
+    // Update session with new refresh token and expiration
+    session.refreshToken = newRefreshToken;
+    session.expiresAt = new Date(Date.now() + refreshTokenDurationMs);
+    await session.save();
+
+    logger.info("Session refreshed successfully", {
+      sessionId: session._id,
+      newExpiresAt: session.expiresAt,
+    });
+
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   } catch (error) {
-    logger.error("Error invalidating session", { token, error });
+    logger.error("Error refreshing session", { refreshToken, error });
     throw error;
   }
 };
 
-// Invalidate all sessions for a specific user
+/**
+ * Invalidates a session by deleting it from the database using the Refresh Token.
+ * @param refreshToken - The Refresh Token of the session to invalidate.
+ */
+export const invalidateSession = async (
+  refreshToken: string,
+  uniqueId: string
+): Promise<boolean> => {
+  try {
+    await Session.deleteOne({ refreshToken, uniqueId });
+    logger.info("Session invalidated", { refreshToken });
+    return true;
+  } catch (error) {
+    logger.error("Error invalidating session", { refreshToken, error });
+    return false;
+  }
+};
+
+/**
+ * Invalidates all sessions for a specific user.
+ * @param userId - The ID of the user whose sessions are to be invalidated.
+ */
 export const invalidateAllUserSessions = async (
   userId: string
 ): Promise<void> => {
   try {
-    await Session.deleteMany({ userId });
-    logger.info("All sessions invalidated for user", { userId });
-  } catch (error) {
-    logger.error("Error invalidating all sessions for user", { userId, error });
+    const result = await Session.deleteMany({ userId });
+
+    logger.info("All sessions invalidated for user.", {
+      userId,
+      deletedCount: result.deletedCount,
+    });
+  } catch (error: unknown) {
+    logger.error("Error invalidating all sessions for user.", {
+      userId,
+      error,
+    });
     throw error;
   }
 };
 
-// Fetch all valid sessions for a user
+/**
+ * Fetches all active sessions for a user.
+ * @param userId - The ID of the user whose sessions are to be fetched.
+ * @returns An array of active sessions.
+ */
 export const getUserSessions = async (userId: string): Promise<ISession[]> => {
   try {
     const sessions = await Session.find({
@@ -170,56 +315,8 @@ export const getUserSessions = async (userId: string): Promise<ISession[]> => {
       sessionCount: sessions.length,
     });
     return sessions;
-  } catch (error) {
-    logger.error("Error fetching user sessions", { userId, error });
-    throw error;
-  }
-};
-
-// Renew an existing session by extending its expiration time
-export const renewSession = async (
-  sessionToken: string,
-  req: Request
-): Promise<ISession | null> => {
-  try {
-    const decoded = verifySessionToken(sessionToken);
-    const session = await Session.findOne({
-      userId: decoded.userId,
-      token: sessionToken,
-      userAgent: req.get("User-Agent"),
-      expiresAt: { $gt: new Date() },
-    });
-
-    if (!session) {
-      logger.warn("Session renewal attempted for invalid or expired session", {
-        sessionToken,
-      });
-      return null;
-    }
-
-    const incomingUserAgent = req.get("User-Agent");
-    if (session.userAgent !== incomingUserAgent) {
-      logger.warn("User-Agent mismatch during session renewal", {
-        sessionId: session._id,
-        storedUserAgent: session.userAgent,
-        incomingUserAgent,
-      });
-      return null; // Deny session renewal if user-agent doesn't match
-    }
-
-    // Renew session expiry time
-    const newExpiresAt = new Date(Date.now() + sessionDurationMs);
-    session.expiresAt = newExpiresAt;
-    await session.save();
-
-    logger.info("Session renewed successfully", {
-      sessionId: session._id,
-      newExpiresAt,
-    });
-
-    return session;
-  } catch (error) {
-    logger.error("Error renewing session", { sessionToken, error });
+  } catch (error: unknown) {
+    logger.error("Error fetching user sessions.", { userId, error });
     throw error;
   }
 };

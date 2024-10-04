@@ -4,13 +4,13 @@ import { Agent } from "http";
 import { Promo, Visit } from "../models/dataModels";
 import { serverClient, serverMovement } from "../models/dataSetTypes";
 import { Admin } from "../models/entityModels";
-import { appCache, CacheEntry } from "./cache";
+import { appCache, CacheEntry } from "../services/cache";
+import { showToast } from "../services/toastMessage";
 import {
   decryptData,
   deriveKeyFromAuthState,
   encryptData,
 } from "./cryptoUtils";
-import { showToast } from "./toastMessage";
 
 // Define cache durations in milliseconds
 const CACHE_DURATIONS: Record<string, number> = {
@@ -110,7 +110,6 @@ export const getCachedData = async <T>(
   }
 };
 
-
 export const setCachedData = async <T>(
   storeName: StoreName,
   data: T
@@ -146,16 +145,13 @@ export const setCachedData = async <T>(
   }
 };
 
-
 export const clearCachedData = async (storeName: StoreName): Promise<void> => {
   try {
     await appCache[storeName].clear();
-
   } catch (error) {
     console.error(`Error clearing cache for ${storeName}:`, error);
   }
 };
-
 
 export const initializeUserEncryption = async (params: {
   userId: string;

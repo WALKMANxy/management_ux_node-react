@@ -7,7 +7,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Promo } from "../models/dataModels";
-import { showToast } from "../utils/toastMessage";
+import { showToast } from "../services/toastMessage";
 import usePromos from "./usePromos";
 
 interface UsePromoFormProps {

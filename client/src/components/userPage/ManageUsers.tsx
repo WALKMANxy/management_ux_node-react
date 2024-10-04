@@ -25,7 +25,7 @@ import {
   selectUsersLoading,
 } from "../../features/users/userSlice";
 import { User } from "../../models/entityModels";
-import { showToast } from "../../utils/toastMessage";
+import { showToast } from "../../services/toastMessage";
 import UserDetails from "./UserDetails";
 
 const ManageUsers: React.FC = () => {

@@ -15,7 +15,7 @@ import {
   User,
   UserRole,
 } from "../models/entityModels";
-import { showToast } from "../utils/toastMessage";
+import { showToast } from "../services/toastMessage";
 
 const useUserDetails = (user: Partial<User>) => {
   const clients = useAppSelector((state) => state.data.clients);
