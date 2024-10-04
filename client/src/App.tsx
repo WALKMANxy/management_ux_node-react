@@ -17,6 +17,7 @@ import { handleLogout } from "./features/auth/authThunks";
 import { fetchUserById, setCurrentUser } from "./features/users/userSlice";
 import Layout from "./layout/Layout";
 import { UserRole } from "./models/entityModels";
+import LandingPage from "./pages/landing/LandingPage";
 import { refreshAccessToken } from "./services/sessionService";
 import { showToast } from "./services/toastMessage";
 import { initializeUserEncryption } from "./utils/cacheUtils";
@@ -24,7 +25,6 @@ import { initializeUserEncryption } from "./utils/cacheUtils";
  */
 
 // Lazy load components for performance optimization
-const LandingPage = lazy(() => import("./pages/landing/LandingPage"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AgentDashboard = lazy(() => import("./pages/agent/AgentDashboard"));
 const ClientDashboard = lazy(() => import("./pages/client/ClientDashboard"));
@@ -233,20 +233,20 @@ function App() {
         // Check if the auth state is present in the local storage
         const localAuthState = localStorage.getItem("authState");
         if (!localAuthState) {
-          console.debug("No auth state found in local storage");
+          // console.debug("No auth state found in local storage");
           setIsInitializing(false); // Initialization complete
           return;
         }
 
         const storedAuthState = JSON.parse(localAuthState);
 
-        console.debug("Auth state:", storedAuthState);
+        // console.debug("Auth state:", storedAuthState);
 
         // Check if user is logged in and has a valid role (not "guest")
         if (storedAuthState.isLoggedIn && storedAuthState.role !== "guest") {
-          console.debug(
+          /* console.debug(
             "User is logged in and has a valid role, attempting to refresh session"
-          );
+          ); */
 
           // Attempt to refresh the session to validate and extend it on the server side
           const refreshSuccessful = await refreshAccessToken();

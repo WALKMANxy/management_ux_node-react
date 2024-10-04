@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "../app/hooks";
-import { handleLogout } from "../features/auth/authSlice";
 import {
   updateUserEmail,
   updateUserPassword,
 } from "../features/users/api/users";
 import { showToast } from "../services/toastMessage";
+import { handleLogout } from "../features/auth/authThunks";
 
 const useModifyAccount = () => {
   const dispatch = useAppDispatch();
