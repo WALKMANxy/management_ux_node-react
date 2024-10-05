@@ -1,11 +1,11 @@
 // Footer.tsx
-
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CallIcon from "@mui/icons-material/Call"; // Import the Call icon
 import FacebookIcon from "@mui/icons-material/Facebook";
 import FmdGoodIcon from "@mui/icons-material/FmdGood";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import MailIcon from "@mui/icons-material/Mail";
 
 import {
   Box,
@@ -33,7 +33,7 @@ const Footer: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery("(min-width:600px) and (max-width:785px)");
-  const isSuperMobile = useMediaQuery("(min-width:0px) and (max-width:420px)");
+  const isSuperMobile = useMediaQuery("(min-width:0px) and (max-width:380px)");
   const handleLogoClick = () => {
     window.scrollTo(0, 0);
   };
@@ -110,7 +110,7 @@ const Footer: React.FC = () => {
               sx={{
                 display: "flex",
                 justifyContent: "flex-end",
-                gap: isSuperMobile ? 1 : isMobile ? 6 : 4,
+                gap: isSuperMobile ? 1 : isMobile ? 5 : 4,
                 flexWrap: "wrap",
               }}
             >
@@ -236,30 +236,19 @@ const Footer: React.FC = () => {
           {/* Call IconButton */}
           <IconButton
             href="tel:+390954190006" // Ensure no spaces in the phone number
-            sx={{ color: "green" }}
+            sx={{ color: "green", mr: -1.0 }}
             aria-label="Call"
           >
             <CallIcon />
           </IconButton>
+          <IconButton
+            href="mailto:info.ricambicentrosud.com" // mailto link to open email client
+            sx={{ color: "#D44638", mr: -1 }} // Email color
+            aria-label="Email"
+          >
+            <MailIcon />
+          </IconButton>
 
-          <IconButton
-            href="https://www.facebook.com/RicambiCentroSud/"
-            sx={{ color: "#3b5998" }}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Facebook"
-          >
-            <FacebookIcon />
-          </IconButton>
-          <IconButton
-            href="https://www.instagram.com/ricambicentrosud/"
-            sx={{ color: "#E1306C" }}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-          >
-            <InstagramIcon />
-          </IconButton>
           <IconButton
             href="https://goo.gl/maps/MFy1cqdn3BbQNmtW6"
             sx={{ color: "#4285F4" }}
@@ -268,6 +257,25 @@ const Footer: React.FC = () => {
             aria-label="Google Maps"
           >
             <FmdGoodIcon />
+
+            <IconButton
+              href="https://www.facebook.com/RicambiCentroSud/"
+              sx={{ color: "#3b5998", mr: -0.6 }}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+            >
+              <FacebookIcon />
+            </IconButton>
+            <IconButton
+              href="https://www.instagram.com/ricambicentrosud/"
+              sx={{ color: "#E1306C", mr: -2 }}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
+              <InstagramIcon />
+            </IconButton>
           </IconButton>
           <IconButton
             href="https://www.linkedin.com/company/7007068/"
