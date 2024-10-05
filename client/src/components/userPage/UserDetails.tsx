@@ -9,8 +9,8 @@ import {
   Box,
   Button,
   ButtonGroup,
-  CircularProgress,
   Divider,
+  Skeleton,
   Stack,
   Table,
   TableBody,
@@ -186,43 +186,57 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
           sx={{ mb: 2 }}
         />
 
-        {loadingEntities && <CircularProgress />}
-
         {/* Table for displaying entities */}
-        {!loadingEntities && (
-          <TableContainer sx={{ maxHeight: 400 }}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t("userDetails.entityName", "Name")}</TableCell>
-                  <TableCell>{t("userDetails.entityId", "ID")}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {entityOptions.slice(0, visibleRows).map((entity, index) => (
-                  <TableRow
-                    hover
-                    key={entity.id}
-                    onClick={() => setSelectedEntity(entity)}
-                    selected={selectedEntity?.id === entity.id}
-                    sx={{
-                      cursor: "pointer",
-                      backgroundColor:
-                        selectedEntity?.id === entity.id
-                          ? "rgba(0, 0, 0, 0.08)"
-                          : "inherit",
-                    }}
-                    ref={index === visibleRows - 1 ? ref : null} // Attach ref to the last row
-                  >
-                    <TableCell>{entity.name}</TableCell>
-                    <TableCell>{entity.id}</TableCell>
-                  </TableRow>
-                ))}
-                <TableRow ref={ref} />
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
+        <TableContainer sx={{ maxHeight: 400 }}>
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell>{t("userDetails.entityName", "Name")}</TableCell>
+                <TableCell>{t("userDetails.entityId", "ID")}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {loadingEntities
+                ? Array.from({ length: visibleRows }).map((_, index) => (
+                    <TableRow
+                      key={index}
+                      className="animate__animated animate__fadeOut" // Animate fadeOut when loading
+                    >
+                      <TableCell>
+                        <Skeleton variant="text" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                : entityOptions.slice(0, visibleRows).map((entity, index) => (
+                    <TableRow
+                      hover
+                      key={entity.id}
+                      onClick={() => setSelectedEntity(entity)}
+                      selected={selectedEntity?.id === entity.id}
+                      sx={{
+                        cursor: "pointer",
+                        backgroundColor:
+                          selectedEntity?.id === entity.id
+                            ? "rgba(0, 0, 0, 0.08)"
+                            : "inherit",
+                      }}
+                      className="animate__animated animate__fadeIn" // Animate fadeIn when loaded
+                      ref={index === visibleRows - 1 ? ref : null} // Attach ref to the last row
+                    >
+                      <TableCell>{entity.name}</TableCell>
+                      <TableCell>{entity.id}</TableCell>
+                    </TableRow>
+                  ))}
+              {/* Sentinel row for Intersection Observer */}
+              <TableRow ref={ref}>
+                <TableCell colSpan={2} />
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
 
         <Divider sx={{ mb: 2 }} />
 

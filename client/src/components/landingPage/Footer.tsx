@@ -18,11 +18,12 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { lazy, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import ModalContent from "./modalContent";
+import Loader from "../common/Loader";
 
 const Footer: React.FC = () => {
+  const ModalContent = lazy(() => import("./modalContent"));
   const { t } = useTranslation();
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [modalContent, setModalContent] = useState<
@@ -271,17 +272,17 @@ const Footer: React.FC = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            height: "100vh",
+            height: "100%",
             padding: 2,
+            pointerEvents: "none", // Make the Box click-through
           }}
         >
           <Paper
             elevation={3}
             sx={{
               padding: "2rem",
-              width: "50%",
-              maxWidth: "800px",
-              maxHeight: "80vh",
+              maxWidth: "80dvh",
+              maxHeight: "90dvh",
               overflowY: "auto",
               textAlign: "left",
               borderRadius: 2,
@@ -291,10 +292,12 @@ const Footer: React.FC = () => {
             }}
           >
             {modalContent && (
-              <ModalContent
-                contentKey={modalContent}
-                onClose={handleCloseModal}
-              />
+              <React.Suspense fallback={<Loader fadeout />}>
+                <ModalContent
+                  contentKey={modalContent}
+                  onClose={handleCloseModal}
+                />
+              </React.Suspense>
             )}
           </Paper>
         </Box>
