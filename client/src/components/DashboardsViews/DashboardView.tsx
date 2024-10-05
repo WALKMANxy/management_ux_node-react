@@ -70,22 +70,37 @@ const DashboardView: React.FC<DashboardViewProps> = ({
             aria-label={t("dashboard.loadingStatistics")}
           />
         ) : (
-          <Typography variant="h5" gutterBottom>
+          <Typography
+            variant="h5"
+            gutterBottom
+            fontFamily="ui-rounded"
+            fontWeight={100}
+          >
             {t("dashboard.yourStatistics")}
           </Typography>
         )}
-        {isTablet && (
-          <Fab
-            color="primary"
-            aria-label={t("dashboard.calendarButton")}
-            onClick={handleToggleDrawer}
-            sx={{
-              zIndex: 0,
-            }}
-          >
-            <CalendarMonthIcon />
-          </Fab>
-        )}
+        {isTablet &&
+          (loadingState ? (
+            <Skeleton
+              animation="wave"
+              variant="circular"
+              width={40}
+              height={40}
+              sx={{ borderRadius: "50%" }}
+              aria-label={t("dashboard.loadingCalendarButton")}
+            />
+          ) : (
+            <Fab
+              color="primary"
+              aria-label={t("dashboard.calendarButton")}
+              onClick={handleToggleDrawer}
+              sx={{
+                zIndex: 0,
+              }}
+            >
+              <CalendarMonthIcon />
+            </Fab>
+          ))}
       </Box>
 
       <Divider sx={{ my: 2, borderRadius: "12px" }} />

@@ -7,12 +7,18 @@ import { setAccessToken } from "./tokenService";
  * Function to refresh the access token using the refresh token.
  */
 export async function refreshAccessToken(): Promise<boolean> {
+  console.log("Entering refreshAccessToken function");
+
   const localAuthState =
     JSON.parse(localStorage.getItem("authState")!) ||
     JSON.parse(sessionStorage.getItem("authState")!);
+  console.log("Local auth state:", localAuthState);
 
   const refreshToken = localAuthState.refreshToken;
+  console.log("Refresh token:", refreshToken);
+
   const uniqueId = localStorage.getItem("app_unique_identifier");
+  console.log("Unique ID:", uniqueId);
 
   if (!refreshToken || !uniqueId) {
     console.error("No refresh token or uniqueId available");

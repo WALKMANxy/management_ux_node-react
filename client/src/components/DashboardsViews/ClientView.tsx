@@ -76,7 +76,13 @@ const ClientView: React.FC<ClientViewProps> = ({
             aria-label={t("dashboard.loadingStatistics")}
           />
         ) : (
-          <Typography variant="h5" gutterBottom>
+          <Typography
+            variant="h5"
+            gutterBottom
+            fontFamily="ui-rounded"
+            fontWeight={100}
+          >
+            {" "}
             {userRole === "client"
               ? t("dashboard.yourStatistics")
               : t("dashboard.statisticsFor", {
@@ -85,16 +91,32 @@ const ClientView: React.FC<ClientViewProps> = ({
           </Typography>
         )}
         {isTablet && (
-          <Fab
-            color="primary"
-            aria-label={t("dashboard.calendarButton")}
-            onClick={handleToggleDrawer}
-            sx={{
-              zIndex: 1000,
-            }}
-          >
-            <CalendarMonthIcon />
-          </Fab>
+          <React.Fragment>
+            {loadingState ? (
+              <Skeleton
+                animation="wave"
+                variant="circular"
+                width={40}
+                height={40}
+                sx={{
+                  borderRadius: "50%",
+                  zIndex: 1000,
+                }}
+                aria-label={t("dashboard.loadingCalendarButton")}
+              />
+            ) : (
+              <Fab
+                color="primary"
+                aria-label={t("dashboard.calendarButton")}
+                onClick={handleToggleDrawer}
+                sx={{
+                  zIndex: 1000,
+                }}
+              >
+                <CalendarMonthIcon />
+              </Fab>
+            )}
+          </React.Fragment>
         )}
       </Box>
 
