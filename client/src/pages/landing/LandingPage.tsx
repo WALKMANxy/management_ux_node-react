@@ -4,6 +4,7 @@ import {
   Container,
   Divider,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -22,6 +23,8 @@ const LandingPage: React.FC = () => {
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
   const userRole = useSelector((state: RootState) => state.auth.role);
   const navigate = useNavigate();
+
+  const isSuperMobile = useMediaQuery("(min-width:0px) and (max-width:420px)");
 
   useEffect(() => {
     const timer = setTimeout(() => setShowLoader(false), 1500);
@@ -78,17 +81,6 @@ const LandingPage: React.FC = () => {
         }}
       >
         {/* Top Shadow */}
-        <Box
-          sx={{
-            width: "100%",
-            height: "4px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            zIndex: 1,
-          }}
-        />
 
         <Container
           component="main"
@@ -98,7 +90,7 @@ const LandingPage: React.FC = () => {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            padding: "2rem",
+            padding: isSuperMobile ? "1rem" : "2rem",
             position: "relative",
             zIndex: 0,
           }}
@@ -124,37 +116,41 @@ const LandingPage: React.FC = () => {
                 alt="Welcome Logo"
                 style={{ width: "100%", height: "auto" }}
               />
-              <Divider sx={{ my: 2 }} />
+              <Divider sx={{ my: isSuperMobile ? 0.5 : 2 }} />
               <Typography
                 variant="h2"
-                component="h2"
                 gutterBottom
                 sx={{
-                  mt: 2,
-                  fontFamily: "ui-rounded",
+                  mt: isSuperMobile ? 0.5 : 2,
+                  fontFamily: "Inter, sans-serif",
+                  fontWeight: 100, // Now using the lighter custom font weight
                 }}
               >
                 NEXT_
               </Typography>
+
               {/* Login Button */}
               <Button
                 variant="contained"
                 color="primary"
                 onClick={() => setShowLogin(true)}
                 sx={{
-                  mt: 4,
+                  mt: isSuperMobile ? 0.5 : 4,
                   paddingX: 4,
                   paddingY: 1.5,
                   fontSize: "1.2rem",
                   borderRadius: "50px",
-                  background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
+                  background:
+                    "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
                   color: "white",
                   boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.2)",
-                  transition: "transform 0.3s, box-shadow 0.3s, background 0.3s",
+                  transition:
+                    "transform 0.3s, box-shadow 0.3s, background 0.3s",
                   "&:hover": {
                     transform: "translateY(-3px)",
                     boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.3)",
-                    background: "linear-gradient(45deg, #FF8E53 30%, #FE6B8B 90%)",
+                    background:
+                      "linear-gradient(45deg, #FF8E53 30%, #FE6B8B 90%)",
                   },
                 }}
               >

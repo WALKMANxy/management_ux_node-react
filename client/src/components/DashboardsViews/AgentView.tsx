@@ -7,6 +7,7 @@ import {
   Box,
   Fab,
   Grid,
+  Skeleton,
   Typography,
   useMediaQuery,
   useTheme,
@@ -34,6 +35,7 @@ interface AgentViewProps {
   agentComparativeStatisticsMonthly: any; // Replace `any` with appropriate type
   agentComparativeStatistics: any;
   salesDistributionDataAgents: any;
+  loadingState: boolean;
 }
 
 const AgentView: React.FC<AgentViewProps> = ({
@@ -46,6 +48,7 @@ const AgentView: React.FC<AgentViewProps> = ({
   calculateMonthlyData,
   agentComparativeStatisticsMonthly,
   agentComparativeStatistics,
+  loadingState,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -72,22 +75,43 @@ const AgentView: React.FC<AgentViewProps> = ({
           mb: 2,
         }}
       >
-        <Typography variant="h5" gutterBottom>
-          {t("adminDashboard.statisticsFor", {
+        <Typography
+          variant="h5"
+          gutterBottom
+          fontFamily="ui-rounded"
+          fontWeight={100}
+        >
+          {" "}
+          {t("dashboard.statisticsFor", {
             name: selectedAgentData.name,
           })}
         </Typography>
         {isTablet && (
-          <Fab
-            color="primary"
-            aria-label={t("adminDashboard.calendarButton")}
-            onClick={handleToggleDrawer}
-            sx={{
-              zIndex: 1000,
-            }}
-          >
-            <CalendarMonthIcon />
-          </Fab>
+          <React.Fragment>
+            {loadingState ? (
+              <Skeleton
+                animation="wave"
+                variant="circular"
+                width={56}
+                height={56}
+                sx={{
+                  borderRadius: "50%",
+                  zIndex: 1000,
+                }}
+              />
+            ) : (
+              <Fab
+                color="primary"
+                aria-label={t("adminDashboard.calendarButton")}
+                onClick={handleToggleDrawer}
+                sx={{
+                  zIndex: 1000,
+                }}
+              >
+                <CalendarMonthIcon />
+              </Fab>
+            )}
+          </React.Fragment>
         )}
       </Box>
 

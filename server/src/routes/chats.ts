@@ -3,7 +3,7 @@
 import express from "express";
 import { ChatController } from "../controllers/chatController";
 import { authenticateUser } from "../middlewares/authentication";
-import {  checkAllowedRole } from "../middlewares/roleChecker";
+import { checkAllowedRole } from "../middlewares/roleChecker";
 
 const router = express.Router();
 
@@ -23,7 +23,7 @@ router.get("/:chatId/messages", ChatController.fetchMessages);
 router.get("/:chatId/older-messages", ChatController.fetchOlderMessages);
 
 // Route to fetch messages for multiple chats
-router.get("/chats/messages", ChatController.fetchMessagesFromMultipleChats);
+router.post("/messages", ChatController.fetchMessagesFromMultipleChats);
 
 // Route to create a new chat
 router.post("/create", ChatController.createChat);

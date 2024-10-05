@@ -84,6 +84,7 @@ const AdminDashboard: React.FC = () => {
         role="admin" // or "agent" or "client"
         loading={loadingState}
       />
+
       {loadingState ? (
         <Skeleton
           animation="wave"
@@ -116,6 +117,7 @@ const AdminDashboard: React.FC = () => {
                 }
                 agentComparativeStatistics={agentComparativeStatistics}
                 salesDistributionDataAgents={salesDistributionDataAgents}
+                loadingState={loadingState}
               />
             </Suspense>
           ) : selectedClient ? (
@@ -155,7 +157,6 @@ const AdminDashboard: React.FC = () => {
               salesDistributionDataAgents={salesDistributionDataAgents}
               isMobile={isMobile}
               userRole={userRole!}
-
             />
           )}
         </Grid>
