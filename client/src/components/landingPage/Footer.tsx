@@ -274,8 +274,8 @@ const Footer: React.FC = () => {
             alignItems: "center",
             height: "100%",
             padding: 2,
-            pointerEvents: "none", // Make the Box click-through
           }}
+          onClick={handleCloseModal} // Handle click on the overlay to close modal
         >
           <Paper
             elevation={3}
@@ -285,6 +285,7 @@ const Footer: React.FC = () => {
               maxHeight: "90dvh",
               overflowY: "auto",
               textAlign: "left",
+
               borderRadius: 2,
               "@media (max-width: 600px)": {
                 width: "80%",

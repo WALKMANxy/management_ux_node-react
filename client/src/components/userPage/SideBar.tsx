@@ -69,7 +69,6 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({ onSelectSection }) => {
       sx={{
         width: isMobile ? 55 : 240, // Narrower width on mobile
         flexShrink: 0,
-        height: "100vh", // Full height to match the layout
         bgcolor: "transparent", // Transparent background
         display: "flex",
         flexDirection: "column",
