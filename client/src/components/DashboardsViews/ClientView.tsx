@@ -79,8 +79,10 @@ const ClientView: React.FC<ClientViewProps> = ({
           <Typography
             variant="h5"
             gutterBottom
-            fontFamily="ui-rounded"
-            fontWeight={100}
+            sx={{
+              fontFamily: "Inter, sans-serif",
+              fontWeight: 100, // Now using the lighter custom font weight
+            }}
           >
             {" "}
             {userRole === "client"

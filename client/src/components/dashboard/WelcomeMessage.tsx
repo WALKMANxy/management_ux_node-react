@@ -35,8 +35,10 @@ const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
     <Typography
       variant="h4"
       gutterBottom
-      fontFamily="ui-rounded"
-      fontWeight={400}
+      sx={{
+        fontFamily: "Inter, sans-serif",
+        fontWeight: 100, // Now using the lighter custom font weight
+      }}
     >
       {t(`dashboard.welcomeBack`, {
         name: name || t(`${roleKey}.defaultName`),
