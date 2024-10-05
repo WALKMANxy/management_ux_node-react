@@ -116,7 +116,14 @@ const Footer: React.FC = () => {
             >
               {/* ABOUT Column */}
               <Box sx={{}}>
-                <Typography variant="h6" fontWeight={300} sx={{ mb: 1 }}>
+                <Typography
+                  variant="h6"
+                  fontWeight={300}
+                  sx={{
+                    mb: 1,
+                    borderBottom: "0.5px solid rgba(176,176,176,0.5)",
+                  }}
+                >
                   {t("footer.about")}
                 </Typography>
                 <Typography
@@ -137,7 +144,14 @@ const Footer: React.FC = () => {
 
               {/* HOURS Column */}
               <Box sx={{ pl: 1 }}>
-                <Typography variant="h6" fontWeight={300} sx={{ mb: 1 }}>
+                <Typography
+                  variant="h6"
+                  fontWeight={300}
+                  sx={{
+                    mb: 1,
+                    borderBottom: "0.5px solid rgba(176,176,176,0.5)",
+                  }}
+                >
                   {t("footer.hours") || "HOURS"}
                 </Typography>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
@@ -160,7 +174,14 @@ const Footer: React.FC = () => {
 
               {/* LEGAL Column */}
               <Box>
-                <Typography variant="h6" fontWeight={300} sx={{ mb: 1 }}>
+                <Typography
+                  variant="h6"
+                  fontWeight={300}
+                  sx={{
+                    mb: 1,
+                    borderBottom: "0.5px solid rgba(176,176,176,0.5)",
+                  }}
+                >
                   {t("footer.legal")}
                 </Typography>
                 <Typography
