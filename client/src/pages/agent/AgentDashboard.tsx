@@ -1,11 +1,10 @@
 import { Box, Grid, Skeleton, useMediaQuery, useTheme } from "@mui/material";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
 import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
 import WelcomeMessage from "../../components/dashboard/WelcomeMessage";
 import CalendarAndVisitsView from "../../components/DashboardsViews/CalendarAndVisitsView";
-import ClientView from "../../components/DashboardsViews/ClientView";
 import DashboardView from "../../components/DashboardsViews/DashboardView";
 import GlobalSearch from "../../components/Header/GlobalSearch";
 import { selectCurrentUser } from "../../features/users/userSlice";
@@ -13,6 +12,10 @@ import useLoadingData from "../../hooks/useLoadingData";
 import useSelectionState from "../../hooks/useSelectionState";
 import useStats from "../../hooks/useStats";
 import { calculateMonthlyData } from "../../utils/dataUtils";
+
+const ClientView = React.lazy(
+  () => import("../../components/DashboardsViews/ClientView")
+);
 
 const AgentDashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -81,22 +84,24 @@ const AgentDashboard: React.FC = () => {
       <Grid container spacing={6} mt={2}>
         <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
           {selectedClient ? (
-            <ClientView
-              loadingState={loadingState}
-              selectedClient={selectedClient}
-              handleToggleDrawer={handleToggleDrawer}
-              clearSelection={clearSelection}
-              calculateTotalSpentThisMonth={calculateTotalSpentThisMonth}
-              calculateTotalSpentThisYear={calculateTotalSpentThisYear}
-              calculateTopArticleType={calculateTopArticleType}
-              calculateMonthlyData={calculateMonthlyData}
-              topBrandsData={topBrandsData}
-              clientComparativeStatisticsMonthly={
-                clientComparativeStatisticsMonthly
-              }
-              clientComparativeStatistics={clientComparativeStatistics}
-              userRole={userRole}
-            />
+            <Suspense>
+              <ClientView
+                loadingState={loadingState}
+                selectedClient={selectedClient}
+                handleToggleDrawer={handleToggleDrawer}
+                clearSelection={clearSelection}
+                calculateTotalSpentThisMonth={calculateTotalSpentThisMonth}
+                calculateTotalSpentThisYear={calculateTotalSpentThisYear}
+                calculateTopArticleType={calculateTopArticleType}
+                calculateMonthlyData={calculateMonthlyData}
+                topBrandsData={topBrandsData}
+                clientComparativeStatisticsMonthly={
+                  clientComparativeStatisticsMonthly
+                }
+                clientComparativeStatistics={clientComparativeStatistics}
+                userRole={userRole}
+              />
+            </Suspense>
           ) : (
             <DashboardView
               t={t}

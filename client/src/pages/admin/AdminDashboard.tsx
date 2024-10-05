@@ -3,13 +3,11 @@ import { Box, Grid, Skeleton, useMediaQuery, useTheme } from "@mui/material";
 import React, { Suspense, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
-import GlobalSearch from "../../components/Header/GlobalSearch";
-
-import WelcomeMessage from "../../components/dashboard/WelcomeMessage";
-import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
-
 import CalendarAndVisitsView from "../../components/DashboardsViews/CalendarAndVisitsView";
 import DashboardView from "../../components/DashboardsViews/DashboardView";
+import GlobalSearch from "../../components/Header/GlobalSearch";
+import WelcomeMessage from "../../components/dashboard/WelcomeMessage";
+import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
 import { selectCurrentUser } from "../../features/users/userSlice";
 import useLoadingData from "../../hooks/useLoadingData";
 import useSelectionState from "../../hooks/useSelectionState";

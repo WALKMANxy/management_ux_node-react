@@ -9,7 +9,6 @@ import {
 } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
 import Loader from "./components/common/Loader";
-import LoadingSpinner from "./components/common/LoadingSpinner";
 import "./components/statistics/grids/AGGridTable.css"; // Import the custom AG Grid CSS
 import { getTimeMs } from "./config/config";
 import { selectIsLoggedIn, selectUserRole } from "./features/auth/authSlice";
@@ -17,7 +16,6 @@ import { handleLogout } from "./features/auth/authThunks";
 import { fetchUserById, setCurrentUser } from "./features/users/userSlice";
 import Layout from "./layout/Layout";
 import { UserRole } from "./models/entityModels";
-import LandingPage from "./pages/landing/LandingPage";
 import { refreshAccessToken } from "./services/sessionService";
 import { showToast } from "./services/toastMessage";
 import { initializeUserEncryption } from "./utils/cacheUtils";
@@ -25,6 +23,7 @@ import { initializeUserEncryption } from "./utils/cacheUtils";
  */
 
 // Lazy load components for performance optimization
+const LandingPage = lazy(() => import("./pages/landing/LandingPage"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AgentDashboard = lazy(() => import("./pages/agent/AgentDashboard"));
 const ClientDashboard = lazy(() => import("./pages/client/ClientDashboard"));
@@ -83,7 +82,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <LandingPage />,
+    element: (
+      <Suspense fallback={<Loader fadeout />}>
+        <LandingPage />
+      </Suspense>
+    ),
   },
   {
     path: "/",
@@ -93,7 +96,7 @@ const router = createBrowserRouter([
         path: "agent-dashboard",
         element: (
           <ProtectedRoute requiredRoles={["agent"]}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <AgentDashboard />
             </Suspense>
           </ProtectedRoute>
@@ -103,7 +106,7 @@ const router = createBrowserRouter([
         path: "admin-dashboard",
         element: (
           <ProtectedRoute requiredRoles={["admin"]}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <AdminDashboard />
             </Suspense>
           </ProtectedRoute>
@@ -113,7 +116,7 @@ const router = createBrowserRouter([
         path: "client-dashboard",
         element: (
           <ProtectedRoute requiredRoles={["client"]}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <ClientDashboard />
             </Suspense>
           </ProtectedRoute>
@@ -123,7 +126,7 @@ const router = createBrowserRouter([
         path: "employee-dashboard",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_UNPROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <EmployeeDashboard />
             </Suspense>
           </ProtectedRoute>
@@ -133,7 +136,7 @@ const router = createBrowserRouter([
         path: "clients",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <ClientsPage />
             </Suspense>
           </ProtectedRoute>
@@ -143,7 +146,7 @@ const router = createBrowserRouter([
         path: "articles",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <ArticlesPage />
             </Suspense>
           </ProtectedRoute>
@@ -153,7 +156,7 @@ const router = createBrowserRouter([
         path: "movements",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <MovementsPage />
             </Suspense>
           </ProtectedRoute>
@@ -163,7 +166,7 @@ const router = createBrowserRouter([
         path: "messages",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_UNPROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <ChatPage />
             </Suspense>
           </ProtectedRoute>
@@ -173,7 +176,7 @@ const router = createBrowserRouter([
         path: "settings",
         element: (
           <ProtectedRoute>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <UserPage />
             </Suspense>
           </ProtectedRoute>
@@ -183,7 +186,7 @@ const router = createBrowserRouter([
         path: "visits",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <VisitsPage />
             </Suspense>
           </ProtectedRoute>
@@ -193,7 +196,7 @@ const router = createBrowserRouter([
         path: "promos",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <PromosPage />
             </Suspense>
           </ProtectedRoute>
@@ -203,7 +206,7 @@ const router = createBrowserRouter([
         path: "calendar",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_UNPROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <CalendarPage />
             </Suspense>
           </ProtectedRoute>
