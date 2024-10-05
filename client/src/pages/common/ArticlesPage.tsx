@@ -1,9 +1,8 @@
 import { Box, useMediaQuery, useTheme } from "@mui/material";
-import React, { useEffect, useMemo } from "react";
+import React, { Suspense, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import ArticleDetails from "../../components/articlepage/ArticleDetails";
 import Spinner from "../../components/common/Spinner";
 import ArticlesList from "../../components/statistics/grids/ArticlesList";
 import { useArticlesGrid } from "../../hooks/useArticlesGrid";
@@ -11,6 +10,10 @@ import useLoadingData from "../../hooks/useLoadingData";
 import { MovementDetail } from "../../models/dataModels";
 import { ArticleColumnDefinition } from "../../models/propsModels";
 import { currencyFormatter } from "../../utils/dataUtils";
+
+const ArticleDetails = React.lazy(
+  () => import("../../components/articlepage/ArticleDetails")
+);
 
 const ArticlesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -150,14 +153,16 @@ const ArticlesPage: React.FC = () => {
         articleDetailsRef={articleDetailsRef}
       />
       {selectedArticle && (
-        <ArticleDetails
-          ref={articleDetailsRef}
-          isLoading={false}
-          selectedArticle={selectedArticle}
-          isArticleDetailsCollapsed={isArticleDetailsCollapsed}
-          setArticleDetailsCollapsed={setArticleDetailsCollapsed}
-          clientMovements={clientMovements}
-        />
+        <Suspense>
+          <ArticleDetails
+            ref={articleDetailsRef}
+            isLoading={false}
+            selectedArticle={selectedArticle}
+            isArticleDetailsCollapsed={isArticleDetailsCollapsed}
+            setArticleDetailsCollapsed={setArticleDetailsCollapsed}
+            clientMovements={clientMovements}
+          />
+        </Suspense>
       )}
     </Box>
   );
