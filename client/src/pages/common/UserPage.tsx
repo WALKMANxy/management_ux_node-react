@@ -1,6 +1,6 @@
 // src/components/UserPage/UserPage.tsx
 
-import { Box, Divider, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Divider } from "@mui/material";
 import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
@@ -16,9 +16,6 @@ const UserPage: React.FC = () => {
   const currentUser = useAppSelector(selectCurrentUser);
   const [selectedSection, setSelectedSection] =
     useState<SelectedSection>("modify-account");
-  const theme = useTheme();
-
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // If no user is logged in, redirect to login or another appropriate page
   if (!currentUser || !currentUser._id) {
@@ -46,7 +43,7 @@ const UserPage: React.FC = () => {
     <Box
       sx={{
         display: "flex",
-        height: isMobile ? "94vh" : "calc(100vh - 120px)", // Use 95vh when isMobile is true, otherwise subtract the header height
+        height: "95dvh", // Use 95vh when isMobile is true, otherwise subtract the header height
       }}
     >
       <Sidebar onSelectSection={setSelectedSection} />
