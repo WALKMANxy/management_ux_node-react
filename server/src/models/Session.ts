@@ -35,6 +35,6 @@ const sessionSchema = new Schema<ISession>(
 sessionSchema.index({ refreshToken: 1 });
 sessionSchema.index({ userId: 1 });
 sessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-sessionSchema.index({ userId: 1, uniqueId: 1 }, { unique: true });
+sessionSchema.index({ userId: 1, userAgent: 1, uniqueId: 1 }, { unique: true });
 
 export const Session = model<ISession>("Session", sessionSchema);

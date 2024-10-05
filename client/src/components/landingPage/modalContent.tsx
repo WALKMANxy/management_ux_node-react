@@ -1,6 +1,5 @@
-// ModalContent.tsx
-
-import { Box, Button, Typography } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close"; // Import Close Icon
+import { Box, Divider, IconButton, Typography } from "@mui/material";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
 
@@ -17,9 +16,20 @@ const ModalContent: React.FC<ModalContentProps> = ({ contentKey, onClose }) => {
       case "ourStory":
         return (
           <Box>
+            {/* Title */}
             <Typography variant="h4" sx={{ mb: 2 }}>
               {t("ourStory.title")}
             </Typography>
+            <Divider
+              sx={{
+                backgroundColor: "white",
+                width: "95%",
+                margin: "0 auto",
+                mb: 3,
+              }}
+            />
+
+            {/* Content Parts */}
             <Typography variant="body2" sx={{ textIndent: "2rem", mb: 2 }}>
               <Trans i18nKey="ourStory.content.part1">
                 <strong>Ricambi Centro Sud S.r.l.</strong> operates in the
@@ -70,22 +80,28 @@ const ModalContent: React.FC<ModalContentProps> = ({ contentKey, onClose }) => {
                 agents by product type and brand.
               </Trans>
             </Typography>
+
             {/* Add more content parts as needed */}
-            <Button onClick={onClose} sx={{ mt: 3 }}>
-              {t("footer.close")}
-            </Button>
           </Box>
         );
 
       case "privacyPolicy":
         return (
           <Box>
-            <Typography
-              variant="h4"
-              sx={{ mb: 2, textDecoration: "underline" }}
-            >
+            {/* Title */}
+            <Typography variant="h4" sx={{ mb: 2 }}>
               {t("privacyPolicy.title")}
             </Typography>
+            <Divider
+              sx={{
+                backgroundColor: "white",
+                width: "95%",
+                margin: "0 auto",
+                mb: 3,
+              }}
+            />
+
+            {/* Content Parts */}
             <Typography variant="body2" sx={{ textIndent: "2rem", mb: 2 }}>
               <Trans i18nKey="privacyPolicy.content.part1">
                 <strong>Welcome to RCS NEXT</strong>, a browser-based
@@ -166,21 +182,26 @@ const ModalContent: React.FC<ModalContentProps> = ({ contentKey, onClose }) => {
                 periodically.
               </Trans>
             </Typography>
-            <Button onClick={onClose} sx={{ mt: 3 }}>
-              {t("footer.close")}
-            </Button>
           </Box>
         );
 
       case "termsOfService":
         return (
-          <Box sx={{ height: "100%" }}>
-            <Typography
-              variant="h4"
-              sx={{ mb: 2, textDecoration: "underline" }}
-            >
+          <Box>
+            {/* Title */}
+            <Typography variant="h4" sx={{ mb: 2 }}>
               {t("termsOfService.title")}
             </Typography>
+            <Divider
+              sx={{
+                backgroundColor: "white",
+                width: "95%",
+                margin: "0 auto",
+                mb: 3,
+              }}
+            />
+
+            {/* Content Parts */}
             <Typography variant="body2" sx={{ textIndent: "2rem", mb: 2 }}>
               <Trans i18nKey="termsOfService.content.part1">
                 <strong>Welcome to RCS NEXT</strong>, a browser-based
@@ -278,9 +299,34 @@ const ModalContent: React.FC<ModalContentProps> = ({ contentKey, onClose }) => {
                 info@ricambicentrosud.com.
               </Trans>
             </Typography>
-            <Button onClick={onClose} sx={{ mt: 3 }}>
-              {t("footer.close")}
-            </Button>
+          </Box>
+        );
+
+      case "team":
+        return (
+          <Box>
+            {/* Example content for the Team modal */}
+            <Typography variant="h4" sx={{ mb: 2 }}>
+              {t("team.title")}
+            </Typography>
+            <Divider
+              sx={{
+                backgroundColor: "white",
+                width: "95%",
+                margin: "0 auto",
+                mb: 3,
+              }}
+            />
+            <Typography variant="body2" sx={{ textIndent: "2rem", mb: 2 }}>
+              <Trans i18nKey="team.content.part1">
+                Our team at Ricambi Centro Sud S.r.l. is composed of dedicated
+                professionals committed to providing top-notch services and
+                solutions to our clients. With a diverse range of expertise, our
+                team members collaborate seamlessly to ensure customer
+                satisfaction and business growth.
+              </Trans>
+            </Typography>
+            {/* Add more team-related content as needed */}
           </Box>
         );
 
@@ -289,7 +335,27 @@ const ModalContent: React.FC<ModalContentProps> = ({ contentKey, onClose }) => {
     }
   };
 
-  return <>{renderContent()}</>;
+  return (
+    <Box>
+      {renderContent()}
+      {/* Close Button Positioned at Bottom Right */}
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
+        <IconButton
+          onClick={onClose}
+          sx={{
+            backgroundColor: "grey.500",
+            color: "white",
+            "&:hover": {
+              backgroundColor: "grey.700",
+            },
+          }}
+          aria-label="Close"
+        >
+          <CloseIcon />
+        </IconButton>
+      </Box>
+    </Box>
+  );
 };
 
 export default ModalContent;

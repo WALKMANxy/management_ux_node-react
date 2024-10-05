@@ -1,11 +1,12 @@
 // Footer.tsx
 
-import React, { useState } from "react";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import CallIcon from "@mui/icons-material/Call"; // Import the Call icon
 import FacebookIcon from "@mui/icons-material/Facebook";
 import FmdGoodIcon from "@mui/icons-material/FmdGood";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
+
 import {
   Box,
   Divider,
@@ -14,20 +15,31 @@ import {
   Modal,
   Paper,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
+import React, { useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import ModalContent from "./modalContent";
 
 const Footer: React.FC = () => {
   const { t } = useTranslation();
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const [modalContent, setModalContent] = useState<"ourStory" | "privacyPolicy" | "termsOfService"| "team" | null>(null);
+  const [modalContent, setModalContent] = useState<
+    "ourStory" | "privacyPolicy" | "termsOfService" | "team" | null
+  >(null);
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery("(min-width:600px) and (max-width:785px)");
+  const isSuperMobile = useMediaQuery("(min-width:0px) and (max-width:420px)");
   const handleLogoClick = () => {
     window.scrollTo(0, 0);
   };
 
-  const handleOpenModal = (content: "ourStory" | "privacyPolicy" | "termsOfService" | "team" ) => {
+  const handleOpenModal = (
+    content: "ourStory" | "privacyPolicy" | "termsOfService" | "team"
+  ) => {
     setModalContent(content);
     setOpenModal(true);
   };
@@ -51,92 +63,123 @@ const Footer: React.FC = () => {
       }}
     >
       {/* Top Section (90%) */}
-      <Box sx={{ flex: "90%", pt: 2, px: 6, pb: 2 }}>
-        <Grid container spacing={2}>
+      <Box
+        sx={{
+          flex: "90%",
+          pt: isMobile ? 1 : 2,
+          px: isMobile ? 2 : isSuperMobile ? 0 : 6,
+          pb: isMobile ? 1 : 2,
+        }}
+      >
+        <Grid
+          container
+          spacing={1}
+          direction={isMobile ? "column" : "row"}
+          alignItems={isMobile ? "center" : "flex-start"}
+        >
           {/* Logo Section */}
-          <Grid item xs={10} sm={6}>
+          {!isMobile && (
+            <Grid item xs={12} sm={isTablet ? 3 : 6}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  cursor: "pointer",
+                  flexDirection: isTablet ? "column" : "column",
+                  justifyContent: "flex-start",
+                  gap: 1,
+                }}
+                onClick={handleLogoClick}
+              >
+                <img
+                  src="/images/logo-appbar.png"
+                  alt="Ricambi Centro Sud Logo"
+                  style={{ height: "40px", marginRight: "16px" }}
+                />
+                <Typography variant="h6" sx={{ color: "#FFFFFF" }}>
+                  #RicambiCentroSud
+                </Typography>
+              </Box>
+            </Grid>
+          )}
+
+          {/* Grouped Columns: About, Hours, Legal */}
+          <Grid item xs={12} sm={isTablet ? 9 : isMobile ? 10 : 6}>
             <Box
               sx={{
                 display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
+                justifyContent: "flex-end",
+                gap: isSuperMobile ? 1 : isMobile ? 6 : 4,
+                flexWrap: "wrap",
               }}
-              onClick={handleLogoClick}
             >
-              <img
-                src="/images/logo-appbar.png"
-                alt="Ricambi Centro Sud Logo"
-                style={{ height: "40px", marginRight: "16px" }}
-              />
-              <Typography variant="h6" sx={{ color: "#FFFFFF" }}>
-                #RicambiCentroSud
-              </Typography>
-            </Box>
-          </Grid>
+              {/* ABOUT Column */}
+              <Box sx={{}}>
+                <Typography variant="h6" fontWeight={300} sx={{ mb: 1 }}>
+                  {t("footer.about")}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ cursor: "pointer", mb: 0.5, color: "#b0b0b0" }}
+                  onClick={() => handleOpenModal("ourStory")}
+                >
+                  <Trans i18nKey="footer.ourStory">Our Story</Trans>
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ cursor: "pointer", color: "#b0b0b0" }}
+                  onClick={() => handleOpenModal("team")}
+                >
+                  <Trans i18nKey="footer.team">Team</Trans>
+                </Typography>
+              </Box>
 
-          {/* ABOUT Column */}
-          <Grid item xs={10} sm={2}>
-            <Typography variant="h6" fontWeight={300} sx={{ mb: 1 }}>
-              {t("footer.about")}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ cursor: "pointer", mb: 0.5, color: "#b0b0b0" }}
-              onClick={() => handleOpenModal("ourStory")}
-            >
-              <Trans i18nKey="footer.ourStory">Our Story</Trans>
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ cursor: "pointer", color: "#b0b0b0" }}
-              onClick={() => handleOpenModal("team")}
-            >
-              <Trans i18nKey="footer.team">Team</Trans>
-            </Typography>
-          </Grid>
+              {/* HOURS Column */}
+              <Box sx={{ pl: 1 }}>
+                <Typography variant="h6" fontWeight={300} sx={{ mb: 1 }}>
+                  {t("footer.hours") || "HOURS"}
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
+                  <AccessTimeIcon
+                    sx={{ mr: 0.5, color: "#b0b0b0", fontSize: "medium" }}
+                  />
+                  <Typography variant="body2" sx={{ color: "#b0b0b0" }}>
+                    8:30-13:00
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <AccessTimeIcon
+                    sx={{ mr: 0.5, color: "#b0b0b0", fontSize: "medium" }}
+                  />
+                  <Typography variant="body2" sx={{ color: "#b0b0b0" }}>
+                    15:00-18:30
+                  </Typography>
+                </Box>
+              </Box>
 
-          {/* HOURS Column */}
-          <Grid item xs={10} sm={2}>
-            <Typography variant="h6" fontWeight={300} sx={{ mb: 1 }}>
-              {t("footer.hours") || "HOURS"}
-            </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
-              <AccessTimeIcon
-                sx={{ mr: 1, color: "#b0b0b0", fontSize: "medium" }}
-              />
-              <Typography variant="body2" sx={{ color: "#b0b0b0" }}>
-                8:30 - 13:00
-              </Typography>
+              {/* LEGAL Column */}
+              <Box>
+                <Typography variant="h6" fontWeight={300} sx={{ mb: 1 }}>
+                  {t("footer.legal")}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ cursor: "pointer", mb: 0.5, color: "#b0b0b0" }}
+                  onClick={() => handleOpenModal("privacyPolicy")}
+                >
+                  <Trans i18nKey="footer.privacyPolicy">Privacy Policy</Trans>
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ cursor: "pointer", color: "#b0b0b0" }}
+                  onClick={() => handleOpenModal("termsOfService")}
+                >
+                  <Trans i18nKey="footer.termsOfService">
+                    Terms of Service
+                  </Trans>
+                </Typography>
+              </Box>
             </Box>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <AccessTimeIcon
-                sx={{ mr: 1, color: "#b0b0b0", fontSize: "medium" }}
-              />
-              <Typography variant="body2" sx={{ color: "#b0b0b0" }}>
-                15:00 - 18:30
-              </Typography>
-            </Box>
-          </Grid>
-
-          {/* LEGAL Column */}
-          <Grid item xs={10} sm={2}>
-            <Typography variant="h6" fontWeight={300} sx={{ mb: 1 }}>
-              {t("footer.legal")}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ cursor: "pointer", mb: 0.5, color: "#b0b0b0" }}
-              onClick={() => handleOpenModal("privacyPolicy")}
-            >
-              <Trans i18nKey="footer.privacyPolicy">Privacy Policy</Trans>
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ cursor: "pointer", color: "#b0b0b0" }}
-              onClick={() => handleOpenModal("termsOfService")}
-            >
-              <Trans i18nKey="footer.termsOfService">Terms of Service</Trans>
-            </Typography>
           </Grid>
         </Grid>
       </Box>
@@ -158,16 +201,25 @@ const Footer: React.FC = () => {
           justifyContent: "space-between",
           alignItems: "center",
           py: 0.5,
-          px: 6,
+          px: isSuperMobile ? 2 : 6,
         }}
       >
         {/* Copyright */}
         <Typography variant="body2" sx={{ flex: 1, textAlign: "left" }}>
-          &copy; 2024 Ricambi Centro Sud™
+          &copy;2024 NEXT_™
         </Typography>
 
         {/* Social Links */}
         <Box>
+          {/* Call IconButton */}
+          <IconButton
+            href="tel:+390954190006" // Ensure no spaces in the phone number
+            sx={{ color: "green" }}
+            aria-label="Call"
+          >
+            <CallIcon />
+          </IconButton>
+
           <IconButton
             href="https://www.facebook.com/RicambiCentroSud/"
             sx={{ color: "#3b5998" }}
@@ -239,7 +291,10 @@ const Footer: React.FC = () => {
             }}
           >
             {modalContent && (
-              <ModalContent contentKey={modalContent} onClose={handleCloseModal} />
+              <ModalContent
+                contentKey={modalContent}
+                onClose={handleCloseModal}
+              />
             )}
           </Paper>
         </Box>

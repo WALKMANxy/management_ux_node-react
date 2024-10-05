@@ -35,8 +35,8 @@ const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
     <Typography
       variant="h4"
       gutterBottom
-      fontFamily="Comic Neue"
-      fontWeight={700}
+      fontFamily="ui-rounded"
+      fontWeight={400}
     >
       {t(`dashboard.welcomeBack`, {
         name: name || t(`${roleKey}.defaultName`),
