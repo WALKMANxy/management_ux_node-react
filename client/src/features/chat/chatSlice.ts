@@ -152,12 +152,39 @@ const chatSlice = createSlice({
         // Client-originated chat, add to state keyed by local_id
         const localId = chat.local_id;
         if (localId) {
-          console.log(`addChatReducer: Adding new chat with local_id ${localId}`);
+          console.log(
+            `addChatReducer: Adding new chat with local_id ${localId}`
+          );
           state.chats[localId] = chat;
         }
       }
     },
+    updateChatReducer: (
+      state,
+      action: PayloadAction<{
+        chatId: string;
+        updatedData: Partial<IChat>;
+        fromServer?: boolean;
+      }>
+    ) => {
+      const { chatId, updatedData, fromServer } = action.payload;
+      const existingChat = state.chats[chatId];
 
+      if (existingChat) {
+        state.chats[chatId] = {
+          ...existingChat,
+          ...updatedData,
+          updatedAt: new Date(),
+        };
+        if (fromServer) {
+          console.log(`updateChatReducer: Chat ${chatId} updated from server.`);
+        } else {
+          console.log(`updateChatReducer: Chat ${chatId} updated from client.`);
+        }
+      } else {
+        console.warn(`updateChatReducer: Chat with ID ${chatId} not found.`);
+      }
+    },
   },
 
   extraReducers: (builder) => {
@@ -332,6 +359,7 @@ export const {
   addMessageReducer,
   updateReadStatusReducer,
   addChatReducer,
+  updateChatReducer,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
@@ -380,6 +408,7 @@ export const selectUnreadMessages = createSelector(
   [selectCurrentChat, (_: RootState, userId: string) => userId],
   (currentChat, userId) =>
     currentChat?.messages.filter(
-      (message: IMessage) => !message.readBy.includes(userId) && message.sender !== userId
+      (message: IMessage) =>
+        !message.readBy.includes(userId) && message.sender !== userId
     ) || []
 );

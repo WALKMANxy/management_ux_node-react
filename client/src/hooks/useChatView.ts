@@ -73,25 +73,13 @@ const useChatView = () => {
 
     if (currentChat.type === "group") {
       return isAdmin
-        ? [
-            "mute",
-            "edit_group",
-            "edit_group_member",
-            "delete_chat",
-            ...baseOptions,
-          ]
+        ? ["edit_group", "delete_chat", ...baseOptions]
         : baseOptions;
     }
 
     if (currentChat.type === "broadcast") {
       return isAdmin
-        ? [
-            "mute",
-            "edit_broadcast_name",
-            "edit_broadcast_members",
-            "delete_broadcast",
-            ...baseOptions,
-          ]
+        ? ["edit_broadcast", "delete_broadcast", ...baseOptions]
         : baseOptions;
     }
 
