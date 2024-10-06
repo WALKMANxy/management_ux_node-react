@@ -12,6 +12,8 @@ import {
   Menu as MenuIcon,
   People as PeopleIcon,
 } from "@mui/icons-material";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import {
   AppBar,
@@ -38,6 +40,7 @@ import { handleLogout } from "../../features/auth/authThunks";
 import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 import { clearSelection } from "../../features/data/dataSlice";
 import GlobalSearch from "./GlobalSearch";
+import { UserRole } from "../../models/entityModels";
 const NotificationBell = React.lazy(() => import("./NotificationBell"));
 const UserAvatar = React.lazy(() => import("./UserAvatar"));
 
@@ -96,47 +99,17 @@ const Header: React.FC = () => {
   };
 
   const handleLogoClick = () => {
-    let dashboardLink = "/";
-    switch (userRole) {
-      case "admin":
-        dashboardLink = "/admin-dashboard";
-        break;
-      case "agent":
-        dashboardLink = "/agent-dashboard";
-        break;
-      case "client":
-        dashboardLink = "/client-dashboard";
-        break;
-      case "employee":
-        dashboardLink = "/employee-dashboard";
-        break;
-      default:
-        dashboardLink = "/";
-    }
-    navigate(dashboardLink);
+    navigate("/dashboard"); // Navigate to the consolidated dashboard
   };
 
   const renderLinks = () => {
-    let dashboardLink = "/";
-    switch (userRole) {
-      case "admin":
-        dashboardLink = "/admin-dashboard";
-        break;
-      case "agent":
-        dashboardLink = "/agent-dashboard";
-        break;
-      case "client":
-        dashboardLink = "/client-dashboard";
-        break;
-      case "employee":
-        dashboardLink = "/employee-dashboard";
-        break;
-      default:
-        dashboardLink = "/";
-    }
+    const dashboardLink = "/dashboard";
+    const statisticsLink = "/statistics";
+    const allowedStatisticsRoles: UserRole[] = ["admin", "client", "agent"];
 
     return (
       <>
+        {/* Dashboard Link */}
         <ListItem
           button
           component={Link}
@@ -149,66 +122,87 @@ const Header: React.FC = () => {
           <ListItemText primary={t("headerDashboard", "Dashboard")} />
         </ListItem>
 
-        {userRole !== "employee" && (
+        {/* Statistics Link - Only for Admin, Client, Agent */}
+        {allowedStatisticsRoles.includes(userRole) && (
           <ListItem
             button
             component={Link}
-            to="/movements"
+            to={statisticsLink}
             onClick={toggleDrawer}
           >
             <ListItemIcon sx={{ color: "white" }}>
-              <HistoryIcon />
+              <AssessmentIcon />
             </ListItemIcon>
-            <ListItemText primary={t("movements", "Movements")} />
+            <ListItemText primary={t("statistics", "Statistics")} />
           </ListItem>
         )}
 
+        {/* Conditional Links for Non-Employee Roles */}
         {userRole !== "employee" && (
-          <ListItem
-            button
-            component={Link}
-            to="/clients"
-            onClick={toggleDrawer}
-          >
-            <ListItemIcon sx={{ color: "white" }}>
-              <PeopleIcon />
-            </ListItemIcon>
-            <ListItemText primary={t("clients", "Clients")} />
-          </ListItem>
+          <>
+            <ListItem
+              button
+              component={Link}
+              to="/movements"
+              onClick={toggleDrawer}
+            >
+              <ListItemIcon sx={{ color: "white" }}>
+                <HistoryIcon />
+              </ListItemIcon>
+              <ListItemText primary={t("movements", "Movements")} />
+            </ListItem>
+
+            <ListItem
+              button
+              component={Link}
+              to="/clients"
+              onClick={toggleDrawer}
+            >
+              <ListItemIcon sx={{ color: "white" }}>
+                <PeopleIcon />
+              </ListItemIcon>
+              <ListItemText primary={t("clients", "Clients")} />
+            </ListItem>
+
+            <ListItem
+              button
+              component={Link}
+              to="/articles"
+              onClick={toggleDrawer}
+            >
+              <ListItemIcon sx={{ color: "white" }}>
+                <CategoryIcon />
+              </ListItemIcon>
+              <ListItemText primary={t("articles", "Articles")} />
+            </ListItem>
+
+            <ListItem
+              button
+              component={Link}
+              to="/visits"
+              onClick={toggleDrawer}
+            >
+              <ListItemIcon sx={{ color: "white" }}>
+                <EventNoteIcon />
+              </ListItemIcon>
+              <ListItemText primary={t("visits", "Visits")} />
+            </ListItem>
+
+            <ListItem
+              button
+              component={Link}
+              to="/promos"
+              onClick={toggleDrawer}
+            >
+              <ListItemIcon sx={{ color: "white" }}>
+                <LocalOfferIcon />
+              </ListItemIcon>
+              <ListItemText primary={t("promos", "Promos")} />
+            </ListItem>
+          </>
         )}
 
-        {userRole !== "employee" && (
-          <ListItem
-            button
-            component={Link}
-            to="/articles"
-            onClick={toggleDrawer}
-          >
-            <ListItemIcon sx={{ color: "white" }}>
-              <CategoryIcon />
-            </ListItemIcon>
-            <ListItemText primary={t("articles", "Articles")} />
-          </ListItem>
-        )}
-
-        {userRole !== "employee" && (
-          <ListItem button component={Link} to="/visits" onClick={toggleDrawer}>
-            <ListItemIcon sx={{ color: "white" }}>
-              <EventNoteIcon />
-            </ListItemIcon>
-            <ListItemText primary={t("visits", "Visits")} />
-          </ListItem>
-        )}
-
-        {userRole !== "employee" && (
-          <ListItem button component={Link} to="/promos" onClick={toggleDrawer}>
-            <ListItemIcon sx={{ color: "white" }}>
-              <LocalOfferIcon />
-            </ListItemIcon>
-            <ListItemText primary={t("promos", "Promos")} />
-          </ListItem>
-        )}
-
+        {/* Calendar Link - Hidden for Client Role */}
         {userRole !== "client" && (
           <ListItem
             button
