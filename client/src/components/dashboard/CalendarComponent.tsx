@@ -247,6 +247,7 @@ const CalendarComponent: React.FC = () => {
             } as ServerDayProps,
           }}
           sx={{
+            width: "auto",
             flexGrow: 1, // Allow the calendar to grow and shrink based on available space
             minHeight: 0, // Allow the calendar to shrink without constraints
           }}

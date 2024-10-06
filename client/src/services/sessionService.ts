@@ -2,23 +2,24 @@ import axios from "axios";
 import { baseUrl } from "../utils/apiUtils";
 import { showToast } from "./toastMessage";
 import { setAccessToken } from "./tokenService";
+import { webSocketService } from "./webSocketService";
 
 /**
  * Function to refresh the access token using the refresh token.
  */
 export async function refreshAccessToken(): Promise<boolean> {
-  console.log("Entering refreshAccessToken function");
+  // console.log("Entering refreshAccessToken function");
 
   const localAuthState =
     JSON.parse(localStorage.getItem("authState")!) ||
     JSON.parse(sessionStorage.getItem("authState")!);
-  console.log("Local auth state:", localAuthState);
+  // console.log("Local auth state:", localAuthState);
 
   const refreshToken = localAuthState.refreshToken;
-  console.log("Refresh token:", refreshToken);
+  // console.log("Refresh token:", refreshToken);
 
   const uniqueId = localStorage.getItem("app_unique_identifier");
-  console.log("Unique ID:", uniqueId);
+  // console.log("Unique ID:", uniqueId);
 
   if (!refreshToken || !uniqueId) {
     console.error("No refresh token or uniqueId available");
@@ -52,6 +53,8 @@ export async function refreshAccessToken(): Promise<boolean> {
       "authState",
       JSON.stringify({ ...localAuthState, refreshToken: newRefreshToken })
     );
+
+    webSocketService.connect();
     return true;
   } catch (error) {
     console.error("Failed to refresh access token:", error);
