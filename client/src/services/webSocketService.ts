@@ -46,7 +46,6 @@ type AutomatedMessageQueueItem = {
 
 class WebSocketService {
   private socket: Socket | null = null;
-  private reconnectAttempts = 0;
   private maxReconnectAttempts = 15;
 
   // Queues to handle offline updates
@@ -54,9 +53,7 @@ class WebSocketService {
   private offlineMessageQueue: MessageQueueItem[] = [];
   private offlineChatQueue: ChatQueueItem[] = [];
   private offlineAutomatedMessageQueue: AutomatedMessageQueueItem[] = [];
-  private reconnectToastId: string | null = null;
-  private maxReconnectToastId = "maxrectoast";
-  private toastId = "reconnectionToast";
+  private connectionLostToastId = "connectionLostToast";
 
   // Inject the store reference at runtime
   injectStore(_store: AppStore) {
@@ -75,11 +72,17 @@ class WebSocketService {
       withCredentials: true,
       transports: ["websocket"],
       auth: {
-        authorization: `Bearer ${accessToken}`, // Correct spelling
+        authorization: `Bearer ${accessToken}`,
       },
+      reconnection: true, // Enable reconnection
+      reconnectionAttempts: this.maxReconnectAttempts, // Set maximum attempts
+      reconnectionDelay: 5000, // Initial delay before reconnection
+      reconnectionDelayMax: 30000, // Maximum delay between attempts
+      autoConnect: false, // Control when to connect
     });
 
     this.setupEventListeners();
+    this.socket.connect(); // Initiate the connection
   }
 
   isConnected(): boolean {
@@ -95,7 +98,38 @@ class WebSocketService {
     this.socket.on("connect_error", this.handleConnectError);
 
     // Handle unauthorized reconnect due to token expiry
-    this.socket.on("reconnect:unauthorized", this.handleTokenExpiry);
+    this.socket.on("reconnect_error", (error) => {
+      if (error.message === "Unauthorized") {
+        this.handleTokenExpiry();
+      }
+    });
+
+    // Handle reconnection attempts
+    this.socket.on("reconnect_attempt", (attempt) => {
+      console.log(`Reconnection attempt ${attempt}`);
+      // Optionally, update UI or state
+    });
+
+    this.socket.on("reconnect_failed", () => {
+      console.error("Reconnection attempts failed.");
+      // Show a persistent error or prompt the user
+      toast.error(t("webSocketService.connectionLost"), {
+        id: this.connectionLostToastId,
+      });
+    });
+
+    // Handle successful reconnection
+    this.socket.on("reconnect", (attemptNumber) => {
+      console.log(`Reconnected after ${attemptNumber} attempts`);
+      // Dismiss any existing connection lost toasts
+      toast.dismiss(this.connectionLostToastId);
+      // Optionally, show a success toast
+      toast.success(t("webSocketService.reconnected"), {
+        id: "reconnectedToast",
+      });
+      // Flush the offline queues
+      this.flushOfflineQueues();
+    });
 
     // Handle incoming chat events
     this.socket.on("chat:newMessage", this.handleNewMessage);
@@ -103,44 +137,38 @@ class WebSocketService {
     this.socket.on("chat:newChat", this.handleNewChat);
   }
 
-  // On connect, flush the offline queues
-  // On connect, flush the offline queues
   private handleConnect = () => {
-    this.reconnectAttempts = 0;
-
-    // Flush read status updates
-    for (const { chatId, messageIds } of this.offlineReadStatusQueue) {
-      this.emitMessageRead(chatId, messageIds);
-    }
-    this.offlineReadStatusQueue = [];
-
-    // Flush queued messages
-    for (const { chatId, message } of this.offlineMessageQueue) {
-      this.emitNewMessage(chatId, message);
-    }
-    this.offlineMessageQueue = [];
-
-    // Flush queued chat creations
-    for (const { chat } of this.offlineChatQueue) {
-      this.emitNewChat(chat);
-    }
-    this.offlineChatQueue = [];
-
-    // Flush queued automated messages
-    for (const { targetIds, message } of this.offlineAutomatedMessageQueue) {
-      this.emitAutomatedMessage(targetIds, message);
-    }
-    this.offlineAutomatedMessageQueue = [];
+    console.log("WebSocket connected.");
+    // Dismiss any connection lost toasts
+    toast.dismiss(this.connectionLostToastId);
+    // Optionally, show a connected toast
+    toast.success(t("webSocketService.connected"), {
+      id: "connectedToast",
+    });
+    // Flush the offline queues
+    this.flushOfflineQueues();
   };
 
-  private handleDisconnect = () => {
-    /*     console.log(`WebSocket disconnected: ${reason}`);
-     */ this.tryReconnect();
+  private handleDisconnect = (reason: string) => {
+    console.warn(`WebSocket disconnected: ${reason}`);
+    // Show a connection lost toast if not already shown
+    if (!toast(this.connectionLostToastId)) {
+      toast.error(t("webSocketService.lostConnection"), {
+        id: this.connectionLostToastId,
+        duration: Infinity, // Keep it until dismissed
+      });
+    }
   };
 
   private handleConnectError = (error: Error) => {
     console.error("WebSocket connection error:", error);
-    this.tryReconnect();
+    // Optionally, show an error toast
+    if (!toast(this.connectionLostToastId)) {
+      toast.error(t("webSocketService.connectionError"), {
+        id: this.connectionLostToastId,
+        duration: Infinity,
+      });
+    }
   };
 
   private handleTokenExpiry = async () => {
@@ -157,7 +185,7 @@ class WebSocketService {
 
         if (this.socket) {
           this.socket.auth = {
-            token: `Bearer ${newAccessToken}`,
+            authorization: `Bearer ${newAccessToken}`,
             uniqueId,
           };
           this.socket.connect();
@@ -175,44 +203,30 @@ class WebSocketService {
     }
   };
 
-  private tryReconnect() {
-    if (this.reconnectAttempts < this.maxReconnectAttempts) {
-      this.reconnectAttempts++;
+  private flushOfflineQueues() {
+    // Flush read status updates
+    this.offlineReadStatusQueue.forEach(({ chatId, messageIds }) => {
+      this.emitMessageRead(chatId, messageIds);
+    });
+    this.offlineReadStatusQueue = [];
 
-      // Show loading toast only once
-      if (!this.reconnectToastId) {
-        toast.loading(t("webSocketService.lostConnection"), {
-          id: this.toastId,
-        });
-      }
+    // Flush queued messages
+    this.offlineMessageQueue.forEach(({ chatId, message }) => {
+      this.emitNewMessage(chatId, message);
+    });
+    this.offlineMessageQueue = [];
 
-      setTimeout(() => {
-        // Check if the token is still valid before reconnecting
-        const accessToken = getAccessToken();
-        if (accessToken) {
-          this.socket?.connect();
-        } else {
-          this.handleTokenExpiry();
-        }
-      }, 5000 * this.reconnectAttempts);
-    } else {
-      console.error(
-        "Max reconnection attempts reached. Please refresh the page."
-      );
+    // Flush queued chat creations
+    this.offlineChatQueue.forEach(({ chat }) => {
+      this.emitNewChat(chat);
+    });
+    this.offlineChatQueue = [];
 
-      // Dismiss the reconnect loading toast if it exists
-      if (this.reconnectToastId) {
-        toast.dismiss(this.reconnectToastId);
-        this.reconnectToastId = null;
-      }
-
-      // Show error toast
-      toast.error(
-        t("webSocketService.connectionLost", {
-          id: this.maxReconnectToastId,
-        })
-      );
-    }
+    // Flush queued automated messages
+    this.offlineAutomatedMessageQueue.forEach(({ targetIds, message }) => {
+      this.emitAutomatedMessage(targetIds, message);
+    });
+    this.offlineAutomatedMessageQueue = [];
   }
 
   // Handle incoming new message event
@@ -291,7 +305,12 @@ class WebSocketService {
 
     // Dispatch the action to update the read status in local state with message IDs
     store.dispatch(
-      updateReadStatusReducer({ chatId, userId, messageIds, fromServer: true })
+      updateReadStatusReducer({
+        chatId,
+        userId,
+        messageIds,
+        fromServer: true,
+      })
     );
   };
 
@@ -313,11 +332,10 @@ class WebSocketService {
       store.dispatch(addChatReducer({ chat, fromServer: true }));
     } else {
       try {
-        // Chat does not exist, fetch the chat data if needed
-        // Alternatively, if chat fetching is unnecessary, you could simply add it
+        // Chat does not exist, add it directly
         store.dispatch(addChatReducer({ chat, fromServer: true }));
       } catch (error) {
-        console.error("Failed to fetch and add chat:", error);
+        console.error("Failed to add chat:", error);
       }
     }
   };
@@ -370,9 +388,14 @@ class WebSocketService {
     if (this.socket) {
       this.socket.off("connect", this.handleConnect);
       this.socket.off("disconnect", this.handleDisconnect);
+      this.socket.off("connect_error", this.handleConnectError);
+      this.socket.off("reconnect_error");
+      this.socket.off("reconnect_attempt");
+      this.socket.off("reconnect_failed");
+      this.socket.off("reconnect");
       this.socket.off("chat:newMessage", this.handleNewMessage);
       this.socket.off("chat:messageRead", this.handleMessageRead);
-      this.socket.off("connect_error", this.handleConnectError);
+      this.socket.off("chat:newChat", this.handleNewChat);
       this.socket.disconnect();
       this.socket = null;
     }

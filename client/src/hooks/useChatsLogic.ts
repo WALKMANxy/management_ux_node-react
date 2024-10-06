@@ -400,35 +400,17 @@ const useChatLogic = () => {
     }
   };
 
-  /*  // Custom hook to find the message inside the state by local_id
-  const useStateMessage = (
-    chatId: string | undefined,
-    localId: string | undefined
-  ): IMessage | undefined => {
-    return useAppSelector((state) => {
-      if (!chatId || !localId) return undefined;
+  const broadcastChatId = "6701f7dbc1a80a3d029808ab"; // Your broadcast chat ID
 
-      const chat = state.chats.chats[chatId];
-      if (!chat) {
-        console.error(`Chat with ID ${chatId} does not exist in the state.`);
-        return undefined;
-      }
+  // Selector to get the broadcast chat
+  const broadcastChat = useMemo(() => {
+    return chats.find((chat) => chat._id === broadcastChatId) || null;
+  }, [chats, broadcastChatId]);
 
-      // Find the message by matching local_id
-      const stateMessage = chat.messages.find(
-        (message) => message.local_id === localId
-      );
-
-      if (!stateMessage) {
-        console.error(
-          `Message with local_id ${localId} not found in chat ${chatId}.`
-        );
-      }
-
-      return stateMessage;
-    });
-  }; */
-
+  // Selector to get broadcast messages
+  const employeeWhiteboardBroadcast = useMemo(() => {
+    return broadcastChat ? broadcastChat.messages : [];
+  }, [broadcastChat]);
   useEffect(() => {
     if (chatError) {
       showToast.error(t("chats.error", { error: chatError }));
@@ -455,8 +437,8 @@ const useChatLogic = () => {
     handleBackToChats,
     getUnreadChats,
     handleSelectChat,
-    /*     useStateMessage,
-     */
+    employeeWhiteboardBroadcast,
+    broadcastChat,
   };
 };
 

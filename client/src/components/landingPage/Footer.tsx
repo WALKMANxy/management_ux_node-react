@@ -235,48 +235,54 @@ const Footer: React.FC = () => {
         <Box>
           {/* Call IconButton */}
           <IconButton
-            href="tel:+390954190006" // Ensure no spaces in the phone number
+            href="tel:+390954190006"
             sx={{ color: "green", mr: -1.0 }}
             aria-label="Call"
           >
             <CallIcon />
           </IconButton>
           <IconButton
-            href="mailto:info.ricambicentrosud.com" // mailto link to open email client
-            sx={{ color: "#D44638", mr: -1 }} // Email color
+            href="mailto:info@ricambicentrosud.com" // Added missing @ in email
+            sx={{ color: "#D44638", mr: -1 }}
             aria-label="Email"
           >
             <MailIcon />
           </IconButton>
 
+          {/* Google Maps IconButton */}
           <IconButton
             href="https://goo.gl/maps/MFy1cqdn3BbQNmtW6"
-            sx={{ color: "#4285F4" }}
+            sx={{ color: "#4285F4", mr: -1 }} // Added margin for spacing
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Google Maps"
           >
             <FmdGoodIcon />
-
-            <IconButton
-              href="https://www.facebook.com/RicambiCentroSud/"
-              sx={{ color: "#3b5998", mr: -0.6 }}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Facebook"
-            >
-              <FacebookIcon />
-            </IconButton>
-            <IconButton
-              href="https://www.instagram.com/ricambicentrosud/"
-              sx={{ color: "#E1306C", mr: -2 }}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram"
-            >
-              <InstagramIcon />
-            </IconButton>
           </IconButton>
+
+          {/* Facebook IconButton */}
+          <IconButton
+            href="https://www.facebook.com/RicambiCentroSud/"
+            sx={{ color: "#3b5998", mr: -0.6 }}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+          >
+            <FacebookIcon />
+          </IconButton>
+
+          {/* Instagram IconButton */}
+          <IconButton
+            href="https://www.instagram.com/ricambicentrosud/"
+            sx={{ color: "#E1306C", mr: -2 }}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+          >
+            <InstagramIcon />
+          </IconButton>
+
+          {/* LinkedIn IconButton */}
           <IconButton
             href="https://www.linkedin.com/company/7007068/"
             sx={{ color: "#0077B5" }}

@@ -26,12 +26,10 @@ const DrawerContainer: React.FC<DrawerContainerProps> = ({
         component: Paper,
         sx: {
           height: "auto",
-          width: "auto",
           maxWidth: "85vw",
           borderRadius: "16px",
           position: "fixed",
           top: fabPosition.top + 315, // Adjust for FAB position + offset
-          backgroundColor: "#FFF5E1",
           backdropFilter: "blur(50px)", // Enhanced focus on drawer content
           margin: "20px", // Margin for better spacing and alignment
           overflow: "hidden",

@@ -60,7 +60,6 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-
 /**
  * Generic API call function
  * @param endpoint - API endpoint
@@ -95,7 +94,8 @@ export const apiCall = async <T>(
         "An error occurred while processing the request";
 
       // Throwing a new error so that it's easier to handle in the calling function
-      throw new Error(serverMessage);
+      console.error(serverMessage);
+      throw error;
     }
 
     // If it's not an AxiosError, re-throw the original error or a generic one

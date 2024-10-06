@@ -83,18 +83,6 @@ axiosInstance.interceptors.response.use(
       }
     }
 
-    // Handle 404 for PUT and PATCH methods
-    if (
-      (error.config?.method === "put" || error.config?.method === "patch") &&
-      error.response?.status === 404
-    ) {
-      const endpoint = error.config?.url || "Unknown Endpoint";
-      showToast.error(`Resource not found at ${endpoint}, cannot update.`);
-      return Promise.reject(
-        new Error(`Resource not found at ${endpoint}, cannot update.`)
-      );
-    }
-
     // Handle other errors
     if (error.response) {
       const { data } = error.response;

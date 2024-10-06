@@ -73,7 +73,7 @@ const ChatList: React.FC<ChatListProps> = ({
 
           return (
             <ListItem
-              key={chat._id}
+              key={chat._id || chat.local_id}
               button
               onClick={() => {
                 selectChat(chat); // Call selectChat to update the current chat state
