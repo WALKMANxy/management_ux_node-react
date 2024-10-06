@@ -16,13 +16,15 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "../../app/hooks";
 import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 import useLoadOlderMessages from "../../hooks/useChatLoadOlderMessages";
 import useChatView from "../../hooks/useChatView"; // Import the custom hook
+import { IChat } from "../../models/dataModels";
 import { canUserChat } from "../../utils/chatUtils";
+import CreateChatForm from "./CreateChatForm"; // Import CreateChatForm
 import InputBox from "./InputBox";
 import RenderMessage from "./RenderMessage"; // Import the RenderMessage component
 import RenderParticipantsAvatars from "./RenderParticipantsAvatars"; // Import the RenderParticipantsAvatars component
@@ -91,6 +93,23 @@ const ChatView: React.FC = () => {
 
   const handleTooltipOpen = () => {
     setOpen(true);
+  };
+
+  // State for Edit Chat Form
+  const [isEditChatFormOpen, setIsEditChatFormOpen] = useState(false);
+  const [chatToEdit, setChatToEdit] = useState<IChat | null>(null);
+
+  // Handle MenuItem clicks
+  const handleMenuItemClick = (option: string) => {
+    handleMenuClose(); // Close the menu first
+
+    if (option === "edit_group" || option === "edit_broadcast") {
+      setChatToEdit(currentChat);
+      setIsEditChatFormOpen(true);
+    }
+
+    // Handle other options like mute, archive_chat, delete_chat as needed
+    // e.g., if (option === "mute") { ... }
   };
 
   // Fallback if currentChat is not set
@@ -206,7 +225,7 @@ const ChatView: React.FC = () => {
           onClose={handleMenuClose}
         >
           {getChatOptions.map((option) => (
-            <MenuItem key={option} onClick={handleMenuClose}>
+            <MenuItem key={option} onClick={() => handleMenuItemClick(option)}>
               {t(`chatView.menuOptions.${option}`)}
             </MenuItem>
           ))}
@@ -270,6 +289,18 @@ const ChatView: React.FC = () => {
       >
         <InputBox canUserChat={isUserAllowedToChat} />
       </Box>
+
+      {/* Edit Chat Form */}
+      {isEditChatFormOpen && chatToEdit && (
+        <CreateChatForm
+          open={isEditChatFormOpen}
+          onClose={() => {
+            setIsEditChatFormOpen(false);
+            setChatToEdit(null); // Reset the chat to edit
+          }}
+          chat={chatToEdit} // Pass the chat data to prefill the form
+        />
+      )}
     </Box>
   );
 };

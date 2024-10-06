@@ -4,6 +4,7 @@ import {
   Divider,
   Fab,
   Grid,
+  Skeleton,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -88,28 +89,72 @@ const EmployeeDashboard: React.FC = () => {
 
       <Grid container spacing={6} mt={-2}>
         {/* Left Side Components */}
-        <Grid item xs={!isTablet ? 12 : 0} md={!isTablet ? 9 : 0}>
+        <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
           <Grid container spacing={3}>
             {/* Top Left: Clock Component */}
             <Grid item xs={6}>
-              <Clock />
+              {loading ? (
+                <Skeleton
+                  animation="wave"
+                  variant="rectangular"
+                  width="100%"
+                  height={100} // Adjust height as needed
+                  sx={{ borderRadius: "12px" }}
+                  aria-label="Loading Clock"
+                />
+              ) : (
+                <Clock />
+              )}
             </Grid>
 
             {/* Top Right: Weather Component */}
             <Grid item xs={6}>
-              <Weather />
+              {loading ? (
+                <Skeleton
+                  animation="wave"
+                  variant="rectangular"
+                  width="100%"
+                  height={100} // Adjust height as needed
+                  sx={{ borderRadius: "12px" }}
+                  aria-label="Loading Weather"
+                />
+              ) : (
+                <Weather />
+              )}
             </Grid>
 
             {/* Bottom Left: Whiteboard Component */}
             {userRole !== "client" && (
               <Grid item xs={6}>
-                <Whiteboard />
+                {loading ? (
+                  <Skeleton
+                    animation="wave"
+                    variant="rectangular"
+                    width="100%"
+                    height={200} // Adjust height as needed
+                    sx={{ borderRadius: "12px" }}
+                    aria-label="Loading Whiteboard"
+                  />
+                ) : (
+                  <Whiteboard />
+                )}
               </Grid>
             )}
 
             {/* Bottom Right: Navigation Component */}
             <Grid item xs={6}>
-              <Navigation />
+              {loading ? (
+                <Skeleton
+                  animation="wave"
+                  variant="rectangular"
+                  width="100%"
+                  height={150} // Adjust height as needed
+                  sx={{ borderRadius: "12px" }}
+                  aria-label="Loading Navigation"
+                />
+              ) : (
+                <Navigation />
+              )}
             </Grid>
           </Grid>
         </Grid>

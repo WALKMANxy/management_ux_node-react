@@ -8,6 +8,7 @@ import { fetchChatById } from "../features/chat/api/chats";
 import {
   addChatReducer,
   addMessageReducer,
+  updateChatReducer,
   updateReadStatusReducer,
 } from "../features/chat/chatSlice";
 import { IChat, IMessage } from "../models/dataModels";
@@ -52,6 +53,11 @@ class WebSocketService {
   private offlineReadStatusQueue: ReadStatusQueueItem[] = [];
   private offlineMessageQueue: MessageQueueItem[] = [];
   private offlineChatQueue: ChatQueueItem[] = [];
+  private offlineUpdateChatQueue: Array<{
+    chatId: string;
+    updatedData: Partial<IChat>;
+  }> = [];
+
   private offlineAutomatedMessageQueue: AutomatedMessageQueueItem[] = [];
   private connectionLostToastId = "connectionLostToast";
 
@@ -135,6 +141,7 @@ class WebSocketService {
     this.socket.on("chat:newMessage", this.handleNewMessage);
     this.socket.on("chat:messageRead", this.handleMessageRead);
     this.socket.on("chat:newChat", this.handleNewChat);
+    this.socket.on("chat:updatedChat", this.handleUpdatedChat);
   }
 
   private handleConnect = () => {
@@ -221,6 +228,11 @@ class WebSocketService {
       this.emitNewChat(chat);
     });
     this.offlineChatQueue = [];
+
+    this.offlineUpdateChatQueue.forEach(({ chatId, updatedData }) => {
+      this.emitUpdateChat(chatId, updatedData);
+    });
+    this.offlineUpdateChatQueue = [];
 
     // Flush queued automated messages
     this.offlineAutomatedMessageQueue.forEach(({ targetIds, message }) => {
@@ -340,6 +352,34 @@ class WebSocketService {
     }
   };
 
+  // **New** Handle incoming updated chat event from the server
+  public handleUpdatedChat = async ({ chat }: { chat: IChat }) => {
+    if (!store) {
+      console.error("Store has not been injected into WebSocketService.");
+      return;
+    }
+
+    const state = store.getState(); // Replace RootState with your actual root state type
+    const existingChat = chat._id && state.chats.chats[chat._id];
+
+    if (existingChat) {
+      // Update the chat with the new data from the server
+      store.dispatch(
+        updateChatReducer({
+          chatId: chat._id!,
+          updatedData: chat,
+          fromServer: true,
+        })
+      );
+    } else {
+      console.warn(
+        `handleUpdatedChat: Chat with ID ${chat._id} not found in the store.`
+      );
+      // Optionally, you can decide to add the chat if it's not present
+      // this.store.dispatch(addChatReducer({ chat, fromServer: true }));
+    }
+  };
+
   // Emit a new message to the server
   public emitNewMessage(chatId: string, message: IMessage) {
     if (!this.socket || !this.socket.connected) {
@@ -371,6 +411,17 @@ class WebSocketService {
     }
 
     this.socket.emit("chat:create", { chat });
+  }
+
+  // Emit a chat update event to the server
+  public emitUpdateChat(chatId: string, updatedData: Partial<IChat>) {
+    if (!this.socket || !this.socket.connected) {
+      console.warn("Socket disconnected. Queuing outgoing chat update.");
+      this.offlineUpdateChatQueue.push({ chatId, updatedData });
+      return;
+    }
+
+    this.socket.emit("chat:edit", { chatId, updatedData });
   }
 
   public emitAutomatedMessage(targetIds: string[], message: Partial<IMessage>) {

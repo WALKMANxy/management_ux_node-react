@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import "animate.css";
 import React, {
+  lazy,
   useCallback,
   useEffect,
   useMemo,
@@ -29,7 +30,10 @@ import { fetchMessagesFromMultipleChatsThunk } from "../../features/chat/chatThu
 import useChatLogic from "../../hooks/useChatsLogic";
 import ChatList from "./ChatList";
 import ContactsList from "./ContactsList";
-import CreateChatForm from "./CreateChatForm";
+import Loader from "../common/Loader";
+
+const CreateChatForm = lazy(() => import("./CreateChatForm"));
+
 
 const ChatSidebar: React.FC = () => {
   const { t } = useTranslation();
@@ -264,10 +268,12 @@ const ChatSidebar: React.FC = () => {
       </Box>
 
       {isCreateChatFormOpen && (
-        <CreateChatForm
-          open={isCreateChatFormOpen}
-          onClose={() => setIsCreateChatFormOpen(false)}
-        />
+        <React.Suspense fallback={<Loader fadeout />}>
+          <CreateChatForm
+            open={isCreateChatFormOpen}
+            onClose={() => setIsCreateChatFormOpen(false)}
+          />
+        </React.Suspense>
       )}
     </Box>
   );

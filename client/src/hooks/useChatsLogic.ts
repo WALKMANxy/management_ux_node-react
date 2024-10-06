@@ -5,6 +5,7 @@ import { useAppDispatch /* useAppSelector */ } from "../app/hooks";
 import { selectUserId, selectUserRole } from "../features/auth/authSlice";
 import {
   addChatReducer,
+  updateChatReducer,
   addMessageReducer,
   clearCurrentChatReducer,
   selectAllChats,
@@ -258,7 +259,7 @@ const useChatLogic = () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         status: "pending", // Indicate that the chat is pending confirmation
-        ...(admins && { admins }), // Conditionally add admins if provided
+        admins: admins || [], // Assign the admins array directly
       };
 
       /*       console.log("Dispatching to addChatReducer:", chatData);
@@ -270,6 +271,40 @@ const useChatLogic = () => {
       }
     },
     [dispatch]
+  );
+
+  const handleEditChat = useCallback(
+    async (
+      chatId: string,
+      updatedData: Partial<{
+        name: string;
+        participants: string[];
+        admins: string[];
+        updatedAt: Date;
+      }>
+    ) => {
+      if (!chatId) return;
+
+      try {
+        const existingChat = chats.find((u) => u._id === chatId);
+
+        if (!existingChat) {
+          throw new Error("Chat not found");
+        }
+
+        const updatedChat: IChat = {
+          ...existingChat,
+          ...updatedData,
+        };
+
+        // Dispatch an action to update the chat in the store
+        dispatch(updateChatReducer({ chatId: updatedChat._id!, updatedData: updatedChat })); // Ensure you have an updateChatReducer
+      } catch (error) {
+        console.error("Failed to edit chat:", error);
+        throw error; // Re-throw to handle in the form
+      }
+    },
+    [dispatch, chats]
   );
 
   // Handle selecting a contact to open or create a chat
@@ -473,6 +508,7 @@ const useChatLogic = () => {
     employeeWhiteboardBroadcast,
     broadcastChat,
     markMessagesAsRead,
+    handleEditChat,
   };
 };
 
