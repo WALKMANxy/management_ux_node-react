@@ -101,9 +101,11 @@ const EmployeeDashboard: React.FC = () => {
             </Grid>
 
             {/* Bottom Left: Whiteboard Component */}
-            <Grid item xs={6}>
-              <Whiteboard />
-            </Grid>
+            {userRole !== "client" && (
+              <Grid item xs={6}>
+                <Whiteboard />
+              </Grid>
+            )}
 
             {/* Bottom Right: Navigation Component */}
             <Grid item xs={6}>
