@@ -18,6 +18,7 @@ import Navigation from "../../components/employeeDashboard/Navigation";
 import Weather from "../../components/employeeDashboard/Weather";
 import Whiteboard from "../../components/employeeDashboard/Whiteboard";
 import { selectCurrentUser } from "../../features/users/userSlice";
+import useLoadingData from "../../hooks/useLoadingData";
 
 const EmployeeDashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -26,6 +27,8 @@ const EmployeeDashboard: React.FC = () => {
   const isTablet = useMediaQuery("(min-width:900px) and (max-width:1250px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  const { loadingState } = useLoadingData();
+
   const handleToggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
   };
@@ -33,30 +36,36 @@ const EmployeeDashboard: React.FC = () => {
   const user = useAppSelector(selectCurrentUser);
   const userRole = user?.role;
 
-  const [loadingState, setLoadingState] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoadingState(false), 500);
+    const timer = setTimeout(() => setLoading(false), 500);
     return () => clearTimeout(timer);
   }, []);
 
   return (
     <Box
       className="employee-dashboard"
-      sx={{ px: isMobile ? 1 : 4, bgcolor: "#f4f5f7", position: "relative" }}
+      sx={{
+        px: isMobile ? 1 : 4,
+        bgcolor: "#f4f5f7",
+        position: "relative",
+        pt: isMobile ? 0 : 4,
+      }}
     >
       <Box sx={{ mt: 2 }}>
         {/* Welcome Message */}
         <WelcomeMessage
           name={user?.entityName}
           role={userRole || "employee"}
-          loading={loadingState}
+          loading={loading}
         />
       </Box>
       <Divider
         sx={{
           width: "95%",
           margin: "0 auto",
+          pt: 2,
         }}
       />
 
@@ -106,7 +115,7 @@ const EmployeeDashboard: React.FC = () => {
         {/* Calendar and Upcoming Visits section */}
         {!isTablet && (
           <CalendarAndVisitsView
-            loadingState={loadingState}
+            loadingState={userRole === "employee" ? loading : loadingState}
             t={t}
             disableUpcomingVisits
           />

@@ -19,14 +19,12 @@ import { UserRole } from "./models/entityModels";
 import { refreshAccessToken } from "./services/sessionService";
 import { showToast } from "./services/toastMessage";
 import { initializeUserEncryption } from "./utils/cacheUtils";
+import StatisticsDashboard from "./pages/statistics/StatisticsDashboard";
 /* console.log("Vite mode:", import.meta.env.MODE);
  */
 
 // Lazy load components for performance optimization
 const LandingPage = lazy(() => import("./pages/landing/LandingPage"));
-const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
-const AgentDashboard = lazy(() => import("./pages/agent/AgentDashboard"));
-const ClientDashboard = lazy(() => import("./pages/client/ClientDashboard"));
 const ArticlesPage = lazy(() => import("./pages/common/ArticlesPage"));
 const CalendarPage = lazy(() => import("./pages/common/CalendarPage"));
 const ChatPage = lazy(() => import("./pages/common/ChatPage"));
@@ -92,38 +90,9 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
+      // Default Dashboard Route
       {
-        path: "agent-dashboard",
-        element: (
-          <ProtectedRoute requiredRoles={["agent"]}>
-            <Suspense fallback={<Loader fadeout />}>
-              <AgentDashboard />
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "admin-dashboard",
-        element: (
-          <ProtectedRoute requiredRoles={["admin"]}>
-            <Suspense fallback={<Loader fadeout />}>
-              <AdminDashboard />
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "client-dashboard",
-        element: (
-          <ProtectedRoute requiredRoles={["client"]}>
-            <Suspense fallback={<Loader fadeout />}>
-              <ClientDashboard />
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "employee-dashboard",
+        path: "dashboard",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_UNPROTECTED_ROUTES}>
             <Suspense fallback={<Loader fadeout />}>
@@ -132,6 +101,18 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      // Statistics Route
+      {
+        path: "statistics",
+        element: (
+          <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
+            <Suspense fallback={<Loader fadeout />}>
+              <StatisticsDashboard />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      // Removed individual dashboard routes (agent-dashboard, admin-dashboard, client-dashboard)
       {
         path: "clients",
         element: (
@@ -212,10 +193,14 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      // Redirect any unknown routes to /dashboard or another appropriate page
+      {
+        path: "*",
+        element: <Navigate to="/dashboard" replace />,
+      },
     ],
   },
 ]);
-
 const theme = createTheme({
   typography: {
     fontFamily: [

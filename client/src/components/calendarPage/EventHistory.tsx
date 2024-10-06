@@ -32,8 +32,9 @@ import { useCalendar } from "../../hooks/useCalendar";
 import { CalendarEvent } from "../../models/dataModels";
 import {
   getComparator,
+  getDeleteButtonStyles,
   getEditButtonStyles,
-  isPastEvent,
+  isDisabled,
 } from "../../utils/calendarUtils";
 import { EventForm } from "./EventForm";
 
@@ -74,7 +75,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
   } = useCalendar();
 
   const getEditButtonTooltip = (event: CalendarEvent) => {
-    return isPastEvent(event)
+    return isDisabled(event, userRole)
       ? t("eventHistoryTooltips.editDisabled") // New tooltip for past events
       : t("eventHistoryTooltips.edit");
   };
@@ -324,14 +325,14 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                         </Tooltip>
                       </>
                     ) : event.status === "approved" ||
-                      event.status === "rejected" && userRole === "admin" ? (
+                      (event.status === "rejected" && userRole === "admin") ? (
                       <>
                         <Tooltip title={getEditButtonTooltip(event)}>
                           <span>
                             <IconButton
                               onClick={() => handleEditEvent(event)}
-                              sx={getEditButtonStyles(event)}
-                              disabled={isPastEvent(event)} // Disable button for past events
+                              sx={getEditButtonStyles(event, userRole)}
+                              disabled={isDisabled(event, userRole)} // Disable button for past events
                             >
                               <EditIcon />
                             </IconButton>
@@ -341,14 +342,8 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                         <Tooltip title={t("eventHistoryTooltips.delete")}>
                           <IconButton
                             onClick={() => handleDeleteEvent(event)}
-                            sx={{
-                              backgroundColor: "brown",
-                              color: "white",
-                              borderRadius: "50%",
-                              "&:hover": {
-                                backgroundColor: "darkgray",
-                              },
-                            }}
+                            sx={getDeleteButtonStyles(event, userRole)}
+                            disabled={isDisabled(event, userRole)} // Disable button for past events
                           >
                             <DeleteIcon />
                           </IconButton>
