@@ -39,10 +39,10 @@ export const createSession = async (
 
     const userId = user?._id?.toString();
 
-    logger.info("Attempting to create session", { userId, uniqueId });
+    // logger.info("Attempting to create session", { userId, uniqueId });
 
     const userAgent = req.get("User-Agent") || "Unknown";
-    logger.info("Retrieved User-Agent from request", { userAgent });
+    // logger.info("Retrieved User-Agent from request", { userAgent });
 
     // Check if a session with the same userId, uniqueId, and userAgent exists
     const existingSession = await Session.findOne({
@@ -53,25 +53,25 @@ export const createSession = async (
     });
 
     if (existingSession) {
-      logger.info("Existing session found, invalidating", {
+      /* logger.info("Existing session found, invalidating", {
         sessionId: existingSession._id,
         userId,
-      });
+      }); */
       await invalidateSession(
         existingSession.refreshToken,
         existingSession.uniqueId!
       );
     } else {
-      logger.info("No existing session found for user", { userId, uniqueId });
+      // logger.info("No existing session found for user", { userId, uniqueId });
     }
 
     // Generate tokens
-    logger.info("Generating new tokens for user", { userId });
+    // logger.info("Generating new tokens for user", { userId });
     const newAccessToken = generateAccessToken(user as IUser, uniqueId);
     const newRefreshToken = generateRefreshToken(user as IUser);
 
     // Create session
-    logger.info("Saving new session to database", { userId, uniqueId });
+    // logger.info("Saving new session to database", { userId, uniqueId });
     const session = new Session({
       userId,
       refreshToken: newRefreshToken,
@@ -81,16 +81,16 @@ export const createSession = async (
       uniqueId,
     });
 
-    console.log("Saved session:", session.toObject());
+    // console.log("Saved session:", session.toObject());
 
     await session.save();
-    logger.info("Session created successfully", {
+    /*  logger.info("Session created successfully", {
       userId,
       sessionId: session._id,
       ipAddress: req.ip,
       userAgent,
       uniqueId,
-    });
+    }); */
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   } catch (error: unknown) {
@@ -121,12 +121,12 @@ export const getSessionByAccessToken = async (
     const userAgent = req.get("User-Agent");
     const uniqueId = decoded.uniqueId;
 
-    logger.info("Retrieving session by Access Token", {
+    /*  logger.info("Retrieving session by Access Token", {
       accessToken,
       userId,
       userAgent,
       uniqueId,
-    });
+    }); */
 
     if (!uniqueId && !userAgent) {
       logger.warn(
@@ -135,7 +135,6 @@ export const getSessionByAccessToken = async (
       );
       return null;
     }
-
 
     // Find sessions for the user that are still valid, match userAgent and uniqueId
     const session = await Session.findOne(
@@ -148,7 +147,6 @@ export const getSessionByAccessToken = async (
       { _id: 1, userId: 1, userAgent: 1, uniqueId: 1, expiresAt: 1 }
     );
 
-
     if (!session) {
       logger.warn("No valid session found for the provided access token", {
         userId: userId,
@@ -158,12 +156,12 @@ export const getSessionByAccessToken = async (
       return null;
     }
 
-    logger.info("Session found by Access Token", {
+    /*  logger.info("Session found by Access Token", {
       sessionId: session._id,
       userId,
       userAgent,
       uniqueId,
-    });
+    }); */
 
     return session;
   } catch (error: unknown) {
@@ -191,7 +189,7 @@ export const renewSession = async (
 ): Promise<{ accessToken: string; refreshToken: string } | null> => {
   try {
     if (!refreshToken) {
-      logger.warn("No refresh token provided");
+      // logger.warn("No refresh token provided");
       return null;
     }
 
@@ -199,22 +197,22 @@ export const renewSession = async (
     const session = await Session.findOne({ refreshToken, uniqueId });
 
     if (!session) {
-      logger.warn("Invalid refresh token", { refreshToken });
+      // logger.warn("Invalid refresh token", { refreshToken });
       return null;
     }
 
     // Optional: Validate uniqueId, IP, User-Agent
     if (uniqueId && session.uniqueId !== uniqueId) {
-      logger.warn("Unique identifier mismatch during token refresh", {
+      /* logger.warn("Unique identifier mismatch during token refresh", {
         sessionId: session._id,
         storedUniqueId: session.uniqueId,
         incomingUniqueId: uniqueId,
-      });
+      }); */
       return null;
     }
 
     if (session.expiresAt < new Date()) {
-      logger.warn("Refresh token expired", { sessionId: session._id });
+      // logger.warn("Refresh token expired", { sessionId: session._id });
       await invalidateSession(refreshToken, uniqueId);
       return null;
     }
@@ -222,18 +220,18 @@ export const renewSession = async (
     // Validate userAgent
     const incomingUserAgent = req.get("User-Agent");
     if (session.userAgent !== incomingUserAgent) {
-      logger.warn("User-Agent mismatch during token refresh", {
+      /* logger.warn("User-Agent mismatch during token refresh", {
         sessionId: session._id,
         storedUserAgent: session.userAgent,
         incomingUserAgent,
-      });
+      }); */
       return null;
     }
 
     // Retrieve the user details using UserService
     const user = await UserService.getUserById(session.userId.toString());
     if (!user) {
-      logger.warn("User not found for session", { sessionId: session._id });
+      // logger.warn("User not found for session", { sessionId: session._id });
       return null;
     }
 
@@ -246,10 +244,10 @@ export const renewSession = async (
     session.expiresAt = new Date(Date.now() + refreshTokenDurationMs);
     await session.save();
 
-    logger.info("Session refreshed successfully", {
+    /* logger.info("Session refreshed successfully", {
       sessionId: session._id,
       newExpiresAt: session.expiresAt,
-    });
+    }); */
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   } catch (error) {
@@ -268,7 +266,7 @@ export const invalidateSession = async (
 ): Promise<boolean> => {
   try {
     await Session.deleteOne({ refreshToken, uniqueId });
-    logger.info("Session invalidated", { refreshToken });
+    // logger.info("Session invalidated", { refreshToken });
     return true;
   } catch (error) {
     logger.error("Error invalidating session", { refreshToken, error });
@@ -284,12 +282,12 @@ export const invalidateAllUserSessions = async (
   userId: string
 ): Promise<void> => {
   try {
-    const result = await Session.deleteMany({ userId });
+    await Session.deleteMany({ userId });
 
-    logger.info("All sessions invalidated for user.", {
+    /*  logger.info("All sessions invalidated for user.", {
       userId,
       deletedCount: result.deletedCount,
-    });
+    }); */
   } catch (error: unknown) {
     logger.error("Error invalidating all sessions for user.", {
       userId,
@@ -310,10 +308,10 @@ export const getUserSessions = async (userId: string): Promise<ISession[]> => {
       userId,
       expiresAt: { $gt: new Date() },
     });
-    logger.info("Fetched user sessions", {
+    /*  logger.info("Fetched user sessions", {
       userId,
       sessionCount: sessions.length,
-    });
+    }); */
     return sessions;
   } catch (error: unknown) {
     logger.error("Error fetching user sessions.", { userId, error });

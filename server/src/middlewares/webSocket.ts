@@ -92,12 +92,20 @@ export const setupWebSocket = (io: SocketIOServer) => {
       socket.join(userRoomId);
       logger.debug(`Socket ${socket.id} joined user room ${userRoomId}`);
 
-      // Join all existing chat rooms the user is part of
       await joinUserToChats(io, socket);
-      // If the user is an admin, join the 'admins' room
-      if (socket.userRole === "admin") {
-        socket.join("admins");
-        logger.debug(`Socket ${socket.id} joined admins room`);
+
+      // Join all existing chat rooms the user is part of
+      // Check if user is employee or admin and update the broadcast chat accordingly
+      const broadcastChatId = "6701f7dbc1a80a3d029808ab";
+
+      if (socket.userRole === "employee") {
+        // Add the employee to the broadcast chat's participants
+        await ChatService.addParticipantToChat(broadcastChatId, socket.userId);
+      } else if (socket.userRole === "admin") {
+        // Add the admin to the broadcast chat's admin list
+        await ChatService.addAdminToChat(broadcastChatId, socket.userId);
+
+        socket.join("admins"); // Also join the 'admins' room
       }
     }
 
@@ -175,6 +183,33 @@ export const setupWebSocket = (io: SocketIOServer) => {
         });
       } catch (error) {
         logger.error("Error handling new chat creation", { error });
+      }
+    });
+
+    // **Handle chat editing**
+    socket.on("chat:edit", async ({ chatId, updatedData }) => {
+      try {
+        const updatedChat = await ChatService.updateChat(chatId, updatedData);
+
+        if (!updatedChat) {
+          throw new Error("Chat not found");
+        }
+
+        // Emit 'chat:updatedChat' to inform all participants about the updated chat
+        updatedChat.participants.forEach((participantId) => {
+          const participantRoomId = `user:${participantId.toString()}`;
+          io.to(participantRoomId).emit("chat:updatedChat", {
+            chat: updatedChat,
+          });
+        });
+
+        logger.info("Chat updated successfully.", {
+          chatId: updatedChat._id,
+          updatedData: updatedData,
+        });
+      } catch (error) {
+        logger.error("Error handling chat editing", { error });
+        // Emit an error back to the client
       }
     });
 
