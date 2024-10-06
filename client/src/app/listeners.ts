@@ -2,6 +2,7 @@ import { createListenerMiddleware } from "@reduxjs/toolkit";
 import {
   addChatReducer,
   addMessageReducer,
+  updateChatReducer,
   updateReadStatusReducer,
 } from "../features/chat/chatSlice";
 import { fetchAllChatsThunk } from "../features/chat/chatThunks";
@@ -26,7 +27,11 @@ let readStatusQueue: Array<{
 }> = [];
 let messageQueue: Array<{ chatId: string; messageData: IMessage }> = [];
 let chatQueue: Array<IChat> = [];
-let automatedMessageQueue: Array<{ targetId: string[]; message: Partial<IMessage> }> =
+let automatedMessageQueue: Array<{
+  targetId: string[];
+  message: Partial<IMessage>;
+}> = [];
+let updateChatQueue: Array<{ chatId: string; updatedData: Partial<IChat> }> =
   [];
 
 // Timers for debouncing WebSocket messages to avoid excessive traffic
@@ -34,6 +39,7 @@ let readStatusTimer: NodeJS.Timeout | null = null;
 let messageTimer: NodeJS.Timeout | null = null;
 let chatTimer: NodeJS.Timeout | null = null;
 let automatedMessageTimer: NodeJS.Timeout | null = null;
+let updateChatTimer: NodeJS.Timeout | null = null;
 
 // Debounce time in milliseconds to group similar WebSocket messages
 const DEBOUNCE_TIME = 100;
@@ -77,6 +83,15 @@ const processChatQueue = () => {
       webSocketService.emitNewChat(chatData);
     });
     chatQueue = []; // Clear the queue after processing
+  }
+};
+
+const processUpdateChatQueue = () => {
+  if (updateChatQueue.length > 0) {
+    updateChatQueue.forEach(({ chatId, updatedData }) => {
+      webSocketService.emitUpdateChat(chatId, updatedData);
+    });
+    updateChatQueue = [];
   }
 };
 
@@ -144,6 +159,23 @@ listenerMiddleware.startListening({
   },
 });
 
+listenerMiddleware.startListening({
+  actionCreator: updateChatReducer,
+  effect: async (action) => {
+    const { chatId, updatedData, fromServer } = action.payload;
+
+    // Skip WebSocket emission if action is from the server
+    if (fromServer) return;
+
+    // Add the chat to the queue
+    updateChatQueue.push({ chatId, updatedData });
+
+    // Debounce the processing of the chat queue
+    if (updateChatTimer) clearTimeout(updateChatTimer);
+    updateChatTimer = setTimeout(processUpdateChatQueue, DEBOUNCE_TIME);
+  },
+});
+
 // Listener for the fetchAllChatsThunk action, triggered after fetching all chats
 listenerMiddleware.startListening({
   actionCreator: fetchAllChatsThunk.fulfilled,
@@ -179,7 +211,7 @@ listenerMiddleware.startListening({
         (user) =>
           user.role === "client" &&
           user.entityCode !== undefined &&
-          !(promo.excludedClientsId?.includes(user.entityCode))
+          !promo.excludedClientsId?.includes(user.entityCode)
       );
     } else {
       targetedUsers = allUsers.filter(
@@ -215,7 +247,6 @@ listenerMiddleware.startListening({
   },
 });
 
-
 // Listener for the createVisitAsync action
 listenerMiddleware.startListening({
   actionCreator: createVisitAsync.fulfilled,
@@ -226,7 +257,7 @@ listenerMiddleware.startListening({
 
     // Find the user based on the entityCode (which corresponds to the clientId)
     const targetedUser = allUsers.find(
-      (user) => user.role === "client" &&user.entityCode === visit.clientId
+      (user) => user.role === "client" && user.entityCode === visit.clientId
     );
 
     if (!targetedUser?._id) {
@@ -237,7 +268,10 @@ listenerMiddleware.startListening({
     const messageData = generateAutomatedMessage(visit);
 
     // Add the automated message to the queue
-    automatedMessageQueue.push({ targetId: [targetedUser._id], message : messageData });
+    automatedMessageQueue.push({
+      targetId: [targetedUser._id],
+      message: messageData,
+    });
 
     // Debounce the processing of the automated message queue
     if (automatedMessageTimer) clearTimeout(automatedMessageTimer);
