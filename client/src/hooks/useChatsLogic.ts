@@ -136,6 +136,39 @@ const useChatLogic = () => {
     [currentUserId, dispatch]
   );
 
+  // Function to mark messages as read
+  const markMessagesAsRead = useCallback(
+    (chat: IChat, userId: string) => {
+      if (chat._id) {
+        const unreadMessageIds = chat.messages
+          .filter(
+            (message: IMessage) =>
+              !message.readBy.map((id) => id.toString()).includes(userId) &&
+              message.sender.toString() !== userId
+          )
+          .map((message) =>
+            message.local_id
+              ? message.local_id.toString()
+              : message._id.toString()
+          );
+
+        if (unreadMessageIds.length > 0) {
+          dispatch(
+            updateReadStatusReducer({
+              chatId: chat._id.toString(),
+              userId: userId,
+              messageIds: unreadMessageIds,
+            })
+          );
+        }
+      } else {
+        console.warn("Chat does not have an _id:", chat);
+        return;
+      }
+    },
+    [dispatch]
+  );
+
   // Fetch contacts when needed
   const fetchContacts = useCallback(async () => {
     if (contactsFetched) return;
@@ -439,6 +472,7 @@ const useChatLogic = () => {
     handleSelectChat,
     employeeWhiteboardBroadcast,
     broadcastChat,
+    markMessagesAsRead,
   };
 };
 
