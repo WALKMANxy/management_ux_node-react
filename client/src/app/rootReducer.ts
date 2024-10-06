@@ -12,6 +12,7 @@ import { promoVisitApi } from "../features/promoVisits/promosVisitsQueries";
 import searchReducer from "../features/search/searchSlice";
 import { userApi } from "../features/users/userQueries";
 import userReducer from "../features/users/userSlice";
+import { weatherApi } from "../features/weather/weatherQuery.ts";
 
 /**
  * Combine all individual reducers into a single app-level reducer.
@@ -29,8 +30,8 @@ const appReducer = combineReducers({
   [dataApi.reducerPath]: dataApi.reducer,
   [calendarApi.reducerPath]: calendarApi.reducer,
   [promoVisitApi.reducerPath]: promoVisitApi.reducer,
+  [weatherApi.reducerPath]: weatherApi.reducer,
 });
-
 
 /**
  * Root reducer with special logic for handling global actions.

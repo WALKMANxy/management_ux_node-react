@@ -6,6 +6,7 @@ import { calendarApi } from "../features/calendar/calendarQuery";
 import { dataApi } from "../features/data/dataQueries.ts";
 import { promoVisitApi } from "../features/promoVisits/promosVisitsQueries";
 import { userApi } from "../features/users/userQueries";
+import { weatherApi } from "../features/weather/weatherQuery.ts";
 import { loadAuthState, saveAuthState } from "../services/localStorage.ts";
 import listenerMiddleware from "./listeners";
 import rootReducer from "./rootReducer";
@@ -38,7 +39,8 @@ const store = configureStore({
       .concat(dataApi.middleware)
       .concat(promoVisitApi.middleware)
       .concat(listenerMiddleware.middleware)
-      .concat(calendarApi.middleware),
+      .concat(calendarApi.middleware)
+      .concat(weatherApi.middleware),
 });
 
 /**

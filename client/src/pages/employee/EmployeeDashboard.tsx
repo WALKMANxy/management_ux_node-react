@@ -1,5 +1,12 @@
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import { Box, Fab, Grid, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  Divider,
+  Fab,
+  Grid,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
@@ -36,13 +43,21 @@ const EmployeeDashboard: React.FC = () => {
   return (
     <Box
       className="employee-dashboard"
-      sx={{ p: isMobile ? 2 : 4, bgcolor: "#f4f5f7", position: "relative" }}
+      sx={{ px: isMobile ? 1 : 4, bgcolor: "#f4f5f7", position: "relative" }}
     >
-      {/* Welcome Message */}
-      <WelcomeMessage
-        name={user?.entityName}
-        role={userRole || "employee"}
-        loading={loadingState}
+      <Box sx={{ mt: 2 }}>
+        {/* Welcome Message */}
+        <WelcomeMessage
+          name={user?.entityName}
+          role={userRole || "employee"}
+          loading={loadingState}
+        />
+      </Box>
+      <Divider
+        sx={{
+          width: "95%",
+          margin: "0 auto",
+        }}
       />
 
       {/* FAB Button for Calendar - Positioned Top Right (Tablet Only) */}
@@ -62,7 +77,7 @@ const EmployeeDashboard: React.FC = () => {
         </Fab>
       )}
 
-      <Grid container spacing={6} mt={2}>
+      <Grid container spacing={6} mt={-2}>
         {/* Left Side Components */}
         <Grid item xs={!isTablet ? 12 : 0} md={!isTablet ? 9 : 0}>
           <Grid container spacing={3}>
@@ -90,12 +105,20 @@ const EmployeeDashboard: React.FC = () => {
 
         {/* Calendar and Upcoming Visits section */}
         {!isTablet && (
-          <CalendarAndVisitsView loadingState={loadingState} t={t} disableUpcomingVisits />
+          <CalendarAndVisitsView
+            loadingState={loadingState}
+            t={t}
+            disableUpcomingVisits
+          />
         )}
       </Grid>
       {/* Drawer Container for Calendar and Upcoming Visits */}
       {isTablet && (
-        <DrawerContainer open={drawerOpen} onClose={handleToggleDrawer} disableUpcomingVisits />
+        <DrawerContainer
+          open={drawerOpen}
+          onClose={handleToggleDrawer}
+          disableUpcomingVisits
+        />
       )}
     </Box>
   );

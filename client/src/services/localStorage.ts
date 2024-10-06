@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuthState } from "../models/stateModels";
 
 /**
@@ -44,7 +45,6 @@ export const saveAuthState = (state: AuthState): void => {
  * @param obj - The object to check.
  * @returns True if the object is a valid AuthState, false otherwise.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isAuthState = (obj: any): obj is AuthState => {
   return (
     typeof obj === "object" &&
@@ -55,4 +55,54 @@ const isAuthState = (obj: any): obj is AuthState => {
     (typeof obj.userId === "string" || obj.userId === null) &&
     (typeof obj.refreshToken === "string" || obj.refreshToken === null)
   );
+};
+
+// Helper to store data with an expiry in localStorage
+export const setWithExpiry = (key: string, value: any, ttl: number) => {
+  const now = new Date();
+
+  const item = {
+    value: value,
+    expiry: now.getTime() + ttl,
+  };
+  localStorage.setItem(key, JSON.stringify(item));
+};
+
+// Helper to get data from localStorage with expiry check
+export const getWithExpiry = (key: string) => {
+  const itemStr = localStorage.getItem(key);
+
+  if (!itemStr) {
+    return null;
+  }
+
+  const item = JSON.parse(itemStr);
+  const now = new Date();
+
+  if (now.getTime() > item.expiry) {
+    localStorage.removeItem(key);
+    return null;
+  }
+
+  return item.value;
+};
+
+// Helper to cache location data with city name
+export const cacheCityData = (
+  lat: number,
+  lon: number,
+  city: string,
+  ttl: number = 1000 * 60 * 60
+) => {
+  const cachedData = {
+    lat,
+    lon,
+    city,
+  };
+  setWithExpiry("cityData", cachedData, ttl); // Cache city data with expiry
+};
+
+// Helper to retrieve cached city data
+export const getCachedCityData = () => {
+  return getWithExpiry("cityData");
 };
