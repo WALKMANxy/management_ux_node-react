@@ -23,6 +23,7 @@ import oauthRoutes from "./routes/OAuth";
 import promosRoutes from "./routes/promos";
 import usersRoutes from "./routes/users";
 import visitsRoutes from "./routes/visits";
+import citiesRoutes from "./routes/cities";
 import { errorHandler } from "./utils/errorHandler";
 import { logger, logRequestsIp } from "./utils/logger";
 import { csp } from "./middlewares/csp";
@@ -77,6 +78,7 @@ app.use("/users", usersRoutes);
 app.use("/calendar", calendarEventsRoutes); // Register the day-off request routes
 app.use("/chats", chatRoutes); // Add chat routes
 app.use("/employees", employeeRoutes);
+app.use("/cities", citiesRoutes);
 
 app.use(errorHandler);
 
