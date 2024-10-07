@@ -85,6 +85,74 @@ const chatSlice = createSlice({
 
       chat.updatedAt = new Date();
     },
+    addAttachmentMessageReducer: (
+      state,
+      action: PayloadAction<{ chatId: string; message: IMessage }>
+    ) => {
+      const { chatId, message } = action.payload;
+      const chat = state.chats[chatId];
+      if (!chat) {
+        console.error("Chat does not exist in the state.");
+        return;
+      }
+      message.isUploading = true;
+      message.uploadProgress = 0;
+      chat.messages.push(message);
+      chat.updatedAt = new Date();
+    },
+    updateMessageProgress: (
+      state,
+      action: PayloadAction<{
+        chatId: string;
+        messageId: string;
+        progress: number;
+      }>
+    ) => {
+      const { chatId, messageId, progress } = action.payload;
+      const chat = state.chats[chatId];
+      if (!chat) {
+        console.error("Chat does not exist in the state.");
+        return;
+      }
+      const message = chat.messages.find((msg) => msg.local_id === messageId);
+      if (message) {
+        message.uploadProgress = progress;
+      }
+    },
+    uploadComplete: (
+      state,
+      action: PayloadAction<{
+        chatId: string;
+        message: IMessage;
+        fromServer?: boolean;
+      }>
+    ) => {
+      const { chatId, message } = action.payload;
+      const chat = state.chats[chatId];
+      if (!chat) {
+        console.error("Chat does not exist in the state.");
+        return;
+      }
+      const existingMessage = chat.messages.find(
+        (msg) => msg.local_id === message.local_id
+      );
+      if (existingMessage) {
+        Object.assign(existingMessage, message);
+        existingMessage.isUploading = false;
+        existingMessage.status = "sent";
+        existingMessage.uploadProgress = 100;
+      } else {
+        message.isUploading = false;
+        message.status = "sent";
+        message.uploadProgress = 100;
+        chat.messages.push(message);
+      }
+      chat.messages.sort(
+        (a, b) =>
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
+      chat.updatedAt = new Date();
+    },
 
     updateReadStatusReducer: (
       state,
@@ -183,6 +251,23 @@ const chatSlice = createSlice({
         }
       } else {
         console.warn(`updateChatReducer: Chat with ID ${chatId} not found.`);
+      }
+    },
+    uploadFailed: (
+      state,
+      action: PayloadAction<{ chatId: string; messageId: string }>
+    ) => {
+      const { chatId, messageId } = action.payload;
+      const chat = state.chats[chatId];
+      if (!chat) {
+        console.error("Chat does not exist in the state.");
+        return;
+      }
+      const message = chat.messages.find((msg) => msg.local_id === messageId);
+      if (message) {
+        message.isUploading = false;
+        message.status = "failed";
+        message.uploadProgress = 0;
       }
     },
   },
@@ -360,6 +445,10 @@ export const {
   updateReadStatusReducer,
   addChatReducer,
   updateChatReducer,
+  addAttachmentMessageReducer,
+  uploadComplete,
+  updateMessageProgress,
+  uploadFailed,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

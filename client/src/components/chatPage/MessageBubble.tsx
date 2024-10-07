@@ -6,10 +6,12 @@ import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
 import { selectCurrentChat } from "../../features/chat/chatSlice";
+import { useFilePreview } from "../../hooks/useFilePreview";
 import { IMessage } from "../../models/dataModels";
 import { User } from "../../models/entityModels";
 import "../../Styles/styles.css";
 import MessageStatusIcon from "./MessageStatusIcon";
+import AttachmentPreview from "./AttachmentPreview";
 
 interface MessageBubbleProps {
   message: IMessage;
@@ -34,6 +36,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   const isOwnMessage = message.sender === currentUserId;
   const currentChat = useAppSelector(selectCurrentChat);
   const currentChatType = currentChat?.type;
+  const { openFileViewer } = useFilePreview();
 
   // Find the sender's details from the participants data
   const sender = participantsData.find((user) => user._id === message.sender);
@@ -162,7 +165,28 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
               {message.content}
             </Typography>
 
-            {/* Timestamp and Status Icon */}
+            {/* Attachments */}
+            {message.attachments && message.attachments.length > 0 && (
+              <Box
+                sx={{
+                  mt: 1,
+                  display: "flex",
+                  gap: 1,
+                  flexWrap: "wrap",
+                }}
+              >
+                {message.attachments.map((attachment, index) => (
+                  <AttachmentPreview
+                    key={index}
+                    attachment={attachment}
+                    isUploading={message.isUploading}
+                    uploadProgress={message.uploadProgress}
+                    onClick={() => openFileViewer(attachment, false)} // Call openFileViewer from the hook
+                  />
+                ))}
+              </Box>
+            )}
+
             <Box
               sx={{
                 color: "gray",
@@ -171,7 +195,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                 mb: -1,
                 mt: 0.5,
                 justifyContent: isOwnMessage ? "flex-end" : "flex-start",
-                gap: 0.5, // Add margin between timestamp and status icon
+                gap: 0.5,
               }}
             >
               <Typography variant="caption">{formattedTime}</Typography>
@@ -189,23 +213,12 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   );
 };
 
-/**
- * Memoization function for MessageBubble component.
- * We only re-render the component if the readBy array length changes or any of the elements change.
- * This optimization prevents unnecessary re-renders when the message status changes.
- * @param {Object} prevProps Previous props
- * @param {Object} nextProps Next props
- * @returns {boolean} Whether the component should be re-rendered
- */
 export default React.memo(MessageBubble, (prevProps, nextProps) => {
   return (
-    // Check if the readBy array length is the same
     prevProps.message.readBy.length === nextProps.message.readBy.length &&
-    // Check if all elements in the readBy array are the same
     prevProps.message.readBy.every(
       (value, index) => value === nextProps.message.readBy[index]
     ) &&
-    // Check if the message status is the same
     prevProps.message.status === nextProps.message.status
   );
 });

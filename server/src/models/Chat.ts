@@ -11,8 +11,16 @@ export interface IMessage {
   timestamp: Date;
   readBy: Types.ObjectId[]; // Array of user IDs who have read the message
   messageType: "message" | "alert" | "promo" | "visit"; // Categorizes the message type
-  attachments?: { url: string; type: "image" }[]; // Array to store image URLs and types
+  attachments?: {
+    url: string;
+    type: "image" | "pdf" | "word" | "excel" | "csv" | "video" | "other"; // Added more types
+    fileName: string; // Original file name
+    size: number; // File size in bytes
+    thumbnail?: string; // Thumbnail for images, if applicable
+  }[]; // Array to store attachments with metadata
   status: "pending" | "sent" | "failed"; // Status indicating the message state
+  isUploading?: boolean; // Tracks if the message is still uploading
+  uploadProgress?: number; // Tracks the progress of the upload (percentage)
 }
 
 // Define the IChat interface with server and client IDs
@@ -30,7 +38,6 @@ export interface IChat extends Document {
   status: "pending" | "created" | "failed"; // Status indicating the chat state
 }
 
-// Define the schema for Message with client and server IDs
 const messageSchema = new Schema<IMessage>(
   {
     _id: { type: Schema.Types.ObjectId, auto: true }, // Auto-generated server-side
@@ -60,7 +67,10 @@ const messageSchema = new Schema<IMessage>(
     attachments: [
       {
         url: { type: String, required: true },
-        type: { type: String, enum: ["image"], required: true },
+        type: { type: String, enum: ["image", "pdf", "word", "excel", "csv", "video","other"], required: true }, // Added more file types
+        fileName: { type: String, required: true }, // Original file name
+        size: { type: Number, required: true }, // File size in bytes
+        thumbnail: { type: String }, // Optional thumbnail for images
       },
     ],
     status: {
@@ -68,6 +78,8 @@ const messageSchema = new Schema<IMessage>(
       enum: ["pending", "sent", "failed"],
       default: "pending",
     },
+    isUploading: { type: Boolean, default: false }, // Tracks if the message is still uploading
+    uploadProgress: { type: Number, default: 0 }, // Upload progress percentage
   },
   { _id: false } // Do not override _id behavior
 );

@@ -22,12 +22,14 @@ import { useAppDispatch } from "../../app/hooks";
 import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 import useLoadOlderMessages from "../../hooks/useChatLoadOlderMessages";
 import useChatView from "../../hooks/useChatView"; // Import the custom hook
+import { useFilePreview } from "../../hooks/useFilePreview";
 import { IChat } from "../../models/dataModels";
 import { canUserChat } from "../../utils/chatUtils";
 import CreateChatForm from "./CreateChatForm"; // Import CreateChatForm
 import InputBox from "./InputBox";
 import RenderMessage from "./RenderMessage"; // Import the RenderMessage component
 import RenderParticipantsAvatars from "./RenderParticipantsAvatars"; // Import the RenderParticipantsAvatars component
+import FileViewer from "./FileViewer";
 
 const ChatView: React.FC = () => {
   const { t } = useTranslation();
@@ -49,6 +51,8 @@ const ChatView: React.FC = () => {
     participantsData,
     currentUserId,
   } = useChatView(); // Destructure the hook values
+
+  const { isViewerOpen, closeFileViewer } = useFilePreview();
 
   // Hook for loading older messages
   const { messagesContainerRef, topRef } = useLoadOlderMessages(
@@ -261,6 +265,7 @@ const ChatView: React.FC = () => {
             "&::-webkit-scrollbar": {
               display: "none",
             },
+
             position: "relative",
             flexGrow: 1,
           }}
@@ -289,6 +294,16 @@ const ChatView: React.FC = () => {
       >
         <InputBox canUserChat={isUserAllowedToChat} />
       </Box>
+
+      {/* File Viewer */}
+      {isViewerOpen && (
+        <FileViewer
+          onClose={closeFileViewer}
+          chatAttachments={currentChat.messages.flatMap(
+            (message) => message.attachments || []
+          )}
+        />
+      )}
 
       {/* Edit Chat Form */}
       {isEditChatFormOpen && chatToEdit && (
