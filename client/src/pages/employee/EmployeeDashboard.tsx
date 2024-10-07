@@ -51,10 +51,10 @@ const EmployeeDashboard: React.FC = () => {
         px: isMobile ? 1 : 4,
         bgcolor: "#f4f5f7",
         position: "relative",
-        pt: isMobile ? 0 : 4,
+        pt: isMobile ? 0 : 1,
       }}
     >
-      <Box sx={{ mt: 2 }}>
+      <Box sx={{ mt: 0 }}>
         {/* Welcome Message */}
         <WelcomeMessage
           name={user?.entityName}

@@ -3,15 +3,17 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { useAppDispatch /* useAppSelector */ } from "../app/hooks";
 import { selectUserId, selectUserRole } from "../features/auth/authSlice";
+import { uploadAttachments } from "../features/chat/api/chats";
 import {
+  addAttachmentMessageReducer,
   addChatReducer,
-  updateChatReducer,
   addMessageReducer,
   clearCurrentChatReducer,
   selectAllChats,
   selectCurrentChat,
   selectMessagesFromCurrentChat,
   setCurrentChatReducer,
+  updateChatReducer,
   updateReadStatusReducer,
 } from "../features/chat/chatSlice"; // Ensure correct selectors are imported
 import { fetchAllChatsThunk } from "../features/chat/chatThunks";
@@ -21,6 +23,7 @@ import { IChat, IMessage } from "../models/dataModels";
 import { showToast } from "../services/toastMessage";
 import { sanitizeSearchTerm } from "../utils/chatUtils";
 import { generateId } from "../utils/deviceUtils";
+import { Attachment } from "./useFilePreview";
 
 const useChatLogic = () => {
   const dispatch = useAppDispatch();
@@ -188,7 +191,8 @@ const useChatLogic = () => {
   const handleSendMessage = useCallback(
     async (
       content: string,
-      messageType: "message" | "alert" | "promo" | "visit"
+      messageType: "message" | "alert" | "promo" | "visit",
+      attachments?: Attachment[]
     ) => {
       if (!currentChatId || !currentUserId) {
         console.error("Missing currentChatId or currentUserId");
@@ -197,22 +201,41 @@ const useChatLogic = () => {
 
       const localId = generateId();
 
+      // Failsafe for empty content when attachments exist
+      const finalContent =
+        content.trim() === "" && attachments && attachments.length > 0
+          ? "\u200B" // Use an invisible character (zero-width space)
+          : content;
+
       const messageData: IMessage = {
         _id: localId,
         local_id: localId,
-        content,
+        content: finalContent,
         sender: currentUserId,
         timestamp: new Date(),
         readBy: [currentUserId],
         messageType,
-        attachments: [],
+        attachments: attachments || [],
         status: "pending",
       };
 
       try {
-        dispatch(
-          addMessageReducer({ chatId: currentChatId, message: messageData })
-        );
+        if (attachments && attachments.length > 0) {
+          // Use the new reducer for messages with attachments
+          dispatch(
+            addAttachmentMessageReducer({
+              chatId: currentChatId,
+              message: messageData,
+            })
+          );
+          // Initiate the upload
+          await uploadAttachments(currentChatId, messageData, dispatch);
+        } else {
+          // Use the existing reducer for messages without attachments
+          dispatch(
+            addMessageReducer({ chatId: currentChatId, message: messageData })
+          );
+        }
       } catch (error) {
         console.error("Failed to send message:", error);
       }
@@ -298,7 +321,12 @@ const useChatLogic = () => {
         };
 
         // Dispatch an action to update the chat in the store
-        dispatch(updateChatReducer({ chatId: updatedChat._id!, updatedData: updatedChat })); // Ensure you have an updateChatReducer
+        dispatch(
+          updateChatReducer({
+            chatId: updatedChat._id!,
+            updatedData: updatedChat,
+          })
+        ); // Ensure you have an updateChatReducer
       } catch (error) {
         console.error("Failed to edit chat:", error);
         throw error; // Re-throw to handle in the form
