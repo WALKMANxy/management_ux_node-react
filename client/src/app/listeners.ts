@@ -4,6 +4,7 @@ import {
   addMessageReducer,
   updateChatReducer,
   updateReadStatusReducer,
+  uploadComplete,
 } from "../features/chat/chatSlice";
 import { fetchAllChatsThunk } from "../features/chat/chatThunks";
 import {
@@ -126,6 +127,24 @@ listenerMiddleware.startListening({
 // Listener for the addMessageReducer action
 listenerMiddleware.startListening({
   actionCreator: addMessageReducer,
+  effect: async (action) => {
+    const { chatId, message, fromServer } = action.payload;
+
+    // Skip WebSocket emission if action is from the server
+    if (fromServer) return;
+
+    // Add the message to the queue
+    messageQueue.push({ chatId, messageData: message });
+
+    // Debounce the processing of the message queue
+    if (messageTimer) clearTimeout(messageTimer);
+    messageTimer = setTimeout(processMessageQueue, DEBOUNCE_TIME);
+  },
+});
+
+// Listener for the addMessageReducer action
+listenerMiddleware.startListening({
+  actionCreator: uploadComplete,
   effect: async (action) => {
     const { chatId, message, fromServer } = action.payload;
 

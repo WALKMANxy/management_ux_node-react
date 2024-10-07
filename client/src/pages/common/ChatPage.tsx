@@ -1,6 +1,6 @@
 import { Box, Grid, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
-import {  useAppSelector } from "../../app/hooks";
+import { useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
 import ChatSidebar from "../../components/chatPage/ChatSidebar";
 import ChatView from "../../components/chatPage/ChatView";
@@ -8,7 +8,7 @@ import ChatView from "../../components/chatPage/ChatView";
 const ChatPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   // Get currentChat from Redux state
   const currentChat = useAppSelector(
@@ -30,19 +30,19 @@ const ChatPage: React.FC = () => {
         overflow: "hidden",
       }}
     >
-      <Grid container sx={{ flexGrow: 1, height: "100%"}}>
+      <Grid container sx={{ flexGrow: 1, height: "100%" }}>
         {/* Sidebar for chat list, hidden on mobile when chat view is active */}
         {!currentChat || !isMobile ? (
           <Grid
             item
-            xs={12}
+            xs={isTablet ? 3 : true}
             md={3}
             sx={{
               display: { xs: isMobile && currentChat ? "none" : "block" },
               borderRight: "1px solid #e0e0e0",
               height: "100%", // Ensure sidebar fills available height
               overflowY: "auto", // Enable scrolling if content overflows
-              minWidth: "20dvh"
+              minWidth: "20dvh",
             }}
           >
             <ChatSidebar />
@@ -53,7 +53,7 @@ const ChatPage: React.FC = () => {
         {currentChat && (
           <Grid
             item
-            xs={12}
+            xs={true}
             md={true}
             sx={{
               display: "flex",

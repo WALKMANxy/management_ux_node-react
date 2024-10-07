@@ -189,7 +189,7 @@ export const renewSession = async (
 ): Promise<{ accessToken: string; refreshToken: string } | null> => {
   try {
     if (!refreshToken) {
-      // logger.warn("No refresh token provided");
+      logger.warn("No refresh token provided");
       return null;
     }
 
@@ -197,22 +197,22 @@ export const renewSession = async (
     const session = await Session.findOne({ refreshToken, uniqueId });
 
     if (!session) {
-      // logger.warn("Invalid refresh token", { refreshToken });
+       logger.warn("Invalid refresh token", { refreshToken });
       return null;
     }
 
     // Optional: Validate uniqueId, IP, User-Agent
     if (uniqueId && session.uniqueId !== uniqueId) {
-      /* logger.warn("Unique identifier mismatch during token refresh", {
+       logger.warn("Unique identifier mismatch during token refresh", {
         sessionId: session._id,
         storedUniqueId: session.uniqueId,
         incomingUniqueId: uniqueId,
-      }); */
+      });
       return null;
     }
 
     if (session.expiresAt < new Date()) {
-      // logger.warn("Refresh token expired", { sessionId: session._id });
+       logger.warn("Refresh token expired", { sessionId: session._id });
       await invalidateSession(refreshToken, uniqueId);
       return null;
     }
@@ -220,18 +220,18 @@ export const renewSession = async (
     // Validate userAgent
     const incomingUserAgent = req.get("User-Agent");
     if (session.userAgent !== incomingUserAgent) {
-      /* logger.warn("User-Agent mismatch during token refresh", {
+       logger.warn("User-Agent mismatch during token refresh", {
         sessionId: session._id,
         storedUserAgent: session.userAgent,
         incomingUserAgent,
-      }); */
+      });
       return null;
     }
 
     // Retrieve the user details using UserService
     const user = await UserService.getUserById(session.userId.toString());
     if (!user) {
-      // logger.warn("User not found for session", { sessionId: session._id });
+       logger.warn("User not found for session", { sessionId: session._id });
       return null;
     }
 
@@ -244,10 +244,10 @@ export const renewSession = async (
     session.expiresAt = new Date(Date.now() + refreshTokenDurationMs);
     await session.save();
 
-    /* logger.info("Session refreshed successfully", {
+     logger.info("Session refreshed successfully", {
       sessionId: session._id,
       newExpiresAt: session.expiresAt,
-    }); */
+    });
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   } catch (error) {
