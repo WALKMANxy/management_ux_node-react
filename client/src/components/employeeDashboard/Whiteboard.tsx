@@ -34,7 +34,11 @@ const WhiteboardComponent: React.FC = () => {
 
   // Function to scroll to the bottom (newest message)
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({
+      block: "nearest",
+      inline: "nearest",
+      behavior: "smooth",
+    });
   };
 
   // Scroll to the bottom whenever new messages are added
@@ -78,7 +82,6 @@ const WhiteboardComponent: React.FC = () => {
         flexDirection: "column",
         bgcolor: "#f5f5f5",
         height: "auto",
-
       }}
     >
       {/* Header - Always Visible */}
@@ -89,8 +92,6 @@ const WhiteboardComponent: React.FC = () => {
           bgcolor: "#f5f5f5",
           zIndex: 1,
           pb: 1, // Padding bottom for separation
-
-
         }}
       >
         <Typography variant="h6" gutterBottom>
@@ -110,8 +111,8 @@ const WhiteboardComponent: React.FC = () => {
           "&.webkitScrollbar": {
             display: "none",
           },
-          "msOverflowStyle": "none", // IE and Edge
-          "scrollbarWidth": "none", // Firefox
+          msOverflowStyle: "none", // IE and Edge
+          scrollbarWidth: "none", // Firefox
         }}
         ref={messagesContainerRef}
         onClick={handleWhiteboardClick} // Attach click handler
