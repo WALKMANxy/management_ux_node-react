@@ -36,7 +36,6 @@ export const generateAccessToken = (user: Partial<IUser>, uniqueId: string): str
 };
 
 // Verify Access Token
-// Verify Access Token
 export const verifyAccessToken = (token: string): DecodedAccessToken => {
   try {
     const decoded = jwt.verify(

@@ -16,7 +16,7 @@ export interface IMessage {
     type: "image" | "pdf" | "word" | "excel" | "csv" | "video" | "other"; // Added more types
     fileName: string; // Original file name
     size: number; // File size in bytes
-    thumbnail?: string; // Thumbnail for images, if applicable
+    thumbnailUrl?: string; // Thumbnail for images, if applicable
   }[]; // Array to store attachments with metadata
   status: "pending" | "sent" | "failed"; // Status indicating the message state
   isUploading?: boolean; // Tracks if the message is still uploading

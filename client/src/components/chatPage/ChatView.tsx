@@ -26,10 +26,10 @@ import { useFilePreview } from "../../hooks/useFilePreview";
 import { IChat } from "../../models/dataModels";
 import { canUserChat } from "../../utils/chatUtils";
 import CreateChatForm from "./CreateChatForm"; // Import CreateChatForm
+import FileViewer from "./FileViewer";
 import InputBox from "./InputBox";
 import RenderMessage from "./RenderMessage"; // Import the RenderMessage component
 import RenderParticipantsAvatars from "./RenderParticipantsAvatars"; // Import the RenderParticipantsAvatars component
-import FileViewer from "./FileViewer";
 
 const ChatView: React.FC = () => {
   const { t } = useTranslation();
@@ -52,7 +52,7 @@ const ChatView: React.FC = () => {
     currentUserId,
   } = useChatView(); // Destructure the hook values
 
-  const { isViewerOpen, closeFileViewer } = useFilePreview();
+  const { isViewerOpen, closeFileViewer, isPreview } = useFilePreview();
 
   // Hook for loading older messages
   const { messagesContainerRef, topRef } = useLoadOlderMessages(
@@ -297,12 +297,7 @@ const ChatView: React.FC = () => {
 
       {/* File Viewer */}
       {isViewerOpen && (
-        <FileViewer
-          onClose={closeFileViewer}
-          chatAttachments={currentChat.messages.flatMap(
-            (message) => message.attachments || []
-          )}
-        />
+        <FileViewer onClose={() => closeFileViewer(isPreview)} />
       )}
 
       {/* Edit Chat Form */}

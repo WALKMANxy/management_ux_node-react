@@ -57,7 +57,7 @@ const AttachmentModal: React.FC<AttachmentModalProps> = ({
       <Box sx={{ display: "flex", gap: 2, justifyContent: "center" }}>
         <Tooltip title={t("inputBox.tooltips.uploadPicture")} arrow>
           <IconButton
-            onClick={() => document.getElementById("image-upload")?.click()}
+            onClick={() => document.getElementById("media-upload")?.click()}
             size="medium"
             sx={{ color: "rgba(0, 0, 255, 0.6)" }}
           >
@@ -79,7 +79,7 @@ const AttachmentModal: React.FC<AttachmentModalProps> = ({
       <input
         id="media-upload"
         type="file"
-        accept=".png,.jpg,.jpeg,.gif,.jpeg,.webp,.avi,.mov,.mp4,.m4v,.mov,.mpg,.mpeg,.webm,.wmv"
+        accept=".png,.jpg,.gif,.jpeg,.webp,.avi,.mov,.mp4,.m4v,.mov,.mpg,.mpeg,.webm,.wmv"
         multiple
         style={{ display: "none" }}
         onChange={onFileSelect}
