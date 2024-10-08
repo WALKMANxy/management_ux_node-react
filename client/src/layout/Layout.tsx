@@ -1,8 +1,6 @@
-// src/layout/Layout.tsx
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import "animate.css";
-
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
 import ErrorBoundary from "../components/ErrorBoundary/ErrorBoundary";
@@ -14,6 +12,9 @@ const Layout: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const currentChat = useAppSelector(selectCurrentChat);
+  const [shouldShowHeader, setShouldShowHeader] = useState(
+    !currentChat || !isMobile
+  );
 
   // Check if the current path matches specific routes
   const isOtherPage =
@@ -42,11 +43,17 @@ const Layout: React.FC = () => {
     };
   }, [isMessagesPage, isOtherPage, isMobile]);
 
-  // Determine if the header should be displayed
-  const shouldShowHeader = useMemo(
-    () => !currentChat || !isMobile,
-    [currentChat, isMobile]
-  );
+  // useEffect to monitor location and enable the header when leaving /messages page
+  useEffect(() => {
+    if (isMessagesPage && currentChat && isMobile) {
+      // Hide header if on /messages page with currentChat and mobile view
+      setShouldShowHeader(false);
+    } else {
+      // Re-enable the header when leaving the /messages page or on desktop view
+      setShouldShowHeader(true);
+    }
+  }, [location.pathname, currentChat, isMobile, isMessagesPage]);
+
   return (
     <ErrorBoundary>
       <Box
@@ -57,7 +64,7 @@ const Layout: React.FC = () => {
           overflowX: "hidden",
         }}
       >
-        {/* Hide Header if currentChat exists and we are in mobile view */}
+        {/* Conditionally render Header based on chat state and mobile view */}
         {shouldShowHeader && <Header />}
         <Box
           component="main"

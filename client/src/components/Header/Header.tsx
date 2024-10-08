@@ -39,8 +39,8 @@ import { RootState } from "../../app/store";
 import { handleLogout } from "../../features/auth/authThunks";
 import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 import { clearSelection } from "../../features/data/dataSlice";
-import GlobalSearch from "./GlobalSearch";
 import { UserRole } from "../../models/entityModels";
+import GlobalSearch from "./GlobalSearch";
 const NotificationBell = React.lazy(() => import("./NotificationBell"));
 const UserAvatar = React.lazy(() => import("./UserAvatar"));
 
@@ -72,12 +72,15 @@ const Header: React.FC = () => {
   }, [location.pathname, dispatch]);
 
   useEffect(() => {
+    // Check if the user is leaving the /messages page
     if (
       prevLocationRef.current === "/messages" &&
       location.pathname !== "/messages"
     ) {
       dispatch(clearCurrentChatReducer());
     }
+
+    // Update the previous location ref after checking
     prevLocationRef.current = location.pathname;
   }, [location.pathname, dispatch]);
 
