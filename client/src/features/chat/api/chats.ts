@@ -4,6 +4,7 @@ import imageCompression from "browser-image-compression";
 import { Dispatch } from "redux";
 import { IChat, IMessage } from "../../../models/dataModels";
 import { apiCall, axiosInstance } from "../../../utils/apiUtils";
+import { cacheFile, getCachedFile } from "../../../utils/cacheUtils";
 import {
   updateMessageProgress,
   uploadComplete,
@@ -233,4 +234,64 @@ export const uploadAttachments = async (
   };
 
   dispatch(uploadComplete({ chatId, message: updatedMessage }));
+};
+
+// Fetch Thumbnail with Caching
+export const fetchThumbnail = async (thumbnailUrl: string): Promise<string> => {
+  try {
+    // Check if the thumbnail is cached
+    const cachedFile = await getCachedFile(thumbnailUrl);
+    if (cachedFile) {
+      return cachedFile.objectUrl; // Return the regenerated object URL
+    }
+
+    // If not cached, fetch the thumbnail from the server
+    const response = await axiosInstance.get(thumbnailUrl, {
+      responseType: "blob",
+    });
+
+    const blob = response.data as Blob;
+
+    // Cache the fetched Blob
+    const objectUrl = await cacheFile(thumbnailUrl, blob);
+    return objectUrl;
+  } catch (error) {
+    console.error("Error fetching thumbnail:", error);
+    throw error;
+  }
+};
+
+// Download Full File
+export const downloadFile = async (
+  fileUrl: string,
+  onDownloadProgress: (progress: number) => void
+): Promise<string> => {
+  try {
+    // Check if the file is cached
+    const cachedFile = await getCachedFile(fileUrl);
+    if (cachedFile) {
+      return cachedFile.objectUrl; // Return the regenerated object URL
+    }
+
+    // If not cached, download the file from the server
+    const response = await axiosInstance.get(fileUrl, {
+      responseType: "blob",
+      onDownloadProgress: (progressEvent) => {
+        const totalLength = progressEvent.total;
+        if (totalLength) {
+          const progress = Math.round((progressEvent.loaded * 100) / totalLength);
+          onDownloadProgress(progress);
+        }
+      },
+    });
+
+    const blob = response.data as Blob;
+
+    // Cache the downloaded Blob
+    const objectUrl = await cacheFile(fileUrl, blob);
+    return objectUrl;
+  } catch (error) {
+    console.error("Error downloading the file:", error);
+    throw error;
+  }
 };

@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import { downloadFile, fetchThumbnail } from "../features/chat/api/chats";
 
 // Define the structure of the attachment
 export interface Attachment {
@@ -8,38 +9,92 @@ export interface Attachment {
   type: "image" | "video" | "pdf" | "word" | "excel" | "csv" | "other";
   fileName: string;
   size: number;
-  thumbnail?: string; // Optional thumbnail for images
+  thumbnailUrl?: string; // Optional thumbnail for images
 }
+
 
 const MAX_FILES = 10; // Maximum number of files allowed
 const MAX_FILE_SIZE_MB = 15; // Max size per file in MB
 const MAX_TOTAL_SIZE_MB = 50; // Max total size of all files in MB
 
-interface UseFilePreviewReturn {
-  isViewerOpen: boolean;
-  currentFile: Attachment | null;
-  openFileViewer: (attachment: Attachment, isPreview: boolean) => void;
-  closeFileViewer: () => void;
-  downloadFile: (attachment: Attachment) => void;
-  setCurrentFile: (attachment: Attachment | null) => void;
-  addAttachments: (attachments: Attachment[]) => void;
-  removeAttachment: (fileName: string) => void;
-  clearAttachments: () => void;
-  selectedAttachments: Attachment[];
-  handleFileSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  isPreview: boolean;
-}
-
 // Hook to manage file preview and download logic
-export const useFilePreview = (): UseFilePreviewReturn => {
+export const useFilePreview = () => {
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [currentFile, setCurrentFile] = useState<Attachment | null>(null);
   const [selectedAttachments, setSelectedAttachments] = useState<Attachment[]>(
     []
   );
+  const [downloadedFiles, setDownloadedFiles] = useState<Attachment[]>([]);
+  const [downloadedThumbnails, setDownloadedThumbnails] = useState<
+    Attachment[]
+  >([]);
+
   const [isPreview, setIsPreview] = useState<boolean>(false);
 
-  const downloadFile = useCallback((attachment: Attachment) => {
+  const fetchAndStoreThumbnail = useCallback(async (attachment: Attachment) => {
+    try {
+      const downloadThumbnailUrl = await fetchThumbnail(
+        attachment.thumbnailUrl!
+      );
+
+      // Store the downloaded thumbnail in the state using the fileName as the key
+      setDownloadedThumbnails((prev) => [
+        ...prev,
+        { ...attachment, thumbnailUrl: downloadThumbnailUrl },
+      ]);
+    } catch (error) {
+      console.error("Error fetching thumbnail:", error);
+    }
+  }, []);
+
+  const downloadAndStoreFile = useCallback(
+    async (attachment: Attachment) => {
+      try {
+        const downloadUrl = await downloadFile(attachment.url, (progress) => {
+          // Optionally update download progress state here if needed
+          console.log(
+            `Download progress for ${attachment.fileName}: ${progress}%`
+          );
+        });
+
+        // Store the downloaded file in the state
+        setDownloadedFiles((prev) => [
+          ...prev,
+          { ...attachment, url: downloadUrl },
+        ]);
+
+        // Fetch and store the thumbnail if it's an image or video
+        if (["image", "video"].includes(attachment.type)) {
+          fetchAndStoreThumbnail(attachment);
+        }
+
+        toast.success(`${attachment.fileName} downloaded successfully.`);
+      } catch (error) {
+        toast.error(`Failed to download ${attachment.fileName}.`);
+        console.error("Error downloading file:", error);
+      }
+    },
+    [fetchAndStoreThumbnail]
+  );
+
+  const clearDownloadedData = useCallback(() => {
+    // Clear downloaded files
+    setDownloadedFiles((prev) => {
+      prev.forEach((attachment) => URL.revokeObjectURL(attachment.url));
+      return [];
+    });
+
+    // Clear downloaded thumbnails
+    setDownloadedThumbnails((prev) => {
+      prev.forEach((attachment) => URL.revokeObjectURL(attachment.url));
+      return [];
+    });
+  }, []);
+
+
+
+
+  const download = useCallback((attachment: Attachment) => {
     try {
       // Check if the attachment URL exists and is valid
       if (!attachment.url) {
@@ -65,34 +120,44 @@ export const useFilePreview = (): UseFilePreviewReturn => {
   }, []);
 
   const openFileViewer = useCallback(
-    (attachment: Attachment, isPreview: boolean) => {
-      // Ensure the attachment exists and has a valid URL
-      if (!attachment || !attachment.url) {
-        toast.error("Unable to open file. Invalid attachment.");
-        return;
-      }
-
-      // Update the preview mode based on the passed isPreview argument
+    (isPreview: boolean, fileName?: string) => {
       setIsPreview(isPreview);
 
-      // Handle images and videos for previewing
-      if (attachment.type === "image" || attachment.type === "video") {
-        setCurrentFile(attachment); // Set the current file for preview
-        setIsViewerOpen(true); // Open the viewer
-      }
-      // Future-proof: Add more types if needed (e.g., PDFs)
-      else {
-        downloadFile(attachment);
+      if (isPreview) {
+        // Ensure selectedAttachments array is not empty in preview mode
+        if (selectedAttachments.length === 0) {
+          toast.error("No attachments available for preview.");
+          return;
+        }
+
+        // Set the current file to the first attachment in the selectedAttachments array
+        setCurrentFile(selectedAttachments[0]);
+        setIsViewerOpen(true);
+      } else {
+        // Find the file in the downloadedFiles array by fileName
+        const fileToView = downloadedFiles.find(
+          (file) => file.fileName === fileName
+        );
+
+        // Handle the case where the file isn't found
+        if (!fileToView) {
+          toast.error("Unable to open file. File not found.");
+          return;
+        }
+
+        // Set the current file to the clicked attachment
+        setCurrentFile(fileToView);
+        setIsViewerOpen(true);
       }
     },
-    [downloadFile, setCurrentFile, setIsViewerOpen]
+    [
+      selectedAttachments,
+      downloadedFiles,
+      setCurrentFile,
+      setIsViewerOpen,
+      setIsPreview,
+    ]
   );
-
-  // Function to handle closing the file viewer
-  const closeFileViewer = () => {
-    setIsViewerOpen(false);
-    setCurrentFile(null);
-  };
 
   const addAttachments = useCallback(
     (attachments: Attachment[]) => {
@@ -135,7 +200,7 @@ export const useFilePreview = (): UseFilePreviewReturn => {
     [setSelectedAttachments]
   );
 
-  const clearAttachments = () => {
+  const clearAttachments = useCallback(() => {
     setSelectedAttachments((prev) => {
       // Revoke all object URLs before clearing
       prev.forEach((attachment) => {
@@ -145,7 +210,21 @@ export const useFilePreview = (): UseFilePreviewReturn => {
       // Clear all attachments
       return [];
     });
-  };
+  }, [setSelectedAttachments]);
+
+  // Function to handle closing the file viewer
+  const closeFileViewer = useCallback(
+    (isPreview: boolean) => {
+      setIsViewerOpen(false);
+      setCurrentFile(null);
+
+      // If in preview mode, clear the attachments
+      if (isPreview) {
+        clearAttachments();
+      }
+    },
+    [setIsViewerOpen, setCurrentFile, clearAttachments]
+  );
 
   // Function to handle selecting files
   const handleFileSelect = useCallback(
@@ -234,7 +313,7 @@ export const useFilePreview = (): UseFilePreviewReturn => {
               type: fileType,
               fileName: file.name,
               size: file.size,
-              thumbnail:
+              thumbnailUrl:
                 fileType === "image" ? URL.createObjectURL(file) : undefined, // Only for images
             };
           })
@@ -244,7 +323,7 @@ export const useFilePreview = (): UseFilePreviewReturn => {
 
         // Open the viewer with the first selected file, if any
         if (fileArray.length > 0) {
-          openFileViewer(fileArray[0], true);
+          openFileViewer(false); // Pass all selected files and the first one to view
         }
       }
     },
@@ -256,7 +335,7 @@ export const useFilePreview = (): UseFilePreviewReturn => {
     currentFile,
     openFileViewer,
     closeFileViewer,
-    downloadFile,
+    download,
     setCurrentFile,
     addAttachments,
     removeAttachment,
@@ -264,5 +343,10 @@ export const useFilePreview = (): UseFilePreviewReturn => {
     selectedAttachments,
     handleFileSelect,
     isPreview,
+    downloadAndStoreFile, // New function
+    fetchAndStoreThumbnail, // New function
+    clearDownloadedData, // New function
+    downloadedFiles, // New state
+    downloadedThumbnails, // New state
   };
 };

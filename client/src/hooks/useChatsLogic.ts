@@ -201,11 +201,11 @@ const useChatLogic = () => {
 
       const localId = generateId();
 
-      // Failsafe for empty content when attachments exist
-      const finalContent =
-        content.trim() === "" && attachments && attachments.length > 0
-          ? "\u200B" // Use an invisible character (zero-width space)
-          : content;
+        // Failsafe for empty content when attachments exist
+    const finalContent =
+    (content.trim() === "" && attachments && attachments.length > 0)
+      ? "\u200B" // Use an invisible character (zero-width space)
+      : content;
 
       const messageData: IMessage = {
         _id: localId,

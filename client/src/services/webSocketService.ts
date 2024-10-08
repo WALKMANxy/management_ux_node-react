@@ -10,6 +10,7 @@ import {
   addMessageReducer,
   updateChatReducer,
   updateReadStatusReducer,
+  uploadFailed,
 } from "../features/chat/chatSlice";
 import { IChat, IMessage } from "../models/dataModels";
 import { getUniqueIdentifier } from "../utils/cryptoUtils";
@@ -385,10 +386,43 @@ class WebSocketService {
     if (!this.socket || !this.socket.connected) {
       console.warn("Socket disconnected. Queuing outgoing message.");
       this.offlineMessageQueue.push({ chatId, message });
+
+      // Dispatch uploadFailed reducer immediately if offline
+      store.dispatch(
+        uploadFailed({ chatId, messageId: message.local_id || message._id })
+      );
       return;
     }
+  
+    // Send the message and wait for acknowledgment from the server
+    this.socket.emit(
+      "chat:message",
+      { chatId, message },
+      (ack: { success: boolean }) => {
+        if (!ack.success) {
+          console.warn("Message delivery failed. Queuing message.");
+          this.offlineMessageQueue.push({ chatId, message });
 
-    this.socket.emit("chat:message", { chatId, message });
+          // Dispatch uploadFailed reducer if the server fails to acknowledge the message
+          store.dispatch(
+            uploadFailed({ chatId, messageId: message.local_id || message._id })
+          );
+        }
+      }
+    );
+
+    // Optionally, you can also implement a timeout for acknowledgment
+    setTimeout(() => {
+      const isMessagePending = this.offlineMessageQueue.find(
+        (msg) => msg.message.local_id === message.local_id
+      );
+      if (isMessagePending) {
+        console.warn("Message acknowledgment timeout. Marking as failed.");
+        store.dispatch(
+          uploadFailed({ chatId, messageId: message.local_id || message._id })
+        );
+      }
+    }, 5000); // 5 seconds timeout for acknowledgment
   }
 
   // Emit a message read event to the server

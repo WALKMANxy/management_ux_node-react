@@ -91,13 +91,25 @@ const chatSlice = createSlice({
     ) => {
       const { chatId, message } = action.payload;
       const chat = state.chats[chatId];
+
       if (!chat) {
         console.error("Chat does not exist in the state.");
         return;
       }
-      message.isUploading = true;
-      message.uploadProgress = 0;
-      chat.messages.push(message);
+
+      // Remove the 'file' property from each attachment before storing in the state
+      const strippedMessage = {
+        ...message,
+        attachments: message.attachments.map((attachment) => {
+          const { file, ...rest } = attachment; // Destructure and remove 'file' property
+          return rest; // Return attachment without 'file' property
+        }),
+        isUploading: true,
+        uploadProgress: 0,
+      };
+
+      // Push the modified message to the chat
+      chat.messages.push(strippedMessage);
       chat.updatedAt = new Date();
     },
     updateMessageProgress: (
@@ -152,6 +164,25 @@ const chatSlice = createSlice({
           new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
       );
       chat.updatedAt = new Date();
+    },
+    uploadFailed: (
+      state,
+      action: PayloadAction<{ chatId: string; messageId: string }>
+    ) => {
+      const { chatId, messageId } = action.payload;
+      const chat = state.chats[chatId];
+      if (!chat) {
+        console.error("Chat does not exist in the state.");
+        return;
+      }
+      const message = chat.messages.find(
+        (msg) => msg.local_id || msg._id === messageId
+      );
+      if (message) {
+        message.isUploading = false;
+        message.status = "failed";
+        message.uploadProgress = 0;
+      }
     },
 
     updateReadStatusReducer: (
@@ -251,23 +282,6 @@ const chatSlice = createSlice({
         }
       } else {
         console.warn(`updateChatReducer: Chat with ID ${chatId} not found.`);
-      }
-    },
-    uploadFailed: (
-      state,
-      action: PayloadAction<{ chatId: string; messageId: string }>
-    ) => {
-      const { chatId, messageId } = action.payload;
-      const chat = state.chats[chatId];
-      if (!chat) {
-        console.error("Chat does not exist in the state.");
-        return;
-      }
-      const message = chat.messages.find((msg) => msg.local_id === messageId);
-      if (message) {
-        message.isUploading = false;
-        message.status = "failed";
-        message.uploadProgress = 0;
       }
     },
   },
