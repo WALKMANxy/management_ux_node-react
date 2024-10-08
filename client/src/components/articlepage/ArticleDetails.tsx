@@ -1,5 +1,3 @@
-// src/components/articlepage/ArticleDetails.tsx
-
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
@@ -13,20 +11,12 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { ArticleDetailsProps } from "../../models/propsModels";
 import ArticleHistory from "../statistics/grids/ArticleHistory";
 import ArticleDetailComponent from "./ArticleDetailComponent";
 
-/**
- * ArticleDetails Component
- * Displays detailed information about a selected article, including its details and history.
- *
- * @param {ArticleDetailsProps} props - Component props.
- * @param {React.Ref<HTMLDivElement>} ref - Forwarded ref.
- * @returns {JSX.Element} The rendered component.
- */
 const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
   (
     {
@@ -42,9 +32,6 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
     const theme = useTheme();
     const isMobile = useMediaQuery("(max-width:600px)");
 
-    /**
-     * Determines if there is history related to the selected article.
-     */
     const hasHistory = clientMovements
       ? clientMovements.some((movement) =>
           movement.details.some(
@@ -53,48 +40,66 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
         )
       : false;
 
-    /**
-     * Handles the toggle of the article details collapse state.
-     */
-    const handleToggleCollapse = () => {
-      setArticleDetailsCollapsed(!isArticleDetailsCollapsed);
-    };
+    // Memoized toggle function to avoid recreating it
+    const toggleCollapse = useMemo(
+      () => () => {
+        setArticleDetailsCollapsed(!isArticleDetailsCollapsed);
+      },
+      [isArticleDetailsCollapsed, setArticleDetailsCollapsed]
+    );
+
+    // Calculate height based on expansion state and mobile view
+    const height = useMemo(() => {
+      if (isMobile) {
+        return isArticleDetailsCollapsed ? "100%" : 740 * 1.33; // Adjust height when expanded
+      }
+      return "100%";
+    }, [isMobile, isArticleDetailsCollapsed]);
+
+    // Memoize styles to prevent recreation on each render
+    const paperStyles = useMemo(
+      () => ({
+        p: isMobile ? 0 : 3,
+        borderRadius: "12px",
+        background: "linear-gradient(135deg, #e3f2fd 30%, #bbdefb 100%)",
+        color: "#000",
+        overflow: "hidden",
+        height,
+        maxHeight: height,
+        position: "relative" as const,
+        overflowX: "hidden",
+        "&::-webkit-scrollbar": {
+          display: "none", // Hide scrollbar
+        },
+        "&:after": {
+          content: '""',
+          position: "absolute",
+          width: 210,
+          height: 210,
+          background: theme.palette.primary.main,
+          borderRadius: "50%",
+          top: -85,
+          right: -95,
+          overflow: "hidden",
+        },
+        "&:before": {
+          content: '""',
+          position: "absolute",
+          width: 210,
+          height: 210,
+          background: theme.palette.primary.main,
+          borderRadius: "50%",
+          top: -125,
+          right: -15,
+          opacity: 0.5,
+          overflow: "hidden",
+        },
+      }),
+      [theme.palette.primary.main, isMobile, height]
+    );
 
     return (
-      <Paper
-        elevation={3}
-        ref={ref}
-        sx={{
-          p: 3,
-          borderRadius: "12px",
-          background: "linear-gradient(135deg, #e3f2fd 30%, #bbdefb 100%)",
-          color: "#000",
-          position: "relative",
-          overflow: "hidden",
-          height: "100%",
-          "&:after": {
-            content: '""',
-            position: "absolute",
-            width: 210,
-            height: 210,
-            background: theme.palette.primary.main,
-            borderRadius: "50%",
-            top: -85,
-            right: -95,
-          },
-          "&:before": {
-            content: '""',
-            position: "absolute",
-            width: 210,
-            height: 210,
-            background: theme.palette.primary.main,
-            borderRadius: "50%",
-            top: -125,
-            right: -15,
-            opacity: 0.5,
-          },
-        }}
-      >
+      <Paper elevation={3} ref={ref} sx={paperStyles}>
         {/* Header Section */}
         <Box sx={{ p: 2.25 }}>
           <Grid container direction="column">
@@ -109,23 +114,27 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
                     {t("articleDetails.title", "Article Details")}
                   </Typography>
                 </Grid>
-                <Grid item>
+                <Box sx={{ alignItems: "flex-end", display: "flex" }}>
                   <Tooltip
                     title={
                       isArticleDetailsCollapsed
-                        ? t("articleDetails.expand", "Expand Details")
-                        : t("articleDetails.collapse", "Collapse Details")
+                        ? t("articleDetails.expandTooltip", "Expand details")
+                        : t(
+                            "articleDetails.collapseTooltip",
+                            "Collapse details"
+                          )
                     }
                     arrow
                   >
                     <IconButton
-                      onClick={handleToggleCollapse}
+                      onClick={toggleCollapse}
                       aria-label={
                         isArticleDetailsCollapsed
-                          ? t("articleDetails.expand", "Expand Details")
-                          : t("articleDetails.collapse", "Collapse Details")
+                          ? t("articleDetails.expand", "Expand details")
+                          : t("articleDetails.collapse", "Collapse details")
                       }
                       size="large"
+                      sx={{ zIndex: 1000 }}
                     >
                       {isArticleDetailsCollapsed ? (
                         <ExpandMoreIcon />
@@ -134,7 +143,7 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
                       )}
                     </IconButton>
                   </Tooltip>
-                </Grid>
+                </Box>
               </Grid>
             </Grid>
           </Grid>

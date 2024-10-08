@@ -124,8 +124,9 @@ const ChatView: React.FC = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "100vh",
+          height: "100dvh",
           bgcolor: "#ffffff",
+          overflow: "hidden",
         }}
       >
         <Typography variant="h6" color="textSecondary">
@@ -141,7 +142,7 @@ const ChatView: React.FC = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: "100dvh", // Fill the available height
+        height: "100dvh",
         px: isMobile ? 0 : 1, // Remove padding on mobile
         paddingTop: isMobile ? 1 : 0,
         bgcolor: "#ffffff",
@@ -235,25 +236,27 @@ const ChatView: React.FC = () => {
           ))}
         </Menu>
       </Box>
-      <Divider sx={{ mb: 2 }} />
+      <Divider sx={{ mb: -1 }} />
 
       {/* Messages Display */}
       <Paper
         elevation={1}
         sx={{
+          flexGrow: 1,
           borderRadius: "1.5em", // Rounded corners for the paper
           overflowY: "auto", // Enable scrolling for messages
           display: "flex",
           flexDirection: "column",
-          "&::-webkit-scrollbar": {
+          "&::webkitScrollbar": {
             display: "none",
           },
           position: "relative",
-          height: isMobile ? "100dvh" : "100dvh", // Adjust height based on mobile or desktop
+          height: "100dvh", // Adjust height based on mobile or desktop
         }}
       >
         <Box
           sx={{
+            flexGrow: 1,
             p: 1,
             bgcolor: "#f9f9f9",
             borderRadius: 6,
@@ -262,16 +265,15 @@ const ChatView: React.FC = () => {
             pb: 10,
 
             flexDirection: "column",
-            "&::-webkit-scrollbar": {
+            "&::webkitScrollbar": {
               display: "none",
             },
 
             position: "relative",
-            flexGrow: 1,
           }}
           ref={messagesContainerRef} // Attach the ref from useLoadOlderMessages
         >
-          <div ref={topRef} style={{ height: 1 }}></div> {/* Add this line */}
+          <div ref={topRef} style={{}}></div> {/* Add this line */}
           <RenderMessage
             messages={sortedMessages || []}
             currentUserId={currentUserId}
@@ -287,9 +289,9 @@ const ChatView: React.FC = () => {
           mt: isMobile ? -10 : 0,
           flexShrink: 0, // Prevent shrinking of the input box
           borderRadius: isMobile ? "0px" : "25px", // Rounded corners for the input box
-          position: "sticky", // Keep the input box sticky at the bottom
-          bottom: 0,
           zIndex: 10,
+          bottom: 0,
+          position: "sticky",
         }}
       >
         <InputBox canUserChat={isUserAllowedToChat} />

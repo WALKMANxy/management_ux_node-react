@@ -104,3 +104,14 @@ th {
   padding: var(--ag-grid-size) calc(var(--ag-grid-size) * 2);
   cursor: pointer;
 }
+
+html,
+body {
+  height: 100dvh;
+  width: 99vw;
+}
+
+/* * {
+  outline: 1px solid #f00 !important;
+}
+ */

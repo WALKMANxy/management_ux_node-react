@@ -10,11 +10,7 @@ import { getTimeMs } from "../config/config";
 import { loginUser, registerUser } from "../features/auth/api/auth";
 import { handleLogin, handleLogout } from "../features/auth/authThunks";
 import { getUserById } from "../features/users/api/users";
-import {
-  FetchUserRoleError,
-  LoginError,
-  RegistrationError,
-} from "../services/errorHandling";
+import { FetchUserRoleError, LoginError } from "../services/errorHandling";
 import { saveAuthState } from "../services/localStorage";
 import { showToast } from "../services/toastMessage";
 import { setAccessToken } from "../services/tokenService";
@@ -34,17 +30,80 @@ export const useAuth = () => {
     setAlertSeverity: (severity: "success" | "error") => void,
     setAlertOpen: (open: boolean) => void
   ) => {
+    console.log("Attempting to register with credentials:", { email });
+
+    // Client-side validation for email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setAlertMessage("Invalid email address.");
+      setAlertSeverity("error");
+      setAlertOpen(true);
+      return; // Stop execution if validation fails
+    }
+
+    // Client-side validation for password
+    if (password.length < 8) {
+      setAlertMessage("Password must be at least 8 characters long.");
+      setAlertSeverity("error");
+      setAlertOpen(true);
+      return;
+    }
+    if (!/[A-Z]/.test(password)) {
+      setAlertMessage("Password must contain at least 1 uppercase letter.");
+      setAlertSeverity("error");
+      setAlertOpen(true);
+      return;
+    }
+    if (!/[a-z]/.test(password)) {
+      setAlertMessage("Password must contain at least 1 lowercase letter.");
+      setAlertSeverity("error");
+      setAlertOpen(true);
+      return;
+    }
+    if (!/[0-9]/.test(password)) {
+      setAlertMessage("Password must contain at least 1 number.");
+      setAlertSeverity("error");
+      setAlertOpen(true);
+      return;
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      setAlertMessage("Password must contain at least 1 special character.");
+      setAlertSeverity("error");
+      setAlertOpen(true);
+      return;
+    }
+
     try {
-      const { message, statusCode } = await registerUser({
+      const { statusCode, message } = await registerUser({
         email,
         password,
       });
-      setAlertMessage(t("auth.registrationSuccess" + message)); // translation key
+
+      // Check if the login was unsuccessful
+      if (statusCode !== 201) {
+        console.warn(
+          "Login failed with status code:",
+          statusCode,
+          "Message:",
+          message
+        );
+        setAlertMessage(t("auth.loginFailed" + { message }));
+        setAlertSeverity("error");
+        setAlertOpen(true);
+        return;
+      }
+
+      console.log("Response from registerUser:", {
+        statusCode,
+      });
+
+      setAlertMessage(t("auth.registrationSuccess")); // translation key
       setAlertSeverity(statusCode === 201 ? "success" : "error");
       setAlertOpen(true);
     } catch (error) {
-      const registrationError = new RegistrationError((error as Error).message);
-      setAlertMessage(t("auth.registrationFailed" + registrationError.message)); // translation key
+      console.warn("Registration error:", (error as Error).message);
+
+      setAlertMessage("Registration failed. Please try again.");
       setAlertSeverity("error");
       setAlertOpen(true);
     }
@@ -151,7 +210,6 @@ export const useAuth = () => {
         }
       } else {
         console.error("User ID not found in login response");
-        showToast.error(t("auth.userNotFound"));
         setAlertMessage(t("auth.userNotFound"));
         setAlertSeverity("error");
         setAlertOpen(true);

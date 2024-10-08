@@ -23,7 +23,8 @@ const Layout: React.FC = () => {
     location.pathname === "/calendar" ||
     location.pathname === "/movements" ||
     location.pathname === "/employee-dashboard" ||
-    location.pathname === "/articles";
+    location.pathname === "/articles" ||
+    location.pathname === "/dashboard";
   const isSettingsPage = location.pathname === "/settings"; // Check if on the /settings page
 
   const isMessagesPage = location.pathname === "/messages";
@@ -49,7 +50,12 @@ const Layout: React.FC = () => {
   return (
     <ErrorBoundary>
       <Box
-        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100dvh",
+          overflowX: "hidden",
+        }}
       >
         {/* Hide Header if currentChat exists and we are in mobile view */}
         {shouldShowHeader && <Header />}

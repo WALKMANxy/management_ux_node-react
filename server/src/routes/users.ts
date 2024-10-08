@@ -10,13 +10,12 @@ import {
 import { checkValidation } from "../middlewares/validate";
 
 const router = express.Router();
-router.use(checkAllowedRole);
 
 // Middleware to authenticate user
 router.use(authenticateUser);
 
 // GET method to retrieve all users (Admin only)
-router.get("/", checkAllowedRole, UserController.getAllUsers);
+router.get("/", UserController.getAllUsers);
 
 // GET method to retrieve a user by ID
 router.get("/:id", checkAllowedRole, UserController.getUserById);

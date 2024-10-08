@@ -124,7 +124,14 @@ const MovementsPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        overflowX: "hidden",
+        
+      }}
+    >
       <MovementList
         quickFilterText={quickFilterText}
         setQuickFilterText={setQuickFilterText}

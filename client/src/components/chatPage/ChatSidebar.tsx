@@ -28,12 +28,11 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectUserRole } from "../../features/auth/authSlice";
 import { fetchMessagesFromMultipleChatsThunk } from "../../features/chat/chatThunks";
 import useChatLogic from "../../hooks/useChatsLogic";
+import Loader from "../common/Loader";
 import ChatList from "./ChatList";
 import ContactsList from "./ContactsList";
-import Loader from "../common/Loader";
 
 const CreateChatForm = lazy(() => import("./CreateChatForm"));
-
 
 const ChatSidebar: React.FC = () => {
   const { t } = useTranslation();
@@ -47,10 +46,10 @@ const ChatSidebar: React.FC = () => {
     filteredContacts,
     handleContactSelect,
     fetchContacts,
+    contactsFetched,
     loadingContacts,
   } = useChatLogic();
   const messagesFetched = useRef(false);
-  const contactsFetched = useRef(false);
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const [isCreateChatFormOpen, setIsCreateChatFormOpen] = useState(false);
@@ -80,11 +79,10 @@ const ChatSidebar: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!contactsFetched.current) {
+    if (!contactsFetched) {
       fetchContacts();
-      contactsFetched.current = true;
     }
-  }, [fetchContacts]);
+  }, [fetchContacts, contactsFetched]);
 
   const handleRefreshContacts = useCallback(() => {
     fetchContacts();
@@ -136,7 +134,8 @@ const ChatSidebar: React.FC = () => {
     <Box
       className={`animate__animated  ${appliedAnimationClass}`}
       sx={{
-        p: 2,
+        p: 1,
+
         bgcolor: "#ffffff",
         height: "100%",
         display: "flex",
