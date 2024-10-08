@@ -150,9 +150,7 @@ class WebSocketService {
     // Dismiss any connection lost toasts
     toast.dismiss(this.connectionLostToastId);
     // Optionally, show a connected toast
-    toast.success(t("webSocketService.connected"), {
-      id: "connectedToast",
-    });
+
     // Flush the offline queues
     this.flushOfflineQueues();
   };
@@ -393,7 +391,7 @@ class WebSocketService {
       );
       return;
     }
-  
+
     // Send the message and wait for acknowledgment from the server
     this.socket.emit(
       "chat:message",

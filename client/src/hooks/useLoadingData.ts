@@ -71,7 +71,6 @@ const useLoadingData = () => {
       setLocalError(null);
       setRetryCount(0);
 
-      toast.success(t("useStatsToasts.successData"));
 
       updateUserEntityNameIfMissing(dispatch, currentUser, currentUserDetails);
     } catch (err: unknown) {

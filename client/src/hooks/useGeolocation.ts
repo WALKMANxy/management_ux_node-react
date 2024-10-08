@@ -1,9 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
-import {
-  findCityByCoordinates,
-  storeCity,
-} from "../features/weather/apis/reverseGeo";
+import { findCityByCoordinates } from "../features/weather/apis/reverseGeo";
 import { useGetWeatherQuery } from "../features/weather/weatherQuery";
 import {
   cacheCityData,
@@ -11,7 +8,6 @@ import {
   getWithExpiry,
   setWithExpiry,
 } from "../services/localStorage";
-import { reverseGeocodeLocationIQ } from "../services/reverseGeocode";
 import { hasLocationChanged } from "../utils/weatherUtils";
 
 type GeoLocation = {
@@ -157,7 +153,7 @@ export const useGeolocation = (
           // If location hasn't changed significantly, use cached city
           setCity(cachedCityData.city);
         } else {
-          // Step 2: Fetch city from server or reverse geocode
+          // Step 2: Fetch city from server (server handles finding or reverse geocoding)
           try {
             const { city: serverCity } = await findCityByCoordinates(
               location.lat,
@@ -166,22 +162,11 @@ export const useGeolocation = (
             setCity(serverCity);
             // Cache the new city data
             cacheCityData(location.lat, location.lon, serverCity);
-          } catch (err: unknown) {
-            if (axios.isAxiosError(err)) {
-              const axiosError = err as AxiosError;
+          } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+              const axiosError = error as AxiosError;
               if (axiosError.response?.status === 404) {
-                // If city is not found, reverse geocode and cache the new city
-                const cityName = await reverseGeocodeLocationIQ(
-                  location.lat,
-                  location.lon
-                );
-                setCity(cityName);
-                cacheCityData(location.lat, location.lon, cityName); // Cache the new city name
-                await storeCity({
-                  name: cityName,
-                  lat: location.lat,
-                  lon: location.lon,
-                });
+                setError("City not found, please try again later.");
               } else {
                 throw new Error("Error retrieving city from server");
               }
@@ -202,10 +187,10 @@ export const useGeolocation = (
     fetchCity();
   }, [location]);
 
-   /**
+  /**
    * Step 3: Fetch weather data
    */
-   useEffect(() => {
+  useEffect(() => {
     const fetchWeather = async () => {
       if (!location || !city) return;
 
@@ -236,12 +221,16 @@ export const useGeolocation = (
   /**
    * Use RTK Query to fetch weather data if not cached
    */
-  const { data: apiData, error: apiError, isFetching } = useGetWeatherQuery(
+  const {
+    data: apiData,
+    error: apiError,
+    isFetching,
+  } = useGetWeatherQuery(
     location && city
       ? { latitude: location.lat, longitude: location.lon }
       : { latitude: 0, longitude: 0 }, // Provide default values or handle appropriately
     {
-      skip: !location || !city || (getWithExpiry(CACHE_KEY)?.city === city), // Skip if cached
+      skip: !location || !city || getWithExpiry(CACHE_KEY)?.city === city, // Skip if cached
     }
   );
 

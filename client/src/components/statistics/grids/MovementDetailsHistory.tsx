@@ -82,7 +82,9 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
   }, [t, userRole]);
 
   return (
-    <Box sx={{ height: 600, width: "100%" }}>
+    <Box
+      sx={{ height: 600, width: "100%", overflowX: "hidden", maxWidth: "100%" }}
+    >
       <AGGridTable
         columnDefs={columnDefinitions}
         rowData={movementDetails}

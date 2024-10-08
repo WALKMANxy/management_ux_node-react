@@ -16,6 +16,8 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 
 import { brandColors } from "../../utils/constants";
+import { calculateTopBrandsData } from "../../utils/dataUtils";
+import ActivePromotions from "../dashboard/ActivePromotions";
 import SpentThisMonth from "../dashboard/SpentThisMonth";
 import SpentThisYear from "../dashboard/SpentThisYear";
 import TopArticleType from "../dashboard/TopArticleType";
@@ -47,7 +49,6 @@ const ClientView: React.FC<ClientViewProps> = ({
   calculateMonthlyData,
   clientComparativeStatisticsMonthly,
   clientComparativeStatistics,
-  topBrandsData,
   userRole,
   loadingState,
 }) => {
@@ -55,6 +56,13 @@ const ClientView: React.FC<ClientViewProps> = ({
   const { t } = useTranslation();
   const isTablet = useMediaQuery("(min-width:900px) and (max-width:1250px)");
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const topBrandsForSelectedClient = React.useMemo(() => {
+    if (selectedClient) {
+      return calculateTopBrandsData(selectedClient.movements);
+    }
+    return [];
+  }, [selectedClient]);
 
   return (
     <Box mb={4}>
@@ -224,7 +232,7 @@ const ClientView: React.FC<ClientViewProps> = ({
             />
           ) : (
             <TopBrandsSold
-              topBrandsData={topBrandsData}
+              topBrandsData={topBrandsForSelectedClient}
               brandColors={brandColors}
               isMobile={isMobile}
               isAgentSelected={false}
@@ -232,6 +240,20 @@ const ClientView: React.FC<ClientViewProps> = ({
           )}
         </Grid>
       </Grid>
+      <Box pt={2.5}>
+        {loadingState ? (
+          <Skeleton
+            animation="wave"
+            variant="rectangular"
+            width="100%"
+            height={300}
+            sx={{ borderRadius: "12px" }}
+            aria-label={t("dashboard.skeleton")}
+          />
+        ) : (
+          <ActivePromotions clientSelected={selectedClient.id} />
+        )}
+      </Box>
 
       {/* Conditionally render the Close Selection FAB */}
       {userRole !== "client" &&

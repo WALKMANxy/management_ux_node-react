@@ -68,10 +68,14 @@ const useChatLogic = () => {
     }
   }, [dispatch, chatRetryCount]);
 
-  // Fetch chats with retry mechanism
   useEffect(() => {
-    // Call fetchChats initially
-    fetchChats();
+    const timeoutId = setTimeout(() => {
+      // Call fetchChats after a 500ms delay
+      fetchChats();
+    }, 500);
+
+    // Cleanup function to clear timeout if the component unmounts or dependencies change
+    return () => clearTimeout(timeoutId);
   }, [dispatch, chatRetryCount, fetchChats]);
 
   // Retry mechanism
@@ -201,11 +205,11 @@ const useChatLogic = () => {
 
       const localId = generateId();
 
-        // Failsafe for empty content when attachments exist
-    const finalContent =
-    (content.trim() === "" && attachments && attachments.length > 0)
-      ? "\u200B" // Use an invisible character (zero-width space)
-      : content;
+      // Failsafe for empty content when attachments exist
+      const finalContent =
+        content.trim() === "" && attachments && attachments.length > 0
+          ? "\u200B" // Use an invisible character (zero-width space)
+          : content;
 
       const messageData: IMessage = {
         _id: localId,
@@ -400,12 +404,18 @@ const useChatLogic = () => {
             (user.role === "admin" || user.role === "agent")
         ) || []
       );
+    } else if (userRole === "employee") {
+      // Employees can see admins and agents, but not clients, and exclude themselves
+      return (
+        users.filter(
+          (user) =>
+            user._id !== currentUserId && // Exclude the current user
+            (user.role === "admin" || user.role === "agent")
+        ) || []
+      );
     }
 
     // Default return if no contacts are found
-    /* console.log(
-      "User role not recognized or no contacts found. Returning empty array."
-    ); */
     return [];
   }, [users, userRole, agentClientIds, currentUserId]); // Dependencies array
 
@@ -525,6 +535,7 @@ const useChatLogic = () => {
     handleCreateChat,
     handleContactSelect,
     fetchContacts, // Add fetchContacts to be used when toggling to contacts view
+    contactsFetched,
     loadingContacts, // Provide loading state
     filteredContacts, // Function to filter contacts based on the role
     getFilteredAndSortedChats,

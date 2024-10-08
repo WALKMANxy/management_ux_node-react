@@ -73,7 +73,6 @@ const DashboardView: React.FC<DashboardViewProps> = ({
           <Typography
             variant="h5"
             gutterBottom
-            fontFamily="ui-rounded"
             fontWeight={100}
           >
             {t("dashboard.yourStatistics")}

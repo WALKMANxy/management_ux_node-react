@@ -75,12 +75,7 @@ const AgentView: React.FC<AgentViewProps> = ({
           mb: 2,
         }}
       >
-        <Typography
-          variant="h5"
-          gutterBottom
-          fontFamily="ui-rounded"
-          fontWeight={100}
-        >
+        <Typography variant="h5" gutterBottom fontWeight={100}>
           {" "}
           {t("dashboard.statisticsFor", {
             name: selectedAgentData.name,

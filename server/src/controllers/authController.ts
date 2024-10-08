@@ -221,12 +221,16 @@ export const requestPasswordReset = async (
       longitude: 0,
     };
 
+    console.log("Requesting password reset for:", email);
+    console.log("IP Info:", ipInfo);
     await generateResetCodeService(email, ipInfo);
+    console.log("Password reset code sent successfully.");
     res.status(200).json({
       message:
         "If an account with that email exists, a reset code will be sent.",
     });
   } catch (err) {
+    console.error("Error requesting password reset:", err);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

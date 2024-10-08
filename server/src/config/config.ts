@@ -53,6 +53,7 @@ export const config = {
     refreshTokenExpiry: process.env.REFRESH_TOKEN_EXPIRY || "7d",
   },
   sessionDuration: process.env.SESSION_DURATION || "7d",
+  reverseGeoToken: process.env.REVERSE_GEO_TOKEN || "",
 };
 
 // Validate required environment variables
