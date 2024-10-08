@@ -1,6 +1,6 @@
 // src/components/dashboard/WhiteboardComponent.tsx
 
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Paper, Typography, useMediaQuery } from "@mui/material";
 import React, { useEffect, useMemo, useRef } from "react";
 import { useAppSelector } from "../../app/hooks";
 import { selectCurrentUser } from "../../features/users/userSlice";
@@ -18,6 +18,8 @@ const WhiteboardComponent: React.FC = () => {
     markMessagesAsRead,
   } = useChatLogic();
 
+  const isMobile = useMediaQuery("(max-width:600px)");
+
   // Ref to the messages container for auto-scrolling
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -34,11 +36,10 @@ const WhiteboardComponent: React.FC = () => {
 
   // Function to scroll to the bottom (newest message)
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({
-      block: "nearest",
-      inline: "nearest",
-      behavior: "smooth",
-    });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
   };
 
   // Scroll to the bottom whenever new messages are added
@@ -77,7 +78,7 @@ const WhiteboardComponent: React.FC = () => {
       sx={{
         p: 2,
         borderRadius: "12px",
-        maxHeight: "40dvh", // Adjusted height for better visibility
+        maxHeight: isMobile ? "550px" : "40dvh", // Adjusted height for better visibility
         display: "flex",
         flexDirection: "column",
         bgcolor: "#f5f5f5",

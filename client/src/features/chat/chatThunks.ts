@@ -55,7 +55,7 @@ export const fetchAllChatsThunk = createAuthenticatedThunk<IChat[], void>(
       return result; // Return the fetched chats
     } catch (error) {
       const typedError = error as chatThunkError;
-      showToast.error(`Failed to fetch chats: ${typedError.message}`);
+      console.error(`Failed to fetch chats: ${typedError.message}`);
       return rejectWithValue(typedError.message || "Failed to fetch chats");
     }
   }
@@ -74,7 +74,7 @@ export const fetchMessagesThunk = createAsyncThunk<
       return { chatId, messages };
     } catch (error) {
       const typedError = error as chatThunkError;
-      showToast.error(`Failed to fetch messages: ${typedError.message}`);
+      console.error(`Failed to fetch messages: ${typedError.message}`);
       return rejectWithValue(typedError.message || "Failed to fetch messages");
     }
   }
@@ -93,7 +93,7 @@ export const fetchOlderMessagesThunk = createAsyncThunk<
       return { chatId, messages };
     } catch (error) {
       const typedError = error as chatThunkError;
-      showToast.error(`Error fetching older messages: ${typedError.message}`);
+      console.error(`Error fetching older messages: ${typedError.message}`);
       return rejectWithValue(
         typedError.message || "Failed to fetch older messages"
       );
@@ -114,7 +114,7 @@ export const fetchMessagesFromMultipleChatsThunk = createAsyncThunk<
       return result;
     } catch (error) {
       const typedError = error as chatThunkError;
-      showToast.error(`Error fetching messages: ${typedError.message}`);
+      console.error(`Error fetching messages: ${typedError.message}`);
       return rejectWithValue(
         typedError.message || "Failed to fetch messages from multiple chats"
       );
@@ -134,7 +134,7 @@ export const createChatThunk = createAsyncThunk<
     return result;
   } catch (error) {
     const typedError = error as chatThunkError;
-    showToast.error(`Failed to create chat: ${typedError.message}`);
+    console.error(`Failed to create chat: ${typedError.message}`);
     return rejectWithValue(typedError.message || "Failed to create chat");
   }
 });
@@ -152,7 +152,7 @@ export const createMessageThunk = createAsyncThunk<
       return { chatId, message };
     } catch (error) {
       const typedError = error as chatThunkError;
-      showToast.error(`Failed to create message: ${typedError.message}`);
+      console.error(`Failed to create message: ${typedError.message}`);
       return rejectWithValue(typedError.message || "Failed to send message");
     }
   }
@@ -171,7 +171,7 @@ export const updateReadStatusThunk = createAsyncThunk<
       return result;
     } catch (error) {
       const typedError = error as chatThunkError;
-      showToast.error(
+      console.error(
         `Failed to update message read status: ${typedError.message}`
       );
       return rejectWithValue(

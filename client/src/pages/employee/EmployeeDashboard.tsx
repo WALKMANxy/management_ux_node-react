@@ -1,7 +1,6 @@
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import {
   Box,
-  Divider,
   Fab,
   Grid,
   Skeleton,
@@ -51,7 +50,7 @@ const EmployeeDashboard: React.FC = () => {
         px: isMobile ? 1 : 4,
         bgcolor: "#f4f5f7",
         position: "relative",
-        pt: isMobile ? 0 : 1,
+        pt: isMobile ? 3 : 5,
       }}
     >
       <Box sx={{ mt: 0 }}>
@@ -62,13 +61,6 @@ const EmployeeDashboard: React.FC = () => {
           loading={loading}
         />
       </Box>
-      <Divider
-        sx={{
-          width: "95%",
-          margin: "0 auto",
-          pt: 2,
-        }}
-      />
 
       {/* FAB Button for Calendar - Positioned Top Right (Tablet Only) */}
       {isTablet && (

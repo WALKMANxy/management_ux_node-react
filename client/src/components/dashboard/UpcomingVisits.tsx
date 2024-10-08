@@ -9,33 +9,52 @@ import {
   TimelineItem,
   TimelineSeparator,
 } from "@mui/lab";
-import { Box, IconButton, Paper, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Paper,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
 import { selectVisits } from "../../features/promoVisits/promoVisitsSelectors";
+import useStats from "../../hooks/useStats";
 import { VisitItem } from "./VisitItem";
 
 const UpcomingVisits: React.FC = () => {
   const { t } = useTranslation();
 
+  const isMobile = useMediaQuery("(max-width:600px)");
+
+  const { selectedClient } = useStats(isMobile);
+
   const navigate = useNavigate();
   const visits = useAppSelector(selectVisits);
 
   const now = useMemo(() => new Date(), []);
+
   const upcomingVisits = useMemo(() => {
-    // Filter visits to include only those that are pending, not completed, and scheduled for today or later
     return visits
-      .filter(
-        (visit) =>
+      .filter((visit) => {
+        const isPendingAndUpcoming =
           visit.pending === true &&
           visit.completed === false &&
-          new Date(visit.date) >= now
-      )
+          new Date(visit.date) >= now;
+
+        // Filter by selectedClient if it exists, otherwise include all clients
+        const isForSelectedClient = selectedClient
+          ? visit.clientId === selectedClient.id
+          : true;
+
+        return isPendingAndUpcoming && isForSelectedClient;
+      })
       .sort((a, b) => +new Date(a.date) - +new Date(b.date)) // Sort by date ascending
       .slice(0, 3); // Limit to top 3 upcoming visits
-  }, [visits, now]);
+  }, [visits, now, selectedClient]);
 
   // Define the renderVisits constant inspired by renderPromotions syntax
   const renderVisits = () => (

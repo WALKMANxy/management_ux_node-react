@@ -140,15 +140,22 @@ export const generateResetCodeService = async (
   email: string,
   ipInfo: IpInfo | null
 ): Promise<void> => {
+  console.log(`Generating reset code for user: ${email}`);
   const user = await User.findOne({ email });
-  if (!user) return;
+  if (!user) {
+    console.log(`User not found for email: ${email}`);
+    return;
+  }
 
   const resetCode = generatePasscode();
+  console.log(`Generated reset code for user: ${email}`, resetCode);
+
   user.passwordResetToken = await bcrypt.hash(resetCode, 10);
   user.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000);
   await user.save();
 
   await sendPasswordResetEmail(user.email, resetCode, ipInfo);
+  console.log(`Password reset email sent successfully for user: ${email}`);
 };
 
 // Verify reset code

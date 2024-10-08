@@ -25,6 +25,7 @@ const LandingPage: React.FC = () => {
   const navigate = useNavigate();
 
   const isSuperMobile = useMediaQuery("(min-width:0px) and (max-width:420px)");
+  const isMobile = useMediaQuery("(min-width:0px) and (max-width:600px)");
 
   useEffect(() => {
     const timer = setTimeout(() => setShowLoader(false), 1500);
@@ -60,11 +61,13 @@ const LandingPage: React.FC = () => {
   return (
     <Box
       sx={{
+        flex: 1,
         display: "flex",
         flexDirection: "column",
-        minHeight: "100vh",
+        mineHeight: "-webkit-fill-available",
         position: "relative",
         overflow: "hidden",
+        flexGrow: 1,
       }}
     >
       {showLoader && <Loader fadeout={!showLoader} />}
@@ -75,9 +78,10 @@ const LandingPage: React.FC = () => {
           transition: "opacity 0.5s ease-in-out",
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh",
+          minHeight: "100dvh",
           position: "relative",
           zIndex: 0,
+          flexGrow: 1,
         }}
       >
         {/* Top Shadow */}
@@ -90,7 +94,7 @@ const LandingPage: React.FC = () => {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            padding: isSuperMobile ? "1rem" : "2rem",
+            padding: isSuperMobile ? "0rem" : "2rem",
             position: "relative",
             zIndex: 0,
           }}
@@ -135,7 +139,7 @@ const LandingPage: React.FC = () => {
                 color="primary"
                 onClick={() => setShowLogin(true)}
                 sx={{
-                  mt: isSuperMobile ? 0.5 : 4,
+                  mt: isSuperMobile || isMobile ? 0.5 : 4,
                   paddingX: 4,
                   paddingY: 1.5,
                   fontSize: "1.2rem",
@@ -160,7 +164,13 @@ const LandingPage: React.FC = () => {
           </Box>
         </Container>
 
-        <Box component="footer">
+        {/* Footer should stay at the bottom and remain visible */}
+        <Box
+          component="footer"
+          sx={{
+            paddingBottom: "env(safe-area-inset-bottom)", // Ensure padding for safe area
+          }}
+        >
           <Footer />
         </Box>
       </Box>

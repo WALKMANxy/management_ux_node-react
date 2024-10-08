@@ -101,14 +101,10 @@ export const useHandleSignin = (onClose: () => void) => {
     } catch (error: unknown) {
       // Handling the error with proper type checking
       if (error instanceof Error) {
-        setAlertMessage(t("errors.unknown"));
-        setAlertSeverity("error");
-        setAlertOpen(true);
+        console.log("Error:", error.message);
       } else {
         // Fallback in case error is not an instance of Error
-        setAlertMessage(t("errors.unknown"));
-        setAlertSeverity("error");
-        setAlertOpen(true);
+        console.log("Error:", error);
       }
     } finally {
       setLoading(false);
