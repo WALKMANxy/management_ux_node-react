@@ -58,7 +58,7 @@ const InputBox: React.FC<InputBoxProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const { handleFileSelect, closeFileViewer } = useFilePreview(); // Use the updated hook
+  const { handleFileSelect, closeFileViewer, isPreview } = useFilePreview(); // Use the updated hook
 
   /**
    * Handles sending the message.
@@ -69,13 +69,14 @@ const InputBox: React.FC<InputBoxProps> = ({
       setMessageInput(""); // Clear the input field
       inputRef.current?.focus(); // Keep focus on the input field
     }
-    closeFileViewer();
+    closeFileViewer(isPreview);
   }, [
     messageInput,
     messageType,
     handleSendMessage,
     attachments,
     closeFileViewer,
+    isPreview,
   ]);
 
   /**

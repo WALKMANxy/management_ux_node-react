@@ -71,9 +71,9 @@ const FileGallery: React.FC<FileGalleryProps> = ({
           onClick={() => setCurrentFile(file)}
         >
           {/* Display file preview or icon based on file type */}
-          {file.type === "image" && file.thumbnail ? (
+          {file.type === "image" && file.thumbnailUrl ? (
             <img
-              src={file.thumbnail || file.url}
+              src={file.thumbnailUrl}
               alt={file.fileName}
               style={{
                 width: "100%",

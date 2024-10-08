@@ -5,28 +5,38 @@ import DownloadIcon from "@mui/icons-material/Download";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import ZoomInIcon from "@mui/icons-material/ZoomIn";
 import ZoomOutIcon from "@mui/icons-material/ZoomOut";
-import { Box, IconButton, Paper, Tooltip, Typography } from "@mui/material";
-import React, { useState } from "react";
+import {
+  Box,
+  CircularProgress,
+  IconButton,
+  Paper,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import React, { useCallback, useEffect, useState } from "react";
 import { Attachment, useFilePreview } from "../../hooks/useFilePreview";
 import FileGallery from "./FileGallery";
 import InputBox from "./InputBox";
 
 interface FileViewerProps {
   onClose: () => void;
-  chatAttachments: Attachment[];
 }
 
-const FileViewer: React.FC<FileViewerProps> = ({
-  onClose,
-  chatAttachments,
-}) => {
+const FileViewer: React.FC<FileViewerProps> = ({ onClose }) => {
   const {
-    downloadFile,
+    download,
     currentFile,
     removeAttachment,
     selectedAttachments,
     isPreview,
+    downloadedFiles,
+    downloadAndStoreFile,
+    downloadedThumbnails,
+    setCurrentFile,
   } = useFilePreview();
+
+  const [loading, setLoading] = useState(false); // Track loading state
+
   const [zoomLevel, setZoomLevel] = useState(1);
   const isImage = currentFile?.type.startsWith("image/");
   const isVideo = currentFile?.type.startsWith("video/");
@@ -34,11 +44,54 @@ const FileViewer: React.FC<FileViewerProps> = ({
   const handleZoomIn = () => setZoomLevel((prev) => prev + 0.2);
   const handleZoomOut = () => setZoomLevel((prev) => Math.max(1, prev - 0.2));
 
+  // New function to handle setting the current file based on isPreview status
+  const handleCurrentFile = useCallback(
+    async (file: Attachment) => {
+      if (!isPreview) {
+        // If we're not in preview mode, check if the file is already downloaded
+        const downloadedFile = downloadedFiles.find(
+          (f) => f.fileName === file.fileName
+        );
+
+        if (downloadedFile) {
+          // File is already downloaded, set the current file
+          setCurrentFile(downloadedFile);
+        } else {
+          // File is not downloaded yet, trigger download and display loading
+          setLoading(true);
+          await downloadAndStoreFile(file);
+          setLoading(false);
+        }
+      } else {
+        return;
+      }
+    },
+    [isPreview, downloadedFiles, downloadAndStoreFile, setCurrentFile]
+  );
+
+  useEffect(() => {
+    if (currentFile && (isImage || isVideo)) {
+      const fileDownloaded = downloadedFiles.find(
+        (file) => file.fileName === currentFile.fileName
+      );
+
+      // If file isn't downloaded, initiate download
+      if (!fileDownloaded) {
+        handleCurrentFile(currentFile);
+      }
+    }
+  }, [currentFile, downloadedFiles, isImage, isVideo, handleCurrentFile]);
+
   const handleOpenFile = () => {
     window.open(currentFile?.url, "_blank");
   };
 
   if (!currentFile) return null;
+
+  // Determine which attachments to pass to FileGallery
+  const attachmentsToShow = isPreview
+    ? selectedAttachments
+    : downloadedThumbnails;
 
   return (
     <Paper
@@ -114,31 +167,46 @@ const FileViewer: React.FC<FileViewerProps> = ({
             backgroundColor: "#000", // Optional: to enhance media display
           }}
         >
-          {isImage && (
-            <img
-              src={currentFile?.url}
-              alt={currentFile?.fileName}
-              style={{
-                maxWidth: "100%",
-                maxHeight: "100%",
-                transform: `scale(${zoomLevel})`,
-                transition: "transform 0.2s ease",
+          {loading ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "100%",
+                height: "100%",
               }}
-            />
-          )}
+            >
+              <CircularProgress />
+            </Box>
+          ) : (
+            <>
+              {isImage && (
+                <img
+                  src={currentFile?.url}
+                  alt={currentFile?.fileName}
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    transform: `scale(${zoomLevel})`,
+                    transition: "transform 0.2s ease",
+                  }}
+                />
+              )}
 
-          {isVideo && (
-            <video
-              src={currentFile?.url}
-              controls
-              style={{
-                maxWidth: "100%",
-                maxHeight: "100%",
-                borderRadius: "8px",
-              }}
-            />
+              {isVideo && (
+                <video
+                  src={currentFile?.url}
+                  controls
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    borderRadius: "8px",
+                  }}
+                />
+              )}
+            </>
           )}
-
           {/* Fallback for non-image/video files */}
           {!isImage && !isVideo && (
             <Box
@@ -162,7 +230,7 @@ const FileViewer: React.FC<FileViewerProps> = ({
                     <IconButton
                       onClick={() => {
                         if (currentFile) {
-                          downloadFile(currentFile);
+                          download(currentFile);
                         }
                       }}
                     >
@@ -183,7 +251,7 @@ const FileViewer: React.FC<FileViewerProps> = ({
         <Box sx={{ height: "20%" }} />
         {/* File Gallery with Trash Bin Overlay */}
         <FileGallery
-          attachments={chatAttachments}
+          attachments={attachmentsToShow}
           currentFile={currentFile}
           onRemoveFile={removeAttachment} // Pass the removal handler
         />
@@ -218,7 +286,7 @@ const FileViewer: React.FC<FileViewerProps> = ({
               <IconButton
                 onClick={() => {
                   if (currentFile) {
-                    downloadFile(currentFile);
+                    download(currentFile);
                   }
                 }}
               >

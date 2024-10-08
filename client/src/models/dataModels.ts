@@ -69,7 +69,7 @@ export interface IMessage {
     type: "image" | "video" | "pdf" | "word" | "excel" | "csv" | "other";
     fileName: string;
     size: number;
-    thumbnail?: string; // Optional thumbnail for images
+    thumbnailUrl?: string; // Optional thumbnail for images
   }[]; // Array to store file metadata for attachments
   status: "pending" | "sent" | "failed"; // Status indicating the message state
   isUploading?: boolean; // Whether the file is still uploading

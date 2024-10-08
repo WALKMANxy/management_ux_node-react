@@ -16,10 +16,14 @@ import { handleLogout } from "./features/auth/authThunks";
 import { fetchUserById, setCurrentUser } from "./features/users/userSlice";
 import Layout from "./layout/Layout";
 import { UserRole } from "./models/entityModels";
+import StatisticsDashboard from "./pages/statistics/StatisticsDashboard";
 import { refreshAccessToken } from "./services/sessionService";
 import { showToast } from "./services/toastMessage";
-import { initializeUserEncryption } from "./utils/cacheUtils";
-import StatisticsDashboard from "./pages/statistics/StatisticsDashboard";
+import {
+  cleanupStaleFiles,
+  enforceCacheSizeLimit,
+  initializeUserEncryption,
+} from "./utils/cacheUtils";
 /* console.log("Vite mode:", import.meta.env.MODE);
  */
 
@@ -229,6 +233,18 @@ function App() {
 
   useEffect(() => {
     const initializeApp = async () => {
+      try {
+        await cleanupStaleFiles();
+      } catch (error) {
+        console.error("Error cleaning up stale files:", error);
+      }
+
+      try {
+        await enforceCacheSizeLimit();
+      } catch (error) {
+        console.error("Error enforcing cache size limit:", error);
+      }
+
       try {
         // Check if the auth state is present in the local storage
         const localAuthState = localStorage.getItem("authState");
