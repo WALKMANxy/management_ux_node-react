@@ -10,7 +10,7 @@ import { getTimeMs } from "../config/config";
 import { loginUser, registerUser } from "../features/auth/api/auth";
 import { handleLogin, handleLogout } from "../features/auth/authThunks";
 import { getUserById } from "../features/users/api/users";
-import { FetchUserRoleError, LoginError } from "../services/errorHandling";
+import { FetchUserRoleError } from "../services/errorHandling";
 import { saveAuthState } from "../services/localStorage";
 import { showToast } from "../services/toastMessage";
 import { setAccessToken } from "../services/tokenService";
@@ -127,12 +127,15 @@ export const useAuth = () => {
         password,
       });
 
-      /* console.log("Response from loginUser:", {
-        id,
-        message,
-        statusCode,
-        refreshToken,
-      }); */
+      // Handle 401 Unauthorized response
+      if (statusCode === 401) {
+        setAlertMessage(
+          t("auth.loginInconsistency") // Translated message for 401 errors
+        );
+        setAlertSeverity("error");
+        setAlertOpen(true);
+        return;
+      }
 
       // Check if the login was unsuccessful
       if (statusCode !== 200) {
@@ -227,11 +230,12 @@ export const useAuth = () => {
         error.message.includes("undefined")
       ) {
         errorMessage = t("auth.serverUnreachable");
+        setAlertMessage(errorMessage);
+        setAlertSeverity(errorSeverity);
+        setAlertOpen(true);
       }
 
-      showToast.error(errorMessage);
-      const loginError = new LoginError(errorMessage);
-      setAlertMessage(loginError.message);
+      setAlertMessage(t("auth.loginInconsistency"));
       setAlertSeverity(errorSeverity);
       setAlertOpen(true);
     }
@@ -244,12 +248,10 @@ export const useAuth = () => {
   ) => {
     try {
       dispatch(handleLogout());
-      showToast.success(t("auth.logoutSuccess")); // Toast for successful logout
       setAlertMessage(t("auth.logoutSuccess"));
       setAlertSeverity("success");
       setAlertOpen(true);
     } catch (error: unknown) {
-      showToast.error(t("auth.logoutFailed")); // Toast for logout failure
       if (error instanceof Error) {
         setAlertMessage(t("auth.logoutFailed"));
         setAlertSeverity("error");

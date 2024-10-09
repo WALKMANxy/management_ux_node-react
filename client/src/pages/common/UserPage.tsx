@@ -1,6 +1,6 @@
 // src/components/UserPage/UserPage.tsx
 
-import { Box, Divider } from "@mui/material";
+import { Box, Divider, useMediaQuery } from "@mui/material";
 import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
@@ -13,6 +13,7 @@ import { selectCurrentUser } from "../../features/users/userSlice";
 type SelectedSection = "modify-account" | "app-settings" | "manage-users";
 
 const UserPage: React.FC = () => {
+  const isMobile = useMediaQuery("(max-width: 600px)");
   const currentUser = useAppSelector(selectCurrentUser);
   const [selectedSection, setSelectedSection] =
     useState<SelectedSection>("modify-account");
@@ -43,18 +44,47 @@ const UserPage: React.FC = () => {
     <Box
       sx={{
         display: "flex",
-        height: "95dvh", // Use 95vh when isMobile is true, otherwise subtract the header height
+        height: isMobile ? "100dvh" : "calc(100vh - 120px)", // Adjust height based on view
+        overflowY: isMobile ? "hidden" : "hidden", // Enable scrolling within main content area
       }}
     >
-      <Sidebar onSelectSection={setSelectedSection} />
-      <Divider orientation="vertical" flexItem sx={{ ml: 2 }} />
+      <Box
+        sx={{
+          height: "100%",
+          position: "fixed", // Sidebar stays fixed in place
+          overflowY: "auto", // Scroll independently if needed
+          // Hide scrollbar for WebKit-based browsers (Chrome, Safari)
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          // Hide scrollbar for Firefox
+          scrollbarWidth: "none",
+          // Hide scrollbar for IE/Edge
+          msOverflowStyle: "none",
+        }}
+      >
+        <Sidebar onSelectSection={setSelectedSection} />
+      </Box>
+
+      <Divider
+        orientation="vertical"
+        flexItem
+        sx={{ ml: isMobile ? "70px" : "auto" }}
+      />
+
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           bgcolor: "#f5f5f5",
-          p: 3,
-          overflowY: "auto",
+          px: isMobile ? 1 : 3,
+          pt: isMobile ? 3 : 3,
+          pb: isMobile ? 4 : 0,
+          overflowY: "auto", // Always enable scrolling within main content area
+          overflowX: "hidden", // Prevent horizontal scrolling
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          ml: isMobile ? 0 : "240px",
         }}
       >
         {renderSelectedSection()}

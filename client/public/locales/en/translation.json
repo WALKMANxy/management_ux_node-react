@@ -678,7 +678,8 @@
     "unexpectedError": "An unexpected error occurred.",
     "googleLoginSuccess": "User logged in successfully via Google OAuth.",
     "googleLoginFailed": "Authentication failed via Google OAuth.",
-    "invalidStateParameter": "Invalid state parameter"
+    "invalidStateParameter": "Invalid state parameter",
+    "loginInconsistency": "There were some inconsistencies while attempting to login. Please contact an administrator."
   },
   "movementDetails": {
     "id": "List ID",

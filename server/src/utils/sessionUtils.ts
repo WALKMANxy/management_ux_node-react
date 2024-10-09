@@ -84,18 +84,29 @@ export const createSession = async (
     // console.log("Saved session:", session.toObject());
 
     await session.save();
-    /*  logger.info("Session created successfully", {
-      userId,
-      sessionId: session._id,
-      ipAddress: req.ip,
-      userAgent,
-      uniqueId,
-    }); */
-
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   } catch (error: unknown) {
-    const typedError = error as { message: string; stack?: string };
-    console.error("Error creating session", {
+    const typedError = error as {
+      message: string;
+      code?: number;
+      stack?: string;
+    };
+
+    if (
+      typedError.message.includes("E11000") &&
+      typedError.message.includes("dup key")
+    ) {
+      // This handles the duplicate key error
+      logger.error("Duplicate session detected", {
+        error: typedError.message,
+        stack: typedError.stack,
+        userId: user?._id,
+        uniqueId,
+      });
+      throw new Error("DUPLICATE_SESSION");
+    }
+
+    logger.error("Error creating session", {
       error: typedError.message,
       stack: typedError.stack,
       userId: user?._id,
@@ -197,13 +208,13 @@ export const renewSession = async (
     const session = await Session.findOne({ refreshToken, uniqueId });
 
     if (!session) {
-       logger.warn("Invalid refresh token", { refreshToken });
+      logger.warn("Invalid refresh token", { refreshToken });
       return null;
     }
 
     // Optional: Validate uniqueId, IP, User-Agent
     if (uniqueId && session.uniqueId !== uniqueId) {
-       logger.warn("Unique identifier mismatch during token refresh", {
+      logger.warn("Unique identifier mismatch during token refresh", {
         sessionId: session._id,
         storedUniqueId: session.uniqueId,
         incomingUniqueId: uniqueId,
@@ -212,7 +223,7 @@ export const renewSession = async (
     }
 
     if (session.expiresAt < new Date()) {
-       logger.warn("Refresh token expired", { sessionId: session._id });
+      logger.warn("Refresh token expired", { sessionId: session._id });
       await invalidateSession(refreshToken, uniqueId);
       return null;
     }
@@ -220,7 +231,7 @@ export const renewSession = async (
     // Validate userAgent
     const incomingUserAgent = req.get("User-Agent");
     if (session.userAgent !== incomingUserAgent) {
-       logger.warn("User-Agent mismatch during token refresh", {
+      logger.warn("User-Agent mismatch during token refresh", {
         sessionId: session._id,
         storedUserAgent: session.userAgent,
         incomingUserAgent,
@@ -231,7 +242,7 @@ export const renewSession = async (
     // Retrieve the user details using UserService
     const user = await UserService.getUserById(session.userId.toString());
     if (!user) {
-       logger.warn("User not found for session", { sessionId: session._id });
+      logger.warn("User not found for session", { sessionId: session._id });
       return null;
     }
 
@@ -244,7 +255,7 @@ export const renewSession = async (
     session.expiresAt = new Date(Date.now() + refreshTokenDurationMs);
     await session.save();
 
-     logger.info("Session refreshed successfully", {
+    logger.info("Session refreshed successfully", {
       sessionId: session._id,
       newExpiresAt: session.expiresAt,
     });

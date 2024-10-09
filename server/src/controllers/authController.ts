@@ -78,8 +78,16 @@ export const login = async (req: Request, res: Response) => {
       id: user.id,
     });
   } catch (error: unknown) {
+    const typedError = error as { message: string };
+
+    if (typedError.message === "DUPLICATE_SESSION") {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+
     logger.error("Login error:", { error });
-    res
+    return res
       .status(500)
       .json({ message: "Login failed", error: "Internal server error." });
   }
