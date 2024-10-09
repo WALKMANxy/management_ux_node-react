@@ -59,4 +59,11 @@ router.patch(
   UserController.updateUserPassword // Controller method to update password
 );
 
+router.delete(
+  "/:id",
+  checkValidation, // Validate the request
+  checkAdminRole,   // Ensure the user is an admin
+  UserController.deleteUser // Controller method to delete the user
+);
+
 export default router;

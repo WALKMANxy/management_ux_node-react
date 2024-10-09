@@ -23,7 +23,7 @@ const DailyForecastItem: React.FC<DailyForecastItemProps> = ({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        padding: isMobile ? "1px" : "16px",
+        padding: isMobile ? "4px" : "20px",
         border: "0.5px solid #ddd", // Light gray border
         borderRadius: "8px", // Rounded corners
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow
@@ -35,9 +35,14 @@ const DailyForecastItem: React.FC<DailyForecastItemProps> = ({
       }}
     >
       {/* Max/Min Temperature */}
-      <Typography variant="body1">{`${Math.floor(maxTemp)}° / ${Math.floor(
-        minTemp
-      )}°`}</Typography>
+      <Typography
+        variant="body1"
+        sx={{
+          color: "rgba(255,255,255,0.8)",
+        }}
+      >
+        {`${Math.floor(maxTemp)}° / ${Math.floor(minTemp)}°`}
+      </Typography>
       {/* Weather Icon */}
       <img
         src={getWeatherIcon(weatherCode)}
@@ -46,7 +51,14 @@ const DailyForecastItem: React.FC<DailyForecastItemProps> = ({
         height={30}
       />
       {/* Date */}
-      <Typography variant="body2">{date}</Typography>
+      <Typography
+        variant="body2"
+        sx={{
+          color: "rgba(255,255,255,0.6)",
+        }}
+      >
+        {date}
+      </Typography>
     </Box>
   );
 };

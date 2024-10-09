@@ -13,6 +13,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import "animate.css";
 import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useInView } from "react-intersection-observer";
@@ -25,7 +26,6 @@ import {
 import { User } from "../../models/entityModels";
 import { showToast } from "../../services/toastMessage";
 import UserDetails from "./UserDetails";
-import "animate.css";
 
 const ManageUsers: React.FC = () => {
   const theme = useTheme();
@@ -112,7 +112,7 @@ const ManageUsers: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ width: "auto" }}>
+    <Box sx={{ width: "auto", flexGrow: 1 }}>
       <Typography variant="h4" gutterBottom>
         {t("manageUsers.title", "Manage Users")}
       </Typography>
@@ -145,18 +145,23 @@ const ManageUsers: React.FC = () => {
 
       {/* Render User Details with fadeIn animation */}
       {selectedUser ? (
-        <div className="animate__animated animate__fadeIn">
+        <Box sx={{ px: 1 }} className="animate__animated animate__fadeIn">
           <UserDetails user={selectedUser} onBack={handleBackToList} />
-        </div>
+        </Box>
       ) : (
-        <div className="animate__animated animate__fadeIn">
+        <Box className="animate__animated animate__fadeIn">
           <TableContainer
             sx={{
-              minHeight: "40dvh", // Set minimum height
-              maxHeight: 440,
+              maxHeight: "400px",
+              transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
+              transformOrigin: "top left", // Anchor the scale to the top-left corner
+              width: isMobile ? "133.33%" : "100%", // Adjust width to prevent clipping
             }}
           >
-            <Table stickyHeader aria-label={t("manageUsers.userTable", "User Table")}>
+            <Table
+              stickyHeader
+              aria-label={t("manageUsers.userTable", "User Table")}
+            >
               <TableHead>
                 <TableRow>
                   {columns.map((column) => (
@@ -239,7 +244,7 @@ const ManageUsers: React.FC = () => {
               </TableBody>
             </Table>
           </TableContainer>
-        </div>
+        </Box>
       )}
     </Box>
   );

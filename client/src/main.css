@@ -107,8 +107,17 @@ th {
 
 html,
 body {
-  height: 100dvh;
-  width: 99vw;
+  width: 100vw;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  scrollbar-width: none;
+
+  /* Hide scrollbar for IE/Edge */
+  -ms-overflow-style: none;
 }
 
 /* * {

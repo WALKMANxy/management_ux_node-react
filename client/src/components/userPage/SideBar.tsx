@@ -67,17 +67,16 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({ onSelectSection }) => {
     <Box
       component="nav"
       sx={{
+        maxHeight: "100dvh",
         width: isMobile ? 55 : 240, // Narrower width on mobile
-        flexShrink: 0,
         bgcolor: "transparent", // Transparent background
         display: "flex",
         flexDirection: "column",
         alignItems: isMobile ? "center" : "flex-start",
         borderRight: isMobile ? "none" : "1px solid rgba(0, 0, 0, 0.12)", // Optional border for non-mobile
-        overflowY: "auto",
+        overflowX: "hidden",
         transition: "width 0.3s", // Smooth transition for width change
         borderTopRightRadius: isMobile ? 0 : 30,
-        borderBottomRightRadius: isMobile ? 0 : 30,
       }}
     >
       <Toolbar>
@@ -90,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({ onSelectSection }) => {
       <Divider />
       <List
         sx={{
-          width: isMobile ? "90%" : "100%",
+          width: isMobile ? "83%" : "100%",
           pr: isMobile ? 1 : 0,
           px: isMobile ? 0 : 2,
           my: isMobile ? 0 : 2,

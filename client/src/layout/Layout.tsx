@@ -25,7 +25,8 @@ const Layout: React.FC = () => {
     location.pathname === "/movements" ||
     location.pathname === "/employee-dashboard" ||
     location.pathname === "/articles" ||
-    location.pathname === "/dashboard";
+    location.pathname === "/dashboard" ||
+    location.pathname === "/settings";
   const isSettingsPage = location.pathname === "/settings"; // Check if on the /settings page
 
   const isMessagesPage = location.pathname === "/messages";
@@ -60,7 +61,6 @@ const Layout: React.FC = () => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          minHeight: "100dvh",
           overflowX: "hidden",
         }}
       >

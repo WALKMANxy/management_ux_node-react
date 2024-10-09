@@ -56,3 +56,8 @@ export const updateUserPassword = async (
     newPassword,
   });
 };
+
+// API call to delete a user by ID
+export const deleteUserById = async (id: string): Promise<void> => {
+  return apiCall<void>(`users/${id}`, "DELETE");
+};

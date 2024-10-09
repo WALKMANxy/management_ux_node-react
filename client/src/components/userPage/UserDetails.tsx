@@ -21,6 +21,8 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import "animate.css";
 import React from "react";
@@ -51,21 +53,31 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
     alertMessage,
     setAlertMessage,
     alertSeverity,
+    handleDeleteUser,
   } = useUserDetails(user);
 
   const { t } = useTranslation();
+  const theme = useTheme();
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
-    <Box>
+    <Box
+      sx={{ px: 0 }}
+    >
       <Tooltip title={t("userDetails.goBack", "Go back")} placement="top">
-        <Button onClick={onBack} sx={{ mb: 2, color: "black" }}>
+        <Button onClick={onBack} sx={{ mb: 2, ml: -2, color: "black" }}>
           <ArrowBackIosIcon />
         </Button>
       </Tooltip>
 
       {/* Current User Details Card */}
-      <Box className="animate__animated animate__fadeInLeft">
+      <Box
+        className="animate__animated animate__fadeInLeft"
+        sx={{ pl: 1 }}
+      >
         <UserCard
+          userId={user._id || "N/A"}
           email={user.email || "N/A"}
           avatar={user.avatar}
           details={{
@@ -73,18 +85,23 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
             code: user.entityCode,
             name: user.entityName,
           }}
+          onDeleteUser={handleDeleteUser}
         />
       </Box>
 
       {/* Info message for selecting a new role */}
-      <Box display="flex" alignItems="center" sx={{ my: 3 }}>
-        <InfoIcon color="info" sx={{ mr: 1, fontSize: "1.2rem" }} />
+      <Box
+        display="flex"
+        alignItems="center"
+        sx={{ my: isMobile ? 0 : 3, mt: isMobile ? -2 : null }}
+      >
+        <InfoIcon color="info" sx={{ mr: 1, fontSize: "1.0rem" }} />
         <Typography variant="subtitle1" sx={{ color: "gray" }}>
           {t("userDetails.selectRole", "Select a new role.")}
         </Typography>
       </Box>
 
-      <Divider sx={{ mb: 2 }} />
+      <Divider sx={{ mb: isMobile ? 1 : 2 }} />
 
       <Box display="flex" flexDirection="column" gap={1}>
         {/* Role Selection Buttons */}
@@ -94,6 +111,9 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
           sx={{
             boxShadow: "none",
             gap: 2,
+            transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
+            transformOrigin: "top left", // Anchor the scale to the top-left corner
+            width: isMobile ? "133.33%" : "100%",
           }}
         >
           <Tooltip
@@ -159,8 +179,12 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
         </ButtonGroup>
 
         {/* Info message for selecting an entity */}
-        <Box display="flex" alignItems="center" sx={{ my: 3 }}>
-          <InfoIcon color="info" sx={{ mr: 1, fontSize: "1.2rem" }} />
+        <Box
+          display="flex"
+          alignItems="center"
+          sx={{ my: isMobile ? 0.5 : 3, mt: isMobile ? -1.1 : null }}
+        >
+          <InfoIcon color="info" sx={{ mr: 1, fontSize: "1.0rem" }} />
           <Typography variant="subtitle1" sx={{ color: "gray" }}>
             {t(
               "userDetails.selectEntity",
@@ -187,7 +211,15 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
         />
 
         {/* Table for displaying entities */}
-        <TableContainer sx={{ maxHeight: 400 }}>
+        <TableContainer
+          sx={{
+            maxHeight: 400,
+            transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
+            transformOrigin: "top left", // Anchor the scale to the top-left corner
+            width: isMobile ? "133.33%" : "100%",
+            mt: isMobile ? -2.5 : 0,
+          }}
+        >
           <Table stickyHeader>
             <TableHead>
               <TableRow>
@@ -238,12 +270,14 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
           </Table>
         </TableContainer>
 
-        <Divider sx={{ mb: 2 }} />
-
         {/* Confirmation Card below the table */}
         {selectedEntity && (
-          <Box className="animate__animated animate__bounceIn">
+          <Box
+            className="animate__animated animate__bounceIn"
+            sx={{ mt: isMobile ? -8 : 0, pl: 1 }}
+          >
             <UserCard
+              userId={user._id}
               email={user.email || "N/A"}
               avatar={user.avatar || "/default-avatar.png"}
               details={{
@@ -252,11 +286,12 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
                 name: selectedEntity.name,
               }}
               isnew={"true"} // Apply faint green styling for new entity details
+              onDeleteUser={handleDeleteUser}
             />
           </Box>
         )}
 
-        <Divider sx={{ mb: 2 }} />
+        <Divider sx={{ mb: isMobile ? 0 : 2 }} />
 
         <LoadingButton
           color="secondary"
