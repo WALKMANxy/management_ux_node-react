@@ -31,7 +31,6 @@ const authSlice = createSlice({
       state.id = action.payload.id;
       state.userId = action.payload.userId;
     },
-
   },
   extraReducers: (builder) => {
     builder
@@ -57,7 +56,6 @@ const authSlice = createSlice({
       })
       .addCase(handleLogout.rejected, (_state, action) => {
         // Optionally, handle logout errors
-        showToast.error("Failed to logout: " + action.payload);
 
         console.error(action.payload);
       });

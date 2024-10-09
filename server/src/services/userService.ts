@@ -157,4 +157,21 @@ export class UserService {
       );
     }
   }
+
+  static async deleteUser(id: string): Promise<IUser | null> {
+    try {
+      const user = await User.findByIdAndDelete(id).exec();
+      if (!user) {
+        throw new Error("User not found");
+      }
+      return user;
+    } catch (err) {
+      throw new Error(
+        `Error deleting user: ${
+          err instanceof Error ? err.message : "Unknown error"
+        }`
+      );
+    }
+  }
+  
 }

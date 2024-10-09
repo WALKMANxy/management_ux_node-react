@@ -69,7 +69,7 @@ axiosInstance.interceptors.request.use(
  */
 export const apiCall = async <T>(
   endpoint: string,
-  method: "GET" | "POST" | "PUT" | "PATCH",
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
   data?: unknown
 ): Promise<T> => {
   try {
