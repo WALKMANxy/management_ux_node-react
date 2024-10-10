@@ -1,8 +1,7 @@
 // Header.tsx
 
 import {
-  /*   BarChart as BarChartIcon,
-   */ Category as CategoryIcon,
+  Category as CategoryIcon,
   Close as CloseIcon,
   EventNote as EventNoteIcon,
   History as HistoryIcon,
@@ -13,7 +12,6 @@ import {
   People as PeopleIcon,
 } from "@mui/icons-material";
 import AssessmentIcon from "@mui/icons-material/Assessment";
-
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import {
   AppBar,
@@ -50,16 +48,37 @@ const Header: React.FC = () => {
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [iconChange, setIconChange] = useState(false);
+  const [showAppBar, setShowAppBar] = useState(true); // New state for showing/hiding AppBar
+  const [lastScrollY, setLastScrollY] = useState(0); // State to track last scroll position
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const userRole = useSelector((state: RootState) => state.auth.role);
 
-  const location = useLocation(); // Get current location
-  const prevLocationRef = useRef<string>(location.pathname); // Initialize previous location
+  const location = useLocation();
+  const prevLocationRef = useRef<string>(location.pathname);
 
   const initiateLogout = () => {
     dispatch(handleLogout());
   };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // If scrolling down and past 100px
+        setShowAppBar(false); // Hide AppBar
+      } else if (currentScrollY < lastScrollY) {
+        // If scrolling up
+        setShowAppBar(true); // Show AppBar
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [lastScrollY]);
 
   useEffect(() => {
     if (
@@ -72,15 +91,12 @@ const Header: React.FC = () => {
   }, [location.pathname, dispatch]);
 
   useEffect(() => {
-    // Check if the user is leaving the /messages page
     if (
       prevLocationRef.current === "/messages" &&
       location.pathname !== "/messages"
     ) {
       dispatch(clearCurrentChatReducer());
     }
-
-    // Update the previous location ref after checking
     prevLocationRef.current = location.pathname;
   }, [location.pathname, dispatch]);
 
@@ -112,7 +128,6 @@ const Header: React.FC = () => {
 
     return (
       <>
-        {/* Dashboard Link */}
         <ListItem
           button
           component={Link}
@@ -125,7 +140,6 @@ const Header: React.FC = () => {
           <ListItemText primary={t("headerDashboard", "Dashboard")} />
         </ListItem>
 
-        {/* Statistics Link - Only for Admin, Client, Agent */}
         {allowedStatisticsRoles.includes(userRole) && (
           <ListItem
             button
@@ -140,7 +154,6 @@ const Header: React.FC = () => {
           </ListItem>
         )}
 
-        {/* Conditional Links for Non-Employee Roles */}
         {userRole !== "employee" && (
           <>
             <ListItem
@@ -205,7 +218,6 @@ const Header: React.FC = () => {
           </>
         )}
 
-        {/* Calendar Link - Hidden for Client Role */}
         {userRole !== "client" && (
           <ListItem
             button
@@ -230,8 +242,7 @@ const Header: React.FC = () => {
       to="/"
       onClick={() => {
         initiateLogout();
-
-        toggleDrawer(); // Close the drawer on logout
+        toggleDrawer();
       }}
       sx={{ color: "white", paddingBottom: "20px" }}
     >
@@ -247,29 +258,25 @@ const Header: React.FC = () => {
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor: "rgba(0, 0, 0, 1)", // Slightly more transparent for a frosty look
-          borderBottomLeftRadius: "32px", // Rounded corners for a smoother look
-          borderBottomRightRadius: "32px", // Rounded corners for a smoother look
-          boxShadow: `0px 4px 12px rgba(0, 0, 0, 0.1)`, // Soft shadow for depth
+          backgroundColor: "rgba(0, 0, 0, 1)",
+          boxShadow: `0px 4px 12px rgba(0, 0, 0, 0.1)`,
           width: "100%",
           right: "auto",
           left: "auto",
-          maxWidth: "100vw", // Prevents overflowing past the viewport width
+          maxWidth: "100vw",
+          transition: "top 0.3s ease-in-out", // Smooth transition
+          top: showAppBar ? "0" : "-64px", // Hide/show the AppBar based on scroll
         }}
-        className="animate__animated animate__fadeInDown" // Apply the animation class here
+        className="animate__animated animate__fadeInDown"
       >
-        <Toolbar
-          sx={{
-            display: "flex",
-          }}
-        >
+        <Toolbar sx={{ display: "flex" }}>
           <Fade in={!iconChange} timeout={500}>
             <IconButton
               edge="start"
               color="inherit"
               aria-label="menu"
               onClick={toggleDrawer}
-              sx={{ color: "white" }} // Scoped color style
+              sx={{ color: "white" }}
             >
               {iconChange ? <CloseIcon /> : <MenuIcon />}
             </IconButton>
@@ -285,13 +292,11 @@ const Header: React.FC = () => {
             placeholder={t("search")}
             isHeaderSearch={true}
           />
-          <NotificationBell /> {/* Render the NotificationBell component */}
-          <UserAvatar /> {/* Render the UserAvatar component */}
+          <NotificationBell />
+          <UserAvatar />
         </Toolbar>
       </AppBar>
       <Toolbar />
-      {/* This Toolbar component is added to push the content down */}
-      {/* Blur backdrop */}
       {drawerOpen && (
         <Box
           sx={{
@@ -301,11 +306,11 @@ const Header: React.FC = () => {
             right: 0,
             bottom: 0,
             zIndex: 1000,
-            backdropFilter: "blur(6px)", // Apply blur effect
-            backgroundColor: "rgba(0, 0, 0, 0.2)", // Slight dark overlay
+            backdropFilter: "blur(6px)",
+            backgroundColor: "rgba(0, 0, 0, 0.2)",
             transition: "backdrop-filter 0.3s ease",
           }}
-          onClick={toggleDrawer} // Close drawer when backdrop is clicked
+          onClick={toggleDrawer}
         />
       )}
       <Drawer
@@ -316,15 +321,15 @@ const Header: React.FC = () => {
           sx: {
             backgroundColor: "black",
             color: "white",
-            width: isMobile ? "auto" : "250px", // Conditional width based on screen size
+            width: isMobile ? "auto" : "250px",
             height: "100vh",
             borderBottomRightRadius: "32px",
             borderTopRightRadius: "32px",
           },
         }}
         ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
-          disableScrollLock: true, // Prevent body padding adjustment
+          keepMounted: true,
+          disableScrollLock: true,
         }}
       >
         <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>

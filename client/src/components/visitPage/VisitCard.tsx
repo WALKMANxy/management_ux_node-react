@@ -143,4 +143,4 @@ const VisitCard: React.FC<VisitCardProps> = ({
   );
 };
 
-export default VisitCard;
+export default React.memo(VisitCard);

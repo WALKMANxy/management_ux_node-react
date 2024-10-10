@@ -75,12 +75,23 @@ const AgentView: React.FC<AgentViewProps> = ({
           mb: 2,
         }}
       >
-        <Typography variant="h5" gutterBottom fontWeight={100}>
-          {" "}
-          {t("dashboard.statisticsFor", {
-            name: selectedAgentData.name,
-          })}
-        </Typography>
+        {loadingState ? (
+          <Skeleton
+            animation="wave"
+            variant="text"
+            width="50%"
+            height={30}
+            sx={{ borderRadius: "4px" }}
+            aria-label={t("dashboard.loadingStatistics")}
+          />
+        ) : (
+          <Typography variant="h5" gutterBottom fontWeight={100}>
+            {" "}
+            {t("dashboard.statisticsFor", {
+              name: selectedAgentData.name,
+            })}
+          </Typography>
+        )}
         {isTablet && (
           <React.Fragment>
             {loadingState ? (
@@ -112,61 +123,119 @@ const AgentView: React.FC<AgentViewProps> = ({
 
       <Grid container spacing={2}>
         <Grid item xs={12} md={4}>
-          <SpentThisMonth
-            amount={
-              calculateTotalSpentThisMonth(
+          {loadingState ? (
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width="100%"
+              height={300}
+              sx={{ borderRadius: "12px" }}
+              aria-label={t("dashboard.skeleton")}
+            />
+          ) : (
+            <SpentThisMonth
+              amount={
+                calculateTotalSpentThisMonth(
+                  selectedAgentData.clients.flatMap(
+                    (client: any) => client.movements
+                  )
+                ).totalRevenue
+              }
+              comparison={{
+                value: parseFloat(
+                  `${
+                    agentComparativeStatisticsMonthly?.revenuePercentage || "0"
+                  }`
+                ),
+              }}
+              isAgentSelected={true}
+            />
+          )}
+        </Grid>
+        <Grid item xs={12} md={4}>
+          {loadingState ? (
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width="100%"
+              height={300}
+              sx={{ borderRadius: "12px" }}
+              aria-label={t("dashboard.skeleton")}
+            />
+          ) : (
+            <SpentThisYear
+              amount={calculateTotalSpentThisYearForAgents(
+                selectedAgentData.clients
+              )}
+              comparison={{
+                value: parseFloat(
+                  `${agentComparativeStatistics?.revenuePercentage || "0"}`
+                ),
+              }}
+              isAgentSelected={true}
+            />
+          )}
+        </Grid>
+        <Grid item xs={12} md={4}>
+          {loadingState ? (
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width="100%"
+              height={300}
+              sx={{ borderRadius: "12px" }}
+              aria-label={t("dashboard.skeleton")}
+            />
+          ) : (
+            <TopArticleType
+              articles={calculateTopArticleType(
                 selectedAgentData.clients.flatMap(
                   (client: any) => client.movements
                 )
-              ).totalRevenue
-            }
-            comparison={{
-              value: parseFloat(
-                `${agentComparativeStatisticsMonthly?.revenuePercentage || "0"}`
-              ),
-            }}
-            isAgentSelected={true}
-          />
+              )}
+              isAgentSelected={true}
+            />
+          )}
         </Grid>
-        <Grid item xs={12} md={4}>
-          <SpentThisYear
-            amount={calculateTotalSpentThisYearForAgents(
-              selectedAgentData.clients
-            )}
-            comparison={{
-              value: parseFloat(
-                `${agentComparativeStatistics?.revenuePercentage || "0"}`
-              ),
-            }}
-            isAgentSelected={true}
-          />
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <TopArticleType
-            articles={calculateTopArticleType(
-              selectedAgentData.clients.flatMap(
-                (client: any) => client.movements
-              )
-            )}
-            isAgentSelected={true}
-          />
+
+        <Grid item xs={12} md={6}>
+          {loadingState ? (
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width="100%"
+              height={300}
+              sx={{ borderRadius: "12px" }}
+              aria-label={t("dashboard.skeleton")}
+            />
+          ) : (
+            <MonthOverMonthSpendingTrend
+              months={calculateMonthlyData(selectedAgentData.clients).months}
+              revenueData={
+                calculateMonthlyData(selectedAgentData.clients).revenueData
+              }
+              userRole="admin"
+            />
+          )}
         </Grid>
         <Grid item xs={12} md={6}>
-          <MonthOverMonthSpendingTrend
-            months={calculateMonthlyData(selectedAgentData.clients).months}
-            revenueData={
-              calculateMonthlyData(selectedAgentData.clients).revenueData
-            }
-            userRole="admin"
-          />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <TopBrandsSold
-            topBrandsData={topBrandsForSelectedAgent}
-            brandColors={brandColors}
-            isMobile={isMobile}
-            isAgentSelected={true}
-          />
+          {loadingState ? (
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width="100%"
+              height={300}
+              sx={{ borderRadius: "12px" }}
+              aria-label={t("dashboard.skeleton")}
+            />
+          ) : (
+            <TopBrandsSold
+              topBrandsData={topBrandsForSelectedAgent}
+              brandColors={brandColors}
+              isMobile={isMobile}
+              isAgentSelected={true}
+            />
+          )}
         </Grid>
         <Grid item xs={12}>
           <AgentActivityOverview selectedAgent={selectedAgentData} />
@@ -174,19 +243,30 @@ const AgentView: React.FC<AgentViewProps> = ({
       </Grid>
 
       {/* Close Selection FAB */}
-      <Fab
-        color="secondary"
-        aria-label={t("adminDashboard.closeButton")}
-        sx={{
-          position: "fixed",
-          bottom: isMobile ? 20 : 16,
-          right: isMobile ? 120 : 16,
-          zIndex: 1300,
-        }}
-        onClick={() => clearSelection()}
-      >
-        <CloseIcon fontSize="small" />
-      </Fab>
+      {loadingState ? (
+        <Skeleton
+          animation="wave"
+          variant="circular"
+          width={40}
+          height={40}
+          sx={{ borderRadius: "50%" }}
+          aria-label={t("dashboard.loadingCalendarButton")}
+        />
+      ) : (
+        <Fab
+          color="secondary"
+          aria-label={t("adminDashboard.closeButton")}
+          sx={{
+            position: "fixed",
+            bottom: isMobile ? 10 : 16,
+            right: isMobile ? 5 : 16,
+            zIndex: 1300,
+          }}
+          onClick={() => clearSelection()}
+        >
+          <CloseIcon fontSize="small" />
+        </Fab>
+      )}
     </Box>
   );
 };

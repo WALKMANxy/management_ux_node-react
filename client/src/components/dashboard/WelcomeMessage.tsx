@@ -29,7 +29,10 @@ const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
     );
   }
 
-  const roleKey = `${role}Dashboard`;
+  // Split name on space and take the first word
+  const displayName = name
+    ? name.split(" ")[0]
+    : t(`${role}Dashboard.defaultName`);
 
   return (
     <Typography
@@ -41,7 +44,7 @@ const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
       }}
     >
       {t(`dashboard.welcomeBack`, {
-        name: name || t(`${roleKey}.defaultName`),
+        name: displayName,
       })}
     </Typography>
   );

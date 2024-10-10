@@ -44,7 +44,7 @@ const ClientDashboard: React.FC = () => {
         loading={loadingState}
       />
 
-      <Grid container spacing={6} mt={2}>
+      <Grid container spacing={6} mt={isMobile ? 0 : 2}>
         {/* Main Content Area */}
         <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
           {/* Render ClientView if a client is selected */}

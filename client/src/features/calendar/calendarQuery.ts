@@ -47,8 +47,6 @@ export const baseQueryWithAxios = async (
   }
 };
 
-
-
 export const calendarApi = createApi({
   reducerPath: "calendarApi",
   baseQuery: baseQueryWithAxios, // Default to the query with credentials
@@ -112,11 +110,14 @@ export const calendarApi = createApi({
     }),
 
     createEvent: builder.mutation<CalendarEvent, CreateEventPayload>({
-      query: (newEvent) => ({
-        url: "calendar/events",
-        method: "POST",
-        body: newEvent,
-      }),
+      query: (newEvent) => {
+        console.log("Creating new event:", newEvent);
+        return {
+          url: "calendar/events",
+          method: "POST",
+          data: newEvent,
+        };
+      },
       invalidatesTags: ["CalendarEvent"],
     }),
     updateEventStatus: builder.mutation<
@@ -126,7 +127,7 @@ export const calendarApi = createApi({
       query: ({ eventId, status }) => ({
         url: `calendar/events/${eventId}/status`,
         method: "PATCH",
-        body: { status },
+        data: { status },
       }),
       invalidatesTags: (_result, _error, { eventId }) => [
         { type: "CalendarEvent", _id: eventId },
@@ -149,7 +150,7 @@ export const calendarApi = createApi({
       query: ({ eventId, data }) => ({
         url: `calendar/events/${eventId}`,
         method: "PATCH",
-        body: data,
+        data: data,
       }),
       invalidatesTags: (_result, _error, { eventId }) => [
         { type: "CalendarEvent", _id: eventId },

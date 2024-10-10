@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/visitPage/EditVisitForm.tsx
 
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import {
   Alert,
   Box,
@@ -22,6 +24,8 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { StaticDateTimePicker } from "@mui/x-date-pickers";
@@ -29,11 +33,13 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
 import dayjs, { Dayjs } from "dayjs";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAppDispatch } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { selectUserRole } from "../../features/auth/authSlice";
 import { updateVisitAsync } from "../../features/data/dataThunks";
 import { Visit } from "../../models/dataModels";
+import { locale } from "../../services/localizer";
 import { showToast } from "../../services/toastMessage";
 import VisitCard from "./VisitCard";
 
@@ -71,6 +77,16 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
 
   const { t } = useTranslation();
 
+  // Retrieve userRole from the Redux store or context
+  const userRole = useAppSelector(selectUserRole);
+
+  // Responsive Design
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  // Determine if the visit date is in the past
+  const isPastVisit = dayjs(visit.date).isBefore(dayjs(), "minute");
+
   // Form state
   const [date, setDate] = useState<Dayjs | null>(dayjs(visit.date));
   const [notePublic, setNotePublic] = useState<string>(visit.notePublic || "");
@@ -79,6 +95,18 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
   );
   const [pending, setPending] = useState<boolean>(visit.pending);
   const [completed, setCompleted] = useState<boolean>(visit.completed);
+
+  // Track initial state for change detection and button logic
+  const initialState = useMemo(
+    () => ({
+      date: dayjs(visit.date).toISOString(),
+      notePublic: visit.notePublic || "",
+      notePrivate: visit.notePrivate || "",
+      pending: visit.pending,
+      completed: visit.completed,
+    }),
+    [visit]
+  );
 
   // Snackbar state
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
@@ -93,6 +121,31 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if any data has changed
+    const currentState = {
+      date: date ? date.toISOString() : "",
+      notePublic: notePublic.trim(),
+      notePrivate: notePrivate.trim(),
+      pending,
+      completed,
+    };
+
+    const isChanged = Object.keys(initialState).some(
+      (key) => (currentState as any)[key] !== (initialState as any)[key]
+    );
+
+    if (!isChanged) {
+      setSnackbarMessage(
+        t(
+          "editVisitForm.noChanges",
+          "You must edit the visit before updating it."
+        )
+      );
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
 
     if (!date) {
       setSnackbarMessage(t("editVisitForm.fillDate", "Please select a date."));
@@ -171,20 +224,41 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
     setOpenConfirm(false);
   }, []);
 
-  // Toggle Completed status
-  const handleToggleCompleted = () => {
+  // Determine if the visit was initially cancelled
+  const isVisitInitiallyCancelled =
+    initialState.pending === false && initialState.completed === false;
+
+  // Current State Variables
+  const isCancelled = !pending && !completed;
+  const isCompleted = completed;
+
+  // Button Labels
+  const completedButtonLabel = isCompleted
+    ? t("editVisitForm.completed", "Completed")
+    : t("editVisitForm.markAsCompleted", "Mark as Completed");
+
+  const cancelledButtonLabel = isCancelled
+    ? t("editVisitForm.cancelled", "Cancelled")
+    : t("editVisitForm.markAsCancelled", "Mark as Cancelled");
+
+  // Button Disabled States
+  const completedButtonDisabled =
+    isCompleted || (isVisitInitiallyCancelled && userRole !== "admin");
+  const cancelledButtonDisabled = isCancelled;
+
+  // Event Handlers
+  const handleToggleCompleted = useCallback(() => {
     setCompleted(true);
     setPending(false);
-  };
+  }, []);
 
-  // Toggle Cancelled status
-  const handleToggleCancelled = () => {
+  const handleToggleCancelled = useCallback(() => {
     setCompleted(false);
     setPending(false);
-  };
+  }, []);
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
       <Box sx={{ m: 2 }}>
         {/* Form Container */}
         <Box
@@ -198,7 +272,7 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
             backgroundColor: "#fff",
             display: "flex",
             flexDirection: "column",
-            height: "100%", // Ensures the form takes full height
+            height: "100%",
           }}
         >
           <Typography
@@ -266,7 +340,7 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
             <Grid item xs={12} sm={6}>
               <StaticDateTimePicker
                 value={date}
-                disablePast={true}
+                disablePast={false}
                 onAccept={(newValue: Dayjs | null) => {
                   setDate(newValue);
                 }}
@@ -281,6 +355,7 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
                 slotProps={{
                   actionBar: { hidden: true },
                 }}
+                disabled={isPastVisit}
               />
             </Grid>
 
@@ -303,12 +378,13 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
                       fullWidth
                       multiline
                       minRows={2}
-                      maxRows={10} // Allow expansion up to 10 rows
+                      maxRows={10}
                       variant="outlined"
+                      disabled={isPastVisit}
                       sx={{
                         "& .MuiOutlinedInput-root": {
                           "& fieldset": {
-                            borderRadius: 2, // Adjust border radius
+                            borderRadius: 2,
                           },
                         },
                       }}
@@ -341,10 +417,11 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
                       minRows={2}
                       maxRows={10}
                       variant="outlined"
+                      disabled={isPastVisit}
                       sx={{
                         "& .MuiOutlinedInput-root": {
                           "& fieldset": {
-                            borderRadius: 2, // Adjust border radius
+                            borderRadius: 2,
                           },
                         },
                       }}
@@ -354,46 +431,90 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
               </Grid>
             </Grid>
 
-            {/* Status Buttons */}
+            {/* Status Buttons and Exclamation Message */}
             <Grid item xs={12}>
+              {/* Exclamation Message */}
+              {isPastVisit && pending && !completed && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    mb: 1,
+                    color: "orange",
+                  }}
+                >
+                  <WarningAmberIcon sx={{ mr: 1 }} />
+                  <Typography variant="body2">
+                    {t(
+                      "editVisitForm.pastVisitWarning",
+                      "The visit is past the set date. Have you completed the visit? If so, please add your report and mark as completed."
+                    )}
+                  </Typography>
+                </Box>
+              )}
+
               <Box
                 sx={{
                   display: "flex",
+                  justifyContent: "center",
+                  width: "auto",
                   gap: 2,
-                  flexWrap: "wrap",
+                  flexDirection: "row",
+                  transform: isMobile ? "scale(0.75)" : "scale(1)",
                 }}
               >
+                {/* Completed Button */}
                 <Button
                   variant="contained"
-                  color="success"
                   onClick={handleToggleCompleted}
-                  disabled={completed}
+                  disabled={completedButtonDisabled}
                   sx={{
-                    backgroundColor: completed ? "green" : "grey",
+                    backgroundColor: isCompleted
+                      ? "rgba(76, 175, 80, 0.9)"
+                      : "gray",
                     color: "white",
                     "&:hover": {
-                      backgroundColor: completed ? "darkgreen" : "darkgrey",
+                      backgroundColor: isCompleted
+                        ? "rgba(76, 175, 80, 0.9)"
+                        : "darkgrey",
+                    },
+                    flexGrow: 1,
+                    "&.Mui-disabled": {
+                      backgroundColor: isCompleted
+                        ? "rgba(76, 175, 80, 0.9)"
+                        : "gray",
+                      color: "white",
                     },
                   }}
                 >
-                  {t("editVisitForm.markAsCompleted", "Mark as Completed")}
+                  {completedButtonLabel}
                 </Button>
 
+                {/* Cancelled Button */}
                 <Button
                   variant="contained"
-                  color="error"
                   onClick={handleToggleCancelled}
-                  disabled={!pending && !completed}
+                  disabled={cancelledButtonDisabled}
                   sx={{
-                    backgroundColor: !pending && !completed ? "red" : "grey",
+                    backgroundColor: isCancelled
+                      ? "rgba(244, 67, 54, 0.9)"
+                      : "gray",
                     color: "white",
                     "&:hover": {
-                      backgroundColor:
-                        !pending && !completed ? "darkred" : "darkgrey",
+                      backgroundColor: isCancelled
+                        ? "rgba(244, 67, 54, 0.9)"
+                        : "darkgrey",
+                    },
+                    flexGrow: 1,
+                    "&.Mui-disabled": {
+                      backgroundColor: isCancelled
+                        ? "rgba(244, 67, 54, 0.9)"
+                        : "gray",
+                      color: "white",
                     },
                   }}
                 >
-                  {t("editVisitForm.markAsCancelled", "Mark as Cancelled")}
+                  {cancelledButtonLabel}
                 </Button>
               </Box>
             </Grid>
@@ -406,7 +527,7 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
                 reason={visit.visitReason}
                 date={date}
                 notePublic={notePublic}
-                notePrivate={notePrivate} // Pass private note
+                notePrivate={notePrivate}
                 pending={pending}
                 completed={completed}
                 visitIssuedBy={visit.visitIssuedBy}

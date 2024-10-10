@@ -1,21 +1,9 @@
 // src/components/visitPage/VisitView.tsx
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  IconButton,
-  Stack,
-  styled,
-  Tooltip,
-} from "@mui/material";
+import { Box, IconButton, Stack, styled, Tooltip } from "@mui/material";
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "../../app/hooks";
 import { selectVisits } from "../../features/promoVisits/promoVisitsSelectors";
 import EditVisitForm from "./EditVisitForm";
@@ -52,9 +40,17 @@ const StyledCloseButton = styled(IconButton)(({ theme }) => ({
 
 const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [openConfirm, setOpenConfirm] = useState(false);
 
   const selectedVisitId = useAppSelector((state) => state.data.selectedVisitId);
+
+  const editVisitRef = useRef<HTMLDivElement | null>(null);
+
+  // Scroll into view when EditVisitForm is rendered
+  useEffect(() => {
+    if (isEditing && editVisitRef.current) {
+      editVisitRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [isEditing]);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -65,16 +61,7 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
   };
 
   const handleDeselectClick = () => {
-    setOpenConfirm(true);
-  };
-
-  const handleConfirmDeselect = () => {
-    setOpenConfirm(false);
     onDeselectVisit();
-  };
-
-  const handleCancelDeselect = () => {
-    setOpenConfirm(false);
   };
 
   // useEffect to close the edit form when selectedVisitId changes
@@ -93,7 +80,7 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
   if (!visit) return null;
 
   return (
-    <Box>
+    <Box sx={{ height: "100%" }}>
       <VisitCard
         clientId={visit.clientId}
         type={visit.type}
@@ -108,12 +95,12 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
       />
 
       {/* Action Buttons */}
-      <Box sx={{ mt: 2 }}>
+      <Box sx={{ mt: 1 }}>
         <Stack
           direction={"row"}
           spacing={2}
           justifyContent="flex-end"
-          sx={{ pr: 1.2, pt: 1 }} // Adjust padding-right or padding-left to align
+          sx={{ pr: 1.2, pt: 0.5 }} // Adjust padding-right or padding-left to align
         >
           <Tooltip title="Edit Visit" arrow>
             <StyledActionButton
@@ -135,32 +122,12 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
         </Stack>
       </Box>
 
-      {/* Confirmation Dialog for Deselecting Visit */}
-      <Dialog
-        open={openConfirm}
-        onClose={handleCancelDeselect}
-        aria-labelledby="confirm-deselect-title"
-        aria-describedby="confirm-deselect-description"
-      >
-        <DialogTitle id="confirm-deselect-title">Deselect Visit</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="confirm-deselect-description">
-            Are you sure you want to deselect this visit? Any unsaved changes
-            will be lost.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelDeselect} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmDeselect} color="error" autoFocus>
-            Deselect
-          </Button>
-        </DialogActions>
-      </Dialog>
-
       {/* Edit Visit Form */}
-      {isEditing && <EditVisitForm visit={visit} onClose={handleEditClose} />}
+      {isEditing && (
+        <Box ref={editVisitRef}>
+          <EditVisitForm visit={visit} onClose={handleEditClose} />
+        </Box>
+      )}
     </Box>
   );
 };

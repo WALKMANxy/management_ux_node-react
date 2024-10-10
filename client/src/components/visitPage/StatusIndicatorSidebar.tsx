@@ -1,7 +1,7 @@
 // StatusIndicator.tsx
-import React from "react";
+import ErrorIcon from "@mui/icons-material/Error";
 import { Box, Tooltip } from "@mui/material";
-import ExclamationIcon from "@mui/icons-material/ErrorOutline";
+import React from "react";
 import { useTranslation } from "react-i18next";
 
 interface StatusIndicatorProps {
@@ -18,7 +18,9 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({ type, count }) => {
         ? t("visitsSidebar.pendingCount", "{{count}} Pending Visits", { count })
         : t("visitsSidebar.pendingVisits", "Has Pending Visits")
       : isClient
-      ? t("visitsSidebar.incompleteCount", "{{count}} Incomplete Visits", { count })
+      ? t("visitsSidebar.incompleteCount", "{{count}} Incomplete Visits", {
+          count,
+        })
       : t("visitsSidebar.incompleteVisits", "Has Incomplete Visits");
 
   const backgroundColor = type === "pending" ? "lightgreen" : "lightcoral";
@@ -37,7 +39,7 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({ type, count }) => {
           justifyContent: "center",
         }}
       >
-        {isClient ? count : <ExclamationIcon fontSize="small" />}
+        {isClient ? count : <ErrorIcon fontSize="small" />}
       </Box>
     </Tooltip>
   );

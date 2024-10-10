@@ -1,10 +1,10 @@
 // src/pages/common/ClientsPage.tsx
 import { Box, useMediaQuery } from "@mui/material";
-import React, { useEffect, useMemo } from "react";
+import React, { lazy, Suspense, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import ClientDetails from "../../components/clientpage/ClientDetails";
+import SkeletonDetails from "../../components/common/SkeletonDetails";
 import Spinner from "../../components/common/Spinner";
 import ClientList from "../../components/statistics/grids/ClientList";
 import { useClientsGrid } from "../../hooks/useClientGrid";
@@ -19,6 +19,10 @@ import {
   currencyFormatter,
   numberComparator,
 } from "../../utils/dataUtils";
+
+const ClientDetails = lazy(
+  () => import("../../components/clientpage/ClientDetails")
+);
 
 const ClientsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -231,13 +235,17 @@ const ClientsPage: React.FC = () => {
             clientDetailsRef={clientDetailsRef}
           />
           {selectedClient && (
-            <ClientDetails
-              ref={clientDetailsRef}
-              isLoading={false}
-              selectedClient={selectedClient}
-              isClientDetailsCollapsed={isClientDetailsCollapsed}
-              setClientDetailsCollapsed={setClientDetailsCollapsed}
-            />
+            <>
+              {/* Invisible div with ref for scrolling */}
+              <Suspense fallback={<SkeletonDetails />}>
+                <ClientDetails
+                  isLoading={false}
+                  selectedClient={selectedClient}
+                  isClientDetailsCollapsed={isClientDetailsCollapsed}
+                  setClientDetailsCollapsed={setClientDetailsCollapsed}
+                />
+              </Suspense>
+            </>
           )}
         </>
       )}
