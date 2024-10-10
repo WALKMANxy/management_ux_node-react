@@ -63,21 +63,37 @@ const EmployeeDashboard: React.FC = () => {
       </Box>
 
       {/* FAB Button for Calendar - Positioned Top Right (Tablet Only) */}
-      {isTablet && (
-        <Fab
-          color="primary"
-          aria-label="calendar"
-          onClick={handleToggleDrawer}
-          sx={{
-            position: "absolute",
-            top: 40,
-            right: 32,
-            zIndex: 1000,
-          }}
-        >
-          <CalendarMonthIcon />
-        </Fab>
-      )}
+      {isTablet &&
+        (loading ? (
+          <Skeleton
+            animation="wave"
+            variant="circular"
+            width={40}
+            height={40}
+            sx={{
+              borderRadius: "50%",
+              position: "absolute",
+              top: 40,
+              right: 32,
+              zIndex: 1000,
+            }}
+            aria-label={t("dashboard.loadingCalendarButton")}
+          />
+        ) : (
+          <Fab
+            color="primary"
+            aria-label="calendar"
+            onClick={handleToggleDrawer}
+            sx={{
+              position: "absolute",
+              top: 40,
+              right: 32,
+              zIndex: 1000,
+            }}
+          >
+            <CalendarMonthIcon />
+          </Fab>
+        ))}
 
       <Grid container spacing={6} mt={-2}>
         {/* Left Side Components */}
