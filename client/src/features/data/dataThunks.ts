@@ -98,8 +98,9 @@ export const getPromos = createAsyncThunk<
 });
 
 // Create Visit Thunk
+// Create Visit Thunk
 export const createVisitAsync = createAsyncThunk<
-  Visit, // Changed return type to void
+  Visit, // Return type
   Visit, // Input type
   { state: { data: DataSliceState } }
 >(
@@ -110,25 +111,36 @@ export const createVisitAsync = createAsyncThunk<
       const entity = state.currentUserData;
       const role = state.currentUserDetails?.role;
 
+      console.log("Debug: Current State", state);
+      console.log("Debug: Visit Data", visitData);
+      console.log("Debug: User Entity", entity);
+      console.log("Debug: User Role", role);
+
       if (role === "employee") {
-        // Employees should not fetch visits
+        console.warn("Debug: User is an employee, rejecting visit creation.");
         return rejectWithValue("You can't create visits.");
       }
 
       if (!entity || !role) {
+        console.error("Debug: No entity or role found in the state.");
         throw new Error("No entity or role found in the state.");
       }
 
       // Dispatch the mutation and unwrap the response
-      await dispatch(
+      const result = await dispatch(
         promoVisitApi.endpoints.createVisit.initiate({
           visitData,
           entity,
           role,
         })
       ).unwrap();
+
+      console.log("Debug: Visit creation successful", result);
       return visitData;
+
     } catch (err: unknown) {
+      console.error("Debug: Error occurred", err);
+
       // Safely handle and type the error
       if (err instanceof Error && "data" in err) {
         return rejectWithValue((err as { data: string }).data);
@@ -140,6 +152,7 @@ export const createVisitAsync = createAsyncThunk<
     }
   }
 );
+
 
 // Update Visit Thunk
 export const updateVisitAsync = createAsyncThunk<

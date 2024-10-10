@@ -110,7 +110,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
               animation="wave"
               variant="rectangular"
               width="100%"
-              height={200}
+              height={300}
               sx={{ borderRadius: "12px" }}
               aria-label={t("dashboard.skeleton")}
             />
@@ -124,7 +124,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
               animation="wave"
               variant="rectangular"
               width="100%"
-              height={200}
+              height={300}
               sx={{ borderRadius: "12px" }}
               aria-label={t("dashboard.skeleton")}
             />

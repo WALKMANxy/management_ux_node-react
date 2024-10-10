@@ -1,6 +1,10 @@
 import dayjs from "dayjs";
 import "dayjs/locale/en"; // Import English locale (and others as needed)
+import "dayjs/locale/fr"; // Import French locale (and others as needed)
+import "dayjs/locale/de"; // Import German locale (and others as needed)
+import "dayjs/locale/es"; // Import Spanish locale (and others as needed)
 import "dayjs/locale/it"; // Import Italian locale (and others as needed)
+import "dayjs/locale/ru"; // Import Russian locale (and others as needed)
 import isBetween from "dayjs/plugin/isBetween";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
@@ -27,3 +31,15 @@ dayjs.locale(currentLocale);
 
 // Create the localizer
 export const localizer = dayjsLocalizer(dayjs);
+
+const localeMap: { [key: string]: string } = {
+    "en-US": "en",
+    "fr-FR": "fr",
+    "es-ES": "es",
+    "de-DE": "de",
+    "it-IT": "it",
+    "ru-RU": "ru",
+    // Add other mappings as needed
+  };
+
+  export const locale = localeMap[i18n.language] || "en";

@@ -137,7 +137,7 @@ const ClientView: React.FC<ClientViewProps> = ({
               animation="wave"
               variant="rectangular"
               width="100%"
-              height={150}
+              height={300}
               sx={{ borderRadius: "12px" }}
               aria-label={t("dashboard.skeleton")}
             />
@@ -167,7 +167,7 @@ const ClientView: React.FC<ClientViewProps> = ({
               animation="wave"
               variant="rectangular"
               width="100%"
-              height={150}
+              height={300}
               sx={{ borderRadius: "12px" }}
               aria-label={t("dashboard.skeleton")}
             />
@@ -191,7 +191,7 @@ const ClientView: React.FC<ClientViewProps> = ({
               animation="wave"
               variant="rectangular"
               width="100%"
-              height={150}
+              height={300}
               sx={{ borderRadius: "12px" }}
               aria-label={t("dashboard.skeleton")}
             />
@@ -257,21 +257,38 @@ const ClientView: React.FC<ClientViewProps> = ({
 
       {/* Conditionally render the Close Selection FAB */}
       {userRole !== "client" &&
-        !loadingState && ( // Do not render FAB if userRole is "client" or loading
+        (loadingState ? (
+          // Show Skeleton when loadingState is true
+          <Skeleton
+            animation="wave"
+            variant="circular"
+            width={40}
+            height={40}
+            sx={{
+              borderRadius: "50%",
+              position: "fixed",
+              bottom: isMobile ? 10 : 16,
+              right: isMobile ? 5 : 16,
+              zIndex: 1300,
+            }}
+            aria-label={t("dashboard.loadingCalendarButton")}
+          />
+        ) : (
+          // Show FAB when not loading
           <Fab
             color="secondary"
             aria-label={t("dashboard.closeButton")}
             sx={{
               position: "fixed",
-              bottom: isMobile ? 20 : 16,
-              right: isMobile ? 120 : 16,
+              bottom: isMobile ? 10 : 16,
+              right: isMobile ? 5 : 16,
               zIndex: 1300,
             }}
             onClick={() => clearSelection!()}
           >
             <CloseIcon fontSize="small" />
           </Fab>
-        )}
+        ))}
     </Box>
   );
 };

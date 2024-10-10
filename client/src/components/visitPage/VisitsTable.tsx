@@ -88,7 +88,7 @@ const VisitsTable: React.FC<VisitsTableProps> = ({ clientId }) => {
   );
 
   return (
-    <Box>
+    <Box sx={{ px: 1, height: "100%", overflowY: "auto" }}>
       <StyledTableContainer>
         <StyledTable
           aria-label={t("visitsTable.tableAriaLabel", "Visits Table")}

@@ -59,7 +59,7 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
       >
         <Typography
           variant="h4"
-          sx={{ pl: 2, pt: isMobile ? 0 : 2, mb: isMobile ? -2 : -6 }}
+          sx={{ pl: 2, pt: isMobile ? 0 : 2, mb: isMobile ? -2 : -6, }}
         >
           {t("articleList.title")}
         </Typography>
@@ -84,7 +84,7 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
       </Box>
       <Collapse
         in={!isArticleListCollapsed}
-        sx={{ pt: isMobile ? 2 : 0, pb: 4 }}
+        sx={{ pt: isMobile ? 0 : 0, pb: 4 }}
       >
         <Box sx={{ p: 2, pt: 0 }}>
         <Box

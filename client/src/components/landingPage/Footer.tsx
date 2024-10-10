@@ -18,12 +18,11 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { lazy, useState } from "react";
+import React, { useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import Loader from "../common/Loader";
+import ModalContent from "./modalContent";
 
 const Footer: React.FC = () => {
-  const ModalContent = lazy(() => import("./modalContent"));
   const { t } = useTranslation();
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [modalContent, setModalContent] = useState<
@@ -236,14 +235,14 @@ const Footer: React.FC = () => {
           {/* Call IconButton */}
           <IconButton
             href="tel:+390954190006"
-            sx={{ color: "green", mr: -1.0 }}
+            sx={{ color: "green", mr: -1.2 }}
             aria-label="Call"
           >
             <CallIcon />
           </IconButton>
           <IconButton
             href="mailto:info@ricambicentrosud.com" // Added missing @ in email
-            sx={{ color: "#D44638", mr: -1 }}
+            sx={{ color: "#D44638", mr: -1.4 }}
             aria-label="Email"
           >
             <MailIcon />
@@ -252,7 +251,7 @@ const Footer: React.FC = () => {
           {/* Google Maps IconButton */}
           <IconButton
             href="https://goo.gl/maps/MFy1cqdn3BbQNmtW6"
-            sx={{ color: "#4285F4", mr: -1 }} // Added margin for spacing
+            sx={{ color: "#4285F4", mr: -1.3 }} // Added margin for spacing
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Google Maps"
@@ -263,7 +262,7 @@ const Footer: React.FC = () => {
           {/* Facebook IconButton */}
           <IconButton
             href="https://www.facebook.com/RicambiCentroSud/"
-            sx={{ color: "#3b5998", mr: -0.6 }}
+            sx={{ color: "#3b5998", mr: -1.1 }}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Facebook"
@@ -274,7 +273,7 @@ const Footer: React.FC = () => {
           {/* Instagram IconButton */}
           <IconButton
             href="https://www.instagram.com/ricambicentrosud/"
-            sx={{ color: "#E1306C", mr: -2 }}
+            sx={{ color: "#E1306C", mr: -1.2 }}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
@@ -328,12 +327,10 @@ const Footer: React.FC = () => {
             }}
           >
             {modalContent && (
-              <React.Suspense fallback={<Loader fadeout />}>
-                <ModalContent
-                  contentKey={modalContent}
-                  onClose={handleCloseModal}
-                />
-              </React.Suspense>
+              <ModalContent
+                contentKey={modalContent}
+                onClose={handleCloseModal}
+              />
             )}
           </Paper>
         </Box>

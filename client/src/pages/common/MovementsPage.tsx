@@ -1,10 +1,10 @@
 // src/pages/common/MovementsPage.tsx
 
 import { Box, useMediaQuery } from "@mui/material";
-import React, { useMemo } from "react";
+import React, { lazy, Suspense, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import SkeletonDetails from "../../components/common/SkeletonDetails";
 import Spinner from "../../components/common/Spinner";
-import MovementDetails from "../../components/movementsPage/movementsDetails";
 import MovementList from "../../components/statistics/grids/MovementList";
 import useLoadingData from "../../hooks/useLoadingData";
 import { useMovementsGrid } from "../../hooks/useMovementsGrid";
@@ -16,6 +16,8 @@ import {
   currencyFormatter,
   numberComparator,
 } from "../../utils/dataUtils";
+
+const MovementDetails = lazy(() => import("../../components/movementsPage/movementsDetails"));
 
 const MovementsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -129,7 +131,6 @@ const MovementsPage: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         overflowX: "hidden",
-        
       }}
     >
       <MovementList
@@ -152,13 +153,15 @@ const MovementsPage: React.FC = () => {
         movementDetailsRef={movementDetailsRef}
       />
       {selectedMovement && (
-        <MovementDetails
-          ref={movementDetailsRef}
-          isLoading={false}
-          selectedMovement={selectedMovement}
-          isMovementDetailsCollapsed={isMovementDetailsCollapsed}
-          setMovementDetailsCollapsed={setMovementDetailsCollapsed}
-        />
+        <Suspense fallback={<SkeletonDetails />}>
+          <MovementDetails
+            ref={movementDetailsRef}
+            isLoading={false}
+            selectedMovement={selectedMovement}
+            isMovementDetailsCollapsed={isMovementDetailsCollapsed}
+            setMovementDetailsCollapsed={setMovementDetailsCollapsed}
+          />
+        </Suspense>
       )}
     </Box>
   );
