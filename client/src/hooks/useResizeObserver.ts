@@ -1,80 +1,23 @@
-// src/hooks/useResizeObserver.ts
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { showToast } from "../services/toastMessage";
+// src/hooks/useResizeObserver.tsx
+import { useEffect } from "react";
 
-/**
- * Interface representing the dimensions of an element.
- */
-interface Dimensions {
-  width: number;
-  height: number;
-}
-
-/**
- * Custom hook to observe the size of a DOM element using ResizeObserver.
- *
- * @template T - The type of the HTML element to observe.
- * @param {Dimensions} [initialDimensions] - The initial dimensions of the element.
- * @returns {{
- *   containerRef: React.RefObject<T>;
- *   dimensions: Dimensions;
- * }} An object containing the ref to attach to the element and its current dimensions.
- *
- * @example
- * const { containerRef, dimensions } = useResizeObserver<HTMLDivElement>();
- * return <div ref={containerRef}>Width: {dimensions.width}, Height: {dimensions.height}</div>;
- */
-const useResizeObserver = <T extends HTMLElement>(
-  initialDimensions: Dimensions = { width: 0, height: 0 }
+const useResizeObserver = (
+  ref: React.RefObject<HTMLElement>,
+  callback: () => void
 ) => {
-  const { t } = useTranslation(); // Initialize translation
-  const [dimensions, setDimensions] = useState<Dimensions>(initialDimensions);
-  const containerRef = useRef<T>(null);
-
-  /**
-   * Callback to handle resize events from ResizeObserver.
-   *
-   * @param {ResizeObserverEntry[]} entries - The entries observed by ResizeObserver.
-   */
-  const handleResize = useCallback((entries: ResizeObserverEntry[]) => {
-    if (entries[0]?.contentRect) {
-      const { width, height } = entries[0].contentRect;
-      setDimensions((prevDimensions) => {
-        if (
-          prevDimensions.width !== width ||
-          prevDimensions.height !== height
-        ) {
-          return { width, height };
-        }
-        return prevDimensions;
-      });
-    }
-  }, []);
-
   useEffect(() => {
-    if (typeof ResizeObserver === "undefined") {
-      showToast.error(t("resizeObserver.unsupported"));
-      console.error(t("resizeObserver.unsupported"));
-      return;
-    }
+    if (!ref.current) return;
 
-    const observer = new ResizeObserver(handleResize);
-    const currentContainer = containerRef.current;
+    const observer = new ResizeObserver(() => {
+      callback();
+    });
 
-    if (currentContainer) {
-      observer.observe(currentContainer);
-    }
+    observer.observe(ref.current);
 
     return () => {
-      if (currentContainer) {
-        observer.unobserve(currentContainer);
-      }
       observer.disconnect();
     };
-  }, [handleResize, t]);
-
-  return { containerRef, dimensions };
+  }, [ref, callback]);
 };
 
 export default useResizeObserver;

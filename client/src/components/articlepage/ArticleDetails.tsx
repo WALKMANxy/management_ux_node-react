@@ -153,11 +153,7 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
         <Collapse in={!isArticleDetailsCollapsed}>
           {selectedArticle ? (
             <Box sx={{ p: 2 }}>
-              <Grid
-                container
-                spacing={2}
-                direction={isMobile ? "column" : "row"}
-              >
+              <Grid container spacing={2} direction={"column"}>
                 {/* Article Details */}
                 <Grid item xs={12} md={6}>
                   <ArticleDetailComponent

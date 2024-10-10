@@ -36,6 +36,10 @@ export const baseQueryWithAxios = async (
   }
 };
 
+// Define types for entities and roles to avoid repetition
+type Entity = Client | Admin | Agent;
+type Role = "client" | "agent" | "admin";
+
 // Unified API slice for handling visits and promos
 export const promoVisitApi = createApi({
   reducerPath: "promoVisitApi",
@@ -43,10 +47,7 @@ export const promoVisitApi = createApi({
   tagTypes: ["Visit", "Promo", "Client", "Agent", "Admin"],
   endpoints: (builder) => ({
     // Fetch Visits Query
-    getVisits: builder.query<
-      Visit[],
-      { entity: Client | Admin | Agent; role: "client" | "agent" | "admin" }
-    >({
+    getVisits: builder.query<Visit[], { entity: Entity; role: Role }>({
       query: () => ({
         url: "/visits",
         method: "GET",
@@ -74,10 +75,7 @@ export const promoVisitApi = createApi({
     }),
 
     // Fetch Promos Query
-    getPromos: builder.query<
-      Promo[],
-      { entity: Client | Admin | Agent; role: "client" | "agent" | "admin" }
-    >({
+    getPromos: builder.query<Promo[], { entity: Entity; role: Role }>({
       query: () => ({
         url: "/promos",
         method: "GET",
@@ -109,30 +107,42 @@ export const promoVisitApi = createApi({
       Visit,
       {
         visitData: Visit;
-        entity: Client | Admin | Agent;
-        role: "client" | "agent" | "admin";
+        entity: Entity;
+        role: Role;
       }
     >({
-      query: ({ visitData }) => ({
-        url: `/visits`,
-        method: "POST",
+      query: ({ visitData }) => {
+        console.log("Debug: Visit Data in Query", visitData);
 
-        body: {
-          ...visitData,
-          date: visitData.date.toISOString(),
-          createdAt: visitData.createdAt.toISOString(),
-        },
-      }),
+        return {
+          url: "/visits", // Ensure URL is a string
+          method: "POST",
+          data: {
+            // Use 'data' instead of 'body'
+            ...visitData,
+            date: new Date(visitData.date).toISOString(),
+            createdAt: new Date(visitData.createdAt).toISOString(),
+          },
+        };
+      },
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
+          console.log("Debug: onQueryStarted Argument", arg);
+
           const { data } = await queryFulfilled;
+          console.log("Debug: Query Fulfilled Data", data);
+
           const { entity, role } = arg;
 
+          console.log("Debug: Entity and Role", entity, role);
+
           if (!entity || !role) {
+            console.error("Debug: No entity or role provided.");
             throw new Error("No entity or role provided.");
           }
 
           dispatch(addOrUpdateVisit(data));
+          console.log("Debug: Visit added or updated successfully", data);
         } catch (error) {
           // Handle error
           console.error("Failed to create visit:", error);
@@ -146,19 +156,24 @@ export const promoVisitApi = createApi({
       Visit,
       {
         _id: string; // Visit ID to be updated
-        visitData: Visit; // Partial visit data to be updated
-        entity: Client | Admin | Agent;
-        role: "client" | "agent" | "admin";
+        visitData: Partial<Visit>; // Partial visit data to be updated
+        entity: Entity;
+        role: Role;
       }
     >({
       query: ({ _id, visitData }) => ({
-        url: `/visits/${_id}`,
+        url: `/visits/${_id}`, // Ensure URL is a string with the ID
         method: "PATCH",
-
-        body: {
+        data: {
+          // Use 'data' instead of 'body'
           ...visitData,
-          date: visitData.date.toISOString(),
-          createdAt: visitData.createdAt.toISOString(),
+          // Check if date fields exist before converting
+          ...(visitData.date && {
+            date: new Date(visitData.date).toISOString(),
+          }),
+          ...(visitData.createdAt && {
+            createdAt: new Date(visitData.createdAt).toISOString(),
+          }),
         },
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
@@ -184,21 +199,25 @@ export const promoVisitApi = createApi({
       Promo,
       {
         promoData: Promo;
-        entity: Client | Admin | Agent;
-        role: "client" | "agent" | "admin";
+        entity: Entity;
+        role: Role;
       }
     >({
-      query: ({ promoData }) => ({
-        url: `/promos`,
-        method: "POST",
+      query: ({ promoData }) => {
+        console.log("Debug: Promo Data in Query", promoData);
 
-        body: {
-          ...promoData,
-          startDate: promoData.startDate.toISOString(),
-          endDate: promoData.endDate.toISOString(),
-          createdAt: promoData.createdAt.toISOString(),
-        },
-      }),
+        return {
+          url: "/promos", // Ensure URL is a string
+          method: "POST",
+          data: {
+            // Use 'data' instead of 'body'
+            ...promoData,
+            startDate: new Date(promoData.startDate).toISOString(),
+            endDate: new Date(promoData.endDate).toISOString(),
+            createdAt: new Date(promoData.createdAt).toISOString(),
+          },
+        };
+      },
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -223,20 +242,27 @@ export const promoVisitApi = createApi({
       Promo,
       {
         _id: string; // Promo ID to be updated
-        promoData: Promo; // Partial promo data to be updated
-        entity: Client | Admin | Agent;
-        role: "client" | "agent" | "admin";
+        promoData: Partial<Promo>; // Partial promo data to be updated
+        entity: Entity;
+        role: Role;
       }
     >({
       query: ({ _id, promoData }) => ({
-        url: `/promos/${_id}`,
+        url: `/promos/${_id}`, // Ensure URL is a string with the ID
         method: "PATCH",
-
-        body: {
+        data: {
+          // Use 'data' instead of 'body'
           ...promoData,
-          startDate: promoData.startDate.toISOString(),
-          endDate: promoData.endDate.toISOString(),
-          createdAt: promoData.createdAt.toISOString(),
+          // Check if date fields exist before converting
+          ...(promoData.startDate && {
+            startDate: new Date(promoData.startDate).toISOString(),
+          }),
+          ...(promoData.endDate && {
+            endDate: new Date(promoData.endDate).toISOString(),
+          }),
+          ...(promoData.createdAt && {
+            createdAt: new Date(promoData.createdAt).toISOString(),
+          }),
         },
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {

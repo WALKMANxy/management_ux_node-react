@@ -36,6 +36,7 @@ import { RootState } from "../../app/store";
 import { createVisitAsync } from "../../features/data/dataThunks";
 import { showToast } from "../../services/toastMessage";
 import VisitCard from "./VisitCard"; // Import the VisitCard component
+import { locale } from "../../services/localizer";
 
 // Styled IconButton for Send and Cancel actions
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
@@ -84,6 +85,12 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
   const [notePublic, setNotePublic] = useState<string>("");
   const [notePrivate, setNotePrivate] = useState<string>(""); // Private note field
 
+  // Validation error states
+  const [typeError, setTypeError] = useState<boolean>(false);
+  const [reasonError, setReasonError] = useState<boolean>(false);
+  const [dateError, setDateError] = useState<boolean>(false);
+  const [notePrivateError, setNotePrivateError] = useState<boolean>(false);
+
   // Snackbar state
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
@@ -98,6 +105,55 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Reset all error states before validation
+    setTypeError(false);
+    setReasonError(false);
+    setDateError(false);
+    setNotePrivateError(false);
+
+    let isValid = true;
+
+    // Validate Type
+    if (!type) {
+      setTypeError(true);
+      isValid = false;
+    }
+
+    // Validate Reason
+    if (!reason) {
+      setReasonError(true);
+      isValid = false;
+    }
+
+    // Validate Date (must not be in the past)
+    if (date && dayjs(date).isBefore(dayjs(), "minute")) {
+      setDateError(true);
+      setSnackbarMessage(
+        t("createVisitForm.dateInPast", "Date cannot be in the past.")
+      );
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      isValid = false;
+    }
+
+    // Validate Private Note
+    if (!notePrivate.trim()) {
+      setNotePrivateError(true);
+      showToast.error(
+        t(
+          "createVisitForm.privateNoteMissing",
+          "You must fill in the private note before submitting."
+        )
+      );
+      isValid = false;
+    }
+
+    // If any validation fails, do not proceed
+    if (!isValid) {
+      return;
+    }
+
+    // Existing validation for type, reason, and date (if not already handled)
     if (!type || !reason || !date) {
       setSnackbarMessage(
         t(
@@ -187,7 +243,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
   }, []);
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
       <Box
         component="form"
         onSubmit={handleSubmit}
@@ -213,7 +269,12 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
         <Grid container spacing={2} sx={{ flexGrow: 1 }}>
           {/* Type Field */}
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth required variant="outlined">
+            <FormControl
+              fullWidth
+              required
+              variant="outlined"
+              error={typeError}
+            >
               <InputLabel id="visit-type-label">
                 {t("createVisitForm.typeLabel", "Type")}
               </InputLabel>
@@ -225,6 +286,12 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
                 onChange={(e) => setType(e.target.value)}
                 sx={{
                   borderRadius: 2,
+                  // Apply faint red border if there's an error
+                  ...(typeError && {
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "rgba(244, 67, 54, 0.2)",
+                    },
+                  }),
                 }}
               >
                 <MenuItem value="Regular">
@@ -239,7 +306,12 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
 
           {/* Reason Field */}
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth required variant="outlined">
+            <FormControl
+              fullWidth
+              required
+              variant="outlined"
+              error={reasonError}
+            >
               <InputLabel id="visit-reason-label">
                 {t("createVisitForm.reasonLabel", "Reason")}
               </InputLabel>
@@ -251,6 +323,12 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
                 onChange={(e) => setReason(e.target.value)}
                 sx={{
                   borderRadius: 2,
+                  // Apply faint red border if there's an error
+                  ...(reasonError && {
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "rgba(244, 67, 54, 0.2)",
+                    },
+                  }),
                 }}
               >
                 <MenuItem value="Issue">
@@ -284,6 +362,17 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
               renderLoading={() => <CircularProgress />}
               slotProps={{
                 actionBar: { hidden: true }, // This hides the toolbar
+              }}
+              // Apply faint red border if there's an error
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  ...(dateError && {
+                    "& fieldset": {
+                      borderColor: "rgba(244, 67, 54, 0.2)",
+                    },
+                  }),
+                },
               }}
             />
           </Grid>
@@ -345,10 +434,14 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
                     minRows={2}
                     maxRows={10}
                     variant="outlined"
+                    error={notePrivateError}
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         "& fieldset": {
                           borderRadius: 2, // Adjust this value to change the border radius
+                          ...(notePrivateError && {
+                            borderColor: "rgba(244, 67, 54, 0.2)",
+                          }),
                         },
                       },
                     }}

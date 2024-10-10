@@ -152,7 +152,7 @@ const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
               <Grid
                 container
                 spacing={2}
-                direction={isMobile ? "column" : "row"}
+                direction={"column"}
               >
                 {/* Client Details */}
                 <Grid item xs={12} md={6}>

@@ -11,7 +11,7 @@ import {
   TimelineOppositeContent,
   TimelineSeparator,
 } from "@mui/lab";
-import { CardHeader, Paper, Typography } from "@mui/material";
+import { CardHeader, Paper, Typography, useMediaQuery } from "@mui/material";
 import dayjs from "dayjs";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -37,6 +37,7 @@ const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({
   const promos = useAppSelector(selectVisits); // Assuming 'selectVisits' fetches promotion-related visits
   const { t } = useTranslation(); // Initialize translation
 
+  const isMobile = useMediaQuery("(max-width: 600px)");
   // Generate activity list using the utility function
   const activityList: ActivityItem[] = useMemo(
     () => generateActivityList(selectedAgent.clients, selectedAgent.id, promos),
@@ -71,7 +72,7 @@ const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({
         position="alternate"
         sx={{
           m: 0,
-          p: 3,
+          p: isMobile ? 0 : 3,
           [`& .${timelineItemClasses.root}:before`]: {
             flex: 0,
             padding: 0,

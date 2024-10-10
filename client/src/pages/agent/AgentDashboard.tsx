@@ -12,6 +12,7 @@ import useLoadingData from "../../hooks/useLoadingData";
 import useSelectionState from "../../hooks/useSelectionState";
 import useStats from "../../hooks/useStats";
 import { calculateMonthlyData } from "../../utils/dataUtils";
+import SkeletonView from "../../components/DashboardsViews/SkeletonView";
 
 const ClientView = React.lazy(
   () => import("../../components/DashboardsViews/ClientView")
@@ -81,10 +82,10 @@ const AgentDashboard: React.FC = () => {
           aria-label="skeleton"
         />
       )}
-      <Grid container spacing={6} mt={2}>
-        <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
+      <Grid container spacing={6} mt={isMobile? 0 :2}>
+      <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
           {selectedClient ? (
-            <Suspense>
+            <Suspense fallback={<SkeletonView />}>
               <ClientView
                 loadingState={loadingState}
                 selectedClient={selectedClient}

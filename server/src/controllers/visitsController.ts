@@ -21,15 +21,20 @@ export class VisitController {
     res: Response
   ): Promise<void> {
     try {
+      console.log("Creating visit:", req.body);
       // Convert date string to Date object
       const visitData = {
         ...req.body,
         date: req.body.date ? new Date(req.body.date) : null, // Ensure the date is a Date object
       };
 
+      console.log("Visit data:", visitData);
+
       const visit = await VisitService.createVisit(visitData);
+      console.log("Created visit:", visit);
       res.status(201).json(visit);
     } catch (err) {
+      console.error("Error creating visit:", err);
       if (err instanceof Error) {
         res.status(500).json({ message: err.message });
       } else {
@@ -37,6 +42,7 @@ export class VisitController {
       }
     }
   }
+
 
   static async replaceVisit(
     req: AuthenticatedRequest,
