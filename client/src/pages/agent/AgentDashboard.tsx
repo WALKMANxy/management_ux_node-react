@@ -6,13 +6,13 @@ import DrawerContainer from "../../components/dashboard/tabletCalendarContainer"
 import WelcomeMessage from "../../components/dashboard/WelcomeMessage";
 import CalendarAndVisitsView from "../../components/DashboardsViews/CalendarAndVisitsView";
 import DashboardView from "../../components/DashboardsViews/DashboardView";
+import SkeletonView from "../../components/DashboardsViews/SkeletonView";
 import GlobalSearch from "../../components/Header/GlobalSearch";
 import { selectCurrentUser } from "../../features/users/userSlice";
 import useLoadingData from "../../hooks/useLoadingData";
 import useSelectionState from "../../hooks/useSelectionState";
 import useStats from "../../hooks/useStats";
 import { calculateMonthlyData } from "../../utils/dataUtils";
-import SkeletonView from "../../components/DashboardsViews/SkeletonView";
 
 const ClientView = React.lazy(
   () => import("../../components/DashboardsViews/ClientView")
@@ -44,7 +44,6 @@ const AgentDashboard: React.FC = () => {
   const { loadingState } = useLoadingData();
 
   const {
-    details,
     calculateTotalSpentThisMonth,
     calculateTotalSpentThisYear,
     calculateTopArticleType,
@@ -57,6 +56,8 @@ const AgentDashboard: React.FC = () => {
     ordersData,
     yearlyCategories,
     yearlyOrdersData,
+    totalNetRevenue,
+    netRevenueData
   } = useStats(isMobile);
 
   return (
@@ -70,7 +71,7 @@ const AgentDashboard: React.FC = () => {
         role="admin" // or "agent" or "client"
         loading={loadingState}
       />
-      {details && "clients" in details ? (
+      {!loadingState ? (
         <GlobalSearch filter="client" onSelect={handleSelect} />
       ) : (
         <Skeleton
@@ -82,8 +83,8 @@ const AgentDashboard: React.FC = () => {
           aria-label="skeleton"
         />
       )}
-      <Grid container spacing={6} mt={isMobile? 0 :2}>
-      <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
+      <Grid container spacing={6} mt={isMobile ? 0 : 2}>
+        <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
           {selectedClient ? (
             <Suspense fallback={<SkeletonView />}>
               <ClientView
@@ -120,6 +121,8 @@ const AgentDashboard: React.FC = () => {
               salesDistributionDataClients={salesDistributionDataClients}
               isMobile={isMobile}
               userRole={userRole!}
+              totalNetRevenue={totalNetRevenue}
+              netRevenueData={netRevenueData}
             />
           )}
         </Grid>

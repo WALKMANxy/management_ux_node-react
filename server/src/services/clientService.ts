@@ -32,11 +32,11 @@ export class ClientService {
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(
-          `Error retrieving client with codice ${codice}: ${err.message}`
+          `Error retrieving client with CODICE ${codice}: ${err.message}`
         );
       } else {
         throw new Error(
-          `An unknown error occurred while retrieving client with codice ${codice}`
+          `An unknown error occurred while retrieving client with CODICE ${codice}`
         );
       }
     }
@@ -78,19 +78,12 @@ export class ClientService {
       const replacedClient = await Client.findOneAndReplace(
         { CODICE: codice },
         clientData,
-        { new: true, upsert: false } // Do not create a new document if not found
+        { new: true, upsert: false, runValidators: true } // Do not create a new document if not found, run validators
       ).exec();
       return replacedClient;
-    } catch (err) {
-      if (err instanceof Error) {
-        throw new Error(
-          `Error replacing client with CODICE ${codice}: ${err.message}`
-        );
-      } else {
-        throw new Error(
-          `An unknown error occurred while replacing client with CODICE ${codice}`
-        );
-      }
+    } catch (err: any) {
+      console.error(`Error replacing client with CODICE ${codice}:`, err);
+      throw err; // Let the controller handle specific error responses
     }
   }
 
@@ -108,19 +101,43 @@ export class ClientService {
       const updatedClient = await Client.findOneAndUpdate(
         { CODICE: codice },
         { $set: clientData },
-        { new: true }
+        { new: true, runValidators: true } // Return the updated document and run validators
       ).exec();
       return updatedClient;
+    } catch (err: any) {
+      console.error(`Error updating client with CODICE ${codice}:`, err);
+      throw err; // Let the controller handle specific error responses
+    }
+  }
+
+  /**
+   * Create a new client in the database.
+   * @param clientData - The data for the new client.
+   * @returns Promise resolving to the created Client document.
+   */
+  static async createClientService(clientData: IClient): Promise<IClient> {
+    try {
+      const newClient = new Client(clientData);
+      await newClient.save();
+      return newClient;
+    } catch (err: any) {
+      console.error("Error creating client:", err);
+      throw err; // Let the controller handle specific error responses
+    }
+  }
+
+  /**
+   * Delete a client by CODICE.
+   * @param codice - The CODICE of the client to delete.
+   * @returns Promise resolving to true if deleted, false if not found.
+   */
+  static async deleteClientService(codice: string): Promise<boolean> {
+    try {
+      const result = await Client.deleteOne({ CODICE: codice }).exec();
+      return result.deletedCount === 1;
     } catch (err) {
-      if (err instanceof Error) {
-        throw new Error(
-          `Error updating client with CODICE ${codice}: ${err.message}`
-        );
-      } else {
-        throw new Error(
-          `An unknown error occurred while updating client with CODICE ${codice}`
-        );
-      }
+      console.error(`Error deleting client with CODICE ${codice}:`, err);
+      throw new Error("Error deleting client");
     }
   }
 }

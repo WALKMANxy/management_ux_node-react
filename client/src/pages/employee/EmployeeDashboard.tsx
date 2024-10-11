@@ -106,7 +106,7 @@ const EmployeeDashboard: React.FC = () => {
                   animation="wave"
                   variant="rectangular"
                   width="100%"
-                  height={100} // Adjust height as needed
+                  height={300} // Adjust height as needed
                   sx={{ borderRadius: "12px" }}
                   aria-label="Loading Clock"
                 />
@@ -122,7 +122,7 @@ const EmployeeDashboard: React.FC = () => {
                   animation="wave"
                   variant="rectangular"
                   width="100%"
-                  height={100} // Adjust height as needed
+                  height={300} // Adjust height as needed
                   sx={{ borderRadius: "12px" }}
                   aria-label="Loading Weather"
                 />
@@ -139,7 +139,7 @@ const EmployeeDashboard: React.FC = () => {
                     animation="wave"
                     variant="rectangular"
                     width="100%"
-                    height={200} // Adjust height as needed
+                    height={300} // Adjust height as needed
                     sx={{ borderRadius: "12px" }}
                     aria-label="Loading Whiteboard"
                   />
@@ -156,7 +156,7 @@ const EmployeeDashboard: React.FC = () => {
                   animation="wave"
                   variant="rectangular"
                   width="100%"
-                  height={150} // Adjust height as needed
+                  height={300} // Adjust height as needed
                   sx={{ borderRadius: "12px" }}
                   aria-label="Loading Navigation"
                 />
@@ -170,7 +170,7 @@ const EmployeeDashboard: React.FC = () => {
         {/* Calendar and Upcoming Visits section */}
         {!isTablet && (
           <CalendarAndVisitsView
-            loadingState={userRole === "employee" ? loading : loadingState}
+            loadingState={userRole === "employee" || userRole === "client" ? loading : loadingState}
             t={t}
             disableUpcomingVisits
           />

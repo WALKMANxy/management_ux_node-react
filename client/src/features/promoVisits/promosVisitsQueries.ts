@@ -47,11 +47,20 @@ export const promoVisitApi = createApi({
   tagTypes: ["Visit", "Promo", "Client", "Agent", "Admin"],
   endpoints: (builder) => ({
     // Fetch Visits Query
-    getVisits: builder.query<Visit[], { entity: Entity; role: Role }>({
-      query: () => ({
-        url: "/visits",
-        method: "GET",
-      }),
+    getVisits: builder.query<Visit[], { entity: Entity; role: Role; id?: string }>({
+      query: ({ role, id }) => {
+        const params = new URLSearchParams({ role });
+
+        // If the role is 'client', include the 'id' in the query parameters
+        if (role === "client" && id) {
+          params.append("clientId", id);
+        }
+
+        return {
+          url: `/visits?${params.toString()}`,
+          method: "GET",
+        };
+      },
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;

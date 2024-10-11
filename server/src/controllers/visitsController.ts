@@ -3,11 +3,39 @@ import { AuthenticatedRequest } from "../models/types";
 import { VisitService } from "../services/visitService";
 
 export class VisitController {
-  static async getAllVisits(_req: Request, res: Response): Promise<void> {
+  static async getAllVisits(req: Request, res: Response): Promise<void> {
     try {
-      const visits = await VisitService.getAllVisits();
-      res.json(visits);
+      const role = req.query.role as string; // Extract role from query parameters
+      const clientId = req.query.clientId as string; // Extract clientId from query parameters
+
+      if (!role) {
+        res.status(400).json({ message: "Role is required." });
+        return;
+      }
+
+      // Validate parameters based on role
+      if (role === "client" && !clientId) {
+        res
+          .status(400)
+          .json({ message: "clientId is required for role 'client'." });
+        return;
+      }
+
+      // Fetch visits based on role and clientId
+      const visits = await VisitService.getAllVisits({ role, clientId });
+
+      // If role is 'client', strip out the notePrivate
+      const processedVisits = visits.map((visit) => {
+        const visitObj = visit.toObject(); // Assuming Mongoose document
+        if (role === "client") {
+          delete visitObj.notePrivate;
+        }
+        return visitObj;
+      });
+
+      res.json(processedVisits);
     } catch (err) {
+      console.error("Error fetching visits:", err);
       if (err instanceof Error) {
         res.status(500).json({ message: err.message });
       } else {
@@ -42,7 +70,6 @@ export class VisitController {
       }
     }
   }
-
 
   static async replaceVisit(
     req: AuthenticatedRequest,

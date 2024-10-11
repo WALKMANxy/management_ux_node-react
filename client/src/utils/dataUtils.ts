@@ -19,7 +19,9 @@ export const calculateTotalRevenue = (clients: Client[]): number => {
   return Number(total.toFixed(2));
 };
 
-export const calculateNetRevenue = (clients: Client[]): string => {
+
+
+export const calculateNetRevenue = (clients: Client[]): number => {
   let netTotal = 0;
   for (const client of clients) {
     for (const movement of client.movements) {
@@ -32,7 +34,7 @@ export const calculateNetRevenue = (clients: Client[]): string => {
       }
     }
   }
-  return netTotal.toFixed(2);
+  return Number(netTotal.toFixed(2));
 };
 
 // Calculate sales distribution data for agents

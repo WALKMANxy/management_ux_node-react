@@ -1,38 +1,29 @@
-// src/models/AgentModel.ts
+// src/models/AgentModel.ts (Mongoose Schema)
 import mongoose, { Document, Schema } from 'mongoose';
-import { IClient } from './Client';
 
 export interface IAgent extends Document {
   id: string;
   name: string;
   email?: string;
   phone?: string;
-  clients: IClient[]; // Embedded Client subdocuments
+  clients: {
+    CODICE: mongoose.Schema.Types.ObjectId; // Reference to Client
+    colour?: string; // Optional colour property
+  }[];
 }
 
-const ClientSchema: Schema = new Schema({
-  CODICE: { type: String, required: true },
-  "RAGIONE SOCIALE": { type: String, required: true },
-  "RAGIONE SOCIALE AGG.": { type: String },
-  INDIRIZZO: { type: String },
-  "C.A.P. - COMUNE (PROV.)": { type: String },
-  TELEFONO: { type: String },
-  EMAIL: { type: String },
-  "EMAIL PEC": { type: String },
-  "PARTITA IVA": { type: String },
-  "CODICE FISCALE": { type: String },
-  MP: { type: String },
-  "Descizione metodo pagamento": { type: String },
-  CS: { type: String },
-  AG: { type: String },
+// Reference ClientSchema by CODICE
+const ClientReferenceSchema: Schema = new Schema({
+  CODICE: { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true }, // Refers to the Client model by CODICE
+  colour: { type: String }, // Optional property
 });
 
 const AgentSchema: Schema = new Schema({
   id: { type: String, required: true, unique: true },
   name: { type: String, required: true },
-  email: { type: String, unique: true, sparse: true }, // `sparse` allows multiple documents to have `null`
+  email: { type: String, unique: true, sparse: true },
   phone: { type: String, sparse: true },
-  clients: { type: [ClientSchema], default: [] },
+  clients: { type: [ClientReferenceSchema], default: [] },
 });
 
 // Indexes for better query performance

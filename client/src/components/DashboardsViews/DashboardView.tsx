@@ -30,6 +30,8 @@ interface DashboardViewProps {
   salesDistributionDataAgents?: any;
   isMobile: boolean;
   userRole: UserRole;
+  totalNetRevenue: number;
+  netRevenueData: number[];
 }
 
 const DashboardView: React.FC<DashboardViewProps> = ({
@@ -49,6 +51,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   salesDistributionDataAgents,
   isMobile,
   userRole,
+  totalNetRevenue,
+  netRevenueData,
 }) => {
   return (
     <Box mb={4}>
@@ -115,7 +119,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
               aria-label={t("dashboard.skeleton")}
             />
           ) : (
-            <TotalEarning totalEarning={totalRevenue} />
+            <TotalEarning totalGross={totalRevenue} totalNet={totalNetRevenue}  />
           )}
         </Grid>
         <Grid item xs={12} md={6}>
@@ -152,6 +156,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
             <MonthOverMonthSpendingTrend
               months={months}
               revenueData={revenueData}
+              netRevenueData={netRevenueData}
               userRole={userRole}
             />
           )}

@@ -13,6 +13,7 @@ import { DataSliceState } from "../models/stateModels";
 import {
   calculateMonthlyData,
   calculateMonthlyRevenue,
+  calculateNetRevenue,
   calculatePercentage,
   calculateRevenue,
   calculateSalesDistributionData,
@@ -210,9 +211,9 @@ const useStats = (isMobile: boolean) => {
   ]);
 
   // Monthly Revenue and Orders Data
-  const { months, revenueData, ordersData } = useMemo(() => {
+  const { months, revenueData, netRevenueData, ordersData } = useMemo(() => {
     if (!currentUserData)
-      return { months: [], revenueData: [], ordersData: [] };
+      return { months: [], revenueData: [], netRevenueData: [], ordersData: [] };
 
     let clientData: Client[] = [];
 
@@ -434,6 +435,14 @@ const useStats = (isMobile: boolean) => {
     return calculateTotalRevenue(clientList);
   }, [role, currentUserData, clients]);
 
+    // Total Revenue and Orders
+    const totalNetRevenue = useMemo<number>(() => {
+      if (!currentUserData || !role) return 0;
+
+      const clientList = getAdjustedClients(role, currentUserData, clients);
+      return calculateNetRevenue(clientList);
+    }, [role, currentUserData, clients]);
+
   const totalOrders = useMemo<number>(() => {
     if (!currentUserData || !role) return 0;
 
@@ -460,6 +469,7 @@ const useStats = (isMobile: boolean) => {
     salesDistributionDataAgents,
     months,
     revenueData,
+    netRevenueData,
     ordersData,
     yearlyCategories,
     yearlyOrdersData,
@@ -467,6 +477,7 @@ const useStats = (isMobile: boolean) => {
     clientComparativeStatisticsMonthly,
     agentComparativeStatistics,
     agentComparativeStatisticsMonthly,
+    totalNetRevenue,
     error: localError || error, // Prefer local error if set, otherwise Redux error
   };
 };

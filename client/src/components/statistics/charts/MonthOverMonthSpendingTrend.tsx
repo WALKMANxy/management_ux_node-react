@@ -1,3 +1,4 @@
+// src/components/MonthOverMonthSpendingTrend.tsx
 import ShowChartIcon from "@mui/icons-material/ShowChart"; // Import the ShowChart icon
 import {
   Avatar,
@@ -16,26 +17,41 @@ import { UserRole } from "../../../models/entityModels";
 import { monthMap } from "../../../utils/constants";
 import { currencyFormatter } from "../../../utils/dataUtils";
 
-const MonthOverMonthSpendingTrend: React.FC<{
+interface MonthOverMonthSpendingTrendProps {
   months: string[];
   revenueData: number[];
+  netRevenueData: number[]; // New prop for Net Revenue
   userRole: UserRole;
-}> = ({ months, revenueData, userRole }) => {
+}
+
+const MonthOverMonthSpendingTrend: React.FC<MonthOverMonthSpendingTrendProps> = ({
+  months,
+  revenueData,
+  netRevenueData, // Destructure the new prop
+  userRole,
+}) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const loading = revenueData.length === 0;
 
+  // Adjust loading condition based on userRole
+  const loading =
+    revenueData.length === 0 ||
+    (userRole !== "client" && netRevenueData.length === 0);
+
+  // Process data to include both revenue and net revenue
   const data = useMemo(
     () =>
       months.map((month, index) => {
         const [year, monthNum] = month.split("-");
         const monthName = monthMap[monthNum];
         const revenue = revenueData[index];
-        return { month: `${monthName} ${year}`, revenue };
+        const netRevenue = netRevenueData[index]; // Retrieve Net Revenue
+        return { month: `${monthName} ${year}`, revenue, netRevenue };
       }),
-    [months, revenueData]
+    [months, revenueData, netRevenueData] // Include netRevenueData in dependencies
   );
 
+  // Configure ApexCharts options for multiple series
   const options: ApexOptions = useMemo(
     () => ({
       chart: {
@@ -57,13 +73,11 @@ const MonthOverMonthSpendingTrend: React.FC<{
       },
       dataLabels: { enabled: false },
       tooltip: {
+        shared: true, // Enable shared tooltips to display both series
         y: {
           formatter: (val: number) => currencyFormatter(val),
           title: {
-            formatter: () =>
-              userRole === "agent" || userRole === "admin"
-                ? t("monthOverMonthSpendingTrend.revenue")
-                : t("monthOverMonthSpendingTrend.expense"),
+            formatter: () => "",
           },
         },
       },
@@ -99,12 +113,24 @@ const MonthOverMonthSpendingTrend: React.FC<{
       theme: {
         palette: "palette2",
       },
+      colors: [
+        theme.palette.primary.main,
+        theme.palette.secondary.main,
+      ], // Assign distinct colors
+      legend: {
+        position: "top",
+        horizontalAlign: "center",
+        labels: {
+          colors: theme.palette.text.primary,
+        },
+      },
     }),
-    [data, t, userRole]
+    [data, theme.palette.primary.main, theme.palette.secondary.main, theme.palette.text.primary]
   );
 
-  const series = useMemo(
-    () => [
+  // Define series with both Revenue and Net Revenue conditionally
+  const series = useMemo(() => {
+    const baseSeries = [
       {
         name:
           userRole === "agent" || userRole === "admin"
@@ -112,9 +138,17 @@ const MonthOverMonthSpendingTrend: React.FC<{
             : t("monthOverMonthSpendingTrend.expense"),
         data: data.map((d) => d.revenue),
       },
-    ],
-    [data, t, userRole]
-  );
+    ];
+
+    if (userRole !== "client") {
+      baseSeries.push({
+        name: t("monthOverMonthSpendingTrend.netRevenue"), // New series for Net Revenue
+        data: data.map((d) => d.netRevenue),
+      });
+    }
+
+    return baseSeries;
+  }, [data, t, userRole]);
 
   return (
     <Paper
