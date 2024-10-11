@@ -9,8 +9,9 @@ import ManageUsers from "../../components/userPage/ManageUsers";
 import ModifyAccount from "../../components/userPage/ModifyAccount";
 import Sidebar from "../../components/userPage/SideBar";
 import { selectCurrentUser } from "../../features/users/userSlice";
+import ManageEntities from "../../components/userPage/ManageEntities";
 
-type SelectedSection = "modify-account" | "app-settings" | "manage-users";
+type SelectedSection = "modify-account" | "app-settings" | "manage-users" | "manage-entities";
 
 const UserPage: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 600px)");
@@ -24,6 +25,7 @@ const UserPage: React.FC = () => {
   }
 
   // Render the appropriate component based on the selected section
+  // Render the appropriate component based on the selected section
   const renderSelectedSection = () => {
     switch (selectedSection) {
       case "modify-account":
@@ -33,6 +35,11 @@ const UserPage: React.FC = () => {
       case "manage-users":
         if (currentUser.role === "admin") {
           return <ManageUsers />;
+        }
+        return null;
+      case "manage-entities":
+        if (currentUser.role === "admin") {
+          return <ManageEntities />;
         }
         return null;
       default:

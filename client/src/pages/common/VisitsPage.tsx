@@ -1,12 +1,15 @@
 // src/pages/VisitsPage.tsx
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import RefreshIcon from "@mui/icons-material/Refresh";
+
 import {
   Box,
   CircularProgress,
   Collapse,
   Grid,
   IconButton,
+  Tooltip,
   Typography,
   useMediaQuery,
 } from "@mui/material";
@@ -17,9 +20,11 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
-import SkeletonClientDetailsCard from "../../components/visitPage/SkeletonCard";
+import SkeletonCard from "../../components/visitPage/SkeletonCard";
+import SkeletonClientDetailsCard from "../../components/visitPage/SkeletonCardButtons";
 import VisitsSidebar from "../../components/visitPage/VisitsSidebar";
 import {
   clearSelectedVisit,
@@ -28,6 +33,7 @@ import {
 } from "../../features/data/dataSlice";
 import useLoadingData from "../../hooks/useLoadingData";
 import useResizeObserver from "../../hooks/useResizeObserver"; // Import the hook
+import { useVisitSidebar } from "../../hooks/useVisitSidebar";
 
 // Lazy load the non-immediate components
 const ClientDetailsCard = React.lazy(
@@ -47,6 +53,8 @@ const VisitsPage: React.FC = () => {
   const isMobile = useMediaQuery("(max-width:900px)");
   const dispatch = useAppDispatch();
 
+  const { t } = useTranslation();
+
   const { loading } = useLoadingData();
 
   const selectedVisitId = useAppSelector(
@@ -54,6 +62,8 @@ const VisitsPage: React.FC = () => {
   );
 
   const [isCreatingVisit, setIsCreatingVisit] = useState(false);
+
+  const { handleVisitsRefresh } = useVisitSidebar();
 
   // Get currentUser from Redux state
   const currentUser = useAppSelector(
@@ -166,7 +176,7 @@ const VisitsPage: React.FC = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: isMobile ? "100dvh" : "calc(100vh - 120px)",
+        height: isMobile ? "100dvh" : "calc(100vh - 90px)",
         bgcolor: "#f4f5f7",
       }}
     >
@@ -219,118 +229,143 @@ const VisitsPage: React.FC = () => {
               }}
             >
               {/* Client Details Collapsible Container */}
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  flexShrink: 0,
-                  mb: 2, // Add margin-bottom to separate from next section
-                }}
-                ref={clientDetailsRef}
-              >
+              {userRole !== "client" && (
                 <Box
                   sx={{
                     display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    bgcolor: "#f4f5f7",
-                    p: 1,
-                    pt: 2,
-                    pb: 2,
-                    pl: 2,
-                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                    borderRadius: 6,
-                    mb: 1,
-                  }}
-                >
-                  <Typography variant="h4" sx={{ ml: 1 }}>
-                    Client Details
-                  </Typography>
-                  <IconButton
-                    onClick={() =>
-                      setIsClientDetailsCollapsed(!isClientDetailsCollapsed)
-                    }
-                  >
-                    {isClientDetailsCollapsed ? (
-                      <ExpandMoreIcon />
-                    ) : (
-                      <ExpandLessIcon />
-                    )}
-                  </IconButton>
-                </Box>
-                <Collapse
-                  in={!isClientDetailsCollapsed}
-                  sx={{
+                    flexDirection: "column",
                     flexShrink: 0,
+                    mb: 2, // Add margin-bottom to separate from next section
                   }}
+                  ref={clientDetailsRef}
                 >
-                  <Suspense fallback={<SkeletonClientDetailsCard />}>
-                    <ClientDetailsCard
-                      clientId={selectedClientId}
-                      onCreateVisit={handleOpenCreateVisit}
-                      onDeselectClient={() => dispatch(clearSelection())}
-                    />
-                  </Suspense>
-                </Collapse>
-              </Box>
-
-              {/* Visits Table Collapsible Container */}
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  flexShrink: 0,
-                }}
-                ref={visitsTableRef}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    bgcolor: "#f4f5f7",
-                    p: 1,
-                    pt: 1,
-                    pb: 2,
-                    pl: 2,
-                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                    borderRadius: 6,
-                    mb: 2,
-                    mt: !isClientDetailsCollapsed
-                      ? -5
-                      : isClientDetailsCollapsed
-                      ? -1
-                      : isCreatingVisit
-                      ? 0
-                      : -4,
-                  }}
-                >
-                  <Typography variant="h4" sx={{ ml: 1 }}>
-                    Visits
-                  </Typography>
-                  <IconButton
-                    onClick={() =>
-                      setIsVisitsTableCollapsed(!isVisitsTableCollapsed)
-                    }
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      bgcolor: "#f4f5f7",
+                      p: 1,
+                      pt: 2,
+                      pb: 2,
+                      pl: 2,
+                      boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                      borderRadius: 6,
+                      mb: 1,
+                    }}
                   >
-                    {isVisitsTableCollapsed ? (
-                      <ExpandMoreIcon />
-                    ) : (
-                      <ExpandLessIcon />
-                    )}
-                  </IconButton>
+                    <Typography variant="h4" sx={{ ml: 1 }}>
+                      Client Details
+                    </Typography>
+                    <IconButton
+                      onClick={() =>
+                        setIsClientDetailsCollapsed(!isClientDetailsCollapsed)
+                      }
+                    >
+                      {isClientDetailsCollapsed ? (
+                        <ExpandMoreIcon />
+                      ) : (
+                        <ExpandLessIcon />
+                      )}
+                    </IconButton>
+                  </Box>
+                  <Collapse
+                    in={!isClientDetailsCollapsed}
+                    sx={{
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Suspense fallback={<SkeletonClientDetailsCard />}>
+                      <ClientDetailsCard
+                        clientId={selectedClientId}
+                        onCreateVisit={handleOpenCreateVisit}
+                        onDeselectClient={() => dispatch(clearSelection())}
+                      />
+                    </Suspense>
+                  </Collapse>
                 </Box>
-                <Collapse
-                  sx={{
-                    mb: isCreatingVisit && !isVisitsTableCollapsed ? 25 : 0,
-                  }}
-                  in={!isVisitsTableCollapsed}
-                >
-                  <Suspense fallback={<CircularProgress />}>
-                    <VisitsTable clientId={selectedClientId} />
-                  </Suspense>
-                </Collapse>
-              </Box>
+              )}
+
+             {/* Visits Table Collapsible Container */}
+<Box
+  sx={{
+    display: "flex",
+    flexDirection: "column",
+    flexShrink: 0,
+  }}
+  ref={visitsTableRef}
+>
+  <Box
+    sx={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      bgcolor: "#f4f5f7",
+      p: 1,
+      pt: 1,
+      pb: 2,
+      pl: 2,
+      boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+      borderRadius: 6,
+      mb: 2,
+      mt:
+        userRole !== "client"
+          ? !isClientDetailsCollapsed
+            ? -5
+            : isClientDetailsCollapsed
+            ? -1
+            : isCreatingVisit
+            ? 0
+            : -4
+          : 0, // Adjust margin-top when Client Details is hidden
+    }}
+  >
+    <Typography variant="h4" sx={{ ml: 1 }}>
+      Visits
+    </Typography>
+
+    {/* Positioned Refresh and Collapse Buttons */}
+    <Box sx={{ display: "flex", ml: "auto" }}>
+      {/* Show Refresh Button only for clients */}
+      {userRole === "client" && (
+        <Tooltip
+          title={t("visitsSidebar.refreshTooltip", "Refresh Visits")}
+          arrow
+        >
+          <IconButton
+            onClick={handleVisitsRefresh}
+            aria-label={t("visitsSidebar.refresh", "Refresh Visits")}
+          >
+            <RefreshIcon />
+          </IconButton>
+        </Tooltip>
+      )}
+
+      {/* Collapse Button */}
+      <IconButton
+        onClick={() => setIsVisitsTableCollapsed(!isVisitsTableCollapsed)}
+      >
+        {isVisitsTableCollapsed ? (
+          <ExpandMoreIcon />
+        ) : (
+          <ExpandLessIcon />
+        )}
+      </IconButton>
+    </Box>
+  </Box>
+
+  <Collapse
+    sx={{
+      mb: isCreatingVisit && !isVisitsTableCollapsed ? 25 : 0,
+    }}
+    in={!isVisitsTableCollapsed}
+  >
+    <Suspense fallback={<SkeletonCard />}>
+      <VisitsTable clientId={selectedClientId} />
+    </Suspense>
+  </Collapse>
+</Box>
+
 
               {/* Visit View (conditionally rendered) */}
               {selectedVisitId && (
@@ -342,7 +377,7 @@ const VisitsPage: React.FC = () => {
                     mb: 2,
                   }}
                 >
-                  <Suspense fallback={<CircularProgress />}>
+                  <Suspense fallback={<SkeletonClientDetailsCard />}>
                     <VisitView
                       visitId={selectedVisitId}
                       onDeselectVisit={() => dispatch(clearSelectedVisit())}

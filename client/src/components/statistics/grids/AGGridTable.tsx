@@ -1,4 +1,5 @@
 // src/components/common/AGGridTable.tsx
+import { useMediaQuery } from "@mui/material";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { AgGridReact, AgGridReactProps } from "ag-grid-react";
@@ -6,7 +7,6 @@ import { forwardRef, useMemo } from "react";
 import { AGGridTableProps } from "../../../models/propsModels";
 import { paginationPageSizeSelector } from "../../../utils/constants";
 import "./AGGridTable.css";
-import { useMediaQuery } from "@mui/material";
 
 const AGGridTable = forwardRef<AgGridReact, AGGridTableProps>(
   ({ columnDefs, rowData, quickFilterText }, ref) => {
@@ -16,10 +16,9 @@ const AGGridTable = forwardRef<AgGridReact, AGGridTableProps>(
     const isMobile = useMediaQuery("(max-width: 600px)");
 
     // In AGGridTable component
-const onGridReady = (params: { api: { sizeColumnsToFit: () => void; }; }) => {
-  params.api.sizeColumnsToFit();
-};
-
+    const onGridReady = (params: { api: { sizeColumnsToFit: () => void } }) => {
+      params.api.sizeColumnsToFit();
+    };
 
     // Memoize defaultColDef
     const defaultColDef = useMemo<AgGridReactProps["defaultColDef"]>(
@@ -49,13 +48,15 @@ const onGridReady = (params: { api: { sizeColumnsToFit: () => void; }; }) => {
           ref={ref}
           columnDefs={memoizedColumnDefs}
           rowData={memoizedRowData}
-          pagination={true}
+          pagination={false}
           paginationPageSize={100}
           paginationPageSizeSelector={paginationPageSizeSelector}
           quickFilterText={quickFilterText} // Pass quickFilterText to AgGridReact
           enableCellTextSelection={true}
           onGridReady={onGridReady}
-
+          rowBuffer={5}
+          suppressPaginationPanel={true} // Add this line to hide the pagination panel
+          suppressColumnVirtualisation={false}
           defaultColDef={defaultColDef}
         />
       </div>

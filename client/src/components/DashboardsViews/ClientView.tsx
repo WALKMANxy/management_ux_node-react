@@ -216,6 +216,7 @@ const ClientView: React.FC<ClientViewProps> = ({
             <MonthOverMonthSpendingTrend
               months={calculateMonthlyData([selectedClient]).months}
               revenueData={calculateMonthlyData([selectedClient]).revenueData}
+              netRevenueData={calculateMonthlyData([selectedClient]).netRevenueData}
               userRole={userRole}
             />
           )}

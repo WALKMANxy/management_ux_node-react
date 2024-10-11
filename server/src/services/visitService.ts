@@ -1,9 +1,19 @@
 import { IVisit, Visit } from "../models/Visit";
 
 export class VisitService {
-  static async getAllVisits(): Promise<IVisit[]> {
+  static async getAllVisits({ role, clientId }: { role: string; clientId?: string; }): Promise<IVisit[]> {
     try {
-      return await Visit.find().sort({ date: -1 }).exec();
+      let query = {};
+
+      if (role === "client") {
+        if (!clientId) {
+          throw new Error("clientId is required for role 'client'.");
+        }
+        // Filter visits by clientId
+        query = { clientId };
+      }
+
+      return await Visit.find(query).sort({ date: -1 }).exec();
     } catch (err) {
       throw new Error(
         `Error retrieving visits: ${

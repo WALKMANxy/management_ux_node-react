@@ -46,12 +46,12 @@ export const getVisits = createAsyncThunk<
   try {
     const state = getState().data;
     const entity = state.currentUserData;
+    const id = state.currentUserDetails?.id
     const role = state.currentUserDetails?.role;
     if (role === "employee") {
       // Employees should not fetch visits
       return;
     }
-
 
     if (!entity || !role) {
       throw new Error("No entity or role found in the state.");
@@ -59,7 +59,7 @@ export const getVisits = createAsyncThunk<
 
     // Dispatch the RTK Query endpoint with the necessary arguments
     await dispatch(
-      promoVisitApi.endpoints.getVisits.initiate({ entity, role })
+      promoVisitApi.endpoints.getVisits.initiate({ entity, role, id })
     ).unwrap();
   } catch (error) {
     console.error("Failed to update visits:", error);

@@ -13,7 +13,6 @@ import {
   useDeleteEventMutation,
   useEditEventMutation,
   useGetEventsByMonthForAdminQuery,
-  useGetEventsByStatusAndUserQuery,
   useUpdateEventStatusMutation,
 } from "../features/calendar/calendarQuery";
 import { selectClient, selectVisit } from "../features/data/dataSlice";
@@ -73,30 +72,17 @@ export const useCalendar = () => {
     data: adminEventsData,
     isLoading: isAdminLoading,
     error: adminError,
-  } = useGetEventsByMonthForAdminQuery(
-    { year: currentYear, month: currentMonth },
-    { skip: userRole !== "admin" }
-  );
-
-  const {
-    data: userEventsData,
-    isLoading: isUserLoading,
-    error: userError,
-  } = useGetEventsByStatusAndUserQuery(
-    { year: currentYear, month: currentMonth },
-    { skip: userRole === "admin" }
-  );
+  } = useGetEventsByMonthForAdminQuery({
+    year: currentYear,
+    month: currentMonth,
+  });
 
   const serverEvents: CalendarEvent[] | undefined = useMemo(() => {
-    if (userRole === "admin") {
-      return adminEventsData || [];
-    } else {
-      return userEventsData || [];
-    }
-  }, [adminEventsData, userEventsData, userRole]);
+    return adminEventsData || [];
+  }, [adminEventsData]);
 
-  const isServerLoading = isAdminLoading || isUserLoading;
-  const serverError = adminError || userError;
+  const isServerLoading = isAdminLoading;
+  const serverError = adminError;
 
   // Effect to merge new events with existing events
   useEffect(() => {
@@ -313,11 +299,7 @@ export const useCalendar = () => {
   const toggleViewMode = () => {
     setViewMode((prev) => {
       const newMode = prev === "calendar" ? "history" : "calendar";
-      showToast.info(
-        t("calendarHook.switchedToView", {
-          view: t(`calendarHook.viewModes.${newMode}`),
-        })
-      );
+
       return newMode;
     });
   };

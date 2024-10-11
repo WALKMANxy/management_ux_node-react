@@ -1,8 +1,7 @@
-import { Box, Grid, Skeleton, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Grid, useMediaQuery, useTheme } from "@mui/material";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
-import ActivePromotions from "../../components/dashboard/ActivePromotions";
 import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
 import WelcomeMessage from "../../components/dashboard/WelcomeMessage";
 
@@ -59,20 +58,6 @@ const ClientDashboard: React.FC = () => {
             topBrandsData={topBrandsData}
             userRole="client" // Pass the user role as "client"
           />
-
-          {/* Active Promotions */}
-          {loadingState ? (
-            <Skeleton
-              animation="wave"
-              variant="rectangular"
-              width="100%"
-              height={300}
-              sx={{ borderRadius: "12px" }}
-              aria-label={t("clientDashboard.skeleton")}
-            />
-          ) : (
-            <ActivePromotions />
-          )}
         </Grid>
 
         {/* Calendar and Upcoming Visits section */}

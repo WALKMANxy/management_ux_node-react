@@ -58,6 +58,7 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
         display: "flex",
         flexDirection: "column",
         boxSizing: "border-box",
+
       }}
     >
       {/* Header with title and action buttons */}
@@ -76,7 +77,7 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
       {/* List of Promos */}
       <Box
         sx={{
-          height: isMobile ? "79vh" : "100dvh",
+          height: isMobile ? "79vh" : "100%",
           overflowY: "auto", // Enable vertical scrolling
           // Hide scrollbar but allow scrolling
           scrollbarWidth: "none", // Firefox
