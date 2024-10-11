@@ -89,12 +89,12 @@ export const updateAgentById = async (
     const updatedAgent = await Agent.findOneAndUpdate(
       { id },
       { $set: updatedAgentData },
-      { new: true } // Return the updated document
+      { new: true, runValidators: true } // Return the updated document and run validators
     ).exec();
     return updatedAgent;
-  } catch (error) {
+  } catch (error: any) {
     console.error(`Error updating agent with id ${id}:`, error);
-    throw new Error('Error updating agent by ID');
+    throw error; // Let the controller handle specific error responses
   }
 };
 
@@ -112,11 +112,48 @@ export const replaceAgentById = async (
     const replacedAgent = await Agent.findOneAndReplace(
       { id },
       newAgentData,
-      { new: true } // Return the replaced document
+      { new: true, runValidators: true } // Return the replaced document and run validators
     ).exec();
     return replacedAgent;
-  } catch (error) {
+  } catch (error: any) {
     console.error(`Error replacing agent with id ${id}:`, error);
-    throw new Error('Error replacing agent by ID');
+    throw error; // Let the controller handle specific error responses
+  }
+};
+
+/**
+ * Create a new agent in the database.
+ * @param agentData - The data for the new agent.
+ * @returns Promise resolving to the created Agent document.
+ */
+export const createAgentService = async (agentData: {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  clients?: any[]; // Adjust the type based on your IClient interface
+}): Promise<IAgent> => {
+  try {
+    const newAgent = new Agent(agentData);
+    await newAgent.save();
+    return newAgent;
+  } catch (error: any) {
+    console.error("Error creating agent:", error);
+    throw error; // Let the controller handle specific error responses
+  }
+};
+
+/**
+ * Delete an agent by ID.
+ * @param id - The ID of the agent to delete.
+ * @returns Promise resolving to true if deleted, false if not found.
+ */
+export const deleteAgentService = async (id: string): Promise<boolean> => {
+  try {
+    const result = await Agent.deleteOne({ id }).exec();
+    return result.deletedCount === 1;
+  } catch (error) {
+    console.error(`Error deleting agent with id ${id}:`, error);
+    throw new Error("Error deleting agent");
   }
 };

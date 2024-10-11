@@ -3,6 +3,7 @@
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PeopleIcon from "@mui/icons-material/People";
 import SettingsIcon from "@mui/icons-material/Settings";
+import PermContactCalendarIcon from '@mui/icons-material/PermContactCalendar';
 import {
   Box,
   Divider,
@@ -24,13 +25,13 @@ import { selectCurrentUser } from "../../features/users/userSlice";
 interface NavItem {
   text: string;
   icon: React.ReactElement;
-  section: "modify-account" | "app-settings" | "manage-users";
+  section: "modify-account" | "app-settings" | "manage-users" | "manage-entities";
   adminOnly?: boolean;
 }
 
 interface SidebarProps {
   onSelectSection: (
-    section: "modify-account" | "app-settings" | "manage-users"
+    section: "modify-account" | "app-settings" | "manage-users"| "manage-entities"
   ) => void;
 }
 
@@ -55,6 +56,12 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({ onSelectSection }) => {
       text: t("sidebar.manageUsers", "Manage Users"),
       icon: <PeopleIcon />,
       section: "manage-users",
+      adminOnly: true,
+    },
+    {
+      text: t("sidebar.manageEntities", "Manage Entities"),
+      icon: <PermContactCalendarIcon />,
+      section: "manage-entities",
       adminOnly: true,
     },
   ];

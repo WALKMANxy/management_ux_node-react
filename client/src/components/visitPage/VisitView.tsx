@@ -8,6 +8,7 @@ import { useAppSelector } from "../../app/hooks";
 import { selectVisits } from "../../features/promoVisits/promoVisitsSelectors";
 import EditVisitForm from "./EditVisitForm";
 import VisitCard from "./VisitCard";
+import { selectCurrentUser } from "../../features/users/userSlice";
 
 interface VisitViewProps {
   visitId: string;
@@ -45,6 +46,8 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
 
   const editVisitRef = useRef<HTMLDivElement | null>(null);
 
+  // Retrieve userRole from Redux store
+  const userRole = useAppSelector(selectCurrentUser)?.role
   // Scroll into view when EditVisitForm is rendered
   useEffect(() => {
     if (isEditing && editVisitRef.current) {
@@ -64,7 +67,7 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
     onDeselectVisit();
   };
 
-  // useEffect to close the edit form when selectedVisitId changes
+  // Close the edit form when selectedVisitId changes
   useEffect(() => {
     if (isEditing) {
       handleEditClose();
@@ -102,14 +105,17 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
           justifyContent="flex-end"
           sx={{ pr: 1.2, pt: 0.5 }} // Adjust padding-right or padding-left to align
         >
-          <Tooltip title="Edit Visit" arrow>
-            <StyledActionButton
-              onClick={handleEditClick}
-              aria-label="Edit Visit"
-            >
-              <EditIcon />
-            </StyledActionButton>
-          </Tooltip>
+          {/* Conditionally render the Edit button if userRole is not "client" */}
+          {userRole !== "client" && (
+            <Tooltip title="Edit Visit" arrow>
+              <StyledActionButton
+                onClick={handleEditClick}
+                aria-label="Edit Visit"
+              >
+                <EditIcon />
+              </StyledActionButton>
+            </Tooltip>
+          )}
 
           <Tooltip title="Deselect Visit" arrow>
             <StyledCloseButton

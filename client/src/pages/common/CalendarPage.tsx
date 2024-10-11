@@ -4,9 +4,10 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import {
   Box,
-  CircularProgress,
   IconButton,
   Paper,
+  Typography,
+  useMediaQuery,
   useTheme,
 } from "@mui/material";
 import "animate.css"; // Add animate.css
@@ -21,6 +22,7 @@ import { EventForm } from "../../components/calendarPage/EventForm";
 import { EventHistory } from "../../components/calendarPage/EventHistory";
 import PopOverEvent from "../../components/calendarPage/PopOverEvent";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
+import Loader from "../../components/common/Loader";
 import { selectCurrentUser } from "../../features/users/userSlice";
 import { useCalendar } from "../../hooks/useCalendar";
 import { useCalendarWithHolidays } from "../../hooks/useCalendarWithHolidays";
@@ -64,6 +66,8 @@ const CalendarPage: React.FC = () => {
   const userRole = useSelector(selectCurrentUser)?.role;
 
   const theme = useTheme();
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [confirmDelete, setConfirmDelete] = useState<CalendarEvent | null>(
     null
@@ -119,18 +123,7 @@ const CalendarPage: React.FC = () => {
 
   // Optional: Show a loading spinner
   if (isLoading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          height: "100vh",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <Loader fadeout />;
   }
 
   const dayPropGetter = (date: Date) => {
@@ -171,11 +164,24 @@ const CalendarPage: React.FC = () => {
         flexDirection: "column",
         height: "100%",
         position: "relative",
-        paddingTop: theme.spacing(8), // Add padding to push down the calendar
+        paddingBottom: 2,
       }}
     >
       {/* Toggle Button */}
-      <Box sx={{ position: "absolute", top: 16, right: 16, zIndex: 1 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          pb: isMobile ? 0 : 4,
+          px: isMobile ? 1 : null,
+        }}
+      >
+        <Typography variant="h6" sx={{ fontWeight: "bold", color: "black" }}>
+          {viewMode === "history"
+            ? t("calendar.HistoryTitle")
+            : t("calendar.Title")}
+        </Typography>
         <IconButton
           onClick={toggleViewMode}
           sx={{ color: "black" }} // Override color to black
@@ -189,7 +195,7 @@ const CalendarPage: React.FC = () => {
         <Fragment>
           <Paper
             elevation={3}
-            sx={{ padding: theme.spacing(2), borderRadius: 5 }}
+            sx={{ p: 2, mt: isMobile ? 0 : -3, borderRadius: 5 }}
             className="animate__animated animate__animate_faster animate__fadeIn"
           >
             <Calendar
@@ -230,11 +236,18 @@ const CalendarPage: React.FC = () => {
           </Paper>
         </Fragment>
       ) : (
-        <EventHistory
-          events={displayEvents}
-          userRole={userRole!}
-          handleDeleteEvent={handleDeleteEventWithConfirmation}
-        />
+        <Box
+          sx={{
+            pt: isMobile ? 2 : 0,
+            px: isMobile ? 1.3 : 0,
+          }}
+        >
+          <EventHistory
+            events={displayEvents}
+            userRole={userRole!}
+            handleDeleteEvent={handleDeleteEventWithConfirmation}
+          />
+        </Box>
       )}
 
       <EventForm

@@ -234,7 +234,7 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
           rowData={rowData}
           columnDefs={columnDefs}
           onSelectionChanged={onSelectionChanged}
-          pagination={true}
+          pagination={false}
           paginationPageSize={100}
           enableCellTextSelection={true}
           rowBuffer={5}
@@ -259,6 +259,7 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
           }}
           suppressColumnVirtualisation={false}
           suppressAggFuncInHeader={true}
+          suppressPaginationPanel={true} // Add this line to hide the pagination panel
           animateRows={true}
           suppressMovableColumns={true}
           selection={!isViewing ? selection : undefined} // Disable selection when in view mode

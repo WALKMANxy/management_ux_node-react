@@ -8,18 +8,24 @@ import { webSocketService } from "./webSocketService";
  * Function to refresh the access token using the refresh token.
  */
 export async function refreshAccessToken(): Promise<boolean> {
-  // console.log("Entering refreshAccessToken function");
+  console.log("Entering refreshAccessToken function");
 
-  const localAuthState =
-    JSON.parse(localStorage.getItem("authState")!) ||
-    JSON.parse(sessionStorage.getItem("authState")!);
-  // console.log("Local auth state:", localAuthState);
-
+  let localAuthState;
+  if (localStorage.getItem("authState")) {
+    localAuthState = JSON.parse(localStorage.getItem("authState")!);
+  } else if (sessionStorage.getItem("authState")) {
+    localAuthState = JSON.parse(sessionStorage.getItem("authState")!);
+  } else {
+    console.error("No authState available in local or session storage");
+    showToast.error("No authState available in local or session storage, logging out...");
+    return false;
+  }
+  console.log("Local auth state:", localAuthState);
   const refreshToken = localAuthState.refreshToken;
-  // console.log("Refresh token:", refreshToken);
+  console.log("Refresh token:", refreshToken);
 
   const uniqueId = localStorage.getItem("app_unique_identifier");
-  // console.log("Unique ID:", uniqueId);
+  console.log("Unique ID:", uniqueId);
 
   if (!refreshToken || !uniqueId) {
     console.error("No refresh token or uniqueId available");

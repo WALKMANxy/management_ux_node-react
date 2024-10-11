@@ -27,7 +27,6 @@ const Layout: React.FC = () => {
     location.pathname === "/articles" ||
     location.pathname === "/dashboard" ||
     location.pathname === "/settings";
-  const isSettingsPage = location.pathname === "/settings"; // Check if on the /settings page
 
   const isMessagesPage = location.pathname === "/messages";
 
@@ -62,6 +61,7 @@ const Layout: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           overflowX: "hidden",
+          m: 0,
         }}
       >
         {/* Conditionally render Header based on chat state and mobile view */}
@@ -74,8 +74,10 @@ const Layout: React.FC = () => {
             flex: 1, // Let main content grow to fill available space
 
             p: determinePadding(), // Apply dynamic padding
-            pl: isSettingsPage ? 0 : undefined, // Remove left padding for settings page
-            pr: isSettingsPage ? 0 : undefined, // Remove right padding for settings page
+
+            overflowY: "auto",
+
+            m: 0,
           }}
         >
           <Outlet />

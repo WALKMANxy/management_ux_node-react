@@ -6,9 +6,11 @@ import {
   getAllAgents,
   replaceAgentById,
   updateAgentById,
+  createAgentService,
+  deleteAgentService,
 } from '../services/agentService';
-import { AuthenticatedRequest } from '../models/types'; // Ensure this type is correctly defined
 import { IAgent } from '../models/Agent';
+import { isMongoDuplicateKeyError } from './adminController';
 
 /**
  * Fetch all agents.
@@ -16,9 +18,6 @@ import { IAgent } from '../models/Agent';
 export const fetchAllAgents = async (req: Request, res: Response) => {
   try {
     const agents = await getAllAgents();
-
-    // Map agents to include empty agents and clients arrays if necessary
-    // Assuming you want to include clients as part of Agent, skip this step
     res.json(agents);
   } catch (error) {
     console.error('Error in fetchAllAgents:', error);
@@ -46,11 +45,14 @@ export const fetchAgentById = async (req: Request, res: Response) => {
  * Fetch an agent by client's entity code.
  */
 export const fetchAgentByClientEntityCode = async (
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response
 ) => {
   try {
-    if (!req.user || !req.user.entityCode) {
+    // Assuming req.user.entityCode is available via authentication middleware
+    const clientEntityCode = (req as any).user?.entityCode;
+
+    if (!clientEntityCode) {
       console.error(
         'Unauthorized access: User information is missing or incomplete.'
       );
@@ -58,7 +60,6 @@ export const fetchAgentByClientEntityCode = async (
         message: 'Unauthorized: User information is missing or incomplete.',
       });
     }
-    const clientEntityCode = req.user.entityCode;
 
     const agent = await getAgentByClientEntityCode(clientEntityCode);
 
@@ -80,19 +81,105 @@ export const fetchAgentByClientEntityCode = async (
 };
 
 /**
- * Update an agent by ID.
+ * Create a new agent.
+ */
+export const createAgent = async (req: Request, res: Response) => {
+  try {
+    const { id, name, email, clients } = req.body;
+
+    // Validate required fields
+    if (!id || !name) {
+      return res
+        .status(400)
+        .json({ message: 'Agent ID and name are required' });
+    }
+
+    const newAgent = await createAgentService({ id, name, email, clients });
+
+    res.status(201).json({
+      id: newAgent.id,
+      name: newAgent.name,
+      email: newAgent.email,
+      clients: newAgent.clients,
+    });
+  } catch (error) {
+    console.error('Error in createAgent:', error);
+
+    if (isMongoDuplicateKeyError(error)) {
+      // Determine which field caused the duplicate key error
+      const duplicatedField = Object.keys(error.keyValue)[0];
+      return res.status(409).json({
+        message: `Agent with the given ${duplicatedField} already exists`,
+      });
+    }
+
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+/**
+ * Update an existing agent by ID.
  */
 export const updateAgent = async (req: Request, res: Response) => {
   try {
-    const updatedAgent = await updateAgentById(req.params.id, req.body);
+    const adminId = req.params.id;
+    const { name, email, phone, clients } = req.body;
+
+    // At least one field must be provided for update
+    if (!name && !email && !phone && !clients) {
+      return res.status(400).json({
+        message:
+          'At least one of name, email, phone, or clients must be provided for update',
+      });
+    }
+
+    const updatedAgent = await updateAgentById(adminId, {
+      name,
+      email,
+      phone,
+      clients,
+    });
+
     if (!updatedAgent) {
       return res.status(404).json({ message: 'Agent not found' });
     }
-    res
-      .status(200)
-      .json({ message: 'Agent updated successfully', updatedAgent });
+
+    res.json({
+      id: updatedAgent.id,
+      name: updatedAgent.name,
+      email: updatedAgent.email,
+      phone: updatedAgent.phone,
+      clients: updatedAgent.clients,
+    });
   } catch (error) {
     console.error(`Error in updateAgent for id ${req.params.id}:`, error);
+
+    if (isMongoDuplicateKeyError(error)) {
+      const duplicatedField = Object.keys(error.keyValue)[0];
+      return res.status(409).json({
+        message: `${duplicatedField.charAt(0).toUpperCase() + duplicatedField.slice(1)} already in use`,
+      });
+    }
+
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+/**
+ * Delete an agent by ID.
+ */
+export const deleteAgent = async (req: Request, res: Response) => {
+  try {
+    const agentId = req.params.id;
+    const deleted = await deleteAgentService(agentId);
+
+    if (!deleted) {
+      return res.status(404).json({ message: 'Agent not found' });
+    }
+
+    res.status(200).json({ message: 'Agent deleted successfully' });
+  } catch (error) {
+    console.error(`Error in deleteAgent for id ${req.params.id}:`, error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };

@@ -29,6 +29,7 @@ router.post(
   register
 );
 router.get("/verify-email", verifyEmail);
+
 router.post(
   "/login",
   loginValidationRules,
@@ -37,7 +38,9 @@ router.post(
   login
 );
 router.post("/logout", authRateLimiter, logout);
+
 router.post("/logout-all", authenticateUser, authRateLimiter, logoutAllDevices);
+
 router.get(
   "/active-sessions",
   authenticateUser,
@@ -48,7 +51,9 @@ router.post("/refresh-session", authRateLimiter, refreshSession);
 
 // Password reset routes
 router.post("/request-password-reset", authRateLimiter, requestPasswordReset);
+
 router.post("/verify-reset-code", authRateLimiter, verifyResetCode);
+
 router.post("/update-password", authRateLimiter, updatePassword);
 
 export default router;

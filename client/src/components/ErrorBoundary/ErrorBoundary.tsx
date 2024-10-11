@@ -2,6 +2,7 @@ import { Box, Button, Paper, Typography } from "@mui/material";
 import { styled } from "@mui/system";
 import React, { ErrorInfo, ReactNode } from "react";
 import { withTranslation, WithTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 interface ErrorBoundaryProps extends WithTranslation, React.PropsWithChildren {
   children: ReactNode;
@@ -53,7 +54,11 @@ class ErrorBoundary extends React.Component<
   }
 
   handleBackToHome = () => {
-    this.props.history.push("/");
+    return (
+      <Link to="/">
+        {this.props.t("errorBoundary.backToHome", "Back to Home")}
+      </Link>
+    );
   };
 
   render() {

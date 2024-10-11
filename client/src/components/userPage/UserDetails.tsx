@@ -5,13 +5,11 @@ import InfoIcon from "@mui/icons-material/Info";
 import SaveIcon from "@mui/icons-material/Save";
 import { LoadingButton } from "@mui/lab";
 import {
-  Alert,
   Box,
   Button,
   ButtonGroup,
   Divider,
   Skeleton,
-  Stack,
   Table,
   TableBody,
   TableCell,
@@ -50,9 +48,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
     setSelectedEntity,
     ref,
     visibleRows,
-    alertMessage,
-    setAlertMessage,
-    alertSeverity,
+
     handleDeleteUser,
   } = useUserDetails(user);
 
@@ -62,9 +58,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
-    <Box
-      sx={{ px: 0 }}
-    >
+    <Box sx={{ px: 0 }}>
       <Tooltip title={t("userDetails.goBack", "Go back")} placement="top">
         <Button onClick={onBack} sx={{ mb: 2, ml: -2, color: "black" }}>
           <ArrowBackIosIcon />
@@ -72,10 +66,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
       </Tooltip>
 
       {/* Current User Details Card */}
-      <Box
-        className="animate__animated animate__fadeInLeft"
-        sx={{ pl: 1 }}
-      >
+      <Box className="animate__animated animate__fadeInLeft" sx={{ pl: 1 }}>
         <UserCard
           userId={user._id || "N/A"}
           email={user.email || "N/A"}
@@ -303,18 +294,6 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
         >
           {t("userDetails.saveChanges", "Save")}
         </LoadingButton>
-
-        {/* Alert for success or error message */}
-        {alertMessage && (
-          <Stack sx={{ width: "100%", mt: 2 }}>
-            <Alert
-              severity={alertSeverity}
-              onClose={() => setAlertMessage(null)}
-            >
-              {alertMessage}
-            </Alert>
-          </Stack>
-        )}
       </Box>
     </Box>
   );

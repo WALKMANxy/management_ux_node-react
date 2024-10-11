@@ -1,4 +1,5 @@
-//src/features/data/dataSlice.ts
+// src/features/data/dataSlice.ts
+
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createSelector } from "reselect";
 import { RootState } from "../../app/store";
@@ -6,6 +7,10 @@ import { GlobalVisits, Promo, Visit } from "../../models/dataModels";
 import { Agent, Client } from "../../models/entityModels";
 import { DataSliceState } from "../../models/stateModels";
 import { fetchInitialData } from "./dataThunks";
+import { createAgentAsync, updateAgentAsync, deleteAgentAsync } from "./entityThunks";
+
+
+
 
 const initialState: DataSliceState = {
   clients: {},
@@ -108,8 +113,6 @@ export const dataSlice = createSlice({
       const newPromo = action.payload;
       const role = state.currentUserDetails?.role;
 
-      /*       console.log("addOrUpdatePromo called with:", action.payload); // Debugging
-       */
       if (role === "admin") {
         if (!Array.isArray(state.currentUserPromos)) {
           state.currentUserPromos = [];
@@ -131,6 +134,7 @@ export const dataSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Existing fetchInitialData cases
       .addCase(fetchInitialData.pending, (state) => {
         state.status = "loading";
       })
@@ -242,6 +246,59 @@ export const dataSlice = createSlice({
         } else {
           state.error = "An unknown error occurred during data fetching.";
         }
+      })
+
+
+
+      // ----------------------------
+      // Agent Thunks Cases
+      // ----------------------------
+
+      // Create Agent
+      .addCase(createAgentAsync.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(createAgentAsync.fulfilled, (state, action: PayloadAction<Agent>) => {
+        state.status = "succeeded";
+        const newAgent = action.payload;
+        state.agents[newAgent.id] = newAgent;
+      })
+      .addCase(createAgentAsync.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to create agent.";
+      })
+
+      // Update Agent
+      .addCase(updateAgentAsync.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(updateAgentAsync.fulfilled, (state, action: PayloadAction<Agent>) => {
+        state.status = "succeeded";
+        const updatedAgent = action.payload;
+        if (state.agents[updatedAgent.id]) {
+          state.agents[updatedAgent.id] = updatedAgent;
+        }
+      })
+      .addCase(updateAgentAsync.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to update agent.";
+      })
+
+      // Delete Agent
+      .addCase(deleteAgentAsync.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(deleteAgentAsync.fulfilled, (state, action: PayloadAction<string>) => {
+        state.status = "succeeded";
+        const deletedAgentId = action.payload;
+        delete state.agents[deletedAgentId];
+      })
+      .addCase(deleteAgentAsync.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to delete agent.";
       });
   },
 });
@@ -266,4 +323,10 @@ export default dataSlice.reducer;
 export const selectClientIds = createSelector(
   (state: RootState) => state.data.clients,
   (clients) => Object.keys(clients)
+);
+
+// Memoized selector to get all agent IDs from the state
+export const selectAgentIds = createSelector(
+  (state: RootState) => state.data.agents,
+  (agents) => Object.keys(agents)
 );

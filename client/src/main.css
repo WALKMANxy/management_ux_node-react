@@ -78,9 +78,6 @@ th {
   display: none; /* Safari and Chrome */
 }
 
-.ag-icon {
-  aria-hidden: true; /* More widely supported for accessibility */
-}
 
 @keyframes ag-shake-left-to-right {
   from {

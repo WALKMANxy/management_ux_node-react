@@ -185,26 +185,32 @@ export const verifyEmail = async (req: Request, res: Response) => {
 export const refreshSession = async (req: Request, res: Response) => {
   const { refreshToken, uniqueId } = req.body; // Ensure uniqueId is sent from client
 
+  console.log("refreshSession called with:", { refreshToken, uniqueId });
+
   if (!refreshToken || !uniqueId) {
+    console.log("Missing required parameters");
     return res
       .status(400)
       .json({ message: "Refresh token and uniqueId are required." });
   }
 
   try {
+    console.log("Attempting to renew session");
     const renewedTokens = await renewSession(refreshToken, req, uniqueId);
 
     if (!renewedTokens) {
+      console.log("Renewal failed");
       return res.status(401).json({ message: "Invalid or expired session." });
     }
 
+    console.log("Renewed session successfully");
     return res.status(200).json({
       message: "Session renewed successfully.",
       accessToken: renewedTokens.accessToken,
       refreshToken: renewedTokens.refreshToken,
     });
   } catch (error: unknown) {
-    logger.error("Error renewing session:", { error });
+    console.error("Error renewing session:", { error });
     res.status(500).json({
       message: "Failed to renew session.",
       error: "Internal server error.",

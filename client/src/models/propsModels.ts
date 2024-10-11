@@ -229,7 +229,8 @@ export type TopArticleTypeProps = {
 };
 
 export type TotalEarningProps = {
-  totalEarning: number;
+  totalGross: number;
+  totalNet: number;
 };
 
 export type UpcomingVisitsProps = {

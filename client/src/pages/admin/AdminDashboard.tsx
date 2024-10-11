@@ -61,6 +61,8 @@ const AdminDashboard: React.FC = () => {
     ordersData,
     yearlyCategories,
     yearlyOrdersData,
+    totalNetRevenue,
+    netRevenueData
   } = useStats(isMobile);
 
   const user = useAppSelector(selectCurrentUser);
@@ -156,6 +158,8 @@ const AdminDashboard: React.FC = () => {
               salesDistributionDataAgents={salesDistributionDataAgents}
               isMobile={isMobile}
               userRole={userRole!}
+              totalNetRevenue={totalNetRevenue}
+              netRevenueData={netRevenueData}
             />
           )}
         </Grid>
