@@ -103,7 +103,13 @@ const useManageEntities = () => {
   );
 
   const sortedClients = useMemo(
-    () => Object.values(clients).sort((a, b) => a.name.localeCompare(b.name)),
+    () =>
+      Object.values(clients)
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(client => ({
+          ...client,
+          colour: client.colour || "", // Initialize colour if not present
+        })),
     [clients]
   );
 
@@ -234,10 +240,7 @@ const useManageEntities = () => {
         }
 
         showToast.error(
-          `${t(
-            "manageEntities.deleteFailed",
-            "Failed to delete entity"
-          )}: ${errorMessage}`
+          `${t("manageEntities.deleteFailed", "Failed to delete entity")}: ${errorMessage}`
         );
 
         setAlertMessage(
@@ -257,14 +260,13 @@ const useManageEntities = () => {
    * Handle creation of an entity based on its type.
    */
   const handleCreateEntity = useCallback(
-    async (entityData: Agent | Admin | Employee) => {
-      // Removed Omit<..., "id">
+    async (entityData: Partial<Agent | Admin | Employee>) => {
       setLoadingAction(true);
 
       try {
         switch (role) {
           case "agent": {
-            await dispatch(createAgentAsync(entityData as Agent)).unwrap(); // Removed Omit cast
+            await dispatch(createAgentAsync(entityData as Agent)).unwrap();
             showToast.success(
               t(
                 "manageEntities.createAgentSuccess",
@@ -274,7 +276,7 @@ const useManageEntities = () => {
             break;
           }
           case "admin": {
-            await dispatch(createAdminAsync(entityData as Admin)).unwrap(); // Removed Omit cast
+            await dispatch(createAdminAsync(entityData as Admin)).unwrap();
             showToast.success(
               t(
                 "manageEntities.createAdminSuccess",
@@ -286,7 +288,7 @@ const useManageEntities = () => {
           case "employee": {
             await dispatch(
               createEmployeeAsync(entityData as Employee)
-            ).unwrap(); // Removed Omit cast
+            ).unwrap();
             showToast.success(
               t(
                 "manageEntities.createEmployeeSuccess",
@@ -313,10 +315,7 @@ const useManageEntities = () => {
         }
 
         showToast.error(
-          `${t(
-            "manageEntities.createFailed",
-            "Failed to create entity"
-          )}: ${errorMessage}`
+          `${t("manageEntities.createFailed", "Failed to create entity")}: ${errorMessage}`
         );
 
         setAlertMessage(
@@ -390,10 +389,7 @@ const useManageEntities = () => {
         }
 
         showToast.error(
-          `${t(
-            "manageEntities.updateFailed",
-            "Failed to update entity"
-          )}: ${errorMessage}`
+          `${t("manageEntities.updateFailed", "Failed to update entity")}: ${errorMessage}`
         );
 
         setAlertMessage(
@@ -429,6 +425,7 @@ const useManageEntities = () => {
     handleDeleteEntity,
     handleCreateEntity,
     handleUpdateEntity,
+    sortedClients,
   };
 };
 

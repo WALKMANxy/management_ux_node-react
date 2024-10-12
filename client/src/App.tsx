@@ -206,7 +206,6 @@ const router = createBrowserRouter([
   },
 ]);
 
-
 const theme = createTheme({
   typography: {
     fontFamily: [

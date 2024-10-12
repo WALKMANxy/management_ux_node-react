@@ -10,10 +10,15 @@ import { fetchAllChatsThunk } from "../features/chat/chatThunks";
 import {
   createPromoAsync,
   createVisitAsync,
+  getVisits,
 } from "../features/data/dataThunks";
 import { fetchUsersByIds, selectAllUsers } from "../features/users/userSlice";
 import { IChat, IMessage } from "../models/dataModels";
 import { webSocketService } from "../services/webSocketService";
+import {
+  getLastAlertTimestamp,
+  setLastAlertTimestamp,
+} from "../utils/alertUtils";
 import { generateAutomatedMessage } from "../utils/chatUtils";
 import { RootState } from "./store";
 
@@ -298,6 +303,80 @@ listenerMiddleware.startListening({
       processAutomatedMessageQueue,
       DEBOUNCE_TIME
     );
+  },
+});
+
+// listenerMiddleware.ts
+
+listenerMiddleware.startListening({
+  actionCreator: getVisits.fulfilled,
+  effect: async (_action, listenerApi) => {
+    const state = listenerApi.getState() as RootState;
+    const currentUserDetails = state.data.currentUserDetails;
+
+    if (!currentUserDetails || currentUserDetails.role !== "agent") {
+      return;
+    }
+
+    const currentUserVisits = state.data.currentUserVisits;
+
+    if (!currentUserVisits || !Array.isArray(currentUserVisits)) {
+      return;
+    }
+
+    const currentUserId = currentUserDetails.userId;
+    const now = new Date();
+
+    // Retrieve the last alert timestamp from localStorage
+    const lastAlertSent = getLastAlertTimestamp(currentUserId);
+
+    // Calculate the time difference in milliseconds
+    const millisecondsIn24Hours = 24 * 60 * 60 * 1000;
+
+    // Determine if 24 hours have passed since the last alert
+    const shouldSendAlert =
+      !lastAlertSent ||
+      now.getTime() - lastAlertSent.getTime() >= millisecondsIn24Hours;
+
+    if (!shouldSendAlert) {
+      console.log("Alert already sent within the last 24 hours. Skipping.");
+      return;
+    }
+
+    const overdueVisits = currentUserVisits.filter((visit) => {
+      const visitDate = new Date(visit.date);
+      return (
+        visitDate < now && visit.pending === true && visit.completed === false
+      );
+    });
+
+    if (overdueVisits.length === 0) {
+      console.log("No overdue visits found.");
+      return;
+    }
+
+    // Use generateAutomatedMessage with the count of overdue visits
+    const messageData = generateAutomatedMessage(
+      overdueVisits[0], // Use any visit data, as the content will be based on the count
+      "alert",
+      overdueVisits.length // Pass the count of overdue visits
+    );
+
+    // Add the automated message to the queue
+    automatedMessageQueue.push({
+      targetId: [currentUserId],
+      message: messageData,
+    });
+
+    // Debounce the processing of the automated message queue
+    if (automatedMessageTimer) clearTimeout(automatedMessageTimer);
+    automatedMessageTimer = setTimeout(
+      processAutomatedMessageQueue,
+      DEBOUNCE_TIME
+    );
+
+    // Update the last alert timestamp in localStorage
+    setLastAlertTimestamp(currentUserId);
   },
 });
 

@@ -28,7 +28,6 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectUserRole } from "../../features/auth/authSlice";
 import { fetchMessagesFromMultipleChatsThunk } from "../../features/chat/chatThunks";
 import useChatLogic from "../../hooks/useChatsLogic";
-import Loader from "../common/Loader";
 import ChatList from "./ChatList";
 import ContactsList from "./ContactsList";
 
@@ -152,7 +151,7 @@ const ChatSidebar: React.FC = () => {
         alignItems="center"
         mb={2}
       >
-        <Typography variant="h6" sx={{ fontSize: "2rem" }}>
+        <Typography variant="h6" sx={{ fontSize: "2rem", pl: 2, pt: 1 }}>
           {showContacts
             ? t("chatSidebar.labels.contacts")
             : t("chatSidebar.labels.chats")}
@@ -267,7 +266,7 @@ const ChatSidebar: React.FC = () => {
       </Box>
 
       {isCreateChatFormOpen && (
-        <React.Suspense fallback={<Loader fadeout />}>
+        <React.Suspense>
           <CreateChatForm
             open={isCreateChatFormOpen}
             onClose={() => setIsCreateChatFormOpen(false)}

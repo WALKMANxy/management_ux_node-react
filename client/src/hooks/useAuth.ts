@@ -113,13 +113,19 @@ export const useAuth = () => {
     email: string,
     password: string,
     setAlertMessage: (message: string) => void,
-    setAlertSeverity: (severity: "success" | "error" | "info") => void, // Added "info" severity
+    setAlertSeverity: (severity: "success" | "error" | "info") => void,
     setAlertOpen: (open: boolean) => void,
     onClose: () => void,
     keepMeSignedIn: boolean
   ) => {
     try {
-      // console.log("Attempting to log in with credentials:", { email });
+      // Check if email or password is empty
+      if (!email || !password) {
+        setAlertMessage(t("auth.enterEmailAndPassword")); // Translated message for empty fields
+        setAlertSeverity("error");
+        setAlertOpen(true);
+        return;
+      }
 
       // Attempt to log in the user
       const { id, message, statusCode, refreshToken } = await loginUser({
@@ -129,9 +135,7 @@ export const useAuth = () => {
 
       // Handle 401 Unauthorized response
       if (statusCode === 401) {
-        setAlertMessage(
-          t("auth.loginInconsistency") // Translated message for 401 errors
-        );
+        setAlertMessage(t("auth.loginInconsistency")); // Translated message for 401 errors
         setAlertSeverity("error");
         setAlertOpen(true);
         return;
@@ -139,12 +143,7 @@ export const useAuth = () => {
 
       // Check if the login was unsuccessful
       if (statusCode !== 200) {
-        console.warn(
-          "Login failed with status code:",
-          statusCode,
-          "Message:",
-          message
-        );
+        console.warn("Login failed with status code:", statusCode, "Message:", message);
         setAlertMessage(t("auth.loginFailed" + message));
         setAlertSeverity("error");
         setAlertOpen(true);
@@ -155,25 +154,15 @@ export const useAuth = () => {
       const userId = id;
 
       if (userId) {
-        // console.log("User ID retrieved from login response:", userId);
-
-        // Derive the encryption key using userId, userAgent, and salt
         await initializeUserEncryption({
           userId,
           timeMS,
-          // Check if the
         });
 
-        // console.log("Encryption initialized for user:", userId);
-
-        // Dispatch an action to get the user role by ID
         const result = await getUserById(userId);
-        // console.log("Response from getUserById:", result);
 
         if (result) {
           const user = result as User;
-
-          // console.log("User role retrieved:", user.role);
 
           if (!user.role) {
             setAlertMessage(t("auth.roleNotAssigned" + message));
@@ -198,15 +187,10 @@ export const useAuth = () => {
             })
           );
 
-          // console.log("Login dispatched successfully.");
-
-          // Set the current user in the userSlice for consistent state management
           dispatch(setCurrentUser(user));
 
-          // Save auth state if 'Keep me signed in' is selected
           if (keepMeSignedIn) {
             saveAuthState(store.getState().auth);
-            // console.log("Auth state saved in local storage");
           }
 
           onClose();
@@ -225,17 +209,19 @@ export const useAuth = () => {
       if (error instanceof FetchUserRoleError) {
         errorMessage = t("auth.roleNotAssigned");
         errorSeverity = "info";
-      } else if (
-        error instanceof Error &&
-        error.message.includes("undefined")
-      ) {
+      } else if (error instanceof Error && error.message.includes("undefined")) {
         errorMessage = t("auth.serverUnreachable");
         setAlertMessage(errorMessage);
         setAlertSeverity(errorSeverity);
         setAlertOpen(true);
+      } else if (error instanceof Error && error.message.includes("Forbidden")) {
+        errorMessage = t("auth.accountEntityAssignmentPending"); // Translated message for "Forbidden" error
+        setAlertMessage(errorMessage);
+        setAlertSeverity("info");
+        setAlertOpen(true);
       }
 
-      setAlertMessage(t("auth.loginInconsistency"));
+      setAlertMessage(errorMessage);
       setAlertSeverity(errorSeverity);
       setAlertOpen(true);
     }
