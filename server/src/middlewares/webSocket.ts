@@ -94,7 +94,8 @@ export const setupWebSocket = (io: SocketIOServer) => {
 
       await joinUserToChats(io, socket);
 
-      // Join all existing chat rooms the user is part of
+      // We're gonna handle this once the project starts, since there are no users currently.
+     /*  // Join all existing chat rooms the user is part of
       // Check if user is employee or admin and update the broadcast chat accordingly
       const broadcastChatId = "6701f7dbc1a80a3d029808ab";
 
@@ -106,7 +107,7 @@ export const setupWebSocket = (io: SocketIOServer) => {
         await ChatService.addAdminToChat(broadcastChatId, socket.userId);
 
         socket.join("admins"); // Also join the 'admins' room
-      }
+      } */
     }
 
     socket.on("disconnect", () => {

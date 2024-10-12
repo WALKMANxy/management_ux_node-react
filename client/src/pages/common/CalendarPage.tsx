@@ -19,7 +19,6 @@ import { useSelector } from "react-redux";
 import CalendarEventComponent from "../../components/calendarPage/CalendarEventComponent";
 import { CustomToolbar } from "../../components/calendarPage/CustomToolbar";
 import { EventForm } from "../../components/calendarPage/EventForm";
-import { EventHistory } from "../../components/calendarPage/EventHistory";
 import PopOverEvent from "../../components/calendarPage/PopOverEvent";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import Loader from "../../components/common/Loader";
@@ -31,6 +30,9 @@ import { localizer } from "../../services/localizer";
 import { showToast } from "../../services/toastMessage";
 import "./CalendarPage.css"; // Import the CSS file
 
+const EventHistory = React.lazy(
+  () => import("../../components/calendarPage/EventHistory")
+);
 const CalendarPage: React.FC = () => {
   const { t } = useTranslation();
 
@@ -242,11 +244,13 @@ const CalendarPage: React.FC = () => {
             px: isMobile ? 1.3 : 0,
           }}
         >
-          <EventHistory
-            events={displayEvents}
-            userRole={userRole!}
-            handleDeleteEvent={handleDeleteEventWithConfirmation}
-          />
+          <React.Suspense fallback={<Loader fadeout />}>
+            <EventHistory
+              events={displayEvents}
+              userRole={userRole!}
+              handleDeleteEvent={handleDeleteEventWithConfirmation}
+            />
+          </React.Suspense>
         </Box>
       )}
 

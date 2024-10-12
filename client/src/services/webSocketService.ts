@@ -112,8 +112,8 @@ class WebSocketService {
     });
 
     // Handle reconnection attempts
-    this.socket.on("reconnect_attempt", (attempt) => {
-      console.log(`Reconnection attempt ${attempt}`);
+    this.socket.on("reconnect_attempt", () => {
+      // console.log(`Reconnection attempt ${attempt}`);
       // Optionally, update UI or state
     });
 
@@ -126,8 +126,8 @@ class WebSocketService {
     });
 
     // Handle successful reconnection
-    this.socket.on("reconnect", (attemptNumber) => {
-      console.log(`Reconnected after ${attemptNumber} attempts`);
+    this.socket.on("reconnect", () => {
+      // console.log(`Reconnected after ${attemptNumber} attempts`);
       // Dismiss any existing connection lost toasts
       toast.dismiss(this.connectionLostToastId);
       // Optionally, show a success toast
@@ -146,7 +146,7 @@ class WebSocketService {
   }
 
   private handleConnect = () => {
-    console.log("WebSocket connected.");
+    // console.log("WebSocket connected.");
     // Dismiss any connection lost toasts
     toast.dismiss(this.connectionLostToastId);
     // Optionally, show a connected toast

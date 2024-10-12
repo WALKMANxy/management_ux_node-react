@@ -1,6 +1,6 @@
 // src/components/TotalEarning.tsx
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 
 import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -9,7 +9,10 @@ import { useTranslation } from "react-i18next";
 import { TotalEarningProps } from "../../models/propsModels";
 import { currencyFormatter } from "../../utils/dataUtils";
 
-const TotalEarning: React.FC<TotalEarningProps> = ({ totalGross, totalNet }) => {
+const TotalEarning: React.FC<TotalEarningProps> = ({
+  totalGross,
+  totalNet,
+}) => {
   const { t } = useTranslation();
 
   const theme = useTheme();
@@ -82,8 +85,7 @@ const TotalEarning: React.FC<TotalEarningProps> = ({ totalGross, totalNet }) => 
                     fontWeight: 500,
                     mt: -1,
                     mr: 1,
-
-                    }}
+                  }}
                 >
                   {formattedGross}
                 </Typography>
@@ -94,6 +96,8 @@ const TotalEarning: React.FC<TotalEarningProps> = ({ totalGross, totalNet }) => 
                     cursor: "pointer",
                     bgcolor: theme.palette.secondary.light,
                     color: "#000",
+                    height: 30,
+                    width: 30,
                   }}
                 >
                   <ArrowUpwardIcon
@@ -108,7 +112,6 @@ const TotalEarning: React.FC<TotalEarningProps> = ({ totalGross, totalNet }) => 
                 fontSize: "1.5rem",
                 fontWeight: 500,
                 color: "#000",
-
               }}
             >
               {t("dashboard.totalGross")}
@@ -129,8 +132,8 @@ const TotalEarning: React.FC<TotalEarningProps> = ({ totalGross, totalNet }) => 
                         cursor: "pointer",
                         bgcolor: theme.palette.secondary.light,
                         color: "#000",
-                        width: 32,
-                        height: 32,
+                        height: 30,
+                        width: 30,
                       }}
                     >
                       <ArrowDownwardIcon
@@ -142,12 +145,11 @@ const TotalEarning: React.FC<TotalEarningProps> = ({ totalGross, totalNet }) => 
                   {/* Net Earnings Value */}
                   <Grid item>
                     <Typography
-                       sx={{
-                        fontSize: "2.0rem",
+                      sx={{
+                        fontSize: "2.10rem",
                         fontWeight: 500,
                         mr: 1,
-
-                        }}
+                      }}
                     >
                       {formattedNet}
                     </Typography>
