@@ -180,6 +180,7 @@ const EntityDetails: React.FC<EntityDetailsProps> = ({
         const agent = entity as Agent;
         return (
           <>
+            {/* Existing Agent Fields */}
             <Box display="flex" alignItems="center">
               <Label>{t("entityDetails.id", "ID")}:</Label>
               <Value sx={{ ml: 0.5 }}>{displayValue(agent.id)}</Value>
@@ -202,6 +203,16 @@ const EntityDetails: React.FC<EntityDetailsProps> = ({
               <Label>{t("entityDetails.phone", "Phone")}:</Label>
               <Value sx={{ ml: 0.5 }}>{displayValue(agent.phone)}</Value>
             </Box>
+            <Divider />
+
+            {/* New Field: Number of Assigned Clients */}
+            <Box display="flex" alignItems="center">
+              <Label>{t("entityDetails.assignedClients", "Assigned Clients")}:</Label>
+              <Value sx={{ ml: 0.5 }}>
+                {agent.clients ? agent.clients.length : 0}
+              </Value>
+            </Box>
+            <Divider />
           </>
         );
       }

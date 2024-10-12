@@ -14,7 +14,7 @@ import {
   useTheme,
 } from "@mui/material";
 import "animate.css";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useInView } from "react-intersection-observer";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
@@ -25,7 +25,9 @@ import {
 } from "../../features/users/userSlice";
 import { User } from "../../models/entityModels";
 import { showToast } from "../../services/toastMessage";
-import UserDetails from "./UserDetails";
+import { ExtendedManageUsersSkeleton } from "./Skeletons";
+
+const UserDetails = React.lazy(() => import("./UserDetails"));
 
 const ManageUsers: React.FC = () => {
   const theme = useTheme();
@@ -146,7 +148,9 @@ const ManageUsers: React.FC = () => {
       {/* Render User Details with fadeIn animation */}
       {selectedUser ? (
         <Box sx={{ px: 1 }} className="animate__animated animate__fadeIn">
-          <UserDetails user={selectedUser} onBack={handleBackToList} />
+          <Suspense fallback={<ExtendedManageUsersSkeleton />}>
+            <UserDetails user={selectedUser} onBack={handleBackToList} />
+          </Suspense>
         </Box>
       ) : (
         <Box className="animate__animated animate__fadeIn">

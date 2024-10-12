@@ -1,6 +1,7 @@
 // src/components/userPage/ManageEntities.tsx
 
 import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import InfoIcon from "@mui/icons-material/Info";
@@ -9,35 +10,89 @@ import {
   Box,
   Button,
   ButtonGroup,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
+  Skeleton,
+  styled,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   TextField,
   Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import "animate.css";
+
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useAppSelector } from "../../app/hooks";
+import { selectCurrentUser } from "../../features/users/userSlice";
 import useManageEntities from "../../hooks/useManageEntities";
 import { Admin, Agent, Client, Employee } from "../../models/entityModels";
 import { showToast } from "../../services/toastMessage";
 import EntityDetails from "./EntityCard"; // Assuming EntityCard is the detailed view component
 import EntityFormModal from "./EntityFormModal";
 
+type Order = "asc" | "desc";
+
+interface HeadCell {
+  id: keyof Client | keyof Agent | keyof Admin | keyof Employee;
+  label: string;
+  numeric: boolean;
+}
+
+const headCells: HeadCell[] = [
+  {
+    id: "name",
+    label: "Name",
+    numeric: false,
+  },
+  {
+    id: "id",
+    label: "ID",
+    numeric: true,
+  },
+  // Actions column will be conditionally rendered
+];
+
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.common.white,
+  "&:hover": {
+    backgroundColor: theme.palette.primary.dark,
+  },
+  borderRadius: "50%",
+  width: 48,
+  height: 48,
+}));
+
+const StyledCloseButton = styled(IconButton)(({ theme }) => ({
+  backgroundColor: theme.palette.error.main,
+  color: theme.palette.common.white,
+  "&:hover": {
+    backgroundColor: theme.palette.error.dark,
+  },
+  borderRadius: "50%",
+  width: 48,
+  height: 48,
+}));
+
 const ManageEntities: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const entityCode = useAppSelector(selectCurrentUser)?.entityCode;
 
   const [filter, setFilter] = useState<
     "client" | "agent" | "admin" | "employee"
@@ -45,6 +100,10 @@ const ManageEntities: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [addEditModalOpen, setAddEditModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Sorting state
+  const [order, setOrder] = useState<Order>("asc");
+  const [orderBy, setOrderBy] = useState<"name" | "id">("name");
 
   const {
     setRole,
@@ -61,13 +120,80 @@ const ManageEntities: React.FC = () => {
     setAlertMessage,
     alertSeverity,
     handleDeleteEntity,
+    handleCreateEntity,
+    handleUpdateEntity,
   } = useManageEntities();
 
   useEffect(() => {
     // Update role based on filter selection
     setRole(filter);
     setSelectedEntity(null); // Reset selected entity on filter change
+    // Reset sorting when filter changes
+    setOrder("asc");
+    setOrderBy("name");
   }, [filter, setRole, setSelectedEntity]);
+
+  const descendingComparator = useCallback(
+    (
+      a: Client | Agent | Admin | Employee,
+      b: Client | Agent | Admin | Employee,
+      orderBy: "name" | "id"
+    ) => {
+      if (orderBy === "name") {
+        return b.name.localeCompare(a.name);
+      } else {
+        // Assuming IDs are numeric strings
+        return parseInt(b.id, 10) - parseInt(a.id, 10);
+      }
+    },
+    []
+  );
+
+  // Comparator function
+  const getComparator = useCallback(
+    (order: Order, orderBy: "name" | "id") =>
+      order === "desc"
+        ? (
+            a: Client | Agent | Admin | Employee,
+            b: Client | Agent | Admin | Employee
+          ) => descendingComparator(a, b, orderBy)
+        : (
+            a: Client | Agent | Admin | Employee,
+            b: Client | Agent | Admin | Employee
+          ) => -descendingComparator(a, b, orderBy),
+    [descendingComparator]
+  );
+
+  // Stable sort function
+  const stableSort = (
+    array: (Client | Agent | Admin | Employee)[],
+    comparator: (
+      a: Client | Agent | Admin | Employee,
+      b: Client | Agent | Admin | Employee
+    ) => number
+  ) => {
+    const stabilizedThis = array.map(
+      (el, index) => [el, index] as [Client | Agent | Admin | Employee, number]
+    );
+    stabilizedThis.sort((a, b) => {
+      const order = comparator(a[0], b[0]);
+      if (order !== 0) return order;
+      return a[1] - b[1];
+    });
+    return stabilizedThis.map((el) => el[0]);
+  };
+
+  // Handle sorting request
+  const handleRequestSort = (property: "name" | "id") => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
+  };
+
+  // Memoized sorted entities
+  const sortedEntities = useMemo(() => {
+    return stableSort(entityOptions, getComparator(order, orderBy));
+  }, [entityOptions, order, orderBy, getComparator]);
 
   // Handle adding a new entity
   const handleAddButtonClick = () => {
@@ -87,17 +213,44 @@ const ManageEntities: React.FC = () => {
     entity: Client | Agent | Admin | Employee
   ) => {
     setSelectedEntity(entity);
+    if (filter === "admin" && entity.id === entityCode) {
+      showToast.error(
+        t(
+          "manageEntities.cannotDeleteYourself",
+          "You cannot delete your own entity."
+        )
+      );
+      return;
+    }
+
     setDeleteDialogOpen(true);
   };
 
   // Confirm deletion of entity
-  // Confirm deletion of entity
   const confirmDeleteEntity = () => {
     if (selectedEntity) {
-      // Check if selectedEntity is of type Client and return early if true
-      if ("totalNetRevenue" in selectedEntity) {
-        // Assuming 'Client' has a 'CODICE' field, which is unique to Client
+      // Prevent deletion of Client entities by checking the current filter
+      if (filter === "client") {
+        showToast.error(
+          t(
+            "manageEntities.cannotDeleteClient",
+            "Cannot delete Client entities."
+          )
+        );
         console.error("Cannot delete Client entities");
+        setDeleteDialogOpen(false);
+        return;
+      }
+
+      if (filter === "admin" && selectedEntity.id === entityCode) {
+        showToast.error(
+          t(
+            "manageEntities.cannotDeleteYourself",
+            "You cannot delete your own entity."
+          )
+        );
+        console.error("You cannot delete your own entity");
+        setDeleteDialogOpen(false);
         return;
       }
 
@@ -106,12 +259,15 @@ const ManageEntities: React.FC = () => {
       setSelectedEntity(null);
     } else {
       // Show error if no entity selected
+      showToast.error(
+        t("manageEntities.noEntitySelected", "No entity selected for deletion.")
+      );
       console.error("No entity selected for deletion");
     }
   };
 
   return (
-    <Box sx={{ padding: isMobile ? 1 : 2 }}>
+    <Box sx={{ px: 0, pb: 1 }}>
       <Typography variant="h4" gutterBottom>
         {t("manageEntities.title", "Manage Entities")}
       </Typography>
@@ -150,7 +306,14 @@ const ManageEntities: React.FC = () => {
       <ButtonGroup
         variant="contained"
         aria-label={t("manageEntities.roleSelection", "Role selection")}
-        sx={{ mb: 2 }}
+        sx={{
+          boxShadow: "none",
+          gap: 2,
+          transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
+          transformOrigin: "top left", // Anchor the scale to the top-left corner
+          width: isMobile ? "133.33%" : "100%",
+          mb: 2.5,
+        }}
       >
         <Button
           onClick={() => setFilter("client")}
@@ -214,12 +377,21 @@ const ManageEntities: React.FC = () => {
             : t("manageEntities.startTyping", "Start typing to search")
         }
         fullWidth
-        sx={{ mb: 2 }}
+        sx={{ mb: 0 }}
       />
 
       {/* Add Button */}
-      <Box display="flex" justifyContent="flex-end" sx={{ mb: 2 }}>
-        <IconButton onClick={handleAddButtonClick} color="primary">
+      <Box display="flex" justifyContent="flex-end" sx={{ mb: 0 }}>
+        <IconButton
+          onClick={handleAddButtonClick}
+          color="primary"
+          disabled={filter === "client"} // Disable Add button for Clients
+          title={
+            filter === "client"
+              ? t("manageEntities.addDisabled", "Adding Clients is disabled.")
+              : t("manageEntities.addEntity", "Add Entity")
+          }
+        >
           <AddIcon />
         </IconButton>
       </Box>
@@ -229,30 +401,64 @@ const ManageEntities: React.FC = () => {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell>{t("manageEntities.entityName", "Name")}</TableCell>
-              <TableCell>{t("manageEntities.entityId", "ID")}</TableCell>
-              <TableCell>{t("manageEntities.actions", "Actions")}</TableCell>
+              {headCells.map((headCell) => (
+                <TableCell
+                  key={headCell.id}
+                  sortDirection={orderBy === headCell.id ? order : false}
+                >
+                  <TableSortLabel
+                    active={orderBy === headCell.id}
+                    direction={orderBy === headCell.id ? order : "asc"}
+                    onClick={() =>
+                      handleRequestSort(headCell.id as "name" | "id")
+                    }
+                  >
+                    {t(
+                      `manageEntities.${headCell.label.toLowerCase()}`,
+                      headCell.label
+                    )}
+                  </TableSortLabel>
+                </TableCell>
+              ))}
+              {filter !== "client" && (
+                <TableCell>{t("manageEntities.actions", "Actions")}</TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
-            {loadingEntities
-              ? Array.from({ length: visibleRows }).map((_, index) => (
-                  <TableRow key={index}>
-                    <TableCell colSpan={3}>
-                      {t("manageEntities.loading", "Loading...")}
-                    </TableCell>
-                  </TableRow>
-                ))
-              : entityOptions.map((entity) => (
-                  <TableRow
-                    key={entity.id}
-                    hover
-                    onClick={() => setSelectedEntity(entity)}
-                    selected={selectedEntity?.id === entity.id}
-                    sx={{ cursor: "pointer" }}
-                  >
-                    <TableCell>{entity.name}</TableCell>
-                    <TableCell>{entity.id}</TableCell>
+            {loadingEntities ? (
+              Array.from({ length: visibleRows }).map((_, index) => (
+                <TableRow
+                  key={index}
+                  className="animate__animated animate__fadeOut" // Animate fadeOut when loading
+                >
+                  <TableCell>
+                    <Skeleton variant="text" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton variant="text" />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : sortedEntities.length > 0 ? (
+              sortedEntities.map((entity) => (
+                <TableRow
+                  hover
+                  key={entity.id}
+                  onClick={() => setSelectedEntity(entity)}
+                  selected={selectedEntity?.id === entity.id}
+                  sx={{
+                    cursor: "pointer",
+                    backgroundColor:
+                      selectedEntity?.id === entity.id
+                        ? "rgba(0, 0, 0, 0.08)"
+                        : "inherit",
+                  }}
+                  className="animate__animated animate__fadeIn" // Animate fadeIn when loaded
+                >
+                  <TableCell>{entity.name}</TableCell>
+                  <TableCell>{entity.id}</TableCell>
+                  {filter !== "client" && (
                     <TableCell>
                       <IconButton onClick={() => handleEditButtonClick(entity)}>
                         <EditIcon />
@@ -263,11 +469,19 @@ const ManageEntities: React.FC = () => {
                         <DeleteIcon />
                       </IconButton>
                     </TableCell>
-                  </TableRow>
-                ))}
+                  )}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={filter !== "client" ? 3 : 2} align="center">
+                  {t("manageEntities.noEntitiesFound", "No entities found.")}
+                </TableCell>
+              </TableRow>
+            )}
             {/* Sentinel row for infinite scrolling */}
             <TableRow ref={ref}>
-              <TableCell colSpan={3} />
+              <TableCell colSpan={filter !== "client" ? 3 : 2} />
             </TableRow>
           </TableBody>
         </Table>
@@ -275,7 +489,9 @@ const ManageEntities: React.FC = () => {
 
       {/* Entity Details */}
       {selectedEntity && (
-        <EntityDetails entity={selectedEntity} entityType={filter} />
+        <Box pt={2} className="animate__animated animate__bounceIn">
+          <EntityDetails entity={selectedEntity} entityType={filter} />
+        </Box>
       )}
 
       {/* Delete Confirmation Dialog */}
@@ -293,19 +509,41 @@ const ManageEntities: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={confirmDeleteEntity}
-            color="error"
-            disabled={loadingAction}
+          <Box
+            sx={{
+              mb: 2,
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: 2,
+            }}
           >
-            {t("manageEntities.deleteButton", "Delete")}
-          </Button>
-          <Button
-            onClick={() => setDeleteDialogOpen(false)}
-            disabled={loadingAction}
-          >
-            {t("manageEntities.cancelButton", "Cancel")}
-          </Button>
+            {/* Delete Button */}
+            <Tooltip title={t("manageEntities.deleteTooltip", "Delete")} arrow>
+              <StyledIconButton
+                onClick={confirmDeleteEntity}
+                color="error"
+                aria-label={t("manageEntities.deleteButton", "Delete")}
+                disabled={loadingAction || filter === "client"} // Additional safety
+              >
+                {loadingAction ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  <DeleteIcon />
+                )}
+              </StyledIconButton>
+            </Tooltip>
+
+            {/* Cancel Button */}
+            <Tooltip title={t("manageEntities.cancelTooltip", "Cancel")} arrow>
+              <StyledCloseButton
+                onClick={() => setDeleteDialogOpen(false)}
+                aria-label={t("manageEntities.cancelButton", "Cancel")}
+                disabled={loadingAction}
+              >
+                <CloseIcon />
+              </StyledCloseButton>
+            </Tooltip>
+          </Box>
         </DialogActions>
       </Dialog>
 
@@ -315,16 +553,15 @@ const ManageEntities: React.FC = () => {
         onClose={() => setAddEditModalOpen(false)}
         isEditing={isEditing}
         entityType={filter}
-        entity={isEditing ? selectedEntity : null}
+        entity={
+          isEditing ? (selectedEntity as Admin | Agent | Employee | null) : null
+        }
         onSave={() => {
           setAddEditModalOpen(false);
           // Optionally, refetch or update entities after save
-          showToast.success(
-            isEditing
-              ? t("manageEntities.editSuccess", "Entity updated successfully")
-              : t("manageEntities.addSuccess", "Entity added successfully")
-          );
         }}
+        onCreate={handleCreateEntity}
+        onUpdate={handleUpdateEntity}
       />
     </Box>
   );
