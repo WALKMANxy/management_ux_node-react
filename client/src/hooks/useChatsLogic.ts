@@ -93,19 +93,20 @@ const useChatLogic = () => {
       };
     }
   }, [chatRetryCount, fetchChats]);
-
   // Select a chat
   const selectChat = useCallback(
     (chat: IChat) => {
       // Determine the chat identifier: use _id if available, otherwise local_id
-      const chatId = chat.local_id || chat._id
+      const chatId = chat._id ? chat._id.toString() : chat.local_id;
 
       if (!chatId) {
         console.warn("Chat does not have an _id or local_id:", chat);
         return;
       }
 
-      console./*  */log(`Selecting chat ${chatId} for user ${currentUserId}`);
+      /*   console.log(`Selected chat ID: ${chatId}`); // Debug: Log chat ID
+      console.log(`Chat name: ${chat.name}`); // Debug: Log chat name
+      console.log(`Chat with ${chat.participants.length} members`); // Debug: Log the number of members */
 
       // Set the current chat in the state
       dispatch(setCurrentChatReducer(chat));
@@ -125,15 +126,12 @@ const useChatLogic = () => {
             : message._id.toString()
         );
 
-      /* console.log(
+      /*   console.log(
         `Found ${unreadMessageIds.length} unread messages by ${currentUserId} in chat ${chatId}`
-      ); */
+      ); */ // Debug: Log the number of unread messages
 
       // Update read status for unread messages
       if (unreadMessageIds.length > 0) {
-       /*  console.log(
-          `Updating read status for ${unreadMessageIds.length} unread messages by ${currentUserId} in chat ${chatId}`
-        ); */
         dispatch(
           updateReadStatusReducer({
             chatId: chatId,
@@ -145,7 +143,6 @@ const useChatLogic = () => {
     },
     [currentUserId, dispatch]
   );
-
 
   // Function to mark messages as read
   const markMessagesAsRead = useCallback(
@@ -345,57 +342,40 @@ const useChatLogic = () => {
   // Handle selecting a contact to open or create a chat
   const handleContactSelect = useCallback(
     (contactId: string) => {
-      // console.log("handleContactSelect:", contactId);
-      let chatToSelect: IChat | null = null;
+      // Check if there's an existing chat with this contact
+      const existingChat = Object.values(chats).find(
+        (chat) =>
+          chat.type === "simple" &&
+          chat.participants.includes(contactId) &&
+          chat.participants.includes(currentUserId)
+      );
 
-      try {
-        // Check if there's an existing chat with this contact
-        const existingChat = Object.values(chats).find(
-          (chat) =>
-            chat.type === "simple" &&
-            chat.participants.includes(contactId) &&
-            chat.participants.includes(currentUserId)
-        );
+      if (existingChat) {
+        // If chat exists, select it
+        selectChat(existingChat);
+      } else {
+        // If no chat exists, create a new one optimistically
+        const localId = generateId();
 
-        if (existingChat) {
-          // console.log("handleContactSelect: existingChat:", existingChat);
-          // If chat exists, prepare to select it
-          chatToSelect = existingChat;
-        } else {
-          // console.log("handleContactSelect: no existing chat, creating a new one");
-          // If no chat exists, create a new one optimistically
-          const localId = generateId();
+        const newChat: IChat = {
+          local_id: localId,
+          type: "simple",
+          participants: [currentUserId, contactId],
+          messages: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          status: "pending", // Indicate that the chat is pending confirmation
+        };
 
-          const newChat: IChat = {
-            local_id: localId,
-            type: "simple",
-            participants: [currentUserId, contactId],
-            messages: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            status: "pending", // Indicate that the chat is pending confirmation
-          };
+        // Optimistically add the new chat to the state
+        dispatch(addChatReducer({ chat: newChat }));
 
-          // Optimistically add the new chat to the state
-          dispatch(addChatReducer({ chat: newChat }));
-          // console.log("handleContactSelect: newChat:", newChat);
-
-          // Prepare to select the new optimistic chat
-          chatToSelect = newChat;
-        }
-      } catch (error) {
-        console.error("handleContactSelect encountered an error:", error);
-        // Handle error appropriately (e.g., show a notification to the user)
-      } finally {
-        if (chatToSelect) {
-          selectChat(chatToSelect);
-        }
+        // Immediately select the new optimistic chat
+        selectChat(newChat);
       }
     },
     [chats, currentUserId, dispatch, selectChat]
   );
-
-
 
   const filteredContacts = useMemo(() => {
     // Filter contacts based on the user role and exclude the current user
