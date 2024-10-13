@@ -20,7 +20,6 @@ import { fetchAllChatsThunk } from "../features/chat/chatThunks";
 import { selectClientIds } from "../features/data/dataSlice";
 import { getAllUsersThunk, selectAllUsers } from "../features/users/userSlice";
 import { IChat, IMessage } from "../models/dataModels";
-import { showToast } from "../services/toastMessage";
 import { sanitizeSearchTerm } from "../utils/chatUtils";
 import { generateId } from "../utils/deviceUtils";
 import { Attachment } from "./useFilePreview";
@@ -93,20 +92,17 @@ const useChatLogic = () => {
       };
     }
   }, [chatRetryCount, fetchChats]);
+
   // Select a chat
   const selectChat = useCallback(
     (chat: IChat) => {
       // Determine the chat identifier: use _id if available, otherwise local_id
-      const chatId = chat._id ? chat._id.toString() : chat.local_id;
+      const chatId = chat._id || chat.local_id;
 
       if (!chatId) {
         console.warn("Chat does not have an _id or local_id:", chat);
         return;
       }
-
-      /*   console.log(`Selected chat ID: ${chatId}`); // Debug: Log chat ID
-      console.log(`Chat name: ${chat.name}`); // Debug: Log chat name
-      console.log(`Chat with ${chat.participants.length} members`); // Debug: Log the number of members */
 
       // Set the current chat in the state
       dispatch(setCurrentChatReducer(chat));
@@ -125,10 +121,6 @@ const useChatLogic = () => {
             ? message.local_id.toString()
             : message._id.toString()
         );
-
-      /*   console.log(
-        `Found ${unreadMessageIds.length} unread messages by ${currentUserId} in chat ${chatId}`
-      ); */ // Debug: Log the number of unread messages
 
       // Update read status for unread messages
       if (unreadMessageIds.length > 0) {
@@ -342,7 +334,6 @@ const useChatLogic = () => {
   // Handle selecting a contact to open or create a chat
   const handleContactSelect = useCallback(
     (contactId: string) => {
-      // console.log("handleContactSelect:", contactId);
       let chatToSelect: IChat | null = null;
 
       try {
@@ -355,11 +346,9 @@ const useChatLogic = () => {
         );
 
         if (existingChat) {
-          // console.log("handleContactSelect: existingChat:", existingChat);
           // If chat exists, prepare to select it
           chatToSelect = existingChat;
         } else {
-          // console.log("handleContactSelect: no existing chat, creating a new one");
           // If no chat exists, create a new one optimistically
           const localId = generateId();
 
@@ -375,7 +364,6 @@ const useChatLogic = () => {
 
           // Optimistically add the new chat to the state
           dispatch(addChatReducer({ chat: newChat }));
-          // console.log("handleContactSelect: newChat:", newChat);
 
           // Prepare to select the new optimistic chat
           chatToSelect = newChat;
@@ -534,7 +522,7 @@ const useChatLogic = () => {
   }, [broadcastChat]);
   useEffect(() => {
     if (chatError) {
-      showToast.error(t("chats.error", { error: chatError }));
+      console.error(t("chats.error", { error: chatError }));
     }
   }, [chatError, t]);
 

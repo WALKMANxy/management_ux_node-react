@@ -5,7 +5,6 @@ import store from "../app/store";
 import { handleLogout } from "../features/auth/authThunks";
 import { axiosInstance } from "../utils/apiUtils";
 import { refreshAccessToken } from "./sessionService";
-import { showToast } from "./toastMessage";
 import { getAccessToken } from "./tokenService";
 
 let isRefreshing = false;
@@ -99,7 +98,6 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(new Error(serverMessage));
     } else if (error.request) {
       // Network error
-      showToast.error("Network Error");
       console.error("Network Error:", error.message);
       return Promise.reject(new Error("Network Error"));
     } else {
