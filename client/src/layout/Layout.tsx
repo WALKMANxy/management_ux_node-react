@@ -1,4 +1,4 @@
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, useMediaQuery } from "@mui/material";
 import "animate.css";
 import React, { useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
@@ -9,8 +9,7 @@ import { selectCurrentChat } from "../features/chat/chatSlice";
 
 const Layout: React.FC = () => {
   const location = useLocation();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery("(max-width:800px)");
   const currentChat = useAppSelector(selectCurrentChat);
   const [shouldShowHeader, setShouldShowHeader] = useState(
     !currentChat || !isMobile

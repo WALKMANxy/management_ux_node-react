@@ -1,4 +1,4 @@
-import { Box, Grid, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Grid, useMediaQuery } from "@mui/material";
 import React from "react";
 import { useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
@@ -6,9 +6,8 @@ import ChatSidebar from "../../components/chatPage/ChatSidebar";
 import ChatView from "../../components/chatPage/ChatView";
 
 const ChatPage: React.FC = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery("(min-width:900px) and (max-width:1250px)");
+  const isMobile = useMediaQuery("(max-width:800px)");
+  const isTablet = useMediaQuery("(min-width:800px) and (max-width:1250px)");
 
   // Get currentChat from Redux state
   const currentChat = useAppSelector(
