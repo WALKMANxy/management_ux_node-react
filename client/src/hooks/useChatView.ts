@@ -95,7 +95,7 @@ const useChatView = () => {
       );
       if (participantId) {
         const participant = users[participantId];
-        return participant?.entityName || t("chat.defaultTitle");
+        return participant?.entityName || t("chat.deletedUser");
       }
     }
     return currentChat?.name || t("chat.groupTitle");

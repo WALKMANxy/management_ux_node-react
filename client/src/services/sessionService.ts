@@ -29,7 +29,6 @@ export async function refreshAccessToken(): Promise<boolean> {
 
   if (!refreshToken || !uniqueId) {
     console.error("No refresh token or uniqueId available");
-    showToast.error("No refresh token or uniqueId available, logging out...");
     return false;
   }
 
@@ -64,7 +63,6 @@ export async function refreshAccessToken(): Promise<boolean> {
     return true;
   } catch (error) {
     console.error("Failed to refresh access token:", error);
-    showToast.error("No refresh token or uniqueId available, logging out...");
     return false;
   }
 }
