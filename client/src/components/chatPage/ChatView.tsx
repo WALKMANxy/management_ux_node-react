@@ -24,6 +24,7 @@ import useChatView from "../../hooks/useChatView"; // Import the custom hook
 import { useFilePreview } from "../../hooks/useFilePreview";
 import { IChat } from "../../models/dataModels";
 import { canUserChat } from "../../utils/chatUtils";
+import Spinner from "../common/Spinner";
 import CreateChatForm from "./CreateChatForm"; // Import CreateChatForm
 import FileViewer from "./FileViewer";
 import InputBox from "./InputBox";
@@ -116,22 +117,7 @@ const ChatView: React.FC = () => {
 
   // Fallback if currentChat is not set
   if (!currentChat) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100dvh",
-          bgcolor: "#ffffff",
-          overflow: "hidden",
-        }}
-      >
-        <Typography variant="h6" color="textSecondary">
-          {t("chatView.labels.noChatSelected")}
-        </Typography>
-      </Box>
-    );
+    return <Spinner />;
   }
 
   return (

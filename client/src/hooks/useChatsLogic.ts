@@ -342,36 +342,51 @@ const useChatLogic = () => {
   // Handle selecting a contact to open or create a chat
   const handleContactSelect = useCallback(
     (contactId: string) => {
-      // Check if there's an existing chat with this contact
-      const existingChat = Object.values(chats).find(
-        (chat) =>
-          chat.type === "simple" &&
-          chat.participants.includes(contactId) &&
-          chat.participants.includes(currentUserId)
-      );
+      // console.log("handleContactSelect:", contactId);
+      let chatToSelect: IChat | null = null;
 
-      if (existingChat) {
-        // If chat exists, select it
-        selectChat(existingChat);
-      } else {
-        // If no chat exists, create a new one optimistically
-        const localId = generateId();
+      try {
+        // Check if there's an existing chat with this contact
+        const existingChat = Object.values(chats).find(
+          (chat) =>
+            chat.type === "simple" &&
+            chat.participants.includes(contactId) &&
+            chat.participants.includes(currentUserId)
+        );
 
-        const newChat: IChat = {
-          local_id: localId,
-          type: "simple",
-          participants: [currentUserId, contactId],
-          messages: [],
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          status: "pending", // Indicate that the chat is pending confirmation
-        };
+        if (existingChat) {
+          // console.log("handleContactSelect: existingChat:", existingChat);
+          // If chat exists, prepare to select it
+          chatToSelect = existingChat;
+        } else {
+          // console.log("handleContactSelect: no existing chat, creating a new one");
+          // If no chat exists, create a new one optimistically
+          const localId = generateId();
 
-        // Optimistically add the new chat to the state
-        dispatch(addChatReducer({ chat: newChat }));
+          const newChat: IChat = {
+            local_id: localId,
+            type: "simple",
+            participants: [currentUserId, contactId],
+            messages: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            status: "pending", // Indicate that the chat is pending confirmation
+          };
 
-        // Immediately select the new optimistic chat
-        selectChat(newChat);
+          // Optimistically add the new chat to the state
+          dispatch(addChatReducer({ chat: newChat }));
+          // console.log("handleContactSelect: newChat:", newChat);
+
+          // Prepare to select the new optimistic chat
+          chatToSelect = newChat;
+        }
+      } catch (error) {
+        console.error("handleContactSelect encountered an error:", error);
+        // Handle error appropriately (e.g., show a notification to the user)
+      } finally {
+        if (chatToSelect) {
+          selectChat(chatToSelect);
+        }
       }
     },
     [chats, currentUserId, dispatch, selectChat]

@@ -231,6 +231,21 @@ const chatSlice = createSlice({
           console.log(
             `addChatReducer: Found existing chat with local_id ${localId}. Updating with server data and using _id ${chat._id}.`
           );
+
+          // Check if the current chat is the same as the one being updated
+          if (state.currentChat?.local_id === localId) {
+            console.log(
+              `addChatReducer: Current chat is the same as the updated chat, updating currentChat with server data.`
+            );
+            // Update the currentChat with the server data
+            state.currentChat = {
+              ...state.currentChat,
+              ...chat,
+              _id: chat._id, // Ensure _id is set
+              status: chat.status, // Update status
+            };
+          }
+
           // Replace the chat keyed by local_id with the chat keyed by _id
           state.chats[chat._id] = {
             ...state.chats[localId], // Retain existing data
@@ -258,6 +273,7 @@ const chatSlice = createSlice({
         }
       }
     },
+
     updateChatReducer: (
       state,
       action: PayloadAction<{
