@@ -14,7 +14,6 @@ import {
   Tooltip,
   Typography,
   useMediaQuery,
-  useTheme,
 } from "@mui/material";
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -33,8 +32,7 @@ import RenderParticipantsAvatars from "./RenderParticipantsAvatars"; // Import t
 
 const ChatView: React.FC = () => {
   const { t } = useTranslation();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery("(max-width:800px)");
   const dispatch = useAppDispatch();
   const [open, setOpen] = React.useState(false);
 
