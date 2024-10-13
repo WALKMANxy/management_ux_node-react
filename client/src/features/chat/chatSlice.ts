@@ -499,8 +499,10 @@ export const selectChatById = createSelector(
 );
 
 // Replace with a simple selector
-export const selectCurrentChat = (state: RootState) => state.chats.currentChat;
-
+export const selectCurrentChat = (state: RootState) => {
+  const currentChatId = state.chats.currentChat?._id;
+  return currentChatId ? state.chats.chats[currentChatId] : state.chats.currentChat;
+};
 // Memoized selector for messages from the current chat
 export const selectMessagesFromCurrentChat = createSelector(
   selectCurrentChat,

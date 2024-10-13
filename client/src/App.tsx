@@ -288,7 +288,6 @@ function App() {
                 });
               } catch (error) {
                 console.error("Failed to fetch current user:", error);
-                showToast.error("Failed to initialize user data.");
                 dispatch(handleLogout()); // Force logout if fetching user fails
               }
             }
