@@ -149,43 +149,39 @@ export const setupWebSocket = (io: SocketIOServer) => {
       }
     );
 
-    // Handle chat creation
-    socket.on("chat:create", async ({ chat }: { chat: Partial<IChat> }) => {
-      try {
-        const createdChat = await ChatService.createChat(chat);
+   // Handle chat creation
+socket.on("chat:create", async ({ chat }: { chat: Partial<IChat> }) => {
+  try {
+    const createdChat = await ChatService.createChat(chat);
 
-        // Automatically join all participants to the correct chat room
-        createdChat.participants.forEach((participantId) => {
-          const roomId = `chat:${createdChat._id}`;
-          const participantSocket = io.sockets.sockets.get(
-            participantId.toString()
-          );
-          if (participantSocket) {
-            participantSocket.join(roomId);
-            logger.info("User automatically joined chat room", {
-              userId: participantId.toString(),
-              chatId: createdChat._id,
-              roomId,
-            });
-          }
-        });
+    // Automatically join all participants to the correct chat room
+    createdChat.participants.forEach((participantId) => {
+      const roomId = `chat:${createdChat._id}`;
+      const participantRoomId = `user:${participantId.toString()}`;
 
-        // Emit 'chat:newChat' to inform the clients about the new chat
-        createdChat.participants.forEach((participantId) => {
-          const participantRoomId = `user:${participantId.toString()}`;
-          io.to(participantRoomId).emit("chat:newChat", {
-            chat: createdChat,
-          });
-        });
+      // Make all sockets in participant's user room join the new chat room
+      io.in(participantRoomId).socketsJoin(roomId);
+      logger.info("User sockets joined chat room", {
+        userId: participantId.toString(),
+        chatId: createdChat._id,
+        roomId,
+      });
 
-        logger.info("New chat created and users joined successfully.", {
-          chatId: createdChat._id,
-          participants: createdChat.participants,
-        });
-      } catch (error) {
-        logger.error("Error handling new chat creation", { error });
-      }
+      // Emit 'chat:newChat' to inform the client about the new chat
+      io.to(participantRoomId).emit("chat:newChat", {
+        chat: createdChat,
+      });
     });
+
+    logger.info("New chat created and users joined successfully.", {
+      chatId: createdChat._id,
+      participants: createdChat.participants,
+    });
+  } catch (error) {
+    logger.error("Error handling new chat creation", { error });
+  }
+});
+
 
     // **Handle chat editing**
     socket.on("chat:edit", async ({ chatId, updatedData }) => {
