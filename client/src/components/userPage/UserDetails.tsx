@@ -5,13 +5,11 @@ import InfoIcon from "@mui/icons-material/Info";
 import SaveIcon from "@mui/icons-material/Save";
 import { LoadingButton } from "@mui/lab";
 import {
-  Alert,
   Box,
   Button,
   ButtonGroup,
-  CircularProgress,
   Divider,
-  Stack,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -21,6 +19,8 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import "animate.css";
 import React from "react";
@@ -48,24 +48,27 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
     setSelectedEntity,
     ref,
     visibleRows,
-    alertMessage,
-    setAlertMessage,
-    alertSeverity,
+
+    handleDeleteUser,
   } = useUserDetails(user);
 
   const { t } = useTranslation();
+  const theme = useTheme();
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
-    <Box>
+    <Box sx={{ px: 0 }}>
       <Tooltip title={t("userDetails.goBack", "Go back")} placement="top">
-        <Button onClick={onBack} sx={{ mb: 2, color: "black" }}>
+        <Button onClick={onBack} sx={{ mb: 2, ml: -2, color: "black" }}>
           <ArrowBackIosIcon />
         </Button>
       </Tooltip>
 
       {/* Current User Details Card */}
-      <Box className="animate__animated animate__fadeInLeft">
+      <Box className="animate__animated animate__fadeInLeft" sx={{ pl: 1 }}>
         <UserCard
+          userId={user._id || "N/A"}
           email={user.email || "N/A"}
           avatar={user.avatar}
           details={{
@@ -73,18 +76,23 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
             code: user.entityCode,
             name: user.entityName,
           }}
+          onDeleteUser={handleDeleteUser}
         />
       </Box>
 
       {/* Info message for selecting a new role */}
-      <Box display="flex" alignItems="center" sx={{ my: 3 }}>
-        <InfoIcon color="info" sx={{ mr: 1, fontSize: "1.2rem" }} />
+      <Box
+        display="flex"
+        alignItems="center"
+        sx={{ my: isMobile ? 0 : 3, mt: isMobile ? -2 : null }}
+      >
+        <InfoIcon color="info" sx={{ mr: 1, fontSize: "1.0rem" }} />
         <Typography variant="subtitle1" sx={{ color: "gray" }}>
           {t("userDetails.selectRole", "Select a new role.")}
         </Typography>
       </Box>
 
-      <Divider sx={{ mb: 2 }} />
+      <Divider sx={{ mb: isMobile ? 1 : 2 }} />
 
       <Box display="flex" flexDirection="column" gap={1}>
         {/* Role Selection Buttons */}
@@ -94,6 +102,9 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
           sx={{
             boxShadow: "none",
             gap: 2,
+            transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
+            transformOrigin: "top left", // Anchor the scale to the top-left corner
+            width: isMobile ? "133.33%" : "100%",
           }}
         >
           <Tooltip
@@ -159,8 +170,12 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
         </ButtonGroup>
 
         {/* Info message for selecting an entity */}
-        <Box display="flex" alignItems="center" sx={{ my: 3 }}>
-          <InfoIcon color="info" sx={{ mr: 1, fontSize: "1.2rem" }} />
+        <Box
+          display="flex"
+          alignItems="center"
+          sx={{ my: isMobile ? 0.5 : 3, mt: isMobile ? -1.1 : null }}
+        >
+          <InfoIcon color="info" sx={{ mr: 1, fontSize: "1.0rem" }} />
           <Typography variant="subtitle1" sx={{ color: "gray" }}>
             {t(
               "userDetails.selectEntity",
@@ -186,50 +201,74 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
           sx={{ mb: 2 }}
         />
 
-        {loadingEntities && <CircularProgress />}
-
         {/* Table for displaying entities */}
-        {!loadingEntities && (
-          <TableContainer sx={{ maxHeight: 400 }}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t("userDetails.entityName", "Name")}</TableCell>
-                  <TableCell>{t("userDetails.entityId", "ID")}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {entityOptions.slice(0, visibleRows).map((entity, index) => (
-                  <TableRow
-                    hover
-                    key={entity.id}
-                    onClick={() => setSelectedEntity(entity)}
-                    selected={selectedEntity?.id === entity.id}
-                    sx={{
-                      cursor: "pointer",
-                      backgroundColor:
-                        selectedEntity?.id === entity.id
-                          ? "rgba(0, 0, 0, 0.08)"
-                          : "inherit",
-                    }}
-                    ref={index === visibleRows - 1 ? ref : null} // Attach ref to the last row
-                  >
-                    <TableCell>{entity.name}</TableCell>
-                    <TableCell>{entity.id}</TableCell>
-                  </TableRow>
-                ))}
-                <TableRow ref={ref} />
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-
-        <Divider sx={{ mb: 2 }} />
+        <TableContainer
+          sx={{
+            maxHeight: 400,
+            transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
+            transformOrigin: "top left", // Anchor the scale to the top-left corner
+            width: isMobile ? "133.33%" : "100%",
+            mt: isMobile ? -2.5 : 0,
+          }}
+        >
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell>{t("userDetails.entityName", "Name")}</TableCell>
+                <TableCell>{t("userDetails.entityId", "ID")}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {loadingEntities
+                ? Array.from({ length: visibleRows }).map((_, index) => (
+                    <TableRow
+                      key={index}
+                      className="animate__animated animate__fadeOut" // Animate fadeOut when loading
+                    >
+                      <TableCell>
+                        <Skeleton variant="text" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                : entityOptions.slice(0, visibleRows).map((entity, index) => (
+                    <TableRow
+                      hover
+                      key={entity.id}
+                      onClick={() => setSelectedEntity(entity)}
+                      selected={selectedEntity?.id === entity.id}
+                      sx={{
+                        cursor: "pointer",
+                        backgroundColor:
+                          selectedEntity?.id === entity.id
+                            ? "rgba(0, 0, 0, 0.08)"
+                            : "inherit",
+                      }}
+                      className="animate__animated animate__fadeIn" // Animate fadeIn when loaded
+                      ref={index === visibleRows - 1 ? ref : null} // Attach ref to the last row
+                    >
+                      <TableCell>{entity.name}</TableCell>
+                      <TableCell>{entity.id}</TableCell>
+                    </TableRow>
+                  ))}
+              {/* Sentinel row for Intersection Observer */}
+              <TableRow ref={ref}>
+                <TableCell colSpan={2} />
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
 
         {/* Confirmation Card below the table */}
         {selectedEntity && (
-          <Box className="animate__animated animate__bounceIn">
+          <Box
+            className="animate__animated animate__bounceIn"
+            sx={{ mt: isMobile ? -8 : 0, pl: 1 }}
+          >
             <UserCard
+              userId={user._id}
               email={user.email || "N/A"}
               avatar={user.avatar || "/default-avatar.png"}
               details={{
@@ -238,11 +277,12 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
                 name: selectedEntity.name,
               }}
               isnew={"true"} // Apply faint green styling for new entity details
+              onDeleteUser={handleDeleteUser}
             />
           </Box>
         )}
 
-        <Divider sx={{ mb: 2 }} />
+        <Divider sx={{ mb: isMobile ? 0 : 2 }} />
 
         <LoadingButton
           color="secondary"
@@ -254,18 +294,6 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
         >
           {t("userDetails.saveChanges", "Save")}
         </LoadingButton>
-
-        {/* Alert for success or error message */}
-        {alertMessage && (
-          <Stack sx={{ width: "100%", mt: 2 }}>
-            <Alert
-              severity={alertSeverity}
-              onClose={() => setAlertMessage(null)}
-            >
-              {alertMessage}
-            </Alert>
-          </Stack>
-        )}
       </Box>
     </Box>
   );

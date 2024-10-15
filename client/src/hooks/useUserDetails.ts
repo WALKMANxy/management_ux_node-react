@@ -6,7 +6,7 @@ import { useInView } from "react-intersection-observer";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { loadAdminDetailsData } from "../features/data/api/admins";
 import { getAllEmployees } from "../features/data/api/employees";
-import { updateUserById } from "../features/users/userSlice";
+import { deleteUserByIdThunk, updateUserById } from "../features/users/userSlice";
 import {
   Admin,
   Agent,
@@ -15,7 +15,7 @@ import {
   User,
   UserRole,
 } from "../models/entityModels";
-import { showToast } from "../utils/toastMessage";
+import { showToast } from "../services/toastMessage";
 
 const useUserDetails = (user: Partial<User>) => {
   const clients = useAppSelector((state) => state.data.clients);
@@ -175,6 +175,38 @@ const useUserDetails = (user: Partial<User>) => {
     }
   }, [selectedEntity, role, user._id, dispatch, t]);
 
+   // New handleDeleteUser function
+   const handleDeleteUser = useCallback(
+    (userId: string) => {
+      setLoading(true);
+      dispatch(deleteUserByIdThunk(userId))
+        .then(() => {
+          setAlertMessage(t("userDetails.deleteSuccess"));
+          setAlertSeverity("success");
+          showToast.success(t("userDetails.deleteSuccessToast"));
+        })
+        .catch((error: unknown) => {
+          if (error instanceof Error) {
+            setAlertMessage(
+              t("userDetails.deleteFailed", { message: error.message })
+            );
+            showToast.error(
+              t("userDetails.deleteFailedToast", { message: error.message })
+            );
+          } else {
+            setAlertMessage(t("userDetails.deleteUnknownError"));
+            showToast.error(t("userDetails.deleteUnknownErrorToast"));
+          }
+          setAlertSeverity("error");
+          console.error("Error deleting user:", error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    },
+    [dispatch, t]
+  );
+
   return {
     role,
     setRole,
@@ -192,6 +224,7 @@ const useUserDetails = (user: Partial<User>) => {
     alertMessage,
     setAlertMessage,
     alertSeverity,
+    handleDeleteUser,
   };
 };
 

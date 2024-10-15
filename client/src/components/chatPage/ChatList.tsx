@@ -38,18 +38,16 @@ const ChatList: React.FC<ChatListProps> = ({
     getChatTitle,
     getUnreadCount,
     selectChat,
-    loadingChats,
   } = useChatLogic(); // Destructure the required functions from the hook
 
   // Combine external loading prop with internal loadingChats state
-  const isLoading = loading || loadingChats;
 
   // Retrieve sorted and filtered chats based on the search term
   const sortedChats = getFilteredAndSortedChats(searchTerm);
 
   return (
     <List>
-      {isLoading ? (
+      {loading ? (
         // Display skeletons while loading chats
         Array.from({ length: 5 }).map((_, index) => (
           <ListItem key={index}>
@@ -73,7 +71,7 @@ const ChatList: React.FC<ChatListProps> = ({
 
           return (
             <ListItem
-              key={chat._id}
+              key={chat._id || chat.local_id}
               button
               onClick={() => {
                 selectChat(chat); // Call selectChat to update the current chat state

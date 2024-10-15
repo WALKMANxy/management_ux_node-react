@@ -27,7 +27,14 @@ const CalendarAndVisitsSection: React.FC<CalendarAndVisitsSectionProps> = ({
             aria-label={t("dashboard.loadingText")}
           />
         ) : (
-          <Typography variant="h5" gutterBottom>
+          <Typography
+            variant="h5"
+            gutterBottom
+            sx={{
+              fontFamily: "Inter, sans-serif",
+              fontWeight: 100, // Now using the lighter custom font weight
+            }}
+          >
             {t("dashboard.calendar")}
           </Typography>
         )}

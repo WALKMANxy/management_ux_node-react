@@ -1,10 +1,10 @@
 // services/chatService.ts
 
 import mongoose, { Types } from "mongoose";
-import { Chat, IChat, IMessage } from "../models/Chat";
-import { logger } from "../utils/logger";
 import { Server } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import { Chat, IChat, IMessage } from "../models/Chat";
+import { logger } from "../utils/logger";
 
 // Custom Error Classes (Optional but Recommended)
 class ValidationError extends Error {
@@ -113,13 +113,12 @@ export class ChatService {
         .lean() // Use lean for faster reads as we're not modifying the data
         .exec(); // Execute the query
 
-      return chatIds.map(chat => chat._id);
+      return chatIds.map((chat) => chat._id);
     } catch (error) {
       console.error("Error fetching chat IDs:", error);
       throw new Error("Failed to fetch chat IDs");
     }
   }
-
 
   // Fetch a specific chat by its ID for the authenticated user
   static async getChatById(
@@ -233,7 +232,7 @@ export class ChatService {
     limit: number // Include limit parameter
   ) {
     try {
-     /*  console.log("Fetching older messages for:", {
+      /*  console.log("Fetching older messages for:", {
         chatId,
         userId,
         oldestTimestamp,
@@ -254,8 +253,8 @@ export class ChatService {
         throw new Error("Chat not found or access denied.");
       }
 
-/*       console.log("Chat found:", chat);
- */
+      /*       console.log("Chat found:", chat);
+       */
       const userObjectId = new Types.ObjectId(userId);
 
       // Check if the user is a participant in the chat
@@ -282,8 +281,8 @@ export class ChatService {
       // Extract messages from the aggregation result
       const messages = olderMessages.map((chat) => chat.messages);
 
-/*       console.log("Fetched Older Messages:", messages);
- */
+      /*       console.log("Fetched Older Messages:", messages);
+       */
       return messages;
     } catch (error) {
       console.error("Error fetching older messages:", error);
@@ -430,10 +429,61 @@ export class ChatService {
     }
   }
 
+  static async updateChat(
+    chatId: string,
+    updatedData: Partial<IChat>
+  ): Promise<IChat> {
+    try {
+      // **Validation Logic**
+      if (
+        updatedData.type &&
+        !["simple", "group", "broadcast"].includes(updatedData.type)
+      ) {
+        throw new ValidationError("Invalid chat type.");
+      }
+
+      if (updatedData.type === "group") {
+        if (
+          !updatedData.name ||
+          !updatedData.participants ||
+          updatedData.participants.length === 0
+        ) {
+          throw new ValidationError(
+            "Group chats must have a name and at least one participant."
+          );
+        }
+      }
+
+      if (
+        updatedData.type === "broadcast" &&
+        (!updatedData.participants || updatedData.participants.length === 0)
+      ) {
+        throw new ValidationError("Broadcast chats must have participants.");
+      }
+
+      // **Update the Chat in the Database**
+      const updatedChat = await Chat.findByIdAndUpdate(chatId, updatedData, {
+        new: true,
+      });
+
+      if (!updatedChat) {
+        throw new Error("Chat not found");
+      }
+
+      // **Return the Updated Chat Object**
+      return updatedChat;
+    } catch (error) {
+      console.error("Error updating chat:", error);
+      throw error instanceof ValidationError
+        ? error
+        : new Error("Failed to update chat");
+    }
+  }
+
   static async findOrCreateChat(
     userId: string,
     botId: string,
-    io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>  // Pass the io instance to emit events
+    io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any> // Pass the io instance to emit events
   ): Promise<string> {
     try {
       const userObjectId = new mongoose.Types.ObjectId(userId);
@@ -457,16 +507,18 @@ export class ChatService {
       // Check if the chat was newly created
       if (chat.isNew) {
         // Emit 'chat:newChat' event to the user and bot's rooms
-        chat.participants.forEach(participantId => {
+        chat.participants.forEach((participantId) => {
           const participantRoomId = `user:${participantId.toString()}`;
           io.to(participantRoomId).emit("chat:newChat", {
             chat: chat,
           });
-          logger.info(`Emitting chat:newChat for newly created chat ${chat._id.toString()}`);
+          /* logger.info(
+            `Emitting chat:newChat for newly created chat ${chat._id.toString()}`
+          ); */
         });
       }
 
-      logger.debug(`Chat found or created with ID: ${chat._id.toString()}`);
+      // logger.debug(`Chat found or created with ID: ${chat._id.toString()}`);
       return chat._id.toString();
     } catch (error) {
       logger.error(
@@ -477,7 +529,6 @@ export class ChatService {
       throw error;
     }
   }
-
 
   // Add a message to an existing chat
   static async addMessage(
@@ -523,23 +574,19 @@ export class ChatService {
     messageData: Partial<IMessage>,
     botId: string,
     io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any> // Accept io instance here
-
   ): Promise<string[]> {
     // Return type is Promise<string[]>
-    const startTime = Date.now(); // For performance logging
-
-
-
+    // const startTime = Date.now(); // For performance logging
 
     try {
-      logger.info("sendAutomatedMessageToUsers called with data", {
+      /* logger.info("sendAutomatedMessageToUsers called with data", {
         userIds,
         messageData,
         botId,
-      });
+      }); */
 
-       // Capture a single timestamp for consistency
-     const currentTimestamp = new Date();
+      // Capture a single timestamp for consistency
+      const currentTimestamp = new Date();
 
       // Convert userIds to ObjectId with validation
       const userObjectIds = userIds.map((id) => {
@@ -566,54 +613,58 @@ export class ChatService {
         content: messageData.content || "", // Ensure content is always defined
       };
 
-    // Prepare bulk operations concurrently
-    const chatIdPromises = userObjectIds.map(async (userId) => {
-      try {
-        const chatId = await this.findOrCreateChat(userId.toString(), botId, io);
-        chatIds.push(chatId);
+      // Prepare bulk operations concurrently
+      const chatIdPromises = userObjectIds.map(async (userId) => {
+        try {
+          const chatId = await this.findOrCreateChat(
+            userId.toString(),
+            botId,
+            io
+          );
+          chatIds.push(chatId);
 
-        bulkOperations.push({
-          updateOne: {
-            filter: { _id: new Types.ObjectId(chatId) },
-            update: {
-              $push: { messages: automatedMessage },
-              $set: { updatedAt: currentTimestamp },
+          bulkOperations.push({
+            updateOne: {
+              filter: { _id: new Types.ObjectId(chatId) },
+              update: {
+                $push: { messages: automatedMessage },
+                $set: { updatedAt: currentTimestamp },
+              },
             },
-          },
-        });
+          });
 
-        logger.debug(`Prepared bulk operation for chatId: ${chatId}`);
-      } catch (error) {
-        logger.error(`Error processing user ${userId.toString()}`, { error });
+          // logger.debug(`Prepared bulk operation for chatId: ${chatId}`);
+        } catch (error) {
+          logger.error(`Error processing user ${userId.toString()}`, { error });
+        }
+      });
+
+      // Await all chatIdPromises
+      await Promise.all(chatIdPromises);
+
+      // Execute bulk operations if any
+      if (bulkOperations.length > 0) {
+        try {
+          await Chat.bulkWrite(bulkOperations, { ordered: false });
+          /*   logger.info(`Successfully sent automated messages to users`, {
+            userIds: userIds,
+            chatIds,
+            durationMs: Date.now() - startTime,
+          }); */
+        } catch (error) {
+          logger.error("Error executing bulk operations", { error });
+          throw error;
+        }
+      } else {
+        logger.warn("No bulk operations to execute");
       }
-    });
 
-     // Await all chatIdPromises
-     await Promise.all(chatIdPromises);
-
-     // Execute bulk operations if any
-     if (bulkOperations.length > 0) {
-       try {
-         await Chat.bulkWrite(bulkOperations, { ordered: false });
-         logger.info(`Successfully sent automated messages to users`, {
-           userIds: userIds,
-           chatIds,
-           durationMs: Date.now() - startTime,
-         });
-       } catch (error) {
-         logger.error("Error executing bulk operations", { error });
-         throw error;
-       }
-     } else {
-       logger.warn("No bulk operations to execute");
-     }
-
-     return chatIds;
-   } catch (error) {
-     logger.error("Error in sendAutomatedMessageToUsers", { error });
-     throw error; // Optionally rethrow if higher-level handling is needed
-   }
- }
+      return chatIds;
+    } catch (error) {
+      logger.error("Error in sendAutomatedMessageToUsers", { error });
+      throw error; // Optionally rethrow if higher-level handling is needed
+    }
+  }
 
   // Function to update read status of messages using findOneAndUpdate
   static async updateReadStatus(
@@ -647,6 +698,68 @@ export class ChatService {
     } catch (error) {
       console.error("Error updating read status:", error);
       throw new Error("Failed to update read status");
+    }
+  }
+  static async addParticipantToChat(
+    chatId: string,
+    userId: string
+  ): Promise<void> {
+    try {
+      const chat = await Chat.findById(chatId).select("participants").lean(); // Lean for fast read
+
+      if (!chat) {
+        throw new Error("Chat not found");
+      }
+
+      // Convert `ObjectId` participants to strings for comparison
+      const participants = chat.participants.map((id) => id.toString());
+
+      // Check if user is already a participant
+      if (participants.includes(userId)) {
+        // logger.info(`User ${userId} is already a participant in chat ${chatId}`);
+        return;
+      } else {
+        // Add the user to participants if not already present
+        await Chat.updateOne(
+          { _id: chatId },
+          { $addToSet: { participants: userId } } // Prevents duplicates
+        );
+        // logger.info(`User ${userId} added as a participant to chat ${chatId}`);
+      }
+    } catch (error) {
+      logger.error("Error adding participant to chat:", { error });
+      throw new Error("Failed to add participant to chat");
+    }
+  }
+  static async addAdminToChat(chatId: string, adminId: string): Promise<void> {
+    try {
+      const chat = await Chat.findById(chatId).select("admins").lean(); // Lean for fast read
+
+      if (!chat) {
+        throw new Error("Chat not found");
+      }
+
+      // Convert `ObjectId` admins to strings for comparison
+      const admins = chat!.admins!.map((id) => id.toString());
+
+      // Check if user is already an admin
+      if (admins.includes(adminId)) {
+        // logger.info(`Admin ${adminId} is already in chat ${chatId}. Skipping add`);
+        return;
+      } else {
+        // Add the user to admins if not already present
+        /* logger.debug(
+          `Adding admin ${adminId} to chat ${chatId}. Existing admins: ${admins}`
+        ); */
+        await Chat.updateOne(
+          { _id: chatId },
+          { $addToSet: { admins: adminId } } // Prevents duplicates
+        );
+        // logger.info(`Admin ${adminId} added to chat ${chatId}`);
+      }
+    } catch (error) {
+      logger.error("Error adding admin to chat:", { error });
+      throw new Error("Failed to add admin to chat");
     }
   }
 }

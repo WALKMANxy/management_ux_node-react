@@ -1,27 +1,22 @@
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-
-import {
-  Box,
-  Fab,
-  Grid,
-  Skeleton,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
-import React, { useState } from "react";
+import { Box, Grid, Skeleton, useMediaQuery, useTheme } from "@mui/material";
+import React, { Suspense, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
 import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
 import WelcomeMessage from "../../components/dashboard/WelcomeMessage";
 import CalendarAndVisitsView from "../../components/DashboardsViews/CalendarAndVisitsView";
-import ClientView from "../../components/DashboardsViews/ClientView";
 import DashboardView from "../../components/DashboardsViews/DashboardView";
+import SkeletonView from "../../components/DashboardsViews/SkeletonView";
 import GlobalSearch from "../../components/Header/GlobalSearch";
 import { selectCurrentUser } from "../../features/users/userSlice";
 import useLoadingData from "../../hooks/useLoadingData";
 import useSelectionState from "../../hooks/useSelectionState";
 import useStats from "../../hooks/useStats";
 import { calculateMonthlyData } from "../../utils/dataUtils";
+
+const ClientView = React.lazy(
+  () => import("../../components/DashboardsViews/ClientView")
+);
 
 const AgentDashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -49,7 +44,6 @@ const AgentDashboard: React.FC = () => {
   const { loadingState } = useLoadingData();
 
   const {
-    details,
     calculateTotalSpentThisMonth,
     calculateTotalSpentThisYear,
     calculateTopArticleType,
@@ -62,6 +56,8 @@ const AgentDashboard: React.FC = () => {
     ordersData,
     yearlyCategories,
     yearlyOrdersData,
+    totalNetRevenue,
+    netRevenueData
   } = useStats(isMobile);
 
   return (
@@ -75,7 +71,7 @@ const AgentDashboard: React.FC = () => {
         role="admin" // or "agent" or "client"
         loading={loadingState}
       />
-      {details && "clients" in details ? (
+      {!loadingState ? (
         <GlobalSearch filter="client" onSelect={handleSelect} />
       ) : (
         <Skeleton
@@ -87,41 +83,27 @@ const AgentDashboard: React.FC = () => {
           aria-label="skeleton"
         />
       )}
-      {/* FAB Button for Calendar - Positioned Top Right */}
-      {isTablet && (
-        <Fab
-          color="primary"
-          aria-label="calendar"
-          onClick={handleToggleDrawer}
-          sx={{
-            position: "absolute",
-            top: 220, // Adjust as needed based on layout
-            right: 32, // Adjust as needed based on layout
-            zIndex: 1000,
-          }}
-        >
-          <CalendarMonthIcon />
-        </Fab>
-      )}
-      <Grid container spacing={6} mt={2}>
-        <Grid item xs={!isTablet ? 12 : 0} md={!isTablet ? 9 : 0}>
+      <Grid container spacing={6} mt={isMobile ? 0 : 2}>
+        <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
           {selectedClient ? (
-            <ClientView
-              loadingState={loadingState}
-              selectedClient={selectedClient}
-              handleToggleDrawer={handleToggleDrawer}
-              clearSelection={clearSelection}
-              calculateTotalSpentThisMonth={calculateTotalSpentThisMonth}
-              calculateTotalSpentThisYear={calculateTotalSpentThisYear}
-              calculateTopArticleType={calculateTopArticleType}
-              calculateMonthlyData={calculateMonthlyData}
-              topBrandsData={topBrandsData}
-              clientComparativeStatisticsMonthly={
-                clientComparativeStatisticsMonthly
-              }
-              clientComparativeStatistics={clientComparativeStatistics}
-              userRole={userRole}
-            />
+            <Suspense fallback={<SkeletonView />}>
+              <ClientView
+                loadingState={loadingState}
+                selectedClient={selectedClient}
+                handleToggleDrawer={handleToggleDrawer}
+                clearSelection={clearSelection}
+                calculateTotalSpentThisMonth={calculateTotalSpentThisMonth}
+                calculateTotalSpentThisYear={calculateTotalSpentThisYear}
+                calculateTopArticleType={calculateTopArticleType}
+                calculateMonthlyData={calculateMonthlyData}
+                topBrandsData={topBrandsData}
+                clientComparativeStatisticsMonthly={
+                  clientComparativeStatisticsMonthly
+                }
+                clientComparativeStatistics={clientComparativeStatistics}
+                userRole={userRole}
+              />
+            </Suspense>
           ) : (
             <DashboardView
               t={t}
@@ -139,6 +121,8 @@ const AgentDashboard: React.FC = () => {
               salesDistributionDataClients={salesDistributionDataClients}
               isMobile={isMobile}
               userRole={userRole!}
+              totalNetRevenue={totalNetRevenue}
+              netRevenueData={netRevenueData}
             />
           )}
         </Grid>

@@ -10,13 +10,12 @@ import {
 import { checkValidation } from "../middlewares/validate";
 
 const router = express.Router();
-router.use(checkAllowedRole);
 
 // Middleware to authenticate user
 router.use(authenticateUser);
 
 // GET method to retrieve all users (Admin only)
-router.get("/", checkAllowedRole, UserController.getAllUsers);
+router.get("/", UserController.getAllUsers);
 
 // GET method to retrieve a user by ID
 router.get("/:id", checkAllowedRole, UserController.getUserById);
@@ -58,6 +57,13 @@ router.patch(
   userValidationRules, // Specific validation rules for updating password
   checkValidation,
   UserController.updateUserPassword // Controller method to update password
+);
+
+router.delete(
+  "/:id",
+  checkValidation, // Validate the request
+  checkAdminRole,   // Ensure the user is an admin
+  UserController.deleteUser // Controller method to delete the user
 );
 
 export default router;

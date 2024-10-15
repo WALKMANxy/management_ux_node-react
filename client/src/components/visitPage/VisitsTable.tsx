@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectVisit } from "../../features/data/dataSlice";
 import { selectVisits } from "../../features/promoVisits/promoVisitsSelectors";
-import { showToast } from "../../utils/toastMessage";
+import { showToast } from "../../services/toastMessage";
 
 // Styled Components
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
@@ -88,7 +88,7 @@ const VisitsTable: React.FC<VisitsTableProps> = ({ clientId }) => {
   );
 
   return (
-    <Box>
+    <Box sx={{ px: 1, height: "100%", overflowY: "auto" }}>
       <StyledTableContainer>
         <StyledTable
           aria-label={t("visitsTable.tableAriaLabel", "Visits Table")}

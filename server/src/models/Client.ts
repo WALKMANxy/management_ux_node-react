@@ -1,39 +1,47 @@
-//src/models/Client.ts
+import mongoose, { Document, Schema } from 'mongoose';
 
-import { Document, Schema, model } from "mongoose";
-
-interface IClient extends Document {
-  codice: string;
-  ragioneSociale: string;
-  ragioneSocialeAgg: string;
-  indirizzo: string;
-  capComuneProv: string;
-  telefono: string;
-  email: string;
-  emailPec: string;
-  partitaIva: string;
-  codiceFiscale: string;
-  mp: string;
-  descizioneMetodoPagamento: string;
-  cs: string;
-  ag: string;
+export interface IClient extends Document {
+  CODICE: string;
+  "RAGIONE SOCIALE": string;
+  "RAGIONE SOCIALE AGG.": string;
+  INDIRIZZO: string;
+  "C.A.P. - COMUNE (PROV.)": string;
+  TELEFONO: string;
+  EMAIL: string;
+  "EMAIL PEC": string;
+  "PARTITA IVA": string;
+  "CODICE FISCALE": string;
+  MP: string;
+  "Descizione metodo pagamento": string;
+  CS: string;
+  AG: string;
+  createdAt?: Date; // Optional timestamp fields
+  updatedAt?: Date;
 }
 
-const clientSchema = new Schema<IClient>({
-  codice: { type: String, required: true },
-  ragioneSociale: { type: String, required: true },
-  ragioneSocialeAgg: { type: String, required: false },
-  indirizzo: { type: String, required: true },
-  capComuneProv: { type: String, required: true },
-  telefono: { type: String, required: false },
-  email: { type: String, required: false },
-  emailPec: { type: String, required: false },
-  partitaIva: { type: String, required: true },
-  codiceFiscale: { type: String, required: false },
-  mp: { type: String, required: true },
-  descizioneMetodoPagamento: { type: String, required: true },
-  cs: { type: String, required: true },
-  ag: { type: String, required: true },
-});
+const ClientSchema: Schema = new Schema(
+  {
+    CODICE: { type: String, required: true },
+    "RAGIONE SOCIALE": { type: String, required: true },
+    "RAGIONE SOCIALE AGG.": { type: String },
+    INDIRIZZO: { type: String },
+    "C.A.P. - COMUNE (PROV.)": { type: String },
+    TELEFONO: { type: String },
+    EMAIL: { type: String },
+    "EMAIL PEC": { type: String },
+    "PARTITA IVA": { type: String },
+    "CODICE FISCALE": { type: String },
+    MP: { type: String },
+    "Descizione metodo pagamento": { type: String },
+    CS: { type: String },
+    AG: { type: String },
+  },
+  {
+    timestamps: true, // Automatically create `createdAt` and `updatedAt` fields
+  }
+);
 
-export const Client = model<IClient>("Client", clientSchema);
+ClientSchema.index({ CODICE: 1 });
+ClientSchema.index({ AG: 1 });
+
+export default mongoose.model<IClient>('Client', ClientSchema);

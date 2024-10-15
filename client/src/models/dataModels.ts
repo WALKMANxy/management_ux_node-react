@@ -63,8 +63,17 @@ export interface IMessage {
   timestamp: Date;
   readBy: string[]; // Array of user IDs who have read the message
   messageType: "message" | "alert" | "promo" | "visit"; // Categorizes the message type
-  attachments: { url: string; type: "image" }[]; // Array to store image URLs and types
+  attachments: {
+    file?: File; // Local file, only for client-side usage
+    url: string;
+    type: "image" | "video" | "pdf" | "word" | "excel" | "csv" | "other";
+    fileName: string;
+    size: number;
+    thumbnailUrl?: string; // Optional thumbnail for images
+  }[]; // Array to store file metadata for attachments
   status: "pending" | "sent" | "failed"; // Status indicating the message state
+  isUploading?: boolean; // Whether the file is still uploading
+  uploadProgress?: number; // Upload progress percentage (0-100)
 }
 
 export interface IChat {

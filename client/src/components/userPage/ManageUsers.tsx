@@ -1,5 +1,3 @@
-// src/components/UserPage/ManageUsers.tsx
-
 import InfoIcon from "@mui/icons-material/Info";
 import {
   Box,
@@ -15,7 +13,8 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+import "animate.css";
+import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useInView } from "react-intersection-observer";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
@@ -25,8 +24,10 @@ import {
   selectUsersLoading,
 } from "../../features/users/userSlice";
 import { User } from "../../models/entityModels";
-import { showToast } from "../../utils/toastMessage";
-import UserDetails from "./UserDetails";
+import { showToast } from "../../services/toastMessage";
+import { ExtendedManageUsersSkeleton } from "./Skeletons";
+
+const UserDetails = React.lazy(() => import("./UserDetails"));
 
 const ManageUsers: React.FC = () => {
   const theme = useTheme();
@@ -113,7 +114,7 @@ const ManageUsers: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ width: "auto" }}>
+    <Box sx={{ width: "auto", flexGrow: 1 }}>
       <Typography variant="h4" gutterBottom>
         {t("manageUsers.title", "Manage Users")}
       </Typography>
@@ -144,99 +145,110 @@ const ManageUsers: React.FC = () => {
         </Box>
       )}
 
+      {/* Render User Details with fadeIn animation */}
       {selectedUser ? (
-        <UserDetails user={selectedUser} onBack={handleBackToList} />
+        <Box sx={{ px: 1 }} className="animate__animated animate__fadeIn">
+          <Suspense fallback={<ExtendedManageUsersSkeleton />}>
+            <UserDetails user={selectedUser} onBack={handleBackToList} />
+          </Suspense>
+        </Box>
       ) : (
-        <TableContainer
-          sx={{
-            minHeight: "40dvh", // Set minimum height
-            maxHeight: 440,
-          }}
-        >
-          <Table
-            stickyHeader
-            aria-label={t("manageUsers.userTable", "User Table")}
+        <Box className="animate__animated animate__fadeIn">
+          <TableContainer
+            sx={{
+              maxHeight: "400px",
+              transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
+              transformOrigin: "top left", // Anchor the scale to the top-left corner
+              width: isMobile ? "133.33%" : "100%", // Adjust width to prevent clipping
+            }}
           >
-            <TableHead>
-              <TableRow>
-                {columns.map((column) => (
-                  <TableCell
-                    key={column.id}
-                    style={{
-                      minWidth: column.minWidth,
-                      whiteSpace: "nowrap",
-                      fontWeight: "bold",
-                      backgroundColor: theme.palette.action.hover,
-                    }}
-                  >
-                    {column.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading
-                ? Array.from({ length: visibleRows }).map((_, index) => (
-                    <TableRow key={index}>
-                      {columns.map((column) => (
-                        <TableCell key={column.id}>
-                          <Skeleton variant="text" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                : users.slice(0, visibleRows).map((user) => (
-                    <TableRow
-                      hover
-                      role="checkbox"
-                      tabIndex={-1}
-                      key={user._id}
-                      onClick={() => handleRowDoubleClick(user)}
-                      sx={{
-                        cursor: "pointer",
-                        "&:last-child td, &:last-child th": { border: 0 },
-                        "&:hover": {
-                          backgroundColor: theme.palette.action.hover,
-                        },
+            <Table
+              stickyHeader
+              aria-label={t("manageUsers.userTable", "User Table")}
+            >
+              <TableHead>
+                <TableRow>
+                  {columns.map((column) => (
+                    <TableCell
+                      key={column.id}
+                      style={{
+                        minWidth: column.minWidth,
+                        whiteSpace: "nowrap",
+                        fontWeight: "bold",
+                        backgroundColor: theme.palette.action.hover,
                       }}
                     >
-                      <TableCell
-                        onClick={
-                          isMobile
-                            ? () => handleRowDoubleClick(user)
-                            : undefined
-                        }
-                        sx={{ color: "primary.main" }}
-                      >
-                        {user.email}
-                      </TableCell>
-
-                      <TableCell>{user.role}</TableCell>
-                      <TableCell>{user.entityCode}</TableCell>
-                      <TableCell>
-                        {user.entityName || t("manageUsers.na", "N/A")}
-                      </TableCell>
-                      <TableCell>{user.authType}</TableCell>
-                      <TableCell>
-                        {user.isEmailVerified
-                          ? t("manageUsers.yes", "Yes")
-                          : t("manageUsers.no", "No")}
-                      </TableCell>
-
-                      <TableCell>
-                        {user.createdAt
-                          ? new Date(user.createdAt).toLocaleDateString()
-                          : t("manageUsers.na", "N/A")}
-                      </TableCell>
-                    </TableRow>
+                      {column.label}
+                    </TableCell>
                   ))}
-              {/* Sentinel row for Intersection Observer */}
-              <TableRow ref={ref}>
-                <TableCell colSpan={columns.length} />
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {loading
+                  ? Array.from({ length: visibleRows }).map((_, index) => (
+                      <TableRow
+                        key={index}
+                        className="animate__animated animate__fadeOut" // Fade out when loading
+                      >
+                        {columns.map((column) => (
+                          <TableCell key={column.id}>
+                            <Skeleton variant="text" />
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  : users.slice(0, visibleRows).map((user) => (
+                      <TableRow
+                        hover
+                        role="checkbox"
+                        tabIndex={-1}
+                        key={user._id}
+                        onClick={() => handleRowDoubleClick(user)}
+                        sx={{
+                          cursor: "pointer",
+                          "&:last-child td, &:last-child th": { border: 0 },
+                          "&:hover": {
+                            backgroundColor: theme.palette.action.hover,
+                          },
+                        }}
+                        className="animate__animated animate__fadeIn" // Fade in when loaded
+                      >
+                        <TableCell
+                          onClick={
+                            isMobile
+                              ? () => handleRowDoubleClick(user)
+                              : undefined
+                          }
+                          sx={{ color: "primary.main" }}
+                        >
+                          {user.email}
+                        </TableCell>
+                        <TableCell>{user.role}</TableCell>
+                        <TableCell>{user.entityCode}</TableCell>
+                        <TableCell>
+                          {user.entityName || t("manageUsers.na", "N/A")}
+                        </TableCell>
+                        <TableCell>{user.authType}</TableCell>
+                        <TableCell>
+                          {user.isEmailVerified
+                            ? t("manageUsers.yes", "Yes")
+                            : t("manageUsers.no", "No")}
+                        </TableCell>
+                        <TableCell>
+                          {user.createdAt
+                            ? new Date(user.createdAt).toLocaleDateString()
+                            : t("manageUsers.na", "N/A")}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                {/* Sentinel row for Intersection Observer */}
+                <TableRow ref={ref}>
+                  <TableCell colSpan={columns.length} />
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       )}
     </Box>
   );

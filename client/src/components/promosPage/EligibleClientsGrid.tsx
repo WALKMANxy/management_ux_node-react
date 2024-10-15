@@ -15,8 +15,8 @@ import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
 import { selectCurrentUser } from "../../features/users/userSlice";
 import usePromos from "../../hooks/usePromos";
+import { showToast } from "../../services/toastMessage";
 import { numberComparator } from "../../utils/dataUtils";
-import { showToast } from "../../utils/toastMessage";
 import "../statistics/grids/AGGridTable.css";
 
 interface EligibleClientsGridProps {
@@ -234,7 +234,7 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
           rowData={rowData}
           columnDefs={columnDefs}
           onSelectionChanged={onSelectionChanged}
-          pagination={true}
+          pagination={false}
           paginationPageSize={100}
           enableCellTextSelection={true}
           rowBuffer={5}
@@ -259,6 +259,7 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
           }}
           suppressColumnVirtualisation={false}
           suppressAggFuncInHeader={true}
+          suppressPaginationPanel={true} // Add this line to hide the pagination panel
           animateRows={true}
           suppressMovableColumns={true}
           selection={!isViewing ? selection : undefined} // Disable selection when in view mode

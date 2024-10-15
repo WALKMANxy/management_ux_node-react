@@ -1,4 +1,5 @@
 // src/components/common/AGGridTable.tsx
+import { useMediaQuery } from "@mui/material";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { AgGridReact, AgGridReactProps } from "ag-grid-react";
@@ -11,6 +12,13 @@ const AGGridTable = forwardRef<AgGridReact, AGGridTableProps>(
   ({ columnDefs, rowData, quickFilterText }, ref) => {
     const memoizedColumnDefs = useMemo(() => columnDefs, [columnDefs]);
     const memoizedRowData = useMemo(() => rowData, [rowData]);
+
+    const isMobile = useMediaQuery("(max-width: 600px)");
+
+    // In AGGridTable component
+    const onGridReady = (params: { api: { sizeColumnsToFit: () => void } }) => {
+      params.api.sizeColumnsToFit();
+    };
 
     // Memoize defaultColDef
     const defaultColDef = useMemo<AgGridReactProps["defaultColDef"]>(
@@ -29,17 +37,26 @@ const AGGridTable = forwardRef<AgGridReact, AGGridTableProps>(
     return (
       <div
         className="ag-theme-quartz"
-        style={{ height: 600, width: "100%" }}
+        style={{
+          height: 600,
+          transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
+          transformOrigin: "top left", // Anchor the scale to the top-left corner
+          width: isMobile ? "133.33%" : "100%", // Adjust width to prevent clipping
+        }}
       >
         <AgGridReact
           ref={ref}
           columnDefs={memoizedColumnDefs}
           rowData={memoizedRowData}
-          pagination={true}
+          pagination={false}
           paginationPageSize={100}
           paginationPageSizeSelector={paginationPageSizeSelector}
           quickFilterText={quickFilterText} // Pass quickFilterText to AgGridReact
           enableCellTextSelection={true}
+          onGridReady={onGridReady}
+          rowBuffer={5}
+          suppressPaginationPanel={true} // Add this line to hide the pagination panel
+          suppressColumnVirtualisation={false}
           defaultColDef={defaultColDef}
         />
       </div>

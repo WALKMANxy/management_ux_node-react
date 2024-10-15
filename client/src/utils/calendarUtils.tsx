@@ -123,31 +123,75 @@ export const isNotDefaultTime = (date: Date | undefined) => {
   return date && dayjs(date).format("HH:mm") !== "00:00";
 };
 
-export const isPastEvent = (event: CalendarEvent) => {
+/**
+ * Determines if a button should be disabled based on the event and user role.
+ * @param event - The calendar event.
+ * @param userRole - The role of the current user.
+ * @returns A boolean indicating if the button should be disabled.
+ */
+export const isDisabled = (event: CalendarEvent, userRole: string): boolean => {
+  // Disable if the user is not an admin
+  if (userRole !== 'admin') {
+    return true;
+  }
+  // Additionally disable if the event is in the past
   return dayjs(event.endDate).isBefore(dayjs());
 };
 
-export const getEditButtonStyles = (event: CalendarEvent) => {
-  if (isPastEvent(event)) {
+/**
+ * Returns the appropriate styles for the edit button based on the event and user role.
+ * @param event - The calendar event.
+ * @param userRole - The role of the current user.
+ * @returns An object containing the style properties.
+ */
+export const getEditButtonStyles = (event: CalendarEvent, userRole: string) => {
+  if (isDisabled(event, userRole)) {
     return {
       backgroundColor: "gray", // Grayed out background
       color: "white",
       marginRight: 1,
       borderRadius: "50%",
-
-      cursor: "not-allowed", // Change cursor to indicate disabled state
+      cursor: "not-allowed", // Indicate disabled state
       "&:hover": {
-        backgroundColor: "gray", // Keep the button gray when hovered
+        backgroundColor: "gray", // Maintain gray on hover
       },
     };
   }
   return {
-    bgcolor: "primary.main", // Regular background color for editable events
+    bgcolor: "primary.main", // Regular background for admins
     color: "white",
     marginRight: 1,
     borderRadius: "50%",
     "&:hover": {
       backgroundColor: "darkblue",
+    },
+  };
+};
+
+/**
+ * Returns the appropriate styles for the delete button based on the event and user role.
+ * @param event - The calendar event.
+ * @param userRole - The role of the current user.
+ * @returns An object containing the style properties.
+ */
+export const getDeleteButtonStyles = (event: CalendarEvent, userRole: string) => {
+  if (isDisabled(event, userRole)) {
+    return {
+      backgroundColor: "gray",
+      color: "white",
+      borderRadius: "50%",
+      cursor: "not-allowed",
+      "&:hover": {
+        backgroundColor: "gray",
+      },
+    };
+  }
+  return {
+    bgcolor: "secondary.main",
+    color: "white",
+    borderRadius: "50%",
+    "&:hover": {
+      backgroundColor: "darkred",
     },
   };
 };

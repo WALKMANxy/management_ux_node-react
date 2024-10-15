@@ -4,7 +4,7 @@ import { User } from "../../models/entityModels";
 import {
   generateErrorResponse,
   handleApiError,
-} from "../../utils/errorHandling";
+} from "../../services/errorHandling";
 import { apiCall } from "../../utils/apiUtils";
 
 // Define the RTK Query slice
@@ -18,7 +18,9 @@ export const userApi = createApi({
       queryFn: async (ids) => {
         try {
           // Fetch users by a batch of IDs
-          const users = await apiCall<Partial<User>[]>(`users/batch`, "POST", { ids });
+          const users = await apiCall<Partial<User>[]>(`users/batch`, "POST", {
+            ids,
+          });
           return { data: users };
         } catch (error) {
           handleApiError(error, "fetchUsersByIds");
@@ -62,11 +64,18 @@ export const userApi = createApi({
     }),
 
     // Endpoint to update a user by ID
-    updateUserById: builder.mutation<User, { id: string; updatedData: Partial<User> }>({
+    updateUserById: builder.mutation<
+      User,
+      { id: string; updatedData: Partial<User> }
+    >({
       queryFn: async ({ id, updatedData }) => {
         try {
           // Update user data
-          const updatedUser = await apiCall<User>(`users/${id}`, "PATCH", updatedData);
+          const updatedUser = await apiCall<User>(
+            `users/${id}`,
+            "PATCH",
+            updatedData
+          );
           return { data: updatedUser };
         } catch (error) {
           handleApiError(error, "updateUserById");

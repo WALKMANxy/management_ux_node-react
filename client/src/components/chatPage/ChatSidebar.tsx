@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import "animate.css";
 import React, {
+  lazy,
   useCallback,
   useEffect,
   useMemo,
@@ -29,7 +30,8 @@ import { fetchMessagesFromMultipleChatsThunk } from "../../features/chat/chatThu
 import useChatLogic from "../../hooks/useChatsLogic";
 import ChatList from "./ChatList";
 import ContactsList from "./ContactsList";
-import CreateChatForm from "./CreateChatForm";
+
+const CreateChatForm = lazy(() => import("./CreateChatForm"));
 
 const ChatSidebar: React.FC = () => {
   const { t } = useTranslation();
@@ -43,10 +45,10 @@ const ChatSidebar: React.FC = () => {
     filteredContacts,
     handleContactSelect,
     fetchContacts,
+    contactsFetched,
     loadingContacts,
   } = useChatLogic();
   const messagesFetched = useRef(false);
-  const contactsFetched = useRef(false);
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const [isCreateChatFormOpen, setIsCreateChatFormOpen] = useState(false);
@@ -76,11 +78,10 @@ const ChatSidebar: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!contactsFetched.current) {
+    if (!contactsFetched) {
       fetchContacts();
-      contactsFetched.current = true;
     }
-  }, [fetchContacts]);
+  }, [fetchContacts, contactsFetched]);
 
   const handleRefreshContacts = useCallback(() => {
     fetchContacts();
@@ -132,7 +133,8 @@ const ChatSidebar: React.FC = () => {
     <Box
       className={`animate__animated  ${appliedAnimationClass}`}
       sx={{
-        p: 2,
+        p: 1,
+
         bgcolor: "#ffffff",
         height: "100%",
         display: "flex",
@@ -149,7 +151,7 @@ const ChatSidebar: React.FC = () => {
         alignItems="center"
         mb={2}
       >
-        <Typography variant="h6" sx={{ fontSize: "2rem" }}>
+        <Typography variant="h6" sx={{ fontSize: "2rem", pl: 2, pt: 1 }}>
           {showContacts
             ? t("chatSidebar.labels.contacts")
             : t("chatSidebar.labels.chats")}
@@ -264,10 +266,12 @@ const ChatSidebar: React.FC = () => {
       </Box>
 
       {isCreateChatFormOpen && (
-        <CreateChatForm
-          open={isCreateChatFormOpen}
-          onClose={() => setIsCreateChatFormOpen(false)}
-        />
+        <React.Suspense>
+          <CreateChatForm
+            open={isCreateChatFormOpen}
+            onClose={() => setIsCreateChatFormOpen(false)}
+          />
+        </React.Suspense>
       )}
     </Box>
   );

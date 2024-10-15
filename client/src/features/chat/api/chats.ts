@@ -1,7 +1,15 @@
 // src/api/chatApi.ts
 
+import imageCompression from "browser-image-compression";
+import { Dispatch } from "redux";
 import { IChat, IMessage } from "../../../models/dataModels";
-import { apiCall } from "../../../utils/apiUtils";
+import { apiCall, axiosInstance } from "../../../utils/apiUtils";
+import { cacheFile, getCachedFile } from "../../../utils/cacheUtils";
+import {
+  updateMessageProgress,
+  uploadComplete,
+  uploadFailed,
+} from "../chatSlice";
 
 // Fetch all chats for the authenticated user
 export const fetchAllChats = async (): Promise<IChat[]> => {
@@ -74,10 +82,11 @@ export const fetchMessagesFromMultipleChats = async (
     if (!chatIds || !Array.isArray(chatIds) || chatIds.length === 0) {
       throw new Error("Invalid chat IDs array.");
     }
-    const query = chatIds.map((id) => `chatIds[]=${id}`).join("&");
+    // Send chatIds in the request body instead of query params
     return await apiCall<{ chatId: string; messages: IMessage[] }[]>(
-      `/chats/messages?${query}`,
-      "GET"
+      `/chats/messages`,
+      "POST",
+      { chatIds } // Pass chatIds in the body
     );
   } catch (error) {
     console.error("Error fetching messages from multiple chats:", error);
@@ -150,6 +159,139 @@ export const updateReadStatus = async (
       `Error updating read status for messages in chat ${chatId}:`,
       error
     );
+    throw error;
+  }
+};
+
+export const uploadAttachments = async (
+  chatId: string,
+  message: IMessage,
+  dispatch: Dispatch
+) => {
+  const uploadedAttachments = [];
+
+  for (const attachment of message.attachments) {
+    if (!attachment.file) continue;
+
+    try {
+      // Compress images if applicable
+      let fileToUpload = attachment.file;
+      if (attachment.type === "image") {
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        };
+        fileToUpload = await imageCompression(attachment.file, options);
+      }
+
+      const formData = new FormData();
+      formData.append("file", fileToUpload);
+
+      // Use your axiosInstance to upload the file with progress tracking
+      const response = await axiosInstance.post("/api/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          const progress = Math.round(
+            (progressEvent.loaded * 100) / (progressEvent.total ?? 0)
+          );
+
+          // Dispatch progress update to Redux store
+          dispatch(
+            updateMessageProgress({
+              chatId,
+              messageId: message.local_id || message._id,
+              progress,
+            })
+          );
+        },
+      });
+
+      uploadedAttachments.push({
+        ...attachment,
+        url: response.data.url, // Assuming the response contains a "url"
+      });
+    } catch (error) {
+      console.error("Failed to upload attachment:", error);
+      dispatch(
+        uploadFailed({
+          chatId,
+          messageId: message.local_id || message._id,
+        })
+      );
+      return;
+    }
+  }
+
+  const updatedMessage: IMessage = {
+    ...message,
+    attachments: uploadedAttachments,
+    isUploading: false,
+    status: "sent",
+    uploadProgress: 100,
+  };
+
+  dispatch(uploadComplete({ chatId, message: updatedMessage }));
+};
+
+// Fetch Thumbnail with Caching
+export const fetchThumbnail = async (thumbnailUrl: string): Promise<string> => {
+  try {
+    // Check if the thumbnail is cached
+    const cachedFile = await getCachedFile(thumbnailUrl);
+    if (cachedFile) {
+      return cachedFile.objectUrl; // Return the regenerated object URL
+    }
+
+    // If not cached, fetch the thumbnail from the server
+    const response = await axiosInstance.get(thumbnailUrl, {
+      responseType: "blob",
+    });
+
+    const blob = response.data as Blob;
+
+    // Cache the fetched Blob
+    const objectUrl = await cacheFile(thumbnailUrl, blob);
+    return objectUrl;
+  } catch (error) {
+    console.error("Error fetching thumbnail:", error);
+    throw error;
+  }
+};
+
+// Download Full File
+export const downloadFile = async (
+  fileUrl: string,
+  onDownloadProgress: (progress: number) => void
+): Promise<string> => {
+  try {
+    // Check if the file is cached
+    const cachedFile = await getCachedFile(fileUrl);
+    if (cachedFile) {
+      return cachedFile.objectUrl; // Return the regenerated object URL
+    }
+
+    // If not cached, download the file from the server
+    const response = await axiosInstance.get(fileUrl, {
+      responseType: "blob",
+      onDownloadProgress: (progressEvent) => {
+        const totalLength = progressEvent.total;
+        if (totalLength) {
+          const progress = Math.round((progressEvent.loaded * 100) / totalLength);
+          onDownloadProgress(progress);
+        }
+      },
+    });
+
+    const blob = response.data as Blob;
+
+    // Cache the downloaded Blob
+    const objectUrl = await cacheFile(fileUrl, blob);
+    return objectUrl;
+  } catch (error) {
+    console.error("Error downloading the file:", error);
     throw error;
   }
 };

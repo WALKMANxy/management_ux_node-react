@@ -1,4 +1,26 @@
 {
+  "footer": {
+    "about": "À propos",
+    "ourStory": "Notre histoire",
+    "team": "Équipe",
+    "followUs": "Suivez-nous",
+    "facebook": "Suivez-nous sur Facebook",
+    "instagram": "Suivez-nous sur Instagram",
+    "legal": "Légal",
+    "privacyPolicy": "Politique de confidentialité",
+    "termsOfService": "Conditions d'utilisation",
+    "close": "Fermer",
+    "hours": "Heures"
+  },
+  "ourStory": {
+    "title": "Notre histoire",
+    "content": {
+      "part1": "<0>Ricambi Centro Sud S.r.l.</0> opère dans les secteurs des véhicules utilitaires, des autobus, des camions et des pièces détachées pour voitures pour moteurs diesel et essence, en s'occupant également de la carrosserie et des véhicules industriels, agricoles, maritimes et ferroviaires. Depuis 1995 à Catane, elle offre des services de choix et de vente des produits proposés avec professionnalisme et compétence, répondant aux besoins des entités publiques et privées, des revendeurs de pièces détachées, des spécialistes de pompes, des mécaniciens et des électriciens.",
+      "part2": "L'entreprise, en pleine expansion, souhaite offrir ce service de plus en plus compétent et efficace directement aux particuliers, en fournissant une opportunité et en offrant des solutions pour les grands et petits problèmes de véhicules. Vous trouverez du personnel qualifié en formation continue, capable d'analyser le problème et de donner des conseils sur les bonnes alternatives. Vous pouvez bénéficier de la livraison à domicile et d'un service complet à 360 degrés.",
+      "part3": "L'entreprise est distributeur de marques de pièces détachées d'origine, ainsi que de produits officiellement reconditionnés directement par le fabricant. La qualité du service par rapport au prix, la zone technique qualifiée et la gestion/projet au-delà de la simple vente directe sont les trois points forts et distinctifs de Ricambi Centro Sud S.r.l. La zone technique, équipée d'outils et d'une formation continue, favorise le réseau fonctionnel dans la région, garantissant des mises à jour et une assistance après-vente aux clients.",
+      "part4": "<0>Une entreprise qui n'a pas perdu son caractère ouvert et familial</0> mais qui est aujourd'hui en pleine expansion, face à de nouveaux défis. La nouvelle structure, qui s'étend sur 3 800 m² sur trois niveaux, comprenant des bureaux, un entrepôt et un point de vente, avec un total de 25 employés, est capable de garantir des services dans différents domaines d'expertise sur le territoire grâce à des agents commerciaux spécialisés par type de produit et de marque."
+    }
+  },
   "welcome": "Bienvenue",
   "login": "Connexion",
   "statistics": "Statistiques",
@@ -833,7 +855,7 @@
     "agent": "Agent",
     "admin": "Administrateur",
     "selectEntity": "Sélectionnez une entité en double-cliquant dessus.",
-    "searchPlaceholder": "Rechercher des {{role}}s par nom ou ID",
+    "searchPlaceholder": "Rechercher des par nom ou ID",
     "loadingEntities": "Chargement des entités...",
     "startTyping": "Commencez à taper pour rechercher",
     "entityName": "Nom",
@@ -989,7 +1011,7 @@
     "yes": "Oui",
     "no": "Non",
     "selectVisitError": "Impossible de sélectionner la visite.",
-    "noVisits": "Aucune visite trouvée pour ce client.",
+    "noVisits": "Aucune visite trouvée.",
     "unknown": "Inconnu"
   },
   "calendarHook": {

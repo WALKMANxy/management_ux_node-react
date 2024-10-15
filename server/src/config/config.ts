@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { logger } from "../utils/logger";
 
-const nodeEnv = process.env.NODE_ENV
+const nodeEnv = process.env.NODE_ENV;
 
 // Function to load environment-specific .env file
 const loadEnvFile = () => {
@@ -31,10 +31,6 @@ export const config = {
   smtpPass: process.env.SMTP_PASS || "",
   sslKeyPath: process.env.SSL_KEY_PATH || "",
   sslCertPath: process.env.SSL_CERT_PATH || "",
-  clientDetailsFilePath: process.env.CLIENT_DETAILS_FILE_PATH || "",
-  jsonFilePath: process.env.JSON_FILE_PATH || "",
-  agentDetailsFilePath: process.env.AGENT_DETAILS_FILE_PATH || "",
-  adminDetailsFilePath: process.env.ADMIN_DETAILS_FILE_PATH || "",
   ipinfoToken: process.env.IPINFO_TOKEN || "",
   googleClientId: process.env.GOOGLE_CLIENT_ID || "",
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
@@ -47,10 +43,17 @@ export const config = {
   passwordResetExpiresIn: process.env.PASSWORD_RESET_EXPIRES_IN || "1h",
   tunnelSubdomain: process.env.TUNNEL_SUBDOMAIN || "",
   refreshTokenDuration: process.env.REFRESH_TOKEN_DURATION || "7d",
-  sessionDuration: process.env.SESSION_DURATION || "24d",
   emailHost: process.env.EMAIL_HOST || "",
   emailHostPort: process.env.EMAIL_HOST_PORT || "",
   botId: process.env.BOT_TOKEN || "",
+  jwt: {
+    accessTokenSecret: process.env.ACCESS_TOKEN_SECRET || "",
+    refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET || "",
+    accessTokenExpiry: process.env.ACCESS_TOKEN_EXPIRY || "15m",
+    refreshTokenExpiry: process.env.REFRESH_TOKEN_EXPIRY || "7d",
+  },
+  sessionDuration: process.env.SESSION_DURATION || "7d",
+  reverseGeoToken: process.env.REVERSE_GEO_TOKEN || "",
 };
 
 // Validate required environment variables

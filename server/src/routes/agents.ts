@@ -1,12 +1,13 @@
-//src/routes/agents.ts
+// src/routes/agentRoutes.ts
 import express from "express";
-import { agentValidationRules } from "../constants/validationRules";
 import {
   fetchAgentByClientEntityCode,
   fetchAgentById,
   fetchAllAgents,
   replaceAgent,
   updateAgent,
+  createAgent,
+  deleteAgent,
 } from "../controllers/agentController";
 import { authenticateUser } from "../middlewares/authentication";
 import {
@@ -14,7 +15,12 @@ import {
   checkAgentOrAdminOrClientRole,
   checkAgentOrAdminRole,
 } from "../middlewares/roleChecker";
-import { checkValidation } from "../middlewares/validate";
+import {
+  validateCreateAgent,
+  validateUpdateAgent,
+  validateDeleteAgent,
+  handleValidation,
+} from "../middlewares/validateAgent";
 
 const router = express.Router();
 
@@ -28,19 +34,26 @@ router.get(
   fetchAgentByClientEntityCode
 );
 
-
 // GET method to retrieve all agents
 router.get("/", checkAgentOrAdminRole, fetchAllAgents);
 
 // GET method to retrieve an agent by ID
 router.get("/:id", checkAgentOrAdminOrClientRole, fetchAgentById);
 
+// POST method to create a new agent
+router.post(
+  "/",
+  validateCreateAgent,
+  handleValidation,
+  checkAdminRole,
+  createAgent
+);
 
 // PUT method to replace an entire agent
 router.put(
   "/:id",
-  agentValidationRules,
-  checkValidation,
+  validateUpdateAgent,
+  handleValidation,
   checkAdminRole,
   replaceAgent
 );
@@ -48,10 +61,19 @@ router.put(
 // PATCH method to update part of an agent's information
 router.patch(
   "/:id",
-  agentValidationRules,
-  checkValidation,
+  validateUpdateAgent,
+  handleValidation,
   checkAdminRole,
   updateAgent
+);
+
+// DELETE method to delete an agent by ID
+router.delete(
+  "/:id",
+  validateDeleteAgent,
+  handleValidation,
+  checkAdminRole,
+  deleteAgent
 );
 
 export default router;

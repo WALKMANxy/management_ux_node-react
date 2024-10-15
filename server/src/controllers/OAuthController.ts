@@ -1,13 +1,16 @@
 import { Request, Response } from "express";
+import { config } from "../config/config";
 import { AuthenticatedRequest } from "../models/types";
 import { IUser } from "../models/User";
 import { OAuthService } from "../services/OAuthService";
-import { generateSessionToken } from "../utils/jwtUtils";
-import { createSession, renewSession } from "../utils/sessionUtils";
-import { config } from "../config/config";
+import { logger } from "../utils/logger";
+import {
+  createSession,
+  invalidateAllUserSessions,
+  renewSession,
+} from "../utils/sessionUtils";
 
 export class OAuthController {
-
   static initiateGoogleOAuth(req: Request, res: Response) {
     const { state } = req.query;
 
@@ -17,9 +20,14 @@ export class OAuthController {
     res.redirect(googleAuthUrl);
   }
 
-
   static async handleOAuthCallback(req: Request, res: Response) {
     const { code, state } = req.query;
+
+    const uniqueId = req.query.uniqueId;
+
+    if (typeof uniqueId !== "string") {
+      return res.status(400).json({ message: "Invalid or missing uniqueId" });
+    }
 
     if (typeof code !== "string") {
       return res.status(400).json({ message: "Invalid authorization code" });
@@ -37,67 +45,84 @@ export class OAuthController {
         picture
       );
 
-      const sessionToken = generateSessionToken(user);
-      await createSession(user.id.toString(), sessionToken, req);
+      const { accessToken, refreshToken } = await createSession(
+        user,
+        req as AuthenticatedRequest,
+        uniqueId
+      );
 
-      res.cookie("sessionToken", sessionToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
+      // Respond with tokens in the response body
+      res.status(200).json({
+        message: "OAuth login successful.",
+        accessToken,
+        refreshToken,
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.entityName,
+          picture: user.avatar,
+        },
       });
 
-      // Send a message to the opener window
+      // Send a message to the opener window to close the window if needed
       res.send(`
-        <script>
-          window.opener.postMessage({ status: "success", state: "${state}", user: ${JSON.stringify(user)} }, "${process.env.CLIENT_URL}");
+      <script>
+          window.opener.postMessage({
+              status: "success",
+              state: "${state}",
+              user: ${JSON.stringify(user)},
+              accessToken: "${accessToken}",
+              refreshToken: "${refreshToken}"
+          }, "${process.env.CLIENT_URL}");
           window.close();
-        </script>
-      `);
+      </script>
+  `);
     } catch (error) {
       console.error("Error during OAuth callback", error);
       res.send(`
-        <script>
+      <script>
           window.opener.postMessage({ status: "error", state: "${state}" }, "${process.env.CLIENT_URL}");
           window.close();
-        </script>
-      `);
+      </script>
+  `);
     }
   }
 
-  static async refreshSession(req: AuthenticatedRequest, res: Response) {
-    const sessionToken =
-      req.cookies.sessionToken ||
-      req.header("Authorization")?.replace("Bearer ", "");
+  /**
+   * Refreshes the session by validating the provided Refresh Token and issuing new tokens.
+   */
+  static async refreshSession(req: Request, res: Response) {
+    const { refreshToken, uniqueId } = req.body;
 
-    if (!sessionToken) {
-      return res.status(401).json({ message: "No session token provided" });
+    if (!refreshToken || !uniqueId) {
+      return res
+        .status(400)
+        .json({ message: "Refresh token and uniqueId are required." });
     }
 
     try {
-      const renewedSession = await renewSession(sessionToken, req);
-      if (!renewedSession) {
-        return res.status(401).json({ message: "Invalid or expired session" });
+      const renewedTokens = await renewSession(refreshToken, req, uniqueId);
+
+      if (!renewedTokens) {
+        return res.status(401).json({ message: "Invalid or expired session." });
       }
 
-      res.cookie("sessionToken", renewedSession.token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        expires: renewedSession.expiresAt,
-      });
-
       return res.status(200).json({
-        message: "Session renewed successfully",
-        expiresAt: renewedSession.expiresAt,
+        message: "Session renewed successfully.",
+        accessToken: renewedTokens.accessToken,
+        refreshToken: renewedTokens.refreshToken,
       });
-    } catch (error) {
-      console.error("Error renewing session:", error);
-      return res.status(500).json({ message: "Failed to renew session" });
+    } catch (error: unknown) {
+      logger.error("Error renewing session:", { error });
+      return res.status(500).json({
+        message: "Failed to renew session.",
+        error: "Internal server error.",
+      });
     }
   }
 
   static async linkGoogleAccount(req: AuthenticatedRequest, res: Response) {
-    const { code } = req.body;
+    const { code, uniqueId } = req.body;
     const user = req.user as IUser;
 
     if (typeof code !== "string") {
@@ -123,23 +148,34 @@ export class OAuthController {
         picture
       );
 
-      // Create a new session for the user
-      const sessionToken = generateSessionToken(updatedUser);
-      await createSession(updatedUser.id.toString(), sessionToken, req);
+      if (updatedUser && updatedUser._id) {
+        await invalidateAllUserSessions(updatedUser?._id?.toString());
 
-      res.cookie("sessionToken", sessionToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-      });
+        const { accessToken, refreshToken } = await createSession(
+          updatedUser,
+          req,
+          uniqueId
+        );
 
-      res.status(200).json({
-        message: "Google account linked successfully",
-        user: updatedUser,
+        // Respond with new tokens
+        res.status(200).json({
+          message: "Google account linked successfully.",
+          accessToken,
+          refreshToken,
+          user: {
+            id: updatedUser._id,
+            email: updatedUser.email,
+            name: updatedUser.entityName,
+            picture: updatedUser.avatar,
+          },
+        });
+      }
+    } catch (error: unknown) {
+      logger.error("Error during Google account linking", { error });
+      res.status(500).json({
+        message: "Failed to link Google account.",
+        error: "Internal server error.",
       });
-    } catch (error) {
-      console.error("Error during Google account linking", error);
-      res.status(500).json({ message: "Failed to link Google account" });
     }
   }
 }

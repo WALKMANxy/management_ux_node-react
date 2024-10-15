@@ -1,19 +1,10 @@
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import EmailIcon from "@mui/icons-material/Email";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import GoogleMapsIcon from "@mui/icons-material/Map";
-import PhoneIcon from "@mui/icons-material/Phone";
 import {
-  AppBar,
   Box,
   Button,
   Container,
   Divider,
-  Toolbar,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -22,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { RootState } from "../../app/store";
 import Loader from "../../components/common/Loader";
 import AuthenticationModal from "../../components/landingPage/AuthenticationModal";
+import Footer from "../../components/landingPage/Footer";
 
 const LandingPage: React.FC = () => {
   const { t } = useTranslation();
@@ -32,7 +24,8 @@ const LandingPage: React.FC = () => {
   const userRole = useSelector((state: RootState) => state.auth.role);
   const navigate = useNavigate();
 
-  // console.log("Logged in?: ", isLoggedIn);
+  const isSuperMobile = useMediaQuery("(min-width:0px) and (max-width:420px)");
+  const isMobile = useMediaQuery("(min-width:0px) and (max-width:600px)");
 
   useEffect(() => {
     const timer = setTimeout(() => setShowLoader(false), 1500);
@@ -40,35 +33,25 @@ const LandingPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (isLoggedIn && userRole !== "guest") {
-      setIsRedirected(true); // Set the flag as redirected
-      // Redirect based on user role
-      switch (userRole) {
-        case "admin":
-          navigate("/admin-dashboard");
-          break;
-        case "agent":
-          navigate("/agent-dashboard");
-          break;
-        case "client":
-          navigate("/client-dashboard");
-          break;
-        case "employee":
-          navigate("/employee-dashboard");
-          break;
-        default:
-          break;
+    const timer = setTimeout(() => {
+      if (isLoggedIn && userRole !== "guest") {
+        setIsRedirected(true); // Set the flag as redirected
+        navigate("/dashboard");
       }
-    }
-  }, [isLoggedIn, userRole, isRedirected, navigate]);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [isLoggedIn, navigate, isRedirected, userRole]);
 
   return (
     <Box
       sx={{
+        flex: 1,
         display: "flex",
         flexDirection: "column",
-        minHeight: "100vh",
+        mineHeight: "-webkit-fill-available",
         position: "relative",
+        overflow: "hidden",
+        flexGrow: 1,
       }}
     >
       {showLoader && <Loader fadeout={!showLoader} />}
@@ -79,21 +62,13 @@ const LandingPage: React.FC = () => {
           transition: "opacity 0.5s ease-in-out",
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh",
+          minHeight: "100dvh",
+          position: "relative",
+          zIndex: 0,
+          flexGrow: 1,
         }}
       >
-        <AppBar position="static" sx={{ backgroundColor: "black" }}>
-          <Toolbar sx={{ justifyContent: "space-between" }}>
-            <img
-              src="/images/logo-appbar.png"
-              alt="Logo"
-              style={{ height: "40px" }}
-            />
-            <Button color="inherit" onClick={() => setShowLogin(true)}>
-              {isLoggedIn ? t("landingPage.enter") : t("landingPage.login")}
-            </Button>
-          </Toolbar>
-        </AppBar>
+        {/* Top Shadow */}
 
         <Container
           component="main"
@@ -103,7 +78,9 @@ const LandingPage: React.FC = () => {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            padding: "2rem",
+            padding: isSuperMobile ? "0rem" : "2rem",
+            position: "relative",
+            zIndex: 0,
           }}
         >
           <Box
@@ -127,212 +104,58 @@ const LandingPage: React.FC = () => {
                 alt="Welcome Logo"
                 style={{ width: "100%", height: "auto" }}
               />
-            </Box>
-            <Divider
-              orientation="vertical"
-              flexItem
-              sx={{
-                bgcolor: "lightgray",
-                height: { xs: "0", md: "200px" },
-                width: { xs: "100%", md: "0" },
-                margin: "1rem",
-              }}
-            />
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)" },
-                gap: 2,
-                flex: { xs: "0 1 auto", md: "0 1 50%" },
-              }}
-            >
-              <Button
-                href="https://www.facebook.com/RicambiCentroSud/"
-                startIcon={<FacebookIcon />}
-                sx={{ color: "#3b5998" }}
+              <Divider sx={{ my: isSuperMobile ? 0.5 : 2 }} />
+              <Typography
+                variant="h2"
+                gutterBottom
+                sx={{
+                  mt: isSuperMobile ? 0.5 : 2,
+                  fontFamily: "Inter, sans-serif",
+                  fontWeight: 100, // Now using the lighter custom font weight
+                }}
               >
-                {t("landingPage.facebook")}
-              </Button>
+                NEXT_
+              </Typography>
+
+              {/* Login Button */}
               <Button
-                href="https://www.instagram.com/ricambicentrosud/"
-                startIcon={<InstagramIcon />}
-                sx={{ color: "#E1306C" }}
+                variant="contained"
+                color="primary"
+                onClick={() => setShowLogin(true)}
+                sx={{
+                  mt: isSuperMobile || isMobile ? 0.5 : 4,
+                  paddingX: 4,
+                  paddingY: 1.5,
+                  fontSize: "1.2rem",
+                  borderRadius: "50px",
+                  background:
+                    "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
+                  color: "white",
+                  boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.2)",
+                  transition:
+                    "transform 0.3s, box-shadow 0.3s, background 0.3s",
+                  "&:hover": {
+                    transform: "translateY(-3px)",
+                    boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.3)",
+                    background:
+                      "linear-gradient(45deg, #FF8E53 30%, #FE6B8B 90%)",
+                  },
+                }}
               >
-                {t("landingPage.instagram")}
-              </Button>
-              <Button
-                href="https://goo.gl/maps/MFy1cqdn3BbQNmtW6"
-                startIcon={<GoogleMapsIcon />}
-                sx={{ color: "#4285F4" }}
-              >
-                {t("landingPage.googleMaps")}
-              </Button>
-              <Button
-                href="https://www.linkedin.com/company/7007068/"
-                startIcon={<LinkedInIcon />}
-                sx={{ color: "#0077B5" }}
-              >
-                {t("landingPage.linkedIn")}
+                {isLoggedIn ? t("landingPage.enter") : t("landingPage.login")}
               </Button>
             </Box>
           </Box>
         </Container>
 
+        {/* Footer should stay at the bottom and remain visible */}
         <Box
           component="footer"
           sx={{
-            backgroundColor: "#f0f0f0",
-            color: "#333",
-            padding: "0.64rem",
-            textAlign: "center",
-            position: "relative",
-            mt: "auto",
-            "&:before": {
-              content: '""',
-              display: "block",
-              height: "6.4px",
-              background:
-                "linear-gradient(to bottom, rgba(255, 255, 255, 0), #f0f0f0)",
-            },
-            "@media (max-width: 600px)": {
-              padding: "0.4rem",
-              "&:before": {
-                height: "4px",
-              },
-            },
+            paddingBottom: "env(safe-area-inset-bottom)", // Ensure padding for safe area
           }}
         >
-          <Container>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              flexDirection={{ xs: "column", sm: "row" }}
-              alignItems={{ xs: "center", sm: "flex-start" }}
-              sx={{
-                "@media (max-width: 600px)": {
-                  flexDirection: "column", // Stack items for mobile
-                  alignItems: "center",
-                },
-              }}
-            >
-              <Box
-                sx={{
-                  textAlign: { xs: "center", sm: "left" },
-                  padding: "0.32rem 0.64rem",
-                  flex: 1,
-                  fontSize: "64%",
-                  "@media (max-width: 600px)": {
-                    padding: "0.16rem 0.32rem", // 50% smaller for mobile
-                    fontSize: "32%", // 50% smaller for mobile
-                  },
-                }}
-              >
-                <Typography
-                  sx={{
-                    marginBottom: "0.32rem",
-                    "@media (max-width: 600px)": {
-                      marginBottom: "0.16rem",
-                      fontSize: "250%",
-                    },
-                  }}
-                >
-                  <AccessTimeIcon /> {t("landingPage.workingHours")}
-                </Typography>
-                <Typography
-                  sx={{
-                    marginBottom: "0.32rem",
-                    "@media (max-width: 600px)": {
-                      marginBottom: "0.16rem",
-                      fontSize: "250%",
-                    },
-                  }}
-                >
-                  <LocationOnIcon /> {t("landingPage.address")}
-                </Typography>
-              </Box>
-              <Box
-                sx={{
-                  textAlign: { xs: "center", sm: "right" },
-                  padding: "0.32rem 0.64rem",
-                  flex: 1,
-                  fontSize: "64%",
-                  "@media (max-width: 600px)": {
-                    padding: "0.16rem 0.32rem", // 50% smaller for mobile
-                    fontSize: "32%", // 50% smaller for mobile
-                  },
-                }}
-              >
-                <Typography
-                  sx={{
-                    marginBottom: "0.32rem",
-                    "@media (max-width: 600px)": {
-                      marginBottom: "0.16rem",
-                      fontSize: "250%",
-                    },
-                  }}
-                >
-                  <PhoneIcon />{" "}
-                  <a
-                    href="tel:+390954190006"
-                    style={{ color: "blue", textDecoration: "none" }}
-                  >
-                    (+39) 095 419 0006
-                  </a>
-                </Typography>
-                <Typography
-                  sx={{
-                    marginBottom: "0.32rem",
-                    "@media (max-width: 600px)": {
-                      marginBottom: "0.16rem",
-                      fontSize: "250%",
-                    },
-                  }}
-                >
-                  <EmailIcon />{" "}
-                  <a
-                    href="mailto:info@ricambicentrosud.com"
-                    style={{ color: "blue", textDecoration: "none" }}
-                  >
-                    info@ricambicentrosud.com
-                  </a>
-                </Typography>
-                <Typography
-                  sx={{
-                    marginBottom: "0.32rem",
-                    "@media (max-width: 600px)": {
-                      marginBottom: "0.16rem",
-                      fontSize: "250%",
-                    },
-                  }}
-                >
-                  VAT 03176280877
-                </Typography>
-              </Box>
-            </Box>
-            <Box
-              sx={{
-                textAlign: "center",
-                padding: "0.32rem 0.64rem",
-                fontSize: "64%",
-                "@media (max-width: 600px)": {
-                  padding: "0.16rem 0.32rem", // 50% smaller for mobile
-                  fontSize: "32%", // 50% smaller for mobile
-                },
-              }}
-            >
-              <Typography
-                sx={{
-                  marginBottom: "0.32rem",
-                  "@media (max-width: 600px)": {
-                    marginBottom: "0.16rem",
-                    fontSize: "250%",
-                  },
-                }}
-              >
-                {t("landingPage.credits")}
-              </Typography>
-            </Box>
-          </Container>
+          <Footer />
         </Box>
       </Box>
 

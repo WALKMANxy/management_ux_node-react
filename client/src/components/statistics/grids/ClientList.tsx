@@ -53,7 +53,10 @@ const ClientList: React.FC<ClientListProps> = ({
   const memoizedColumnDefs = useMemo(() => columnDefs, [columnDefs]);
 
   return (
-    <Paper elevation={8} sx={{ mb: 2, borderRadius: 2 }}>
+    <Paper
+      elevation={8}
+      sx={{ mb: 2, borderRadius: 2, height: isMobile ? 500 * 1.33 : "100%" }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -62,7 +65,10 @@ const ClientList: React.FC<ClientListProps> = ({
           p: 2,
         }}
       >
-        <Typography variant="h4" sx={{ pl: 2, pt: 2, mb: -4 }}>
+        <Typography
+          variant="h4"
+          sx={{ pl: 2, pt: isMobile ? 0 : 2, mb: isMobile ? -2 : -6 }}
+        >
           {t("clientList.title")}
         </Typography>
         <Tooltip
@@ -85,13 +91,17 @@ const ClientList: React.FC<ClientListProps> = ({
         </Tooltip>
       </Box>
       {/* Collapsible Content */}
-      <Collapse in={!isClientListCollapsed} sx={{ pt: 2, pb: 4 }}>
-        <Box sx={{ p: 2 }}>
+      <Collapse
+        in={!isClientListCollapsed}
+        sx={{ pt: isMobile ? 2 : 0, pb: 4 }}
+      >
+        <Box sx={{ p: 2, pt: 0 }}>
           {/* Filter and Menu Section */}
           <Box
             sx={{
               display: "flex",
-              flexDirection: isMobile ? "column" : "row",
+              alignItems: "flex-end",
+              flexDirection: "row-reverse  ",
               gap: 2,
               mb: 2,
             }}
@@ -99,12 +109,34 @@ const ClientList: React.FC<ClientListProps> = ({
             <Box
               sx={{
                 display: "flex",
-                flexDirection: "row-reverse",
-                alignItems: "center",
+                flexDirection: "row",
+                justifyContent: "flex-end",
                 gap: 1,
                 flex: 1,
               }}
             >
+              <TextField
+                type="date"
+                label={t("clientList.startDate")}
+                InputLabelProps={{ shrink: true }}
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                fullWidth={isMobile}
+                InputProps={{
+                  "aria-label": t("clientList.startDateAriaLabel"),
+                }}
+              />
+              <TextField
+                type="date"
+                label={t("clientList.endDate")}
+                InputLabelProps={{ shrink: true }}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                fullWidth={isMobile}
+                InputProps={{
+                  "aria-label": t("clientList.endDateAriaLabel"),
+                }}
+              />
               <Tooltip title={t("clientList.options")}>
                 <IconButton
                   onClick={handleMenuOpen}
@@ -114,28 +146,6 @@ const ClientList: React.FC<ClientListProps> = ({
                 </IconButton>
               </Tooltip>
             </Box>
-            <TextField
-              type="date"
-              label={t("clientList.startDate")}
-              InputLabelProps={{ shrink: true }}
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              fullWidth={isMobile}
-              InputProps={{
-                "aria-label": t("clientList.startDateAriaLabel"),
-              }}
-            />
-            <TextField
-              type="date"
-              label={t("clientList.endDate")}
-              InputLabelProps={{ shrink: true }}
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              fullWidth={isMobile}
-              InputProps={{
-                "aria-label": t("clientList.endDateAriaLabel"),
-              }}
-            />
           </Box>
 
           {/* Options Menu */}

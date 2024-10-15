@@ -5,21 +5,15 @@ import CloseIcon from "@mui/icons-material/Close";
 import {
   Avatar,
   Box,
-  Button,
   Card,
   CardContent,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   IconButton,
   Stack,
   Tooltip,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
@@ -70,8 +64,6 @@ const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({
   );
   const userRole = currentUser?.role;
 
-  const [openConfirm, setOpenConfirm] = useState(false); // State for confirmation dialog
-
   // If client data is not available, render nothing
   if (!client) return null;
 
@@ -82,17 +74,9 @@ const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({
 
   // Handlers for confirmation dialog
   const handleOpenConfirm = () => {
-    setOpenConfirm(true);
-  };
-
-  const handleConfirmCancel = () => {
-    setOpenConfirm(false);
     onDeselectClient();
   };
 
-  const handleDenyCancel = () => {
-    setOpenConfirm(false);
-  };
   return (
     <Box sx={{ m: 2 }}>
       <Card
@@ -159,7 +143,7 @@ const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({
             direction={"row"}
             spacing={2}
             justifyContent="flex-end"
-            sx={{ pt: 1, mr: -2 }}
+            sx={{ py: 1.5, mr: -2 }}
           >
             <Tooltip
               title={t(
@@ -196,34 +180,6 @@ const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({
           </Stack>
         </Box>
       )}
-
-      {/* Confirmation Dialog */}
-      <Dialog
-        open={openConfirm}
-        onClose={handleDenyCancel}
-        aria-labelledby="confirm-deselect-title"
-        aria-describedby="confirm-deselect-description"
-      >
-        <DialogTitle id="confirm-deselect-title">
-          {t("clientDetailsCard.cancelDialogTitle", "Deselect Client")}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="confirm-deselect-description">
-            {t(
-              "clientDetailsCard.cancelDialogDescription",
-              "Are you sure you want to deselect the current client? All unsaved changes will be lost."
-            )}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDenyCancel} color="primary">
-            {t("clientDetailsCard.no", "No")}
-          </Button>
-          <Button onClick={handleConfirmCancel} color="error" autoFocus>
-            {t("clientDetailsCard.yes", "Yes")}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };

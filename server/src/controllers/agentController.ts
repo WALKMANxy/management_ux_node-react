@@ -1,115 +1,219 @@
-//src/controllers/agentController.ts
-import { Request, Response } from "express";
-import { AuthenticatedRequest } from "../models/types";
+// src/controllers/agentController.ts
+import { Request, Response } from 'express';
 import {
   getAgentByClientEntityCode,
   getAgentById,
-  getAgentsFromFile,
+  getAllAgents,
   replaceAgentById,
   updateAgentById,
-} from "../services/agentService";
+  createAgentService,
+  deleteAgentService,
+} from '../services/agentService';
+import { IAgent } from '../models/Agent';
+import { isMongoDuplicateKeyError } from './adminController';
 
-export const fetchAllAgents = (req: Request, res: Response) => {
+/**
+ * Fetch all agents.
+ */
+export const fetchAllAgents = async (req: Request, res: Response) => {
   try {
-    const agents = getAgentsFromFile();
+    const agents = await getAllAgents();
     res.json(agents);
-    return;
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-    return;
+    console.error('Error in fetchAllAgents:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
-export const fetchAgentById = (req: Request, res: Response) => {
+/**
+ * Fetch an agent by ID.
+ */
+export const fetchAgentById = async (req: Request, res: Response) => {
   try {
-    const agent = getAgentById(req.params.id);
+    const agent = await getAgentById(req.params.id);
     if (!agent) {
-      return res.status(404).json({ message: "Agent not found" });
+      return res.status(404).json({ message: 'Agent not found' });
     }
     res.json(agent);
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-    return;
+    console.error(`Error in fetchAgentById for id ${req.params.id}:`, error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
-// New controller function to fetch an agent by client entity code
-export const fetchAgentByClientEntityCode = (
-  req: AuthenticatedRequest,
+/**
+ * Fetch an agent by client's entity code.
+ */
+export const fetchAgentByClientEntityCode = async (
+  req: Request,
   res: Response
 ) => {
   try {
-    if (!req.user || !req.user.entityCode) {
+    // Assuming req.user.entityCode is available via authentication middleware
+    const clientEntityCode = (req as any).user?.entityCode;
+
+    if (!clientEntityCode) {
       console.error(
-        "Unauthorized access: User information is missing or incomplete."
+        'Unauthorized access: User information is missing or incomplete.'
       );
       return res.status(401).json({
-        message: "Unauthorized: User information is missing or incomplete.",
+        message: 'Unauthorized: User information is missing or incomplete.',
       });
     }
-    const clientEntityCode = req.user.entityCode;
-  /*   console.log(
-      "fetchAgentByClientEntityCode called with entityCode:",
-      clientEntityCode
-    ); // Debugging */
 
-    const agent = getAgentByClientEntityCode(clientEntityCode);
+    const agent = await getAgentByClientEntityCode(clientEntityCode);
 
     if (!agent) {
       console.warn(
-        "Agent not found for the given client entity code:",
+        'Agent not found for the given client entity code:',
         clientEntityCode
-      ); // Debugging
+      );
       return res
         .status(404)
-        .json({ message: "Agent not found for the given client" });
+        .json({ message: 'Agent not found for the given client' });
     }
 
-/*     console.log("Agent found:", agent); // Debugging
- */    res.json(agent);
-    return;
+    res.json(agent);
   } catch (error) {
-    console.error("Error in fetchAgentByClientEntityCode:", error); // Debugging
-    res.status(500).json({ message: "Internal Server Error" });
-    return;
+    console.error('Error in fetchAgentByClientEntityCode:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
-export const updateAgent = (req: Request, res: Response) => {
+/**
+ * Create a new agent.
+ */
+export const createAgent = async (req: Request, res: Response) => {
   try {
-    const updatedAgent = updateAgentById(req.params.id, req.body);
-    if (!updatedAgent) {
-      return res.status(404).json({ message: "Agent not found" });
+    const { id, name, email, clients } = req.body;
+
+    // Validate required fields
+    if (!id || !name) {
+      return res
+        .status(400)
+        .json({ message: 'Agent ID and name are required' });
     }
-    res
-      .status(200)
-      .json({ message: "Agent updated successfully", updatedAgent });
-    return;
+
+    const newAgent = await createAgentService({ id, name, email, clients });
+
+    res.status(201).json({
+      id: newAgent.id,
+      name: newAgent.name,
+      email: newAgent.email,
+      clients: newAgent.clients,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-    return;
+    console.error('Error in createAgent:', error);
+
+    if (isMongoDuplicateKeyError(error)) {
+      // Determine which field caused the duplicate key error
+      const duplicatedField = Object.keys(error.keyValue)[0];
+      return res.status(409).json({
+        message: `Agent with the given ${duplicatedField} already exists`,
+      });
+    }
+
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
-export const replaceAgent = (req: Request, res: Response) => {
+/**
+ * Update an existing agent by ID.
+ */
+export const updateAgent = async (req: Request, res: Response) => {
   try {
-    const replacedAgent = replaceAgentById(req.params.id, {
-      id: req.params.id,
-      name: req.body.name,
-      email: req.body.email,
-      phone: req.body.phone,
-      clients: req.body.clients,
+    const adminId = req.params.id;
+    const { name, email, phone, clients } = req.body;
+
+    // At least one field must be provided for update
+    if (!name && !email && !phone && !clients) {
+      return res.status(400).json({
+        message:
+          'At least one of name, email, phone, or clients must be provided for update',
+      });
+    }
+
+    const updatedAgent = await updateAgentById(adminId, {
+      name,
+      email,
+      phone,
+      clients,
     });
 
+    if (!updatedAgent) {
+      return res.status(404).json({ message: 'Agent not found' });
+    }
+
+    res.json({
+      id: updatedAgent.id,
+      name: updatedAgent.name,
+      email: updatedAgent.email,
+      phone: updatedAgent.phone,
+      clients: updatedAgent.clients,
+    });
+  } catch (error) {
+    console.error(`Error in updateAgent for id ${req.params.id}:`, error);
+
+    if (isMongoDuplicateKeyError(error)) {
+      const duplicatedField = Object.keys(error.keyValue)[0];
+      return res.status(409).json({
+        message: `${duplicatedField.charAt(0).toUpperCase() + duplicatedField.slice(1)} already in use`,
+      });
+    }
+
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+/**
+ * Delete an agent by ID.
+ */
+export const deleteAgent = async (req: Request, res: Response) => {
+  try {
+    const agentId = req.params.id;
+    const deleted = await deleteAgentService(agentId);
+
+    if (!deleted) {
+      return res.status(404).json({ message: 'Agent not found' });
+    }
+
+    res.status(200).json({ message: 'Agent deleted successfully' });
+  } catch (error) {
+    console.error(`Error in deleteAgent for id ${req.params.id}:`, error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+/**
+ * Replace an agent by ID.
+ */
+export const replaceAgent = async (req: Request, res: Response) => {
+  try {
+    const { id, name, email, phone, clients } = req.body;
+
+    // Validate required fields
+    if (!id || !name) {
+      return res
+        .status(400)
+        .json({ message: 'Agent ID and name are required for replacement' });
+    }
+
+    const replacedAgent = await replaceAgentById(req.params.id, {
+      id: req.params.id,
+      name,
+      email,
+      phone,
+      clients: clients || [],
+    } as IAgent); // Ensure type casting aligns with your IAgent interface
+
     if (!replacedAgent) {
-      return res.status(404).json({ message: "Agent not found" });
+      return res.status(404).json({ message: 'Agent not found' });
     }
     res
       .status(200)
-      .json({ message: "Agent replaced successfully", replacedAgent });
-    return;
+      .json({ message: 'Agent replaced successfully', replacedAgent });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-    return;
+    console.error(`Error in replaceAgent for id ${req.params.id}:`, error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };

@@ -1,5 +1,3 @@
-// src/components/clientpage/ClientDetails.tsx
-
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
@@ -13,7 +11,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { ClientDetailsProps } from "../../models/propsModels";
 import MovementsHistory from "../statistics/grids/MovementsHistory";
@@ -41,48 +39,66 @@ const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
     const theme = useTheme();
     const isMobile = useMediaQuery("(max-width:600px)");
 
-    /**
-     * Handles the toggle of the client details collapse state.
-     */
-    const handleToggleCollapse = () => {
-      setClientDetailsCollapsed(!isClientDetailsCollapsed);
-    };
+    // Memoize the toggle function to avoid recreating it on every render
+    const toggleCollapse = useMemo(
+      () => () => {
+        setClientDetailsCollapsed(!isClientDetailsCollapsed);
+      },
+      [isClientDetailsCollapsed, setClientDetailsCollapsed]
+    );
+
+    // Calculate height based on expansion state and mobile view
+    const height = useMemo(() => {
+      if (isMobile) {
+        return isClientDetailsCollapsed ? "100%" : 1050 * 1.33; // Similar height logic as in MovementDetails
+      }
+      return "100%";
+    }, [isMobile, isClientDetailsCollapsed]);
+
+    // Memoize styles to avoid recreating them on every render
+    const paperStyles = useMemo(
+      () => ({
+        p: isMobile ? 0 : 3,
+        borderRadius: "12px",
+        background: "linear-gradient(135deg, #e3f2fd 30%, #bbdefb 100%)",
+        color: "#000",
+        overflow: "hidden",
+        height,
+        maxHeight: height,
+        position: "relative" as const,
+        overflowX: "hidden", // Ensure no horizontal overflow
+        "&::-webkit-scrollbar": {
+          display: "none", // Hide scrollbar
+        },
+        "&:after": {
+          content: '""',
+          position: "absolute",
+          width: 210,
+          height: 210,
+          background: theme.palette.primary.main,
+          borderRadius: "50%",
+          top: -85,
+          right: -95,
+          overflow: "hidden",
+        },
+        "&:before": {
+          content: '""',
+          position: "absolute",
+          width: 210,
+          height: 210,
+          background: theme.palette.primary.main,
+          borderRadius: "50%",
+          top: -125,
+          right: -15,
+          opacity: 0.5,
+          overflow: "hidden",
+        },
+      }),
+      [theme.palette.primary.main, isMobile, height]
+    );
 
     return (
-      <Paper
-        elevation={3}
-        ref={ref}
-        sx={{
-          p: 3,
-          borderRadius: "12px",
-          background: "linear-gradient(135deg, #e3f2fd 30%, #bbdefb 100%)",
-          color: "#000",
-          position: "relative",
-          overflow: "hidden",
-          height: "100%",
-          "&:after": {
-            content: '""',
-            position: "absolute",
-            width: 210,
-            height: 210,
-            background: theme.palette.primary.main,
-            borderRadius: "50%",
-            top: -85,
-            right: -95,
-          },
-          "&:before": {
-            content: '""',
-            position: "absolute",
-            width: 210,
-            height: 210,
-            background: theme.palette.primary.main,
-            borderRadius: "50%",
-            top: -125,
-            right: -15,
-            opacity: 0.5,
-          },
-        }}
-      >
+      <Paper elevation={3} ref={ref} sx={paperStyles}>
         {/* Header Section */}
         <Box sx={{ p: 2.25 }}>
           <Grid container direction="column">
@@ -97,7 +113,7 @@ const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
                     {t("clientDetails.title", "Client Details")}
                   </Typography>
                 </Grid>
-                <Grid item>
+                <Grid item sx={{ zIndex: 1000 }}>
                   <Tooltip
                     title={
                       isClientDetailsCollapsed
@@ -107,13 +123,14 @@ const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
                     arrow
                   >
                     <IconButton
-                      onClick={handleToggleCollapse}
+                      onClick={toggleCollapse}
                       aria-label={
                         isClientDetailsCollapsed
                           ? t("clientDetails.expand", "Expand Details")
                           : t("clientDetails.collapse", "Collapse Details")
                       }
                       size="large"
+                      sx={{ zIndex: 1000 }}
                     >
                       {isClientDetailsCollapsed ? (
                         <ExpandMoreIcon />
@@ -135,7 +152,7 @@ const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
               <Grid
                 container
                 spacing={2}
-                direction={isMobile ? "column" : "row"}
+                direction={"column"}
               >
                 {/* Client Details */}
                 <Grid item xs={12} md={6}>

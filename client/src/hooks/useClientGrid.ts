@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/store";
 import { Agent, Client } from "../models/entityModels";
-import { showToast } from "../utils/toastMessage";
+import { showToast } from "../services/toastMessage";
 
 export const useClientsGrid = () => {
   const { t } = useTranslation(); // Initialize translation
@@ -112,7 +112,7 @@ export const useClientsGrid = () => {
       return clients
         .map((client) => addAgentNameToClient(client, agentDetails))
         .sort((a, b) => a.name.localeCompare(b.name));
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.message || t("errors.unknown"));
       return [];

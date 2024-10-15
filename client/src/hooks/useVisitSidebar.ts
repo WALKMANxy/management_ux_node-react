@@ -6,7 +6,7 @@ import { selectAgent, selectClient } from "../features/data/dataSlice";
 import { getVisits } from "../features/data/dataThunks";
 import { selectVisits } from "../features/promoVisits/promoVisitsSelectors";
 import { Agent, Client } from "../models/entityModels";
-import { showToast } from "../utils/toastMessage";
+import { showToast } from "../services/toastMessage";
 
 export const useVisitSidebar = () => {
   const dispatch = useAppDispatch();
@@ -80,36 +80,44 @@ export const useVisitSidebar = () => {
   }, [visits]);
 
   useEffect(() => {
-    let list: Client[] | Agent[] = [];
-    const term = searchTerm.toLowerCase();
+    // Set up debounce timeout
+    const handler = setTimeout(() => {
+      let list: Client[] | Agent[] = [];
+      const term = searchTerm.toLowerCase();
 
-    if (userRole === "admin") {
-      if (selectedAgentId) {
-        const agent = agents[selectedAgentId];
-        list = agent.clients.filter(
-          (client: Client) =>
+      if (userRole === "admin") {
+        if (selectedAgentId) {
+          const agent = agents[selectedAgentId];
+          list = agent.clients.filter(
+            (client: Client) =>
+              client.name.toLowerCase().includes(term) ||
+              client.id.toLowerCase().includes(term) ||
+              (client.province && client.province.toLowerCase().includes(term))
+          );
+        } else {
+          list = Object.values(agents).filter(
+            (agent) =>
+              agent.name.toLowerCase().includes(term) ||
+              agent.id.toLowerCase().includes(term)
+          );
+        }
+      } else if (userRole === "agent") {
+        list = Object.values(clients).filter(
+          (client) =>
             client.name.toLowerCase().includes(term) ||
             client.id.toLowerCase().includes(term) ||
             (client.province && client.province.toLowerCase().includes(term))
         );
-      } else {
-        list = Object.values(agents).filter(
-          (agent) =>
-            agent.name.toLowerCase().includes(term) ||
-            agent.id.toLowerCase().includes(term)
-        );
       }
-    } else if (userRole === "agent") {
-      list = Object.values(clients).filter(
-        (client) =>
-          client.name.toLowerCase().includes(term) ||
-          client.id.toLowerCase().includes(term) ||
-          (client.province && client.province.toLowerCase().includes(term))
-      );
-    }
 
-    setFilteredList(list);
-  }, [searchTerm, clients, agents, userRole, selectedAgentId]);
+      setFilteredList(list);
+    }, ); // 300ms debounce delay
+
+    // Cleanup function to clear the timeout if the user continues typing
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm, clients, agents, userRole, selectedAgentId, setFilteredList]);
 
   const handleAgentSelect = useCallback(
     (agentId: string) => {

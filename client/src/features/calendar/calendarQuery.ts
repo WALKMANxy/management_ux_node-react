@@ -1,13 +1,18 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { createApi /* fetchBaseQuery */ } from "@reduxjs/toolkit/query/react";
+import { AxiosError } from "axios";
 import { CalendarEvent, Holiday } from "../../models/dataModels";
 import {
   CreateEventPayload,
   GetEventsByMonthResponse,
   UpdateEventStatusPayload,
 } from "../../models/propsModels";
+/* import { getAccessToken } from "../../services/tokenService";
+ */ import { axiosInstance } from "../../utils/apiUtils";
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
-
+/* const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+ */
 const currentLocale = (navigator.language || navigator.languages[0]).replace(
   /^[a-z]{2}-/,
   ""
@@ -21,27 +26,41 @@ const normalizeDate = (date: string | Date): Date => {
   return typeof date === "string" ? new Date(date) : date;
 };
 
-// Base query for your server endpoints
-const baseQueryWithCredentials = fetchBaseQuery({
-  baseUrl,
-  credentials: "include",
-  headers: {
-    "bypass-tunnel-reminder": "true",
-    "Content-Type": "application/json",
-  },
-});
+/* const accessToken = getAccessToken();
+ */
+export const baseQueryWithAxios = async (
+  args: any,
+  _api: any,
+  _extraOptions: any
+) => {
+  try {
+    const result = await axiosInstance.request({ ...args });
+    return { data: result.data };
+  } catch (axiosError) {
+    const err = axiosError as AxiosError;
+    return {
+      error: {
+        status: err.response?.status,
+        data: err.response?.data || err.message,
+      },
+    };
+  }
+};
 
 export const calendarApi = createApi({
   reducerPath: "calendarApi",
-  baseQuery: baseQueryWithCredentials, // Default to the query with credentials
+  baseQuery: baseQueryWithAxios, // Default to the query with credentials
   tagTypes: ["CalendarEvent"],
   endpoints: (builder) => ({
     getEventsByMonthForAdmin: builder.query<
       CalendarEvent[],
       { year: number; month: number }
     >({
-      query: ({ year, month }) =>
-        `calendar/events/admin?year=${year}&month=${month}`,
+      query: ({ year, month }) => ({
+        url: `/calendar/events/admin`,
+        method: "GET",
+        params: { year, month },
+      }),
       transformResponse: (response: GetEventsByMonthResponse) => {
         // Convert date strings to Date objects
         return response.map((event) => ({
@@ -62,10 +81,11 @@ export const calendarApi = createApi({
       CalendarEvent[],
       { year: number; month: number }
     >({
-      query: ({ year, month }) => {
-        /*         console.log("Fetching User Events:", { year, month });
-         */ return `calendar/events/user?year=${year}&month=${month}`;
-      },
+      query: ({ year, month }) => ({
+        url: `/calendar/events/user`,
+        method: "GET",
+        params: { year, month },
+      }),
       transformResponse: (response: GetEventsByMonthResponse) => {
         // Normalize date strings to Date objects
         return response.map((event) => ({
@@ -90,11 +110,14 @@ export const calendarApi = createApi({
     }),
 
     createEvent: builder.mutation<CalendarEvent, CreateEventPayload>({
-      query: (newEvent) => ({
-        url: "calendar/events",
-        method: "POST",
-        body: newEvent,
-      }),
+      query: (newEvent) => {
+        console.log("Creating new event:", newEvent);
+        return {
+          url: "calendar/events",
+          method: "POST",
+          data: newEvent,
+        };
+      },
       invalidatesTags: ["CalendarEvent"],
     }),
     updateEventStatus: builder.mutation<
@@ -104,7 +127,7 @@ export const calendarApi = createApi({
       query: ({ eventId, status }) => ({
         url: `calendar/events/${eventId}/status`,
         method: "PATCH",
-        body: { status },
+        data: { status },
       }),
       invalidatesTags: (_result, _error, { eventId }) => [
         { type: "CalendarEvent", _id: eventId },
@@ -127,7 +150,7 @@ export const calendarApi = createApi({
       query: ({ eventId, data }) => ({
         url: `calendar/events/${eventId}`,
         method: "PATCH",
-        body: data,
+        data: data,
       }),
       invalidatesTags: (_result, _error, { eventId }) => [
         { type: "CalendarEvent", _id: eventId },
@@ -149,18 +172,28 @@ export const calendarApi = createApi({
           const result = await fetchWithBQ({
             url,
             method: "GET",
-            ..._queryApi,
-            ...(_extraOptions || {}),
             credentials: "omit", // Explicitly omit credentials for CORS compliance
           });
 
           if (result.error) {
-            return { error: result.error };
+            // Ensure the error object matches the expected structure
+            return {
+              error: {
+                status: result.error.status,
+                data: result.error.data || {},
+              },
+            };
           }
 
           return { data: result.data as Holiday[] };
         } catch (error) {
-          return { error: { status: "FETCH_ERROR", error: String(error) } };
+          // Ensure the caught error is properly formatted
+          return {
+            error: {
+              status: 500,
+              data: { message: String(error) },
+            },
+          };
         }
       },
     }),

@@ -33,6 +33,7 @@ import {
 import { ServerDayProps } from "../../models/propsModels";
 import { agentColorMap } from "../../utils/constants";
 import ServerDay from "./ServerDay";
+import { locale } from "../../services/localizer";
 
 const CalendarComponent: React.FC = () => {
   const visits = useAppSelector(selectVisits);
@@ -227,7 +228,7 @@ const CalendarComponent: React.FC = () => {
         },
       }}
     >
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
         <DateCalendar
           loading={isLoading}
           onMonthChange={handleMonthChange}
@@ -247,6 +248,7 @@ const CalendarComponent: React.FC = () => {
             } as ServerDayProps,
           }}
           sx={{
+            width: "auto",
             flexGrow: 1, // Allow the calendar to grow and shrink based on available space
             minHeight: 0, // Allow the calendar to shrink without constraints
           }}

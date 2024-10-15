@@ -1,39 +1,92 @@
 // src/components/UpcomingVisits.tsx
 
 import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
-import { Timeline, timelineItemClasses } from "@mui/lab";
-import { Box, IconButton, Paper, Tooltip, Typography } from "@mui/material";
+import {
+  Timeline,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  TimelineItem,
+  TimelineSeparator,
+} from "@mui/lab";
+import {
+  Box,
+  IconButton,
+  Paper,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
 import { selectVisits } from "../../features/promoVisits/promoVisitsSelectors";
+import useStats from "../../hooks/useStats";
 import { VisitItem } from "./VisitItem";
 
 const UpcomingVisits: React.FC = () => {
   const { t } = useTranslation();
 
+  const isMobile = useMediaQuery("(max-width:600px)");
+
+  const { selectedClient } = useStats(isMobile);
+
   const navigate = useNavigate();
   const visits = useAppSelector(selectVisits);
 
   const now = useMemo(() => new Date(), []);
+
   const upcomingVisits = useMemo(() => {
-    // Filter visits to include only those that are pending and not completed
-    const filteredVisits = visits.filter(
-      (visit) =>
-        visit.pending === true &&
-        visit.completed === false &&
-        new Date(visit.date) >= now
-    );
+    return visits
+      .filter((visit) => {
+        const isPendingAndUpcoming =
+          visit.pending === true &&
+          visit.completed === false &&
+          new Date(visit.date) >= now;
 
-    // Sort the visits by date (earliest first)
-    const sortedVisits = filteredVisits.sort(
-      (a, b) => +new Date(a.date) - +new Date(b.date)
-    );
+        // Filter by selectedClient if it exists, otherwise include all clients
+        const isForSelectedClient = selectedClient
+          ? visit.clientId === selectedClient.id
+          : true;
 
-    // Return the top 3 upcoming visits
-    return sortedVisits.slice(0, 3);
-  }, [visits, now]);
+        return isPendingAndUpcoming && isForSelectedClient;
+      })
+      .sort((a, b) => +new Date(a.date) - +new Date(b.date)) // Sort by date ascending
+      .slice(0, 3); // Limit to top 3 upcoming visits
+  }, [visits, now, selectedClient]);
+
+  // Define the renderVisits constant inspired by renderPromotions syntax
+  const renderVisits = () => (
+    <Timeline position="left">
+      {upcomingVisits.length === 0 ? (
+        // No Upcoming Visits
+        <TimelineItem>
+          <TimelineSeparator>
+            <TimelineDot color="grey" />
+            <TimelineConnector />
+          </TimelineSeparator>
+          <TimelineContent>
+            <Typography variant="body1" color="text.secondary">
+              {t(
+                "upcomingVisits.noProgrammedVisits",
+                "No upcoming visits scheduled."
+              )}
+            </Typography>
+          </TimelineContent>
+        </TimelineItem>
+      ) : (
+        // Display Upcoming Visits
+        upcomingVisits.map((visit, index) => (
+          <VisitItem
+            key={visit._id}
+            visit={visit}
+            lastTimeline={index === upcomingVisits.length - 1}
+          />
+        ))
+      )}
+    </Timeline>
+  );
 
   return (
     <Paper
@@ -67,40 +120,7 @@ const UpcomingVisits: React.FC = () => {
         </Typography>
 
         {/* Content Area */}
-        <Box sx={{ maxHeight: 420, overflow: "auto" }}>
-          {upcomingVisits.length === 0 ? (
-            // No Upcoming Visits
-            <Typography variant="body1">
-              {t(
-                "upcomingVisits.noProgrammedVisits",
-                "No upcoming visits scheduled."
-              )}
-            </Typography>
-          ) : (
-            // Display Upcoming Visits
-            <Timeline
-              position="left"
-              sx={{
-                m: 0,
-                mt: 2,
-                mb: 2,
-                p: 0,
-                [`& .${timelineItemClasses.root}:before`]: {
-                  flex: 0,
-                  padding: 0,
-                },
-              }}
-            >
-              {upcomingVisits.map((visit, index) => (
-                <VisitItem
-                  key={visit._id}
-                  visit={visit}
-                  lastTimeline={index === upcomingVisits.length - 1}
-                />
-              ))}
-            </Timeline>
-          )}
-        </Box>
+        <Box sx={{ maxHeight: 420, overflow: "auto" }}>{renderVisits()}</Box>
 
         {/* Navigate to All Visits */}
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

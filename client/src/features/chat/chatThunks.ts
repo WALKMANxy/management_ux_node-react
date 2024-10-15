@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Async thunk to fetch all chats for the user
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { RootState } from "../../app/store";
 import { IChat, IMessage } from "../../models/dataModels";
-import { showToast } from "../../utils/toastMessage";
+import { showToast } from "../../services/toastMessage";
 import {
   createChat,
   fetchAllChats,
@@ -24,20 +26,40 @@ interface chatThunkError extends Error {
   message: string;
 }
 
-export const fetchAllChatsThunk = createAsyncThunk<
-  IChat[],
-  void,
-  { rejectValue: string }
->("chats/fetchAllChatsThunk", async (_, { rejectWithValue }) => {
-  try {
-    const result = await fetchAllChats(); // Direct API call
-    return result; // Return the fetched chats
-  } catch (error) {
-    const typedError = error as chatThunkError;
-    showToast.error(`Failed to fetch chats: ${typedError.message}`);
-    return rejectWithValue(typedError.message || "Failed to fetch chats");
+// Helper function to create authenticated thunks
+const createAuthenticatedThunk = <Returned, ThunkArg>(
+  type: string,
+  payloadCreator: (arg: ThunkArg, thunkAPI: any) => Promise<Returned>
+) => {
+  return createAsyncThunk<Returned, ThunkArg, { rejectValue: string }>(
+    type,
+    payloadCreator,
+    {
+      condition: (_, { getState }) => {
+        const state = getState() as RootState;
+        if (!state.auth.isLoggedIn) {
+          return false; // Prevent the thunk from executing
+        }
+        return true; // Allow the thunk to execute
+      },
+    }
+  );
+};
+
+// Refactored async thunk to fetch all chats for the user
+export const fetchAllChatsThunk = createAuthenticatedThunk<IChat[], void>(
+  "chats/fetchAllChatsThunk",
+  async (_, { rejectWithValue }) => {
+    try {
+      const result = await fetchAllChats(); // Direct API call
+      return result; // Return the fetched chats
+    } catch (error) {
+      const typedError = error as chatThunkError;
+      console.error(`Failed to fetch chats: ${typedError.message}`);
+      return rejectWithValue(typedError.message || "Failed to fetch chats");
+    }
   }
-});
+);
 
 // Refactored async thunk to fetch messages for a specific chat
 export const fetchMessagesThunk = createAsyncThunk<
@@ -52,7 +74,7 @@ export const fetchMessagesThunk = createAsyncThunk<
       return { chatId, messages };
     } catch (error) {
       const typedError = error as chatThunkError;
-      showToast.error(`Failed to fetch messages: ${typedError.message}`);
+      console.error(`Failed to fetch messages: ${typedError.message}`);
       return rejectWithValue(typedError.message || "Failed to fetch messages");
     }
   }
@@ -71,7 +93,7 @@ export const fetchOlderMessagesThunk = createAsyncThunk<
       return { chatId, messages };
     } catch (error) {
       const typedError = error as chatThunkError;
-      showToast.error(`Error fetching older messages: ${typedError.message}`);
+      console.error(`Error fetching older messages: ${typedError.message}`);
       return rejectWithValue(
         typedError.message || "Failed to fetch older messages"
       );
@@ -92,7 +114,7 @@ export const fetchMessagesFromMultipleChatsThunk = createAsyncThunk<
       return result;
     } catch (error) {
       const typedError = error as chatThunkError;
-      showToast.error(`Error fetching messages: ${typedError.message}`);
+      console.error(`Error fetching messages: ${typedError.message}`);
       return rejectWithValue(
         typedError.message || "Failed to fetch messages from multiple chats"
       );
@@ -112,7 +134,7 @@ export const createChatThunk = createAsyncThunk<
     return result;
   } catch (error) {
     const typedError = error as chatThunkError;
-    showToast.error(`Failed to create chat: ${typedError.message}`);
+    console.error(`Failed to create chat: ${typedError.message}`);
     return rejectWithValue(typedError.message || "Failed to create chat");
   }
 });
@@ -130,7 +152,7 @@ export const createMessageThunk = createAsyncThunk<
       return { chatId, message };
     } catch (error) {
       const typedError = error as chatThunkError;
-      showToast.error(`Failed to create message: ${typedError.message}`);
+      console.error(`Failed to create message: ${typedError.message}`);
       return rejectWithValue(typedError.message || "Failed to send message");
     }
   }
@@ -149,7 +171,7 @@ export const updateReadStatusThunk = createAsyncThunk<
       return result;
     } catch (error) {
       const typedError = error as chatThunkError;
-      showToast.error(
+      console.error(
         `Failed to update message read status: ${typedError.message}`
       );
       return rejectWithValue(

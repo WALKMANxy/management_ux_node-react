@@ -152,4 +152,21 @@ export class UserController {
       }
     }
   }
+
+  static async deleteUser(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const user = await UserService.deleteUser(req.params.id);
+      if (!user) {
+        res.status(404).json({ message: "User not found" });
+        return;
+      }
+      res.status(200).json({ message: "User deleted successfully" });
+    } catch (err) {
+      if (err instanceof Error) {
+        res.status(500).json({ message: err.message });
+      } else {
+        res.status(500).json({ message: "Internal Server Error" });
+      }
+    }
+  }
 }

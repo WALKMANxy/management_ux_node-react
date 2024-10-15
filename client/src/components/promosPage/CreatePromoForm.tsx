@@ -16,6 +16,7 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -63,6 +64,8 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
   const selectedClients = watch("selectedClients");
   const excludedClients = watch("excludedClients");
 
+  const isMobile = useMediaQuery("(max-width:600px)");
+
   // Setter functions to update the values
   const setSelectedClients = (clients: string[]) =>
     setValue("selectedClients", clients);
@@ -80,18 +83,21 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
         component="form"
         onSubmit={handleSubmit}
         sx={{
-          p: 2,
+          pt: 2,
+          px: 1,
           borderRadius: 2,
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
           backgroundColor: "#fff",
           display: "flex",
           flexDirection: "column",
-          height: "100%",
+          height: "auto",
+
+
         }}
       >
         {isCreating && (
           <Typography
-            variant="h3"
+            variant="h4"
             gutterBottom
             sx={{ fontWeight: 600, mb: 4, color: "#4d4b5f", mt: 1, ml: 2 }}
           >
@@ -99,7 +105,12 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
           </Typography>
         )}
 
-        <Grid container spacing={2}>
+        <Grid
+          container
+          spacing={2}
+          justifyContent={isMobile ? "center" : "flex-start"}
+          alignItems={isMobile ? "center" : "flex-start"}
+        >
           {/* Promo Type Selector */}
           <Grid item xs={12} sm={6}>
             <Controller

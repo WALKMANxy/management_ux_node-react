@@ -1,14 +1,23 @@
 // src/components/chatPage/MessageBubble.tsx
 
-import { Avatar, Box, Tooltip, Typography } from "@mui/material";
-import React, { useEffect, useRef } from "react";
+import RetryIcon from "@mui/icons-material/Replay"; // Retry icon for failed messages
+import { Avatar, Box, IconButton, Tooltip, Typography } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress"; // For retry spinner
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
-import { selectCurrentChat } from "../../features/chat/chatSlice";
+import {
+  addAttachmentMessageReducer,
+  addMessageReducer,
+  selectCurrentChat,
+} from "../../features/chat/chatSlice";
+import { useFilePreview } from "../../hooks/useFilePreview";
 import { IMessage } from "../../models/dataModels";
 import { User } from "../../models/entityModels";
+import { showToast } from "../../services/toastMessage";
 import "../../Styles/styles.css";
+import AttachmentPreview from "./AttachmentPreview";
 import MessageStatusIcon from "./MessageStatusIcon";
 
 interface MessageBubbleProps {
@@ -30,10 +39,13 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   chatType,
 }) => {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
   const currentUserId = useAppSelector((state: RootState) => state.auth.userId);
   const isOwnMessage = message.sender === currentUserId;
   const currentChat = useAppSelector(selectCurrentChat);
   const currentChatType = currentChat?.type;
+  const { openFileViewer, isPreview } = useFilePreview();
+  const [retrying, setRetrying] = useState(false); // Track retry state
 
   // Find the sender's details from the participants data
   const sender = participantsData.find((user) => user._id === message.sender);
@@ -48,6 +60,61 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
     }
   }, []);
 
+  /**
+   * Handles retrying the message upload.
+   */
+  const handleRetry = async () => {
+    if (!retrying) {
+      setRetrying(true);
+      showToast.info(t("messageBubble.labels.retryingUpload"));
+
+      try {
+        // Check if currentChat._id exists before dispatching the reducers
+        if (!currentChat?._id) {
+          throw new Error(t("messageBubble.labels.chatIdNotFound"));
+        }
+
+        if (message.attachments && message.attachments.length > 0) {
+          // Retry the message with attachments
+          await dispatch(
+            addAttachmentMessageReducer({
+              chatId: currentChat._id, // We are sure that _id exists here
+              message: {
+                ...message,
+                isUploading: true, // Reset upload state for retry
+                uploadProgress: 0, // Reset progress for retry
+                status: "pending", // Mark as pending
+              },
+            })
+          );
+        } else {
+          // Retry the message without attachments
+          await dispatch(
+            addMessageReducer({
+              chatId: currentChat._id, // We are sure that _id exists here
+              message: {
+                ...message,
+                status: "pending", // Mark as pending
+              },
+            })
+          );
+        }
+
+        showToast.success(t("messageBubble.labels.uploadSuccess"));
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          showToast.error(
+            error.message || t("messageBubble.labels.uploadFailed")
+          );
+        } else {
+          showToast.error(t("messageBubble.labels.uploadFailed"));
+        }
+      } finally {
+        setRetrying(false); // Reset the retrying state
+      }
+    }
+  };
+
   // Conditionally apply animation class based on whether the message is the user's own
   const animationClass = isOwnMessage
     ? hasMountedRef.current
@@ -61,6 +128,10 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
    * @returns {string} The background color.
    */
   const getBackgroundColor = () => {
+    if (message.status === "failed") {
+      return "rgba(128, 128, 128, 0.3)"; // Gray background for failed messages
+    }
+
     switch (message.messageType) {
       case "alert":
         return "rgba(255, 0, 0, 0.1)";
@@ -152,6 +223,20 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
               backdropFilter: "blur(10px)", // Frosted glass effect
             }}
           >
+            {/* Retry Icon for failed messages */}
+            {message.status === "failed" && isOwnMessage && (
+              <IconButton
+                onClick={handleRetry}
+                disabled={retrying}
+                sx={{ mr: 1 }}
+              >
+                {retrying ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  <RetryIcon fontSize="small" />
+                )}
+              </IconButton>
+            )}
             <Typography
               variant="body2"
               sx={{
@@ -162,7 +247,28 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
               {message.content}
             </Typography>
 
-            {/* Timestamp and Status Icon */}
+            {/* Attachments */}
+            {message.attachments && message.attachments.length > 0 && (
+              <Box
+                sx={{
+                  mt: 1,
+                  display: "flex",
+                  gap: 1,
+                  flexWrap: "wrap",
+                }}
+              >
+                {message.attachments.map((_, index) => (
+                  <AttachmentPreview
+                    key={index}
+                    attachments={message.attachments}
+                    isUploading={message.isUploading}
+                    uploadProgress={message.uploadProgress}
+                    onClick={() => openFileViewer(isPreview)} // Call openFileViewer from the hook
+                  />
+                ))}
+              </Box>
+            )}
+
             <Box
               sx={{
                 color: "gray",
@@ -171,7 +277,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                 mb: -1,
                 mt: 0.5,
                 justifyContent: isOwnMessage ? "flex-end" : "flex-start",
-                gap: 0.5, // Add margin between timestamp and status icon
+                gap: 0.5,
               }}
             >
               <Typography variant="caption">{formattedTime}</Typography>
@@ -189,23 +295,12 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   );
 };
 
-/**
- * Memoization function for MessageBubble component.
- * We only re-render the component if the readBy array length changes or any of the elements change.
- * This optimization prevents unnecessary re-renders when the message status changes.
- * @param {Object} prevProps Previous props
- * @param {Object} nextProps Next props
- * @returns {boolean} Whether the component should be re-rendered
- */
 export default React.memo(MessageBubble, (prevProps, nextProps) => {
   return (
-    // Check if the readBy array length is the same
     prevProps.message.readBy.length === nextProps.message.readBy.length &&
-    // Check if all elements in the readBy array are the same
     prevProps.message.readBy.every(
       (value, index) => value === nextProps.message.readBy[index]
     ) &&
-    // Check if the message status is the same
     prevProps.message.status === nextProps.message.status
   );
 });

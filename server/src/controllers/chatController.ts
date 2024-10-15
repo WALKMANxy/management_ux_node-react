@@ -115,10 +115,10 @@ export class ChatController {
     }
   }
 
-  static async fetchOlderMessages (
+  static async fetchOlderMessages(
     req: AuthenticatedRequest,
     res: Response
-  ): Promise<void>  {
+  ): Promise<void> {
     try {
       const { chatId } = req.params;
       const { oldestTimestamp, limit } = req.query as {
@@ -126,26 +126,23 @@ export class ChatController {
         limit: string; // Parse limit as a string initially
       };
 
-
-   /*  console.log("Received Request with Parameters:", {
+      /*  console.log("Received Request with Parameters:", {
       chatId,
       oldestTimestamp,
       limit,
     }); */
-
-
 
       if (!oldestTimestamp || isNaN(Date.parse(oldestTimestamp))) {
         res.status(400).json({ message: "Invalid timestamp format." });
         return;
       }
 
-       // Parse and validate limit
-        const limitNumber = parseInt(limit, 10);
-       if (isNaN(limitNumber) || limitNumber <= 0) {
-      res.status(400).json({ message: "Invalid limit parameter." });
-      return;
-    }
+      // Parse and validate limit
+      const limitNumber = parseInt(limit, 10);
+      if (isNaN(limitNumber) || limitNumber <= 0) {
+        res.status(400).json({ message: "Invalid limit parameter." });
+        return;
+      }
 
       // Check user authentication
       if (!req.user) {
@@ -162,8 +159,8 @@ export class ChatController {
       );
 
       // Debug: Log the messages received from the service
-/*     console.log("Messages Received from Service:", messages);
- */
+      /*     console.log("Messages Received from Service:", messages);
+       */
       // Return the fetched messages
       res.status(200).json(messages);
     } catch (error) {
@@ -172,17 +169,19 @@ export class ChatController {
         res.status(500).json({ message: "Internal Server Error" });
       }
     }
-  };
+  }
 
   static async fetchMessagesFromMultipleChats(
     req: AuthenticatedRequest,
     res: Response
   ): Promise<void> {
     try {
-      const chatIds = req.query.chatIds as string[]; // Expect chatIds as query parameters
+      const { chatIds } = req.body; // Extract chatIds from the body
 
-      if (!chatIds || !Array.isArray(chatIds)) {
-        res.status(400).json({ message: "chatIds must be an array of IDs." });
+      if (!chatIds || !Array.isArray(chatIds) || chatIds.length === 0) {
+        res
+          .status(400)
+          .json({ message: "chatIds must be a non-empty array of IDs." });
         return;
       }
 

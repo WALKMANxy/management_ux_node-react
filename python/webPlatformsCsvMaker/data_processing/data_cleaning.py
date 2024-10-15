@@ -1,4 +1,3 @@
-import os
 import re
 
 import pandas as pd
@@ -155,12 +154,6 @@ def load_and_clean_excel_file(file_path, file_type):
 
         df_combined = df_combined[df_combined["GIACENZA"] > 0]
         df_combined = df_combined[df_combined["PRZ. ULT. ACQ."].notna()]
-
-    # print(f"\nCleaned {file_type.capitalize()} DataFrame:")
-    output_path = "Z:/My Drive/rcs/"
-    output_filename = f"{file_type}File.csv"
-    output_file_path = os.path.join(output_path, output_filename)
-    df_combined.to_csv(output_file_path, index=False)
 
     return df_combined
 

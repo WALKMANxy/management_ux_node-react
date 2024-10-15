@@ -18,7 +18,13 @@ import { useAppSelector } from "../../app/hooks";
 import { selectPromos } from "../../features/promoVisits/promoVisitsSelectors";
 import { Promo } from "../../models/dataModels";
 
-const ActivePromotions: React.FC = () => {
+interface ActivePromotionsProps {
+  clientSelected?: string; // Optional prop to filter by selected client
+}
+
+const ActivePromotions: React.FC<ActivePromotionsProps> = ({
+  clientSelected,
+}) => {
   const promos = useAppSelector(selectPromos);
   const navigate = useNavigate();
   const { t } = useTranslation(); // Initialize translation
@@ -30,7 +36,24 @@ const ActivePromotions: React.FC = () => {
 
   // Filter and sort active promotions (non-expired, limited to 5 oldest based on createdAt)
   const activePromos = promos
-    .filter((promo: Promo) => dayjs(promo.endDate).isAfter(dayjs()))
+    .filter((promo: Promo) => {
+      const isPromoActive = dayjs(promo.endDate).isAfter(dayjs());
+
+      // If clientSelected is provided, filter by client-specific promos or global promos
+      if (clientSelected) {
+        const isClientIncluded = promo.clientsId.includes(clientSelected);
+        const isGlobalPromo =
+          promo.global &&
+          (!promo.excludedClientsId ||
+            !promo.excludedClientsId.includes(clientSelected));
+
+        // Return true if the promo is either specific to the client or global and not excluded
+        return isPromoActive && (isClientIncluded || isGlobalPromo);
+      }
+
+      // If no clientSelected, return all active promos
+      return isPromoActive;
+    })
     .sort((a, b) => dayjs(a.createdAt).diff(dayjs(b.createdAt))) // Sort from oldest to newest
     .slice(0, 5); // Limit to 5 promos
 

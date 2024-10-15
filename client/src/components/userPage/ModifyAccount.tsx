@@ -105,7 +105,7 @@ const ModifyAccount: React.FC = () => {
   }
 
   return (
-    <Box>
+    <Box sx={{ overflowY: "hidden" }}>
       <Typography variant="h4" gutterBottom>
         {t("modifyAccount.title")}
       </Typography>
