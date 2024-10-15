@@ -20,7 +20,7 @@ export const authenticateUser = async (
   }
 
   try {
-    logger.info("Authenticating request with access token", { accessToken });
+    // logger.info("Authenticating request with access token", { accessToken });
 
     // Fetch the session based on the access token, user-agent, and uniqueId
     const session = await getSessionByAccessToken(accessToken, req);
@@ -38,7 +38,7 @@ export const authenticateUser = async (
       return res.status(401).json({ message: "User not found" });
     }
 
-    logger.info("User authenticated successfully", { userId: user._id });
+    // logger.info("User authenticated successfully", { userId: user._id });
 
     // Attach the user info to the request object
     req.user = {

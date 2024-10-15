@@ -15,10 +15,10 @@ export const logRegisteredUser = (user: IUser) => {
 
   const logDir = path.dirname(LOG_FILE_PATH);
   if (!fs.existsSync(logDir)) {
-    logger.info(`Directory ${logDir} does not exist. Creating...`);
+    // logger.info(`Directory ${logDir} does not exist. Creating...`);
     try {
       fs.mkdirSync(logDir, { recursive: true });
-      logger.info(`Directory ${logDir} created successfully.`);
+      // logger.info(`Directory ${logDir} created successfully.`);
     } catch (err) {
       logger.error(`Failed to create directory ${logDir}:`, err);
       return;
@@ -26,10 +26,10 @@ export const logRegisteredUser = (user: IUser) => {
   }
 
   if (!fs.existsSync(LOG_FILE_PATH)) {
-    logger.info(`File ${LOG_FILE_PATH} does not exist. Creating...`);
+    // logger.info(`File ${LOG_FILE_PATH} does not exist. Creating...`);
     try {
       writeFile(LOG_FILE_PATH, []);
-      logger.info(`File ${LOG_FILE_PATH} created successfully.`);
+      // logger.info(`File ${LOG_FILE_PATH} created successfully.`);
     } catch (err) {
       logger.error(`Failed to create file ${LOG_FILE_PATH}:`, err);
       return;

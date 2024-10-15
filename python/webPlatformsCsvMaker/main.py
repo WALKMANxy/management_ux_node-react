@@ -63,6 +63,8 @@ class MainWindow(QMainWindow):
             "tyre24_ftp_user_entry",
             "tyre24_ftp_pass_entry",
             "tyre24_ftp_dir_combo",
+            "upload_tulero_checkbox",    # Corrected Naming
+            "upload_tyre24_checkbox",    # Corrected Naming
             "progress_bar",
             "process_button",
             "upload_button",
@@ -148,6 +150,8 @@ class MainWindow(QMainWindow):
         self.validate_shipping(self.tulero_shipping_entry, "shipping")
         self.validate_shipping(self.tyre24_shipping_it_entry, "shipping_it")
         self.validate_shipping(self.tyre24_shipping_de_entry, "shipping_de")
+
+
 
     def check_and_load_files(self):
         config = load_config()
@@ -251,6 +255,10 @@ class MainWindow(QMainWindow):
         self.output_entry.setText(output_folder)
         self.output_button.setStyleSheet("background-color: green; color: white;")
 
+        # Load checkbox states
+        self.upload_tulero_checkbox.setChecked(config.get("upload_tulero", True))
+        self.upload_tyre24_checkbox.setChecked(config.get("upload_tyre24", True))
+
         self.check_ready_to_process()
         self.update_upload_button_state()
 
@@ -304,7 +312,7 @@ class MainWindow(QMainWindow):
             value = float(text)
             # Round to one decimal place without modifying the text
             value = round(value, 1)
-            if 7.0 <= value <= 20.0:
+            if 4.0 <= value <= 20.0:
                 # Valid input
                 field.setStyleSheet("border: 2px solid green;")
                 setattr(self, f"{field_type}_value", value)
@@ -354,6 +362,23 @@ class MainWindow(QMainWindow):
         if not validated_data:
             return  # Stop processing if inputs are invalid
 
+        # Determine which FTPs to upload to based on checkboxes
+        upload_tulero = self.upload_tulero_checkbox.isChecked()
+        upload_tyre24 = self.upload_tyre24_checkbox.isChecked()
+
+        # Optional: Inform user if no uploads are selected
+        if not upload_tulero and not upload_tyre24:
+            reply = QMessageBox.question(
+                self,
+                _("Confirm Processing"),
+                _("No FTP servers selected for upload. Do you want to proceed with processing only?"),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.Yes,
+            )
+            if reply == QMessageBox.StandardButton.No:
+                self.timer.stop()
+                return
+
         self.processing = True
         self.process_button.setEnabled(False)
         self.process_button.setStyleSheet(
@@ -390,6 +415,8 @@ class MainWindow(QMainWindow):
             tulero_ftp_info,  # New
             tyre24_ftp_info,  # New
             validated_data,  # Pass the validated data
+            upload_tulero=upload_tulero,  # Pass upload preference
+            upload_tyre24=upload_tyre24,  # Pass upload preference
         )
         self.worker.progress.connect(self.on_worker_progress)
         self.worker.finished_processing.connect(self.processing_complete)
@@ -422,7 +449,7 @@ class MainWindow(QMainWindow):
             self.fake_progress = min(self.fake_progress, 100)
             self.progress_bar.setValue(int(self.fake_progress))
 
-    def processing_complete(self):
+    def processing_complete(self, message):
         self.timer.stop()
         self.progress_bar.setValue(100)
         self.process_button.setEnabled(True)
@@ -448,7 +475,7 @@ class MainWindow(QMainWindow):
 
         msg_box = QMessageBox(self)
         msg_box.setWindowTitle(_("Processing Complete"))
-        msg_box.setText(_("The file has been successfully uploaded to the FTP server."))
+        msg_box.setText(message)
         msg_box.setIcon(QMessageBox.Icon.Information)
         msg_box.addButton(QMessageBox.StandardButton.Ok)
         exit_button = msg_box.addButton(_("Exit"), QMessageBox.ButtonRole.ActionRole)
@@ -475,16 +502,19 @@ class MainWindow(QMainWindow):
             "tyre24_ftp_user": self.tyre24_ftp_user_entry.text().strip(),
             "tyre24_ftp_pass": self.tyre24_ftp_pass_entry.text().strip(),
             "tyre24_ftp_dir": self.tyre24_ftp_dir_combo.currentText().strip(),
-            "tulero_markup": getattr(self, "markup_value", 1.25),  # Default: 1.25
+            "upload_tulero": self.upload_tulero_checkbox.isChecked(),
+            "upload_tyre24": self.upload_tyre24_checkbox.isChecked(),
+            "tulero_markup": round(getattr(self, "markup_value", 1.25), 2),  # Store with 2 decimal places
             "tulero_shipping": getattr(self, "shipping_value", 7.5),  # Default: 7.5€
-            "tyre24_markup_it": getattr(self, "markup_it_value", 1.25),  # Default: 1.25
+            "tyre24_markup_it": round(getattr(self, "markup_it_value", 1.25), 2),
             "tyre24_shipping_it": getattr(
                 self, "shipping_it_value", 7.5
             ),  # Default: 7.5€
-            "tyre24_markup_de": getattr(self, "markup_de_value", 1.25),  # Default: 1.25
+            "tyre24_markup_de": round(getattr(self, "markup_de_value", 1.25), 2),
             "tyre24_shipping_de": getattr(
                 self, "shipping_de_value", 10.5
             ),  # Default: 10.5€
+
         }
         save_config(config)
 

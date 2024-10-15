@@ -2,13 +2,9 @@ import numpy as np
 import pandas as pd
 
 
-def process_tyre24(merged_df, tecdoc_file_path, markup_it, shipping_it, markup_de, shipping_de):
-
-
-
-
-
-    # print("process_tyre24 function started")
+def process_tyre24(
+    merged_df, tecdoc_file_path, markup_it, shipping_it, markup_de, shipping_de
+):
     # Rename the columns
     merged_df.columns = [
         "TecDoc-ID",
@@ -17,7 +13,6 @@ def process_tyre24(merged_df, tecdoc_file_path, markup_it, shipping_it, markup_d
         "Quantity",
         "PRZ. ULT. ACQ.",
     ]
-    # print("Columns renamed")
 
     # Add two new columns and reorder them
     merged_df["Price_Italia"] = pd.NA
@@ -33,14 +28,12 @@ def process_tyre24(merged_df, tecdoc_file_path, markup_it, shipping_it, markup_d
             "PRZ. ULT. ACQ.",
         ]
     ]
-    # print("Added two new columns and reordered them")
 
     # Convert 'Quantity' and 'PRZ. ULT. ACQ.' columns to numeric types
     merged_df["Quantity"] = pd.to_numeric(merged_df["Quantity"], errors="coerce")
     merged_df["PRZ. ULT. ACQ."] = pd.to_numeric(
         merged_df["PRZ. ULT. ACQ."], errors="coerce"
     )
-    # print("Converted 'Quantity' and 'PRZ. ULT. ACQ.' columns to numeric types")
 
     # Clean the data
     merged_df = merged_df[merged_df["Quantity"] > 0]
@@ -115,17 +108,17 @@ def process_tyre24(merged_df, tecdoc_file_path, markup_it, shipping_it, markup_d
         ).to_dict()
 
         df_articles["TecDoc Brand"] = df_articles["TecDoc Brand"].apply(lambda x: x[:5])
-        df_articles["TecDoc Brand ID"] = "MISSING TECDOC ID"
+        df_articles["TecDoc Brand ID"] = ""
 
         for i, row in df_articles.iterrows():
             brand_partial = row["TecDoc Brand"]
             if brand_partial in brands_to_ignore:
-                df_articles.at[i, "TecDoc Brand ID"] = "MISSING TECDOC ID"
+                df_articles.at[i, "TecDoc Brand ID"] = ""
             elif brand_partial in manual_mapping:
                 tecdoc_brand = manual_mapping[brand_partial]
                 df_articles.at[i, "TecDoc Brand"] = tecdoc_brand
                 df_articles.at[i, "TecDoc Brand ID"] = tecdoc_brand_dict.get(
-                    tecdoc_brand, "MISSING TECDOC ID"
+                    tecdoc_brand, ""
                 )
             else:
                 match_found = False
@@ -136,7 +129,7 @@ def process_tyre24(merged_df, tecdoc_file_path, markup_it, shipping_it, markup_d
                         match_found = True
                         break
                 if not match_found:
-                    df_articles.at[i, "TecDoc Brand ID"] = "MISSING TECDOC ID"
+                    df_articles.at[i, "TecDoc Brand ID"] = ""
 
         df_articles = df_articles[~df_articles["TecDoc Brand"].isin(["BEX", "RESO"])]
         df_articles["TecDoc Brand"] = df_articles["TecDoc Brand"].replace(rename_dict)
@@ -154,7 +147,7 @@ def process_tyre24(merged_df, tecdoc_file_path, markup_it, shipping_it, markup_d
     )
     merged_df.loc[
         (merged_df["Brand Type"] == "ORIGINAL")
-        & (merged_df["TecDoc Brand ID"] == "MISSING TECDOC ID"),
+        & (merged_df["TecDoc Brand ID"] == ""),
         "TecDoc Brand ID",
     ] = ""
 
@@ -202,8 +195,9 @@ def process_tyre24(merged_df, tecdoc_file_path, markup_it, shipping_it, markup_d
         ]
     ]
 
-    tyre24_df = merged_df
+    # Filter out rows with TecDoc Brand 'RCS' and 'CC'
+    merged_df = merged_df[~merged_df["TecDoc Brand"].isin(["RCS", "CC"])]
 
-    # print("TYRE24 READY")
+    tyre24_df = merged_df
 
     return tyre24_df

@@ -63,9 +63,9 @@ const PromosPage: React.FC = () => {
   const [isEligibleClientsCollapsed, setIsEligibleClientsCollapsed] =
     React.useState(false);
 
-  useEffect(() => {
+ /*  useEffect(() => {
     console.log("Page mode:", mode);
-  }, [mode]);
+  }, [mode]); */
 
   // Reset collapsible sections when selectedPromo or mode changes
   useEffect(() => {

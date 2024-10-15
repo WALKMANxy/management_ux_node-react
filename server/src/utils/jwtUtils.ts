@@ -42,7 +42,7 @@ export const verifyAccessToken = (token: string): DecodedAccessToken => {
       token,
       ACCESS_TOKEN_SECRET
     ) as DecodedAccessToken;
-    logger.info("Decoded Access Token successfully", { decoded });
+    // logger.info("Decoded Access Token successfully", { decoded });
     return decoded;
   } catch (error) {
     logger.error("Failed to verify access token", { token, error });
