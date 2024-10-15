@@ -214,6 +214,9 @@ const AgentView: React.FC<AgentViewProps> = ({
               revenueData={
                 calculateMonthlyData(selectedAgentData.clients).revenueData
               }
+              netRevenueData={
+                calculateMonthlyData(selectedAgentData.clients).netRevenueData
+              }
               userRole="admin"
             />
           )}
