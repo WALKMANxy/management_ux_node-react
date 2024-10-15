@@ -1,5 +1,5 @@
-from PyQt6.QtGui import QFont  # type: ignore
-from PyQt6.QtWidgets import QComboBox, QLabel, QLineEdit, QVBoxLayout, QWidget
+from PyQt6.QtGui import QFont
+from PyQt6.QtWidgets import QComboBox, QLabel, QLineEdit, QVBoxLayout, QWidget, QCheckBox
 
 
 def create_ftp_section(main_window, title, base_path):
@@ -42,5 +42,12 @@ def create_ftp_section(main_window, title, base_path):
     dir_combo.addItems(["/", "/csv/", "/test/"])
     section_layout.addWidget(dir_combo)
     widgets[f"{title.lower()}_ftp_dir_combo"] = dir_combo
+
+   # Add the Upload Checkbox with Correct Naming
+    upload_checkbox = QCheckBox(f"Enable Upload to {title}")
+    upload_checkbox.setChecked(True)  # Default: enabled
+    section_layout.addWidget(upload_checkbox)
+    widgets[f"upload_{title.lower()}_checkbox"] = upload_checkbox  # Changed naming
+
 
     return section_widget, widgets

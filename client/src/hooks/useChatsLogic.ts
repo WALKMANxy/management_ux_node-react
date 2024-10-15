@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { useAppDispatch /* useAppSelector */ } from "../app/hooks";
+import {
+  useAppDispatch /* useAppSelector */,
+  useAppSelector,
+} from "../app/hooks";
 import { selectUserId, selectUserRole } from "../features/auth/authSlice";
 import { uploadAttachments } from "../features/chat/api/chats";
 import {
@@ -10,6 +13,7 @@ import {
   addMessageReducer,
   clearCurrentChatReducer,
   selectAllChats,
+  selectChatsStatus,
   selectCurrentChat,
   selectMessagesFromCurrentChat,
   setCurrentChatReducer,
@@ -40,10 +44,16 @@ const useChatLogic = () => {
   const messages = useSelector(selectMessagesFromCurrentChat); // Use selector to get messages of the current chat
   const [contactsFetched, setContactsFetched] = useState(false);
   const { t } = useTranslation();
+  const chatStatus = useAppSelector(selectChatsStatus);
 
   const agentClientIds = useSelector(selectClientIds);
 
   const currentChatId = useMemo(() => currentChat?._id, [currentChat]);
+
+  // Determine if chats should be fetched
+  const shouldFetchChats = useMemo(() => {
+    return chatStatus !== "succeeded";
+  }, [chatStatus]);
 
   const fetchChats = useCallback(async () => {
     try {
@@ -67,23 +77,30 @@ const useChatLogic = () => {
     }
   }, [dispatch, chatRetryCount]);
 
+  // Initial fetch effect
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      // Call fetchChats after a 500ms delay
-      fetchChats();
-    }, 500);
+    if (shouldFetchChats) {
+      const timeoutId = setTimeout(() => {
+        // Call fetchChats after a 500ms delay
+        fetchChats();
+      }, 500);
 
-    // Cleanup function to clear timeout if the component unmounts or dependencies change
-    return () => clearTimeout(timeoutId);
-  }, [dispatch, chatRetryCount, fetchChats]);
+      // Cleanup function to clear timeout if the component unmounts or dependencies change
+      return () => clearTimeout(timeoutId);
+    }
+  }, [shouldFetchChats, fetchChats]);
 
   // Retry mechanism
   useEffect(() => {
-    if (chatRetryCount > 0 && chatRetryCount <= 5) {
+    if (
+      chatRetryCount > 0 &&
+      chatRetryCount <= 5 &&
+      chatStatus !== "succeeded"
+    ) {
       const retryDelay = Math.min(32000, 1000 * 2 ** chatRetryCount); // Exponential backoff
 
       const retryTimeout = setTimeout(() => {
-        // console.log(`Retry attempt #${chatRetryCount}`);
+        console.log(`Retry attempt #${chatRetryCount}`);
         fetchChats();
       }, retryDelay);
 
@@ -91,7 +108,7 @@ const useChatLogic = () => {
         clearTimeout(retryTimeout);
       };
     }
-  }, [chatRetryCount, fetchChats]);
+  }, [chatRetryCount, fetchChats, chatStatus]);
 
   // Select a chat
   const selectChat = useCallback(

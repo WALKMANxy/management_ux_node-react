@@ -18,7 +18,9 @@ type ForecastGridProps = {
 const ForecastGrid: React.FC<ForecastGridProps> = ({ forecast }) => {
   const isDesktop = useMediaQuery("(min-width:786px)");
   const isMobile = useMediaQuery("(min-width:0px) and (max-width:600px)");
-  const numberOfDays = isDesktop ? 7 : 2;
+
+
+  const numberOfDays = isDesktop ? 14 : 2;
 
   // Slice the forecast array based on the number of days to display
   const displayedForecast = forecast.slice(0, numberOfDays);

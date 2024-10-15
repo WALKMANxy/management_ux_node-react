@@ -52,7 +52,6 @@ app.use(cors(corsOptions));
 app.use(compression());
 app.use(cookieParser());
 app.use(express.json());
-app.use(logRequestsIp);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -68,6 +67,7 @@ app.use("/oauth2", oauthRoutes);
 
 // Protected routes
 app.use(authenticateUser);
+app.use(logRequestsIp);
 app.use("/agents", agentRoutes);
 app.use("/admins", adminRoutes);
 app.use("/clients", clientRoutes);
