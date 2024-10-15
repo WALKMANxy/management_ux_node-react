@@ -30,8 +30,9 @@ import { useSelector } from "react-redux";
 import { selectUserRole } from "../../features/auth/authSlice";
 import { CalendarEvent } from "../../models/dataModels";
 import { CreateEventPayload } from "../../models/propsModels";
+import { showToast } from "../../services/toastMessage";
 import { getTwoMonthsFromNow } from "../../utils/dataUtils";
-import { showToast } from "../../utils/toastMessage";
+import { locale } from "../../services/localizer";
 
 interface EventFormProps {
   open: boolean;
@@ -140,7 +141,7 @@ export const EventForm: React.FC<EventFormProps> = ({
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
       <Dialog
         open={open}
         onClose={onCancel}

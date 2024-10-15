@@ -85,6 +85,105 @@ const chatSlice = createSlice({
 
       chat.updatedAt = new Date();
     },
+    addAttachmentMessageReducer: (
+      state,
+      action: PayloadAction<{ chatId: string; message: IMessage }>
+    ) => {
+      const { chatId, message } = action.payload;
+      const chat = state.chats[chatId];
+
+      if (!chat) {
+        console.error("Chat does not exist in the state.");
+        return;
+      }
+
+      // Remove the 'file' property from each attachment before storing in the state
+      const strippedMessage = {
+        ...message,
+        attachments: message.attachments.map((attachment) => {
+          const { file, ...rest } = attachment; // Destructure and remove 'file' property
+          return rest; // Return attachment without 'file' property
+        }),
+        isUploading: true,
+        uploadProgress: 0,
+      };
+
+      // Push the modified message to the chat
+      chat.messages.push(strippedMessage);
+      chat.updatedAt = new Date();
+    },
+    updateMessageProgress: (
+      state,
+      action: PayloadAction<{
+        chatId: string;
+        messageId: string;
+        progress: number;
+      }>
+    ) => {
+      const { chatId, messageId, progress } = action.payload;
+      const chat = state.chats[chatId];
+      if (!chat) {
+        console.error("Chat does not exist in the state.");
+        return;
+      }
+      const message = chat.messages.find((msg) => msg.local_id === messageId);
+      if (message) {
+        message.uploadProgress = progress;
+      }
+    },
+    uploadComplete: (
+      state,
+      action: PayloadAction<{
+        chatId: string;
+        message: IMessage;
+        fromServer?: boolean;
+      }>
+    ) => {
+      const { chatId, message } = action.payload;
+      const chat = state.chats[chatId];
+      if (!chat) {
+        console.error("Chat does not exist in the state.");
+        return;
+      }
+      const existingMessage = chat.messages.find(
+        (msg) => msg.local_id === message.local_id
+      );
+      if (existingMessage) {
+        Object.assign(existingMessage, message);
+        existingMessage.isUploading = false;
+        existingMessage.status = "sent";
+        existingMessage.uploadProgress = 100;
+      } else {
+        message.isUploading = false;
+        message.status = "sent";
+        message.uploadProgress = 100;
+        chat.messages.push(message);
+      }
+      chat.messages.sort(
+        (a, b) =>
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
+      chat.updatedAt = new Date();
+    },
+    uploadFailed: (
+      state,
+      action: PayloadAction<{ chatId: string; messageId: string }>
+    ) => {
+      const { chatId, messageId } = action.payload;
+      const chat = state.chats[chatId];
+      if (!chat) {
+        console.error("Chat does not exist in the state.");
+        return;
+      }
+      const message = chat.messages.find(
+        (msg) => msg.local_id || msg._id === messageId
+      );
+      if (message) {
+        message.isUploading = false;
+        message.status = "failed";
+        message.uploadProgress = 0;
+      }
+    },
 
     updateReadStatusReducer: (
       state,
@@ -132,6 +231,21 @@ const chatSlice = createSlice({
           console.log(
             `addChatReducer: Found existing chat with local_id ${localId}. Updating with server data and using _id ${chat._id}.`
           );
+
+          // Check if the current chat is the same as the one being updated
+          if (state.currentChat?.local_id === localId) {
+            console.log(
+              `addChatReducer: Current chat is the same as the updated chat, updating currentChat with server data.`
+            );
+            // Update the currentChat with the server data
+            state.currentChat = {
+              ...state.currentChat,
+              ...chat,
+              _id: chat._id, // Ensure _id is set
+              status: chat.status, // Update status
+            };
+          }
+
           // Replace the chat keyed by local_id with the chat keyed by _id
           state.chats[chat._id] = {
             ...state.chats[localId], // Retain existing data
@@ -152,12 +266,40 @@ const chatSlice = createSlice({
         // Client-originated chat, add to state keyed by local_id
         const localId = chat.local_id;
         if (localId) {
-          console.log(`addChatReducer: Adding new chat with local_id ${localId}`);
+          console.log(
+            `addChatReducer: Adding new chat with local_id ${localId}`
+          );
           state.chats[localId] = chat;
         }
       }
     },
 
+    updateChatReducer: (
+      state,
+      action: PayloadAction<{
+        chatId: string;
+        updatedData: Partial<IChat>;
+        fromServer?: boolean;
+      }>
+    ) => {
+      const { chatId, updatedData, fromServer } = action.payload;
+      const existingChat = state.chats[chatId];
+
+      if (existingChat) {
+        state.chats[chatId] = {
+          ...existingChat,
+          ...updatedData,
+          updatedAt: new Date(),
+        };
+        if (fromServer) {
+          console.log(`updateChatReducer: Chat ${chatId} updated from server.`);
+        } else {
+          console.log(`updateChatReducer: Chat ${chatId} updated from client.`);
+        }
+      } else {
+        console.warn(`updateChatReducer: Chat with ID ${chatId} not found.`);
+      }
+    },
   },
 
   extraReducers: (builder) => {
@@ -332,6 +474,11 @@ export const {
   addMessageReducer,
   updateReadStatusReducer,
   addChatReducer,
+  updateChatReducer,
+  addAttachmentMessageReducer,
+  uploadComplete,
+  updateMessageProgress,
+  uploadFailed,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
@@ -352,8 +499,10 @@ export const selectChatById = createSelector(
 );
 
 // Replace with a simple selector
-export const selectCurrentChat = (state: RootState) => state.chats.currentChat;
-
+export const selectCurrentChat = (state: RootState) => {
+  const currentChatId = state.chats.currentChat?._id;
+  return currentChatId ? state.chats.chats[currentChatId] : state.chats.currentChat;
+};
 // Memoized selector for messages from the current chat
 export const selectMessagesFromCurrentChat = createSelector(
   selectCurrentChat,
@@ -380,6 +529,7 @@ export const selectUnreadMessages = createSelector(
   [selectCurrentChat, (_: RootState, userId: string) => userId],
   (currentChat, userId) =>
     currentChat?.messages.filter(
-      (message: IMessage) => !message.readBy.includes(userId) && message.sender !== userId
+      (message: IMessage) =>
+        !message.readBy.includes(userId) && message.sender !== userId
     ) || []
 );

@@ -2,16 +2,23 @@ import { createListenerMiddleware } from "@reduxjs/toolkit";
 import {
   addChatReducer,
   addMessageReducer,
+  updateChatReducer,
   updateReadStatusReducer,
+  uploadComplete,
 } from "../features/chat/chatSlice";
 import { fetchAllChatsThunk } from "../features/chat/chatThunks";
 import {
   createPromoAsync,
   createVisitAsync,
+  getVisits,
 } from "../features/data/dataThunks";
 import { fetchUsersByIds, selectAllUsers } from "../features/users/userSlice";
 import { IChat, IMessage } from "../models/dataModels";
 import { webSocketService } from "../services/webSocketService";
+import {
+  getLastAlertTimestamp,
+  setLastAlertTimestamp,
+} from "../utils/alertUtils";
 import { generateAutomatedMessage } from "../utils/chatUtils";
 import { RootState } from "./store";
 
@@ -26,7 +33,11 @@ let readStatusQueue: Array<{
 }> = [];
 let messageQueue: Array<{ chatId: string; messageData: IMessage }> = [];
 let chatQueue: Array<IChat> = [];
-let automatedMessageQueue: Array<{ targetId: string[]; message: Partial<IMessage> }> =
+let automatedMessageQueue: Array<{
+  targetId: string[];
+  message: Partial<IMessage>;
+}> = [];
+let updateChatQueue: Array<{ chatId: string; updatedData: Partial<IChat> }> =
   [];
 
 // Timers for debouncing WebSocket messages to avoid excessive traffic
@@ -34,6 +45,7 @@ let readStatusTimer: NodeJS.Timeout | null = null;
 let messageTimer: NodeJS.Timeout | null = null;
 let chatTimer: NodeJS.Timeout | null = null;
 let automatedMessageTimer: NodeJS.Timeout | null = null;
+let updateChatTimer: NodeJS.Timeout | null = null;
 
 // Debounce time in milliseconds to group similar WebSocket messages
 const DEBOUNCE_TIME = 100;
@@ -77,6 +89,15 @@ const processChatQueue = () => {
       webSocketService.emitNewChat(chatData);
     });
     chatQueue = []; // Clear the queue after processing
+  }
+};
+
+const processUpdateChatQueue = () => {
+  if (updateChatQueue.length > 0) {
+    updateChatQueue.forEach(({ chatId, updatedData }) => {
+      webSocketService.emitUpdateChat(chatId, updatedData);
+    });
+    updateChatQueue = [];
   }
 };
 
@@ -126,6 +147,24 @@ listenerMiddleware.startListening({
   },
 });
 
+// Listener for the addMessageReducer action
+listenerMiddleware.startListening({
+  actionCreator: uploadComplete,
+  effect: async (action) => {
+    const { chatId, message, fromServer } = action.payload;
+
+    // Skip WebSocket emission if action is from the server
+    if (fromServer) return;
+
+    // Add the message to the queue
+    messageQueue.push({ chatId, messageData: message });
+
+    // Debounce the processing of the message queue
+    if (messageTimer) clearTimeout(messageTimer);
+    messageTimer = setTimeout(processMessageQueue, DEBOUNCE_TIME);
+  },
+});
+
 // Listener for the addChatReducer action
 listenerMiddleware.startListening({
   actionCreator: addChatReducer,
@@ -141,6 +180,23 @@ listenerMiddleware.startListening({
     // Debounce the processing of the chat queue
     if (chatTimer) clearTimeout(chatTimer);
     chatTimer = setTimeout(processChatQueue, DEBOUNCE_TIME);
+  },
+});
+
+listenerMiddleware.startListening({
+  actionCreator: updateChatReducer,
+  effect: async (action) => {
+    const { chatId, updatedData, fromServer } = action.payload;
+
+    // Skip WebSocket emission if action is from the server
+    if (fromServer) return;
+
+    // Add the chat to the queue
+    updateChatQueue.push({ chatId, updatedData });
+
+    // Debounce the processing of the chat queue
+    if (updateChatTimer) clearTimeout(updateChatTimer);
+    updateChatTimer = setTimeout(processUpdateChatQueue, DEBOUNCE_TIME);
   },
 });
 
@@ -179,7 +235,7 @@ listenerMiddleware.startListening({
         (user) =>
           user.role === "client" &&
           user.entityCode !== undefined &&
-          !(promo.excludedClientsId?.includes(user.entityCode))
+          !promo.excludedClientsId?.includes(user.entityCode)
       );
     } else {
       targetedUsers = allUsers.filter(
@@ -215,7 +271,6 @@ listenerMiddleware.startListening({
   },
 });
 
-
 // Listener for the createVisitAsync action
 listenerMiddleware.startListening({
   actionCreator: createVisitAsync.fulfilled,
@@ -226,7 +281,7 @@ listenerMiddleware.startListening({
 
     // Find the user based on the entityCode (which corresponds to the clientId)
     const targetedUser = allUsers.find(
-      (user) => user.role === "client" &&user.entityCode === visit.clientId
+      (user) => user.role === "client" && user.entityCode === visit.clientId
     );
 
     if (!targetedUser?._id) {
@@ -237,7 +292,10 @@ listenerMiddleware.startListening({
     const messageData = generateAutomatedMessage(visit);
 
     // Add the automated message to the queue
-    automatedMessageQueue.push({ targetId: [targetedUser._id], message : messageData });
+    automatedMessageQueue.push({
+      targetId: [targetedUser._id],
+      message: messageData,
+    });
 
     // Debounce the processing of the automated message queue
     if (automatedMessageTimer) clearTimeout(automatedMessageTimer);
@@ -245,6 +303,80 @@ listenerMiddleware.startListening({
       processAutomatedMessageQueue,
       DEBOUNCE_TIME
     );
+  },
+});
+
+// listenerMiddleware.ts
+
+listenerMiddleware.startListening({
+  actionCreator: getVisits.fulfilled,
+  effect: async (_action, listenerApi) => {
+    const state = listenerApi.getState() as RootState;
+    const currentUserDetails = state.data.currentUserDetails;
+
+    if (!currentUserDetails || currentUserDetails.role !== "agent") {
+      return;
+    }
+
+    const currentUserVisits = state.data.currentUserVisits;
+
+    if (!currentUserVisits || !Array.isArray(currentUserVisits)) {
+      return;
+    }
+
+    const currentUserId = currentUserDetails.userId;
+    const now = new Date();
+
+    // Retrieve the last alert timestamp from localStorage
+    const lastAlertSent = getLastAlertTimestamp(currentUserId);
+
+    // Calculate the time difference in milliseconds
+    const millisecondsIn24Hours = 24 * 60 * 60 * 1000;
+
+    // Determine if 24 hours have passed since the last alert
+    const shouldSendAlert =
+      !lastAlertSent ||
+      now.getTime() - lastAlertSent.getTime() >= millisecondsIn24Hours;
+
+    if (!shouldSendAlert) {
+      console.log("Alert already sent within the last 24 hours. Skipping.");
+      return;
+    }
+
+    const overdueVisits = currentUserVisits.filter((visit) => {
+      const visitDate = new Date(visit.date);
+      return (
+        visitDate < now && visit.pending === true && visit.completed === false
+      );
+    });
+
+    if (overdueVisits.length === 0) {
+      console.log("No overdue visits found.");
+      return;
+    }
+
+    // Use generateAutomatedMessage with the count of overdue visits
+    const messageData = generateAutomatedMessage(
+      overdueVisits[0], // Use any visit data, as the content will be based on the count
+      "alert",
+      overdueVisits.length // Pass the count of overdue visits
+    );
+
+    // Add the automated message to the queue
+    automatedMessageQueue.push({
+      targetId: [currentUserId],
+      message: messageData,
+    });
+
+    // Debounce the processing of the automated message queue
+    if (automatedMessageTimer) clearTimeout(automatedMessageTimer);
+    automatedMessageTimer = setTimeout(
+      processAutomatedMessageQueue,
+      DEBOUNCE_TIME
+    );
+
+    // Update the last alert timestamp in localStorage
+    setLastAlertTimestamp(currentUserId);
   },
 });
 

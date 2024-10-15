@@ -16,6 +16,8 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 
 import { brandColors } from "../../utils/constants";
+import { calculateTopBrandsData } from "../../utils/dataUtils";
+import ActivePromotions from "../dashboard/ActivePromotions";
 import SpentThisMonth from "../dashboard/SpentThisMonth";
 import SpentThisYear from "../dashboard/SpentThisYear";
 import TopArticleType from "../dashboard/TopArticleType";
@@ -47,7 +49,6 @@ const ClientView: React.FC<ClientViewProps> = ({
   calculateMonthlyData,
   clientComparativeStatisticsMonthly,
   clientComparativeStatistics,
-  topBrandsData,
   userRole,
   loadingState,
 }) => {
@@ -55,6 +56,13 @@ const ClientView: React.FC<ClientViewProps> = ({
   const { t } = useTranslation();
   const isTablet = useMediaQuery("(min-width:900px) and (max-width:1250px)");
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const topBrandsForSelectedClient = React.useMemo(() => {
+    if (selectedClient) {
+      return calculateTopBrandsData(selectedClient.movements);
+    }
+    return [];
+  }, [selectedClient]);
 
   return (
     <Box mb={4}>
@@ -76,7 +84,15 @@ const ClientView: React.FC<ClientViewProps> = ({
             aria-label={t("dashboard.loadingStatistics")}
           />
         ) : (
-          <Typography variant="h5" gutterBottom>
+          <Typography
+            variant="h5"
+            gutterBottom
+            sx={{
+              fontFamily: "Inter, sans-serif",
+              fontWeight: 100, // Now using the lighter custom font weight
+            }}
+          >
+            {" "}
             {userRole === "client"
               ? t("dashboard.yourStatistics")
               : t("dashboard.statisticsFor", {
@@ -85,16 +101,32 @@ const ClientView: React.FC<ClientViewProps> = ({
           </Typography>
         )}
         {isTablet && (
-          <Fab
-            color="primary"
-            aria-label={t("dashboard.calendarButton")}
-            onClick={handleToggleDrawer}
-            sx={{
-              zIndex: 1000,
-            }}
-          >
-            <CalendarMonthIcon />
-          </Fab>
+          <React.Fragment>
+            {loadingState ? (
+              <Skeleton
+                animation="wave"
+                variant="circular"
+                width={40}
+                height={40}
+                sx={{
+                  borderRadius: "50%",
+                  zIndex: 1000,
+                }}
+                aria-label={t("dashboard.loadingCalendarButton")}
+              />
+            ) : (
+              <Fab
+                color="primary"
+                aria-label={t("dashboard.calendarButton")}
+                onClick={handleToggleDrawer}
+                sx={{
+                  zIndex: 1000,
+                }}
+              >
+                <CalendarMonthIcon />
+              </Fab>
+            )}
+          </React.Fragment>
         )}
       </Box>
 
@@ -105,7 +137,7 @@ const ClientView: React.FC<ClientViewProps> = ({
               animation="wave"
               variant="rectangular"
               width="100%"
-              height={150}
+              height={300}
               sx={{ borderRadius: "12px" }}
               aria-label={t("dashboard.skeleton")}
             />
@@ -135,7 +167,7 @@ const ClientView: React.FC<ClientViewProps> = ({
               animation="wave"
               variant="rectangular"
               width="100%"
-              height={150}
+              height={300}
               sx={{ borderRadius: "12px" }}
               aria-label={t("dashboard.skeleton")}
             />
@@ -159,7 +191,7 @@ const ClientView: React.FC<ClientViewProps> = ({
               animation="wave"
               variant="rectangular"
               width="100%"
-              height={150}
+              height={300}
               sx={{ borderRadius: "12px" }}
               aria-label={t("dashboard.skeleton")}
             />
@@ -184,6 +216,7 @@ const ClientView: React.FC<ClientViewProps> = ({
             <MonthOverMonthSpendingTrend
               months={calculateMonthlyData([selectedClient]).months}
               revenueData={calculateMonthlyData([selectedClient]).revenueData}
+              netRevenueData={calculateMonthlyData([selectedClient]).netRevenueData}
               userRole={userRole}
             />
           )}
@@ -200,7 +233,7 @@ const ClientView: React.FC<ClientViewProps> = ({
             />
           ) : (
             <TopBrandsSold
-              topBrandsData={topBrandsData}
+              topBrandsData={topBrandsForSelectedClient}
               brandColors={brandColors}
               isMobile={isMobile}
               isAgentSelected={false}
@@ -208,24 +241,55 @@ const ClientView: React.FC<ClientViewProps> = ({
           )}
         </Grid>
       </Grid>
+      <Box pt={2.5}>
+        {loadingState ? (
+          <Skeleton
+            animation="wave"
+            variant="rectangular"
+            width="100%"
+            height={300}
+            sx={{ borderRadius: "12px" }}
+            aria-label={t("dashboard.skeleton")}
+          />
+        ) : (
+          <ActivePromotions clientSelected={selectedClient.id} />
+        )}
+      </Box>
 
       {/* Conditionally render the Close Selection FAB */}
       {userRole !== "client" &&
-        !loadingState && ( // Do not render FAB if userRole is "client" or loading
+        (loadingState ? (
+          // Show Skeleton when loadingState is true
+          <Skeleton
+            animation="wave"
+            variant="circular"
+            width={40}
+            height={40}
+            sx={{
+              borderRadius: "50%",
+              position: "fixed",
+              bottom: isMobile ? 10 : 16,
+              right: isMobile ? 5 : 16,
+              zIndex: 1300,
+            }}
+            aria-label={t("dashboard.loadingCalendarButton")}
+          />
+        ) : (
+          // Show FAB when not loading
           <Fab
             color="secondary"
             aria-label={t("dashboard.closeButton")}
             sx={{
               position: "fixed",
-              bottom: isMobile ? 20 : 16,
-              right: isMobile ? 120 : 16,
+              bottom: isMobile ? 10 : 16,
+              right: isMobile ? 5 : 16,
               zIndex: 1300,
             }}
             onClick={() => clearSelection!()}
           >
             <CloseIcon fontSize="small" />
           </Fab>
-        )}
+        ))}
     </Box>
   );
 };

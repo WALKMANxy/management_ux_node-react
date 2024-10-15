@@ -1,17 +1,16 @@
-import fs from "fs";
-import path from "path";
-import { config } from "../config/config";
-import { Client } from "../models/types";
-import {
-  getClientById,
-  getClientsByAgentCode,
-  getClientsFromFile,
-} from "../utils/fetchClientsUtil";
+// src/services/clientService.ts
 
+import Client, { IClient } from "../models/Client";
+
+/**
+ * Fetch all clients from the database.
+ * @returns Promise resolving to an array of Client documents.
+ */
 export class ClientService {
-  static getAllClients(): Client[] {
+  static async getAllClients(): Promise<IClient[]> {
     try {
-      return getClientsFromFile();
+      const clients = await Client.find().exec();
+      return clients;
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(`Error retrieving clients: ${err.message}`);
@@ -21,25 +20,37 @@ export class ClientService {
     }
   }
 
-  static getClientById(codice: string): Client | undefined {
+  /**
+   * Fetch a single client by CODICE from the database.
+   * @param codice - The CODICE of the client to fetch.
+   * @returns Promise resolving to a Client document or null if not found.
+   */
+  static async getClientById(codice: string): Promise<IClient | null> {
     try {
-      return getClientById(codice);
+      const client = await Client.findOne({ CODICE: codice }).exec();
+      return client;
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(
-          `Error retrieving client with codice ${codice}: ${err.message}`
+          `Error retrieving client with CODICE ${codice}: ${err.message}`
         );
       } else {
         throw new Error(
-          `An unknown error occurred while retrieving client with codice ${codice}`
+          `An unknown error occurred while retrieving client with CODICE ${codice}`
         );
       }
     }
   }
 
-  static getClientsForAgent(agentCode: string): Client[] {
+  /**
+   * Fetch clients associated with a specific agent code (AG).
+   * @param agentCode - The AG code of the agent.
+   * @returns Promise resolving to an array of Client documents.
+   */
+  static async getClientsForAgent(agentCode: string): Promise<IClient[]> {
     try {
-      return getClientsByAgentCode(agentCode);
+      const clients = await Client.find({ AG: agentCode }).exec();
+      return clients;
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(
@@ -53,64 +64,80 @@ export class ClientService {
     }
   }
 
-  static replaceClient(id: string, clientData: Client): { message: string } {
+  /**
+   * Replace a client by CODICE with new data.
+   * @param codice - The CODICE of the client to replace.
+   * @param clientData - The new client data.
+   * @returns Promise resolving to the replaced Client document or null if not found.
+   */
+  static async replaceClient(
+    codice: string,
+    clientData: IClient
+  ): Promise<IClient | null> {
     try {
-      const filePath = path.resolve(config.clientDetailsFilePath || "");
-      const clients: Client[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-
-      const clientIndex = clients.findIndex((client) => client.CODICE === id);
-      if (clientIndex === -1) {
-        throw new Error(`Client with CODICE ${id} not found`);
-      }
-
-      // Replace client with the provided clientData
-      clients[clientIndex] = clientData;
-
-      fs.writeFileSync(filePath, JSON.stringify(clients, null, 2));
-      return { message: "Client updated successfully" };
-    } catch (err) {
-      if (err instanceof Error) {
-        throw new Error(
-          `Error replacing client with CODICE ${id}: ${err.message}`
-        );
-      } else {
-        throw new Error(
-          `An unknown error occurred while replacing client with CODICE ${id}`
-        );
-      }
+      const replacedClient = await Client.findOneAndReplace(
+        { CODICE: codice },
+        clientData,
+        { new: true, upsert: false, runValidators: true } // Do not create a new document if not found, run validators
+      ).exec();
+      return replacedClient;
+    } catch (err: any) {
+      console.error(`Error replacing client with CODICE ${codice}:`, err);
+      throw err; // Let the controller handle specific error responses
     }
   }
 
-  static updateClient(
-    id: string,
-    clientData: Partial<Client>
-  ): { message: string } {
+  /**
+   * Update a client by CODICE with partial data.
+   * @param codice - The CODICE of the client to update.
+   * @param clientData - Partial client data to update.
+   * @returns Promise resolving to the updated Client document or null if not found.
+   */
+  static async updateClient(
+    codice: string,
+    clientData: Partial<IClient>
+  ): Promise<IClient | null> {
     try {
-      const filePath = path.resolve(config.clientDetailsFilePath || "");
-      const clients: Client[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+      const updatedClient = await Client.findOneAndUpdate(
+        { CODICE: codice },
+        { $set: clientData },
+        { new: true, runValidators: true } // Return the updated document and run validators
+      ).exec();
+      return updatedClient;
+    } catch (err: any) {
+      console.error(`Error updating client with CODICE ${codice}:`, err);
+      throw err; // Let the controller handle specific error responses
+    }
+  }
 
-      const clientIndex = clients.findIndex((client) => client.CODICE === id);
-      if (clientIndex === -1) {
-        throw new Error(`Client with CODICE ${id} not found`);
-      }
+  /**
+   * Create a new client in the database.
+   * @param clientData - The data for the new client.
+   * @returns Promise resolving to the created Client document.
+   */
+  static async createClientService(clientData: IClient): Promise<IClient> {
+    try {
+      const newClient = new Client(clientData);
+      await newClient.save();
+      return newClient;
+    } catch (err: any) {
+      console.error("Error creating client:", err);
+      throw err; // Let the controller handle specific error responses
+    }
+  }
 
-      // Update only the fields provided in clientData
-      const updatedClient = { ...clients[clientIndex], ...clientData };
-
-      clients[clientIndex] = updatedClient;
-
-      fs.writeFileSync(filePath, JSON.stringify(clients, null, 2));
-      return { message: "Client updated successfully" };
+  /**
+   * Delete a client by CODICE.
+   * @param codice - The CODICE of the client to delete.
+   * @returns Promise resolving to true if deleted, false if not found.
+   */
+  static async deleteClientService(codice: string): Promise<boolean> {
+    try {
+      const result = await Client.deleteOne({ CODICE: codice }).exec();
+      return result.deletedCount === 1;
     } catch (err) {
-      if (err instanceof Error) {
-        throw new Error(
-          `Error updating client with CODICE ${id}: ${err.message}`
-        );
-      } else {
-        throw new Error(
-          `An unknown error occurred while updating client with CODICE ${id}`
-        );
-      }
+      console.error(`Error deleting client with CODICE ${codice}:`, err);
+      throw new Error("Error deleting client");
     }
   }
 }

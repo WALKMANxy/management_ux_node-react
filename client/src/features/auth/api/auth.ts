@@ -1,13 +1,11 @@
 // services/api/auth.ts
 
 import axios from "axios";
+import { setAccessToken } from "../../../services/tokenService";
 import { authApiCall } from "../../../utils/apiUtils";
-import { getUserAgent } from "../../../utils/deviceUtils";
-/* import { generateRandomState } from "../../../utils/oatuhUtils";
- */
+import { getUniqueIdentifier } from "../../../utils/cryptoUtils";
+
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
-/* const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
-const appUrl = import.meta.env.VITE_APP_URL || ""; */
 
 // Specific function for registering a user
 export const registerUser = async (credentials: {
@@ -25,52 +23,81 @@ export const loginUser = async (credentials: {
   id: string;
   message: string;
   statusCode: number;
+  refreshToken: string;
 }> => {
-  const userAgent = getUserAgent();
-
-  return authApiCall<{ id: string }>("auth/login", "POST", {
-    ...credentials,
-    userAgent,
-  });
-};
-
-/* // Function to initiate Google OAuth flow
-export const initiateGoogleOAuth = () => {
-  const state = generateRandomState();
-  sessionStorage.setItem("oauth_state", state);
-  window.location.href = `https://accounts.google.com/o/oauth2/auth?client_id=${googleClientId}&redirect_uri=${appUrl}/oauth2/callback&response_type=code&scope=email%20profile&state=${state}`;
-}; */
-
-/* // Handle the OAuth callback and retrieve the user's session
-export const handleOAuthCallback = async (code: string, state: string) => {
-  const expectedState = sessionStorage.getItem("oauth_state");
-  sessionStorage.removeItem("oauth_state");
-
-  if (state !== expectedState) {
-    throw new Error("Invalid OAuth state");
-  }
-
-  const userAgent = navigator.userAgent;
+  const uniqueId = getUniqueIdentifier();
+  // console.log("Generated uniqueId for login:", uniqueId);
 
   try {
-    const response = await axios.post(
-      `${appUrl}/auth/oauth2/callback`,
-      {
-        code,
-        userAgent,
-      },
-      {
-        withCredentials: true, // To ensure the session cookie is set
-      }
-    );
+    // Make the login API call and pass the uniqueId
+    const response = await authApiCall<{
+      id: string;
+      accessToken: string;
+      refreshToken: string;
+    }>("auth/login", "POST", {
+      ...credentials,
+      uniqueId,
+    });
 
-    return response.data;
+    // console.log("Login API response:", response);
+
+    // Validate tokens
+    if (!response.accessToken || !response.refreshToken) {
+      console.error("Access token or refresh token missing in login response");
+      throw new Error("Login failed: Access token or Refresh token missing");
+    }
+
+    // Store the access token in memory
+    setAccessToken(response.accessToken);
+    // console.log("Access token set successfully in memory");
+
+    return {
+      id: response.id,
+      message: response.message,
+      statusCode: response.statusCode,
+      refreshToken: response.refreshToken,
+    };
   } catch (error) {
-    console.error("Error handling OAuth callback:", error);
-    throw new Error("Failed to process OAuth callback");
+    console.error("Error during login API call:", error);
+    throw error;
   }
 };
- */
+
+export const logoutUser = async (): Promise<void> => {
+  // First check sessionStorage, then fallback to localStorage
+  const localAuthState =
+    JSON.parse(sessionStorage.getItem("auth")!) ||
+    JSON.parse(localStorage.getItem("authState")!);
+  if (!localAuthState) {
+    throw new Error("No auth state found for logout.");
+  }
+
+  const refreshToken = localAuthState.refreshToken;
+
+  const uniqueId = getUniqueIdentifier();
+
+  if (!refreshToken) {
+    throw new Error("No refresh token found for logout.");
+  }
+
+  try {
+    await axios.post(
+      `${baseUrl}/auth/logout`,
+      {}, // No body required
+      {
+        headers: {
+          Authorization: `Bearer ${refreshToken}`,
+          "bypass-tunnel-reminder": "true",
+          "Content-Type": "application/json",
+          uniqueId: uniqueId,
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error during logout:", error);
+    throw new Error("Logout failed");
+  }
+};
 
 // Function to link Google account to an existing user
 export const linkGoogleAccount = async (code: string) => {

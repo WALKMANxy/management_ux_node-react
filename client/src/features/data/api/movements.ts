@@ -1,8 +1,10 @@
 import { serverMovement } from "../../../models/dataSetTypes";
+import { showToast } from "../../../services/toastMessage";
 import { apiCall } from "../../../utils/apiUtils";
-import { getCachedDataSafe, setCachedDataSafe } from "../../../utils/cacheUtils";
-import { showToast } from "../../../utils/toastMessage";
-
+import {
+  getCachedDataSafe,
+  setCachedDataSafe,
+} from "../../../utils/cacheUtils";
 
 // Function to fetch filtered movements based on the user's role and entity code
 export const getFilteredMovements = async (): Promise<serverMovement[]> => {
@@ -25,7 +27,10 @@ export const getFilteredMovements = async (): Promise<serverMovement[]> => {
 
     return data;
   } catch (error) {
-    console.error("getFilteredMovements: Failed to load filtered movements data", error);
+    console.error(
+      "getFilteredMovements: Failed to load filtered movements data",
+      error
+    );
     showToast.error("Failed to load filtered movements data.");
     throw error;
   }

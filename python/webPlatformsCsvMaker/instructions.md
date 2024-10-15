@@ -100,7 +100,8 @@ To build a standalone executable for the application without UPX compression, fo
    Use the following command to build the executable:
 
    ```no console
-   pyinstaller --clean --onefile --noconsole --noupx --icon=icons/icon256.ico --add-data "icons;icons" --name "TuleroStockUpdater" main.py
+
+   pyinstaller --clean --onefile --noconsole --noupx --icon=icons/icon256.ico --add-data "icons;icons" --add-data "translations;translations" --name "WebStockUpdater" main.py
 
       console
 pyinstaller --clean --onefile --noupx --icon=icons/icon256.ico --add-data "icons;icons" --add-data "translations;translations" --name "WebStockUpdater" main.py

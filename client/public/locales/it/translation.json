@@ -1,4 +1,25 @@
 {
+  "footer": {
+    "about": "Chi siamo",
+    "ourStory": "La nostra storia",
+    "team": "Team",
+    "followUs": "Seguici",
+    "facebook": "Seguici su Facebook",
+    "instagram": "Seguici su Instagram",
+    "legal": "Legale",
+    "privacyPolicy": "Politica sulla privacy",
+    "termsOfService": "Termini di servizio",
+    "close": "Chiudi"
+  },
+  "ourStory": {
+    "title": "La nostra storia",
+    "content": {
+      "part1": "<0>Ricambi Centro Sud S.r.l.</0> opera nei settori dei veicoli commerciali, autobus, camion e ricambi per auto per motori diesel e a benzina, occupandosi anche di carrozzeria e veicoli industriali, agricoli, marittimi e ferroviari. Dal 1995 a Catania, offre servizi di scelta e vendita dei prodotti proposti con professionalità e competenza, soddisfacendo le esigenze di enti pubblici e privati, ricambisti, specialisti in pompe, meccanici ed elettricisti.",
+      "part2": "L'azienda, ora in espansione, è desiderosa di offrire questo servizio sempre più competente ed efficace direttamente ai privati, fornendo un'opportunità e offrendo soluzioni per i grandi e piccoli problemi dei veicoli. Troverai personale qualificato in formazione continua, capace di analizzare il problema e offrire consulenze sulle giuste alternative. Puoi beneficiare della consegna a domicilio e di servizi completi a 360 gradi.",
+      "part3": "L'azienda è distributore di marchi di ricambi originali, nonché di prodotti ufficialmente ricondizionati direttamente dal produttore. La qualità del servizio rispetto al prezzo, l'area tecnica qualificata e la gestione/progetto oltre la semplice vendita diretta sono i tre punti forti e distintivi di Ricambi Centro Sud S.r.l. L'area tecnica, dotata di strumenti e formazione continua, promuove la rete funzionale nell'area, garantendo aggiornamenti e assistenza post-vendita ai clienti.",
+      "part4": "<0>Un'azienda che non ha perso il suo carattere aperto e familiare</0> ma che oggi è in grande espansione, affrontando nuove sfide. La nuova struttura, che si estende su 3.800 mq su tre livelli, inclusi uffici, magazzino e punto vendita, con un totale di 25 dipendenti, è in grado di garantire servizi in diverse aree di competenza nel territorio grazie a venditori specializzati per tipo di prodotto e marca."
+    }
+  },
   "welcome": "Benvenuto",
   "login": "Accedi",
   "statistics": "Statistiche",
@@ -836,7 +857,7 @@
     "agent": "Agente",
     "admin": "Amministratore",
     "selectEntity": "Seleziona un ente facendo doppio clic su di esso.",
-    "searchPlaceholder": "Cerca {{role}} per nome o ID",
+    "searchPlaceholder": "Cerca per nome o ID",
     "loadingEntities": "Caricamento enti in corso...",
     "startTyping": "Inizia a digitare per cercare",
     "entityName": "Nome",
@@ -979,7 +1000,7 @@
     "yes": "Sì",
     "no": "No",
     "selectVisitError": "Impossibile selezionare la visita.",
-    "noVisits": "Nessuna visita trovata per questo cliente.",
+    "noVisits": "Nessuna visita trovata.",
     "unknown": "Sconosciuto"
   },
   "calendarHook": {

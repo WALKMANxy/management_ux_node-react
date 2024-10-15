@@ -14,23 +14,26 @@ import {
   Tooltip,
   Typography,
   useMediaQuery,
-  useTheme,
 } from "@mui/material";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "../../app/hooks";
 import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 import useLoadOlderMessages from "../../hooks/useChatLoadOlderMessages";
 import useChatView from "../../hooks/useChatView"; // Import the custom hook
+import { useFilePreview } from "../../hooks/useFilePreview";
+import { IChat } from "../../models/dataModels";
 import { canUserChat } from "../../utils/chatUtils";
+import Spinner from "../common/Spinner";
+import CreateChatForm from "./CreateChatForm"; // Import CreateChatForm
+import FileViewer from "./FileViewer";
 import InputBox from "./InputBox";
 import RenderMessage from "./RenderMessage"; // Import the RenderMessage component
 import RenderParticipantsAvatars from "./RenderParticipantsAvatars"; // Import the RenderParticipantsAvatars component
 
 const ChatView: React.FC = () => {
   const { t } = useTranslation();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery("(max-width:800px)");
   const dispatch = useAppDispatch();
   const [open, setOpen] = React.useState(false);
 
@@ -47,6 +50,8 @@ const ChatView: React.FC = () => {
     participantsData,
     currentUserId,
   } = useChatView(); // Destructure the hook values
+
+  const { isViewerOpen, closeFileViewer, isPreview } = useFilePreview();
 
   // Hook for loading older messages
   const { messagesContainerRef, topRef } = useLoadOlderMessages(
@@ -93,23 +98,26 @@ const ChatView: React.FC = () => {
     setOpen(true);
   };
 
+  // State for Edit Chat Form
+  const [isEditChatFormOpen, setIsEditChatFormOpen] = useState(false);
+  const [chatToEdit, setChatToEdit] = useState<IChat | null>(null);
+
+  // Handle MenuItem clicks
+  const handleMenuItemClick = (option: string) => {
+    handleMenuClose(); // Close the menu first
+
+    if (option === "edit_group" || option === "edit_broadcast") {
+      setChatToEdit(currentChat);
+      setIsEditChatFormOpen(true);
+    }
+
+    // Handle other options like mute, archive_chat, delete_chat as needed
+    // e.g., if (option === "mute") { ... }
+  };
+
   // Fallback if currentChat is not set
   if (!currentChat) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          bgcolor: "#ffffff",
-        }}
-      >
-        <Typography variant="h6" color="textSecondary">
-          {t("chatView.labels.noChatSelected")}
-        </Typography>
-      </Box>
-    );
+    return <Spinner />;
   }
 
   return (
@@ -118,7 +126,7 @@ const ChatView: React.FC = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: "100dvh", // Fill the available height
+        height: "100dvh",
         px: isMobile ? 0 : 1, // Remove padding on mobile
         paddingTop: isMobile ? 1 : 0,
         bgcolor: "#ffffff",
@@ -206,31 +214,33 @@ const ChatView: React.FC = () => {
           onClose={handleMenuClose}
         >
           {getChatOptions.map((option) => (
-            <MenuItem key={option} onClick={handleMenuClose}>
+            <MenuItem key={option} onClick={() => handleMenuItemClick(option)}>
               {t(`chatView.menuOptions.${option}`)}
             </MenuItem>
           ))}
         </Menu>
       </Box>
-      <Divider sx={{ mb: 2 }} />
+      <Divider sx={{ mb: -1 }} />
 
       {/* Messages Display */}
       <Paper
         elevation={1}
         sx={{
+          flexGrow: 1,
           borderRadius: "1.5em", // Rounded corners for the paper
           overflowY: "auto", // Enable scrolling for messages
           display: "flex",
           flexDirection: "column",
-          "&::-webkit-scrollbar": {
+          "&::webkitScrollbar": {
             display: "none",
           },
           position: "relative",
-          height: isMobile ? "100dvh" : "100dvh", // Adjust height based on mobile or desktop
+          height: "100dvh", // Adjust height based on mobile or desktop
         }}
       >
         <Box
           sx={{
+            flexGrow: 1,
             p: 1,
             bgcolor: "#f9f9f9",
             borderRadius: 6,
@@ -239,15 +249,15 @@ const ChatView: React.FC = () => {
             pb: 10,
 
             flexDirection: "column",
-            "&::-webkit-scrollbar": {
+            "&::webkitScrollbar": {
               display: "none",
             },
+
             position: "relative",
-            flexGrow: 1,
           }}
           ref={messagesContainerRef} // Attach the ref from useLoadOlderMessages
         >
-          <div ref={topRef} style={{ height: 1 }}></div> {/* Add this line */}
+          <div ref={topRef} style={{}}></div> {/* Add this line */}
           <RenderMessage
             messages={sortedMessages || []}
             currentUserId={currentUserId}
@@ -263,13 +273,30 @@ const ChatView: React.FC = () => {
           mt: isMobile ? -10 : 0,
           flexShrink: 0, // Prevent shrinking of the input box
           borderRadius: isMobile ? "0px" : "25px", // Rounded corners for the input box
-          position: "sticky", // Keep the input box sticky at the bottom
-          bottom: 0,
           zIndex: 10,
+          bottom: 0,
+          position: "sticky",
         }}
       >
         <InputBox canUserChat={isUserAllowedToChat} />
       </Box>
+
+      {/* File Viewer */}
+      {isViewerOpen && (
+        <FileViewer onClose={() => closeFileViewer(isPreview)} />
+      )}
+
+      {/* Edit Chat Form */}
+      {isEditChatFormOpen && chatToEdit && (
+        <CreateChatForm
+          open={isEditChatFormOpen}
+          onClose={() => {
+            setIsEditChatFormOpen(false);
+            setChatToEdit(null); // Reset the chat to edit
+          }}
+          chat={chatToEdit} // Pass the chat data to prefill the form
+        />
+      )}
     </Box>
   );
 };

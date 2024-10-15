@@ -1,7 +1,10 @@
 // src/utils/cryptoUtils.ts
 
-import { encode as base64Encode, decode as base64Decode } from 'base64-arraybuffer';
-import { t } from 'i18next';
+import {
+  decode as base64Decode,
+  encode as base64Encode,
+} from "base64-arraybuffer";
+import { t } from "i18next";
 
 // Module-level instances
 const encoder = new TextEncoder();
@@ -10,15 +13,37 @@ const decoder = new TextDecoder();
 // Cache for derived keys
 const keyCache = new Map<string, CryptoKey>();
 
-const STORAGE_KEY = 'app_unique_identifier';
+const STORAGE_KEY = "app_unique_identifier";
 
-const getUniqueIdentifier = (): string => {
-  let uniqueId = localStorage.getItem(STORAGE_KEY);
-  if (!uniqueId) {
-    uniqueId = crypto.randomUUID();
-    localStorage.setItem(STORAGE_KEY, uniqueId);
+export const getUniqueIdentifier = (): string => {
+  try {
+    let uniqueId = localStorage.getItem(STORAGE_KEY);
+
+    if (!uniqueId) {
+      // Use crypto.randomUUID() if available, otherwise fallback to a custom UUID generator
+      uniqueId = crypto.randomUUID ? crypto.randomUUID() : generateUUID();
+      localStorage.setItem(STORAGE_KEY, uniqueId);
+    }
+
+    return uniqueId;
+  } catch (error) {
+    console.warn(
+      "LocalStorage or crypto.randomUUID is not available, generating a temporary UUID."
+    );
+    console.error(error);
+
+    // If localStorage fails or crypto.randomUUID is unavailable, generate a UUID
+    return crypto.randomUUID ? crypto.randomUUID() : generateUUID();
   }
-  return uniqueId;
+};
+
+// Fallback function to generate a UUID
+const generateUUID = (): string => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 };
 
 export const deriveKeyFromAuthState = async (
@@ -61,7 +86,7 @@ export const deriveKeyFromAuthState = async (
     return derivedKey;
   } catch (error) {
     console.error("Key derivation failed:", error);
-    throw new Error(t('encryption.keyDerivationFailed'));
+    throw new Error(t("encryption.keyDerivationFailed"));
   }
 };
 
@@ -84,7 +109,7 @@ export const encryptData = async (
     return base64Encode(combined);
   } catch (error) {
     console.error("Encryption failed:", error);
-    throw new Error(t('encryption.encryptionFailed'));
+    throw new Error(t("encryption.encryptionFailed"));
   }
 };
 
@@ -92,8 +117,8 @@ export const decryptData = async (
   data: string,
   key: CryptoKey
 ): Promise<string> => {
-  if (typeof data !== 'string') {
-    throw new TypeError(t('errors.invalidDataFormat'));
+  if (typeof data !== "string") {
+    throw new TypeError(t("errors.invalidDataFormat"));
   }
 
   try {
@@ -110,6 +135,6 @@ export const decryptData = async (
     return decoder.decode(decrypted);
   } catch (error) {
     console.error("Decryption failed:", error);
-    throw new Error(t('errors.decryptionFailed'));
+    throw new Error(t("errors.decryptionFailed"));
   }
 };

@@ -1,3 +1,5 @@
+# workerFtp.py
+
 import os
 
 from PyQt6.QtCore import QThread, pyqtSignal
@@ -53,7 +55,6 @@ class UploadDialog(QDialog):
         self.message_label = QLabel("")
         layout.addWidget(self.message_label)
         self.message_label.setWordWrap(True)  # Enable word wrapping for long messages
-
 
         self.progress_bar = QProgressBar()
         self.progress_bar.setVisible(False)
@@ -131,14 +132,13 @@ class UploadWorker(QThread):
     progress = pyqtSignal(str)
     error = pyqtSignal(str)
 
-
     def __init__(
         self,
         output_folder,
         tulero_ftp_info,
         tyre24_ftp_info,
-        upload_tulero,
-        upload_tyre24,
+        upload_tulero=True,
+        upload_tyre24=True,
     ):
         super().__init__()
         self.output_folder = output_folder

@@ -1,35 +1,34 @@
 // src/App.tsx
 import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import React, { lazy, Suspense, useEffect } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import {
   createBrowserRouter,
   Navigate,
   RouterProvider,
 } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
-import LoadingSpinner from "./components/common/LoadingSpinner";
+import Loader from "./components/common/Loader";
 import "./components/statistics/grids/AGGridTable.css"; // Import the custom AG Grid CSS
 import { getTimeMs } from "./config/config";
-import {
-  handleLogout,
-  selectIsLoggedIn,
-  selectUserRole,
-} from "./features/auth/authSlice";
+import { selectIsLoggedIn, selectUserRole } from "./features/auth/authSlice";
+import { handleLogout } from "./features/auth/authThunks";
 import { fetchUserById, setCurrentUser } from "./features/users/userSlice";
 import Layout from "./layout/Layout";
 import { UserRole } from "./models/entityModels";
-import LandingPage from "./pages/landing/LandingPage";
-import { refreshSession } from "./services/sessionService";
-import { initializeUserEncryption } from "./utils/cacheUtils";
-import { showToast } from "./utils/toastMessage";
+import StatisticsDashboard from "./pages/statistics/StatisticsDashboard";
+import { refreshAccessToken } from "./services/sessionService";
+import { showToast } from "./services/toastMessage";
+import {
+  cleanupStaleFiles,
+  enforceCacheSizeLimit,
+  initializeUserEncryption,
+} from "./utils/cacheUtils";
 /* console.log("Vite mode:", import.meta.env.MODE);
  */
 
 // Lazy load components for performance optimization
-const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
-const AgentDashboard = lazy(() => import("./pages/agent/AgentDashboard"));
-const ClientDashboard = lazy(() => import("./pages/client/ClientDashboard"));
+const LandingPage = lazy(() => import("./pages/landing/LandingPage"));
 const ArticlesPage = lazy(() => import("./pages/common/ArticlesPage"));
 const CalendarPage = lazy(() => import("./pages/common/CalendarPage"));
 const ChatPage = lazy(() => import("./pages/common/ChatPage"));
@@ -85,57 +84,44 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <LandingPage />,
+    element: (
+      <Suspense fallback={<Loader fadeout />}>
+        <LandingPage />
+      </Suspense>
+    ),
   },
   {
     path: "/",
     element: <Layout />,
     children: [
+      // Default Dashboard Route
       {
-        path: "agent-dashboard",
-        element: (
-          <ProtectedRoute requiredRoles={["agent"]}>
-            <Suspense fallback={<LoadingSpinner />}>
-              <AgentDashboard />
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "admin-dashboard",
-        element: (
-          <ProtectedRoute requiredRoles={["admin"]}>
-            <Suspense fallback={<LoadingSpinner />}>
-              <AdminDashboard />
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "client-dashboard",
-        element: (
-          <ProtectedRoute requiredRoles={["client"]}>
-            <Suspense fallback={<LoadingSpinner />}>
-              <ClientDashboard />
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "employee-dashboard",
+        path: "dashboard",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_UNPROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <EmployeeDashboard />
             </Suspense>
           </ProtectedRoute>
         ),
       },
+      // Statistics Route
+      {
+        path: "statistics",
+        element: (
+          <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
+            <Suspense fallback={<Loader fadeout />}>
+              <StatisticsDashboard />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      // Removed individual dashboard routes (agent-dashboard, admin-dashboard, client-dashboard)
       {
         path: "clients",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <ClientsPage />
             </Suspense>
           </ProtectedRoute>
@@ -145,7 +131,7 @@ const router = createBrowserRouter([
         path: "articles",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <ArticlesPage />
             </Suspense>
           </ProtectedRoute>
@@ -155,7 +141,7 @@ const router = createBrowserRouter([
         path: "movements",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <MovementsPage />
             </Suspense>
           </ProtectedRoute>
@@ -165,7 +151,7 @@ const router = createBrowserRouter([
         path: "messages",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_UNPROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <ChatPage />
             </Suspense>
           </ProtectedRoute>
@@ -175,7 +161,7 @@ const router = createBrowserRouter([
         path: "settings",
         element: (
           <ProtectedRoute>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <UserPage />
             </Suspense>
           </ProtectedRoute>
@@ -185,7 +171,7 @@ const router = createBrowserRouter([
         path: "visits",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <VisitsPage />
             </Suspense>
           </ProtectedRoute>
@@ -195,7 +181,7 @@ const router = createBrowserRouter([
         path: "promos",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_PROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <PromosPage />
             </Suspense>
           </ProtectedRoute>
@@ -205,17 +191,34 @@ const router = createBrowserRouter([
         path: "calendar",
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_UNPROTECTED_ROUTES}>
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<Loader fadeout />}>
               <CalendarPage />
             </Suspense>
           </ProtectedRoute>
         ),
+      },
+      // Redirect any unknown routes to /dashboard or another appropriate page
+      {
+        path: "*",
+        element: <Navigate to="/dashboard" replace />,
       },
     ],
   },
 ]);
 
 const theme = createTheme({
+  typography: {
+    fontFamily: [
+      "SF Pro Display",
+      "-apple-system",
+      "BlinkMacSystemFont",
+      '"Public Sans"',
+      "Roboto",
+      '"Helvetica Neue"',
+      "Arial",
+      "sans-serif",
+    ].join(","),
+  },
   palette: {
     background: {
       default: "#f4f6f8",
@@ -224,44 +227,67 @@ const theme = createTheme({
   },
 });
 
+// src/App.tsx
 function App() {
   const dispatch = useAppDispatch();
+  const [isInitializing, setIsInitializing] = useState(true); // Initialization state
 
   useEffect(() => {
     const initializeApp = async () => {
-      // Check if the auth state is present in the local storage
-      const localAuthState = localStorage.getItem("authState");
+      try {
+        await cleanupStaleFiles();
+      } catch (error) {
+        console.error("Error cleaning up stale files:", error);
+      }
 
-      // If the auth state is present and the user is logged in
-      if (localAuthState) {
+      try {
+        await enforceCacheSizeLimit();
+      } catch (error) {
+        console.error("Error enforcing cache size limit:", error);
+      }
+
+      try {
+        // Check if the auth state is present in the local storage
+        const localAuthState = localStorage.getItem("authState");
+        if (!localAuthState) {
+          // console.debug("No auth state found in local storage");
+          setIsInitializing(false); // Initialization complete
+          return;
+        }
+
         const storedAuthState = JSON.parse(localAuthState);
+
+        // console.debug("Auth state:", storedAuthState);
 
         // Check if user is logged in and has a valid role (not "guest")
         if (storedAuthState.isLoggedIn && storedAuthState.role !== "guest") {
+          /* console.debug(
+            "User is logged in and has a valid role, attempting to refresh session"
+          ); */
+
           // Attempt to refresh the session to validate and extend it on the server side
-          const refreshSuccessful = await refreshSession();
+          const refreshSuccessful = await refreshAccessToken();
 
           if (refreshSuccessful) {
             // Fetch current user data based on user ID stored in auth state
             if (storedAuthState.userId) {
-              // Fetch the current user and update userSlice
               try {
                 const user = await dispatch(
                   fetchUserById(storedAuthState.userId)
                 ).unwrap();
 
                 dispatch(setCurrentUser(user)); // Update the userSlice with the fetched user
+
                 // Derive and initialize the encryption key
                 const userId = user._id; // Assuming user._id is the unique identifier
 
                 // Initialize encryption using the custom utility
                 await initializeUserEncryption({
                   userId,
-                  timeMS,
+                  timeMS: timeMS, // Ensure this is set in your .env file
                 });
               } catch (error) {
                 console.error("Failed to fetch current user:", error);
-                showToast.error("Failed to initialize user data.");
                 dispatch(handleLogout()); // Force logout if fetching user fails
               }
             }
@@ -275,12 +301,24 @@ function App() {
           );
           dispatch(handleLogout()); // Ensure logout if role is invalid
         }
+      } catch (error) {
+        console.error("Initialization error:", error);
+        showToast.error("An error occurred during initialization.");
+        dispatch(handleLogout());
+      } finally {
+        setIsInitializing(false); // Mark initialization as complete
       }
     };
 
     initializeApp();
   }, [dispatch]);
 
+  // Conditional rendering based on initialization state
+  if (isInitializing) {
+    return <Loader fadeout={!isInitializing} />;
+  }
+
+  // Main application rendering after initialization
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

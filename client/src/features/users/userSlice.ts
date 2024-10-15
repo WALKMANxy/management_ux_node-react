@@ -4,7 +4,7 @@ import { WritableDraft } from "immer";
 import { createSelector } from "reselect";
 import { RootState } from "../../app/store";
 import { User } from "../../models/entityModels";
-import { getAllUsers, getUsersByBatchIds } from "./api/users";
+import { deleteUserById, getAllUsers, getUsersByBatchIds } from "./api/users";
 import { userApi } from "./userQueries";
 
 // Define the initial state
@@ -86,6 +86,21 @@ export const getAllUsersThunk = createAsyncThunk<User[], void>(
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : "Failed to fetch users"
+      );
+    }
+  }
+);
+
+// Async thunk to delete a user by ID
+export const deleteUserByIdThunk = createAsyncThunk(
+  "users/deleteUserById",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      await deleteUserById(id); // Call the API to delete the user
+      return id; // Return the user ID to be removed from the state
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to delete user"
       );
     }
   }
@@ -206,6 +221,19 @@ const userSlice = createSlice({
         }
       })
       .addCase(updateUserById.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      })
+      .addCase(deleteUserByIdThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(deleteUserByIdThunk.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        const userId = action.payload;
+        delete state.users[userId]; // Remove the deleted user from the state
+      })
+      .addCase(deleteUserByIdThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
       });

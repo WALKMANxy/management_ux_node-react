@@ -1,1181 +1,269 @@
 {
-    "welcome": "Willkommen",
+  "footer": {
+    "about": "Über uns",
+    "ourStory": "Unsere Geschichte",
+    "team": "Team",
+    "followUs": "Folge uns",
+    "facebook": "Folge uns auf Facebook",
+    "instagram": "Folge uns auf Instagram",
+    "legal": "Rechtliches",
+    "privacyPolicy": "Datenschutzrichtlinie",
+    "termsOfService": "Nutzungsbedingungen",
+    "close": "Schließen",
+    "hours": "Stunden"
+  },
+  "ourStory": {
+    "title": "Unsere Geschichte",
+    "content": {
+      "part1": "<0>Ricambi Centro Sud S.r.l.</0> ist in den Bereichen Nutzfahrzeuge, Busse, Lastwagen und Autoteile für Diesel- und Benzinmotoren tätig und befasst sich auch mit Karosserien sowie Industrie-, Landwirtschafts-, Schiffs- und Eisenbahnfahrzeugen. Seit 1995 in Catania bietet das Unternehmen Dienstleistungen bei der Auswahl und dem Verkauf der angebotenen Produkte mit Professionalität und Kompetenz an und erfüllt die Bedürfnisse von öffentlichen und privaten Einrichtungen, Ersatzteilhändlern, Pumpenspezialisten, Mechanikern und Elektrikern.",
+      "part2": "Das Unternehmen, das sich derzeit im Wachstum befindet, möchte diesen zunehmend kompetenten und effektiven Service direkt an Privatpersonen anbieten und Lösungen für große und kleine Fahrzeugprobleme anbieten. Sie finden qualifiziertes Personal, das sich kontinuierlich weiterbildet, in der Lage ist, das Problem zu analysieren und Beratung zu den richtigen Alternativen anzubieten. Sie können von Hauslieferungen und einem umfassenden 360-Grad-Service profitieren.",
+      "part3": "Das Unternehmen ist ein Vertriebspartner von Original-Ersatzteilmarken sowie von offiziell wiederaufbereiteten Produkten direkt vom Hersteller. Die Qualität des Services im Vergleich zum Preis, der qualifizierte technische Bereich und das Management/Projekt über den einfachen Direktverkauf hinaus sind die drei starken und unverwechselbaren Punkte von Ricambi Centro Sud S.r.l. Der technische Bereich, ausgestattet mit Werkzeugen und kontinuierlicher Schulung, fördert das funktionale Netzwerk in der Region und gewährleistet Updates und After-Sales-Support für die Kunden.",
+      "part4": "<0>Ein Unternehmen, das seinen offenen und familiären Charakter nicht verloren hat</0>, aber heute stark expandiert und sich neuen Herausforderungen stellt. Die neue Struktur, die sich über 3.800 m² auf drei Ebenen erstreckt, darunter Büros, Lager und Verkaufsstelle, mit insgesamt 25 Mitarbeitern, ist in der Lage, in verschiedenen Fachgebieten auf dem Territorium Dienstleistungen zu gewährleisten, dank spezialisierter Verkaufsagenten nach Produkttyp und Marke."
+    }
+  },
+  "welcome": "Willkommen",
+  "login": "Anmelden",
+  "statistics": "Statistiken",
+  "alerts": "Warnungen",
+  "details": {
+    "name": "Name",
+    "phone": "Telefon",
+    "totalRevenue": "Gesamterlös",
+    "extendedName": "Erweiterter Name",
+    "pec": "PEC",
+    "extendedTaxCode": "Erweiterter Steuercode",
+    "paymentMethod": "Zahlungsmethode",
+    "province": "Provinz",
+    "totalOrders": "Gesamtbestellungen",
+    "unpaidRevenue": "Unbezahlter Erlös",
+    "email": "E-Mail",
+    "taxCode": "Steuercode",
+    "paymentMethodID": "Zahlungsmethoden-ID",
+    "address": "Adresse",
+    "agentName": "Agentenname",
+    "labels": {
+      "call": "Anrufen",
+      "email": "E-Mail senden",
+      "viewOnMap": "Auf Karte anzeigen",
+      "unknownSender": "Unbekannter Absender"
+    }
+  },
+  "promotions": {
+    "activePromotionsFor": "Aktive Aktionen für",
+    "activePromotionsWithClients": "Aktive Aktionen mit Ihren Kunden",
+    "promo1": "Aktion 1",
+    "promo2": "Aktion 2",
+    "promo3": "Aktion 3",
+    "viewMore": "Mehr anzeigen"
+  },
+  "globalSearch": {
+    "placeholder": "Suche..."
+  },
+  "monthOverMonthSpendingTrend": {
+    "title": "Monatlicher Trend",
+    "revenue": "Erlös",
+    "expense": "Ausgabe"
+  },
+  "salesDistribution": {
+    "title": "Vertriebsverteilung",
+    "revenue": "Erlös",
+    "viewClients": "Kunden anzeigen",
+    "viewAgents": "Agenten anzeigen",
+    "clients": "Kunden",
+    "agents": "Agenten"
+  },
+  "topBrandsSold": {
+    "titleAgent": "Top verkaufte Marken",
+    "titleClient": "Top gekaufte Marken",
+    "brandLabel": "Marke"
+  },
+  "clientList": {
+    "title": "Kundenliste",
+    "quickFilterPlaceholder": "Kunden suchen...",
+    "quickFilterAriaLabel": "Schnellfilter für die Kundenliste.",
+    "exportCSV": "Als CSV exportieren",
+    "startDate": "Startdatum",
+    "endDate": "Enddatum",
+    "expand": "Kundenliste erweitern.",
+    "collapse": "Kundenliste reduzieren.",
+    "options": "Optionen",
+    "startDateAriaLabel": "Startdatumsfilter für die Kundenliste.",
+    "endDateAriaLabel": "Enddatumsfilter für die Kundenliste.",
+    "noClients": "Keine Kunden gefunden."
+  },
+  "movementsHistory": {
+    "date": "Datum",
+    "client": "Kunde",
+    "brand": "Marke",
+    "oemId": "OEM ID",
+    "name": "Name",
+    "revenue": "Erlös",
+    "cost": "Kosten",
+    "quantity": "Menge",
+    "unitPrice": "Stückpreis"
+  },
+  "movementDetailHistory": {
+    "articleId": "ID",
+    "name": "Name",
+    "brand": "Marke",
+    "quantity": "Menge",
+    "unitPrice": "Stückpreis",
+    "priceSold": "Verkauft für",
+    "priceBought": "Gekauft für"
+  },
+  "agentDashboard": {
+    "welcomeBack": "Willkommen zurück, {{name}}",
+    "statisticsFor": "Statistiken für {{name}}",
+    "yourStatistics": "Ihre Statistiken",
+    "calendar": "Kalender",
+    "viewMore": "Mehr anzeigen",
+    "totalEarning": "Gesamteinnahmen",
+    "spentThisMonth": "In diesem Monat ausgegeben",
+    "spentThisYear": "In diesem Jahr ausgegeben",
+    "topArticleType": "Meistgekaufte Artikel",
+    "monthOverMonthSpendingTrend": "Monatlicher Ausgaben-Trend",
+    "topBrandsSold": "Top verkaufte Marken",
+    "salesDistribution": "Vertriebsverteilung durch Kunden",
+    "upcomingVisits": "Bevorstehende Besuche für {{name}}"
+  },
+  "clientsPage": {
+    "name": "Name",
+    "province": "Provinz",
+    "phone": "Telefonnummer",
+    "netRevenueThisMonth": "Nettoumsatz in diesem Monat",
+    "totalOrders": "Bestellungen",
+    "totalNetRevenue": "Nettoumsatz",
+    "ordersThisMonth": "Bestellungen in diesem Monat",
+    "totalRevenue": "Gesamterlös",
+    "revenueThisMonth": "Erlös in diesem Monat",
+    "unpaidRevenue": "Unbezahlter Erlös",
+    "paymentMethod": "Zahlungsmethode",
+    "id": "ID",
+    "address": "Adresse",
+    "agent": "Agent"
+  },
+  "landingPage": {
+    "welcome": "Willkommen zurück, {name}",
     "login": "Anmelden",
-    "statistics": "Statistiken",
-    "alerts": "Warnungen",
-    "details": {
-      "name": "Name",
-      "phone": "Telefon",
-      "totalRevenue": "Gesamterlös",
-      "extendedName": "Erweiterter Name",
-      "pec": "PEC",
-      "extendedTaxCode": "Erweiterter Steuercode",
-      "paymentMethod": "Zahlungsmethode",
-      "province": "Provinz",
-      "totalOrders": "Gesamtbestellungen",
-      "unpaidRevenue": "Unbezahlter Erlös",
-      "email": "E-Mail",
-      "taxCode": "Steuercode",
-      "paymentMethodID": "Zahlungsmethoden-ID",
-      "address": "Adresse",
-      "agentName": "Agentenname",
-      "labels": {
-        "call": "Anrufen",
-        "email": "E-Mail senden",
-        "viewOnMap": "Auf Karte anzeigen",
-        "unknownSender": "Unbekannter Absender"
-      }
-    },
-    "promotions": {
-      "activePromotionsFor": "Aktive Aktionen für",
-      "activePromotionsWithClients": "Aktive Aktionen mit Ihren Kunden",
-      "promo1": "Aktion 1",
-      "promo2": "Aktion 2",
-      "promo3": "Aktion 3",
-      "viewMore": "Mehr anzeigen"
-    },
-    "globalSearch": {
-      "placeholder": "Suche..."
-    },
-    "monthOverMonthSpendingTrend": {
-      "title": "Monatlicher Trend",
-      "revenue": "Erlös",
-      "expense": "Ausgabe"
-    },
-    "salesDistribution": {
-      "title": "Vertriebsverteilung",
-      "revenue": "Erlös",
-      "viewClients": "Kunden anzeigen",
-      "viewAgents": "Agenten anzeigen",
-      "clients": "Kunden",
-      "agents": "Agenten"
-    },
-    "topBrandsSold": {
-      "titleAgent": "Top verkaufte Marken",
-      "titleClient": "Top gekaufte Marken",
-      "brandLabel": "Marke"
-    },
-    "clientList": {
-      "title": "Kundenliste",
-      "quickFilterPlaceholder": "Kunden suchen...",
-      "quickFilterAriaLabel": "Schnellfilter für die Kundenliste.",
-      "exportCSV": "Als CSV exportieren",
-      "startDate": "Startdatum",
-      "endDate": "Enddatum",
-      "expand": "Kundenliste erweitern.",
-      "collapse": "Kundenliste reduzieren.",
-      "options": "Optionen",
-      "startDateAriaLabel": "Startdatumsfilter für die Kundenliste.",
-      "endDateAriaLabel": "Enddatumsfilter für die Kundenliste.",
-      "noClients": "Keine Kunden gefunden."
-    },
-    "movementsHistory": {
-      "date": "Datum",
-      "client": "Kunde",
-      "brand": "Marke",
-      "oemId": "OEM ID",
-      "name": "Name",
-      "revenue": "Erlös",
-      "cost": "Kosten",
-      "quantity": "Menge",
-      "unitPrice": "Stückpreis"
-    },
-    "movementDetailHistory": {
-      "articleId": "ID",
-      "name": "Name",
-      "brand": "Marke",
-      "quantity": "Menge",
-      "unitPrice": "Stückpreis",
-      "priceSold": "Verkauft für",
-      "priceBought": "Gekauft für"
-    },
-    "agentDashboard": {
-      "welcomeBack": "Willkommen zurück, {{name}}",
-      "statisticsFor": "Statistiken für {{name}}",
-      "yourStatistics": "Ihre Statistiken",
-      "calendar": "Kalender",
-      "viewMore": "Mehr anzeigen",
-      "totalEarning": "Gesamteinnahmen",
-      "spentThisMonth": "In diesem Monat ausgegeben",
-      "spentThisYear": "In diesem Jahr ausgegeben",
-      "topArticleType": "Meistgekaufte Artikel",
-      "monthOverMonthSpendingTrend": "Monatlicher Ausgaben-Trend",
-      "topBrandsSold": "Top verkaufte Marken",
-      "salesDistribution": "Vertriebsverteilung durch Kunden",
-      "upcomingVisits": "Bevorstehende Besuche für {{name}}"
-    },
-    "clientsPage": {
-      "name": "Name",
-      "province": "Provinz",
-      "phone": "Telefonnummer",
-      "netRevenueThisMonth": "Nettoumsatz in diesem Monat",
-      "totalOrders": "Bestellungen",
-      "totalNetRevenue": "Nettoumsatz",
-      "ordersThisMonth": "Bestellungen in diesem Monat",
-      "totalRevenue": "Gesamterlös",
-      "revenueThisMonth": "Erlös in diesem Monat",
-      "unpaidRevenue": "Unbezahlter Erlös",
-      "paymentMethod": "Zahlungsmethode",
-      "id": "ID",
-      "address": "Adresse",
-      "agent": "Agent"
-    },
-    "landingPage": {
-      "welcome": "Willkommen zurück, {name}",
-      "login": "Anmelden",
-      "enter": "Eintreten",
-      "userRole": "Benutzerrolle",
-      "admin": "Administrator",
-      "agent": "Agent",
-      "client": "Kunde",
-      "selectAgent": "Agent auswählen",
-      "selectClient": "Kunde auswählen",
-      "facebook": "Facebook",
-      "instagram": "Instagram",
-      "googleMaps": "Google Maps",
-      "linkedIn": "LinkedIn",
-      "workingHours": "Mo - Fr, 8:30 - 13:00 und 14:30 - 18:30",
-      "address": "Via Alessandro Volta 17, Catania",
-      "phone": "Telefon",
-      "email": "E-Mail",
-      "vat": "USt-IdNr.",
-      "credits": "Credits: @2024"
-    },
+    "enter": "Eintreten",
+    "userRole": "Benutzerrolle",
+    "admin": "Administrator",
+    "agent": "Agent",
+    "client": "Kunde",
+    "selectAgent": "Agent auswählen",
+    "selectClient": "Kunde auswählen",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "googleMaps": "Google Maps",
+    "linkedIn": "LinkedIn",
+    "workingHours": "Mo - Fr, 8:30 - 13:00 und 14:30 - 18:30",
+    "address": "Via Alessandro Volta 17, Catania",
+    "phone": "Telefon",
+    "email": "E-Mail",
+    "vat": "USt-IdNr.",
+    "credits": "Credits: @2024"
+  },
+  "reasons": {
+    "company_party": "Firmenfeier",
+    "conference": "Konferenz",
+    "expo": "Expo",
+    "illness": "Krankheit",
+    "day_off": "Freier Tag",
+    "public_holiday": "Feiertag",
+    "Issue": "Problem",
+    "Routine": "Routine",
+    "New Client": "Neuer Kunde",
+    "unexpected_event": "Unerwartetes Ereignis",
+    "company_meeting": "Firmenbesprechung",
+    "medical_visit": "Arztbesuch"
+  },
+  "confirmDialog": {
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "defaultTitle": "Bist du sicher?",
+    "defaultMessage": "Bitte bestätigen Sie Ihre Aktion.",
+    "deleteEvent": "Ereignis löschen?"
+  },
+  "articleDetail": {
+    "id": "ID",
+    "name": "Name",
+    "brand": "Marke",
+    "quantity": "Menge",
+    "unitPrice": "Preis pro Artikel",
+    "priceSold": "Verkauft für",
+    "priceBought": "Gekauft für"
+  },
+  "articleDetails": {
+    "title": "Artikeldetails",
+    "noHistory": "Keine Historie verfügbar"
+  },
+  "calendarEvent": {
+    "unknown": "Unbekannt",
     "reasons": {
+      "illness": "Krankheit",
+      "day_off": "Freier Tag",
+      "unexpected_event": "Unerwartetes Ereignis",
+      "medical_visit": "Arztbesuch",
+      "public_holiday": "Feiertag",
+      "company_holiday": "Firmenfeiertag",
+      "company_meeting": "Firmenbesprechung",
       "company_party": "Firmenfeier",
       "conference": "Konferenz",
       "expo": "Expo",
+      "generic": "Allgemein"
+    }
+  },
+  "customToolbar": {
+    "today": "Heute",
+    "previous": "Vorherige",
+    "next": "Nächste",
+    "view": {
+      "month": "Monat",
+      "week": "Woche",
+      "day": "Tag"
+    }
+  },
+  "eventForm": {
+    "title": "Neues Ereignis erstellen",
+    "editTitle": "Ereignis bearbeiten",
+    "titleMarkAbsence": "Abwesenheit markieren",
+    "labels": {
+      "startTime": "Startzeit",
+      "endTime": "Endzeit",
+      "eventType": "Ereignistyp",
+      "reason": "Grund",
+      "note": "Notiz (Optional)",
+      "cancel": "Abbrechen",
+      "create": "Erstellen"
+    },
+    "options": {
+      "absence": "Abwesenheit",
+      "event": "Ereignis",
+      "holiday": "Feiertag"
+    },
+    "reasons": {
       "illness": "Krankheit",
       "day_off": "Freier Tag",
-      "public_holiday": "Feiertag",
-      "Issue": "Problem",
-      "Routine": "Routine",
-      "New Client": "Neuer Kunde",
       "unexpected_event": "Unerwartetes Ereignis",
+      "medical_visit": "Arztbesuch",
+      "public_holiday": "Feiertag",
+      "company_holiday": "Firmenfeiertag",
       "company_meeting": "Firmenbesprechung",
-      "medical_visit": "Arztbesuch"
+      "company_party": "Firmenfeier",
+      "conference": "Konferenz",
+      "expo": "Expo",
+      "generic": "Allgemein"
     },
-    "confirmDialog": {
-      "cancel": "Abbrechen",
-      "confirm": "Bestätigen",
-      "defaultTitle": "Bist du sicher?",
-      "defaultMessage": "Bitte bestätigen Sie Ihre Aktion.",
-      "deleteEvent": "Ereignis löschen?"
-    },
-    "articleDetail": {
-      "id": "ID",
-      "name": "Name",
-      "brand": "Marke",
-      "quantity": "Menge",
-      "unitPrice": "Preis pro Artikel",
-      "priceSold": "Verkauft für",
-      "priceBought": "Gekauft für"
-    },
-    "articleDetails": {
-      "title": "Artikeldetails",
-      "noHistory": "Keine Historie verfügbar"
-    },
-    "calendarEvent": {
-      "unknown": "Unbekannt",
-      "reasons": {
-        "illness": "Krankheit",
-        "day_off": "Freier Tag",
-        "unexpected_event": "Unerwartetes Ereignis",
-        "medical_visit": "Arztbesuch",
-        "public_holiday": "Feiertag",
-        "company_holiday": "Firmenfeiertag",
-        "company_meeting": "Firmenbesprechung",
-        "company_party": "Firmenfeier",
-        "conference": "Konferenz",
-        "expo": "Expo",
-        "generic": "Allgemein"
-      }
-    },
-    "customToolbar": {
-      "today": "Heute",
-      "previous": "Vorherige",
-      "next": "Nächste",
-      "view": {
-        "month": "Monat",
-        "week": "Woche",
-        "day": "Tag"
-      }
-    },
-    "eventForm": {
-      "title": "Neues Ereignis erstellen",
-      "editTitle": "Ereignis bearbeiten",
-      "titleMarkAbsence": "Abwesenheit markieren",
-      "labels": {
-        "startTime": "Startzeit",
-        "endTime": "Endzeit",
-        "eventType": "Ereignistyp",
-        "reason": "Grund",
-        "note": "Notiz (Optional)",
-        "cancel": "Abbrechen",
-        "create": "Erstellen"
-      },
-      "options": {
-        "absence": "Abwesenheit",
-        "event": "Ereignis",
-        "holiday": "Feiertag"
-      },
-      "reasons": {
-        "illness": "Krankheit",
-        "day_off": "Freier Tag",
-        "unexpected_event": "Unerwartetes Ereignis",
-        "medical_visit": "Arztbesuch",
-        "public_holiday": "Feiertag",
-        "company_holiday": "Firmenfeiertag",
-        "company_meeting": "Firmenbesprechung",
-        "company_party": "Firmenfeier",
-        "conference": "Konferenz",
-        "expo": "Expo",
-        "generic": "Allgemein"
-      },
-      "validation": {
-        "startTimeRequired": "Startzeit ist erforderlich",
-        "endTimeRequired": "Endzeit ist erforderlich",
-        "eventTypeRequired": "Ereignistyp ist erforderlich",
-        "reasonRequired": "Grund ist erforderlich",
-        "dateTooFar": "Sie können kein Abwesenheitsdatum wählen, das weiter als zwei Monate von heute entfernt ist. Bitte wählen Sie ein Abwesenheitsdatum vor {{date}}."
-      },
-      "tooltips": {
-        "cancel": "Abbrechen",
-        "create": "Ereignis erstellen"
-      },
-      "eventHistory": {
-        "title": "Ereignishistorie",
-        "headers": {
-          "user": "Benutzer",
-          "eventType": "Ereignistyp",
-          "reason": "Grund",
-          "startDate": "Startdatum",
-          "endDate": "Enddatum",
-          "status": "Status",
-          "actions": "Aktionen"
-        },
-        "unknown": "Unbekannt",
-        "na": "Nicht verfügbar",
-        "eventTypes": {
-          "absence": "Abwesenheit",
-          "event": "Ereignis",
-          "holiday": "Feiertag",
-          "generic": "Allgemein"
-        },
-        "reasons": {
-          "illness": "Krankheit",
-          "day_off": "Freier Tag",
-          "unexpected_event": "Unerwartetes Ereignis",
-          "medical_visit": "Arztbesuch",
-          "company_meeting": "Firmenbesprechung",
-          "company_party": "Firmenfeier",
-          "conference": "Konferenz",
-          "expo": "Expo",
-          "generic": "Allgemein"
-        },
-        "statuses": {
-          "pending": "Ausstehend",
-          "approved": "Genehmigt",
-          "rejected": "Abgelehnt",
-          "cancelled": "Storniert"
-        },
-        "actions": {
-          "na": "Nicht verfügbar"
-        },
-        "tooltips": {
-          "approve": "Ereignis genehmigen",
-          "reject": "Ereignis ablehnen"
-        },
-        "toast": {
-          "approveSuccess": "Ereignis erfolgreich genehmigt!",
-          "approveFailure": "Ereignis konnte nicht genehmigt werden",
-          "rejectSuccess": "Ereignis erfolgreich abgelehnt!",
-          "rejectFailure": "Ereignis konnte nicht abgelehnt werden",
-          "genericError": "Ein unerwarteter Fehler ist aufgetreten"
-        }
-      }
-    },
-    "eventTitle": {
-      "unknown": "Unbekannt",
-      "reasons": {
-        "illness": "Krankheit",
-        "day_off": "Freier Tag",
-        "unexpected_event": "Unerwartetes Ereignis",
-        "medical_visit": "Arztbesuch",
-        "public_holiday": "Feiertag",
-        "company_holiday": "Firmenfeiertag",
-        "company_meeting": "Firmenbesprechung",
-        "company_party": "Firmenfeier",
-        "conference": "Konferenz",
-        "expo": "Expo",
-        "generic": "Allgemein"
-      },
-      "tooltips": {
-        "illness": "Grund: Krankheit",
-        "day_off": "Grund: Freier Tag",
-        "unexpected_event": "Grund: Unerwartetes Ereignis",
-        "medical_visit": "Grund: Arztbesuch",
-        "public_holiday": "Grund: Feiertag",
-        "company_holiday": "Grund: Firmenfeiertag",
-        "company_meeting": "Grund: Firmenbesprechung",
-        "company_party": "Grund: Firmenfeier",
-        "conference": "Grund: Konferenz",
-        "expo": "Grund: Expo",
-        "generic": "Grund: Allgemein",
-        "unknown": "Unbekannte Entität"
-      }
-    },
-    "popOverEvent": {
-      "type": "Typ",
-      "reason": "Grund",
-      "note": "Notiz",
-      "unknown": "Unbekannt",
-      "visit": "Besuch",
-      "issue": "Problem",
-      "routine": "Routine",
-      "newClient": "Neuer Kunde",
-      "edit": "Ereignis bearbeiten",
-      "delete": "Ereignis löschen",
-      "status": "Status",
-      "startsAt": "Beginnt um",
-      "endsAt": "Endet um"
-    },
-    "eventTypes": {
-      "absence": "Abwesenheit",
-      "holiday": "Feiertag",
-      "event": "Ereignis",
-      "generic": "Allgemein",
-      "visit": "Besuch"
-    },
-    "chatList": {
-      "noChatsFound": "Keine Chats gefunden.",
-      "noMessages": "Keine Nachrichten",
-      "na": "Nicht verfügbar"
-    },
-    "chatSidebar": {
-      "labels": {
-        "chats": "Chats",
-        "contacts": "Kontakte"
-      },
-      "tooltips": {
-        "refreshContacts": "Kontakte aktualisieren",
-        "showChats": "Chats anzeigen",
-        "showContacts": "Kontakte anzeigen"
-      },
-      "placeholders": {
-        "searchChats": "Chats suchen...",
-        "searchContacts": "Kontakte suchen..."
-      }
-    },
-    "chatView": {
-      "labels": {
-        "noChatSelected": "Kein Chat ausgewählt. Bitte wählen Sie einen Chat aus, um ihn anzuzeigen.",
-        "type": "Typ",
-        "reason": "Grund",
-        "note": "Notiz",
-        "moreOptions": "Mehr Optionen"
-      },
-      "tooltips": {
-        "backToChats": "Zurück zu Chats",
-        "moreOptions": "Mehr Optionen"
-      },
-      "menuOptions": {
-        "mute": "Chat stummschalten",
-        "block": "Benutzer blockieren",
-        "report": "Chat melden",
-        "delete": "Chat löschen",
-        "archive_chat": "Chat archivieren"
-      }
-    },
-    "contactsList": {
-      "labels": {
-        "unknownContact": "Unbekannter Kontakt",
-        "contact": "Kontakt",
-        "selectContact": "Kontakt auswählen"
-      },
-      "messages": {
-        "noContactsFound": "Keine Kontakte gefunden. Versuchen Sie, Ihre Suche anzupassen.",
-        "promoMessage": "Sie sind berechtigt für eine neue Aktion!\n\nTyp: {{promoType}}\nName: {{promoName}}\nAngebot: {{promoDiscount}}\n\nKontaktieren Sie einen unserer Vertreter für weitere Informationen. Einen schönen Tag!",
-        "visitMessage": "Ein neuer Besuch wurde für Sie geplant!\n\nTyp: {{visitType}}\nGrund: {{visitReason}}\nDatum: {{visitDate}}\n\nBitte seien Sie vorbereitet. Danke!"
-      }
-    },
-    "dateDivider": {
-      "labels": {
-        "dateDivider": "{{date}}"
-      }
-    },
-    "inputBox": {
-      "labels": {
-        "chatInput": "Chat-Eingabefeld",
-        "message": "Nachricht",
-        "alert": "Warnung",
-        "promo": "Aktion",
-        "visit": "Besuch"
-      },
-      "tooltips": {
-        "selectMessageType": "Nachrichtentyp auswählen",
-        "sendMessage": "Nachricht senden"
-      },
-      "placeholders": {
-        "typeMessage": "Geben Sie eine Nachricht ein..."
-      }
-    },
-    "messageBubble": {
-      "labels": {
-        "unknownSender": "Unbekannter Absender"
-      }
-    },
-    "labels": {
-      "chatInput": "Chat-Eingabefeld",
-      "message": "Nachricht",
-      "alert": "Warnung",
-      "promo": "Aktion",
-      "visit": "Besuch"
+    "validation": {
+      "startTimeRequired": "Startzeit ist erforderlich",
+      "endTimeRequired": "Endzeit ist erforderlich",
+      "eventTypeRequired": "Ereignistyp ist erforderlich",
+      "reasonRequired": "Grund ist erforderlich",
+      "dateTooFar": "Sie können kein Abwesenheitsdatum wählen, das weiter als zwei Monate von heute entfernt ist. Bitte wählen Sie ein Abwesenheitsdatum vor {{date}}."
     },
     "tooltips": {
-      "selectMessageType": "Nachrichtentyp auswählen",
-      "sendMessage": "Nachricht senden"
-    },
-    "messageStatus": {
-      "sent": "Gesendet",
-      "delivered": "Zugestellt",
-      "read": "Gelesen",
-      "pending": "Ausstehend"
-    },
-    "clientDetails": {
-      "title": "Kundendetails",
-      "expand": "Details erweitern",
-      "collapse": "Details reduzieren",
-      "noClientSelected": "Kein Kunde ausgewählt."
-    },
-    "activePromotions": {
-      "title": "Aktive Aktionen",
-      "noActivePromotions": "Keine aktiven Aktionen.",
-      "endsAt": "Endet am",
-      "viewAllPromotions": "Alle Aktionen anzeigen"
-    },
-    "agentActivity": {
-      "title": "Letzte Aktivitäten",
-      "noRecentActivities": "Keine aktuellen Aktivitäten.",
-      "occurredAt": "Aufgetreten am",
-      "viewAllPromotions": "Alle Aktionen anzeigen"
-    },
-    "calendarComponent": {
-      "recentActivity": "Letzte Aktivitäten",
-      "selectVisit": "Besuch auswählen",
-      "noVisits": "Keine verfügbaren Besuche.",
-      "close": "Schließen",
-      "occurredAt": "Aufgetreten am"
-    },
-    "spentThisMonth": {
-      "titleAgent": "In diesem Monat verdient",
-      "titleClient": "In diesem Monat ausgegeben",
-      "iconAlt": "Geld-Symbol",
-      "more": "mehr",
-      "neutral": "neutral",
-      "less": "weniger",
-      "even": "gleich",
-      "comparedToOtherAgents": "im Vergleich zum Durchschnitt.",
-      "comparedToOtherClients": "im Vergleich zum Durchschnitt."
-    },
-    "spentThisYear": {
-      "titleAgent": "In diesem Jahr verdient",
-      "titleClient": "In diesem Jahr ausgegeben",
-      "iconAlt": "Geldbeutel-Symbol",
-      "more": "mehr",
-      "neutral": "neutral",
-      "less": "weniger",
-      "even": "gleich",
-      "comparedToOtherAgents": "im Vergleich zum Durchschnitt.",
-      "comparedToOtherClients": "im Vergleich zum Durchschnitt."
-    },
-    "topArticleType": {
-      "titleAgent": "Top verkauft",
-      "titleClient": "Top gekauft",
-      "amountPurchased": "Gekaufte Menge",
-      "iconAlt": "Symbol, das den Top-Artikeltyp darstellt"
-    },
-    "totalOrder": {
-      "month": "Monat",
-      "year": "Jahr",
-      "ordersThisMonth": "Bestellungen in diesem Monat",
-      "totalOrders": "Bestellungen in diesem Jahr",
-      "iconAlt": "Bestellungen-Symbol"
-    },
-    "upcomingVisits": {
-      "title": "Bevorstehende Besuche",
-      "visitType": "Typ",
-      "visitReason": "Grund",
-      "clientId": "Kunden-ID",
-      "noProgrammedVisits": "Keine bevorstehenden Besuche geplant.",
-      "viewDetails": "Details anzeigen",
-      "viewAllVisits": "Alle Besuche anzeigen",
-      "iconAlt": "Bevorstehende Besuche-Symbol"
-    },
-    "errorBoundary": {
-      "title": "Hoppla! Etwas ist schief gelaufen.",
-      "message": "Wir entschuldigen uns für die Unannehmlichkeiten. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support, wenn das Problem weiterhin besteht.",
-      "backToHome": "Zurück zur Startseite"
-    },
-    "headerDashboard": "Dashboard",
-    "movements": "Bewegungen",
-    "clients": "Kunden",
-    "articles": "Artikel",
-    "visits": "Besuche",
-    "promos": "Aktionen",
-    "calendar": "Kalender",
-    "logout": "Abmelden",
-    "search": "Suche",
-    "notifications": "Benachrichtigungen",
-    "no_notifications": "Keine neuen Benachrichtigungen",
-    "no_messages": "Keine Nachrichten",
-    "loggingOut": "Abmelden...",
-    "userAvatar": {
-      "defaultUser": "Benutzer",
-      "chats": "Chats",
-      "settings": "Einstellungen",
-      "logout": "Abmelden"
-    },
-    "auth": {
-      "signIn": "Anmelden",
-      "register": "Registrieren",
-      "continueToApp": "Weiter zu {{appName}}",
-      "email": "E-Mail",
-      "password": "Passwort",
-      "keepMeSignedIn": "Angemeldet bleiben",
-      "recommendedOnTrustedDevices": "Empfohlen auf vertrauenswürdigen Geräten",
-      "enterPassword": "Geben Sie Ihr Passwort ein",
-      "forgotPassword": "Passwort vergessen?",
-      "newToApp": "Neu bei {{appName}}?",
-      "createAccount": "Ein Konto erstellen",
-      "alreadyHaveAccount": "Haben Sie bereits ein Konto?",
-      "hidePassword": "Passwort verbergen",
-      "showPassword": "Passwort anzeigen",
-      "continueWithGoogle": "Mit Google fortfahren",
-      "resetPassword": "Passwort zurücksetzen",
-      "resetInstructions": "Wenn Sie Ihr Passwort vergessen haben, können Sie es zurücksetzen, indem Sie Ihre E-Mail eingeben.",
-      "requestResetCode": "Zurücksetzcode anfordern",
-      "verifyCode": "Code verifizieren",
-      "newPassword": "Neues Passwort",
-      "confirmPassword": "Passwort bestätigen",
-      "updatePassword": "Passwort aktualisieren",
-      "passwordUppercaseError": "Das Passwort muss mindestens einen Großbuchstaben enthalten.",
-      "passwordLowercaseError": "Das Passwort muss mindestens einen Kleinbuchstaben enthalten.",
-      "passwordNumberError": "Das Passwort muss mindestens eine Zahl enthalten.",
-      "passwordSpecialCharError": "Das Passwort muss mindestens ein Sonderzeichen enthalten.",
-      "resetCodeSent": "Wenn ein Konto mit dieser E-Mail existiert, wurde ein Zurücksetzcode gesendet.",
-      "requestResetFailed": "Zurücksetzen des Passworts fehlgeschlagen. Bitte versuchen Sie es erneut.",
-      "codeVerified": "Code erfolgreich verifiziert. Bitte setzen Sie ein neues Passwort.",
-      "invalidCode": "Ungültiger oder abgelaufener Code. Bitte versuchen Sie es erneut.",
-      "passwordsDoNotMatch": "Passwörter stimmen nicht überein. Bitte versuchen Sie es erneut.",
-      "passwordUpdated": "Passwort erfolgreich aktualisiert. Sie können sich jetzt anmelden.",
-      "updatePasswordFailed": "Passwort konnte nicht aktualisiert werden. Bitte überprüfen Sie Ihre Eingaben.",
-      "enterEmail": "Geben Sie Ihre E-Mail ein",
-      "enterNewPassword": "Geben Sie Ihr neues Passwort ein",
-      "enterVerificationCode": "Geben Sie den in Ihrer E-Mail bereitgestellten Verifizierungscode ein",
-      "passwordUpdatedToast": "Passwort erfolgreich aktualisiert. Sie können sich jetzt anmelden!",
-      "registrationSuccess": "Registrierung erfolgreich!",
-      "registrationFailed": "Registrierung fehlgeschlagen: {{error}}",
-      "loginFailed": "Anmeldung fehlgeschlagen: {{message}}",
-      "roleNotAssigned": "Bitte warten Sie, bis Ihrem Konto eine Rolle zugewiesen wurde, bevor Sie sich anmelden.",
-      "accountVerificationPending": "Ihr Konto wird noch von den Administratoren verifiziert.",
-      "roleFetchingError": "Fehler beim Abrufen der Benutzerrolle: {{error}}",
-      "userNotFound": "Benutzerinformationen konnten nicht abgerufen werden.",
-      "errorDuringLogin": "Beim Anmelden ist ein Fehler aufgetreten.",
-      "serverUnreachable": "Der Server ist derzeit nicht erreichbar, bitte versuchen Sie es später erneut.",
-      "logoutSuccess": "Benutzer erfolgreich abgemeldet.",
-      "logoutFailed": "Abmeldung fehlgeschlagen.",
-      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten.",
-      "googleLoginSuccess": "Benutzer erfolgreich über Google OAuth angemeldet.",
-      "googleLoginFailed": "Authentifizierung über Google OAuth fehlgeschlagen.",
-      "invalidStateParameter": "Ungültiger Zustandsparameter"
-    },
-    "movementDetails": {
-      "id": "Listen-ID",
-      "dateOfOrder": "Bestelldatum",
-      "title": "Bewegungsdetails",
-      "expand": "Details erweitern",
-      "collapse": "Details reduzieren",
-      "articleId": "OEM ID",
-      "name": "Name",
-      "brand": "Marke",
-      "quantity": "Menge",
-      "priceSold": "Verkauft für",
-      "unitPrice": "Stückpreis",
-      "priceBought": "Gekauft für"
-    },
-    "createPromoForm": {
-      "createTitle": "Neue Aktion erstellen",
-      "editTitle": "Aktion bearbeiten",
-      "promoTypeLabel": "Aktionsart",
-      "promoTypeContract": "Vertrag",
-      "promoTypeSale": "Verkauf",
-      "promoTypeExtra": "Extra",
-      "promoTypeRequired": "Aktionsart ist erforderlich",
-      "promoNameLabel": "Aktionsname",
-      "promoNameRequired": "Aktionsname ist erforderlich",
-      "startDateLabel": "Startdatum",
-      "startDateRequired": "Startdatum ist erforderlich",
-      "endDateLabel": "Enddatum",
-      "endDateRequired": "Enddatum ist erforderlich",
-      "endDateValidation": "Enddatum kann nicht vor dem Startdatum liegen.",
-      "discountLabel": "Rabattbeschreibung",
-      "discountRequired": "Rabattbeschreibung ist erforderlich",
-      "discountHelperText": "z.B. 'Für jeden ausgegebenen 100 Euro erhalten Sie einen 10-Euro-Gutschein'",
-      "eligibleClientsLabel": "Berechtigte Kunden",
-      "excludedClientsLabel": "Ausgeschlossene Kunden",
-      "createPromo": "Aktion erstellen",
-      "updatePromo": "Aktion aktualisieren",
-      "cancel": "Abbrechen"
-    },
-    "searchResults": {
-      "id": "ID",
-      "idUnknown": "Unbekannte ID",
-      "phone": "Telefon",
-      "phoneUnknown": "Unbekanntes Telefon",
-      "email": "E-Mail",
-      "emailUnknown": "Unbekannte E-Mail",
-      "promoType": "Aktionsart",
-      "promoTypeUnknown": "Unbekannte Aktionsart",
-      "discount": "Rabatt",
-      "discountUnknown": "Unbekannter Rabatt",
-      "startDate": "Startdatum",
-      "startDateUnknown": "Unbekanntes Startdatum",
-      "endDate": "Enddatum",
-      "endDateUnknown": "Unbekanntes Enddatum",
-      "province": "Provinz",
-      "provinceUnknown": "Unbekannte Provinz",
-      "paymentMethod": "Zahlungsmethode",
-      "paymentMethodUnknown": "Unbekannte Zahlungsmethode",
-      "types": {
-        "client": "Kunde",
-        "agent": "Agent",
-        "article": "Artikel",
-        "promo": "Aktion",
-        "visit": "Besuch",
-        "alert": "Warnung"
-      },
-      "noResults": "Keine Ergebnisse gefunden.",
-      "articleId": "OEM",
-      "brand": "Marke",
-      "brandUnknown": "Unbekannte Marke",
-      "lastSoldDate": "Letztes Verkaufsdatum",
-      "lastSoldDateUnknown": "Unbekanntes letztes Verkaufsdatum",
-      "promoIssuedBy": "Ausgestellt von"
-    },
-    "promoDetails": {
-      "notFound": "Aktionsdetails nicht gefunden."
-    },
-    "promo": {
-      "type": "Typ",
-      "discount": "Rabatt",
-      "startDate": "Startdatum",
-      "endDate": "Enddatum",
-      "global": "Global",
-      "notGlobal": "Nicht global",
-      "issuedBy": "Ausgestellt von",
-      "edit": "Aktion bearbeiten",
-      "editTooltip": "Aktion bearbeiten",
-      "terminate": "Aktion beenden",
-      "terminateTooltip": "Aktion beenden",
-      "deselect": "Aktion abwählen",
-      "deselectTooltip": "Aktion abwählen"
-    },
-    "eligibleClients": {
-      "includedClients": "Eingeschlossene Kunden",
-      "excludedClients": "Ausgeschlossene Kunden",
-      "switchToManual": "Zu manueller Auswahl wechseln",
-      "switchToGlobal": "Zu globaler Auswahl wechseln",
-      "globalPromo": "Globale Aktion",
-      "manualSelection": "Manuelle Auswahl",
-      "noClients": "Keine Kunden zur Anzeige"
-    },
-    "promosSidebar": {
-      "title": "Aktionen",
-      "refreshPromos": "Aktionen aktualisieren",
-      "createPromo": "Aktion erstellen",
-      "searchPlaceholder": "Aktionen suchen",
-      "noPromosFound": "Keine Aktionen gefunden.",
-      "type": "Typ"
-    },
-    "common": {
-      "loading": "Laden...",
-      "errorFetchingArticles": "Fehler beim Abrufen der Artikel.",
-      "errorUpdatingSettings": "Einstellungen konnten nicht aktualisiert werden",
-      "unknownError": "Ein unbekannter Fehler ist aufgetreten"
-    },
-    "articleList": {
-      "title": "Artikelliste",
-      "quickFilterPlaceholder": "Artikel suchen...",
-      "quickFilterAriaLabel": "Schnellfilter für die Artikelliste.",
-      "exportCSV": "Als CSV exportieren",
-      "expand": "Artikelliste erweitern.",
-      "collapse": "Artikelliste reduzieren.",
-      "options": "Optionen"
-    },
-    "movementList": {
-      "title": "Bewegungsliste",
-      "quickFilterPlaceholder": "Bewegungen suchen...",
-      "startDate": "Startdatum",
-      "endDate": "Enddatum",
-      "exportCSV": "Als CSV exportieren",
-      "expand": "Bewegungsliste erweitern.",
-      "collapse": "Bewegungsliste reduzieren.",
-      "options": "Optionen"
-    },
-    "appSettings": {
-      "title": "App-Einstellungen",
-      "toggleNotifications": "Benachrichtigungen umschalten",
-      "enableNotificationsAria": "Benachrichtigungen aktivieren",
-      "receiveBrowserNotifications": "Browser-Benachrichtigungen erhalten",
-      "notificationsInfo": "Um Benachrichtigungen zu erhalten, erlauben Sie bitte die Benachrichtigungsberechtigung in Ihren Browsereinstellungen.",
-      "notificationsEnabled": "Benachrichtigungen wurden aktiviert.",
-      "notificationsDisabled": "Benachrichtigungen wurden deaktiviert.",
-      "notificationGranted": "Benachrichtigungsberechtigung gewährt.",
-      "notificationDenied": "Benachrichtigungsberechtigung abgelehnt.",
-      "chooseTheme": "Thema wählen",
-      "themePreference": "Themenpräferenz",
-      "themePreferenceTooltip": "Wenn Sie \"Auto\" auswählen, passt sich das Thema an die Systemeinstellungen an.",
-      "light": "Hell",
-      "dark": "Dunkel",
-      "auto": "Auto",
-      "themeChanged": "Thema geändert zu {{theme}}."
-    },
-    "modifyAccount": {
-      "invalidEmail": "E-Mail ist ungültig.",
-      "passwordUppercase": "Das Passwort muss mindestens einen Großbuchstaben enthalten.",
-      "passwordLowercase": "Das Passwort muss mindestens einen Kleinbuchstaben enthalten.",
-      "passwordNumber": "Das Passwort muss mindestens eine Zahl enthalten.",
-      "passwordSpecialChar": "Das Passwort muss mindestens ein Sonderzeichen enthalten.",
-      "emailUpdated": "Kontoinformationen aktualisiert. Sie werden jetzt abgemeldet.",
-      "passwordUpdated": "Passwort aktualisiert. Sie werden jetzt abgemeldet.",
-      "updateEmailFailed": "Kontoinformationen konnten nicht aktualisiert werden: {{message}}",
-      "updatePasswordFailed": "Passwort konnte nicht aktualisiert werden: {{message}}",
-      "updateEmailUnknownError": "Kontoinformationen konnten nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
-      "updatePasswordUnknownError": "Passwort konnte nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
-      "title": "Konto ändern",
-      "modifyEmail": "E-Mail ändern",
-      "currentEmail": "Aktuelle E-Mail",
-      "currentPassword": "Aktuelles Passwort",
-      "newEmail": "Neue E-Mail",
-      "updateEmailButton": "E-Mail aktualisieren",
-      "updateEmailButtonTooltip": "Klicken Sie, um Ihre E-Mail zu aktualisieren",
-      "updateEmailButtonAria": "E-Mail aktualisieren",
-      "modifyPassword": "Passwort ändern",
-      "newPassword": "Neues Passwort",
-      "updatePasswordButton": "Passwort aktualisieren",
-      "updatePasswordButtonTooltip": "Klicken Sie, um Ihr Passwort zu aktualisieren",
-      "updatePasswordButtonAria": "Passwort aktualisieren",
-      "showPassword": "Passwort anzeigen",
-      "hidePassword": "Passwort verbergen",
-      "showNewPassword": "Neues Passwort anzeigen",
-      "hideNewPassword": "Neues Passwort verbergen",
-      "currentEmailAria": "Aktuelle E-Mail",
-      "newEmailAria": "Neue E-Mail",
-      "currentPasswordAria": "Aktuelles Passwort",
-      "newPasswordAria": "Neues Passwort",
-      "emailErrors": {
-        "invalidEmail": "Ungültige E-Mail-Adresse.",
-        "emailRequired": "E-Mail ist erforderlich."
-      },
-      "passwordErrors": {
-        "invalidPassword": "Das Passwort erfüllt nicht die Kriterien.",
-        "passwordRequired": "Passwort ist erforderlich."
-      },
-      "googleManagedTitle": "Von Google verwaltetes Konto",
-      "googleManagedDescription": "Ihr Konto wird von Google verwaltet. Bitte verwenden Sie Google-Dienste, um Ihr Konto zu ändern.",
-      "alerts": {
-        "error": "Ein Fehler ist aufgetreten.",
-        "success": "Vorgang erfolgreich."
-      }
-    },
-    "sidebar": {
-      "userSettings": "Benutzereinstellungen",
-      "accountSettings": "Kontoeinstellungen",
-      "appSettings": "App-Einstellungen",
-      "manageUsers": "Benutzer verwalten"
-    },
-    "manageUsers": {
-      "title": "Benutzer verwalten",
-      "columns": {
-        "email": "E-Mail",
-        "authType": "Auth-Typ",
-        "emailVerified": "E-Mail verifiziert",
-        "role": "Rolle",
-        "entityCode": "Entitätscode",
-        "entityName": "Entitätsname",
-        "createdAt": "Erstellt am"
-      },
-      "infoTooltip": "Damit ein Benutzer die App nutzen kann, muss ihm eine Entität zugewiesen werden. Sie können die untenstehende Tabelle verwenden, um einen Benutzer durch Doppelklicken auf die E-Mail auszuwählen und dann mit der Entitätszuweisung fortzufahren.",
-      "selectUserPrompt": "Wählen Sie einen Benutzer aus, um eine Entität zuzuweisen",
-      "selectedUser": "Ausgewählter Benutzer: ",
-      "userDeselected": "Benutzer abgewählt",
-      "yes": "Ja",
-      "no": "Nein",
-      "na": "Nicht verfügbar",
-      "userTable": "Benutzertabelle"
-    },
-    "userCard": {
-      "avatarAlt": "Avatar für",
-      "role": "Rolle",
-      "code": "Code",
-      "name": "Name",
-      "none": "Keine"
-    },
-    "userDetails": {
-      "goBack": "Zurückgehen",
-      "selectRole": "Wählen Sie eine neue Rolle aus.",
-      "roleSelection": "Rollenwahl",
-      "selectClient": "Kundenrolle auswählen",
-      "selectAgent": "Agentenrolle auswählen",
-      "selectAdmin": "Administratorrolle auswählen",
-      "client": "Kunde",
-      "agent": "Agent",
-      "admin": "Administrator",
-      "selectEntity": "Wählen Sie eine Entität durch Doppelklicken aus.",
-      "searchPlaceholder": "Suche nach {{role}}s nach Name oder ID",
-      "loadingEntities": "Entitäten werden geladen...",
-      "startTyping": "Beginnen Sie mit der Eingabe, um zu suchen",
-      "entityName": "Name",
-      "entityId": "ID",
-      "saveChanges": "Speichern",
-      "success": "Änderungen erfolgreich gespeichert!",
-      "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-      "updateSuccess": "Benutzer erfolgreich aktualisiert.",
-      "updateSuccessToast": "Benutzer erfolgreich aktualisiert.",
-      "updateFailed": "Benutzer konnte nicht aktualisiert werden: {{message}}",
-      "updateFailedToast": "Benutzer konnte nicht aktualisiert werden: {{message}}",
-      "updateUnknownError": "Benutzer konnte nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
-      "updateUnknownErrorToast": "Benutzer konnte nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
-      "userIdUndefined": "Benutzer-ID ist undefiniert.",
-      "userIdUndefinedToast": "Benutzer-ID ist undefiniert.",
-      "loadAdminsErrror": "Administratoren konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
-      "alerts": {
-        "success": "Änderungen erfolgreich gespeichert!",
-        "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-        "updateSuccess": "Benutzer erfolgreich aktualisiert.",
-        "updateSuccessToast": "Benutzer erfolgreich aktualisiert.",
-        "updateFailed": "Benutzer konnte nicht aktualisiert werden: {{message}}",
-        "updateFailedToast": "Benutzer konnte nicht aktualisiert werden: {{message}}",
-        "updateUnknownError": "Benutzer konnte nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
-        "updateUnknownErrorToast": "Benutzer konnte nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
-        "userIdUndefined": "Benutzer-ID ist undefiniert.",
-        "userIdUndefinedToast": "Benutzer-ID ist undefiniert.",
-        "loadAdminsErrror": "Administratoren konnten nicht geladen werden. Bitte versuchen Sie es erneut."
-      }
-    },
-    "createVisitForm": {
-      "title": "Neuen Besuch erstellen",
-      "typeLabel": "Typ",
-      "regular": "Regulär",
-      "urgent": "Dringend",
-      "reasonLabel": "Grund",
-      "issue": "Problem",
-      "routine": "Routine",
-      "newClient": "Neuer Kunde",
-      "publicNoteLabel": "Öffentliche Notiz",
-      "publicNoteTooltip": "Geben Sie eine öffentliche Notiz für den Besuch ein.",
-      "privateNoteLabel": "Private Notiz*",
-      "privateNoteTooltip": "Die private Notiz ist nur für Sie und die Administratoren sichtbar.",
-      "privateNotePlaceholder": "Die private Notiz ist nur für Sie und die Administratoren sichtbar.",
-      "selectDateTime": "Datum & Uhrzeit auswählen",
-      "sendVisitTooltip": "Besuch senden",
-      "sendVisit": "Besuch senden",
-      "cancelTooltip": "Abbrechen",
       "cancel": "Abbrechen",
-      "fillAllFields": "Bitte füllen Sie alle erforderlichen Felder aus.",
-      "visitCreated": "Besuch erfolgreich erstellt.",
-      "creationFailed": "Besuch konnte nicht erstellt werden: ",
-      "creationFailedUnknown": "Besuch konnte nicht erstellt werden: Ein unbekannter Fehler ist aufgetreten.",
-      "cancelDialogTitle": "Besuchserstellung abbrechen",
-      "cancelDialogDescription": "Sind Sie sicher, dass Sie die Erstellung dieses Besuchs abbrechen möchten? Alle eingegebenen Informationen gehen verloren.",
-      "no": "Nein",
-      "yes": "Ja"
-    },
-    "clientDetailsCard": {
-      "code": "Code",
-      "address": "Adresse",
-      "province": "Provinz",
-      "na": "Nicht verfügbar",
-      "email": "E-Mail",
-      "phone": "Telefon",
-      "paymentMethod": "Zahlungsmethode",
-      "agent": "Agent",
-      "createVisitTooltip": "Neuen Besuch erstellen",
-      "createVisit": "Besuch erstellen",
-      "deselectClientTooltip": "Aktuellen Kunden abwählen",
-      "deselectClient": "Kunde abwählen",
-      "cancelDialogTitle": "Kunde abwählen",
-      "cancelDialogDescription": "Sind Sie sicher, dass Sie den aktuellen Kunden abwählen möchten? Alle nicht gespeicherten Änderungen gehen verloren.",
-      "no": "Nein",
-      "yes": "Ja"
-    },
-    "visitCard": {
-      "avatarAlt": "Avatar",
-      "visitFor": "Besuch für",
-      "type": "Typ",
-      "reason": "Grund",
-      "date": "Datum",
-      "publicNote": "Öffentliche Notiz",
-      "privateNote": "Private Notiz",
-      "completed": "Abgeschlossen",
-      "issuedBy": "Ausgestellt von",
-      "na": "Nicht verfügbar",
-      "unknown": "Unbekannt",
-      "yes": "Ja",
-      "no": "Nein"
-    },
-    "editVisitForm": {
-      "title": "Besuch bearbeiten",
-      "fillAllFields": "Bitte füllen Sie alle erforderlichen Felder aus.",
-      "updateSuccess": "Besuch erfolgreich aktualisiert.",
-      "updateFailed": "Besuch konnte nicht aktualisiert werden: {{message}}",
-      "updateFailedUnknown": "Besuch konnte nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
-      "dateLabel": "Datum",
-      "publicNoteLabel": "Öffentliche Notiz",
-      "publicNoteTooltip": "Geben Sie eine öffentliche Notiz für den Besuch ein.",
-      "privateNoteLabel": "Private Notiz",
-      "privateNoteTooltip": "Geben Sie eine private Notiz für den Besuch ein.",
-      "privateNotePlaceholder": "Die private Notiz ist nur für Sie und die Administratoren sichtbar.",
-      "typeLabel": "Typ",
-      "regular": "Regulär",
-      "urgent": "Dringend",
-      "reasonLabel": "Grund",
-      "issue": "Problem",
-      "routine": "Routine",
-      "newClient": "Neuer Kunde",
-      "saveChangesTooltip": "Änderungen speichern",
-      "cancelTooltip": "Abbrechen",
-      "cancelDialogTitle": "Bearbeitung abbrechen",
-      "cancelDialogDescription": "Sind Sie sicher, dass Sie die Bearbeitung dieses Besuchs abbrechen möchten? Alle nicht gespeicherten Änderungen gehen verloren.",
-      "no": "Nein",
-      "yes": "Ja",
-      "completedLabel": "Als abgeschlossen markieren",
-      "cancelledLabel": "Als storniert markieren",
-      "pendingLabel": "Ausstehend",
-      "completedStatus": "Abgeschlossen",
-      "cancelledStatus": "Storniert"
-    },
-    "visitsSidebar": {
-      "goBack": "Zurückgehen",
-      "goBackTooltip": "Zurück zur Agentenliste",
-      "agents": "Agenten",
-      "clients": "Kunden",
-      "visits": "Besuche",
-      "refresh": "Besuche aktualisieren",
-      "refreshTooltip": "Besuche aktualisieren",
-      "searchTooltip": "Suche",
-      "searchAgents": "Agenten suchen",
-      "searchClients": "Kunden suchen",
-      "id": "ID",
-      "code": "Code",
-      "province": "Provinz",
-      "na": "Nicht verfügbar",
-      "pendingVisits": "Hat ausstehende Besuche",
-      "incompleteVisits": "Hat unvollständige Besuche",
-      "pendingCount": "{{count}} ausstehende Besuche",
-      "incompleteCount": "{{count}} unvollständige Besuche",
-      "unknown": "Unbekannt"
-    },
-    "visitsTable": {
-      "tableAriaLabel": "Besuche Tabelle",
-      "type": "Typ",
-      "reason": "Grund",
-      "date": "Datum",
-      "completed": "Abgeschlossen",
-      "pending": "Ausstehend",
-      "createdAt": "Erstellt am",
-      "na": "Nicht verfügbar",
-      "yes": "Ja",
-      "no": "Nein",
-      "selectVisitError": "Besuch konnte nicht ausgewählt werden.",
-      "noVisits": "Keine Besuche für diesen Kunden gefunden.",
-      "unknown": "Unbekannt"
-    },
-    "calendarHook": {
-      "weekendsNotSelectable": "Wochenenden sind nicht auswählbar.",
-      "pastDateError": "Sie können kein Ereignis in der Vergangenheit erstellen.",
-      "selectedDateRange": "Ausgewählter Datumsbereich von {{start}} bis {{end}}.",
-      "eventUpdatedSuccess": "Ereignis erfolgreich aktualisiert!",
-      "eventCreatedSuccess": "Ereignis erfolgreich erstellt!",
-      "eventSubmitFailedWithError": "Ereignis konnte nicht übermittelt werden: {{error}}",
-      "eventSubmitFailed": "Ereignis konnte nicht übermittelt werden.",
-      "eventIdMissing": "Ereignis-ID fehlt.",
-      "eventDeletedSuccess": "Ereignis erfolgreich gelöscht!",
-      "eventDeleteFailedWithError": "Ereignis konnte nicht gelöscht werden: {{error}}",
-      "eventDeleteFailed": "Ereignis konnte nicht gelöscht werden.",
-      "editingEvent": "Ereignis bearbeiten: {{reason}}",
-      "formCanceled": "Formular abgebrochen.",
-      "switchedToView": "Zu {{view}} Ansicht gewechselt.",
-      "visitEventName": "Besuch für ID: {{clientId}}",
-      "selectedVisit": "Ausgewählter Besuch: {{reason}} am {{date}}.",
-      "visitsNotEditable": "Besuche können nicht aus dem Kalender bearbeitet werden.",
-      "selectedEvent": "Ausgewählter {{reason}} am {{date}}.",
-      "roleNotAssigned": "Bitte warten Sie, bis Ihrem Konto eine Rolle zugewiesen wurde, bevor Sie sich anmelden.",
-      "accountVerificationPending": "Ihr Konto wird noch von den Administratoren verifiziert.",
-      "roleFetchingError": "Fehler beim Abrufen der Benutzerrolle.",
-      "errorDuringLogin": "Beim Anmelden ist ein Fehler aufgetreten: {{error}}",
-      "registrationSuccess": "Registrierung erfolgreich: {{message}}",
-      "registrationFailed": "Registrierung fehlgeschlagen: {{message}}",
-      "loginFailed": "Anmeldung fehlgeschlagen: {{message}}",
-      "viewModes": {
-        "calendar": "Kalender",
-        "history": "Historie"
-      },
-      "userNotAuthenticated": "Benutzer ist nicht authentifiziert."
-    },
-    "createChatForm": {
-      "title": "Neuen Chat erstellen",
-      "tooltips": {
-        "groupChat": "Gruppenchat erstellen",
-        "broadcastChat": "Broadcast-Chat erstellen",
-        "cancel": "Abbrechen",
-        "create": "Chat erstellen"
-      },
-      "labels": {
-        "groupName": "Gruppenname",
-        "broadcastName": "Broadcast-Name",
-        "selectParticipants": "Teilnehmer auswählen",
-        "cancel": "Abbrechen",
-        "create": "Chat erstellen",
-        "searchUsers": "Benutzer suchen",
-        "findParticipants": "Teilnehmer finden"
-      },
-      "errors": {
-        "noParticipants": "Bitte wählen Sie mindestens einen Teilnehmer aus.",
-        "chatNameRequired": "Chatname ist erforderlich.",
-        "createChatFailed": "Chat konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
-      },
-      "success": {
-        "createChat": "Chat erfolgreich erstellt!"
-      },
-      "userList": {
-        "table": "Benutzerauswahltabelle",
-        "unknownUser": "Unbekannter Benutzer",
-        "unknownEmail": "Unbekannte E-Mail",
-        "headers": {
-          "name": "Name",
-          "email": "E-Mail"
-        }
-      }
-    },
-    "chats": {
-      "error": "Ein Fehler ist bei den Chats aufgetreten:",
-      "defaultTitle": "Chat",
-      "groupTitle": "Gruppenchat"
-    },
-    "errors": {
-      "userNotFound": "Benutzer mit ID {{id}} nicht gefunden.",
-      "adminNotFound": "Administrator mit ID {{id}} nicht gefunden.",
-      "unknown": "Ein unbekannter Fehler ist aufgetreten.",
-      "unknownAgent": "Unbekannter Agent",
-      "searchFailed": "Suche fehlgeschlagen. Bitte versuchen Sie es erneut."
-    },
-    "signin": {
-      "loginSuccess": "Erfolgreich angemeldet!",
-      "registrationSuccess": "Erfolgreich registriert!",
-      "loginWithGoogleSuccess": "Erfolgreich mit Google angemeldet!",
-      "passwordMismatch": "Passwörter stimmen nicht überein."
-    },
-    "promoForm": {
-      "success": "Aktion erfolgreich eingereicht!",
-      "updateFailed": "Aktion konnte nicht eingereicht werden: {{message}}",
-      "unknownError": "Aktion konnte nicht eingereicht werden: Ein unbekannter Fehler ist aufgetreten."
-    },
-    "usePromos": {
-      "createSuccess": "Aktion erfolgreich erstellt!",
-      "createFailed": "Aktion konnte nicht erstellt werden: {{message}}",
-      "createUnknownError": "Aktion konnte nicht erstellt werden: Ein unbekannter Fehler ist aufgetreten.",
-      "updateMissingId": "Aktions-ID fehlt für die Aktualisierung.",
-      "updateSuccess": "Aktion erfolgreich aktualisiert!",
-      "updateFailed": "Aktion konnte nicht aktualisiert werden: {{message}}",
-      "updateUnknownError": "Aktion konnte nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
-      "sunsetNoPromoSelected": "Keine Aktion für den Sonnenuntergang ausgewählt.",
-      "sunsetMissingId": "Aktions-ID fehlt für den Sonnenuntergang.",
-      "sunsetSuccess": "Aktion erfolgreich beendet.",
-      "sunsetFailed": "Aktion konnte nicht beendet werden: {{message}}",
-      "sunsetUnknownError": "Aktion konnte nicht beendet werden: Ein unbekannter Fehler ist aufgetreten.",
-      "editNoPromoSelected": "Keine Aktion zum Bearbeiten ausgewählt.",
-      "refreshSuccess": "Aktionen erfolgreich aktualisiert."
-    },
-    "resizeObserver": {
-      "unsupported": "ResizeObserver wird in Ihrem Browser nicht unterstützt. Bitte aktualisieren oder verwenden Sie einen anderen Browser."
-    },
-    "useVisits": {
-      "agentSelected": "Agent erfolgreich ausgewählt.",
-      "clientSelected": "Kunde erfolgreich ausgewählt.",
-      "backToAgents": "Zurück zur Agentenliste.",
-      "visitCreated": "Besuch erfolgreich erstellt.",
-      "failedToCreateVisit": "Besuch konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
-      "visitsRefreshed": "Besuche erfolgreich aktualisiert.",
-      "failedToRefreshVisits": "Besuche konnten nicht aktualisiert werden. Bitte versuchen Sie es erneut.",
-      "agentNotFound": "Ausgewählter Agent nicht gefunden."
-    },
-    "useStatsToasts": {
-      "loadingData": "Daten werden geladen...",
-      "successData": "Daten erfolgreich abgerufen!",
-      "failedData": "Abrufen der Daten fehlgeschlagen. Bitte versuchen Sie, die Seite zu aktualisieren oder kommen Sie später wieder.",
-      "errorMessage": "Fehler: {{message}}",
-      "unknownError": "Beim Abrufen der Daten ist ein unbekannter Fehler aufgetreten. Versuchen Sie, die Seite zu aktualisieren oder kontaktieren Sie die IT.",
-      "retryingData": "Versuche, die Initialdaten abzurufen... (Versuch #{{attempt}})"
-    },
-    "webSocketService": {
-      "lostConnection": "Verbindung zum Server verloren, versuche neu zu verbinden...",
-      "connectionEstablished": "Verbindung zum Server hergestellt.",
-      "connectionLost": "Verbindung zum Server verloren, aktualisieren Sie die Seite oder versuchen Sie es später erneut."
-    },
-    "dashboard": {
-      "welcomeBack": "Willkommen zurück, {{name}}!",
-      "statisticsFor": "Statistiken für {{name}}",
-      "yourStatistics": "Ihre Statistiken",
-      "calendar": "Kalender",
-      "loadingWelcome": "Begrüßung wird geladen",
-      "skeleton": "Inhalt wird geladen",
-      "loadingStatistics": "Statistiken werden geladen",
-      "loadingText": "Text wird geladen",
-      "calendarButton": "Kalender öffnen",
-      "closeButton": "Auswahl schließen",
-      "activePromotions": "Aktive Aktionen",
-      "agentActivityOverview": "Übersicht der Agentenaktivität",
-      "spentThisMonth": "In diesem Monat ausgegeben",
-      "spentThisYear": "In diesem Jahr ausgegeben",
-      "topArticleType": "Top Artikeltypen",
-      "monthOverMonthSpendingTrend": "Monatlicher Ausgaben-Trend",
-      "topBrandsSold": "Top verkaufte Marken",
-      "totalEarning": "Gesamteinnahmen",
-      "totalOrders": "Gesamtbestellungen",
-      "salesDistribution": "Vertriebsverteilung",
-      "upcomingVisits": "Bevorstehende Besuche",
-      "yourCalendar": "Ihr Kalender"
-    },
-    "articlesPage": {
-      "name": "Name",
-      "brand": "Marke",
-      "oemId": "OEM ID",
-      "unitPrice": "Stückpreis",
-      "cost": "Kosten",
-      "quantitySold": "Verkaufte Menge"
-    },
-    "movementsPage": {
-      "id": "Listen-ID",
-      "clientName": "Kunde",
-      "agentName": "Agent",
-      "dateOfOrder": "Datum",
-      "totalQuantity": "Verkaufte Artikel",
-      "totalPriceSold": "Gesamt"
-    },
-    "status": {
-      "pending": "Ausstehend",
-      "approved": "Genehmigt",
-      "rejected": "Abgelehnt",
-      "cancelled": "Storniert"
-    },
-    "eventHistoryTooltips": {
-      "approve": "Ereignis genehmigen",
-      "reject": "Ereignis ablehnen",
-      "delete": "Ereignis löschen",
-      "edit": "Ereignis bearbeiten",
-      "visit": "Zum Besuch gehen"
+      "create": "Ereignis erstellen"
     },
     "eventHistory": {
       "title": "Ereignishistorie",
@@ -1188,15 +276,949 @@
         "status": "Status",
         "actions": "Aktionen"
       },
+      "unknown": "Unbekannt",
+      "na": "Nicht verfügbar",
+      "eventTypes": {
+        "absence": "Abwesenheit",
+        "event": "Ereignis",
+        "holiday": "Feiertag",
+        "generic": "Allgemein"
+      },
+      "reasons": {
+        "illness": "Krankheit",
+        "day_off": "Freier Tag",
+        "unexpected_event": "Unerwartetes Ereignis",
+        "medical_visit": "Arztbesuch",
+        "company_meeting": "Firmenbesprechung",
+        "company_party": "Firmenfeier",
+        "conference": "Konferenz",
+        "expo": "Expo",
+        "generic": "Allgemein"
+      },
+      "statuses": {
+        "pending": "Ausstehend",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt",
+        "cancelled": "Storniert"
+      },
       "actions": {
         "na": "Nicht verfügbar"
       },
+      "tooltips": {
+        "approve": "Ereignis genehmigen",
+        "reject": "Ereignis ablehnen"
+      },
       "toast": {
-        "approveSuccess": "Ereignis erfolgreich genehmigt.",
-        "approveFailure": "Ereignis konnte nicht genehmigt werden.",
-        "rejectSuccess": "Ereignis erfolgreich abgelehnt.",
-        "rejectFailure": "Ereignis konnte nicht abgelehnt werden.",
-        "genericError": "Ein Fehler ist aufgetreten."
+        "approveSuccess": "Ereignis erfolgreich genehmigt!",
+        "approveFailure": "Ereignis konnte nicht genehmigt werden",
+        "rejectSuccess": "Ereignis erfolgreich abgelehnt!",
+        "rejectFailure": "Ereignis konnte nicht abgelehnt werden",
+        "genericError": "Ein unerwarteter Fehler ist aufgetreten"
       }
     }
+  },
+  "eventTitle": {
+    "unknown": "Unbekannt",
+    "reasons": {
+      "illness": "Krankheit",
+      "day_off": "Freier Tag",
+      "unexpected_event": "Unerwartetes Ereignis",
+      "medical_visit": "Arztbesuch",
+      "public_holiday": "Feiertag",
+      "company_holiday": "Firmenfeiertag",
+      "company_meeting": "Firmenbesprechung",
+      "company_party": "Firmenfeier",
+      "conference": "Konferenz",
+      "expo": "Expo",
+      "generic": "Allgemein"
+    },
+    "tooltips": {
+      "illness": "Grund: Krankheit",
+      "day_off": "Grund: Freier Tag",
+      "unexpected_event": "Grund: Unerwartetes Ereignis",
+      "medical_visit": "Grund: Arztbesuch",
+      "public_holiday": "Grund: Feiertag",
+      "company_holiday": "Grund: Firmenfeiertag",
+      "company_meeting": "Grund: Firmenbesprechung",
+      "company_party": "Grund: Firmenfeier",
+      "conference": "Grund: Konferenz",
+      "expo": "Grund: Expo",
+      "generic": "Grund: Allgemein",
+      "unknown": "Unbekannte Entität"
+    }
+  },
+  "popOverEvent": {
+    "type": "Typ",
+    "reason": "Grund",
+    "note": "Notiz",
+    "unknown": "Unbekannt",
+    "visit": "Besuch",
+    "issue": "Problem",
+    "routine": "Routine",
+    "newClient": "Neuer Kunde",
+    "edit": "Ereignis bearbeiten",
+    "delete": "Ereignis löschen",
+    "status": "Status",
+    "startsAt": "Beginnt um",
+    "endsAt": "Endet um"
+  },
+  "eventTypes": {
+    "absence": "Abwesenheit",
+    "holiday": "Feiertag",
+    "event": "Ereignis",
+    "generic": "Allgemein",
+    "visit": "Besuch"
+  },
+  "chatList": {
+    "noChatsFound": "Keine Chats gefunden.",
+    "noMessages": "Keine Nachrichten",
+    "na": "Nicht verfügbar"
+  },
+  "chatSidebar": {
+    "labels": {
+      "chats": "Chats",
+      "contacts": "Kontakte"
+    },
+    "tooltips": {
+      "refreshContacts": "Kontakte aktualisieren",
+      "showChats": "Chats anzeigen",
+      "showContacts": "Kontakte anzeigen"
+    },
+    "placeholders": {
+      "searchChats": "Chats suchen...",
+      "searchContacts": "Kontakte suchen..."
+    }
+  },
+  "chatView": {
+    "labels": {
+      "noChatSelected": "Kein Chat ausgewählt. Bitte wählen Sie einen Chat aus, um ihn anzuzeigen.",
+      "type": "Typ",
+      "reason": "Grund",
+      "note": "Notiz",
+      "moreOptions": "Mehr Optionen"
+    },
+    "tooltips": {
+      "backToChats": "Zurück zu Chats",
+      "moreOptions": "Mehr Optionen"
+    },
+    "menuOptions": {
+      "mute": "Chat stummschalten",
+      "block": "Benutzer blockieren",
+      "report": "Chat melden",
+      "delete": "Chat löschen",
+      "archive_chat": "Chat archivieren"
+    }
+  },
+  "contactsList": {
+    "labels": {
+      "unknownContact": "Unbekannter Kontakt",
+      "contact": "Kontakt",
+      "selectContact": "Kontakt auswählen"
+    },
+    "messages": {
+      "noContactsFound": "Keine Kontakte gefunden. Versuchen Sie, Ihre Suche anzupassen.",
+      "promoMessage": "Sie sind berechtigt für eine neue Aktion!\n\nTyp: {{promoType}}\nName: {{promoName}}\nAngebot: {{promoDiscount}}\n\nKontaktieren Sie einen unserer Vertreter für weitere Informationen. Einen schönen Tag!",
+      "visitMessage": "Ein neuer Besuch wurde für Sie geplant!\n\nTyp: {{visitType}}\nGrund: {{visitReason}}\nDatum: {{visitDate}}\n\nBitte seien Sie vorbereitet. Danke!"
+    }
+  },
+  "dateDivider": {
+    "labels": {
+      "dateDivider": "{{date}}"
+    }
+  },
+  "inputBox": {
+    "labels": {
+      "chatInput": "Chat-Eingabefeld",
+      "message": "Nachricht",
+      "alert": "Warnung",
+      "promo": "Aktion",
+      "visit": "Besuch"
+    },
+    "tooltips": {
+      "selectMessageType": "Nachrichtentyp auswählen",
+      "sendMessage": "Nachricht senden"
+    },
+    "placeholders": {
+      "typeMessage": "Geben Sie eine Nachricht ein..."
+    }
+  },
+  "messageBubble": {
+    "labels": {
+      "unknownSender": "Unbekannter Absender"
+    }
+  },
+  "labels": {
+    "chatInput": "Chat-Eingabefeld",
+    "message": "Nachricht",
+    "alert": "Warnung",
+    "promo": "Aktion",
+    "visit": "Besuch"
+  },
+  "tooltips": {
+    "selectMessageType": "Nachrichtentyp auswählen",
+    "sendMessage": "Nachricht senden"
+  },
+  "messageStatus": {
+    "sent": "Gesendet",
+    "delivered": "Zugestellt",
+    "read": "Gelesen",
+    "pending": "Ausstehend"
+  },
+  "clientDetails": {
+    "title": "Kundendetails",
+    "expand": "Details erweitern",
+    "collapse": "Details reduzieren",
+    "noClientSelected": "Kein Kunde ausgewählt."
+  },
+  "activePromotions": {
+    "title": "Aktive Aktionen",
+    "noActivePromotions": "Keine aktiven Aktionen.",
+    "endsAt": "Endet am",
+    "viewAllPromotions": "Alle Aktionen anzeigen"
+  },
+  "agentActivity": {
+    "title": "Letzte Aktivitäten",
+    "noRecentActivities": "Keine aktuellen Aktivitäten.",
+    "occurredAt": "Aufgetreten am",
+    "viewAllPromotions": "Alle Aktionen anzeigen"
+  },
+  "calendarComponent": {
+    "recentActivity": "Letzte Aktivitäten",
+    "selectVisit": "Besuch auswählen",
+    "noVisits": "Keine verfügbaren Besuche.",
+    "close": "Schließen",
+    "occurredAt": "Aufgetreten am"
+  },
+  "spentThisMonth": {
+    "titleAgent": "In diesem Monat verdient",
+    "titleClient": "In diesem Monat ausgegeben",
+    "iconAlt": "Geld-Symbol",
+    "more": "mehr",
+    "neutral": "neutral",
+    "less": "weniger",
+    "even": "gleich",
+    "comparedToOtherAgents": "im Vergleich zum Durchschnitt.",
+    "comparedToOtherClients": "im Vergleich zum Durchschnitt."
+  },
+  "spentThisYear": {
+    "titleAgent": "In diesem Jahr verdient",
+    "titleClient": "In diesem Jahr ausgegeben",
+    "iconAlt": "Geldbeutel-Symbol",
+    "more": "mehr",
+    "neutral": "neutral",
+    "less": "weniger",
+    "even": "gleich",
+    "comparedToOtherAgents": "im Vergleich zum Durchschnitt.",
+    "comparedToOtherClients": "im Vergleich zum Durchschnitt."
+  },
+  "topArticleType": {
+    "titleAgent": "Top verkauft",
+    "titleClient": "Top gekauft",
+    "amountPurchased": "Gekaufte Menge",
+    "iconAlt": "Symbol, das den Top-Artikeltyp darstellt"
+  },
+  "totalOrder": {
+    "month": "Monat",
+    "year": "Jahr",
+    "ordersThisMonth": "Bestellungen in diesem Monat",
+    "totalOrders": "Bestellungen in diesem Jahr",
+    "iconAlt": "Bestellungen-Symbol"
+  },
+  "upcomingVisits": {
+    "title": "Bevorstehende Besuche",
+    "visitType": "Typ",
+    "visitReason": "Grund",
+    "clientId": "Kunden-ID",
+    "noProgrammedVisits": "Keine bevorstehenden Besuche geplant.",
+    "viewDetails": "Details anzeigen",
+    "viewAllVisits": "Alle Besuche anzeigen",
+    "iconAlt": "Bevorstehende Besuche-Symbol"
+  },
+  "errorBoundary": {
+    "title": "Hoppla! Etwas ist schief gelaufen.",
+    "message": "Wir entschuldigen uns für die Unannehmlichkeiten. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support, wenn das Problem weiterhin besteht.",
+    "backToHome": "Zurück zur Startseite"
+  },
+  "headerDashboard": "Dashboard",
+  "movements": "Bewegungen",
+  "clients": "Kunden",
+  "articles": "Artikel",
+  "visits": "Besuche",
+  "promos": "Aktionen",
+  "calendar": "Kalender",
+  "logout": "Abmelden",
+  "search": "Suche",
+  "notifications": "Benachrichtigungen",
+  "no_notifications": "Keine neuen Benachrichtigungen",
+  "no_messages": "Keine Nachrichten",
+  "loggingOut": "Abmelden...",
+  "userAvatar": {
+    "defaultUser": "Benutzer",
+    "chats": "Chats",
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  },
+  "auth": {
+    "signIn": "Anmelden",
+    "register": "Registrieren",
+    "continueToApp": "Weiter zu {{appName}}",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "keepMeSignedIn": "Angemeldet bleiben",
+    "recommendedOnTrustedDevices": "Empfohlen auf vertrauenswürdigen Geräten",
+    "enterPassword": "Geben Sie Ihr Passwort ein",
+    "forgotPassword": "Passwort vergessen?",
+    "newToApp": "Neu bei {{appName}}?",
+    "createAccount": "Ein Konto erstellen",
+    "alreadyHaveAccount": "Haben Sie bereits ein Konto?",
+    "hidePassword": "Passwort verbergen",
+    "showPassword": "Passwort anzeigen",
+    "continueWithGoogle": "Mit Google fortfahren",
+    "resetPassword": "Passwort zurücksetzen",
+    "resetInstructions": "Wenn Sie Ihr Passwort vergessen haben, können Sie es zurücksetzen, indem Sie Ihre E-Mail eingeben.",
+    "requestResetCode": "Zurücksetzcode anfordern",
+    "verifyCode": "Code verifizieren",
+    "newPassword": "Neues Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "updatePassword": "Passwort aktualisieren",
+    "passwordUppercaseError": "Das Passwort muss mindestens einen Großbuchstaben enthalten.",
+    "passwordLowercaseError": "Das Passwort muss mindestens einen Kleinbuchstaben enthalten.",
+    "passwordNumberError": "Das Passwort muss mindestens eine Zahl enthalten.",
+    "passwordSpecialCharError": "Das Passwort muss mindestens ein Sonderzeichen enthalten.",
+    "resetCodeSent": "Wenn ein Konto mit dieser E-Mail existiert, wurde ein Zurücksetzcode gesendet.",
+    "requestResetFailed": "Zurücksetzen des Passworts fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "codeVerified": "Code erfolgreich verifiziert. Bitte setzen Sie ein neues Passwort.",
+    "invalidCode": "Ungültiger oder abgelaufener Code. Bitte versuchen Sie es erneut.",
+    "passwordsDoNotMatch": "Passwörter stimmen nicht überein. Bitte versuchen Sie es erneut.",
+    "passwordUpdated": "Passwort erfolgreich aktualisiert. Sie können sich jetzt anmelden.",
+    "updatePasswordFailed": "Passwort konnte nicht aktualisiert werden. Bitte überprüfen Sie Ihre Eingaben.",
+    "enterEmail": "Geben Sie Ihre E-Mail ein",
+    "enterNewPassword": "Geben Sie Ihr neues Passwort ein",
+    "enterVerificationCode": "Geben Sie den in Ihrer E-Mail bereitgestellten Verifizierungscode ein",
+    "passwordUpdatedToast": "Passwort erfolgreich aktualisiert. Sie können sich jetzt anmelden!",
+    "registrationSuccess": "Registrierung erfolgreich!",
+    "registrationFailed": "Registrierung fehlgeschlagen: {{error}}",
+    "loginFailed": "Anmeldung fehlgeschlagen: {{message}}",
+    "roleNotAssigned": "Bitte warten Sie, bis Ihrem Konto eine Rolle zugewiesen wurde, bevor Sie sich anmelden.",
+    "accountVerificationPending": "Ihr Konto wird noch von den Administratoren verifiziert.",
+    "roleFetchingError": "Fehler beim Abrufen der Benutzerrolle: {{error}}",
+    "userNotFound": "Benutzerinformationen konnten nicht abgerufen werden.",
+    "errorDuringLogin": "Beim Anmelden ist ein Fehler aufgetreten.",
+    "serverUnreachable": "Der Server ist derzeit nicht erreichbar, bitte versuchen Sie es später erneut.",
+    "logoutSuccess": "Benutzer erfolgreich abgemeldet.",
+    "logoutFailed": "Abmeldung fehlgeschlagen.",
+    "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten.",
+    "googleLoginSuccess": "Benutzer erfolgreich über Google OAuth angemeldet.",
+    "googleLoginFailed": "Authentifizierung über Google OAuth fehlgeschlagen.",
+    "invalidStateParameter": "Ungültiger Zustandsparameter"
+  },
+  "movementDetails": {
+    "id": "Listen-ID",
+    "dateOfOrder": "Bestelldatum",
+    "title": "Bewegungsdetails",
+    "expand": "Details erweitern",
+    "collapse": "Details reduzieren",
+    "articleId": "OEM ID",
+    "name": "Name",
+    "brand": "Marke",
+    "quantity": "Menge",
+    "priceSold": "Verkauft für",
+    "unitPrice": "Stückpreis",
+    "priceBought": "Gekauft für"
+  },
+  "createPromoForm": {
+    "createTitle": "Neue Aktion erstellen",
+    "editTitle": "Aktion bearbeiten",
+    "promoTypeLabel": "Aktionsart",
+    "promoTypeContract": "Vertrag",
+    "promoTypeSale": "Verkauf",
+    "promoTypeExtra": "Extra",
+    "promoTypeRequired": "Aktionsart ist erforderlich",
+    "promoNameLabel": "Aktionsname",
+    "promoNameRequired": "Aktionsname ist erforderlich",
+    "startDateLabel": "Startdatum",
+    "startDateRequired": "Startdatum ist erforderlich",
+    "endDateLabel": "Enddatum",
+    "endDateRequired": "Enddatum ist erforderlich",
+    "endDateValidation": "Enddatum kann nicht vor dem Startdatum liegen.",
+    "discountLabel": "Rabattbeschreibung",
+    "discountRequired": "Rabattbeschreibung ist erforderlich",
+    "discountHelperText": "z.B. 'Für jeden ausgegebenen 100 Euro erhalten Sie einen 10-Euro-Gutschein'",
+    "eligibleClientsLabel": "Berechtigte Kunden",
+    "excludedClientsLabel": "Ausgeschlossene Kunden",
+    "createPromo": "Aktion erstellen",
+    "updatePromo": "Aktion aktualisieren",
+    "cancel": "Abbrechen"
+  },
+  "searchResults": {
+    "id": "ID",
+    "idUnknown": "Unbekannte ID",
+    "phone": "Telefon",
+    "phoneUnknown": "Unbekanntes Telefon",
+    "email": "E-Mail",
+    "emailUnknown": "Unbekannte E-Mail",
+    "promoType": "Aktionsart",
+    "promoTypeUnknown": "Unbekannte Aktionsart",
+    "discount": "Rabatt",
+    "discountUnknown": "Unbekannter Rabatt",
+    "startDate": "Startdatum",
+    "startDateUnknown": "Unbekanntes Startdatum",
+    "endDate": "Enddatum",
+    "endDateUnknown": "Unbekanntes Enddatum",
+    "province": "Provinz",
+    "provinceUnknown": "Unbekannte Provinz",
+    "paymentMethod": "Zahlungsmethode",
+    "paymentMethodUnknown": "Unbekannte Zahlungsmethode",
+    "types": {
+      "client": "Kunde",
+      "agent": "Agent",
+      "article": "Artikel",
+      "promo": "Aktion",
+      "visit": "Besuch",
+      "alert": "Warnung"
+    },
+    "noResults": "Keine Ergebnisse gefunden.",
+    "articleId": "OEM",
+    "brand": "Marke",
+    "brandUnknown": "Unbekannte Marke",
+    "lastSoldDate": "Letztes Verkaufsdatum",
+    "lastSoldDateUnknown": "Unbekanntes letztes Verkaufsdatum",
+    "promoIssuedBy": "Ausgestellt von"
+  },
+  "promoDetails": {
+    "notFound": "Aktionsdetails nicht gefunden."
+  },
+  "promo": {
+    "type": "Typ",
+    "discount": "Rabatt",
+    "startDate": "Startdatum",
+    "endDate": "Enddatum",
+    "global": "Global",
+    "notGlobal": "Nicht global",
+    "issuedBy": "Ausgestellt von",
+    "edit": "Aktion bearbeiten",
+    "editTooltip": "Aktion bearbeiten",
+    "terminate": "Aktion beenden",
+    "terminateTooltip": "Aktion beenden",
+    "deselect": "Aktion abwählen",
+    "deselectTooltip": "Aktion abwählen"
+  },
+  "eligibleClients": {
+    "includedClients": "Eingeschlossene Kunden",
+    "excludedClients": "Ausgeschlossene Kunden",
+    "switchToManual": "Zu manueller Auswahl wechseln",
+    "switchToGlobal": "Zu globaler Auswahl wechseln",
+    "globalPromo": "Globale Aktion",
+    "manualSelection": "Manuelle Auswahl",
+    "noClients": "Keine Kunden zur Anzeige"
+  },
+  "promosSidebar": {
+    "title": "Aktionen",
+    "refreshPromos": "Aktionen aktualisieren",
+    "createPromo": "Aktion erstellen",
+    "searchPlaceholder": "Aktionen suchen",
+    "noPromosFound": "Keine Aktionen gefunden.",
+    "type": "Typ"
+  },
+  "common": {
+    "loading": "Laden...",
+    "errorFetchingArticles": "Fehler beim Abrufen der Artikel.",
+    "errorUpdatingSettings": "Einstellungen konnten nicht aktualisiert werden",
+    "unknownError": "Ein unbekannter Fehler ist aufgetreten"
+  },
+  "articleList": {
+    "title": "Artikelliste",
+    "quickFilterPlaceholder": "Artikel suchen...",
+    "quickFilterAriaLabel": "Schnellfilter für die Artikelliste.",
+    "exportCSV": "Als CSV exportieren",
+    "expand": "Artikelliste erweitern.",
+    "collapse": "Artikelliste reduzieren.",
+    "options": "Optionen"
+  },
+  "movementList": {
+    "title": "Bewegungsliste",
+    "quickFilterPlaceholder": "Bewegungen suchen...",
+    "startDate": "Startdatum",
+    "endDate": "Enddatum",
+    "exportCSV": "Als CSV exportieren",
+    "expand": "Bewegungsliste erweitern.",
+    "collapse": "Bewegungsliste reduzieren.",
+    "options": "Optionen"
+  },
+  "appSettings": {
+    "title": "App-Einstellungen",
+    "toggleNotifications": "Benachrichtigungen umschalten",
+    "enableNotificationsAria": "Benachrichtigungen aktivieren",
+    "receiveBrowserNotifications": "Browser-Benachrichtigungen erhalten",
+    "notificationsInfo": "Um Benachrichtigungen zu erhalten, erlauben Sie bitte die Benachrichtigungsberechtigung in Ihren Browsereinstellungen.",
+    "notificationsEnabled": "Benachrichtigungen wurden aktiviert.",
+    "notificationsDisabled": "Benachrichtigungen wurden deaktiviert.",
+    "notificationGranted": "Benachrichtigungsberechtigung gewährt.",
+    "notificationDenied": "Benachrichtigungsberechtigung abgelehnt.",
+    "chooseTheme": "Thema wählen",
+    "themePreference": "Themenpräferenz",
+    "themePreferenceTooltip": "Wenn Sie \"Auto\" auswählen, passt sich das Thema an die Systemeinstellungen an.",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "auto": "Auto",
+    "themeChanged": "Thema geändert zu {{theme}}."
+  },
+  "modifyAccount": {
+    "invalidEmail": "E-Mail ist ungültig.",
+    "passwordUppercase": "Das Passwort muss mindestens einen Großbuchstaben enthalten.",
+    "passwordLowercase": "Das Passwort muss mindestens einen Kleinbuchstaben enthalten.",
+    "passwordNumber": "Das Passwort muss mindestens eine Zahl enthalten.",
+    "passwordSpecialChar": "Das Passwort muss mindestens ein Sonderzeichen enthalten.",
+    "emailUpdated": "Kontoinformationen aktualisiert. Sie werden jetzt abgemeldet.",
+    "passwordUpdated": "Passwort aktualisiert. Sie werden jetzt abgemeldet.",
+    "updateEmailFailed": "Kontoinformationen konnten nicht aktualisiert werden: {{message}}",
+    "updatePasswordFailed": "Passwort konnte nicht aktualisiert werden: {{message}}",
+    "updateEmailUnknownError": "Kontoinformationen konnten nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
+    "updatePasswordUnknownError": "Passwort konnte nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
+    "title": "Konto ändern",
+    "modifyEmail": "E-Mail ändern",
+    "currentEmail": "Aktuelle E-Mail",
+    "currentPassword": "Aktuelles Passwort",
+    "newEmail": "Neue E-Mail",
+    "updateEmailButton": "E-Mail aktualisieren",
+    "updateEmailButtonTooltip": "Klicken Sie, um Ihre E-Mail zu aktualisieren",
+    "updateEmailButtonAria": "E-Mail aktualisieren",
+    "modifyPassword": "Passwort ändern",
+    "newPassword": "Neues Passwort",
+    "updatePasswordButton": "Passwort aktualisieren",
+    "updatePasswordButtonTooltip": "Klicken Sie, um Ihr Passwort zu aktualisieren",
+    "updatePasswordButtonAria": "Passwort aktualisieren",
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Passwort verbergen",
+    "showNewPassword": "Neues Passwort anzeigen",
+    "hideNewPassword": "Neues Passwort verbergen",
+    "currentEmailAria": "Aktuelle E-Mail",
+    "newEmailAria": "Neue E-Mail",
+    "currentPasswordAria": "Aktuelles Passwort",
+    "newPasswordAria": "Neues Passwort",
+    "emailErrors": {
+      "invalidEmail": "Ungültige E-Mail-Adresse.",
+      "emailRequired": "E-Mail ist erforderlich."
+    },
+    "passwordErrors": {
+      "invalidPassword": "Das Passwort erfüllt nicht die Kriterien.",
+      "passwordRequired": "Passwort ist erforderlich."
+    },
+    "googleManagedTitle": "Von Google verwaltetes Konto",
+    "googleManagedDescription": "Ihr Konto wird von Google verwaltet. Bitte verwenden Sie Google-Dienste, um Ihr Konto zu ändern.",
+    "alerts": {
+      "error": "Ein Fehler ist aufgetreten.",
+      "success": "Vorgang erfolgreich."
+    }
+  },
+  "sidebar": {
+    "userSettings": "Benutzereinstellungen",
+    "accountSettings": "Kontoeinstellungen",
+    "appSettings": "App-Einstellungen",
+    "manageUsers": "Benutzer verwalten"
+  },
+  "manageUsers": {
+    "title": "Benutzer verwalten",
+    "columns": {
+      "email": "E-Mail",
+      "authType": "Auth-Typ",
+      "emailVerified": "E-Mail verifiziert",
+      "role": "Rolle",
+      "entityCode": "Entitätscode",
+      "entityName": "Entitätsname",
+      "createdAt": "Erstellt am"
+    },
+    "infoTooltip": "Damit ein Benutzer die App nutzen kann, muss ihm eine Entität zugewiesen werden. Sie können die untenstehende Tabelle verwenden, um einen Benutzer durch Doppelklicken auf die E-Mail auszuwählen und dann mit der Entitätszuweisung fortzufahren.",
+    "selectUserPrompt": "Wählen Sie einen Benutzer aus, um eine Entität zuzuweisen",
+    "selectedUser": "Ausgewählter Benutzer: ",
+    "userDeselected": "Benutzer abgewählt",
+    "yes": "Ja",
+    "no": "Nein",
+    "na": "Nicht verfügbar",
+    "userTable": "Benutzertabelle"
+  },
+  "userCard": {
+    "avatarAlt": "Avatar für",
+    "role": "Rolle",
+    "code": "Code",
+    "name": "Name",
+    "none": "Keine"
+  },
+  "userDetails": {
+    "goBack": "Zurückgehen",
+    "selectRole": "Wählen Sie eine neue Rolle aus.",
+    "roleSelection": "Rollenwahl",
+    "selectClient": "Kundenrolle auswählen",
+    "selectAgent": "Agentenrolle auswählen",
+    "selectAdmin": "Administratorrolle auswählen",
+    "client": "Kunde",
+    "agent": "Agent",
+    "admin": "Administrator",
+    "selectEntity": "Wählen Sie eine Entität durch Doppelklicken aus.",
+    "searchPlaceholder": "Suche nach nach Name oder ID",
+    "loadingEntities": "Entitäten werden geladen...",
+    "startTyping": "Beginnen Sie mit der Eingabe, um zu suchen",
+    "entityName": "Name",
+    "entityId": "ID",
+    "saveChanges": "Speichern",
+    "success": "Änderungen erfolgreich gespeichert!",
+    "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+    "updateSuccess": "Benutzer erfolgreich aktualisiert.",
+    "updateSuccessToast": "Benutzer erfolgreich aktualisiert.",
+    "updateFailed": "Benutzer konnte nicht aktualisiert werden: {{message}}",
+    "updateFailedToast": "Benutzer konnte nicht aktualisiert werden: {{message}}",
+    "updateUnknownError": "Benutzer konnte nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
+    "updateUnknownErrorToast": "Benutzer konnte nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
+    "userIdUndefined": "Benutzer-ID ist undefiniert.",
+    "userIdUndefinedToast": "Benutzer-ID ist undefiniert.",
+    "loadAdminsErrror": "Administratoren konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+    "alerts": {
+      "success": "Änderungen erfolgreich gespeichert!",
+      "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "updateSuccess": "Benutzer erfolgreich aktualisiert.",
+      "updateSuccessToast": "Benutzer erfolgreich aktualisiert.",
+      "updateFailed": "Benutzer konnte nicht aktualisiert werden: {{message}}",
+      "updateFailedToast": "Benutzer konnte nicht aktualisiert werden: {{message}}",
+      "updateUnknownError": "Benutzer konnte nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
+      "updateUnknownErrorToast": "Benutzer konnte nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
+      "userIdUndefined": "Benutzer-ID ist undefiniert.",
+      "userIdUndefinedToast": "Benutzer-ID ist undefiniert.",
+      "loadAdminsErrror": "Administratoren konnten nicht geladen werden. Bitte versuchen Sie es erneut."
+    }
+  },
+  "createVisitForm": {
+    "title": "Neuen Besuch erstellen",
+    "typeLabel": "Typ",
+    "regular": "Regulär",
+    "urgent": "Dringend",
+    "reasonLabel": "Grund",
+    "issue": "Problem",
+    "routine": "Routine",
+    "newClient": "Neuer Kunde",
+    "publicNoteLabel": "Öffentliche Notiz",
+    "publicNoteTooltip": "Geben Sie eine öffentliche Notiz für den Besuch ein.",
+    "privateNoteLabel": "Private Notiz*",
+    "privateNoteTooltip": "Die private Notiz ist nur für Sie und die Administratoren sichtbar.",
+    "privateNotePlaceholder": "Die private Notiz ist nur für Sie und die Administratoren sichtbar.",
+    "selectDateTime": "Datum & Uhrzeit auswählen",
+    "sendVisitTooltip": "Besuch senden",
+    "sendVisit": "Besuch senden",
+    "cancelTooltip": "Abbrechen",
+    "cancel": "Abbrechen",
+    "fillAllFields": "Bitte füllen Sie alle erforderlichen Felder aus.",
+    "visitCreated": "Besuch erfolgreich erstellt.",
+    "creationFailed": "Besuch konnte nicht erstellt werden: ",
+    "creationFailedUnknown": "Besuch konnte nicht erstellt werden: Ein unbekannter Fehler ist aufgetreten.",
+    "cancelDialogTitle": "Besuchserstellung abbrechen",
+    "cancelDialogDescription": "Sind Sie sicher, dass Sie die Erstellung dieses Besuchs abbrechen möchten? Alle eingegebenen Informationen gehen verloren.",
+    "no": "Nein",
+    "yes": "Ja"
+  },
+  "clientDetailsCard": {
+    "code": "Code",
+    "address": "Adresse",
+    "province": "Provinz",
+    "na": "Nicht verfügbar",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "paymentMethod": "Zahlungsmethode",
+    "agent": "Agent",
+    "createVisitTooltip": "Neuen Besuch erstellen",
+    "createVisit": "Besuch erstellen",
+    "deselectClientTooltip": "Aktuellen Kunden abwählen",
+    "deselectClient": "Kunde abwählen",
+    "cancelDialogTitle": "Kunde abwählen",
+    "cancelDialogDescription": "Sind Sie sicher, dass Sie den aktuellen Kunden abwählen möchten? Alle nicht gespeicherten Änderungen gehen verloren.",
+    "no": "Nein",
+    "yes": "Ja"
+  },
+  "visitCard": {
+    "avatarAlt": "Avatar",
+    "visitFor": "Besuch für",
+    "type": "Typ",
+    "reason": "Grund",
+    "date": "Datum",
+    "publicNote": "Öffentliche Notiz",
+    "privateNote": "Private Notiz",
+    "completed": "Abgeschlossen",
+    "issuedBy": "Ausgestellt von",
+    "na": "Nicht verfügbar",
+    "unknown": "Unbekannt",
+    "yes": "Ja",
+    "no": "Nein"
+  },
+  "editVisitForm": {
+    "title": "Besuch bearbeiten",
+    "fillAllFields": "Bitte füllen Sie alle erforderlichen Felder aus.",
+    "updateSuccess": "Besuch erfolgreich aktualisiert.",
+    "updateFailed": "Besuch konnte nicht aktualisiert werden: {{message}}",
+    "updateFailedUnknown": "Besuch konnte nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
+    "dateLabel": "Datum",
+    "publicNoteLabel": "Öffentliche Notiz",
+    "publicNoteTooltip": "Geben Sie eine öffentliche Notiz für den Besuch ein.",
+    "privateNoteLabel": "Private Notiz",
+    "privateNoteTooltip": "Geben Sie eine private Notiz für den Besuch ein.",
+    "privateNotePlaceholder": "Die private Notiz ist nur für Sie und die Administratoren sichtbar.",
+    "typeLabel": "Typ",
+    "regular": "Regulär",
+    "urgent": "Dringend",
+    "reasonLabel": "Grund",
+    "issue": "Problem",
+    "routine": "Routine",
+    "newClient": "Neuer Kunde",
+    "saveChangesTooltip": "Änderungen speichern",
+    "cancelTooltip": "Abbrechen",
+    "cancelDialogTitle": "Bearbeitung abbrechen",
+    "cancelDialogDescription": "Sind Sie sicher, dass Sie die Bearbeitung dieses Besuchs abbrechen möchten? Alle nicht gespeicherten Änderungen gehen verloren.",
+    "no": "Nein",
+    "yes": "Ja",
+    "completedLabel": "Als abgeschlossen markieren",
+    "cancelledLabel": "Als storniert markieren",
+    "pendingLabel": "Ausstehend",
+    "completedStatus": "Abgeschlossen",
+    "cancelledStatus": "Storniert"
+  },
+  "visitsSidebar": {
+    "goBack": "Zurückgehen",
+    "goBackTooltip": "Zurück zur Agentenliste",
+    "agents": "Agenten",
+    "clients": "Kunden",
+    "visits": "Besuche",
+    "refresh": "Besuche aktualisieren",
+    "refreshTooltip": "Besuche aktualisieren",
+    "searchTooltip": "Suche",
+    "searchAgents": "Agenten suchen",
+    "searchClients": "Kunden suchen",
+    "id": "ID",
+    "code": "Code",
+    "province": "Provinz",
+    "na": "Nicht verfügbar",
+    "pendingVisits": "Hat ausstehende Besuche",
+    "incompleteVisits": "Hat unvollständige Besuche",
+    "pendingCount": "{{count}} ausstehende Besuche",
+    "incompleteCount": "{{count}} unvollständige Besuche",
+    "unknown": "Unbekannt"
+  },
+  "visitsTable": {
+    "tableAriaLabel": "Besuche Tabelle",
+    "type": "Typ",
+    "reason": "Grund",
+    "date": "Datum",
+    "completed": "Abgeschlossen",
+    "pending": "Ausstehend",
+    "createdAt": "Erstellt am",
+    "na": "Nicht verfügbar",
+    "yes": "Ja",
+    "no": "Nein",
+    "selectVisitError": "Besuch konnte nicht ausgewählt werden.",
+    "noVisits": "Keine Besuche gefunden.",
+    "unknown": "Unbekannt"
+  },
+  "calendarHook": {
+    "weekendsNotSelectable": "Wochenenden sind nicht auswählbar.",
+    "pastDateError": "Sie können kein Ereignis in der Vergangenheit erstellen.",
+    "selectedDateRange": "Ausgewählter Datumsbereich von {{start}} bis {{end}}.",
+    "eventUpdatedSuccess": "Ereignis erfolgreich aktualisiert!",
+    "eventCreatedSuccess": "Ereignis erfolgreich erstellt!",
+    "eventSubmitFailedWithError": "Ereignis konnte nicht übermittelt werden: {{error}}",
+    "eventSubmitFailed": "Ereignis konnte nicht übermittelt werden.",
+    "eventIdMissing": "Ereignis-ID fehlt.",
+    "eventDeletedSuccess": "Ereignis erfolgreich gelöscht!",
+    "eventDeleteFailedWithError": "Ereignis konnte nicht gelöscht werden: {{error}}",
+    "eventDeleteFailed": "Ereignis konnte nicht gelöscht werden.",
+    "editingEvent": "Ereignis bearbeiten: {{reason}}",
+    "formCanceled": "Formular abgebrochen.",
+    "switchedToView": "Zu {{view}} Ansicht gewechselt.",
+    "visitEventName": "Besuch für ID: {{clientId}}",
+    "selectedVisit": "Ausgewählter Besuch: {{reason}} am {{date}}.",
+    "visitsNotEditable": "Besuche können nicht aus dem Kalender bearbeitet werden.",
+    "selectedEvent": "Ausgewählter {{reason}} am {{date}}.",
+    "roleNotAssigned": "Bitte warten Sie, bis Ihrem Konto eine Rolle zugewiesen wurde, bevor Sie sich anmelden.",
+    "accountVerificationPending": "Ihr Konto wird noch von den Administratoren verifiziert.",
+    "roleFetchingError": "Fehler beim Abrufen der Benutzerrolle.",
+    "errorDuringLogin": "Beim Anmelden ist ein Fehler aufgetreten: {{error}}",
+    "registrationSuccess": "Registrierung erfolgreich: {{message}}",
+    "registrationFailed": "Registrierung fehlgeschlagen: {{message}}",
+    "loginFailed": "Anmeldung fehlgeschlagen: {{message}}",
+    "viewModes": {
+      "calendar": "Kalender",
+      "history": "Historie"
+    },
+    "userNotAuthenticated": "Benutzer ist nicht authentifiziert."
+  },
+  "createChatForm": {
+    "title": "Neuen Chat erstellen",
+    "tooltips": {
+      "groupChat": "Gruppenchat erstellen",
+      "broadcastChat": "Broadcast-Chat erstellen",
+      "cancel": "Abbrechen",
+      "create": "Chat erstellen"
+    },
+    "labels": {
+      "groupName": "Gruppenname",
+      "broadcastName": "Broadcast-Name",
+      "selectParticipants": "Teilnehmer auswählen",
+      "cancel": "Abbrechen",
+      "create": "Chat erstellen",
+      "searchUsers": "Benutzer suchen",
+      "findParticipants": "Teilnehmer finden"
+    },
+    "errors": {
+      "noParticipants": "Bitte wählen Sie mindestens einen Teilnehmer aus.",
+      "chatNameRequired": "Chatname ist erforderlich.",
+      "createChatFailed": "Chat konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
+    },
+    "success": {
+      "createChat": "Chat erfolgreich erstellt!"
+    },
+    "userList": {
+      "table": "Benutzerauswahltabelle",
+      "unknownUser": "Unbekannter Benutzer",
+      "unknownEmail": "Unbekannte E-Mail",
+      "headers": {
+        "name": "Name",
+        "email": "E-Mail"
+      }
+    }
+  },
+  "chats": {
+    "error": "Ein Fehler ist bei den Chats aufgetreten:",
+    "defaultTitle": "Chat",
+    "groupTitle": "Gruppenchat"
+  },
+  "errors": {
+    "userNotFound": "Benutzer mit ID {{id}} nicht gefunden.",
+    "adminNotFound": "Administrator mit ID {{id}} nicht gefunden.",
+    "unknown": "Ein unbekannter Fehler ist aufgetreten.",
+    "unknownAgent": "Unbekannter Agent",
+    "searchFailed": "Suche fehlgeschlagen. Bitte versuchen Sie es erneut."
+  },
+  "signin": {
+    "loginSuccess": "Erfolgreich angemeldet!",
+    "registrationSuccess": "Erfolgreich registriert!",
+    "loginWithGoogleSuccess": "Erfolgreich mit Google angemeldet!",
+    "passwordMismatch": "Passwörter stimmen nicht überein."
+  },
+  "promoForm": {
+    "success": "Aktion erfolgreich eingereicht!",
+    "updateFailed": "Aktion konnte nicht eingereicht werden: {{message}}",
+    "unknownError": "Aktion konnte nicht eingereicht werden: Ein unbekannter Fehler ist aufgetreten."
+  },
+  "usePromos": {
+    "createSuccess": "Aktion erfolgreich erstellt!",
+    "createFailed": "Aktion konnte nicht erstellt werden: {{message}}",
+    "createUnknownError": "Aktion konnte nicht erstellt werden: Ein unbekannter Fehler ist aufgetreten.",
+    "updateMissingId": "Aktions-ID fehlt für die Aktualisierung.",
+    "updateSuccess": "Aktion erfolgreich aktualisiert!",
+    "updateFailed": "Aktion konnte nicht aktualisiert werden: {{message}}",
+    "updateUnknownError": "Aktion konnte nicht aktualisiert werden: Ein unbekannter Fehler ist aufgetreten.",
+    "sunsetNoPromoSelected": "Keine Aktion für den Sonnenuntergang ausgewählt.",
+    "sunsetMissingId": "Aktions-ID fehlt für den Sonnenuntergang.",
+    "sunsetSuccess": "Aktion erfolgreich beendet.",
+    "sunsetFailed": "Aktion konnte nicht beendet werden: {{message}}",
+    "sunsetUnknownError": "Aktion konnte nicht beendet werden: Ein unbekannter Fehler ist aufgetreten.",
+    "editNoPromoSelected": "Keine Aktion zum Bearbeiten ausgewählt.",
+    "refreshSuccess": "Aktionen erfolgreich aktualisiert."
+  },
+  "resizeObserver": {
+    "unsupported": "ResizeObserver wird in Ihrem Browser nicht unterstützt. Bitte aktualisieren oder verwenden Sie einen anderen Browser."
+  },
+  "useVisits": {
+    "agentSelected": "Agent erfolgreich ausgewählt.",
+    "clientSelected": "Kunde erfolgreich ausgewählt.",
+    "backToAgents": "Zurück zur Agentenliste.",
+    "visitCreated": "Besuch erfolgreich erstellt.",
+    "failedToCreateVisit": "Besuch konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+    "visitsRefreshed": "Besuche erfolgreich aktualisiert.",
+    "failedToRefreshVisits": "Besuche konnten nicht aktualisiert werden. Bitte versuchen Sie es erneut.",
+    "agentNotFound": "Ausgewählter Agent nicht gefunden."
+  },
+  "useStatsToasts": {
+    "loadingData": "Daten werden geladen...",
+    "successData": "Daten erfolgreich abgerufen!",
+    "failedData": "Abrufen der Daten fehlgeschlagen. Bitte versuchen Sie, die Seite zu aktualisieren oder kommen Sie später wieder.",
+    "errorMessage": "Fehler: {{message}}",
+    "unknownError": "Beim Abrufen der Daten ist ein unbekannter Fehler aufgetreten. Versuchen Sie, die Seite zu aktualisieren oder kontaktieren Sie die IT.",
+    "retryingData": "Versuche, die Initialdaten abzurufen... (Versuch #{{attempt}})"
+  },
+  "webSocketService": {
+    "lostConnection": "Verbindung zum Server verloren, versuche neu zu verbinden...",
+    "connectionEstablished": "Verbindung zum Server hergestellt.",
+    "connectionLost": "Verbindung zum Server verloren, aktualisieren Sie die Seite oder versuchen Sie es später erneut."
+  },
+  "dashboard": {
+    "welcomeBack": "Willkommen zurück, {{name}}!",
+    "statisticsFor": "Statistiken für {{name}}",
+    "yourStatistics": "Ihre Statistiken",
+    "calendar": "Kalender",
+    "loadingWelcome": "Begrüßung wird geladen",
+    "skeleton": "Inhalt wird geladen",
+    "loadingStatistics": "Statistiken werden geladen",
+    "loadingText": "Text wird geladen",
+    "calendarButton": "Kalender öffnen",
+    "closeButton": "Auswahl schließen",
+    "activePromotions": "Aktive Aktionen",
+    "agentActivityOverview": "Übersicht der Agentenaktivität",
+    "spentThisMonth": "In diesem Monat ausgegeben",
+    "spentThisYear": "In diesem Jahr ausgegeben",
+    "topArticleType": "Top Artikeltypen",
+    "monthOverMonthSpendingTrend": "Monatlicher Ausgaben-Trend",
+    "topBrandsSold": "Top verkaufte Marken",
+    "totalEarning": "Gesamteinnahmen",
+    "totalOrders": "Gesamtbestellungen",
+    "salesDistribution": "Vertriebsverteilung",
+    "upcomingVisits": "Bevorstehende Besuche",
+    "yourCalendar": "Ihr Kalender"
+  },
+  "articlesPage": {
+    "name": "Name",
+    "brand": "Marke",
+    "oemId": "OEM ID",
+    "unitPrice": "Stückpreis",
+    "cost": "Kosten",
+    "quantitySold": "Verkaufte Menge"
+  },
+  "movementsPage": {
+    "id": "Listen-ID",
+    "clientName": "Kunde",
+    "agentName": "Agent",
+    "dateOfOrder": "Datum",
+    "totalQuantity": "Verkaufte Artikel",
+    "totalPriceSold": "Gesamt"
+  },
+  "status": {
+    "pending": "Ausstehend",
+    "approved": "Genehmigt",
+    "rejected": "Abgelehnt",
+    "cancelled": "Storniert"
+  },
+  "eventHistoryTooltips": {
+    "approve": "Ereignis genehmigen",
+    "reject": "Ereignis ablehnen",
+    "delete": "Ereignis löschen",
+    "edit": "Ereignis bearbeiten",
+    "visit": "Zum Besuch gehen"
+  },
+  "eventHistory": {
+    "title": "Ereignishistorie",
+    "headers": {
+      "user": "Benutzer",
+      "eventType": "Ereignistyp",
+      "reason": "Grund",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "status": "Status",
+      "actions": "Aktionen"
+    },
+    "actions": {
+      "na": "Nicht verfügbar"
+    },
+    "toast": {
+      "approveSuccess": "Ereignis erfolgreich genehmigt.",
+      "approveFailure": "Ereignis konnte nicht genehmigt werden.",
+      "rejectSuccess": "Ereignis erfolgreich abgelehnt.",
+      "rejectFailure": "Ereignis konnte nicht abgelehnt werden.",
+      "genericError": "Ein Fehler ist aufgetreten."
+    }
   }
+}

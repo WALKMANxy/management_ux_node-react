@@ -1,5 +1,12 @@
+// src/routes/adminRoutes.ts
 import express from "express";
-import { fetchAdminById, fetchAllAdmins } from "../controllers/adminController";
+import {
+  fetchAdminById,
+  fetchAllAdmins,
+  createAdmin,
+  updateAdmin,
+  deleteAdmin,
+} from "../controllers/adminController";
 import { authenticateUser } from "../middlewares/authentication";
 import { checkAdminRole } from "../middlewares/roleChecker";
 
@@ -7,13 +14,21 @@ const router = express.Router();
 
 // Middleware to authenticate and authorize user
 router.use(authenticateUser);
+router.use(checkAdminRole);
 
-//console.log("Admin Details File Path:", config.adminDetailsFilePath);
+// GET method to retrieve all admins
+router.get("/", fetchAllAdmins);
 
-// GET method to retrieve all admins, restricted to admin users
-router.get("/", checkAdminRole, fetchAllAdmins);
+// GET method to retrieve an admin by ID
+router.get("/:id", fetchAdminById);
 
-// GET method to retrieve an admin by ID, restricted to admin users
-router.get("/:id", checkAdminRole, fetchAdminById);
+// POST method to create a new admin
+router.post("/", createAdmin);
+
+// PUT method to update an existing admin by ID
+router.put("/:id", updateAdmin);
+
+// DELETE method to delete an admin by ID
+router.delete("/:id", deleteAdmin);
 
 export default router;

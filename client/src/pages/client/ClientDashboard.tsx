@@ -1,16 +1,7 @@
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import {
-  Box,
-  Fab,
-  Grid,
-  Skeleton,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Box, Grid, useMediaQuery, useTheme } from "@mui/material";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
-import ActivePromotions from "../../components/dashboard/ActivePromotions";
 import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
 import WelcomeMessage from "../../components/dashboard/WelcomeMessage";
 
@@ -45,33 +36,16 @@ const ClientDashboard: React.FC = () => {
   };
 
   return (
-    <Box
-      className="client-dashboard"
-    >
+    <Box className="client-dashboard">
       <WelcomeMessage
         name={user?.entityName}
         role="admin" // or "agent" or "client"
         loading={loadingState}
       />
-      {/* FAB Button for Calendar - Positioned Top Right */}
-      {isTablet && (
-        <Fab
-          color="primary"
-          aria-label="calendar"
-          onClick={handleToggleDrawer}
-          sx={{
-            position: "absolute",
-            top: 100, // Adjust as needed based on layout
-            right: 32, // Adjust as needed based on layout
-            zIndex: 1000,
-          }}
-        >
-          <CalendarMonthIcon />
-        </Fab>
-      )}
-      <Grid container spacing={6} mt={2}>
+
+      <Grid container spacing={6} mt={isMobile ? 0 : 2}>
         {/* Main Content Area */}
-        <Grid item xs={!isTablet ? 12 : false} md={!isTablet ? 9 : false}>
+        <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
           {/* Render ClientView if a client is selected */}
           <ClientView
             loadingState={loadingState}
@@ -84,20 +58,6 @@ const ClientDashboard: React.FC = () => {
             topBrandsData={topBrandsData}
             userRole="client" // Pass the user role as "client"
           />
-
-          {/* Active Promotions */}
-          {loadingState ? (
-            <Skeleton
-              animation="wave"
-              variant="rectangular"
-              width="100%"
-              height={300}
-              sx={{ borderRadius: "12px" }}
-              aria-label={t("clientDashboard.skeleton")}
-            />
-          ) : (
-            <ActivePromotions />
-          )}
         </Grid>
 
         {/* Calendar and Upcoming Visits section */}

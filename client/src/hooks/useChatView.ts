@@ -2,17 +2,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../app/hooks";
-import { showToast } from "../utils/toastMessage";
+import { showToast } from "../services/toastMessage";
+import { selectCurrentChat } from "../features/chat/chatSlice";
 
 const useChatView = () => {
   const { t } = useTranslation(); // Initialize translation
   const [error, setError] = useState<string | null>(null);
 
   // Selectors
-  const currentChatId = useAppSelector((state) => state.chats.currentChat?._id);
-  const currentChat = useAppSelector((state) =>
-    currentChatId ? state.chats.chats[currentChatId] : null
-  );
+  const currentChat = useAppSelector(selectCurrentChat);
   const currentUserId = useAppSelector((state) => state.auth.userId);
   const users = useAppSelector((state) => state.users.users);
 
@@ -73,25 +71,13 @@ const useChatView = () => {
 
     if (currentChat.type === "group") {
       return isAdmin
-        ? [
-            "mute",
-            "edit_group",
-            "edit_group_member",
-            "delete_chat",
-            ...baseOptions,
-          ]
+        ? ["edit_group", "delete_chat", ...baseOptions]
         : baseOptions;
     }
 
     if (currentChat.type === "broadcast") {
       return isAdmin
-        ? [
-            "mute",
-            "edit_broadcast_name",
-            "edit_broadcast_members",
-            "delete_broadcast",
-            ...baseOptions,
-          ]
+        ? ["edit_broadcast", "delete_broadcast", ...baseOptions]
         : baseOptions;
     }
 
@@ -109,7 +95,7 @@ const useChatView = () => {
       );
       if (participantId) {
         const participant = users[participantId];
-        return participant?.entityName || t("chat.defaultTitle");
+        return participant?.entityName || t("chat.deletedUser");
       }
     }
     return currentChat?.name || t("chat.groupTitle");

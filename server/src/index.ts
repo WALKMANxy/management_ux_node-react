@@ -6,7 +6,6 @@ import rateLimit from "express-rate-limit";
 import fs from "fs";
 import helmet from "helmet";
 import https from "https";
-import localtunnel from "localtunnel";
 import mongoose from "mongoose";
 import { Server as SocketIOServer } from "socket.io";
 import { config } from "./config/config";
@@ -24,8 +23,10 @@ import oauthRoutes from "./routes/OAuth";
 import promosRoutes from "./routes/promos";
 import usersRoutes from "./routes/users";
 import visitsRoutes from "./routes/visits";
+import citiesRoutes from "./routes/cities";
 import { errorHandler } from "./utils/errorHandler";
 import { logger, logRequestsIp } from "./utils/logger";
+import { csp } from "./middlewares/csp";
 
 const app = express();
 const PORT = config.port || "3000";
@@ -45,12 +46,12 @@ const corsOptions: cors.CorsOptions = {
 
 console.log("CORS Origin:", corsOptions.origin);
 
+app.use(csp);
 app.use(helmet());
 app.use(cors(corsOptions));
 app.use(compression());
 app.use(cookieParser());
 app.use(express.json());
-app.use(logRequestsIp);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -66,6 +67,7 @@ app.use("/oauth2", oauthRoutes);
 
 // Protected routes
 app.use(authenticateUser);
+app.use(logRequestsIp);
 app.use("/agents", agentRoutes);
 app.use("/admins", adminRoutes);
 app.use("/clients", clientRoutes);
@@ -76,6 +78,7 @@ app.use("/users", usersRoutes);
 app.use("/calendar", calendarEventsRoutes); // Register the day-off request routes
 app.use("/chats", chatRoutes); // Add chat routes
 app.use("/employees", employeeRoutes);
+app.use("/cities", citiesRoutes);
 
 app.use(errorHandler);
 
@@ -99,29 +102,11 @@ setupWebSocket(io);
 // Log when the WebSocket server starts
 logger.info("WebSocket server initialized");
 
-server.listen(PORT, async () => {
+server.listen(PORT, () => {
   logger.info(`Server is running on port ${PORT}`, {
     port: PORT,
     environment: process.env.NODE_ENV || "development",
   });
-
-  if (process.env.NODE_ENV === "local") {
-    try {
-      const tunnel = await localtunnel({
-        port: parseInt(PORT),
-        subdomain: config.tunnelSubdomain,
-        local_https: true,
-        allow_invalid_cert: true,
-      });
-      logger.info(`LocalTunnel running at ${tunnel.url}`);
-
-      tunnel.on("close", () => {
-        logger.warn("LocalTunnel closed");
-      });
-    } catch (error) {
-      logger.error("Error setting up LocalTunnel:", { error });
-    }
-  }
 });
 
 export default app;

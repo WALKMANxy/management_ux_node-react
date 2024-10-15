@@ -40,16 +40,29 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
       [isMovementDetailsCollapsed, setMovementDetailsCollapsed]
     );
 
+    // Calculate height based on expansion state and mobile view
+    const height = useMemo(() => {
+      if (isMobile) {
+        return isMovementDetailsCollapsed ? "100%" : 640 * 1.33; // Reduced by 25% when expanded
+      }
+      return "100%";
+    }, [isMobile, isMovementDetailsCollapsed]);
+
     // Memoize styles to avoid recreating them on every render
     const paperStyles = useMemo(
       () => ({
-        p: 3,
+        p: isMobile ? 0 : 3,
         borderRadius: "12px",
         background: "linear-gradient(135deg, #e3f2fd 30%, #bbdefb 100%)",
         color: "#000",
-        position: "relative" as const,
         overflow: "hidden",
-        height: "100%",
+        height,
+        maxHeight: height,
+        position: "relative" as const,
+        overflowX: "hidden", // Ensure no horizontal overflow
+        "&::-webkit-scrollbar": {
+          display: "none", // Hide scrollbar
+        },
         "&:after": {
           content: '""',
           position: "absolute",
@@ -59,6 +72,7 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
           borderRadius: "50%",
           top: -85,
           right: -95,
+          overflow: "hidden",
         },
         "&:before": {
           content: '""',
@@ -70,9 +84,10 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
           top: -125,
           right: -15,
           opacity: 0.5,
+          overflow: "hidden",
         },
       }),
-      [theme.palette.primary.main]
+      [theme.palette.primary.main, isMobile, height]
     );
 
     return (
@@ -85,12 +100,16 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <Grid item>
+                <Grid
+                  item
+                  sx={{ display: "flex", alignItems: "space-between" }}
+                >
                   <Typography variant="h2">
                     {t("movementDetails.title", "Movement Details")}
                   </Typography>
                 </Grid>
-                <Grid item>
+
+                <Box sx={{ alignItems: "flex-end", display: "flex" }}>
                   <Tooltip
                     title={
                       isMovementDetailsCollapsed
@@ -110,6 +129,7 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
                           : t("movementDetails.collapse", "Collapse details")
                       }
                       size="large"
+                      sx={{ zIndex: 1000 }}
                     >
                       {isMovementDetailsCollapsed ? (
                         <ExpandMoreIcon />
@@ -118,19 +138,16 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
                       )}
                     </IconButton>
                   </Tooltip>
-                </Grid>
+                </Box>
               </Grid>
             </Grid>
           </Grid>
         </Box>
+        {/* Collapse the main content, leaving only the title when collapsed */}
         <Collapse in={!isMovementDetailsCollapsed}>
           {selectedMovement && (
             <Box sx={{ p: 2 }}>
-              <Grid
-                container
-                spacing={2}
-                direction={isMobile ? "column" : "row"}
-              >
+              <Grid container spacing={2} direction={"column"}>
                 <Grid item xs={12} md={6}>
                   <MovementDetailComponent
                     detail={{

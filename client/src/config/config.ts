@@ -21,3 +21,13 @@ export const getTimeMs = () => {
 
   return apiUrl;
 };
+
+export const getLocationToken = () => {
+  const apiUrl = import.meta.env.VITE_GEO_TOKEN;
+
+  if (!apiUrl) {
+    console.error("API URL is not defined inside config.ts.");
+  }
+
+  return apiUrl;
+}

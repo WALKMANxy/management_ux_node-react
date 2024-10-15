@@ -8,6 +8,7 @@ import {
   ListItemText,
   Box,
   Divider,
+  useMediaQuery,
 } from "@mui/material";
 import { Agent, Client } from "../../models/entityModels";
 import { useTranslation } from "react-i18next";
@@ -27,6 +28,8 @@ const ListItemComponent: React.FC<ListItemComponentProps> = ({
   onClick,
 }) => {
   const { t } = useTranslation();
+
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   const renderSecondary = () => {
     if ("clients" in item) {
@@ -62,7 +65,7 @@ const ListItemComponent: React.FC<ListItemComponentProps> = ({
             justifyContent="flex-end"
             alignItems="center"
             gap={1}
-            sx={{ height: "100%" }}
+            sx={{ height: "100%", pt: isMobile ? 0: 4 }}
           >
             {/* Render Status Indicators */}
             {"hasPending" in counts && counts.hasPending && (

@@ -1,4 +1,89 @@
 {
+  "footer": {
+    "about": "About",
+    "ourStory": "Our Story",
+    "team": "Team",
+    "followUs": "Follow Us",
+    "facebook": "Follow us on Facebook",
+    "instagram": "Follow us on Instagram",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "close": "Close",
+    "hours": "Hours"
+  },
+  "ourStory": {
+    "title": "Our Story",
+    "content": {
+      "part1": "<0>Ricambi Centro Sud S.r.l.</0> operates in the commercial vehicle, bus, truck, and auto parts sectors for diesel and gasoline engines, also dealing with bodywork and industrial, agricultural, maritime, and railway vehicles. Since 1995 in Catania, it offers services for choosing and selling the products offered with professionalism and competence, meeting the needs of public and private entities, spare parts dealers, pump specialists, mechanics, and electricians.",
+      "part2": "The company, now expanding, is eager to offer this increasingly competent and effective service directly to private individuals, providing an opportunity and offering solutions for big and small vehicle problems. You will find qualified personnel in continuous training, capable of analyzing the problem and offering advice on the right alternatives. You can benefit from home delivery and complete 360-degree services.",
+      "part3": "The company is a distributor of original spare parts brands, as well as officially reconditioned products directly from the manufacturer. The quality of service compared to price, the qualified technical area, and the management/project beyond simple direct sales are the three strong and distinctive points of Ricambi Centro Sud S.r.l. The technical area, equipped with tools and continuous training, promotes the functional network in the area, guaranteeing updates and post-sales assistance to customers.",
+      "part4": "<0>A company that has not lost its open and family-friendly character</0> but is in great expansion today, facing new challenges. The new structure, which spans 3,800 sqm over three levels, including offices, warehouse, and sales point, with a total of 25 employees, is able to guarantee service in different areas of expertise across the territory thanks to specialized sales agents by product type and brand."
+    }
+  },
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "content": {
+      "part1": "<0>Welcome to RCS NEXT</0>, a browser-based application provided by Ricambi Centro Sud. We take your privacy seriously and are committed to protecting the data we collect in compliance with GDPR regulations. This privacy policy outlines the types of information we collect, how it is used, and your rights regarding that information.",
+      "part2": "Data Collection",
+      "part3": "The data handled by Ricambi Centro Sud for the RCS NEXT app is collected solely for the purpose of ensuring the smooth functioning of the services provided. We may collect information such as your IP address and device fingerprint to validate your identity and enhance our authentication processes. This helps us ensure the security of your account and prevent unauthorized access.",
+      "part4": "Purpose of Data Use",
+      "part5": "The data collected is used to make the RCS NEXT app work as intended. Specifically, this includes enabling communication through chats within the company and between clients, facilitating access to statistics, managing visits, handling calendar appointments, and issuing or viewing promotions. There are no third-party analytics tools involved; your data is solely processed for operational purposes.",
+      "part6": "Data Sharing",
+      "part7": "Ricambi Centro Sud does not share any collected data with external parties. Your data is strictly utilized by the company to support the services and functionalities of the RCS NEXT application.",
+      "part8": "Your Rights",
+      "part9": "You have the right to request access to the personal data we have collected about you, as well as the right to request correction or deletion of that data. If you wish to have your data deleted, please send an email to info@ricambicentrosud.com.",
+      "part10": "Data Security",
+      "part11": "We take reasonable measures to protect your information from unauthorized access, alteration, or disclosure. However, please note that no system can be 100% secure.",
+      "part12": "Changes to This Policy",
+      "part13": "We may update this privacy policy from time to time. Any changes will be reflected here, and we encourage you to review this page periodically."
+    }
+  },
+  "termsOfService": {
+    "title": "Terms of Service",
+    "content": {
+      "part1": "<0>Welcome to RCS NEXT</0>, a browser-based application operated by Ricambi Centro Sud. By accessing or using our application, you agree to be bound by these terms of service. If you do not agree with these terms, please do not use the app.",
+      "part2": "Acceptance of Terms",
+      "part3": "By using the RCS NEXT app, you acknowledge that you have read, understood, and agree to these terms of service. We may update these terms occasionally, and it is your responsibility to review them regularly.",
+      "part4": "Use of Service",
+      "part5": "RCS NEXT is intended for use by Ricambi Centro Sud employees and authorized clients only. The app provides access to internal communication features, company statistics, calendar management, and promotions. You agree to use the service for its intended purposes only and refrain from any activities that could disrupt or harm the app or other users.",
+      "part6": "User Accounts",
+      "part7": "You are responsible for maintaining the confidentiality of your account credentials. Any activity under your account is your responsibility. If you believe your account has been compromised, please notify us immediately.",
+      "part8": "Content Ownership",
+      "part9": "All content within the RCS NEXT application, including but not limited to text, graphics, and trademarks, is the property of Ricambi Centro Sud. You may not copy, distribute, or create derivative works without our written consent.",
+      "part10": "Termination",
+      "part11": "We reserve the right to suspend or terminate your access to the RCS NEXT app at any time, particularly if you violate these terms of service or use the app in a manner that we deem inappropriate or harmful.",
+      "part12": "Limitation of Liability",
+      "part13": "Ricambi Centro Sud provides the RCS NEXT app \"as-is\" and makes no guarantees regarding its performance or reliability. We are not liable for any damages arising from your use of the application.",
+      "part14": "Governing Law",
+      "part15": "These terms shall be governed by and construed in accordance with the laws of Italy. Any disputes arising from the use of the RCS NEXT app will be subject to the jurisdiction of Italian courts.",
+      "part16": "Contact Information",
+      "part17": "For questions regarding these terms, please contact us at info@ricambicentrosud.com."
+    }
+  },
+  "modalContent": {
+    "team": {
+      "title": "Our Team",
+      "content": "Meet our dedicated team of professionals..."
+    },
+    "facebook": {
+      "title": "Follow Us on Facebook",
+      "content": "Stay updated with our latest news and offers on Facebook..."
+    },
+    "instagram": {
+      "title": "Follow Us on Instagram",
+      "content": "Check out our Instagram for behind-the-scenes content and more..."
+    },
+    "privacyPolicy": {
+      "title": "Privacy Policy",
+      "content": "Our privacy policy outlines how we collect, use, and protect your personal information..."
+    },
+    "termsOfService": {
+      "title": "Terms of Service",
+      "content": "By using our services, you agree to the following terms and conditions..."
+    }
+  },
+
   "welcome": "Welcome",
   "login": "Login",
   "statistics": "Statistics",
@@ -474,23 +559,23 @@
     "titleAgent": "Earned This Month",
     "titleClient": "Spent This Month",
     "iconAlt": "Money Icon",
-    "more": "more",
-    "neutral": "more",
-    "less": "less",
-    "even": "even",
-    "comparedToOtherAgents": "compared to average.",
-    "comparedToOtherClients": "compared to average."
+    "more": "",
+    "neutral": "",
+    "less": "",
+    "even": "",
+    "comparedToOtherAgents": "compared to all.",
+    "comparedToOtherClients": "compared to all."
   },
   "spentThisYear": {
     "titleAgent": "Earned This Year",
     "titleClient": "Spent This Year",
     "iconAlt": "Money Bag Icon",
-    "more": "more",
-    "neutral": "more",
-    "less": "less",
-    "even": "even",
-    "comparedToOtherAgents": "compared to average.",
-    "comparedToOtherClients": "compared to average."
+    "more": "",
+    "neutral": "",
+    "less": "",
+    "even": "",
+    "comparedToOtherAgents": "compared to all.",
+    "comparedToOtherClients": "compared to all."
   },
   "topArticleType": {
     "titleAgent": "Top Sold",
@@ -549,6 +634,7 @@
     "keepMeSignedIn": "Keep me signed in",
     "recommendedOnTrustedDevices": "Recommended on trusted devices",
     "enterPassword": "Enter your password",
+    "enterConfirmPassword": "Enter your password again",
     "forgotPassword": "Forgot password?",
     "newToApp": "New to {{appName}}?",
     "createAccount": "Create an account",
@@ -578,7 +664,7 @@
     "enterNewPassword": "Enter your new password",
     "enterVerificationCode": "Enter the verification code provided in your email",
     "passwordUpdatedToast": "Password updated successfully. You can now log in!",
-    "registrationSuccess": "Registration successful!",
+    "registrationSuccess": "Registration successful! Please verify your email.",
     "registrationFailed": "Registration failed: {{error}}",
     "loginFailed": "Login failed: {{message}}",
     "roleNotAssigned": "Please wait for your account to be assigned a role before attempting to log in.",
@@ -592,7 +678,8 @@
     "unexpectedError": "An unexpected error occurred.",
     "googleLoginSuccess": "User logged in successfully via Google OAuth.",
     "googleLoginFailed": "Authentication failed via Google OAuth.",
-    "invalidStateParameter": "Invalid state parameter"
+    "invalidStateParameter": "Invalid state parameter",
+    "loginInconsistency": "There were some inconsistencies while attempting to login. Please contact an administrator."
   },
   "movementDetails": {
     "id": "List ID",
@@ -840,7 +927,7 @@
     "agent": "Agent",
     "admin": "Admin",
     "selectEntity": "Select an entity by double-clicking them.",
-    "searchPlaceholder": "Search {{role}}s by name or ID",
+    "searchPlaceholder": "Search by name or ID",
     "loadingEntities": "Loading entities...",
     "startTyping": "Start typing to search",
     "entityName": "Name",
@@ -996,7 +1083,7 @@
     "yes": "Yes",
     "no": "No",
     "selectVisitError": "Unable to select visit.",
-    "noVisits": "No visits found for this client.",
+    "noVisits": "No visits found.",
     "unknown": "Unknown"
   },
   "calendarHook": {
@@ -1206,5 +1293,35 @@
       "rejectFailure": "Failed to reject the event.",
       "genericError": "An error occurred."
     }
+  },
+  "weather": {
+    "0": "Clear sky",
+    "1": "Mainly clear",
+    "2": "Partly cloudy",
+    "3": "Overcast",
+    "45": "Fog",
+    "48": "Rime fog",
+    "51": "Light drizzle",
+    "53": "Moderate drizzle",
+    "55": "Dense drizzle",
+    "56": "Light freezing drizzle",
+    "57": "Dense freezing drizzle",
+    "61": "Slight rain",
+    "63": "Moderate rain",
+    "65": "Heavy rain",
+    "66": "Light freezing rain",
+    "67": "Heavy freezing rain",
+    "71": "Slight snowfall",
+    "73": "Moderate snowfall",
+    "75": "Heavy snowfall",
+    "77": "Snow grains",
+    "80": "Slight rain showers",
+    "81": "Moderate rain showers",
+    "82": "Violent rain showers",
+    "85": "Slight snow showers",
+    "86": "Heavy snow showers",
+    "95": "Thunderstorm",
+    "96": "Thunderstorm with slight hail",
+    "99": "Thunderstorm with heavy hail"
   }
 }

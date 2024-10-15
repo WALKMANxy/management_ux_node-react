@@ -7,6 +7,7 @@ export type AuthState = {
   role: UserRole;
   id: string;
   userId: string;
+  refreshToken: string;
 };
 
 export type ClientsState = {

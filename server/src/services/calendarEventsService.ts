@@ -89,7 +89,8 @@ export class CalendarEventService {
       return await CalendarEvent.find({
         $or: [
           { userId: new Types.ObjectId(userId) }, // Get events for the logged-in user
-          { status: "approved" }, // Get all approved events for the current month
+          { status: "approved" },
+          { status: "pending" }, // Get all approved and pending events for the current month
         ],
         startDate: { $gte: startOfMonth, $lte: endOfMonth },
       }).exec();

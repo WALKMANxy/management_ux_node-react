@@ -14,11 +14,12 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
+  // Removed TablePagination
   TableRow,
   TableSortLabel,
   Tooltip,
-  Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import "animate.css"; // Add animate.css for animations
 import dayjs from "dayjs";
@@ -32,8 +33,9 @@ import { useCalendar } from "../../hooks/useCalendar";
 import { CalendarEvent } from "../../models/dataModels";
 import {
   getComparator,
+  getDeleteButtonStyles,
   getEditButtonStyles,
-  isPastEvent,
+  isDisabled,
 } from "../../utils/calendarUtils";
 import { EventForm } from "./EventForm";
 
@@ -74,7 +76,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
   } = useCalendar();
 
   const getEditButtonTooltip = (event: CalendarEvent) => {
-    return isPastEvent(event)
+    return isDisabled(event, userRole)
       ? t("eventHistoryTooltips.editDisabled") // New tooltip for past events
       : t("eventHistoryTooltips.edit");
   };
@@ -85,10 +87,12 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
   const [orderBy, setOrderBy] = useState<keyof CalendarEvent | "actions">(
     "updatedAt"
   );
-  // Pagination state
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(20);
+  // Removed Pagination state
+  // const [page, setPage] = useState(0);
+  // const [rowsPerPage, setRowsPerPage] = useState(20);
 
+  // Removed Pagination handlers
+  /*
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -99,6 +103,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+  */
 
   const filteredEvents = useMemo(
     () =>
@@ -110,6 +115,9 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
         ),
     [events]
   );
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Adjusted for MUI theme breakpoints
 
   const eventsWithUsers = useMemo(() => {
     return filteredEvents.map((event) => {
@@ -149,27 +157,48 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
         default:
           return "";
       }
+    } else if (event.eventType === "visit" && event.status === "pending") {
+      return "rgba(255, 165, 0, 0.1)"; // Faint orange for pending visits
     }
     return "";
   };
+
+  // Responsive font size and padding
+  const getTableCellStyles = () => ({
+    padding: isMobile ? '10px 8px' : '16px',
+    fontSize: isMobile ? '0.8rem' : '0.875rem',
+    whiteSpace: "nowrap" as const,
+    // Adjust minWidth for better layout on mobile
+    minWidth: isMobile ? '80px' : 'auto',
+  });
+
+
 
   return (
     <Paper
       className="animate__animated animate__animate_faster animate__fadeIn"
       elevation={3}
-      sx={{ borderRadius: 2, padding: 2 }}
+      sx={{ borderRadius: 2, padding: isMobile ? 1 : 2 }}
     >
-      <Typography variant="h4" gutterBottom>
-        {t("eventHistory.title")}
-      </Typography>
       <TableContainer
         component={Paper}
-        sx={{ maxHeight: "65dvh", overflowY: "auto" }}
+        sx={{
+          maxHeight: "82dvh",
+          overflowY: "auto",
+          overflowX: "auto", // Enable horizontal scroll on small screens
+          "&::-webkitScrollbar": {
+            display: "none",
+          },
+          // For Firefox
+          scrollbarWidth: "none",
+          // For IE and Edge
+          MsOverflowStyle: "none",
+        }}
       >
-        <Table stickyHeader>
+        <Table stickyHeader size={isMobile ? "small" : "medium"}>
           <TableHead>
             <TableRow>
-              <TableCell>
+              <TableCell sx={getTableCellStyles()}>
                 <TableSortLabel
                   active={orderBy === "userId"}
                   direction={orderBy === "userId" ? order : "asc"}
@@ -178,7 +207,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                   {t("eventHistory.headers.user")}
                 </TableSortLabel>
               </TableCell>
-              <TableCell>
+              <TableCell sx={getTableCellStyles()}>
                 <TableSortLabel
                   active={orderBy === "eventType"}
                   direction={orderBy === "eventType" ? order : "asc"}
@@ -187,7 +216,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                   {t("eventHistory.headers.eventType")}
                 </TableSortLabel>
               </TableCell>
-              <TableCell>
+              <TableCell sx={getTableCellStyles()}>
                 <TableSortLabel
                   active={orderBy === "reason"}
                   direction={orderBy === "reason" ? order : "asc"}
@@ -196,7 +225,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                   {t("eventHistory.headers.reason")}
                 </TableSortLabel>
               </TableCell>
-              <TableCell>
+              <TableCell sx={getTableCellStyles()}>
                 <TableSortLabel
                   active={orderBy === "startDate"}
                   direction={orderBy === "startDate" ? order : "asc"}
@@ -205,7 +234,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                   {t("eventHistory.headers.startDate")}
                 </TableSortLabel>
               </TableCell>
-              <TableCell>
+              <TableCell sx={getTableCellStyles()}>
                 <TableSortLabel
                   active={orderBy === "endDate"}
                   direction={orderBy === "endDate" ? order : "asc"}
@@ -214,7 +243,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                   {t("eventHistory.headers.endDate")}
                 </TableSortLabel>
               </TableCell>
-              <TableCell>
+              <TableCell sx={getTableCellStyles()}>
                 <TableSortLabel
                   active={orderBy === "status"}
                   direction={orderBy === "status" ? order : "asc"}
@@ -224,7 +253,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                 </TableSortLabel>
               </TableCell>
               {userRole === "admin" && (
-                <TableCell>
+                <TableCell sx={getTableCellStyles()}>
                   <TableSortLabel
                     active={orderBy === "actions"}
                     direction={orderBy === "actions" ? order : "asc"}
@@ -237,36 +266,35 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {sortedEvents
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((event) => (
-                <TableRow
-                  key={event._id}
-                  sx={{ backgroundColor: getBackgroundColor(event) }}
-                >
-                  <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
-                    {event.user?.entityName || t("eventHistory.unknown")}
-                  </TableCell>
-                  <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
-                    {t(`eventTypes.${event.eventType || "generic"}`)}
-                  </TableCell>
-                  <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
-                    {t(`reasons.${event.reason || "generic"}`)}
-                  </TableCell>
-                  <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
-                    {event.startDate
-                      ? dayjs(event.startDate).format("MMMM D, YYYY h:mm A")
-                      : t("eventHistory.na")}
-                  </TableCell>
-                  <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
-                    {event.endDate
-                      ? dayjs(event.endDate).format("MMMM D, YYYY h:mm A")
-                      : t("eventHistory.na")}
-                  </TableCell>
-                  <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
-                    {t(`status.${event.status}`)}
-                  </TableCell>
-                  <TableCell sx={{ width: "auto", whiteSpace: "nowrap" }}>
+            {sortedEvents.map((event) => (
+              <TableRow
+                key={event._id}
+                sx={{ backgroundColor: getBackgroundColor(event) }}
+              >
+                <TableCell sx={getTableCellStyles()}>
+                  {event.user?.entityName || t("eventHistory.unknown")}
+                </TableCell>
+                <TableCell sx={getTableCellStyles()}>
+                  {t(`eventTypes.${event.eventType || "generic"}`)}
+                </TableCell>
+                <TableCell sx={getTableCellStyles()}>
+                  {t(`reasons.${event.reason || "generic"}`)}
+                </TableCell>
+                <TableCell sx={getTableCellStyles()}>
+                  {event.startDate
+                    ? dayjs(event.startDate).format("MMMM D, YYYY h:mm A")
+                    : t("eventHistory.na")}
+                </TableCell>
+                <TableCell sx={getTableCellStyles()}>
+                  {event.endDate
+                    ? dayjs(event.endDate).format("MMMM D, YYYY h:mm A")
+                    : t("eventHistory.na")}
+                </TableCell>
+                <TableCell sx={getTableCellStyles()}>
+                  {t(`status.${event.status}`)}
+                </TableCell>
+                {userRole === "admin" && (
+                  <TableCell sx={getTableCellStyles()}>
                     {event.eventType === "visit" ? (
                       <>
                         {/* Go to Visit Button for Visit Events (Visible for admin, agent, client roles) */}
@@ -278,11 +306,16 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                                 bgcolor: "primary.main",
                                 color: "white",
                                 borderRadius: "50%",
+                                padding: isMobile ? '4px' : '8px',
                                 "&:hover": { bgcolor: "primary.dark" },
                               }}
                               onClick={() => handleGoToVisit(event)} // Call handleGoToVisit for visits
                             >
-                              <AirplaneTicketIcon />
+                              <AirplaneTicketIcon
+                                sx={{
+                                  fontSize: isMobile ? '1rem' : '1.25rem',
+                                }}
+                              />
                             </IconButton>
                           </Tooltip>
                         )}
@@ -296,14 +329,19 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                             sx={{
                               backgroundColor: "green",
                               color: "white",
-                              marginRight: 1,
+                              marginRight: isMobile ? 0.5 : 1,
                               borderRadius: "50%",
+                              padding: isMobile ? '4px' : '8px',
                               "&:hover": {
                                 backgroundColor: "darkgreen",
                               },
                             }}
                           >
-                            <CheckIcon />
+                            <CheckIcon
+                              sx={{
+                                fontSize: isMobile ? '1rem' : '1.25rem',
+                              }}
+                            />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title={t("eventHistoryTooltips.reject")}>
@@ -314,24 +352,35 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                               backgroundColor: "red",
                               color: "white",
                               borderRadius: "50%",
+                              padding: isMobile ? '4px' : '8px',
                               "&:hover": {
                                 backgroundColor: "darkred",
                               },
                             }}
                           >
-                            <CloseIcon />
+                            <CloseIcon
+                              sx={{
+                                fontSize: isMobile ? '1rem' : '1.25rem',
+                              }}
+                            />
                           </IconButton>
                         </Tooltip>
                       </>
                     ) : event.status === "approved" ||
-                      event.status === "rejected" && userRole === "admin" ? (
+                      (event.status === "rejected" && userRole === "admin") ? (
                       <>
                         <Tooltip title={getEditButtonTooltip(event)}>
                           <span>
                             <IconButton
                               onClick={() => handleEditEvent(event)}
-                              sx={getEditButtonStyles(event)}
-                              disabled={isPastEvent(event)} // Disable button for past events
+                              sx={{
+                                ...getEditButtonStyles(event, userRole),
+                                padding: isMobile ? '4px' : '8px',
+                                '& .MuiSvgIcon-root': {
+                                  fontSize: isMobile ? '1rem' : '1.25rem',
+                                },
+                              }}
+                              disabled={isDisabled(event, userRole)} // Disable button for past events
                             >
                               <EditIcon />
                             </IconButton>
@@ -339,30 +388,35 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                         </Tooltip>
 
                         <Tooltip title={t("eventHistoryTooltips.delete")}>
-                          <IconButton
-                            onClick={() => handleDeleteEvent(event)}
-                            sx={{
-                              backgroundColor: "brown",
-                              color: "white",
-                              borderRadius: "50%",
-                              "&:hover": {
-                                backgroundColor: "darkgray",
-                              },
-                            }}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
+                          <span>
+                            <IconButton
+                              onClick={() => handleDeleteEvent(event)}
+                              sx={{
+                                ...getDeleteButtonStyles(event, userRole),
+                                padding: isMobile ? '4px' : '8px',
+                                '& .MuiSvgIcon-root': {
+                                  fontSize: isMobile ? '1rem' : '1.25rem',
+                                },
+                              }}
+                              disabled={isDisabled(event, userRole)} // Disable button for past events
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </span>
                         </Tooltip>
                       </>
                     ) : (
                       t("eventHistory.actions.na")
                     )}
                   </TableCell>
-                </TableRow>
-              ))}
+                )}
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
+      {/* Removed TablePagination */}
+      {/*
       <TablePagination
         rowsPerPageOptions={[50]}
         component="div"
@@ -379,6 +433,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
           },
         }}
       />
+      */}
       <EventForm
         key={editingEvent ? editingEvent._id : "new-event"}
         open={openForm}

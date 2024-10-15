@@ -1,8 +1,6 @@
-// src/layout/Layout.tsx
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, useMediaQuery } from "@mui/material";
 import "animate.css";
-
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
 import ErrorBoundary from "../components/ErrorBoundary/ErrorBoundary";
@@ -11,9 +9,11 @@ import { selectCurrentChat } from "../features/chat/chatSlice";
 
 const Layout: React.FC = () => {
   const location = useLocation();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery("(max-width:800px)");
   const currentChat = useAppSelector(selectCurrentChat);
+  const [shouldShowHeader, setShouldShowHeader] = useState(
+    !currentChat || !isMobile
+  );
 
   // Check if the current path matches specific routes
   const isOtherPage =
@@ -23,8 +23,9 @@ const Layout: React.FC = () => {
     location.pathname === "/calendar" ||
     location.pathname === "/movements" ||
     location.pathname === "/employee-dashboard" ||
-    location.pathname === "/articles";
-  const isSettingsPage = location.pathname === "/settings"; // Check if on the /settings page
+    location.pathname === "/articles" ||
+    location.pathname === "/dashboard" ||
+    location.pathname === "/settings";
 
   const isMessagesPage = location.pathname === "/messages";
 
@@ -41,17 +42,28 @@ const Layout: React.FC = () => {
     };
   }, [isMessagesPage, isOtherPage, isMobile]);
 
-  // Determine if the header should be displayed
-  const shouldShowHeader = useMemo(
-    () => !currentChat || !isMobile,
-    [currentChat, isMobile]
-  );
+  // useEffect to monitor location and enable the header when leaving /messages page
+  useEffect(() => {
+    if (isMessagesPage && currentChat && isMobile) {
+      // Hide header if on /messages page with currentChat and mobile view
+      setShouldShowHeader(false);
+    } else {
+      // Re-enable the header when leaving the /messages page or on desktop view
+      setShouldShowHeader(true);
+    }
+  }, [location.pathname, currentChat, isMobile, isMessagesPage]);
+
   return (
     <ErrorBoundary>
       <Box
-        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          overflowX: "hidden",
+          m: 0,
+        }}
       >
-        {/* Hide Header if currentChat exists and we are in mobile view */}
+        {/* Conditionally render Header based on chat state and mobile view */}
         {shouldShowHeader && <Header />}
         <Box
           component="main"
@@ -61,8 +73,10 @@ const Layout: React.FC = () => {
             flex: 1, // Let main content grow to fill available space
 
             p: determinePadding(), // Apply dynamic padding
-            pl: isSettingsPage ? 0 : undefined, // Remove left padding for settings page
-            pr: isSettingsPage ? 0 : undefined, // Remove right padding for settings page
+
+            overflowY: "auto",
+
+            m: 0,
           }}
         >
           <Outlet />

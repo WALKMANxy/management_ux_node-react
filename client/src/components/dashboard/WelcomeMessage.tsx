@@ -29,17 +29,22 @@ const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
     );
   }
 
-  const roleKey = `${role}Dashboard`;
+  // Split name on space and take the first word
+  const displayName = name
+    ? name.split(" ")[0]
+    : t(`${role}Dashboard.defaultName`);
 
   return (
     <Typography
       variant="h4"
       gutterBottom
-      fontFamily="Comic Neue"
-      fontWeight={700}
+      sx={{
+        fontFamily: "Inter, sans-serif",
+        fontWeight: 100, // Now using the lighter custom font weight
+      }}
     >
       {t(`dashboard.welcomeBack`, {
-        name: name || t(`${roleKey}.defaultName`),
+        name: displayName,
       })}
     </Typography>
   );

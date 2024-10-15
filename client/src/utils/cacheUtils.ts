@@ -4,13 +4,18 @@ import { Agent } from "http";
 import { Promo, Visit } from "../models/dataModels";
 import { serverClient, serverMovement } from "../models/dataSetTypes";
 import { Admin } from "../models/entityModels";
-import { appCache, CacheEntry } from "./cache";
+import { appCache, CacheEntry, FileCacheEntry } from "../services/cache";
+import { showToast } from "../services/toastMessage";
 import {
   decryptData,
   deriveKeyFromAuthState,
   encryptData,
 } from "./cryptoUtils";
-import { showToast } from "./toastMessage";
+
+const FILE_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+
+const MAX_CACHE_SIZE = 100 * 1024 * 1024; // 100 MB for example
+
 
 // Define cache durations in milliseconds
 const CACHE_DURATIONS: Record<string, number> = {
@@ -110,7 +115,6 @@ export const getCachedData = async <T>(
   }
 };
 
-
 export const setCachedData = async <T>(
   storeName: StoreName,
   data: T
@@ -146,16 +150,13 @@ export const setCachedData = async <T>(
   }
 };
 
-
 export const clearCachedData = async (storeName: StoreName): Promise<void> => {
   try {
     await appCache[storeName].clear();
-
   } catch (error) {
     console.error(`Error clearing cache for ${storeName}:`, error);
   }
 };
-
 
 export const initializeUserEncryption = async (params: {
   userId: string;
@@ -221,4 +222,149 @@ export const setCachedDataSafe = async <T>(
 ): Promise<void> => {
   await ensureEncryptionInitialized();
   return setCachedData<T>(storeName, data);
+};
+
+
+/**
+ * Retrieves a cached file by its unique fileName.
+ * @param fileName - Unique identifier for the file.
+ * @returns FileCacheEntry or null if not found or stale.
+ */
+export const getCachedFile = async (fileName: string): Promise<FileCacheEntry | null> => {
+  try {
+    const fileEntry = await appCache.files.get({ fileName });
+
+    if (!fileEntry) return null;
+
+    const currentTime = Date.now();
+    if (currentTime - fileEntry.timestamp > FILE_CACHE_DURATION) {
+      // Cache is stale; remove the entry
+      await appCache.files.where({ fileName }).delete();
+      return null;
+    }
+
+    // Regenerate objectURL for the cached Blob
+    const objectUrl = URL.createObjectURL(fileEntry.blob);
+
+    // Return the updated file entry with the new object URL
+    return { ...fileEntry, objectUrl };
+  } catch (error) {
+    console.error(`Error retrieving cached file (${fileName}):`, error);
+    return null;
+  }
+};
+
+/**
+ * Caches a file by storing its Blob and generating an object URL.
+ * @param fileName - Unique identifier for the file.
+ * @param blob - The file data as a Blob.
+ * @returns The generated object URL.
+ */
+export const cacheFile = async (fileName: string, blob: Blob): Promise<string> => {
+  try {
+    // Store the file in IndexedDB
+    const fileEntry: FileCacheEntry = {
+      fileName,
+      blob,
+      objectUrl: "", // The object URL will be generated later when fetching the file
+      timestamp: Date.now(),
+    };
+    await appCache.files.put(fileEntry);
+
+    // Return the generated object URL for immediate usage
+    const objectUrl = URL.createObjectURL(blob);
+    return objectUrl;
+  } catch (error) {
+    console.error(`Error caching file (${fileName}):`, error);
+    throw error;
+  }
+};
+
+/**
+ * Clears all cached files (optional, for maintenance or logout).
+ */
+export const clearAllCachedFiles = async (): Promise<void> => {
+  try {
+    // Revoke all object URLs to free memory
+    const allFiles = await appCache.files.toArray();
+    allFiles.forEach((file) => URL.revokeObjectURL(file.objectUrl));
+
+    // Clear the files table
+    await appCache.files.clear();
+  } catch (error) {
+    console.error("Error clearing cached files:", error);
+    showToast.error("Failed to clear cached files.");
+  }
+};
+
+
+/**
+ * Removes a specific cached file by fileName.
+ * @param fileName - Unique identifier for the file.
+ */
+export const removeCachedFile = async (fileName: string): Promise<void> => {
+  try {
+    const fileEntry = await appCache.files.get({ fileName });
+    if (fileEntry) {
+      URL.revokeObjectURL(fileEntry.objectUrl);
+      await appCache.files.where({ fileName }).delete();
+    }
+  } catch (error) {
+    console.error(`Error removing cached file (${fileName}):`, error);
+    showToast.error(`Failed to remove cached file: ${fileName}`);
+  }
+};
+
+export const cleanupStaleFiles = async (): Promise<void> => {
+  try {
+    const currentTime = Date.now();
+    const staleFiles = await appCache.files
+      .filter(file => currentTime - file.timestamp > FILE_CACHE_DURATION)
+      .toArray();
+
+    staleFiles.forEach(file => {
+      URL.revokeObjectURL(file.objectUrl);
+    });
+
+    await appCache.files.bulkDelete(staleFiles.map(file => file.fileName));
+  } catch (error) {
+    console.error("Error during stale file cleanup:", error);
+    showToast.error("Failed to clean up stale files.");
+  }
+};
+
+
+
+
+export const enforceCacheSizeLimit = async (): Promise<void> => {
+  try {
+    // Step 1: Calculate the total cache size without sorting or fetching all files
+    let totalSize = 0;
+    await appCache.files.each((file) => {
+      totalSize += file.blob.size;
+    });
+
+    // Step 2: If the total size is below the limit, we can return early
+    if (totalSize <= MAX_CACHE_SIZE) {
+      return; // Cache size is within limit, no need for cleanup
+    }
+
+    // Step 3: If cache exceeds the limit, fetch files and delete the oldest half
+    const allFiles = await appCache.files.orderBy("timestamp").toArray();
+    const numFilesToDelete = Math.floor(allFiles.length / 2); // Delete half of the oldest files
+
+    // Step 4: Delete the oldest files until the cache size is within the limit
+    for (let i = 0; i < numFilesToDelete; i++) {
+      const file = allFiles[i];
+      await removeCachedFile(file.fileName);
+      totalSize -= file.blob.size;
+
+      // Break early if the total size is reduced below the limit
+      if (totalSize <= MAX_CACHE_SIZE) break;
+    }
+
+    console.log(`Deleted ${numFilesToDelete} files to enforce cache size limit.`);
+  } catch (error) {
+    console.error("Error enforcing cache size limit:", error);
+  }
 };

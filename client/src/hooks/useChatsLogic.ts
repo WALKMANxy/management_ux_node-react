@@ -1,16 +1,23 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { useAppDispatch /* useAppSelector */ } from "../app/hooks";
-import { selectUserId, selectUserRole } from "../features/auth/authSlice";
 import {
+  useAppDispatch /* useAppSelector */,
+  useAppSelector,
+} from "../app/hooks";
+import { selectUserId, selectUserRole } from "../features/auth/authSlice";
+import { uploadAttachments } from "../features/chat/api/chats";
+import {
+  addAttachmentMessageReducer,
   addChatReducer,
   addMessageReducer,
   clearCurrentChatReducer,
   selectAllChats,
+  selectChatsStatus,
   selectCurrentChat,
   selectMessagesFromCurrentChat,
   setCurrentChatReducer,
+  updateChatReducer,
   updateReadStatusReducer,
 } from "../features/chat/chatSlice"; // Ensure correct selectors are imported
 import { fetchAllChatsThunk } from "../features/chat/chatThunks";
@@ -19,7 +26,7 @@ import { getAllUsersThunk, selectAllUsers } from "../features/users/userSlice";
 import { IChat, IMessage } from "../models/dataModels";
 import { sanitizeSearchTerm } from "../utils/chatUtils";
 import { generateId } from "../utils/deviceUtils";
-import { showToast } from "../utils/toastMessage";
+import { Attachment } from "./useFilePreview";
 
 const useChatLogic = () => {
   const dispatch = useAppDispatch();
@@ -37,12 +44,16 @@ const useChatLogic = () => {
   const messages = useSelector(selectMessagesFromCurrentChat); // Use selector to get messages of the current chat
   const [contactsFetched, setContactsFetched] = useState(false);
   const { t } = useTranslation();
+  const chatStatus = useAppSelector(selectChatsStatus);
 
   const agentClientIds = useSelector(selectClientIds);
 
   const currentChatId = useMemo(() => currentChat?._id, [currentChat]);
 
-  
+  // Determine if chats should be fetched
+  const shouldFetchChats = useMemo(() => {
+    return chatStatus !== "succeeded";
+  }, [chatStatus]);
 
   const fetchChats = useCallback(async () => {
     try {
@@ -66,19 +77,30 @@ const useChatLogic = () => {
     }
   }, [dispatch, chatRetryCount]);
 
-  // Fetch chats with retry mechanism
+  // Initial fetch effect
   useEffect(() => {
-    // Call fetchChats initially
-    fetchChats();
-  }, [dispatch, chatRetryCount, fetchChats]);
+    if (shouldFetchChats) {
+      const timeoutId = setTimeout(() => {
+        // Call fetchChats after a 500ms delay
+        fetchChats();
+      }, 500);
+
+      // Cleanup function to clear timeout if the component unmounts or dependencies change
+      return () => clearTimeout(timeoutId);
+    }
+  }, [shouldFetchChats, fetchChats]);
 
   // Retry mechanism
   useEffect(() => {
-    if (chatRetryCount > 0 && chatRetryCount <= 5) {
+    if (
+      chatRetryCount > 0 &&
+      chatRetryCount <= 5 &&
+      chatStatus !== "succeeded"
+    ) {
       const retryDelay = Math.min(32000, 1000 * 2 ** chatRetryCount); // Exponential backoff
 
       const retryTimeout = setTimeout(() => {
-        // console.log(`Retry attempt #${chatRetryCount}`);
+        console.log(`Retry attempt #${chatRetryCount}`);
         fetchChats();
       }, retryDelay);
 
@@ -86,21 +108,18 @@ const useChatLogic = () => {
         clearTimeout(retryTimeout);
       };
     }
-  }, [chatRetryCount, fetchChats]);
+  }, [chatRetryCount, fetchChats, chatStatus]);
+
   // Select a chat
   const selectChat = useCallback(
     (chat: IChat) => {
       // Determine the chat identifier: use _id if available, otherwise local_id
-      const chatId = chat._id ? chat._id.toString() : chat.local_id;
+      const chatId = chat._id || chat.local_id;
 
       if (!chatId) {
         console.warn("Chat does not have an _id or local_id:", chat);
         return;
       }
-
-      /*   console.log(`Selected chat ID: ${chatId}`); // Debug: Log chat ID
-      console.log(`Chat name: ${chat.name}`); // Debug: Log chat name
-      console.log(`Chat with ${chat.participants.length} members`); // Debug: Log the number of members */
 
       // Set the current chat in the state
       dispatch(setCurrentChatReducer(chat));
@@ -120,10 +139,6 @@ const useChatLogic = () => {
             : message._id.toString()
         );
 
-      /*   console.log(
-        `Found ${unreadMessageIds.length} unread messages by ${currentUserId} in chat ${chatId}`
-      ); */ // Debug: Log the number of unread messages
-
       // Update read status for unread messages
       if (unreadMessageIds.length > 0) {
         dispatch(
@@ -136,6 +151,39 @@ const useChatLogic = () => {
       }
     },
     [currentUserId, dispatch]
+  );
+
+  // Function to mark messages as read
+  const markMessagesAsRead = useCallback(
+    (chat: IChat, userId: string) => {
+      if (chat._id) {
+        const unreadMessageIds = chat.messages
+          .filter(
+            (message: IMessage) =>
+              !message.readBy.map((id) => id.toString()).includes(userId) &&
+              message.sender.toString() !== userId
+          )
+          .map((message) =>
+            message.local_id
+              ? message.local_id.toString()
+              : message._id.toString()
+          );
+
+        if (unreadMessageIds.length > 0) {
+          dispatch(
+            updateReadStatusReducer({
+              chatId: chat._id.toString(),
+              userId: userId,
+              messageIds: unreadMessageIds,
+            })
+          );
+        }
+      } else {
+        console.warn("Chat does not have an _id:", chat);
+        return;
+      }
+    },
+    [dispatch]
   );
 
   // Fetch contacts when needed
@@ -156,7 +204,8 @@ const useChatLogic = () => {
   const handleSendMessage = useCallback(
     async (
       content: string,
-      messageType: "message" | "alert" | "promo" | "visit"
+      messageType: "message" | "alert" | "promo" | "visit",
+      attachments?: Attachment[]
     ) => {
       if (!currentChatId || !currentUserId) {
         console.error("Missing currentChatId or currentUserId");
@@ -165,22 +214,41 @@ const useChatLogic = () => {
 
       const localId = generateId();
 
+      // Failsafe for empty content when attachments exist
+      const finalContent =
+        content.trim() === "" && attachments && attachments.length > 0
+          ? "\u200B" // Use an invisible character (zero-width space)
+          : content;
+
       const messageData: IMessage = {
         _id: localId,
         local_id: localId,
-        content,
+        content: finalContent,
         sender: currentUserId,
         timestamp: new Date(),
         readBy: [currentUserId],
         messageType,
-        attachments: [],
+        attachments: attachments || [],
         status: "pending",
       };
 
       try {
-        dispatch(
-          addMessageReducer({ chatId: currentChatId, message: messageData })
-        );
+        if (attachments && attachments.length > 0) {
+          // Use the new reducer for messages with attachments
+          dispatch(
+            addAttachmentMessageReducer({
+              chatId: currentChatId,
+              message: messageData,
+            })
+          );
+          // Initiate the upload
+          await uploadAttachments(currentChatId, messageData, dispatch);
+        } else {
+          // Use the existing reducer for messages without attachments
+          dispatch(
+            addMessageReducer({ chatId: currentChatId, message: messageData })
+          );
+        }
       } catch (error) {
         console.error("Failed to send message:", error);
       }
@@ -227,7 +295,7 @@ const useChatLogic = () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         status: "pending", // Indicate that the chat is pending confirmation
-        ...(admins && { admins }), // Conditionally add admins if provided
+        admins: admins || [], // Assign the admins array directly
       };
 
       /*       console.log("Dispatching to addChatReducer:", chatData);
@@ -241,39 +309,89 @@ const useChatLogic = () => {
     [dispatch]
   );
 
+  const handleEditChat = useCallback(
+    async (
+      chatId: string,
+      updatedData: Partial<{
+        name: string;
+        participants: string[];
+        admins: string[];
+        updatedAt: Date;
+      }>
+    ) => {
+      if (!chatId) return;
+
+      try {
+        const existingChat = chats.find((u) => u._id === chatId);
+
+        if (!existingChat) {
+          throw new Error("Chat not found");
+        }
+
+        const updatedChat: IChat = {
+          ...existingChat,
+          ...updatedData,
+        };
+
+        // Dispatch an action to update the chat in the store
+        dispatch(
+          updateChatReducer({
+            chatId: updatedChat._id!,
+            updatedData: updatedChat,
+          })
+        ); // Ensure you have an updateChatReducer
+      } catch (error) {
+        console.error("Failed to edit chat:", error);
+        throw error; // Re-throw to handle in the form
+      }
+    },
+    [dispatch, chats]
+  );
+
   // Handle selecting a contact to open or create a chat
   const handleContactSelect = useCallback(
     (contactId: string) => {
-      // Check if there's an existing chat with this contact
-      const existingChat = Object.values(chats).find(
-        (chat) =>
-          chat.type === "simple" &&
-          chat.participants.includes(contactId) &&
-          chat.participants.includes(currentUserId)
-      );
+      let chatToSelect: IChat | null = null;
 
-      if (existingChat) {
-        // If chat exists, select it
-        selectChat(existingChat);
-      } else {
-        // If no chat exists, create a new one optimistically
-        const localId = generateId();
+      try {
+        // Check if there's an existing chat with this contact
+        const existingChat = Object.values(chats).find(
+          (chat) =>
+            chat.type === "simple" &&
+            chat.participants.includes(contactId) &&
+            chat.participants.includes(currentUserId)
+        );
 
-        const newChat: IChat = {
-          local_id: localId,
-          type: "simple",
-          participants: [currentUserId, contactId],
-          messages: [],
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          status: "pending", // Indicate that the chat is pending confirmation
-        };
+        if (existingChat) {
+          // If chat exists, prepare to select it
+          chatToSelect = existingChat;
+        } else {
+          // If no chat exists, create a new one optimistically
+          const localId = generateId();
 
-        // Optimistically add the new chat to the state
-        dispatch(addChatReducer({ chat: newChat }));
+          const newChat: IChat = {
+            local_id: localId,
+            type: "simple",
+            participants: [currentUserId, contactId],
+            messages: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            status: "pending", // Indicate that the chat is pending confirmation
+          };
 
-        // Immediately select the new optimistic chat
-        selectChat(newChat);
+          // Optimistically add the new chat to the state
+          dispatch(addChatReducer({ chat: newChat }));
+
+          // Prepare to select the new optimistic chat
+          chatToSelect = newChat;
+        }
+      } catch (error) {
+        console.error("handleContactSelect encountered an error:", error);
+        // Handle error appropriately (e.g., show a notification to the user)
+      } finally {
+        if (chatToSelect) {
+          selectChat(chatToSelect);
+        }
       }
     },
     [chats, currentUserId, dispatch, selectChat]
@@ -306,12 +424,18 @@ const useChatLogic = () => {
             (user.role === "admin" || user.role === "agent")
         ) || []
       );
+    } else if (userRole === "employee") {
+      // Employees can see admins and agents, but not clients, and exclude themselves
+      return (
+        users.filter(
+          (user) =>
+            user._id !== currentUserId && // Exclude the current user
+            (user.role === "admin" || user.role === "agent")
+        ) || []
+      );
     }
 
     // Default return if no contacts are found
-    /* console.log(
-      "User role not recognized or no contacts found. Returning empty array."
-    ); */
     return [];
   }, [users, userRole, agentClientIds, currentUserId]); // Dependencies array
 
@@ -402,38 +526,20 @@ const useChatLogic = () => {
     }
   };
 
-  /*  // Custom hook to find the message inside the state by local_id
-  const useStateMessage = (
-    chatId: string | undefined,
-    localId: string | undefined
-  ): IMessage | undefined => {
-    return useAppSelector((state) => {
-      if (!chatId || !localId) return undefined;
+  const broadcastChatId = "6701f7dbc1a80a3d029808ab"; // Your broadcast chat ID
 
-      const chat = state.chats.chats[chatId];
-      if (!chat) {
-        console.error(`Chat with ID ${chatId} does not exist in the state.`);
-        return undefined;
-      }
+  // Selector to get the broadcast chat
+  const broadcastChat = useMemo(() => {
+    return chats.find((chat) => chat._id === broadcastChatId) || null;
+  }, [chats, broadcastChatId]);
 
-      // Find the message by matching local_id
-      const stateMessage = chat.messages.find(
-        (message) => message.local_id === localId
-      );
-
-      if (!stateMessage) {
-        console.error(
-          `Message with local_id ${localId} not found in chat ${chatId}.`
-        );
-      }
-
-      return stateMessage;
-    });
-  }; */
-
+  // Selector to get broadcast messages
+  const employeeWhiteboardBroadcast = useMemo(() => {
+    return broadcastChat ? broadcastChat.messages : [];
+  }, [broadcastChat]);
   useEffect(() => {
     if (chatError) {
-      showToast.error(t("chats.error", { error: chatError }));
+      console.error(t("chats.error", { error: chatError }));
     }
   }, [chatError, t]);
 
@@ -449,6 +555,7 @@ const useChatLogic = () => {
     handleCreateChat,
     handleContactSelect,
     fetchContacts, // Add fetchContacts to be used when toggling to contacts view
+    contactsFetched,
     loadingContacts, // Provide loading state
     filteredContacts, // Function to filter contacts based on the role
     getFilteredAndSortedChats,
@@ -457,8 +564,10 @@ const useChatLogic = () => {
     handleBackToChats,
     getUnreadChats,
     handleSelectChat,
-    /*     useStateMessage,
-     */
+    employeeWhiteboardBroadcast,
+    broadcastChat,
+    markMessagesAsRead,
+    handleEditChat,
   };
 };
 

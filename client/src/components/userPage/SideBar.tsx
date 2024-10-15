@@ -3,6 +3,7 @@
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PeopleIcon from "@mui/icons-material/People";
 import SettingsIcon from "@mui/icons-material/Settings";
+import PermContactCalendarIcon from '@mui/icons-material/PermContactCalendar';
 import {
   Box,
   Divider,
@@ -24,13 +25,13 @@ import { selectCurrentUser } from "../../features/users/userSlice";
 interface NavItem {
   text: string;
   icon: React.ReactElement;
-  section: "modify-account" | "app-settings" | "manage-users";
+  section: "modify-account" | "app-settings" | "manage-users" | "manage-entities";
   adminOnly?: boolean;
 }
 
 interface SidebarProps {
   onSelectSection: (
-    section: "modify-account" | "app-settings" | "manage-users"
+    section: "modify-account" | "app-settings" | "manage-users"| "manage-entities"
   ) => void;
 }
 
@@ -57,6 +58,12 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({ onSelectSection }) => {
       section: "manage-users",
       adminOnly: true,
     },
+    {
+      text: t("sidebar.manageEntities", "Manage Entities"),
+      icon: <PermContactCalendarIcon />,
+      section: "manage-entities",
+      adminOnly: true,
+    },
   ];
 
   const filteredNavItems = navItems.filter(
@@ -67,18 +74,16 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({ onSelectSection }) => {
     <Box
       component="nav"
       sx={{
+        maxHeight: "100dvh",
         width: isMobile ? 55 : 240, // Narrower width on mobile
-        flexShrink: 0,
-        height: "100vh", // Full height to match the layout
         bgcolor: "transparent", // Transparent background
         display: "flex",
         flexDirection: "column",
         alignItems: isMobile ? "center" : "flex-start",
         borderRight: isMobile ? "none" : "1px solid rgba(0, 0, 0, 0.12)", // Optional border for non-mobile
-        overflowY: "auto",
+        overflowX: "hidden",
         transition: "width 0.3s", // Smooth transition for width change
         borderTopRightRadius: isMobile ? 0 : 30,
-        borderBottomRightRadius: isMobile ? 0 : 30,
       }}
     >
       <Toolbar>
@@ -91,7 +96,7 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({ onSelectSection }) => {
       <Divider />
       <List
         sx={{
-          width: isMobile ? "90%" : "100%",
+          width: isMobile ? "83%" : "100%",
           pr: isMobile ? 1 : 0,
           px: isMobile ? 0 : 2,
           my: isMobile ? 0 : 2,

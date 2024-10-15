@@ -42,11 +42,13 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
     handleMenuClose();
   }, [exportDataAsCsv, handleMenuClose]);
 
-
   const memoizedColumnDefs = useMemo(() => columnDefs, [columnDefs]);
 
   return (
-    <Paper elevation={8} sx={{ mb: 2, borderRadius: 2 }}>
+    <Paper
+      elevation={8}
+      sx={{ mb: 2, borderRadius: 2, height: isMobile ? 500 * 1.33 : "100%" }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -55,7 +57,12 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
           p: 2,
         }}
       >
-        <Typography variant="h4" sx={{ pl: 2, pt: 2, mb: -4}}>{t("articleList.title")}</Typography>
+        <Typography
+          variant="h4"
+          sx={{ pl: 2, pt: isMobile ? 0 : 2, mb: isMobile ? -2 : -6, }}
+        >
+          {t("articleList.title")}
+        </Typography>
         <Tooltip
           title={
             isArticleListCollapsed
@@ -75,9 +82,12 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
           </IconButton>
         </Tooltip>
       </Box>
-      <Collapse in={!isArticleListCollapsed} sx={{ pt: 2, pb: 4 }}>
-        <Box sx={{ p: 2 }}>
-          <Box
+      <Collapse
+        in={!isArticleListCollapsed}
+        sx={{ pt: isMobile ? 0 : 0, pb: 4 }}
+      >
+        <Box sx={{ p: 2, pt: 0 }}>
+        <Box
             sx={{
               display: "flex",
               flexDirection: isMobile ? "column" : "row",

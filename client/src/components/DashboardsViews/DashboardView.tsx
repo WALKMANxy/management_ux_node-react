@@ -30,6 +30,8 @@ interface DashboardViewProps {
   salesDistributionDataAgents?: any;
   isMobile: boolean;
   userRole: UserRole;
+  totalNetRevenue: number;
+  netRevenueData: number[];
 }
 
 const DashboardView: React.FC<DashboardViewProps> = ({
@@ -49,6 +51,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   salesDistributionDataAgents,
   isMobile,
   userRole,
+  totalNetRevenue,
+  netRevenueData,
 }) => {
   return (
     <Box mb={4}>
@@ -70,22 +74,36 @@ const DashboardView: React.FC<DashboardViewProps> = ({
             aria-label={t("dashboard.loadingStatistics")}
           />
         ) : (
-          <Typography variant="h5" gutterBottom>
+          <Typography
+            variant="h5"
+            gutterBottom
+            fontWeight={100}
+          >
             {t("dashboard.yourStatistics")}
           </Typography>
         )}
-        {isTablet && (
-          <Fab
-            color="primary"
-            aria-label={t("dashboard.calendarButton")}
-            onClick={handleToggleDrawer}
-            sx={{
-              zIndex: 0,
-            }}
-          >
-            <CalendarMonthIcon />
-          </Fab>
-        )}
+        {isTablet &&
+          (loadingState ? (
+            <Skeleton
+              animation="wave"
+              variant="circular"
+              width={40}
+              height={40}
+              sx={{ borderRadius: "50%" }}
+              aria-label={t("dashboard.loadingCalendarButton")}
+            />
+          ) : (
+            <Fab
+              color="primary"
+              aria-label={t("dashboard.calendarButton")}
+              onClick={handleToggleDrawer}
+              sx={{
+                zIndex: 0,
+              }}
+            >
+              <CalendarMonthIcon />
+            </Fab>
+          ))}
       </Box>
 
       <Divider sx={{ my: 2, borderRadius: "12px" }} />
@@ -96,12 +114,12 @@ const DashboardView: React.FC<DashboardViewProps> = ({
               animation="wave"
               variant="rectangular"
               width="100%"
-              height={200}
+              height={300}
               sx={{ borderRadius: "12px" }}
               aria-label={t("dashboard.skeleton")}
             />
           ) : (
-            <TotalEarning totalEarning={totalRevenue} />
+            <TotalEarning totalGross={totalRevenue} totalNet={totalNetRevenue}  />
           )}
         </Grid>
         <Grid item xs={12} md={6}>
@@ -110,7 +128,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
               animation="wave"
               variant="rectangular"
               width="100%"
-              height={200}
+              height={300}
               sx={{ borderRadius: "12px" }}
               aria-label={t("dashboard.skeleton")}
             />
@@ -138,6 +156,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
             <MonthOverMonthSpendingTrend
               months={months}
               revenueData={revenueData}
+              netRevenueData={netRevenueData}
               userRole={userRole}
             />
           )}
