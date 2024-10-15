@@ -8,7 +8,7 @@ from workerFtp import UploadWorker
 
 class Worker(QThread):
     progress = pyqtSignal(int)
-    finished_processing = pyqtSignal()
+    finished_processing = pyqtSignal(str)
     error = pyqtSignal(str)
 
     def __init__(
@@ -22,6 +22,8 @@ class Worker(QThread):
         tulero_ftp_info,  # New
         tyre24_ftp_info,  # New
         validated_data,  # Add the inputs (markup and shipping costs)
+        upload_tulero=True,  # New parameter
+        upload_tyre24=True,   # New parameter
     ):
         super().__init__()
         self.articles_file = articles_file
@@ -33,6 +35,8 @@ class Worker(QThread):
         self.tulero_ftp_info = tulero_ftp_info  # New
         self.tyre24_ftp_info = tyre24_ftp_info  # New
         self.inputs = validated_data  # Store the inputs
+        self.upload_tulero = upload_tulero  # New
+        self.upload_tyre24 = upload_tyre24    # New
         self.timer = None
 
     def run(self):
@@ -65,18 +69,25 @@ class Worker(QThread):
         except Exception as e:
             self.error.emit(str(e))
 
+    # In worker.py's Worker class
     def upload_files(self):
         """Handles file upload and catches more detailed errors."""
         try:
+            if not self.upload_tulero and not self.upload_tyre24:
+                # No uploads to perform
+                self.finished_processing.emit("Processing completed successfully without uploads.")
+                return
+
             upload_worker = UploadWorker(
                 self.output_folder,
                 self.tulero_ftp_info,
                 self.tyre24_ftp_info,
-                upload_tulero=True,
-                upload_tyre24=True,
+                upload_tulero=self.upload_tulero,  # Pass the flag
+                upload_tyre24=self.upload_tyre24,  # Pass the flag
             )
             upload_worker.progress.connect(lambda message: self.progress.emit(message))
             upload_worker.finished.connect(self.on_upload_finished)
+            upload_worker.error.connect(self.error.emit)  # Ensure errors are propagated
             upload_worker.start()
             upload_worker.wait()  # Wait for upload to finish
 
@@ -84,10 +95,11 @@ class Worker(QThread):
             # Catch more specific errors from UploadWorker and emit them
             self.error.emit(f"FTP upload failed: {str(e)}")
 
+
     def on_upload_finished(self, result):
         """Handles successful upload completion."""
         if "failed" in result.lower():
             self.error.emit(result)  # Forward the failure message
         else:
             self.progress.emit(100)
-            self.finished_processing.emit()
+            self.finished_processing.emit(result)

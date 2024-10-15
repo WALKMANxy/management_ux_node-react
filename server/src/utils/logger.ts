@@ -87,15 +87,22 @@ export const logRequestsIp = async (
     : `[${clientIp}]`;
 
   // Attach IP info to the request object
-  req.ipInfo = ipInfo || { ip: clientIp, country: '', region: '', city: '', latitude: 0, longitude: 0 };
-  
+  req.ipInfo = ipInfo || {
+    ip: clientIp,
+    country: "",
+    region: "",
+    city: "",
+    latitude: 0,
+    longitude: 0,
+  };
+
   logger.info(
     `Incoming request ${req.method}${req.url} : from: ${logData.userEmail}, ${logData.userRole}, ${logData.entityCode} | ipInfo: ${ipInfoString}`
   );
 
   res.on("finish", () => {
     logger.info(
-      `Response status: ${res.statusCode} for ${req.method} ${req.url} | User data: [email: ${logData.userEmail}, role: ${logData.userRole}, code: ${logData.entityCode}]`
+      `Response status: ${res.statusCode} for ${req.method}${req.originalUrl} | User data: [email: ${logData.userEmail}, role: ${logData.userRole}, code: ${logData.entityCode}]`
     );
   });
 

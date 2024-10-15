@@ -66,10 +66,10 @@ export const setupWebSocket = (io: SocketIOServer) => {
       socket.entityCode = user.entityCode;
       socket.authType = user.authType;
 
-      logger.info("Socket authenticated successfully", {
+      /* logger.info("Socket authenticated successfully", {
         userId: socket.userId,
         socketId: socket.id,
-      });
+      }); */
       next(); // Proceed with the connection
     } catch (error) {
       logger.error("WebSocket authentication error", {
@@ -81,10 +81,10 @@ export const setupWebSocket = (io: SocketIOServer) => {
   });
 
   io.on("connection", async (socket: AuthenticatedSocket) => {
-    logger.info("Client connected", {
+    /* logger.info("Client connected", {
       userId: socket.userId,
       socketId: socket.id,
-    });
+    }); */
 
     if (socket.userId) {
       // Join the user-specific room
@@ -111,10 +111,10 @@ export const setupWebSocket = (io: SocketIOServer) => {
     }
 
     socket.on("disconnect", () => {
-      logger.info("Client disconnected", {
+      /* logger.info("Client disconnected", {
         userId: socket.userId,
         socketId: socket.id,
-      });
+      }); */
       // Socket.IO automatically handles leaving all rooms upon disconnection
     });
 
@@ -161,11 +161,11 @@ socket.on("chat:create", async ({ chat }: { chat: Partial<IChat> }) => {
 
       // Make all sockets in participant's user room join the new chat room
       io.in(participantRoomId).socketsJoin(roomId);
-      logger.info("User sockets joined chat room", {
+     /*  logger.info("User sockets joined chat room", {
         userId: participantId.toString(),
         chatId: createdChat._id,
         roomId,
-      });
+      }); */
 
       // Emit 'chat:newChat' to inform the client about the new chat
       io.to(participantRoomId).emit("chat:newChat", {
@@ -173,10 +173,10 @@ socket.on("chat:create", async ({ chat }: { chat: Partial<IChat> }) => {
       });
     });
 
-    logger.info("New chat created and users joined successfully.", {
+   /*  logger.info("New chat created and users joined successfully.", {
       chatId: createdChat._id,
       participants: createdChat.participants,
-    });
+    }); */
   } catch (error) {
     logger.error("Error handling new chat creation", { error });
   }
@@ -200,10 +200,10 @@ socket.on("chat:create", async ({ chat }: { chat: Partial<IChat> }) => {
           });
         });
 
-        logger.info("Chat updated successfully.", {
+       /*  logger.info("Chat updated successfully.", {
           chatId: updatedChat._id,
           updatedData: updatedData,
-        });
+        }); */
       } catch (error) {
         logger.error("Error handling chat editing", { error });
         // Emit an error back to the client
@@ -302,10 +302,10 @@ socket.on("chat:create", async ({ chat }: { chat: Partial<IChat> }) => {
 
     // Handle logout
     socket.on("logout", () => {
-      logger.info("Client logout requested", {
+     /*  logger.info("Client logout requested", {
         userId: socket.userId,
         socketId: socket.id,
-      });
+      }); */
       socket.disconnect(true);
     });
   });

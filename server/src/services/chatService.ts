@@ -576,14 +576,14 @@ export class ChatService {
     io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any> // Accept io instance here
   ): Promise<string[]> {
     // Return type is Promise<string[]>
-    const startTime = Date.now(); // For performance logging
+    // const startTime = Date.now(); // For performance logging
 
     try {
-      logger.info("sendAutomatedMessageToUsers called with data", {
+      /* logger.info("sendAutomatedMessageToUsers called with data", {
         userIds,
         messageData,
         botId,
-      });
+      }); */
 
       // Capture a single timestamp for consistency
       const currentTimestamp = new Date();
@@ -646,11 +646,11 @@ export class ChatService {
       if (bulkOperations.length > 0) {
         try {
           await Chat.bulkWrite(bulkOperations, { ordered: false });
-          logger.info(`Successfully sent automated messages to users`, {
+          /*   logger.info(`Successfully sent automated messages to users`, {
             userIds: userIds,
             chatIds,
             durationMs: Date.now() - startTime,
-          });
+          }); */
         } catch (error) {
           logger.error("Error executing bulk operations", { error });
           throw error;

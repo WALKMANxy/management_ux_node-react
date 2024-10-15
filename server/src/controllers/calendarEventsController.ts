@@ -91,13 +91,13 @@ export class CalendarEventController {
         Number(month)
       );
 
-      if (events && events.length > 0) {
+     /*  if (events && events.length > 0) {
         logger.info(
           `Fetched ${events.length} events for the admin in ${month}/${year}`
         );
       } else {
-/*         logger.info(`No events found for the admin in ${month}/${year}`);
- */      }
+        logger.info(`No events found for the admin in ${month}/${year}`);
+      }
 
       // Log the fetched events (limit the log size to avoid excessive output)
       logger.debug(
@@ -105,7 +105,7 @@ export class CalendarEventController {
           0,
           1000
         )}...`
-      );
+      ); */
 
       return res.status(200).json(events);
     } catch (error) {
@@ -149,15 +149,15 @@ export class CalendarEventController {
       );
 
       if (!events || events.length === 0) {
-        logger.info(
+        /* logger.info(
           `No calendar events found for user ${userId} in ${month}/${year}`
-        );
+        ); */
         return res.status(200);
       }
 
-      logger.info(
+    /*   logger.info(
         `Fetched calendar events by status and user for user ${userId} in ${month}/${year}`
-      );
+      ); */
       return res.status(200).json(events);
     } catch (error) {
       logger.error(
@@ -194,7 +194,7 @@ export class CalendarEventController {
       );
 
       if (!updatedEvent) {
-        logger.info(`Calendar event with ID ${eventId} not found`);
+        // logger.info(`Calendar event with ID ${eventId} not found`);
         return res.status(200).json({ message: "Calendar event not found." });
       }
 
@@ -245,7 +245,7 @@ export class CalendarEventController {
       });
 
       if (!updatedEvent) {
-        logger.info(`Calendar event with ID ${eventId} not found for editing`);
+         logger.error(`Calendar event with ID ${eventId} not found for editing`);
         return res.status(404).json({ message: "Calendar event not found." });
       }
 
@@ -278,7 +278,7 @@ export class CalendarEventController {
       const deletedEvent = await CalendarEventService.deleteEvent(eventId);
 
       if (!deletedEvent) {
-        logger.info(`Calendar event with ID ${eventId} not found for deletion`);
+        logger.error(`Calendar event with ID ${eventId} not found for deletion`);
         return res.status(404).json({ message: "Calendar event not found." });
       }
 

@@ -255,10 +255,10 @@ export const renewSession = async (
     session.expiresAt = new Date(Date.now() + refreshTokenDurationMs);
     await session.save();
 
-    logger.info("Session refreshed successfully", {
+   /*  logger.info("Session refreshed successfully", {
       sessionId: session._id,
       newExpiresAt: session.expiresAt,
-    });
+    }); */
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   } catch (error) {

@@ -243,10 +243,10 @@ export const useGeolocation = (
         const weatherData: WeatherData = {
           temp: apiData.current_weather.temperature,
           weatherCode: apiData.current_weather.weathercode,
-          description: apiData.current_weather.weathercode.toString(), // Update this if you have descriptions
+          description: apiData.current_weather.weathercode.toString(),
           city: city,
           forecast: apiData.daily.time.map((date: string, index: number) => ({
-            date: date, // e.g., "2024-12-06"
+            date: date,
             maxTemp: apiData.daily.temperature_2m_max[index],
             minTemp: apiData.daily.temperature_2m_min[index],
             weatherCode: apiData.daily.weathercode[index],

@@ -119,10 +119,11 @@ const VisitCard: React.FC<VisitCardProps> = ({
 
               {userRole !== "client" && notePrivate && (
                 <>
-                  <Divider sx={{ my: 1 }} />
                   <Typography sx={infoStyles.subtitle}>
                     {t("visitCard.privateNote", "Private Note")}: {notePrivate}
                   </Typography>
+                  <Divider sx={{ my: 1 }} />
+
                 </>
               )}
 
