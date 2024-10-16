@@ -1,13 +1,12 @@
 import { AgGridReact } from "ag-grid-react";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 import { RootState } from "../app/store";
 import { Movement, MovementDetail } from "../models/dataModels";
 import { Client } from "../models/entityModels";
 import { calculateTotalQuantitySold } from "../utils/dataUtils";
 
 export const useArticlesGrid = () => {
-  const clients = useSelector((state: RootState) => state.data.clients);
   const [selectedArticle, setSelectedArticle] = useState<MovementDetail | null>(
     null
   );
@@ -21,8 +20,14 @@ export const useArticlesGrid = () => {
   const articleDetailsRef = useRef<HTMLDivElement>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const userRole = useSelector((state: RootState) => state.auth.role);
-  const userId = useSelector((state: RootState) => state.auth.id);
+  const { clients, userRole, userId } = useSelector(
+    (state: RootState) => ({
+      clients: state.data.clients,
+      userRole: state.auth.role,
+      userId: state.auth.id,
+    }),
+    shallowEqual
+  );
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -93,16 +98,17 @@ export const useArticlesGrid = () => {
     }
 
     if (startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
+      const start = new Date(startDate).getTime();
+      const end = new Date(endDate).getTime();
       articles = articles.filter((detail) => {
         const movementEntries = articleMovementsMap.get(detail.articleId) || [];
         return movementEntries.some(({ movement }) => {
-          const movementDate = new Date(movement.dateOfOrder);
+          const movementDate = new Date(movement.dateOfOrder).getTime();
           return movementDate >= start && movementDate <= end;
         });
       });
     }
+
     // Sort articles by brand name
     articles.sort((a, b) => (a.brand || "").localeCompare(b.brand || ""));
 
@@ -114,6 +120,7 @@ export const useArticlesGrid = () => {
     startDate,
     endDate,
   ]);
+
 
   // Filter clients based on the user role
   const filteredClients = useMemo(() => {

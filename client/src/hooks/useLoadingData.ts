@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { shallowEqual } from "react-redux";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { RootState } from "../app/store";
@@ -10,9 +11,8 @@ import {
   getVisits,
 } from "../features/data/dataThunks";
 import { selectCurrentUser } from "../features/users/userSlice";
-import { DataSliceState } from "../models/stateModels";
-import { ensureEncryptionInitialized } from "../utils/cacheUtils";
 import { updateUserEntityNameIfMissing } from "../services/checkUserName";
+import { ensureEncryptionInitialized } from "../utils/cacheUtils";
 
 const timeMS = getTimeMs(); // Ensure this is set in your .env file
 
@@ -27,7 +27,8 @@ const useLoadingData = () => {
 
   const toastId = "loadingDataToast";
 
-  // Get data from the dataSlice
+  // After Optimization
+
   const {
     clients,
     agents,
@@ -35,10 +36,21 @@ const useLoadingData = () => {
     currentUserDetails,
     status,
     error,
-  } = useAppSelector<RootState, DataSliceState>((state) => state.data);
-
-  const currentUser = useAppSelector(selectCurrentUser);
-  const role = currentUser?.role;
+    currentUser,
+    role,
+  } = useAppSelector(
+    (state: RootState) => ({
+      clients: state.data.clients,
+      agents: state.data.agents,
+      currentUserData: state.data.currentUserData,
+      currentUserDetails: state.data.currentUserDetails,
+      status: state.data.status,
+      error: state.data.error,
+      currentUser: selectCurrentUser(state),
+      role: selectCurrentUser(state)?.role,
+    }),
+    shallowEqual
+  );
 
   const shouldFetchData = useMemo(() => {
     return (
@@ -70,7 +82,6 @@ const useLoadingData = () => {
       ]);
       setLocalError(null);
       setRetryCount(0);
-
 
       updateUserEntityNameIfMissing(dispatch, currentUser, currentUserDetails);
     } catch (err: unknown) {

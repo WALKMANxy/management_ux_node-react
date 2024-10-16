@@ -170,7 +170,11 @@ const EmployeeDashboard: React.FC = () => {
         {/* Calendar and Upcoming Visits section */}
         {!isTablet && (
           <CalendarAndVisitsView
-            loadingState={userRole === "employee" || userRole === "client" ? loading : loadingState}
+            loadingState={
+              userRole === "employee" || userRole === "client"
+                ? loading
+                : loadingState
+            }
             t={t}
             disableUpcomingVisits
           />

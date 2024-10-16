@@ -113,30 +113,15 @@ export const calculateSalesDistributionData = (
   clients: Client[],
   isMobile: boolean
 ): { label: string; value: number }[] => {
-  //console.log("Calculating Sales Distribution Data for Clients:", clients);
-
-  const aggregatedClients = clients.reduce((acc, client) => {
-    if (!acc[client.id]) {
-      acc[client.id] = {
-        ...client,
-        totalRevenue: parseFloat(client.totalRevenue),
-      };
-    } else {
-      acc[client.id].totalRevenue += parseFloat(client.totalRevenue);
-    }
-    return acc;
-  }, {} as { [key: string]: Omit<Client, "totalRevenue"> & { totalRevenue: number } });
-
-  const topClients = Object.values(aggregatedClients)
-    .sort((a, b) => b.totalRevenue - a.totalRevenue)
+  const topClients = clients
+    .map(client => ({
+      label: client.name,
+      value: parseFloat(client.totalRevenue),
+    }))
+    .sort((a, b) => b.value - a.value)
     .slice(0, isMobile ? 8 : 25);
 
-  //console.log("Top Clients:", topClients);
-
-  return topClients.map((client) => ({
-    label: client.name,
-    value: client.totalRevenue,
-  }));
+  return topClients;
 };
 
 export const calculateTotalQuantitySold = (

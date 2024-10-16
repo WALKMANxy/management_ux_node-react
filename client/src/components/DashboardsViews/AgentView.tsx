@@ -12,7 +12,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { memo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { brandColors } from "../../utils/constants";
@@ -274,4 +274,4 @@ const AgentView: React.FC<AgentViewProps> = ({
   );
 };
 
-export default AgentView;
+export default memo(AgentView);

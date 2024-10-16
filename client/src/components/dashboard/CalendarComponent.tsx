@@ -17,7 +17,7 @@ import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { DayCalendarSkeleton } from "@mui/x-date-pickers/DayCalendarSkeleton";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next"; // Import useTranslation
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
@@ -31,9 +31,9 @@ import {
   VisitWithAgent,
 } from "../../features/promoVisits/promoVisitsSelectors";
 import { ServerDayProps } from "../../models/propsModels";
+import { locale } from "../../services/localizer";
 import { agentColorMap } from "../../utils/constants";
 import ServerDay from "./ServerDay";
-import { locale } from "../../services/localizer";
 
 const CalendarComponent: React.FC = () => {
   const visits = useAppSelector(selectVisits);
@@ -58,70 +58,67 @@ const CalendarComponent: React.FC = () => {
     VisitWithAgent[]
   >([]);
 
-  /**
-   * Updates the highlighted days based on the current month and user role.
-   */
+
   const updateHighlightedDays = useCallback(
     (month: Dayjs) => {
       const now = dayjs(); // Current date and time
 
-      // Create a map to ensure one color per date, prioritizing red
-      const dateColorMap: { [date: number]: string } = {};
+      const days = visits.reduce<{ date: number; color: string }[]>((acc, visit) => {
+        if (
+          visit.pending !== true ||
+          visit.completed !== false ||
+          !visit.date ||
+          !dayjs(visit.date).isSame(month, "month")
+        ) {
+          return acc;
+        }
 
-      visits
-        .filter(
-          (visit: VisitWithAgent) =>
-            visit.pending === true &&
-            visit.completed === false &&
-            visit.date &&
-            dayjs(visit.date).isSame(month, "month")
-        )
-        .forEach((visit: VisitWithAgent) => {
-          const visitDay = dayjs(visit.date);
-          const date = visitDay.date();
+        const visitDay = dayjs(visit.date);
+        const date = visitDay.date();
+        const isPast = visitDay.isBefore(now, "day");
 
-          // Check if the visit is in the past
-          const isPast = visitDay.isBefore(now, "day");
+        // Check if the date is already processed
+        const existing = acc.find((d) => d.date === date);
+        if (existing && existing.color === "#FFA8B8") {
+          return acc; // Already has highest priority color
+        }
 
-          if (isPast) {
-            // Prioritize a fainter red color for past pending visits
-            dateColorMap[date] = "#FFA8B8"; // Slightly less faint pastel red
-            return;
+        let color = "#ADD8E6"; // Default pastel blue
+
+        if (currentUserDetails) {
+          if (currentUserDetails.role === "admin") {
+            // Admin view: color by agent
+            color = visit.agentId
+              ? agentColorMap[String(visit.agentId)] ?? color
+              : color;
+          } else if (currentUserDetails.role === "agent") {
+            // Agent view: color by client
+            const client = clients[visit.clientId];
+            color = client?.colour ?? color;
           }
+          // Clients have a single default color; no change needed
+        }
 
-          // If not past, assign color based on role
-          let color = "#ADD8E6"; // Default pastel blue
+        if (isPast) {
+          color = "#FFA8B8"; // Override with fainter red for past pending visits
+        }
 
-          if (currentUserDetails) {
-            if (currentUserDetails.role === "admin") {
-              // Admin view: color by agent
-              color = visit.agentId
-                ? agentColorMap[String(visit.agentId)] ?? color
-                : color;
-            } else if (currentUserDetails.role === "agent") {
-              // Agent view: color by client
-              const client = clients[visit.clientId];
-              color = client?.colour ?? color;
-            }
-            // Clients have a single default color; no change needed
-          }
+        if (!existing) {
+          acc.push({ date, color });
+        } else if (!isPast) {
+          acc = acc.map((d) =>
+            d.date === date && d.color !== "#FFA8B8" ? { ...d, color } : d
+          );
+        }
 
-          // Only set the color if it hasn't been set to red
-          if (!dateColorMap[date]) {
-            dateColorMap[date] = color;
-          }
-        });
-
-      // Convert the map to an array
-      const days = Object.entries(dateColorMap).map(([date, color]) => ({
-        date: Number(date),
-        color,
-      }));
+        return acc;
+      }, []);
 
       setHighlightedDays(days);
     },
     [visits, currentUserDetails, clients]
   );
+
 
   /**
    * Updates highlighted days whenever the current month changes.
@@ -130,21 +127,37 @@ const CalendarComponent: React.FC = () => {
     updateHighlightedDays(currentMonth);
   }, [currentMonth, updateHighlightedDays]);
 
-  /**
-   * Handles the change of month in the calendar.
-   * Simulates an async request to fetch data for the new month.
-   */
-  const handleMonthChange = (date: Dayjs) => {
-    setIsLoading(true);
-    setCurrentMonth(date);
+  // Ref to store the timeout ID
+  const monthChangeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Simulate an async request with a timeout
-    setTimeout(() => {
-      updateHighlightedDays(date);
-      setIsLoading(false);
-    }, 500);
-  };
+  const handleMonthChange = useCallback(
+    (date: Dayjs) => {
+      setIsLoading(true);
+      setCurrentMonth(date);
 
+      // Clear any existing timeout
+      if (monthChangeTimeoutRef.current) {
+        clearTimeout(monthChangeTimeoutRef.current);
+      }
+
+      // Simulate an async request with a timeout
+      monthChangeTimeoutRef.current = setTimeout(() => {
+        updateHighlightedDays(date);
+        setIsLoading(false);
+        monthChangeTimeoutRef.current = null;
+      }, 500);
+    },
+    [updateHighlightedDays]
+  );
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (monthChangeTimeoutRef.current) {
+        clearTimeout(monthChangeTimeoutRef.current);
+      }
+    };
+  }, []);
   /**
    * Handles clicks on a specific day in the calendar.
    * Navigates to the visit details or opens a dialog if multiple visits exist.
