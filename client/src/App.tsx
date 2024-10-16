@@ -1,6 +1,6 @@
 // src/App.tsx
 import CssBaseline from "@mui/material/CssBaseline";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import React, { lazy, Suspense, useEffect, useState } from "react";
 import {
   createBrowserRouter,
@@ -19,6 +19,7 @@ import { UserRole } from "./models/entityModels";
 import StatisticsDashboard from "./pages/statistics/StatisticsDashboard";
 import { refreshAccessToken } from "./services/sessionService";
 import { showToast } from "./services/toastMessage";
+import { theme } from "./Styles/theme";
 import {
   cleanupStaleFiles,
   enforceCacheSizeLimit,
@@ -206,90 +207,46 @@ const router = createBrowserRouter([
   },
 ]);
 
-const theme = createTheme({
-  typography: {
-    fontFamily: [
-      "SF Pro Display",
-      "-apple-system",
-      "BlinkMacSystemFont",
-      '"Public Sans"',
-      "Roboto",
-      '"Helvetica Neue"',
-      "Arial",
-      "sans-serif",
-    ].join(","),
-  },
-  palette: {
-    background: {
-      default: "#f4f6f8",
-      paper: "#ffffff",
-    },
-  },
-});
-
 // src/App.tsx
 function App() {
   const dispatch = useAppDispatch();
   const [isInitializing, setIsInitializing] = useState(true); // Initialization state
 
   useEffect(() => {
+    let isMounted = true; // Flag to track if the component is mounted
+
     const initializeApp = async () => {
+      if (!isMounted) return;
+
       try {
         await cleanupStaleFiles();
-      } catch (error) {
-        console.error("Error cleaning up stale files:", error);
-      }
-
-      try {
         await enforceCacheSizeLimit();
-      } catch (error) {
-        console.error("Error enforcing cache size limit:", error);
-      }
 
-      try {
-        // Check if the auth state is present in the local storage
         const localAuthState = localStorage.getItem("authState");
         if (!localAuthState) {
-          // console.debug("No auth state found in local storage");
-          setIsInitializing(false); // Initialization complete
+          setIsInitializing(false);
           return;
         }
 
         const storedAuthState = JSON.parse(localAuthState);
 
-        // console.debug("Auth state:", storedAuthState);
-
-        // Check if user is logged in and has a valid role (not "guest")
         if (storedAuthState.isLoggedIn && storedAuthState.role !== "guest") {
-          /* console.debug(
-            "User is logged in and has a valid role, attempting to refresh session"
-          ); */
-
-          // Attempt to refresh the session to validate and extend it on the server side
           const refreshSuccessful = await refreshAccessToken();
 
-          if (refreshSuccessful) {
-            // Fetch current user data based on user ID stored in auth state
-            if (storedAuthState.userId) {
-              try {
-                const user = await dispatch(
-                  fetchUserById(storedAuthState.userId)
-                ).unwrap();
+          if (refreshSuccessful && storedAuthState.userId) {
+            try {
+              const user = await dispatch(
+                fetchUserById(storedAuthState.userId)
+              ).unwrap();
+              dispatch(setCurrentUser(user));
 
-                dispatch(setCurrentUser(user)); // Update the userSlice with the fetched user
-
-                // Derive and initialize the encryption key
-                const userId = user._id; // Assuming user._id is the unique identifier
-
-                // Initialize encryption using the custom utility
-                await initializeUserEncryption({
-                  userId,
-                  timeMS: timeMS, // Ensure this is set in your .env file
-                });
-              } catch (error) {
-                console.error("Failed to fetch current user:", error);
-                dispatch(handleLogout()); // Force logout if fetching user fails
-              }
+              await initializeUserEncryption({
+                userId: user._id,
+                timeMS: timeMS,
+              });
+            } catch (error) {
+              console.error("Failed to fetch current user:", error);
+              dispatch(handleLogout());
             }
           } else {
             console.warn("Session refresh failed or session expired.");
@@ -299,18 +256,24 @@ function App() {
           console.warn(
             "User is either not logged in or has an invalid role ('guest')."
           );
-          dispatch(handleLogout()); // Ensure logout if role is invalid
+          dispatch(handleLogout());
         }
       } catch (error) {
         console.error("Initialization error:", error);
         showToast.error("An error occurred during initialization.");
         dispatch(handleLogout());
       } finally {
-        setIsInitializing(false); // Mark initialization as complete
+        if (isMounted) {
+          setIsInitializing(false);
+        }
       }
     };
 
     initializeApp();
+
+    return () => {
+      isMounted = false; // Cleanup flag on unmount
+    };
   }, [dispatch]);
 
   // Conditional rendering based on initialization state

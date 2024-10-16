@@ -28,7 +28,7 @@ export const fetchInitialData = createAsyncThunk(
     const state = getState() as {
       auth: { role: string; id: string; userId: string };
     };
-    const { role, id } = state.auth;
+    const { role, id, userId } = state.auth;
 
     if (role === "employee") {
       // For employees, skip data fetching
@@ -47,7 +47,7 @@ export const fetchInitialData = createAsyncThunk(
     } else {
       throw new Error("Invalid user role");
     }
-    return { role, userData };
+    return { role, userData, userId };
   }
 );
 

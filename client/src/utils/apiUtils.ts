@@ -38,7 +38,7 @@ export const axiosInstance: AxiosInstance = axios.create({
   headers: {
     "bypass-tunnel-reminder": "true",
   },
-  timeout: 10000, // Set a timeout to prevent hanging requests
+  timeout: 60000, // Set a timeout to prevent hanging requests
 });
 
 // Request interceptor to attach the access token

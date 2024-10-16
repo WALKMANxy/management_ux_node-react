@@ -194,7 +194,7 @@ export const uploadAttachments = async (
       let fileToUpload = attachment.file;
       if (attachment.type === "image") {
         const options = {
-          maxSizeMB: 1,
+          maxSizeMB: 0.5,
           maxWidthOrHeight: 1920,
           useWebWorker: true,
         };
