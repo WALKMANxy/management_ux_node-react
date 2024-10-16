@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { downloadFile, fetchThumbnail } from "../features/chat/api/chats";
+import { downloadFileFromS3 } from "../features/data/api/media";
 
 // Define the structure of the attachment
 export interface Attachment {
@@ -9,9 +9,10 @@ export interface Attachment {
   type: "image" | "video" | "pdf" | "word" | "excel" | "csv" | "other";
   fileName: string;
   size: number;
-  thumbnailUrl?: string; // Optional thumbnail for images
+  chatId?: string; // Add this line
+  messageId?: string; // Add this line
+  // thumbnailUrl?: string; // Optional thumbnail for images
 }
-
 
 const MAX_FILES = 10; // Maximum number of files allowed
 const MAX_FILE_SIZE_MB = 15; // Max size per file in MB
@@ -24,6 +25,9 @@ export const useFilePreview = () => {
   const [selectedAttachments, setSelectedAttachments] = useState<Attachment[]>(
     []
   );
+  const [downloadProgresses, setDownloadProgresses] = useState<{
+    [key: string]: number;
+  }>({});
   const [downloadedFiles, setDownloadedFiles] = useState<Attachment[]>([]);
   const [downloadedThumbnails, setDownloadedThumbnails] = useState<
     Attachment[]
@@ -31,51 +35,39 @@ export const useFilePreview = () => {
 
   const [isPreview, setIsPreview] = useState<boolean>(false);
 
-  const fetchAndStoreThumbnail = useCallback(async (attachment: Attachment) => {
-    try {
-      const downloadThumbnailUrl = await fetchThumbnail(
-        attachment.thumbnailUrl!
-      );
+  const downloadAndStoreFile = useCallback(async (attachment: Attachment) => {
+    if (!attachment.chatId || !attachment.messageId) {
+      toast.error("Missing chatId or messageId for the attachment.");
+      console.error("Attachment is missing chatId or messageId:", attachment);
+      return;
+    }
 
-      // Store the downloaded thumbnail in the state using the fileName as the key
-      setDownloadedThumbnails((prev) => [
+    try {
+      const blobUrl = await downloadFileFromS3(attachment, (progress) => {
+        // Optionally update download progress state here if needed
+        console.log(
+          `Download progress for ${attachment.fileName}: ${progress}%`
+        );
+        setDownloadProgresses((prev) => ({
+          ...prev,
+          [attachment.fileName]: progress,
+        }));
+      });
+
+      // Store the downloaded file in the state
+      setDownloadedFiles((prev) => [
         ...prev,
-        { ...attachment, thumbnailUrl: downloadThumbnailUrl },
+        { ...attachment, url: blobUrl ?? "" },
       ]);
     } catch (error) {
-      console.error("Error fetching thumbnail:", error);
+      toast.error(`Failed to download ${attachment.fileName}.`);
+      console.error("Error downloading file:", error);
     }
   }, []);
 
-  const downloadAndStoreFile = useCallback(
-    async (attachment: Attachment) => {
-      try {
-        const downloadUrl = await downloadFile(attachment.url, (progress) => {
-          // Optionally update download progress state here if needed
-          console.log(
-            `Download progress for ${attachment.fileName}: ${progress}%`
-          );
-        });
-
-        // Store the downloaded file in the state
-        setDownloadedFiles((prev) => [
-          ...prev,
-          { ...attachment, url: downloadUrl },
-        ]);
-
-        // Fetch and store the thumbnail if it's an image or video
-        if (["image", "video"].includes(attachment.type)) {
-          fetchAndStoreThumbnail(attachment);
-        }
-
-        toast.success(`${attachment.fileName} downloaded successfully.`);
-      } catch (error) {
-        toast.error(`Failed to download ${attachment.fileName}.`);
-        console.error("Error downloading file:", error);
-      }
-    },
-    [fetchAndStoreThumbnail]
-  );
+  /* useEffect(() => {
+    console.log("hook - isViewerOpen:", isViewerOpen);
+  }, [isViewerOpen]); */
 
   const clearDownloadedData = useCallback(() => {
     // Clear downloaded files
@@ -90,9 +82,6 @@ export const useFilePreview = () => {
       return [];
     });
   }, []);
-
-
-
 
   const download = useCallback((attachment: Attachment) => {
     try {
@@ -124,6 +113,9 @@ export const useFilePreview = () => {
       setIsPreview(isPreview);
 
       if (isPreview) {
+        console.log(
+          "openFileViewer: Preview mode. Setting current file to the first attachment in the selectedAttachments array."
+        );
         // Ensure selectedAttachments array is not empty in preview mode
         if (selectedAttachments.length === 0) {
           toast.error("No attachments available for preview.");
@@ -132,8 +124,15 @@ export const useFilePreview = () => {
 
         // Set the current file to the first attachment in the selectedAttachments array
         setCurrentFile(selectedAttachments[0]);
+        console.log(
+          "openFileViewer: Setting current file to",
+          selectedAttachments[0]
+        );
         setIsViewerOpen(true);
       } else {
+        console.log(
+          "openFileViewer: Not in preview mode. Finding file in the downloadedFiles array by fileName."
+        );
         // Find the file in the downloadedFiles array by fileName
         const fileToView = downloadedFiles.find(
           (file) => file.fileName === fileName
@@ -141,12 +140,14 @@ export const useFilePreview = () => {
 
         // Handle the case where the file isn't found
         if (!fileToView) {
+          console.log("openFileViewer: Unable to open file. File not found.");
           toast.error("Unable to open file. File not found.");
           return;
         }
 
         // Set the current file to the clicked attachment
         setCurrentFile(fileToView);
+        console.log("openFileViewer: Setting current file to", fileToView);
         setIsViewerOpen(true);
       }
     },
@@ -216,6 +217,7 @@ export const useFilePreview = () => {
   const closeFileViewer = useCallback(
     (isPreview: boolean) => {
       setIsViewerOpen(false);
+      setIsPreview(false); // Always reset to false when closing
       setCurrentFile(null);
 
       // If in preview mode, clear the attachments
@@ -303,31 +305,26 @@ export const useFilePreview = () => {
               fileType = "csv";
             } else {
               toast.error("File extension not supported");
-              return;
+              return null;
             }
 
             // Return the Attachment object with the file stored locally
             return {
-              file: file, // Keep the file locally on the client side
+              file, // Keep the file locally on the client side
               url: URL.createObjectURL(file), // Temporary URL for preview
               type: fileType,
               fileName: file.name,
               size: file.size,
-              thumbnailUrl:
-                fileType === "image" ? URL.createObjectURL(file) : undefined, // Only for images
             };
           })
           .filter((item) => item !== undefined && item !== null); // Filter out null and undefined entries from unsupported extensions
+
         // Add the valid attachments to the state
         addAttachments(fileArray);
-
-        // Open the viewer with the first selected file, if any
-        if (fileArray.length > 0) {
-          openFileViewer(false); // Pass all selected files and the first one to view
-        }
+        // console.log("Selected Files:", fileArray);
       }
     },
-    [addAttachments, openFileViewer]
+    [addAttachments]
   );
 
   return {
@@ -343,8 +340,9 @@ export const useFilePreview = () => {
     selectedAttachments,
     handleFileSelect,
     isPreview,
-    downloadAndStoreFile, // New function
-    fetchAndStoreThumbnail, // New function
+    downloadAndStoreFile,
+    downloadProgresses,
+    // fetchAndStoreThumbnail, // New function
     clearDownloadedData, // New function
     downloadedFiles, // New state
     downloadedThumbnails, // New state

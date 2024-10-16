@@ -51,7 +51,21 @@ const ChatView: React.FC = () => {
     currentUserId,
   } = useChatView(); // Destructure the hook values
 
-  const { isViewerOpen, closeFileViewer, isPreview } = useFilePreview();
+  // Centralize useFilePreview here
+  const {
+    isViewerOpen,
+    closeFileViewer,
+    isPreview,
+    currentFile,
+    handleFileSelect,
+    download,
+    removeAttachment,
+    selectedAttachments,
+    downloadedFiles,
+    downloadAndStoreFile,
+    downloadedThumbnails,
+    setCurrentFile,
+  } = useFilePreview();
 
   // Hook for loading older messages
   const { messagesContainerRef, topRef } = useLoadOlderMessages(
@@ -278,12 +292,31 @@ const ChatView: React.FC = () => {
           position: "sticky",
         }}
       >
-        <InputBox canUserChat={isUserAllowedToChat} />
+        {/* Pass the necessary functions as props */}
+        <InputBox
+          canUserChat={isUserAllowedToChat}
+          handleFileSelect={handleFileSelect}
+          closeFileViewer={closeFileViewer}
+          isPreview={isPreview}
+        />
       </Box>
 
       {/* File Viewer */}
       {isViewerOpen && (
-        <FileViewer onClose={() => closeFileViewer(isPreview)} />
+        <FileViewer
+          onClose={() => closeFileViewer(isPreview)}
+          download={download}
+          currentFile={currentFile}
+          removeAttachment={removeAttachment}
+          selectedAttachments={selectedAttachments}
+          isPreview={isPreview}
+          downloadedFiles={downloadedFiles}
+          downloadAndStoreFile={downloadAndStoreFile}
+          downloadedThumbnails={downloadedThumbnails}
+          setCurrentFile={setCurrentFile}
+          handleFileSelect={handleFileSelect}
+          closeFileViewer={closeFileViewer}
+        />
       )}
 
       {/* Edit Chat Form */}

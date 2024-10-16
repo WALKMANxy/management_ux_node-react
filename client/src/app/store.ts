@@ -3,8 +3,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { calendarApi } from "../features/calendar/calendarQuery";
-import { dataApi } from "../features/data/dataQueries.ts";
-import { promoVisitApi } from "../features/promoVisits/promosVisitsQueries";
 import { userApi } from "../features/users/userQueries";
 import { weatherApi } from "../features/weather/weatherQuery.ts";
 import { loadAuthState, saveAuthState } from "../services/localStorage.ts";
@@ -36,8 +34,6 @@ const store = configureStore({
       immutableCheck: false, // Disables checks for state immutability, which can be performance-intensive
     })
       .concat(userApi.middleware)
-      .concat(dataApi.middleware)
-      .concat(promoVisitApi.middleware)
       .concat(listenerMiddleware.middleware)
       .concat(calendarApi.middleware)
       .concat(weatherApi.middleware),

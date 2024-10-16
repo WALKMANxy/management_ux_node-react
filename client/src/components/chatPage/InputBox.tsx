@@ -14,21 +14,23 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useCallback, useRef, useState } from "react";
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { selectUserRole } from "../../features/auth/authSlice"; // Assuming the selector is defined in the auth slice
 import useChatLogic from "../../hooks/useChatsLogic";
-import { Attachment, useFilePreview } from "../../hooks/useFilePreview";
+import { Attachment } from "../../hooks/useFilePreview";
 import AttachmentModal from "./AttachmentModal";
 import MessageTypeModal from "./MessageTypeModal";
 
 interface InputBoxProps {
-  canUserChat: boolean; // Add chatStatus prop
+  canUserChat: boolean;
   attachments?: Attachment[];
   viewingFiles?: boolean;
+  handleFileSelect?: ((event: ChangeEvent<HTMLInputElement>) => void) | undefined; // New prop
+  closeFileViewer: (isPreview: boolean) => void; // New prop
+  isPreview: boolean; // New prop
 }
-
 /**
  * InputBox Component
  * Allows users to input and send messages, and select message types.
@@ -40,6 +42,9 @@ const InputBox: React.FC<InputBoxProps> = ({
   canUserChat,
   attachments,
   viewingFiles,
+  handleFileSelect, // Destructure the new props
+  closeFileViewer, // Destructure the new props
+  isPreview, // Destructure the new props
 }) => {
   const { t } = useTranslation();
   const [messageInput, setMessageInput] = useState("");
@@ -58,11 +63,13 @@ const InputBox: React.FC<InputBoxProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const { handleFileSelect, closeFileViewer, isPreview } = useFilePreview(); // Use the updated hook
+   // Add this useEffect to reset attachmentAnchorEl when viewingFiles changes
+  useEffect(() => {
+    if (viewingFiles) {
+      setAttachmentAnchorEl(null);
+    }
+  }, [viewingFiles]);
 
-  /**
-   * Handles sending the message.
-   */
   const handleSend = useCallback(() => {
     if (messageInput.trim()) {
       handleSendMessage(messageInput, messageType, attachments);
@@ -240,12 +247,14 @@ const InputBox: React.FC<InputBoxProps> = ({
       </Tooltip>
 
       {/* Attachment Modal */}
-      <AttachmentModal
-        anchorEl={attachmentAnchorEl}
-        isOpen={isAttachmentOpen}
-        onClose={handleAttachmentClose}
-        onFileSelect={handleFileSelect}
-      />
+      {!isPreview && (
+        <AttachmentModal
+          anchorEl={attachmentAnchorEl}
+          isOpen={isAttachmentOpen}
+          onClose={handleAttachmentClose}
+          onFileSelect={handleFileSelect}
+        />
+      )}
 
       {/* Message Type Menu */}
       <MessageTypeModal

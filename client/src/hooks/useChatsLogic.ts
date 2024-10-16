@@ -220,6 +220,13 @@ const useChatLogic = () => {
           ? "\u200B" // Use an invisible character (zero-width space)
           : content;
 
+          // **Update attachments to include chatId and messageId**
+    const updatedAttachments = (attachments || []).map((attachment) => ({
+      ...attachment,
+      chatId: currentChatId,
+      messageId: localId,
+    }));
+
       const messageData: IMessage = {
         _id: localId,
         local_id: localId,
@@ -228,23 +235,36 @@ const useChatLogic = () => {
         timestamp: new Date(),
         readBy: [currentUserId],
         messageType,
-        attachments: attachments || [],
+        attachments: updatedAttachments || [],
         status: "pending",
       };
 
       try {
         if (attachments && attachments.length > 0) {
-          // Use the new reducer for messages with attachments
+          // Update attachments to include chatId and messageId
+          const updatedAttachments = attachments.map((attachment) => ({
+            ...attachment,
+            chatId: currentChatId,
+            messageId: localId,
+          }));
+          messageData.attachments = updatedAttachments;
+
+          console.log(`Dispatching addAttachmentMessageReducer for message with attachments: ${messageData._id}`);
+
+          // Dispatch message with attachments
           dispatch(
             addAttachmentMessageReducer({
               chatId: currentChatId,
               message: messageData,
             })
           );
+
           // Initiate the upload
-          await uploadAttachments(currentChatId, messageData, dispatch);
+          await uploadAttachments( currentChatId, messageData, dispatch);
         } else {
-          // Use the existing reducer for messages without attachments
+          console.log(`Dispatching addMessageReducer for message without attachments: ${messageData._id}`);
+
+          // Dispatch message without attachments
           dispatch(
             addMessageReducer({ chatId: currentChatId, message: messageData })
           );
