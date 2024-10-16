@@ -2,52 +2,68 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Promo, Visit } from "../../models/dataModels";
 import { DataSliceState } from "../../models/stateModels";
-import { promoVisitApi } from "../promoVisits/promosVisitsQueries";
-import { dataApi } from "./dataQueries.ts";
+import {
+  mapPromosToEntity,
+  mapVisitsToEntity,
+} from "../../services/dataLoader.ts";
+import {
+  createPromoApi,
+  createVisitApi,
+  getPromosApi,
+  getVisitsApi,
+  updatePromoApi,
+  updateVisitApi,
+} from "../promoVisits/api/promoVisit.ts";
+import {
+  addOrUpdatePromo,
+  addOrUpdateVisit,
+  setCurrentUserPromos,
+  setCurrentUserVisits,
+} from "./dataSlice.ts";
+import { getUserAdminDataApi, getUserAgentDataApi, getUserClientDataApi } from "./api/userData.ts";
 
 export const fetchInitialData = createAsyncThunk(
   "data/fetchInitialData",
-  async (_, { getState, dispatch }) => {
+  async (_, { getState }) => {
     const state = getState() as {
       auth: { role: string; id: string; userId: string };
     };
-    const { role, id, userId } = state.auth;
+    const { role, id } = state.auth;
 
     if (role === "employee") {
       // For employees, skip data fetching
-      return { role, userData: null, userId };
+      return { role, userData: null };
     }
 
     let userData;
     if (role === "client") {
-      userData = await dispatch(
-        dataApi.endpoints.getUserClientData.initiate({ entityCode: id, userId })
-      ).unwrap();
+      userData = await getUserClientDataApi(id );
+
     } else if (role === "agent") {
-      userData = await dispatch(
-        dataApi.endpoints.getUserAgentData.initiate({ entityCode: id, userId })
-      ).unwrap();
+      userData = await getUserAgentDataApi(id );
+
     } else if (role === "admin") {
-      userData = await dispatch(
-        dataApi.endpoints.getUserAdminData.initiate({ entityCode: id, userId })
-      ).unwrap();
+      userData = await getUserAdminDataApi(id);
     } else {
       throw new Error("Invalid user role");
     }
-    return { role, userData, userId };
+    return { role, userData };
   }
 );
+
+
 // Thunk to update visits
 export const getVisits = createAsyncThunk<
-  void, // Changed return type to void
+  void, // Return type
   void,
   { state: { data: DataSliceState } }
 >("data/updateVisits", async (_, { dispatch, getState }) => {
   try {
     const state = getState().data;
     const entity = state.currentUserData;
-    const id = state.currentUserDetails?.id
+    const id = state.currentUserDetails?.id;
     const role = state.currentUserDetails?.role;
+
     if (role === "employee") {
       // Employees should not fetch visits
       return;
@@ -57,10 +73,13 @@ export const getVisits = createAsyncThunk<
       throw new Error("No entity or role found in the state.");
     }
 
-    // Dispatch the RTK Query endpoint with the necessary arguments
-    await dispatch(
-      promoVisitApi.endpoints.getVisits.initiate({ entity, role, id })
-    ).unwrap();
+    const visits = await getVisitsApi({ role, clientId: id });
+
+    // Transform the visits using the correct entity and role
+    const mappedVisits = mapVisitsToEntity(visits, entity, role);
+
+    // Dispatch an action to update the slice
+    dispatch(setCurrentUserVisits(mappedVisits));
   } catch (error) {
     console.error("Failed to update visits:", error);
     throw error;
@@ -69,7 +88,7 @@ export const getVisits = createAsyncThunk<
 
 // Thunk to update promos
 export const getPromos = createAsyncThunk<
-  void, // Changed return type to void
+  void, // Return type
   void,
   { state: { data: DataSliceState } }
 >("data/updatePromos", async (_, { dispatch, getState }) => {
@@ -79,7 +98,7 @@ export const getPromos = createAsyncThunk<
     const role = state.currentUserDetails?.role;
 
     if (role === "employee") {
-      // Employees should not fetch visits
+      // Employees should not fetch promos
       return;
     }
 
@@ -87,17 +106,19 @@ export const getPromos = createAsyncThunk<
       throw new Error("No entity or role found in the state.");
     }
 
-    // Dispatch the RTK Query endpoint with the necessary arguments
-    await dispatch(
-      promoVisitApi.endpoints.getPromos.initiate({ entity, role })
-    ).unwrap();
+    const promos = await getPromosApi();
+
+    // Transform the promos using the correct entity and role
+    const mappedPromos = mapPromosToEntity(promos, entity, role);
+
+    // Dispatch an action to update the slice
+    dispatch(setCurrentUserPromos(mappedPromos));
   } catch (error) {
     console.error("Failed to update promos:", error);
     throw error;
   }
 });
 
-// Create Visit Thunk
 // Create Visit Thunk
 export const createVisitAsync = createAsyncThunk<
   Visit, // Return type
@@ -126,25 +147,19 @@ export const createVisitAsync = createAsyncThunk<
         throw new Error("No entity or role found in the state.");
       }
 
-      // Dispatch the mutation and unwrap the response
-      const result = await dispatch(
-        promoVisitApi.endpoints.createVisit.initiate({
-          visitData,
-          entity,
-          role,
-        })
-      ).unwrap();
+      // Call the API function
+      const createdVisit = await createVisitApi(visitData);
 
-      console.log("Debug: Visit creation successful", result);
-      return visitData;
+      // Dispatch the action to update the slice
+      dispatch(addOrUpdateVisit(createdVisit));
 
+      console.log("Debug: Visit creation successful", createdVisit);
+      return createdVisit;
     } catch (err: unknown) {
       console.error("Debug: Error occurred", err);
 
       // Safely handle and type the error
-      if (err instanceof Error && "data" in err) {
-        return rejectWithValue((err as { data: string }).data);
-      } else if (err instanceof Error) {
+      if (err instanceof Error) {
         return rejectWithValue(err.message);
       } else {
         return rejectWithValue("Failed to create visit.");
@@ -153,13 +168,12 @@ export const createVisitAsync = createAsyncThunk<
   }
 );
 
-
 // Update Visit Thunk
 export const updateVisitAsync = createAsyncThunk<
-  void, // Changed return type to void
+  void, // Return type
   {
     _id: string;
-    visitData: Visit;
+    visitData: Partial<Visit>;
   },
   { state: { data: DataSliceState } }
 >(
@@ -171,7 +185,7 @@ export const updateVisitAsync = createAsyncThunk<
       const role = state.currentUserDetails?.role;
 
       if (role === "employee") {
-        // Employees should not fetch visits
+        // Employees should not update visits
         return rejectWithValue("You can't update visits.");
       }
 
@@ -179,19 +193,13 @@ export const updateVisitAsync = createAsyncThunk<
         throw new Error("No entity or role found in the state.");
       }
 
-      // Dispatch the mutation and unwrap the response
-      await dispatch(
-        promoVisitApi.endpoints.updateVisit.initiate({
-          _id,
-          visitData,
-          entity,
-          role,
-        })
-      ).unwrap();
+      // Call the API function
+      const updatedVisit = await updateVisitApi(_id, visitData);
+
+      // Dispatch the action to update the slice
+      dispatch(addOrUpdateVisit(updatedVisit));
     } catch (err: unknown) {
-      if (err instanceof Error && "data" in err) {
-        return rejectWithValue((err as { data: string }).data);
-      } else if (err instanceof Error) {
+      if (err instanceof Error) {
         return rejectWithValue(err.message);
       } else {
         return rejectWithValue("Failed to update visit.");
@@ -202,7 +210,7 @@ export const updateVisitAsync = createAsyncThunk<
 
 // Create Promo Thunk
 export const createPromoAsync = createAsyncThunk<
-  Promo, // Changed return type to void
+  Promo, // Return type
   Promo, // Input type
   { state: { data: DataSliceState } }
 >(
@@ -214,7 +222,7 @@ export const createPromoAsync = createAsyncThunk<
       const role = state.currentUserDetails?.role;
 
       if (role === "employee") {
-        // Employees should not fetch visits
+        // Employees should not create promos
         return rejectWithValue("You can't create promos.");
       }
 
@@ -222,19 +230,22 @@ export const createPromoAsync = createAsyncThunk<
         throw new Error("No entity or role found in the state.");
       }
 
-      // Dispatch the mutation and unwrap the response
-      await dispatch(
-        promoVisitApi.endpoints.createPromo.initiate({
-          promoData,
-          entity,
-          role,
-        })
-      ).unwrap();
-      return promoData;
+      // Convert Date fields to ISO strings before passing to the API
+      const formattedPromoData = {
+        ...promoData,
+        startDate: new Date(promoData.startDate).toISOString(),
+        endDate: new Date(promoData.endDate).toISOString(),
+        createdAt: new Date(promoData.createdAt).toISOString(),
+      };
+
+      // Call the API function with the formatted data
+      const createdPromo = await createPromoApi(formattedPromoData);
+      // Dispatch the action to update the slice
+      dispatch(addOrUpdatePromo(createdPromo));
+
+      return createdPromo;
     } catch (err: unknown) {
-      if (err instanceof Error && "data" in err) {
-        return rejectWithValue((err as { data: string }).data);
-      } else if (err instanceof Error) {
+      if (err instanceof Error) {
         return rejectWithValue(err.message);
       } else {
         return rejectWithValue("Failed to create promo.");
@@ -245,10 +256,10 @@ export const createPromoAsync = createAsyncThunk<
 
 // Update Promo Thunk
 export const updatePromoAsync = createAsyncThunk<
-  void, // Changed return type to void
+  void, // Return type
   {
     _id: string;
-    promoData: Promo;
+    promoData: Partial<Promo>;
   },
   { state: { data: DataSliceState } }
 >(
@@ -260,7 +271,7 @@ export const updatePromoAsync = createAsyncThunk<
       const role = state.currentUserDetails?.role;
 
       if (role === "employee") {
-        // Employees should not fetch visits
+        // Employees should not update promos
         return rejectWithValue("You can't update promos.");
       }
 
@@ -268,19 +279,13 @@ export const updatePromoAsync = createAsyncThunk<
         throw new Error("No entity or role found in the state.");
       }
 
-      // Dispatch the mutation and unwrap the response
-      await dispatch(
-        promoVisitApi.endpoints.updatePromo.initiate({
-          _id,
-          promoData,
-          entity,
-          role,
-        })
-      ).unwrap();
+      // Call the API function
+      const updatedPromo = await updatePromoApi(_id, promoData);
+
+      // Dispatch the action to update the slice
+      dispatch(addOrUpdatePromo(updatedPromo));
     } catch (err: unknown) {
-      if (err instanceof Error && "data" in err) {
-        return rejectWithValue((err as { data: string }).data);
-      } else if (err instanceof Error) {
+      if (err instanceof Error) {
         return rejectWithValue(err.message);
       } else {
         return rejectWithValue("Failed to update promo.");

@@ -76,7 +76,7 @@ const TotalEarning: React.FC<TotalEarningProps> = ({
           </Grid>
 
           {/* Gross Earnings Section */}
-          <Grid item>
+          <Grid item sx={{ ml: -2}}>
             <Grid container alignItems="center">
               <Grid item>
                 <Typography
@@ -119,7 +119,7 @@ const TotalEarning: React.FC<TotalEarningProps> = ({
           </Grid>
 
           {/* Net Earnings Section */}
-          <Grid item>
+          <Grid item sx={{ mr: -2.5}}>
             {/* Container for Net Earnings */}
             <Grid container direction="column" alignItems="flex-end">
               {/* Net Earnings Value and Icon */}

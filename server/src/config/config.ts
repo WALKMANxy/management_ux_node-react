@@ -54,6 +54,10 @@ export const config = {
   },
   sessionDuration: process.env.SESSION_DURATION || "7d",
   reverseGeoToken: process.env.REVERSE_GEO_TOKEN || "",
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
+  region: process.env.AWS_REGION || "",
+  bucketName: process.env.AWS_BUCKET_NAME || "",
 };
 
 // Validate required environment variables

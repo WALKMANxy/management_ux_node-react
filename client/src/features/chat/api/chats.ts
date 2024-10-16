@@ -10,6 +10,8 @@ import {
   uploadComplete,
   uploadFailed,
 } from "../chatSlice";
+import axios from "axios";
+import { getChatFileUploadUrl, uploadFileToS3 } from "../../data/api/media";
 
 // Fetch all chats for the authenticated user
 export const fetchAllChats = async (): Promise<IChat[]> => {
@@ -168,12 +170,26 @@ export const uploadAttachments = async (
   message: IMessage,
   dispatch: Dispatch
 ) => {
+  // Check if chatId and messageId are valid before proceeding
+  if (!chatId || !message.local_id) {
+    console.error("Invalid chatId or messageId. Aborting attachment upload.");
+    return;
+  }
+
+  console.log(`Starting attachment upload for chatId=${chatId}, messageId=${message.local_id}`);
+
   const uploadedAttachments = [];
 
   for (const attachment of message.attachments) {
-    if (!attachment.file) continue;
+    // Check if attachment has necessary properties
+    if (!attachment.file || !attachment.chatId || !attachment.messageId) {
+      console.error("Attachment is missing required properties. Skipping this attachment.");
+      continue;
+    }
 
     try {
+      console.log(`Uploading attachment: file=${attachment.file.name}, type=${attachment.type}`);
+
       // Compress images if applicable
       let fileToUpload = attachment.file;
       if (attachment.type === "image") {
@@ -182,49 +198,54 @@ export const uploadAttachments = async (
           maxWidthOrHeight: 1920,
           useWebWorker: true,
         };
+        console.log(`Compressing image: ${fileToUpload.name}`);
         fileToUpload = await imageCompression(attachment.file, options);
+        console.log(`Image compressed: original size=${attachment.file.size}, new size=${fileToUpload.size}`);
       }
 
-      const formData = new FormData();
-      formData.append("file", fileToUpload);
+      // Request a pre-signed URL for the file
+      const fileName = encodeURIComponent(fileToUpload.name);
+      const uploadUrl = await getChatFileUploadUrl(attachment.chatId, attachment.messageId, fileName);
 
-      // Use your axiosInstance to upload the file with progress tracking
-      const response = await axiosInstance.post("/api/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (progressEvent) => {
-          const progress = Math.round(
-            (progressEvent.loaded * 100) / (progressEvent.total ?? 0)
-          );
+      console.log(`Uploading to S3 via pre-signed URL: ${uploadUrl}`);
 
-          // Dispatch progress update to Redux store
-          dispatch(
-            updateMessageProgress({
-              chatId,
-              messageId: message.local_id || message._id,
-              progress,
-            })
-          );
-        },
+      // Upload the file to S3
+      await uploadFileToS3(fileToUpload, uploadUrl, (progress) => {
+        console.log(`Dispatching progress update: progress=${progress}%`);
+        dispatch(
+          updateMessageProgress({
+            chatId: attachment.chatId!,
+            messageId: attachment.messageId!,
+            progress,
+          })
+        );
       });
 
+      // Store the URL without the signed parameters
       uploadedAttachments.push({
-        ...attachment,
-        url: response.data.url, // Assuming the response contains a "url"
+        url: uploadUrl.split("?")[0], // Remove signed query parameters
+        type: attachment.type,
+        fileName: attachment.fileName,
+        size: attachment.size,
+        chatId: attachment.chatId,
+        messageId: attachment.messageId,
       });
+
+      console.log(`Attachment uploaded successfully: ${fileToUpload.name}`);
+
     } catch (error) {
       console.error("Failed to upload attachment:", error);
       dispatch(
         uploadFailed({
-          chatId,
-          messageId: message.local_id || message._id,
+          chatId: attachment.chatId,
+          messageId: attachment.messageId,
         })
       );
       return;
     }
   }
 
+  // Update the message with the uploaded attachments
   const updatedMessage: IMessage = {
     ...message,
     attachments: uploadedAttachments,
@@ -232,6 +253,8 @@ export const uploadAttachments = async (
     status: "sent",
     uploadProgress: 100,
   };
+
+  console.log(`All attachments uploaded. Dispatching uploadComplete.`);
 
   dispatch(uploadComplete({ chatId, message: updatedMessage }));
 };
@@ -274,7 +297,7 @@ export const downloadFile = async (
     }
 
     // If not cached, download the file from the server
-    const response = await axiosInstance.get(fileUrl, {
+    const response = await axios.get(fileUrl, {
       responseType: "blob",
       onDownloadProgress: (progressEvent) => {
         const totalLength = progressEvent.total;

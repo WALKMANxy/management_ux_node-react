@@ -3,14 +3,14 @@
 import PhotoIcon from "@mui/icons-material/Photo";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import { Box, IconButton, Menu, Tooltip } from "@mui/material";
-import React from "react";
+import React, { ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 interface AttachmentModalProps {
   anchorEl: HTMLElement | null;
   isOpen: boolean;
   onClose: () => void;
-  onFileSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onFileSelect: ((event: ChangeEvent<HTMLInputElement>) => void) | undefined;
 }
 
 const AttachmentModal: React.FC<AttachmentModalProps> = ({
@@ -21,9 +21,7 @@ const AttachmentModal: React.FC<AttachmentModalProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  /**
-   * Closes the file preview.
-   */
+
 
   return (
     <Menu
@@ -49,8 +47,7 @@ const AttachmentModal: React.FC<AttachmentModalProps> = ({
           display: "flex",
           flexDirection: "column",
           gap: 2,
-          padding: 2,
-        },
+px: 1        },
       }}
     >
       {/* Icon buttons for selecting files */}
