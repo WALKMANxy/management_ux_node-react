@@ -11,16 +11,18 @@ interface FileGalleryProps {
   attachments: Attachment[];
   currentFile: Attachment;
   onRemoveFile: (fileName: string) => void;
+  setCurrentFile: (file: Attachment | null) => void;
 }
 
 const FileGallery: React.FC<FileGalleryProps> = ({
   attachments,
   currentFile,
   onRemoveFile,
+  setCurrentFile,
 }) => {
   const galleryRef = useRef<HTMLDivElement>(null);
 
-  const { setCurrentFile, isPreview } = useFilePreview();
+  const { isPreview } = useFilePreview();
 
   useEffect(() => {
     const currentIndex = attachments.findIndex(

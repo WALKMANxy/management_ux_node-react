@@ -49,7 +49,10 @@ type AutomatedMessageQueueItem = {
 class WebSocketService {
   private socket: Socket | null = null;
   private maxReconnectAttempts = 15;
+  private listenersSetUp = false;
 
+  // Queues to handle offline updates with size limits
+  private readonly MAX_QUEUE_SIZE = 100;
   // Queues to handle offline updates
   private offlineReadStatusQueue: ReadStatusQueueItem[] = [];
   private offlineMessageQueue: MessageQueueItem[] = [];
@@ -67,9 +70,28 @@ class WebSocketService {
     store = _store;
   }
 
+   // To manage timeouts
+   private timeoutIds: NodeJS.Timeout[] = [];
+
+
+
+  private enqueue<T>(queue: T[], item: T) {
+    if (queue.length >= this.MAX_QUEUE_SIZE) {
+      console.warn("Queue max size reached. Discarding oldest item.");
+      queue.shift(); // Remove the oldest item
+    }
+    queue.push(item);
+  }
+
   connect() {
     if (this.socket && this.socket.connected) {
       console.warn("WebSocket is already connected.");
+      return;
+    }
+
+    if (this.socket && !this.socket.connected && this.listenersSetUp) {
+      // Reuse existing socket without setting up listeners again
+      this.socket.connect();
       return;
     }
 
@@ -89,6 +111,7 @@ class WebSocketService {
     });
 
     this.setupEventListeners();
+    this.listenersSetUp = true;
     this.socket.connect(); // Initiate the connection
   }
 
@@ -105,11 +128,8 @@ class WebSocketService {
     this.socket.on("connect_error", this.handleConnectError);
 
     // Handle unauthorized reconnect due to token expiry
-    this.socket.on("reconnect_error", (error) => {
-      if (error.message === "Unauthorized") {
-        this.handleTokenExpiry();
-      }
-    });
+    this.socket.on("reconnect_error", this.handleReconnectError);
+
 
     // Handle reconnection attempts
     this.socket.on("reconnect_attempt", () => {
@@ -117,26 +137,11 @@ class WebSocketService {
       // Optionally, update UI or state
     });
 
-    this.socket.on("reconnect_failed", () => {
-      console.error("Reconnection attempts failed.");
-      // Show a persistent error or prompt the user
-      toast.error(t("webSocketService.connectionLost"), {
-        id: this.connectionLostToastId,
-      });
-    });
+    this.socket.on("reconnect_failed", this.handleReconnectFailed);
 
-    // Handle successful reconnection
-    this.socket.on("reconnect", () => {
-      // console.log(`Reconnected after ${attemptNumber} attempts`);
-      // Dismiss any existing connection lost toasts
-      toast.dismiss(this.connectionLostToastId);
-      // Optionally, show a success toast
-      toast.success(t("webSocketService.reconnected"), {
-        id: "reconnectedToast",
-      });
-      // Flush the offline queues
-      this.flushOfflineQueues();
-    });
+
+    this.socket.on("reconnect", this.handleReconnect);
+
 
     // Handle incoming chat events
     this.socket.on("chat:newMessage", this.handleNewMessage);
@@ -146,29 +151,22 @@ class WebSocketService {
   }
 
   private handleConnect = () => {
-    // console.log("WebSocket connected.");
-    // Dismiss any connection lost toasts
     toast.dismiss(this.connectionLostToastId);
-    // Optionally, show a connected toast
-
-    // Flush the offline queues
     this.flushOfflineQueues();
   };
 
   private handleDisconnect = (reason: string) => {
     console.warn(`WebSocket disconnected: ${reason}`);
-    // Show a connection lost toast if not already shown
     if (!toast(this.connectionLostToastId)) {
       toast.error(t("webSocketService.lostConnection"), {
         id: this.connectionLostToastId,
-        duration: Infinity, // Keep it until dismissed
+        duration: Infinity,
       });
     }
   };
 
   private handleConnectError = (error: Error) => {
     console.error("WebSocket connection error:", error);
-    // Optionally, show an error toast
     if (!toast(this.connectionLostToastId)) {
       toast.error(t("webSocketService.connectionError"), {
         id: this.connectionLostToastId,
@@ -176,6 +174,28 @@ class WebSocketService {
       });
     }
   };
+
+  private handleReconnectError = (error: Error) => {
+    if (error.message === "Unauthorized") {
+      this.handleTokenExpiry();
+    }
+  };
+
+  private handleReconnectFailed = () => {
+    console.error("Reconnection attempts failed.");
+    toast.error(t("webSocketService.connectionLost"), {
+      id: this.connectionLostToastId,
+    });
+  };
+
+  private handleReconnect = () => {
+    toast.dismiss(this.connectionLostToastId);
+    toast.success(t("webSocketService.reconnected"), {
+      id: "reconnectedToast",
+    });
+    this.flushOfflineQueues();
+  };
+
 
   private handleTokenExpiry = async () => {
     console.warn("WebSocket token expired, attempting to refresh token...");
@@ -228,6 +248,7 @@ class WebSocketService {
     });
     this.offlineChatQueue = [];
 
+    // Flush queued chat updates
     this.offlineUpdateChatQueue.forEach(({ chatId, updatedData }) => {
       this.emitUpdateChat(chatId, updatedData);
     });
@@ -248,16 +269,10 @@ class WebSocketService {
     chatId: string;
     message: IMessage;
   }) => {
-    if (!store) {
-      console.error("Store has not been injected into WebSocketService.");
-      return;
-    }
-
-    // Access the current state to check if the chat exists
     const state = store.getState();
     const chatExists = state.chats.chats[chatId];
-    const currentChatId = state.chats.currentChat?._id; // Access the currently opened chat ID
-    const currentUserId = state.auth.userId; // Access the current user ID
+    const currentChatId = state.chats.currentChat?._id;
+    const currentUserId = state.auth.userId;
 
     if (!chatExists) {
       try {
@@ -269,38 +284,34 @@ class WebSocketService {
       }
     }
 
-    // Add a slight delay before dispatching the server-confirmed message
-    setTimeout(() => {
-      // Chat exists, dispatch the action to add the message as usual
+    const firstTimeout = setTimeout(() => {
       store.dispatch(addMessageReducer({ chatId, message, fromServer: true }));
       if (message.sender !== currentUserId) {
-        handleNewNotification(message.sender, message.content, state); // Call the notification handler
+        handleNewNotification(message.sender, message.content, state);
       }
-      // Wait for the message to be fully added to the server
-      setTimeout(() => {
-        // Check if the message is part of the currently opened chat and hasn't been read
+
+      const secondTimeout = setTimeout(() => {
         if (
-          currentChatId === chatId && // Check if the message belongs to the current chat
-          message.sender !== currentUserId && // Ensure it's a received message
-          !message.readBy.includes(currentUserId) // Check if it hasn't been read by the current user
+          currentChatId === chatId &&
+          message.sender !== currentUserId &&
+          !message.readBy.includes(currentUserId)
         ) {
-          // Dispatch the read status update
           store.dispatch(
             updateReadStatusReducer({
               chatId,
               userId: currentUserId,
-              messageIds: [message.local_id || message._id], // Update the read status of the new message
+              messageIds: [message.local_id || message._id],
             })
           );
-
-          // Show notification if the sender is not the current user
         }
-      }, 50); // Add an additional delay to ensure the server processes the message
-    }, 50); // Initial delay for adding the message
+      }, 50);
+      this.timeoutIds.push(secondTimeout);
+    }, 50);
+    this.timeoutIds.push(firstTimeout);
   };
 
-  // Handle incoming message read event
-  public handleMessageRead = ({
+   // Handle incoming message read event
+   public handleMessageRead = ({
     chatId,
     userId,
     messageIds,
@@ -309,12 +320,6 @@ class WebSocketService {
     userId: string;
     messageIds: string[];
   }) => {
-    if (!store) {
-      console.error("Store has not been injected into WebSocketService.");
-      return;
-    }
-
-    // Dispatch the action to update the read status in local state with message IDs
     store.dispatch(
       updateReadStatusReducer({
         chatId,
@@ -380,83 +385,82 @@ class WebSocketService {
   };
 
   // Emit a new message to the server
-  public emitNewMessage(chatId: string, message: IMessage) {
-    console.log(`Emitting new message to chat ${chatId}:`, message);
+ // Emit a new message to the server
+ public emitNewMessage(chatId: string, message: IMessage) {
+  console.log(`Emitting new message to chat ${chatId}:`, message);
 
-    if (!this.socket || !this.socket.connected) {
-      console.warn("Socket disconnected. Queuing outgoing message.");
-      this.offlineMessageQueue.push({ chatId, message });
+  if (!this.socket || !this.socket.connected) {
+    console.warn("Socket disconnected. Queuing outgoing message.");
+    this.enqueue(this.offlineMessageQueue, { chatId, message });
 
-      // Dispatch uploadFailed reducer immediately if offline
-      console.log("Dispatching uploadFailed reducer due to offline.");
-      store.dispatch(
-        uploadFailed({ chatId, messageId: message.local_id || message._id })
-      );
-      return;
-    }
-
-    // Send the message and wait for acknowledgment from the server
-    console.log("Sending message to server via WebSocket.");
-    this.socket.emit(
-      "chat:message",
-      { chatId, message },
-      (ack: { success: boolean }) => {
-        console.log(`Server acknowledged message with success=${ack.success}`);
-        if (!ack.success) {
-          console.warn("Message delivery failed. Queuing message.");
-          this.offlineMessageQueue.push({ chatId, message} );
-
-          // Dispatch uploadFailed reducer if the server fails to acknowledge the message
-          console.log("Dispatching uploadFailed reducer due to server failure.");
-          store.dispatch(
-            uploadFailed({ chatId, messageId: message.local_id || message._id })
-          );
-        }
-      }
+    console.log("Dispatching uploadFailed reducer due to offline.");
+    store.dispatch(
+      uploadFailed({ chatId, messageId: message.local_id || message._id })
     );
+    return;
+  }
 
-    // Optionally, you can also implement a timeout for acknowledgment
-    setTimeout(() => {
-      const isMessagePending = this.offlineMessageQueue.find(
-        (msg) => msg.message.local_id === message.local_id
-      );
-      if (isMessagePending) {
-        console.warn("Message acknowledgment timeout. Marking as failed.");
-        console.log("Dispatching uploadFailed reducer due to timeout.");
+  console.log("Sending message to server via WebSocket.");
+  this.socket.emit(
+    "chat:message",
+    { chatId, message },
+    (ack: { success: boolean }) => {
+      console.log(`Server acknowledged message with success=${ack.success}`);
+      if (!ack.success) {
+        console.warn("Message delivery failed. Queuing message.");
+        this.enqueue(this.offlineMessageQueue, { chatId, message });
+
+        console.log("Dispatching uploadFailed reducer due to server failure.");
         store.dispatch(
           uploadFailed({ chatId, messageId: message.local_id || message._id })
         );
       }
-    }, 5000); // 5 seconds timeout for acknowledgment
-  }
+    }
+  );
 
-  // Emit a message read event to the server
-  public emitMessageRead(chatId: string, messageIds: string[]) {
+  const ackTimeout = setTimeout(() => {
+    const isMessagePending = this.offlineMessageQueue.find(
+      (msg) => msg.message.local_id === message.local_id
+    );
+    if (isMessagePending) {
+      console.warn("Message acknowledgment timeout. Marking as failed.");
+      console.log("Dispatching uploadFailed reducer due to timeout.");
+      store.dispatch(
+        uploadFailed({ chatId, messageId: message.local_id || message._id })
+      );
+    }
+  }, 5000);
+  this.timeoutIds.push(ackTimeout);
+}
+
+   // Emit a message read event to the server
+   public emitMessageRead(chatId: string, messageIds: string[]) {
     if (!this.socket || !this.socket.connected) {
       console.warn("Socket disconnected. Queuing read status update.");
-      this.offlineReadStatusQueue.push({ chatId, messageIds });
+      this.enqueue(this.offlineReadStatusQueue, { chatId, messageIds });
       return;
     }
 
     this.socket.emit("chat:read", { chatId, messageIds });
   }
 
-  // Emit a new chat creation event to the server
-  public emitNewChat(chat: IChat) {
-    if (!this.socket || !this.socket.connected) {
-      console.warn("Socket disconnected. Queuing outgoing chat creation.");
-      this.offlineChatQueue.push({ chat });
-      return;
-    }
 
-    this.socket.emit("chat:create", { chat });
+ // Emit a new chat creation event to the server
+ public emitNewChat(chat: IChat) {
+  if (!this.socket || !this.socket.connected) {
+    console.warn("Socket disconnected. Queuing outgoing chat creation.");
+    this.enqueue(this.offlineChatQueue, { chat });
+    return;
   }
+
+  this.socket.emit("chat:create", { chat });
+}
 
   // Emit a chat update event to the server
   public emitUpdateChat(chatId: string, updatedData: Partial<IChat>) {
     if (!this.socket || !this.socket.connected) {
       console.warn("Socket disconnected. Queuing outgoing chat update.");
-      this.offlineUpdateChatQueue.push({ chatId, updatedData });
+      this.enqueue(this.offlineUpdateChatQueue, { chatId, updatedData });
       return;
     }
 
@@ -466,30 +470,30 @@ class WebSocketService {
   public emitAutomatedMessage(targetIds: string[], message: Partial<IMessage>) {
     if (!this.socket || !this.socket.connected) {
       console.warn("Socket disconnected. Queuing automated message.");
-      this.offlineAutomatedMessageQueue.push({ targetIds, message });
+      this.enqueue(this.offlineAutomatedMessageQueue, { targetIds, message });
       return;
     }
 
     this.socket.emit("chat:automatedMessage", { targetIds, message });
   }
 
-  // Clean up and disconnect
-  disconnect() {
-    if (this.socket) {
-      this.socket.off("connect", this.handleConnect);
-      this.socket.off("disconnect", this.handleDisconnect);
-      this.socket.off("connect_error", this.handleConnectError);
-      this.socket.off("reconnect_error");
-      this.socket.off("reconnect_attempt");
-      this.socket.off("reconnect_failed");
-      this.socket.off("reconnect");
-      this.socket.off("chat:newMessage", this.handleNewMessage);
-      this.socket.off("chat:messageRead", this.handleMessageRead);
-      this.socket.off("chat:newChat", this.handleNewChat);
-      this.socket.disconnect();
-      this.socket = null;
-    }
+ // Clean up and disconnect
+ disconnect() {
+  if (this.socket) {
+    this.socket.removeAllListeners();
+    this.socket.disconnect();
+    this.socket = null;
+    this.listenersSetUp = false;
+
+    // Clear all pending timeouts
+    this.timeoutIds.forEach((id) => clearTimeout(id));
+    this.timeoutIds = [];
+
+    // Dismiss all persistent toasts
+    toast.dismiss(this.connectionLostToastId);
+    toast.dismiss("reconnectedToast");
   }
+}
 }
 
 export const webSocketService = new WebSocketService();

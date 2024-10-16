@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { downloadFileFromS3 } from "../features/data/api/media";
 
@@ -326,6 +326,13 @@ export const useFilePreview = () => {
     },
     [addAttachments]
   );
+  // In useEffect
+  useEffect(() => {
+    if (selectedAttachments.length > 0) {
+      console.log("Opening File Viewer with Attachments:", selectedAttachments);
+      openFileViewer(true);
+    }
+  }, [selectedAttachments, openFileViewer]);
 
   return {
     isViewerOpen,

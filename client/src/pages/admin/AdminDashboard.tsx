@@ -1,10 +1,11 @@
 // src/pages/admin/AdminDashboard.tsx
-import { Box, Grid, Skeleton, useMediaQuery, useTheme } from "@mui/material";
-import React, { Suspense, useMemo, useState } from "react";
+import { Grid, Skeleton, useMediaQuery, useTheme } from "@mui/material";
+import React, { Suspense, useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
 import CalendarAndVisitsView from "../../components/DashboardsViews/CalendarAndVisitsView";
 import DashboardView from "../../components/DashboardsViews/DashboardView";
+import SkeletonView from "../../components/DashboardsViews/SkeletonView";
 import GlobalSearch from "../../components/Header/GlobalSearch";
 import WelcomeMessage from "../../components/dashboard/WelcomeMessage";
 import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
@@ -13,7 +14,6 @@ import useLoadingData from "../../hooks/useLoadingData";
 import useSelectionState from "../../hooks/useSelectionState";
 import useStats from "../../hooks/useStats";
 import { calculateMonthlyData } from "../../utils/dataUtils";
-import SkeletonView from "../../components/DashboardsViews/SkeletonView";
 
 const AgentView = React.lazy(
   () => import("../../components/DashboardsViews/AgentView")
@@ -29,10 +29,9 @@ const AdminDashboard: React.FC = () => {
   const isTablet = useMediaQuery("(min-width:900px) and (max-width:1250px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const handleToggleDrawer = () => {
-    setDrawerOpen(!drawerOpen);
-  };
-
+  const handleToggleDrawer = useCallback(() => {
+    setDrawerOpen((prevOpen) => !prevOpen);
+  }, []);
   const { loadingState } = useLoadingData();
 
   const {
@@ -62,24 +61,69 @@ const AdminDashboard: React.FC = () => {
     yearlyCategories,
     yearlyOrdersData,
     totalNetRevenue,
-    netRevenueData
+    netRevenueData,
   } = useStats(isMobile);
 
   const user = useAppSelector(selectCurrentUser);
 
   const userRole = user?.role;
 
+  // Optimized Implementation
   const selectedAgentData = useMemo(() => {
-    if (selectedAgent && salesDistributionDataAgents.agents.length > 0) {
-      return salesDistributionDataAgents.agents.find(
+    if (!selectedAgent) return null;
+    return (
+      salesDistributionDataAgents.agents.find(
         (agent) => agent.id === selectedAgent.id
-      );
-    }
-    return null;
+      ) || null
+    );
   }, [selectedAgent, salesDistributionDataAgents.agents]);
 
+  // Example: Memoizing Props for DashboardView
+  const dashboardViewProps = useMemo(
+    () => ({
+      t,
+      isTablet,
+      handleToggleDrawer,
+      loadingState,
+      totalRevenue,
+      totalOrders,
+      ordersData,
+      yearlyOrdersData,
+      months,
+      yearlyCategories,
+      revenueData,
+      topBrandsData,
+      salesDistributionDataClients,
+      salesDistributionDataAgents,
+      isMobile,
+      userRole: userRole!,
+      totalNetRevenue,
+      netRevenueData,
+    }),
+    [
+      t,
+      isTablet,
+      handleToggleDrawer,
+      loadingState,
+      totalRevenue,
+      totalOrders,
+      ordersData,
+      yearlyOrdersData,
+      months,
+      yearlyCategories,
+      revenueData,
+      topBrandsData,
+      salesDistributionDataClients,
+      salesDistributionDataAgents,
+      isMobile,
+      userRole,
+      totalNetRevenue,
+      netRevenueData,
+    ]
+  );
+
   return (
-    <Box className="admin-dashboard">
+    <>
       <WelcomeMessage
         name={user?.entityName}
         role="admin" // or "agent" or "client"
@@ -99,7 +143,7 @@ const AdminDashboard: React.FC = () => {
         <GlobalSearch filter="admin" onSelect={handleSelect} />
       )}
 
-      <Grid container spacing={6} mt={isMobile? 0 :2}>
+      <Grid container spacing={6} mt={isMobile ? 0 : 2}>
         <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
           {selectedAgentData && selectedAgent ? (
             <Suspense fallback={<SkeletonView />}>
@@ -141,26 +185,7 @@ const AdminDashboard: React.FC = () => {
               />
             </Suspense>
           ) : (
-            <DashboardView
-              t={t}
-              isTablet={isTablet}
-              handleToggleDrawer={handleToggleDrawer}
-              loadingState={loadingState}
-              totalRevenue={totalRevenue}
-              totalOrders={totalOrders}
-              ordersData={ordersData}
-              yearlyOrdersData={yearlyOrdersData}
-              months={months}
-              yearlyCategories={yearlyCategories}
-              revenueData={revenueData}
-              topBrandsData={topBrandsData}
-              salesDistributionDataClients={salesDistributionDataClients}
-              salesDistributionDataAgents={salesDistributionDataAgents}
-              isMobile={isMobile}
-              userRole={userRole!}
-              totalNetRevenue={totalNetRevenue}
-              netRevenueData={netRevenueData}
-            />
+            <DashboardView {...dashboardViewProps} />
           )}
         </Grid>
         {/* Calendar and Upcoming Visits section */}
@@ -173,7 +198,7 @@ const AdminDashboard: React.FC = () => {
       {isTablet && (
         <DrawerContainer open={drawerOpen} onClose={handleToggleDrawer} />
       )}
-    </Box>
+    </>
   );
 };
 

@@ -2,7 +2,7 @@
 // src/components/dashboard/DashboardView.tsx
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { Box, Divider, Fab, Grid, Skeleton, Typography } from "@mui/material";
-import React from "react";
+import React, { memo } from "react";
 
 import { UserRole } from "../../models/entityModels";
 import { brandColors } from "../../utils/constants";
@@ -74,11 +74,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
             aria-label={t("dashboard.loadingStatistics")}
           />
         ) : (
-          <Typography
-            variant="h5"
-            gutterBottom
-            fontWeight={100}
-          >
+          <Typography variant="h5" gutterBottom fontWeight={100}>
             {t("dashboard.yourStatistics")}
           </Typography>
         )}
@@ -119,7 +115,10 @@ const DashboardView: React.FC<DashboardViewProps> = ({
               aria-label={t("dashboard.skeleton")}
             />
           ) : (
-            <TotalEarning totalGross={totalRevenue} totalNet={totalNetRevenue}  />
+            <TotalEarning
+              totalGross={totalRevenue}
+              totalNet={totalNetRevenue}
+            />
           )}
         </Grid>
         <Grid item xs={12} md={6}>
@@ -218,4 +217,4 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   );
 };
 
-export default DashboardView;
+export default memo(DashboardView);

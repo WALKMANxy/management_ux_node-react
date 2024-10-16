@@ -152,7 +152,7 @@ export const dataSlice = createSlice({
             id: clientData.id,
             role: "client",
             name: clientData.name,
-            userId: userId,
+            userId: userId!,
           };
           // Check if agentData exists within clientData and store it
           if (clientData.agentData) {
@@ -185,7 +185,7 @@ export const dataSlice = createSlice({
             id: agentData.id,
             role: "agent",
             name: agentData.name,
-            userId: userId,
+            userId: userId!,
           };
         } else if (role === "admin" && "adminData" in userData!) {
           // Handle admin data
@@ -207,15 +207,15 @@ export const dataSlice = createSlice({
             id: adminData.id,
             role: "admin",
             name: adminData.name,
-            userId: userId,
+            userId: userId!,
           };
         } else if (role === "employee") {
           // Handle employee role
           state.currentUserDetails = {
-            id: userId, // Assuming userId is unique for employees
+            id: userId!, // Assuming userId is unique for employees
             role: "employee",
             name: "Employee Name", // Replace with actual name if available
-            userId: userId,
+            userId: userId!,
           };
           state.currentUserData = null;
           // Optionally, you can reset other state properties if needed

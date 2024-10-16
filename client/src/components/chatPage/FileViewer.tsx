@@ -265,6 +265,7 @@ const FileViewer: React.FC<FileViewerProps> = ({
           <FileGallery
             attachments={attachmentsToShow}
             currentFile={currentFile}
+            setCurrentFile={setCurrentFile}
             onRemoveFile={removeAttachment}
           />
         </Box>
