@@ -15,10 +15,11 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAppDispatch } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
+import { selectDownloadedFiles } from "../../features/downloads/downloadedFilesSlice";
 import useLoadOlderMessages from "../../hooks/useChatLoadOlderMessages";
 import useChatView from "../../hooks/useChatView"; // Import the custom hook
 import { useFilePreview } from "../../hooks/useFilePreview";
@@ -61,16 +62,22 @@ const ChatView: React.FC = () => {
     download,
     removeAttachment,
     selectedAttachments,
-    downloadedFiles,
     downloadAndStoreFile,
-    downloadedThumbnails,
     setCurrentFile,
+    openFileViewer,
+    downloadProgresses,
   } = useFilePreview();
+
+  const downloadedFiles = useAppSelector(selectDownloadedFiles);
 
   // Hook for loading older messages
   const { messagesContainerRef, topRef } = useLoadOlderMessages(
     currentChat?._id || null
   );
+
+  useEffect(() => {
+    console.log("Downloaded files:", downloadedFiles);
+  }, [downloadedFiles]);
 
   /**
    * Handles returning to the sidebar on mobile by clearing the current chat.
@@ -277,6 +284,11 @@ const ChatView: React.FC = () => {
             currentUserId={currentUserId}
             chatType={currentChat?.type || "simple"}
             participantsData={participantsData}
+            openFileViewer={openFileViewer} // Pass the function here
+            downloadAndStoreFile={downloadAndStoreFile}
+            download={download}
+            downloadProgresses={downloadProgresses}
+            downloadedFiles={downloadedFiles}
           />
         </Box>
       </Paper>
@@ -310,12 +322,11 @@ const ChatView: React.FC = () => {
           removeAttachment={removeAttachment}
           selectedAttachments={selectedAttachments}
           isPreview={isPreview}
-          downloadedFiles={downloadedFiles}
           downloadAndStoreFile={downloadAndStoreFile}
-          downloadedThumbnails={downloadedThumbnails}
           setCurrentFile={setCurrentFile}
           handleFileSelect={handleFileSelect}
           closeFileViewer={closeFileViewer}
+          downloadedFiles={downloadedFiles}
         />
       )}
 

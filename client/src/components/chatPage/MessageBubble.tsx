@@ -12,8 +12,7 @@ import {
   addMessageReducer,
   selectCurrentChat,
 } from "../../features/chat/chatSlice";
-import { useFilePreview } from "../../hooks/useFilePreview";
-import { IMessage } from "../../models/dataModels";
+import { Attachment, IMessage } from "../../models/dataModels";
 import { User } from "../../models/entityModels";
 import { showToast } from "../../services/toastMessage";
 import "../../Styles/styles.css";
@@ -24,6 +23,13 @@ interface MessageBubbleProps {
   message: IMessage;
   participantsData: Partial<User>[]; // Array of participants data passed from ChatView
   chatType: string;
+  openFileViewer: (isPreview: boolean, fileName?: string) => void; // Add this line
+  downloadAndStoreFile: (attachment: Attachment) => Promise<void>;
+  download: (fileName: string) => void;
+  downloadProgresses: {
+    [key: string]: number;
+  };
+  downloadedFiles: Attachment[]
 }
 
 /**
@@ -37,6 +43,11 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   message,
   participantsData = [],
   chatType,
+  openFileViewer,
+  downloadAndStoreFile,
+  download,
+  downloadProgresses,
+  downloadedFiles,
 }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -44,7 +55,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   const isOwnMessage = message.sender === currentUserId;
   const currentChat = useAppSelector(selectCurrentChat);
   const currentChatType = currentChat?.type;
-  const { openFileViewer, isPreview } = useFilePreview();
   const [retrying, setRetrying] = useState(false); // Track retry state
 
   // Find the sender's details from the participants data
@@ -242,6 +252,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
               sx={{
                 wordBreak: "break-word", // Allows long words to break and wrap to the next line
                 overflowWrap: "break-word", // Ensures text wraps within the container
+                textAlign: isOwnMessage ? "right" : "left",
               }}
             >
               {message.content}
@@ -263,7 +274,11 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                     attachments={message.attachments}
                     isUploading={message.isUploading}
                     uploadProgress={message.uploadProgress}
-                    onClick={() => openFileViewer(isPreview)} // Call openFileViewer from the hook
+                    openFileViewer={openFileViewer} // Pass the function here
+                    downloadAndStoreFile={downloadAndStoreFile}
+                    download={download}
+                    downloadProgresses={downloadProgresses}
+                    downloadedFiles={downloadedFiles}
                   />
                 ))}
               </Box>
