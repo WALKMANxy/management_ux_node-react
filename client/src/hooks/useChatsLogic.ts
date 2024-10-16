@@ -540,7 +540,13 @@ const useChatLogic = () => {
     });
   }, [chats, getUnreadCount]);
 
-
+  // Function to select a chat and update the currentChat state
+  const handleSelectChat = (chatId: string) => {
+    const selectedChat = chats.find((chat) => chat._id === chatId);
+    if (selectedChat) {
+      selectChat(selectedChat); // Pass the entire chat object to the state
+    }
+  };
 
   const broadcastChatId = "6701f7dbc1a80a3d029808ab"; // Your broadcast chat ID
 
@@ -583,6 +589,7 @@ const useChatLogic = () => {
     broadcastChat,
     markMessagesAsRead,
     handleEditChat,
+    handleSelectChat,
   };
 };
 

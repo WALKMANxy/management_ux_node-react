@@ -1,6 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { downloadFileFromS3 } from "../features/data/api/media";
+import {
+  addDownloadedFile,
+  clearDownloadedFiles,
+  selectDownloadedFiles,
+} from "../features/downloads/downloadedFilesSlice";
 
 // Define the structure of the attachment
 export interface Attachment {
@@ -20,6 +26,8 @@ const MAX_TOTAL_SIZE_MB = 50; // Max total size of all files in MB
 
 // Hook to manage file preview and download logic
 export const useFilePreview = () => {
+  const dispatch = useAppDispatch();
+  const downloadedFiles = useAppSelector(selectDownloadedFiles);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [currentFile, setCurrentFile] = useState<Attachment | null>(null);
   const [selectedAttachments, setSelectedAttachments] = useState<Attachment[]>(
@@ -28,136 +36,136 @@ export const useFilePreview = () => {
   const [downloadProgresses, setDownloadProgresses] = useState<{
     [key: string]: number;
   }>({});
-  const [downloadedFiles, setDownloadedFiles] = useState<Attachment[]>([]);
-  const [downloadedThumbnails, setDownloadedThumbnails] = useState<
-    Attachment[]
-  >([]);
+
+  const downloadedFilesRef = useRef(downloadedFiles);
 
   const [isPreview, setIsPreview] = useState<boolean>(false);
 
-  const downloadAndStoreFile = useCallback(async (attachment: Attachment) => {
-    if (!attachment.chatId || !attachment.messageId) {
-      toast.error("Missing chatId or messageId for the attachment.");
-      console.error("Attachment is missing chatId or messageId:", attachment);
-      return;
-    }
+  useEffect(() => {
+    downloadedFilesRef.current = downloadedFiles;
+  }, [downloadedFiles]);
 
-    try {
-      const blobUrl = await downloadFileFromS3(attachment, (progress) => {
-        // Optionally update download progress state here if needed
-        console.log(
-          `Download progress for ${attachment.fileName}: ${progress}%`
-        );
-        setDownloadProgresses((prev) => ({
-          ...prev,
-          [attachment.fileName]: progress,
-        }));
-      });
+  useEffect(() => {
+    console.log("Downloaded files:", downloadedFiles);
+  }, [downloadedFiles]);
 
-      // Store the downloaded file in the state
-      setDownloadedFiles((prev) => [
-        ...prev,
-        { ...attachment, url: blobUrl ?? "" },
-      ]);
-    } catch (error) {
-      toast.error(`Failed to download ${attachment.fileName}.`);
-      console.error("Error downloading file:", error);
-    }
-  }, []);
-
-  /* useEffect(() => {
-    console.log("hook - isViewerOpen:", isViewerOpen);
-  }, [isViewerOpen]); */
-
-  const clearDownloadedData = useCallback(() => {
-    // Clear downloaded files
-    setDownloadedFiles((prev) => {
-      prev.forEach((attachment) => URL.revokeObjectURL(attachment.url));
-      return [];
-    });
-
-    // Clear downloaded thumbnails
-    setDownloadedThumbnails((prev) => {
-      prev.forEach((attachment) => URL.revokeObjectURL(attachment.url));
-      return [];
-    });
-  }, []);
-
-  const download = useCallback((attachment: Attachment) => {
-    try {
-      // Check if the attachment URL exists and is valid
-      if (!attachment.url) {
-        toast.error("Invalid file URL.");
+  const downloadAndStoreFile = useCallback(
+    async (attachment: Attachment) => {
+      if (!attachment.chatId || !attachment.messageId) {
+        toast.error("Missing chatId or messageId for the attachment.");
+        console.error("Attachment is missing chatId or messageId:", attachment);
         return;
       }
 
-      // Create a link element
-      const link = document.createElement("a");
-      link.href = attachment.url; // URL can be a blob or a remote file URL
+      console.groupCollapsed(`Downloading file: ${attachment.fileName}`);
+      try {
+        console.log(`Download request:`, attachment);
+        const blobUrl = await downloadFileFromS3(attachment, (progress) => {
+          console.log(`Download progress: ${progress}%`);
+          setDownloadProgresses((prev) => ({
+            ...prev,
+            [attachment.fileName]: progress,
+          }));
+        });
 
-      // Set the download attribute with the file name
-      link.download = attachment.fileName;
+        console.log(`Download complete:`, blobUrl);
+        dispatch(
+          addDownloadedFile({
+            ...attachment,
+            url: blobUrl ?? "",
+          })
+        );
+      } catch (error) {
+        toast.error(`Failed to download ${attachment.fileName}.`);
+        console.error("Error downloading file:", error);
+      } finally {
+        console.groupEnd();
+      }
+    },
+    [dispatch]
+  );
 
-      // Trigger the download
-      document.body.appendChild(link); // Append to the DOM temporarily
-      link.click(); // Programmatically click the link to download
-      document.body.removeChild(link); // Remove it after downloading
-    } catch (error) {
-      toast.error("Failed to download the file.");
-      console.error("Error downloading the file:", error);
-    }
-  }, []);
+  const clearDownloadedData = useCallback(() => {
+    dispatch(clearDownloadedFiles());
+  }, [dispatch]);
 
+  const download = useCallback(
+    (fileName: string) => {
+      try {
+        // Use the ref to access the latest downloadedFiles
+        const currentDownloadedFiles = [...downloadedFilesRef.current];
+        console.debug(
+          "Current downloaded files in 'download':",
+          currentDownloadedFiles
+        );
+
+        const fileToDownload = currentDownloadedFiles.find(
+          (file) => file.fileName === fileName
+        );
+
+        if (!fileToDownload || !fileToDownload.url) {
+          toast.error("File not found or invalid file URL.");
+          console.error("File not found with fileName:", fileName);
+          return;
+        }
+
+        const link = document.createElement("a");
+        link.href = fileToDownload.url;
+        link.download = fileToDownload.fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        toast.error("Failed to download the file.");
+        console.error("Error downloading the file:", error);
+      }
+    },
+    [] // Remove downloadedFiles from dependencies
+  );
   const openFileViewer = useCallback(
     (isPreview: boolean, fileName?: string) => {
+      console.groupCollapsed("openFileViewer");
+      console.log("isPreview:", isPreview);
+      console.log("fileName:", fileName);
+      console.log("selectedAttachments:", selectedAttachments);
+      console.log("downloadedFiles:", downloadedFilesRef.current);
+      console.groupEnd();
+
       setIsPreview(isPreview);
 
       if (isPreview) {
-        console.log(
-          "openFileViewer: Preview mode. Setting current file to the first attachment in the selectedAttachments array."
-        );
-        // Ensure selectedAttachments array is not empty in preview mode
         if (selectedAttachments.length === 0) {
           toast.error("No attachments available for preview.");
           return;
         }
-
-        // Set the current file to the first attachment in the selectedAttachments array
         setCurrentFile(selectedAttachments[0]);
-        console.log(
-          "openFileViewer: Setting current file to",
-          selectedAttachments[0]
-        );
         setIsViewerOpen(true);
       } else {
-        console.log(
-          "openFileViewer: Not in preview mode. Finding file in the downloadedFiles array by fileName."
-        );
-        // Find the file in the downloadedFiles array by fileName
-        const fileToView = downloadedFiles.find(
+        const selectedFile = downloadedFilesRef.current.find(
           (file) => file.fileName === fileName
         );
 
-        // Handle the case where the file isn't found
-        if (!fileToView) {
-          console.log("openFileViewer: Unable to open file. File not found.");
-          toast.error("Unable to open file. File not found.");
+        if (!selectedFile) {
+          toast.error("File not found in downloadedFiles.");
+          console.error(
+            "File not found in downloadedFiles with fileName:",
+            fileName
+          );
           return;
         }
 
-        // Set the current file to the clicked attachment
+        const fileToView = {
+          ...selectedFile,
+          url: selectedFile.url,
+        };
+
         setCurrentFile(fileToView);
-        console.log("openFileViewer: Setting current file to", fileToView);
         setIsViewerOpen(true);
       }
+
+      // Rest of your logic
     },
-    [
-      selectedAttachments,
-      downloadedFiles,
-      setCurrentFile,
-      setIsViewerOpen,
-      setIsPreview,
-    ]
+    [selectedAttachments, downloadedFilesRef] // Remove downloadedFiles from dependencies
   );
 
   const addAttachments = useCallback(
@@ -349,9 +357,6 @@ export const useFilePreview = () => {
     isPreview,
     downloadAndStoreFile,
     downloadProgresses,
-    // fetchAndStoreThumbnail, // New function
-    clearDownloadedData, // New function
-    downloadedFiles, // New state
-    downloadedThumbnails, // New state
+    clearDownloadedData,
   };
 };
