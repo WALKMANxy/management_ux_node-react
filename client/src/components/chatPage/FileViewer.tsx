@@ -1,5 +1,3 @@
-// src/components/fileViewer/FileViewer.tsx
-
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DownloadIcon from "@mui/icons-material/Download";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
@@ -14,50 +12,59 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
-import { Attachment, useFilePreview } from "../../hooks/useFilePreview";
+import { Attachment } from "../../hooks/useFilePreview";
 import FileGallery from "./FileGallery";
 import InputBox from "./InputBox";
 
 interface FileViewerProps {
   onClose: () => void;
+  download: (file: Attachment) => void;
+  currentFile: Attachment | null;
+  removeAttachment: (fileName: string) => void;
+  selectedAttachments: Attachment[];
+  isPreview: boolean;
+  downloadedFiles: Attachment[];
+  downloadAndStoreFile: (file: Attachment) => Promise<void>;
+  downloadedThumbnails: Attachment[];
+  setCurrentFile: (file: Attachment | null) => void;
+  handleFileSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  closeFileViewer: (preview: boolean) => void;
 }
 
-const FileViewer: React.FC<FileViewerProps> = ({ onClose }) => {
-  const {
-    download,
-    currentFile,
-    removeAttachment,
-    selectedAttachments,
-    isPreview,
-    downloadedFiles,
-    downloadAndStoreFile,
-    downloadedThumbnails,
-    setCurrentFile,
-  } = useFilePreview();
+const FileViewer: React.FC<FileViewerProps> = ({
+  onClose,
+  download,
+  currentFile,
+  removeAttachment,
+  selectedAttachments,
+  isPreview,
+  downloadedFiles,
+  downloadAndStoreFile,
+  downloadedThumbnails,
+  setCurrentFile,
+  closeFileViewer,
+}) => {
+
 
   const [loading, setLoading] = useState(false); // Track loading state
 
   const [zoomLevel, setZoomLevel] = useState(1);
-  const isImage = currentFile?.type.startsWith("image/");
-  const isVideo = currentFile?.type.startsWith("video/");
+  const isImage = currentFile?.type.startsWith("ima");
+  const isVideo = currentFile?.type.startsWith("vid");
 
   const handleZoomIn = () => setZoomLevel((prev) => prev + 0.2);
   const handleZoomOut = () => setZoomLevel((prev) => Math.max(1, prev - 0.2));
 
-  // New function to handle setting the current file based on isPreview status
   const handleCurrentFile = useCallback(
     async (file: Attachment) => {
       if (!isPreview) {
-        // If we're not in preview mode, check if the file is already downloaded
         const downloadedFile = downloadedFiles.find(
           (f) => f.fileName === file.fileName
         );
 
         if (downloadedFile) {
-          // File is already downloaded, set the current file
           setCurrentFile(downloadedFile);
         } else {
-          // File is not downloaded yet, trigger download and display loading
           setLoading(true);
           await downloadAndStoreFile(file);
           setLoading(false);
@@ -75,7 +82,6 @@ const FileViewer: React.FC<FileViewerProps> = ({ onClose }) => {
         (file) => file.fileName === currentFile.fileName
       );
 
-      // If file isn't downloaded, initiate download
       if (!fileDownloaded) {
         handleCurrentFile(currentFile);
       }
@@ -88,7 +94,6 @@ const FileViewer: React.FC<FileViewerProps> = ({ onClose }) => {
 
   if (!currentFile) return null;
 
-  // Determine which attachments to pass to FileGallery
   const attachmentsToShow = isPreview
     ? selectedAttachments
     : downloadedThumbnails;
@@ -99,11 +104,11 @@ const FileViewer: React.FC<FileViewerProps> = ({ onClose }) => {
         position: "fixed",
         top: 0,
         left: 0,
-        width: "100vw",
-        height: "100vh",
+        width: "100%", // Changed from 100vw to 100%
+        height: "100%", // Changed from 100vh to 100%
         bgcolor: "rgba(0,0,0,0.8)",
-        backdropFilter: "blur(5px)", // Add blur effect
-        zIndex: 1300, // Ensure it's above other elements
+        backdropFilter: "blur(5px)",
+        zIndex: 1300,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -125,11 +130,11 @@ const FileViewer: React.FC<FileViewerProps> = ({ onClose }) => {
         {/* Top Action Bar */}
         <Box
           sx={{
-            height: "10%", // Ensure it's 10% of the viewer's height
+            height: "60px", // Fixed height for consistency
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "10px",
+            padding: "0 10px", // Adjusted padding
             borderBottom: "1px solid #e0e0e0",
             backgroundColor: "#f5f5f5",
           }}
@@ -158,13 +163,13 @@ const FileViewer: React.FC<FileViewerProps> = ({ onClose }) => {
         {/* Content Area */}
         <Box
           sx={{
-            height: "70%", // 70% height for the file preview area
+            flexGrow: 1, // Allows the content area to expand
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             overflow: "hidden",
             position: "relative",
-            backgroundColor: "#000", // Optional: to enhance media display
+            backgroundColor: "#000",
           }}
         >
           {loading ? (
@@ -248,40 +253,54 @@ const FileViewer: React.FC<FileViewerProps> = ({ onClose }) => {
           )}
         </Box>
 
-        <Box sx={{ height: "20%" }} />
-        {/* File Gallery with Trash Bin Overlay */}
-        <FileGallery
-          attachments={attachmentsToShow}
-          currentFile={currentFile}
-          onRemoveFile={removeAttachment} // Pass the removal handler
-        />
-      </Box>
-
-      {/* Bottom Action Bar */}
-      <Box
-        sx={{
-          height: "10%", // Ensure it's 10% of the viewer's height
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-          padding: "10px",
-          borderTop: "1px solid #e0e0e0",
-          backgroundColor: "#f5f5f5",
-          gap: "10px",
-        }}
-      >
-        {/* InputBox only appears in preview mode */}
-        {isPreview && (
-          <InputBox
-            canUserChat={true}
-            attachments={selectedAttachments}
-            viewingFiles={true}
+        {/* File Gallery */}
+        <Box
+          sx={{
+            py: 2,
+            backgroundColor: "#f5f5f5",
+            overflowX: "auto",
+            borderTop: "1px solid #e0e0e0",
+          }}
+        >
+          <FileGallery
+            attachments={attachmentsToShow}
+            currentFile={currentFile}
+            onRemoveFile={removeAttachment}
           />
+        </Box>
+
+        {/* InputBox (only in preview mode) */}
+        {isPreview && (
+          <Box
+            sx={{
+              borderTop: "1px solid #e0e0e0",
+              backgroundColor: "#f5f5f5",
+            }}
+          >
+            <InputBox
+              isPreview={true}
+              canUserChat={true}
+              attachments={selectedAttachments}
+              viewingFiles={true}
+              closeFileViewer={closeFileViewer}
+            />
+          </Box>
         )}
 
-        {/* Download and Open buttons only appear in view mode */}
+        {/* Bottom Action Bar (only in view mode) */}
         {!isPreview && (
-          <Box>
+          <Box
+            sx={{
+              height: "60px", // Fixed height for consistency
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              borderTop: "1px solid #e0e0e0",
+              backgroundColor: "#f5f5f5",
+              gap: "10px",
+              padding: "0 10px", // Adjusted padding
+            }}
+          >
             <Tooltip title="Download">
               <IconButton
                 onClick={() => {
