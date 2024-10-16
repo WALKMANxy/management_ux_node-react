@@ -29,7 +29,6 @@ import {
 } from "@mui/material";
 import "animate.css";
 import React, {
-  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -45,10 +44,9 @@ import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 import { clearSelection } from "../../features/data/dataSlice";
 import { selectCurrentUser } from "../../features/users/userSlice";
 import { UserRole } from "../../models/entityModels";
-import LoadingSpinner from "../common/LoadingSpinner";
 import GlobalSearch from "./GlobalSearch";
-const NotificationBell = React.lazy(() => import("./NotificationBell"));
-const UserAvatar = React.lazy(() => import("./UserAvatar"));
+import NotificationBell from "./NotificationBell";
+import UserAvatar from "./UserAvatar";
 
 const Header: React.FC = () => {
   const theme = useTheme();
@@ -315,12 +313,8 @@ const Header: React.FC = () => {
             placeholder={t("search")}
             isHeaderSearch={true}
           />
-          <Suspense fallback={<LoadingSpinner />}>
-            <NotificationBell />
-          </Suspense>
-          <Suspense fallback={<LoadingSpinner />}>
-            <UserAvatar />
-          </Suspense>
+          <NotificationBell />
+          <UserAvatar />
         </Toolbar>
       </AppBar>
       <Toolbar />

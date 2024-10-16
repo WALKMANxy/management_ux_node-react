@@ -11,24 +11,27 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Attachment } from "../../hooks/useFilePreview";
 import FileGallery from "./FileGallery";
 import InputBox from "./InputBox";
+import { useAppSelector } from "../../app/hooks";
+import { selectCurrentChat } from "../../features/chat/chatSlice";
+import { getIconForFileType } from "../../utils/iconUtils";
+import { formatFileSize } from "../../utils/chatUtils";
 
 interface FileViewerProps {
   onClose: () => void;
-  download: (file: Attachment) => void;
+  download: (fileName: string) => void;
   currentFile: Attachment | null;
   removeAttachment: (fileName: string) => void;
   selectedAttachments: Attachment[];
   isPreview: boolean;
-  downloadedFiles: Attachment[];
   downloadAndStoreFile: (file: Attachment) => Promise<void>;
-  downloadedThumbnails: Attachment[];
   setCurrentFile: (file: Attachment | null) => void;
   handleFileSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
   closeFileViewer: (preview: boolean) => void;
+  downloadedFiles: Attachment[];
 }
 
 const FileViewer: React.FC<FileViewerProps> = ({
@@ -38,12 +41,21 @@ const FileViewer: React.FC<FileViewerProps> = ({
   removeAttachment,
   selectedAttachments,
   isPreview,
-  downloadedFiles,
   downloadAndStoreFile,
-  downloadedThumbnails,
   setCurrentFile,
   closeFileViewer,
+  downloadedFiles,
 }) => {
+
+  const currentChat = useAppSelector(selectCurrentChat);
+
+  const currentChatAttachments = useMemo(() => {
+    if (currentChat) {
+      return currentChat.messages.flatMap((message) => message.attachments || []);
+    } else {
+      return [];
+    }
+  }, [currentChat]);
 
 
   const [loading, setLoading] = useState(false); // Track loading state
@@ -92,11 +104,35 @@ const FileViewer: React.FC<FileViewerProps> = ({
     window.open(currentFile?.url, "_blank");
   };
 
+
+  const attachmentsToShow = useMemo(() => {
+    if (isPreview) {
+      return selectedAttachments;
+    } else {
+      // Combine downloaded images/videos with other attachments
+      const downloadedImageVideoFiles = downloadedFiles.filter((file) =>
+        ["image", "video"].includes(file.type)
+      );
+
+      const otherAttachments = currentChatAttachments.filter(
+        (file) => !["image", "video"].includes(file.type)
+      );
+
+      // Remove duplicates based on fileName
+      const uniqueAttachments = otherAttachments.filter(
+        (attachment) =>
+          !downloadedImageVideoFiles.some(
+            (downloaded) => downloaded.fileName === attachment.fileName
+          )
+      );
+
+      return [...downloadedImageVideoFiles, ...uniqueAttachments];
+    }
+  }, [isPreview, selectedAttachments, downloadedFiles, currentChatAttachments]);
+
   if (!currentFile) return null;
 
-  const attachmentsToShow = isPreview
-    ? selectedAttachments
-    : downloadedThumbnails;
+
 
   return (
     <Paper
@@ -117,8 +153,8 @@ const FileViewer: React.FC<FileViewerProps> = ({
       {/* Main File Viewer Container */}
       <Box
         sx={{
-          width: { xs: "90%", sm: "80%", md: "70%" },
-          height: { xs: "90%", sm: "80%", md: "70%" },
+          width: { xs: "95%", sm: "80%", md: "90%" },
+          height: { xs: "90%", sm: "80%", md: "80%" },
           backgroundColor: "#fff",
           position: "relative",
           borderRadius: "8px",
@@ -214,44 +250,28 @@ const FileViewer: React.FC<FileViewerProps> = ({
           )}
           {/* Fallback for non-image/video files */}
           {!isImage && !isVideo && (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 2,
-                textAlign: "center",
-                color: "#000",
-              }}
-            >
-              <Typography variant="h6" color="textSecondary">
-                {currentFile?.fileName}
-              </Typography>
-              {/* Only show download and open buttons in view mode */}
-              {!isPreview && (
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <Tooltip title="Download">
-                    <IconButton
-                      onClick={() => {
-                        if (currentFile) {
-                          download(currentFile);
-                        }
-                      }}
-                    >
-                      <DownloadIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Open">
-                    <IconButton onClick={handleOpenFile}>
-                      <OpenInNewIcon />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-              )}
-            </Box>
-          )}
-        </Box>
+           <Box
+           sx={{
+             display: "flex",
+             flexDirection: "column",
+             alignItems: "center",
+             justifyContent: "center",
+             gap: 2,
+             textAlign: "center",
+             color: "#FFF",
+             padding: 4,
+           }}
+         >
+           {getIconForFileType(currentFile.fileName, "large", 120)}
+           <Typography variant="h6">{currentFile.fileName}</Typography>
+
+           <Typography variant="body2">
+           {formatFileSize(currentFile.size)}
+           </Typography>
+
+         </Box>
+       )}
+     </Box>
 
         {/* File Gallery */}
         <Box
@@ -306,7 +326,7 @@ const FileViewer: React.FC<FileViewerProps> = ({
               <IconButton
                 onClick={() => {
                   if (currentFile) {
-                    download(currentFile);
+                    download(currentFile.fileName);
                   }
                 }}
               >

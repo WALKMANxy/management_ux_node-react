@@ -1,6 +1,5 @@
-import ArticleIcon from "@mui/icons-material/Article";
 import DownloadIcon from "@mui/icons-material/Download"; // Download overlay icon
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
   Box,
   CircularProgress,
@@ -9,28 +8,35 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect } from "react";
-import { Attachment, useFilePreview } from "../../hooks/useFilePreview";
+import { useAppSelector } from "../../app/hooks";
+import { selectDownloadedFiles } from "../../features/downloads/downloadedFilesSlice";
+import { Attachment } from "../../hooks/useFilePreview";
+import { formatFileSize } from "../../utils/chatUtils";
+import { getIconForFileType } from "../../utils/iconUtils";
 
 interface AttachmentPreviewProps {
   attachments: Attachment[]; // Handle multiple attachments
   isUploading?: boolean;
   uploadProgress?: number;
-  onClick?: (attachment: Attachment) => void; // Optional prop if needed elsewhere
+  openFileViewer: (isPreview: boolean, fileName?: string) => void; // Update this line
+  downloadAndStoreFile: (attachment: Attachment) => Promise<void>;
+  download: (fileName: string) => void;
+  downloadProgresses: {
+    [key: string]: number;
+  };
+  downloadedFiles: Attachment[];
 }
 
 const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
   attachments,
   isUploading = false,
   uploadProgress,
-  onClick,
+  openFileViewer,
+  downloadAndStoreFile,
+  download,
+  downloadProgresses,
 }) => {
-  const {
-    downloadAndStoreFile,
-    downloadedFiles,
-    openFileViewer,
-    download,
-    downloadProgresses, // Access download progress
-  } = useFilePreview();
+  const downloadedFiles = useAppSelector(selectDownloadedFiles);
 
   useEffect(() => {
     attachments.forEach((attachment) => {
@@ -52,7 +58,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
 
   const handleSave = async (attachment: Attachment) => {
     // Start downloading the file and track progress
-    download(attachment);
+    download(attachment.fileName);
   };
 
   // Check if a file is already downloaded
@@ -63,11 +69,9 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
     );
   };
 
-  // Determine what happens when the file is clicked
   const handleClick = (attachment: Attachment) => {
     if (isFileDownloaded(attachment)) {
-      openFileViewer(false, attachment.fileName);
-      if (onClick) onClick(attachment); // Trigger onClick if provided
+      openFileViewer(false, attachment.fileName); // Use the passed prop
     }
   };
 
@@ -92,10 +96,8 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
         <Box
           key={attachment.fileName}
           sx={{
-            maxWidth: "80vw",
+            maxWidth: "40vw",
             maxHeight: "40vh",
-            width: "auto",
-            height: "auto",
             borderRadius: "8px",
             border: "1px solid rgba(255, 255, 255, 0.5)",
             boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
@@ -103,7 +105,8 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
             cursor: isFileDownloaded(attachment) ? "pointer" : "default",
             position: "relative",
             flexShrink: 0,
-            marginBottom: 2, // Spacing between attachments
+            marginBottom: 0.5, // Spacing between attachments
+            // Removed width and height to ensure consistent sizing
           }}
           onClick={() => handleClick(attachment)}
         >
@@ -115,8 +118,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
                 justifyContent: "center",
                 alignItems: "center",
                 position: "absolute",
-                width: "50%",
-                height: "50%",
+                inset: 0, // Ensures full coverage
                 backgroundColor: "rgba(0, 0, 0, 0.5)",
                 zIndex: 1,
               }}
@@ -133,8 +135,8 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
             </Box>
           )}
 
-          {/* Image and Video Preview */}
-          {["image", "video"].includes(attachment.type) && (
+          {/* Images and Videos */}
+          {["image", "video"].includes(attachment.type) ? (
             <>
               {!isFileDownloaded(attachment) ? (
                 // Show Skeleton while downloading
@@ -142,15 +144,13 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
                   variant="rectangular"
                   width="100%"
                   height="100%"
-                  sx={{
-                    maxWidth: "80vw",
-                    minWidth: "200px",
-                    maxHeight: "40vh",
-                    minHeight: "100px",
-                  }}
+                  sx={
+                    {
+                      // Removed maxWidth, minWidth, maxHeight, and minHeight
+                    }
+                  }
                 />
-              ) : // Show the actual image or video once downloaded
-              attachment.type === "image" ? (
+              ) : attachment.type === "image" ? (
                 <img
                   src={getImageSrc(attachment)}
                   loading="lazy"
@@ -172,165 +172,108 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
                   }}
                 />
               )}
-            </>
-          )}
 
-          {/* PDF Preview */}
-          {attachment.type === "pdf" && (
-            <>
-              {!isFileDownloaded(attachment) ? (
-                // Show Skeleton while downloading
-                <Skeleton
-                  variant="rectangular"
-                  width="100%"
-                  height="100%"
-                  sx={{
-                    maxWidth: "80vw",
-                    minWidth: "200px",
-                    maxHeight: "40vh",
-                    minHeight: "100px",
-                  }}
-                />
-              ) : (
+              {/* Download Overlay for Images and Videos */}
+              {!isFileDownloaded(attachment) && (
                 <Box
                   sx={{
-                    width: "100%",
-                    height: "100%",
+                    position: "absolute",
+                    inset: 0, // Ensures full coverage
+                    backgroundColor: "rgba(0, 0, 0, 0.3)",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    backgroundColor: "#f5f5f5",
+                    zIndex: 2,
                   }}
                 >
-                  <PictureAsPdfIcon fontSize="large" />
+                  <IconButton
+                    sx={{ color: "white" }}
+                    onClick={() => handleDownload(attachment)}
+                  >
+                    <DownloadIcon />
+                  </IconButton>
                 </Box>
               )}
-            </>
-          )}
 
-          {/* Document Preview (Word, Excel, CSV) */}
-          {["word", "excel", "csv", "pdf"].includes(attachment.type) && (
-            <>
-              {!isFileDownloaded(attachment) ? (
-                // Show Skeleton while downloading
-                <Skeleton
-                  variant="rectangular"
-                  width="100%"
-                  height="100%"
-                  sx={{
-                    maxWidth: "80vw",
-                    minWidth: "200px",
-                    maxHeight: "40vh",
-                    minHeight: "100px",
-                  }}
-                />
-              ) : (
-                <Box
-                  sx={{
-                    width: "100%",
-                    height: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "#f5f5f5",
-                  }}
-                >
-                  <ArticleIcon fontSize="large" />
-                </Box>
-              )}
+              {/* Show progress while downloading */}
+              {downloadProgresses[attachment.fileName] !== undefined &&
+                downloadProgresses[attachment.fileName] < 100 && (
+                  <CircularProgress
+                    variant="determinate"
+                    value={downloadProgresses[attachment.fileName]}
+                    sx={{
+                      color: "white",
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      zIndex: 3, // Ensure it's above other elements
+                    }}
+                  />
+                )}
             </>
-          )}
-
-          {/* Other File Types Handling */}
-          {!["image", "video", "pdf", "word", "excel", "csv"].includes(
-            attachment.type
-          ) && (
+          ) : (
+            // Other File Types
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
                 backgroundColor: "#f5f5f5",
-                borderRadius: "16px",
+                borderRadius: "8px",
                 padding: "8px",
                 flexDirection: "row",
+                width: "100%",
+                maxWidth: "500px",
+                cursor: isFileDownloaded(attachment) ? "pointer" : "default",
               }}
+              onClick={() => handleClick(attachment)}
             >
-              {/* File Icon */}
               <Box sx={{ display: "flex", alignItems: "center", mr: 1 }}>
-                <ArticleIcon fontSize="small" />
+                {getIconForFileType(attachment.fileName, "small", 40)}
               </Box>
 
               {/* File Metadata */}
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Typography variant="caption" noWrap>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="body2" noWrap>
                   {attachment.fileName}
+                </Typography>
+                <Typography variant="body2">
+                  {formatFileSize(attachment.size)}
                 </Typography>
               </Box>
 
               {/* Download Button with Progress */}
-              {!isFileDownloaded(attachment) ? (
+              {downloadProgresses[attachment.fileName] !== undefined &&
+              downloadProgresses[attachment.fileName] < 100 ? (
+                <CircularProgress
+                  variant="determinate"
+                  value={downloadProgresses[attachment.fileName]}
+                  sx={{ color: "gray", ml: 2 }}
+                  size={20}
+                />
+              ) : !isFileDownloaded(attachment) ? (
                 <IconButton
-                  sx={{ color: "white", ml: "auto" }}
-                  onClick={() => handleSave(attachment)}
+                  sx={{ color: "black", ml: "auto" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDownload(attachment);
+                  }}
                 >
                   <DownloadIcon />
                 </IconButton>
               ) : (
-                downloadProgresses[attachment.fileName] !== undefined &&
-                downloadProgresses[attachment.fileName] < 100 && (
-                  <CircularProgress
-                    variant="determinate"
-                    value={downloadProgresses[attachment.fileName]}
-                    sx={{ color: "gray", ml: 2 }}
-                    size={20}
-                  />
-                )
+                <IconButton
+                  sx={{ color: "black", ml: "auto" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSave(attachment);
+                  }}
+                >
+                  <OpenInNewIcon />
+                </IconButton>
               )}
             </Box>
           )}
-
-          {/* Download Overlay for Images and Videos */}
-          {["image", "video"].includes(attachment.type) &&
-            !isFileDownloaded(attachment) && (
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  backgroundColor: "rgba(0, 0, 0, 0.3)",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  zIndex: 2,
-                }}
-              >
-                <IconButton
-                  sx={{ color: "white" }}
-                  onClick={() => handleDownload(attachment)}
-                >
-                  <DownloadIcon />
-                </IconButton>
-              </Box>
-            )}
-
-          {/* Show progress while downloading */}
-          {["image", "video"].includes(attachment.type) &&
-            downloadProgresses[attachment.fileName] !== undefined &&
-            downloadProgresses[attachment.fileName] < 100 && (
-              <CircularProgress
-                variant="determinate"
-                value={downloadProgresses[attachment.fileName]}
-                sx={{
-                  color: "white",
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                }}
-              />
-            )}
         </Box>
       ))}
     </Box>
