@@ -26,10 +26,8 @@ interface MessageBubbleProps {
   openFileViewer: (isPreview: boolean, fileName?: string) => void; // Add this line
   downloadAndStoreFile: (attachment: Attachment) => Promise<void>;
   download: (fileName: string) => void;
-  downloadProgresses: {
-    [key: string]: number;
-  };
-  downloadedFiles: Attachment[]
+
+  downloadedFiles: Attachment[];
 }
 
 /**
@@ -46,8 +44,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   openFileViewer,
   downloadAndStoreFile,
   download,
-  downloadProgresses,
-  downloadedFiles,
 }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -86,7 +82,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 
         if (message.attachments && message.attachments.length > 0) {
           // Retry the message with attachments
-          await dispatch(
+          dispatch(
             addAttachmentMessageReducer({
               chatId: currentChat._id, // We are sure that _id exists here
               message: {
@@ -99,7 +95,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
           );
         } else {
           // Retry the message without attachments
-          await dispatch(
+          dispatch(
             addMessageReducer({
               chatId: currentChat._id, // We are sure that _id exists here
               message: {
@@ -252,7 +248,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
               sx={{
                 wordBreak: "break-word", // Allows long words to break and wrap to the next line
                 overflowWrap: "break-word", // Ensures text wraps within the container
-                textAlign: isOwnMessage ? "right" : "left",
               }}
             >
               {message.content}
@@ -268,22 +263,14 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                   flexWrap: "wrap",
                 }}
               >
-                {message.attachments.map((_, index) => (
-                  <AttachmentPreview
-                    key={index}
-                    attachments={message.attachments}
-                    isUploading={message.isUploading}
-                    uploadProgress={message.uploadProgress}
-                    openFileViewer={openFileViewer} // Pass the function here
-                    downloadAndStoreFile={downloadAndStoreFile}
-                    download={download}
-                    downloadProgresses={downloadProgresses}
-                    downloadedFiles={downloadedFiles}
-                  />
-                ))}
+                <AttachmentPreview
+                  attachments={message.attachments}
+                  openFileViewer={openFileViewer}
+                  downloadAndStoreFile={downloadAndStoreFile}
+                  download={download}
+                />
               </Box>
             )}
-
             <Box
               sx={{
                 color: "gray",
@@ -310,12 +297,4 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   );
 };
 
-export default React.memo(MessageBubble, (prevProps, nextProps) => {
-  return (
-    prevProps.message.readBy.length === nextProps.message.readBy.length &&
-    prevProps.message.readBy.every(
-      (value, index) => value === nextProps.message.readBy[index]
-    ) &&
-    prevProps.message.status === nextProps.message.status
-  );
-});
+export default React.memo(MessageBubble);

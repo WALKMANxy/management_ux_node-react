@@ -1,7 +1,7 @@
 import axios from "axios";
 import { apiCall } from "../../../utils/apiUtils";
-import { Attachment } from "../../../hooks/useFilePreview";
 import { cacheFile, getCachedFile } from "../../../utils/cacheUtils";
+import { Attachment } from "../../../models/dataModels";
 
 // Request pre-signed URL for chat file upload
 export const getChatFileUploadUrl = async (
@@ -60,6 +60,17 @@ export const uploadFileToS3 = async (
   onUploadProgress: (progress: number) => void
 ): Promise<void> => {
   console.log(`Uploading file to S3: file=${file.name}, uploadUrl=${uploadUrl}`);
+
+     // After successful upload, cache the file
+     try {
+      // Assuming cacheFile takes (fileName: string, blob: Blob) and returns a Promise<string> for the object URL
+      const cachedObjectUrl = await cacheFile(file.name, file);
+      console.log(`File ${file.name} cached successfully. Object URL: ${cachedObjectUrl}`);
+    } catch (cacheError) {
+      // Log caching errors without throwing to avoid interrupting the upload flow
+      console.error(`Failed to cache file ${file.name}:`, cacheError);
+    }
+
   try {
     const response = await axios.put(uploadUrl, file, {
       headers: {

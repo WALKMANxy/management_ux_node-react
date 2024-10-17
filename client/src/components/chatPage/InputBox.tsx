@@ -14,20 +14,28 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { selectUserRole } from "../../features/auth/authSlice"; // Assuming the selector is defined in the auth slice
 import useChatLogic from "../../hooks/useChatsLogic";
-import { Attachment } from "../../hooks/useFilePreview";
 import AttachmentModal from "./AttachmentModal";
 import MessageTypeModal from "./MessageTypeModal";
+import { Attachment } from "../../models/dataModels";
 
 interface InputBoxProps {
   canUserChat: boolean;
   attachments?: Attachment[];
   viewingFiles?: boolean;
-  handleFileSelect?: ((event: ChangeEvent<HTMLInputElement>) => void) | undefined; // New prop
+  handleFileSelect?:
+    | ((event: ChangeEvent<HTMLInputElement>) => void)
+    | undefined; // New prop
   closeFileViewer: (isPreview: boolean) => void; // New prop
   isPreview: boolean; // New prop
 }
@@ -63,7 +71,7 @@ const InputBox: React.FC<InputBoxProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-   // Add this useEffect to reset attachmentAnchorEl when viewingFiles changes
+  // Add this useEffect to reset attachmentAnchorEl when viewingFiles changes
   useEffect(() => {
     if (viewingFiles) {
       setAttachmentAnchorEl(null);
@@ -154,37 +162,43 @@ const InputBox: React.FC<InputBoxProps> = ({
       {!viewingFiles && (
         <Box sx={{ display: "flex", alignItems: "center", pr: 1 }}>
           {/* Attachment Button */}
-          <Tooltip title={t("inputBox.tooltips.attachFile")}>
-            <IconButton
-              color="primary"
-              onClick={handleAttachmentOpen}
-              aria-label={t("inputBox.tooltips.attachFile")}
-              disabled={!canUserChat}
-              sx={{
-                marginRight: 1,
-              }}
-            >
-              <AttachFileIcon />
-            </IconButton>
-          </Tooltip>
+
+              {" "}
+              {/* Wrapper span to handle disabled state */}
+              <IconButton
+                color="primary"
+                onClick={handleAttachmentOpen}
+                aria-label={t("inputBox.tooltips.attachFile")}
+                disabled={!canUserChat}
+                sx={{
+                  marginRight: 1,
+                }}
+              >
+                <AttachFileIcon />
+              </IconButton>
+
 
           {/* Message Type Selection */}
           {userRole !== "client" && ( // Show the TuneIcon only if the user is not a client
             <Tooltip title={t("inputBox.tooltips.selectMessageType")}>
-              <IconButton
-                color="primary"
-                onClick={handleMenuOpen}
-                disabled={!canUserChat}
-                aria-label={t("inputBox.tooltips.selectMessageType")}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "6px",
-                }}
-              >
-                <TuneIcon />
-              </IconButton>
+              <span>
+                {" "}
+                {/* Wrapper span to handle disabled state */}
+                <IconButton
+                  color="primary"
+                  onClick={handleMenuOpen}
+                  disabled={!canUserChat}
+                  aria-label={t("inputBox.tooltips.selectMessageType")}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "6px",
+                  }}
+                >
+                  <TuneIcon />
+                </IconButton>
+              </span>
             </Tooltip>
           )}
         </Box>
@@ -236,14 +250,17 @@ const InputBox: React.FC<InputBoxProps> = ({
 
       {/* Send Message Button */}
       <Tooltip title={t("inputBox.tooltips.sendMessage")}>
-        <IconButton
-          color="primary"
-          onClick={handleSend}
-          aria-label={t("inputBox.tooltips.sendMessage")}
-          disabled={!canUserChat}
-        >
-          <SendIcon />
-        </IconButton>
+        <span>
+          {/* Wrapper span to handle disabled state */}
+          <IconButton
+            color="primary"
+            onClick={handleSend}
+            aria-label={t("inputBox.tooltips.sendMessage")}
+            disabled={!canUserChat}
+          >
+            <SendIcon />
+          </IconButton>
+        </span>
       </Tooltip>
 
       {/* Attachment Modal */}

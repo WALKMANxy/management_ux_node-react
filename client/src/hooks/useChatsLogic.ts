@@ -23,10 +23,9 @@ import {
 import { fetchAllChatsThunk } from "../features/chat/chatThunks";
 import { selectClientIds } from "../features/data/dataSlice";
 import { getAllUsersThunk, selectAllUsers } from "../features/users/userSlice";
-import { IChat, IMessage } from "../models/dataModels";
+import { Attachment, IChat, IMessage } from "../models/dataModels";
 import { sanitizeSearchTerm } from "../utils/chatUtils";
 import { generateId } from "../utils/deviceUtils";
-import { Attachment } from "./useFilePreview";
 
 const useChatLogic = () => {
   const dispatch = useAppDispatch();
@@ -44,11 +43,8 @@ const useChatLogic = () => {
   const [contactsFetched, setContactsFetched] = useState(false);
   const { t } = useTranslation();
   const chatStatus = useAppSelector(selectChatsStatus);
-
   const agentClientIds = useSelector(selectClientIds);
-
   const currentChatId = currentChat?._id;
-
   const chatRetryCountRef = useRef(0);
 
   // Determine if chats should be fetched
@@ -218,7 +214,7 @@ const useChatLogic = () => {
       // Failsafe for empty content when attachments exist
       const finalContent =
         content.trim() === "" && attachments && attachments.length > 0
-          ? "\u200B" // Use an invisible character (zero-width space)
+          ? "." // Use an invisible character (zero-width space)
           : content;
 
 
@@ -589,7 +585,7 @@ const useChatLogic = () => {
     broadcastChat,
     markMessagesAsRead,
     handleEditChat,
-    handleSelectChat,
+    handleSelectChat
   };
 };
 

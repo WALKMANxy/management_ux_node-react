@@ -28,7 +28,7 @@ const useLoadOlderMessages = (currentChatId: string | null) => {
     if (container) {
       container.scrollTop = container.scrollHeight;
     }
-  }, [currentChatId]);
+  }, []);
 
   // Scroll to bottom when new message is sent or received
 

@@ -2,7 +2,7 @@
 
 import PhotoIcon from "@mui/icons-material/Photo";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
-import { Box, IconButton, Menu, Tooltip } from "@mui/material";
+import { Box, IconButton, Menu, Tooltip, useMediaQuery } from "@mui/material";
 import React, { ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -21,6 +21,8 @@ const AttachmentModal: React.FC<AttachmentModalProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  const isDesktop = useMediaQuery("(min-width:800px)");
+
 
 
   return (
@@ -38,10 +40,11 @@ const AttachmentModal: React.FC<AttachmentModalProps> = ({
       }}
       sx={{
         mt: -2,
+        ml: isDesktop ? 5.5 : null
+
       }}
       PaperProps={{
         sx: {
-          backdropFilter: "blur(10px)",
           backgroundColor: "rgba(255, 255, 255, 0.95)", // Slightly more opaque for better readability
           borderRadius: "8px",
           display: "flex",
@@ -56,7 +59,7 @@ px: 1        },
           <IconButton
             onClick={() => document.getElementById("media-upload")?.click()}
             size="medium"
-            sx={{ color: "rgba(0, 0, 255, 0.6)" }}
+
           >
             <PhotoIcon fontSize="large" />
           </IconButton>

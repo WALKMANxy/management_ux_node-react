@@ -153,6 +153,9 @@ export function generateAutomatedMessage(
   return message;
 }
 
+export const getFileExtension = (fileName: string) =>
+  fileName.split(".").pop()?.toLowerCase(); // Extract file extension
+
 
 export const formatFileSize = (size: number): string => {
   if (size === 0) return '0 Bytes';

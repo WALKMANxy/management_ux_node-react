@@ -3,15 +3,14 @@
 import imageCompression from "browser-image-compression";
 import { Dispatch } from "redux";
 import { IChat, IMessage } from "../../../models/dataModels";
-import { apiCall, axiosInstance } from "../../../utils/apiUtils";
-import { cacheFile, getCachedFile } from "../../../utils/cacheUtils";
-import {
-  updateMessageProgress,
-  uploadComplete,
-  uploadFailed,
-} from "../chatSlice";
-import axios from "axios";
+import { apiCall } from "../../../utils/apiUtils";
 import { getChatFileUploadUrl, uploadFileToS3 } from "../../data/api/media";
+import {
+  updateAttachmentProgress,
+  uploadAttachmentComplete,
+  uploadAttachmentFailed,
+  uploadComplete,
+} from "../chatSlice";
 
 // Fetch all chats for the authenticated user
 export const fetchAllChats = async (): Promise<IChat[]> => {
@@ -176,19 +175,24 @@ export const uploadAttachments = async (
     return;
   }
 
-  console.log(`Starting attachment upload for chatId=${chatId}, messageId=${message.local_id}`);
+  console.log(
+    `Starting attachment upload for chatId=${chatId}, messageId=${message.local_id}`
+  );
 
-  const uploadedAttachments = [];
 
   for (const attachment of message.attachments) {
     // Check if attachment has necessary properties
     if (!attachment.file || !attachment.chatId || !attachment.messageId) {
-      console.error("Attachment is missing required properties. Skipping this attachment.");
+      console.error(
+        "Attachment is missing required properties. Skipping this attachment."
+      );
       continue;
     }
 
     try {
-      console.log(`Uploading attachment: file=${attachment.file.name}, type=${attachment.type}`);
+      console.log(
+        `Uploading attachment: file=${attachment.file.name}, type=${attachment.type}`
+      );
 
       // Compress images if applicable
       let fileToUpload = attachment.file;
@@ -200,12 +204,18 @@ export const uploadAttachments = async (
         };
         console.log(`Compressing image: ${fileToUpload.name}`);
         fileToUpload = await imageCompression(attachment.file, options);
-        console.log(`Image compressed: original size=${attachment.file.size}, new size=${fileToUpload.size}`);
+        console.log(
+          `Image compressed: original size=${attachment.file.size}, new size=${fileToUpload.size}`
+        );
       }
 
       // Request a pre-signed URL for the file
-      const fileName = encodeURIComponent(fileToUpload.name);
-      const uploadUrl = await getChatFileUploadUrl(attachment.chatId, attachment.messageId, fileName);
+      const fileName = encodeURIComponent(attachment.fileName);
+      const uploadUrl = await getChatFileUploadUrl(
+        attachment.chatId,
+        attachment.messageId,
+        fileName
+      );
 
       console.log(`Uploading to S3 via pre-signed URL: ${uploadUrl}`);
 
@@ -213,108 +223,44 @@ export const uploadAttachments = async (
       await uploadFileToS3(fileToUpload, uploadUrl, (progress) => {
         console.log(`Dispatching progress update: progress=${progress}%`);
         dispatch(
-          updateMessageProgress({
+          updateAttachmentProgress({
             chatId: attachment.chatId!,
-            messageId: attachment.messageId!,
+            messageLocalId: attachment.messageId!,
+            attachmentFileName: attachment.fileName,
             progress,
           })
         );
       });
 
-      // Store the URL without the signed parameters
-      uploadedAttachments.push({
-        url: uploadUrl.split("?")[0], // Remove signed query parameters
-        type: attachment.type,
-        fileName: attachment.fileName,
-        size: attachment.size,
-        chatId: attachment.chatId,
-        messageId: attachment.messageId,
-      });
+       // Dispatch upload complete action
+       dispatch(
+        uploadAttachmentComplete({
+          chatId,
+          messageLocalId: message.local_id,
+          attachmentFileName: attachment.fileName,
+          url: uploadUrl.split("?")[0], // Ensure you store the clean URL
+        })
+      );
+
+
 
       console.log(`Attachment uploaded successfully: ${fileToUpload.name}`);
-
     } catch (error) {
       console.error("Failed to upload attachment:", error);
       dispatch(
-        uploadFailed({
+        uploadAttachmentFailed({
           chatId: attachment.chatId,
-          messageId: attachment.messageId,
+          messageLocalId: attachment.messageId!,
+            attachmentFileName: attachment.fileName,
         })
       );
       return;
     }
   }
 
-  // Update the message with the uploaded attachments
-  const updatedMessage: IMessage = {
-    ...message,
-    attachments: uploadedAttachments,
-    isUploading: false,
-    status: "sent",
-    uploadProgress: 100,
-  };
+
 
   console.log(`All attachments uploaded. Dispatching uploadComplete.`);
 
-  dispatch(uploadComplete({ chatId, message: updatedMessage }));
-};
-
-// Fetch Thumbnail with Caching
-export const fetchThumbnail = async (thumbnailUrl: string): Promise<string> => {
-  try {
-    // Check if the thumbnail is cached
-    const cachedFile = await getCachedFile(thumbnailUrl);
-    if (cachedFile) {
-      return cachedFile.objectUrl; // Return the regenerated object URL
-    }
-
-    // If not cached, fetch the thumbnail from the server
-    const response = await axiosInstance.get(thumbnailUrl, {
-      responseType: "blob",
-    });
-
-    const blob = response.data as Blob;
-
-    // Cache the fetched Blob
-    const objectUrl = await cacheFile(thumbnailUrl, blob);
-    return objectUrl;
-  } catch (error) {
-    console.error("Error fetching thumbnail:", error);
-    throw error;
-  }
-};
-
-// Download Full File
-export const downloadFile = async (
-  fileUrl: string,
-  onDownloadProgress: (progress: number) => void
-): Promise<string> => {
-  try {
-    // Check if the file is cached
-    const cachedFile = await getCachedFile(fileUrl);
-    if (cachedFile) {
-      return cachedFile.objectUrl; // Return the regenerated object URL
-    }
-
-    // If not cached, download the file from the server
-    const response = await axios.get(fileUrl, {
-      responseType: "blob",
-      onDownloadProgress: (progressEvent) => {
-        const totalLength = progressEvent.total;
-        if (totalLength) {
-          const progress = Math.round((progressEvent.loaded * 100) / totalLength);
-          onDownloadProgress(progress);
-        }
-      },
-    });
-
-    const blob = response.data as Blob;
-
-    // Cache the downloaded Blob
-    const objectUrl = await cacheFile(fileUrl, blob);
-    return objectUrl;
-  } catch (error) {
-    console.error("Error downloading the file:", error);
-    throw error;
-  }
+  dispatch(uploadComplete({ chatId, message: { ...message } }));
 };

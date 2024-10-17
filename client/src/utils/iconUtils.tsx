@@ -2,7 +2,7 @@
 
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ArticleIcon from "@mui/icons-material/Article";
-import Box from "@mui/material/Box";
+import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
 export const getIconForFileType = (
@@ -12,6 +12,9 @@ export const getIconForFileType = (
 ) => {
   const fileExtension = fileName.split('.').pop()?.toLowerCase() || "";
   let IconComponent;
+
+  // List of accepted video file extensions
+  const videoExtensions = ["avi", "mov", "mp4", "m4v", "mpg", "mpeg", "webm", "wmv",];
 
   switch (fileExtension) {
     case "pdf":
@@ -25,12 +28,28 @@ export const getIconForFileType = (
       IconComponent = <ArticleIcon fontSize={fontSize} sx={{ fontSize: iconSize }} />;
       break;
     default:
-      IconComponent = <ArticleIcon fontSize={fontSize} sx={{ fontSize: iconSize }} />;
+      if (videoExtensions.includes(fileExtension)) {
+        IconComponent = (
+          <SmartDisplayIcon
+            fontSize={fontSize}
+            sx={{ fontSize: iconSize,  }} // Set icon color to white
+          />
+        );
+      } else {
+        IconComponent = <ArticleIcon fontSize={fontSize} sx={{ fontSize: iconSize }} />;
+      }
       break;
   }
 
   return (
-    <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+    <Box
+      sx={{
+        position: 'relative',
+        display: 'inline-flex',
+        borderRadius: '8px', // Optional, to style the icon container
+        padding: '8px', // Optional, to add some padding around the icon
+      }}
+    >
       {IconComponent}
       <Typography
         variant="caption"
