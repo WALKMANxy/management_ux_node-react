@@ -7,11 +7,11 @@ import {
   Skeleton,
   Typography,
 } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useAppSelector } from "../../app/hooks";
 import { selectDownloadedFiles } from "../../features/downloads/downloadedFilesSlice";
-import { Attachment } from "../../hooks/useFilePreview";
-import { formatFileSize } from "../../utils/chatUtils";
+import { Attachment } from "../../models/dataModels";
+import { formatFileSize, getFileExtension } from "../../utils/chatUtils";
 import { getIconForFileType } from "../../utils/iconUtils";
 
 interface AttachmentPreviewProps {
@@ -19,41 +19,51 @@ interface AttachmentPreviewProps {
   isUploading?: boolean;
   uploadProgress?: number;
   openFileViewer: (isPreview: boolean, fileName?: string) => void; // Update this line
-  downloadAndStoreFile: (attachment: Attachment) => Promise<void>;
+  downloadAndStoreFile: (file: Attachment, onProgress?: (progress: number) => void) => Promise<void>;
   download: (fileName: string) => void;
-  downloadProgresses: {
-    [key: string]: number;
-  };
-  downloadedFiles: Attachment[];
+
 }
 
 const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
   attachments,
-  isUploading = false,
   uploadProgress,
   openFileViewer,
   downloadAndStoreFile,
   download,
-  downloadProgresses,
+  isUploading,
 }) => {
   const downloadedFiles = useAppSelector(selectDownloadedFiles);
+
+  const [downloadProgresses, setDownloadProgresses] = useState<Record<string, number>>({});
+
 
   useEffect(() => {
     attachments.forEach((attachment) => {
       if (
-        ["image", "video"].includes(attachment.type) &&
-        !attachment.file // Only download if local file is not available
+        ["image"].includes(attachment.type) &&
+        !attachment.file && // Only download if local file is not available
+        attachment.url &&
+        attachment.url.startsWith("https://") // Ensure it's a valid S3 URL
       ) {
-        // Fetch thumbnail for images/videos
-        downloadAndStoreFile(attachment);
+        // Fetch thumbnail for images/videos with progress tracking
+        downloadAndStoreFile(attachment, (progress: number) => {
+          setDownloadProgresses((prev) => ({
+            ...prev,
+            [attachment.fileName]: progress,
+          }));
+        });
       }
     });
   }, [attachments, downloadAndStoreFile]);
 
   // Handle downloading a file
   const handleDownload = async (attachment: Attachment) => {
-    // Start downloading the file and track progress
-    await downloadAndStoreFile(attachment);
+    await downloadAndStoreFile(attachment, (progress: number) => {
+      setDownloadProgresses((prev) => ({
+        ...prev,
+        [attachment.fileName]: progress,
+      }));
+    });
   };
 
   const handleSave = async (attachment: Attachment) => {
@@ -62,10 +72,9 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
   };
 
   // Check if a file is already downloaded
-  const isFileDownloaded = (attachment: Attachment) => {
-    return (
-      attachment.file ||
-      downloadedFiles.some((file) => file.fileName === attachment.fileName)
+   const isFileDownloaded = (attachment: Attachment) => {
+    return downloadedFiles.some(
+      (file) => file.fileName === attachment.fileName
     );
   };
 
@@ -75,20 +84,36 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
     }
   };
 
-  const getImageSrc = (attachment: Attachment) => {
-    if (attachment.file) {
-      return URL.createObjectURL(attachment.file);
-    } else {
-      const downloadedFile = downloadedFiles.find(
-        (file) => file.fileName === attachment.fileName
-      );
-      if (downloadedFile) {
-        return downloadedFile.url;
+  const getImageSrc = useCallback(
+    (attachment: Attachment) => {
+      if (attachment.file) {
+        return URL.createObjectURL(attachment.file);
       } else {
-        return attachment.url || ""; // Use the original URL or placeholder
+        const downloadedFile = downloadedFiles.find(
+          (file) => file.fileName === attachment.fileName
+        );
+        if (downloadedFile) {
+          return downloadedFile.url;
+        } else {
+          return attachment.url || ""; // Use the original URL or placeholder
+        }
       }
-    }
-  };
+    },
+    [downloadedFiles]
+  );
+
+
+
+  useEffect(() => {
+    console.log("Upload progress:", uploadProgress);
+  }, [uploadProgress]);
+
+
+
+  // Inside AttachmentPreview component
+  useEffect(() => {
+    console.log("Download progresses:", downloadProgresses);
+  }, [downloadProgresses]);
 
   return (
     <Box>
@@ -96,7 +121,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
         <Box
           key={attachment.fileName}
           sx={{
-            maxWidth: "40vw",
+            maxWidth: "70vw",
             maxHeight: "40vh",
             borderRadius: "8px",
             border: "1px solid rgba(255, 255, 255, 0.5)",
@@ -104,13 +129,13 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
             overflow: "hidden",
             cursor: isFileDownloaded(attachment) ? "pointer" : "default",
             position: "relative",
-            flexShrink: 0,
-            marginBottom: 0.5, // Spacing between attachments
-            // Removed width and height to ensure consistent sizing
+            marginBottom: 1, // Increased spacing between attachments
+            display: "flex", // Ensure child elements can take full space
+            alignItems: "center",
+            justifyContent: "center",
           }}
           onClick={() => handleClick(attachment)}
         >
-          {/* Uploading Spinner */}
           {isUploading && (
             <Box
               sx={{
@@ -118,39 +143,127 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
                 justifyContent: "center",
                 alignItems: "center",
                 position: "absolute",
-                inset: 0, // Ensures full coverage
+                inset: 0,
                 backgroundColor: "rgba(0, 0, 0, 0.5)",
-                zIndex: 1,
+                zIndex: 1000,
+                height: "100%",
+                width: "100%",
               }}
             >
-              {uploadProgress !== undefined ? (
-                <CircularProgress
-                  variant="determinate"
-                  value={uploadProgress}
-                  sx={{ color: "white" }}
-                />
-              ) : (
-                <CircularProgress sx={{ color: "gray", opacity: 0.7 }} />
-              )}
+              <CircularProgress
+                variant="determinate"
+                value={attachment.uploadProgress || 0}
+                sx={{ color: "white" }}
+              />
+              {/* Add a label to show the progress value */}
+              <Typography
+                variant="caption"
+                sx={{
+                  position: "absolute",
+                  color: "white",
+                  top: "60%",
+                }}
+              >
+                {`${Math.round(attachment.uploadProgress || 0)}%`}
+              </Typography>
             </Box>
           )}
 
-          {/* Images and Videos */}
+          {/* Handling Images and Videos */}
           {["image", "video"].includes(attachment.type) ? (
             <>
-              {!isFileDownloaded(attachment) ? (
-                // Show Skeleton while downloading
-                <Skeleton
-                  variant="rectangular"
-                  width="100%"
-                  height="100%"
-                  sx={
-                    {
-                      // Removed maxWidth, minWidth, maxHeight, and minHeight
-                    }
-                  }
-                />
+              {/* If the file is not downloaded */}
+              {!isFileDownloaded(attachment) &&
+              attachment.uploadProgress !== 100 ? (
+                attachment.type === "image" ? (
+                  // Image Skeleton while downloading
+                  <Skeleton
+                    variant="rectangular"
+                    width="100%"
+                    height="100%"
+                    sx={{
+                      maxWidth: "80vw",
+                      minWidth: "40vw",
+                      maxHeight: "40vh",
+                      minHeight: "40vw",
+                    }}
+                  />
+                ) : (
+                  // Mock Video Player
+                  <Box
+                    sx={{
+                      position: "relative",
+                      width: "40vw",
+                      height: "20vh",
+                      backgroundColor: "black",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      maxWidth: "70vw",
+                      maxHeight: "40vh",
+                    }}
+                  >
+                    {/* Conditional rendering of download icon or progress */}
+                    {downloadProgresses[attachment.fileName] !== undefined &&
+                    downloadProgresses[attachment.fileName] < 100 ? (
+                      // Download Progress
+                      <CircularProgress
+                        variant="determinate"
+                        value={downloadProgresses[attachment.fileName]}
+                        sx={{ color: "white", zIndex: 3 }}
+                      />
+                    ) : (
+                      // Download Icon and Size
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                        }}
+                      >
+                        <IconButton
+                          sx={{ color: "white" }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownload(attachment);
+                          }}
+                        >
+                          <DownloadIcon />
+                        </IconButton>
+                        <Typography variant="body2" sx={{ color: "white" }}>
+                          {formatFileSize(attachment.size)}
+                        </Typography>
+                      </Box>
+                    )}
+
+                    {/* File Extension */}
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        position: "absolute",
+                        bottom: 8,
+                        right: 8,
+                        color: "white",
+                      }}
+                    >
+                      {getFileExtension(attachment.fileName)}
+                    </Typography>
+
+                    {/* Mock Seek Bar */}
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: 4,
+                        backgroundColor: "#555",
+                      }}
+                    />
+                  </Box>
+                )
               ) : attachment.type === "image" ? (
+                // Display Image
                 <img
                   src={getImageSrc(attachment)}
                   loading="lazy"
@@ -162,6 +275,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
                   }}
                 />
               ) : (
+                // Display Video
                 <video
                   src={getImageSrc(attachment)}
                   controls
@@ -172,48 +286,9 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
                   }}
                 />
               )}
-
-              {/* Download Overlay for Images and Videos */}
-              {!isFileDownloaded(attachment) && (
-                <Box
-                  sx={{
-                    position: "absolute",
-                    inset: 0, // Ensures full coverage
-                    backgroundColor: "rgba(0, 0, 0, 0.3)",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    zIndex: 2,
-                  }}
-                >
-                  <IconButton
-                    sx={{ color: "white" }}
-                    onClick={() => handleDownload(attachment)}
-                  >
-                    <DownloadIcon />
-                  </IconButton>
-                </Box>
-              )}
-
-              {/* Show progress while downloading */}
-              {downloadProgresses[attachment.fileName] !== undefined &&
-                downloadProgresses[attachment.fileName] < 100 && (
-                  <CircularProgress
-                    variant="determinate"
-                    value={downloadProgresses[attachment.fileName]}
-                    sx={{
-                      color: "white",
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      zIndex: 3, // Ensure it's above other elements
-                    }}
-                  />
-                )}
             </>
           ) : (
-            // Other File Types
+            // Handling Other File Types
             <Box
               sx={{
                 display: "flex",
@@ -242,9 +317,18 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
                 </Typography>
               </Box>
 
-              {/* Download Button with Progress */}
-              {downloadProgresses[attachment.fileName] !== undefined &&
-              downloadProgresses[attachment.fileName] < 100 ? (
+              {/* Conditional Rendering for Buttons and Progress */}
+              {attachment.status === "uploading" ? (
+                // Uploading Progress Indicator
+                <CircularProgress
+                  variant="determinate"
+                  value={attachment.uploadProgress}
+                  sx={{ color: "gray", ml: 2 }}
+                  size={20}
+                />
+              ) : downloadProgresses[attachment.fileName] !== undefined &&
+                downloadProgresses[attachment.fileName] < 100 ? (
+                // Downloading Progress Indicator
                 <CircularProgress
                   variant="determinate"
                   value={downloadProgresses[attachment.fileName]}
@@ -252,6 +336,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
                   size={20}
                 />
               ) : !isFileDownloaded(attachment) ? (
+                // Download Button
                 <IconButton
                   sx={{ color: "black", ml: "auto" }}
                   onClick={(e) => {
@@ -262,6 +347,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
                   <DownloadIcon />
                 </IconButton>
               ) : (
+                // Open File Button
                 <IconButton
                   sx={{ color: "black", ml: "auto" }}
                   onClick={(e) => {
@@ -274,6 +360,24 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
               )}
             </Box>
           )}
+
+          {/* Downloading Progress Overlay for Images */}
+          {["image"].includes(attachment.type) &&
+            downloadProgresses[attachment.fileName] !== undefined &&
+            downloadProgresses[attachment.fileName] < 100 && (
+              <CircularProgress
+                variant="determinate"
+                value={downloadProgresses[attachment.fileName]}
+                sx={{
+                  color: "white",
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  zIndex: 3, // Ensure it's above other elements
+                }}
+              />
+            )}
         </Box>
       ))}
     </Box>
