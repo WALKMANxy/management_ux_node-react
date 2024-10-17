@@ -15,7 +15,7 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
@@ -65,7 +65,6 @@ const ChatView: React.FC = () => {
     downloadAndStoreFile,
     setCurrentFile,
     openFileViewer,
-    downloadProgresses,
   } = useFilePreview();
 
   const downloadedFiles = useAppSelector(selectDownloadedFiles);
@@ -75,13 +74,7 @@ const ChatView: React.FC = () => {
     currentChat?._id || null
   );
 
-  useEffect(() => {
-    console.log("Downloaded files:", downloadedFiles);
-  }, [downloadedFiles]);
 
-  /**
-   * Handles returning to the sidebar on mobile by clearing the current chat.
-   */
   const handleBackToChats = () => {
     dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
   };
@@ -287,7 +280,6 @@ const ChatView: React.FC = () => {
             openFileViewer={openFileViewer} // Pass the function here
             downloadAndStoreFile={downloadAndStoreFile}
             download={download}
-            downloadProgresses={downloadProgresses}
             downloadedFiles={downloadedFiles}
           />
         </Box>

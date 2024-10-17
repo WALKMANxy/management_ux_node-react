@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { v4 as uuidv4 } from "uuid"; // Import UUID function
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { downloadFileFromS3 } from "../features/data/api/media";
 import {
@@ -7,18 +8,7 @@ import {
   clearDownloadedFiles,
   selectDownloadedFiles,
 } from "../features/downloads/downloadedFilesSlice";
-
-// Define the structure of the attachment
-export interface Attachment {
-  file?: File; // Local file, only for client-side usage
-  url: string;
-  type: "image" | "video" | "pdf" | "word" | "excel" | "csv" | "other";
-  fileName: string;
-  size: number;
-  chatId?: string; // Add this line
-  messageId?: string; // Add this line
-  // thumbnailUrl?: string; // Optional thumbnail for images
-}
+import { Attachment } from "../models/dataModels";
 
 const MAX_FILES = 10; // Maximum number of files allowed
 const MAX_FILE_SIZE_MB = 15; // Max size per file in MB
@@ -33,9 +23,8 @@ export const useFilePreview = () => {
   const [selectedAttachments, setSelectedAttachments] = useState<Attachment[]>(
     []
   );
-  const [downloadProgresses, setDownloadProgresses] = useState<{
-    [key: string]: number;
-  }>({});
+
+
 
   const downloadedFilesRef = useRef(downloadedFiles);
 
@@ -45,12 +34,8 @@ export const useFilePreview = () => {
     downloadedFilesRef.current = downloadedFiles;
   }, [downloadedFiles]);
 
-  useEffect(() => {
-    console.log("Downloaded files:", downloadedFiles);
-  }, [downloadedFiles]);
-
   const downloadAndStoreFile = useCallback(
-    async (attachment: Attachment) => {
+    async (attachment: Attachment, onProgress?: (progress: number) => void) => {
       if (!attachment.chatId || !attachment.messageId) {
         toast.error("Missing chatId or messageId for the attachment.");
         console.error("Attachment is missing chatId or messageId:", attachment);
@@ -62,10 +47,9 @@ export const useFilePreview = () => {
         console.log(`Download request:`, attachment);
         const blobUrl = await downloadFileFromS3(attachment, (progress) => {
           console.log(`Download progress: ${progress}%`);
-          setDownloadProgresses((prev) => ({
-            ...prev,
-            [attachment.fileName]: progress,
-          }));
+          if (onProgress) {
+            onProgress(progress);
+          }
         });
 
         console.log(`Download complete:`, blobUrl);
@@ -73,6 +57,9 @@ export const useFilePreview = () => {
           addDownloadedFile({
             ...attachment,
             url: blobUrl ?? "",
+            file: undefined, // Ensure file is not stored
+            uploadProgress: 100, // Set download progress to 100%
+            status: "uploaded", // Set status to uploaded
           })
         );
       } catch (error) {
@@ -305,7 +292,7 @@ export const useFilePreview = () => {
               fileType = "video";
             } else if (["pdf"].includes(extension)) {
               fileType = "pdf";
-            } else if (["doc", "docx", "rtf", "wpd"].includes(extension)) {
+            } else if (["doc", "docx", "rtf", "wpd", "txt"].includes(extension)) {
               fileType = "word";
             } else if (["xls", "xlsx", "xlsm", "ods"].includes(extension)) {
               fileType = "excel";
@@ -316,24 +303,45 @@ export const useFilePreview = () => {
               return null;
             }
 
-            // Return the Attachment object with the file stored locally
-            return {
-              file, // Keep the file locally on the client side
-              url: URL.createObjectURL(file), // Temporary URL for preview
-              type: fileType,
-              fileName: file.name,
-              size: file.size,
-            };
-          })
-          .filter((item) => item !== undefined && item !== null); // Filter out null and undefined entries from unsupported extensions
 
-        // Add the valid attachments to the state
-        addAttachments(fileArray);
-        // console.log("Selected Files:", fileArray);
-      }
-    },
-    [addAttachments]
-  );
+          // For image and video files, generate a UUID and keep the extension
+          let fileName;
+          if (fileType === "image" || fileType === "video") {
+            const fileId = uuidv4();
+            fileName = `${fileId}.${extension}`;
+          } else {
+            // For other files, sanitize the name and keep the extension
+            const sanitizedBaseName = file.name
+              .replace(/\s+/g, "_") // Replace spaces with underscores
+              .trim(); // Remove any leading/trailing whitespace
+            fileName = sanitizedBaseName;
+          }
+
+          // Create a new File object with the modified name
+          const newFile = new File([file], fileName, { type: file.type });
+
+          return {
+            file: newFile,
+            url: URL.createObjectURL(newFile), // Temporary URL for preview
+            type: fileType,
+            fileName, // Use the new fileName
+            size: newFile.size,
+            uploadProgress: 0, // Initialize uploadProgress to 0
+            status: "pending" as "failed" | "uploaded" | "pending" | "uploading", // Initialize status to 'pending'
+          };
+        })
+        .filter((item) => item !== undefined && item !== null); // Filter out null and undefined entries from unsupported extensions
+
+      // Add the valid attachments to the state
+      addAttachments(fileArray);
+      // console.log("Selected Files:", fileArray);
+    }
+  },
+  [addAttachments]
+);
+
+
+
   // In useEffect
   useEffect(() => {
     if (selectedAttachments.length > 0) {
@@ -356,7 +364,6 @@ export const useFilePreview = () => {
     handleFileSelect,
     isPreview,
     downloadAndStoreFile,
-    downloadProgresses,
     clearDownloadedData,
   };
 };

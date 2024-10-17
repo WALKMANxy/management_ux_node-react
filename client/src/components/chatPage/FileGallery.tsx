@@ -1,9 +1,10 @@
 // src/components/fileViewer/FileGallery.tsx
 
 import DeleteIcon from "@mui/icons-material/Delete";
+
 import { Box, IconButton, Tooltip, useMediaQuery } from "@mui/material";
 import React, { useEffect, useRef } from "react";
-import { Attachment, useFilePreview } from "../../hooks/useFilePreview";
+import { Attachment } from "../../models/dataModels";
 import { getIconForFileType } from "../../utils/iconUtils";
 
 interface FileGalleryProps {
@@ -11,6 +12,7 @@ interface FileGalleryProps {
   currentFile: Attachment;
   onRemoveFile: (fileName: string) => void;
   setCurrentFile: (file: Attachment | null) => void;
+  isPreview: boolean;
 }
 
 const FileGallery: React.FC<FileGalleryProps> = ({
@@ -18,12 +20,11 @@ const FileGallery: React.FC<FileGalleryProps> = ({
   currentFile,
   onRemoveFile,
   setCurrentFile,
+  isPreview,
 }) => {
   const galleryRef = useRef<HTMLDivElement>(null);
 
   const isMobile = useMediaQuery("(max-width: 600px)");
-
-  const { isPreview } = useFilePreview();
 
   useEffect(() => {
     const currentIndex = attachments.findIndex(
@@ -47,7 +48,7 @@ const FileGallery: React.FC<FileGalleryProps> = ({
       sx={{
         display: "flex",
         overflowX: "auto",
-        gap: "10px",
+        gap: "20px",
         padding: "0 10px",
         scrollSnapType: "x mandatory",
         "&::-webkit-scrollbar": {
@@ -58,30 +59,32 @@ const FileGallery: React.FC<FileGalleryProps> = ({
     >
       {attachments.map((file) => {
         const isSelected = file.fileName === currentFile.fileName;
-        const isImageOrVideo = ["image", "video"].includes(file.type);
+        const isImage = ["image"].includes(file.type);
         return (
           <Box
-            key={file.url}
-            sx={{
-              width: { xs: 40, sm: 60 }, // Responsive width
-              height: { xs: 40, sm: 60 }, // Responsive height
-              borderRadius: "8px",
-              overFlowY: "hidden",
+          key={file.url}
+          sx={{
+            mt: 1,
+            mb: 2,
 
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-              cursor: "pointer",
-              flexShrink: 0,
-              scrollSnapAlign: "center",
-              border: isSelected ? "2px solid #1976d2" : "none", // Optional border
-              transition: "box-shadow 0.05s, border 0.05s",
-            }}
-            onClick={() => setCurrentFile(file)}
-          >
+            width: { xs: 40, sm: 60 }, // Responsive width
+            height: { xs: 40, sm: 60 }, // Responsive height
+            borderRadius: "8px",
+            overFlowY: "hidden",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+            cursor: "pointer",
+            flexShrink: 0,
+            scrollSnapAlign: "center",
+            transition: "transform 0.2s, border 0.05s", // Added transform transition
+            transform: isSelected ? "scale(1.1)" : "scale(0.9)", // Scale up when selected
+          }}
+          onClick={() => setCurrentFile(file)}
+        >
             {/* Display file preview or icon based on file type */}
-            {isImageOrVideo ? (
+            {isImage ? (
               <img
                 src={file.url}
                 alt={file.fileName}
@@ -100,6 +103,7 @@ const FileGallery: React.FC<FileGalleryProps> = ({
                   justifyContent: "center",
                   width: "100%",
                   height: "100%",
+                  zIndex: 2,
                 }}
               >
                 {getIconForFileType(file.fileName, "large", isMobile ? 50 : 60)}
@@ -110,11 +114,10 @@ const FileGallery: React.FC<FileGalleryProps> = ({
             {isPreview && isSelected && (
               <Tooltip title="Remove File">
                 <IconButton
-                  size="small"
+                  size="large"
                   sx={{
                     position: "absolute",
-                    top: -5,
-                    right: -5,
+
                     bgcolor: "rgba(255, 255, 255, 0.8)",
                     "&:hover": { bgcolor: "rgba(255, 255, 255, 1)" },
                   }}
@@ -123,7 +126,7 @@ const FileGallery: React.FC<FileGalleryProps> = ({
                     onRemoveFile(file.fileName); // Remove the current selected file
                   }}
                 >
-                  <DeleteIcon fontSize="small" color="error" />
+                  <DeleteIcon fontSize="small"  />
                 </IconButton>
               </Tooltip>
             )}

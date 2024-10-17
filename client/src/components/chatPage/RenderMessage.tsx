@@ -16,9 +16,7 @@ interface RenderMessageProps {
   openFileViewer: (isPreview: boolean, fileName?: string) => void; // Add this line
   downloadAndStoreFile: (attachment: Attachment) => Promise<void>;
   download: (fileName: string) => void;
-  downloadProgresses: {
-    [key: string]: number;
-  };
+
   downloadedFiles: Attachment[]
 
 }
@@ -38,7 +36,6 @@ const RenderMessages: React.FC<RenderMessageProps> = ({
   openFileViewer,
   downloadAndStoreFile,
   download,
-  downloadProgresses,
   downloadedFiles,
 
 }) => {
@@ -82,10 +79,7 @@ const RenderMessages: React.FC<RenderMessageProps> = ({
                 openFileViewer={openFileViewer} // Pass the function here
                 downloadAndStoreFile={downloadAndStoreFile}
                 download={download}
-                downloadProgresses={downloadProgresses}
                 downloadedFiles={downloadedFiles}
-
-
               />
             </Box>
           </React.Fragment>

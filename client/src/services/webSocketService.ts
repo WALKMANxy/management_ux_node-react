@@ -387,30 +387,30 @@ class WebSocketService {
   // Emit a new message to the server
  // Emit a new message to the server
  public emitNewMessage(chatId: string, message: IMessage) {
-  console.log(`Emitting new message to chat ${chatId}:`, message);
+  // console.log(`Emitting new message to chat ${chatId}:`, message);
 
   if (!this.socket || !this.socket.connected) {
     console.warn("Socket disconnected. Queuing outgoing message.");
     this.enqueue(this.offlineMessageQueue, { chatId, message });
 
-    console.log("Dispatching uploadFailed reducer due to offline.");
+    // console.log("Dispatching uploadFailed reducer due to offline.");
     store.dispatch(
       uploadFailed({ chatId, messageId: message.local_id || message._id })
     );
     return;
   }
 
-  console.log("Sending message to server via WebSocket.");
+  // console.log("Sending message to server via WebSocket.");
   this.socket.emit(
     "chat:message",
     { chatId, message },
     (ack: { success: boolean }) => {
-      console.log(`Server acknowledged message with success=${ack.success}`);
+      // console.log(`Server acknowledged message with success=${ack.success}`);
       if (!ack.success) {
         console.warn("Message delivery failed. Queuing message.");
         this.enqueue(this.offlineMessageQueue, { chatId, message });
 
-        console.log("Dispatching uploadFailed reducer due to server failure.");
+        // console.log("Dispatching uploadFailed reducer due to server failure.");
         store.dispatch(
           uploadFailed({ chatId, messageId: message.local_id || message._id })
         );
@@ -424,7 +424,7 @@ class WebSocketService {
     );
     if (isMessagePending) {
       console.warn("Message acknowledgment timeout. Marking as failed.");
-      console.log("Dispatching uploadFailed reducer due to timeout.");
+      // console.log("Dispatching uploadFailed reducer due to timeout.");
       store.dispatch(
         uploadFailed({ chatId, messageId: message.local_id || message._id })
       );
