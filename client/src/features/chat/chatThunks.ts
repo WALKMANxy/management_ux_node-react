@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Async thunk to fetch all chats for the user
 
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, Dispatch } from "@reduxjs/toolkit";
+import { toast } from "sonner";
 import { RootState } from "../../app/store";
 import { IChat, IMessage } from "../../models/dataModels";
 import { showToast } from "../../services/toastMessage";
+import { getChatFileUploadUrl, uploadFileToS3 } from "../data/api/media";
 import {
   createChat,
   fetchAllChats,
@@ -14,6 +16,11 @@ import {
   sendMessage,
   updateReadStatus,
 } from "./api/chats";
+import {
+  updateAttachmentProgress,
+  uploadAttachmentFailed,
+  uploadComplete,
+} from "./chatSlice";
 
 interface FetchOlderMessagesParams {
   chatId: string;
@@ -180,3 +187,92 @@ export const updateReadStatusThunk = createAsyncThunk<
     }
   }
 );
+
+// Thunk action to retry failed attachments
+// Thunk action to retry failed attachments
+export const retryFailedAttachments =
+  (chatId: string, messageLocalId: string) =>
+  async (dispatch: Dispatch, getState: () => RootState) => {
+    const state = getState();
+    const chat = state.chats.chats[chatId];
+    if (!chat) {
+      console.error("Chat does not exist in the state.");
+      return;
+    }
+
+    const message = chat.messages.find(
+      (msg) => msg.local_id === messageLocalId
+    );
+    if (!message) {
+      console.error("Message does not exist in the state.");
+      return;
+    }
+
+    // Find failed attachments
+    const failedAttachments = message.attachments.filter(
+      (att) => att.status === "failed"
+    );
+
+    if (failedAttachments.length === 0) {
+      console.log("No failed attachments to retry.");
+      return;
+    }
+    for (const attachment of failedAttachments) {
+      try {
+        console.log(`Retrying upload for attachment: ${attachment.fileName}`);
+
+        // Request a new pre-signed URL for the file
+        const uploadUrl = await getChatFileUploadUrl(
+          attachment.chatId!,
+          attachment.messageId!,
+          encodeURIComponent(attachment.fileName)
+        );
+        console.log(`Received pre-signed URL for retry: ${uploadUrl}`);
+        // Upload the file to S3
+        await uploadFileToS3(
+          attachment.file!, // Now accessible
+          uploadUrl,
+          attachment.fileName,
+          (progress: number) => {
+            dispatch(
+              updateAttachmentProgress({
+                chatId: attachment.chatId!,
+                messageLocalId: attachment.messageId!,
+                attachmentFileName: attachment.fileName,
+                progress,
+              })
+            );
+          }
+        );
+        console.log(
+          `Attachment ${attachment.fileName} re-uploaded successfully.`
+        );
+      } catch (error) {
+        console.error(
+          `Failed to re-upload attachment ${attachment.fileName}:`,
+          error
+        );
+        dispatch(
+          uploadAttachmentFailed({
+            chatId: attachment.chatId!,
+            messageLocalId: attachment.messageId!,
+            attachmentFileName: attachment.fileName,
+          })
+        );
+      }
+    }
+    // After retrying all, check if all attachments are now uploaded
+    const updatedState = getState();
+    const updatedChat = updatedState.chats.chats[chatId];
+    const updatedMessage = updatedChat.messages.find(
+      (msg) => msg.local_id === messageLocalId
+    );
+    if (updatedMessage?.attachments.every((att) => att.status === "uploaded")) {
+      dispatch(uploadComplete({ chatId, message: updatedMessage }));
+      toast.success("All attachments uploaded successfully.");
+    } else {
+      console.warn("Some attachments still failed to upload after retry.");
+      toast.info("Some attachments failed to upload. Please retry.");
+      // Optionally, you can implement further actions or notifications
+    }
+  };

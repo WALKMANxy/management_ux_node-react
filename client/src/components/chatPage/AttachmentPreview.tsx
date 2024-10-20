@@ -1,5 +1,7 @@
 import DownloadIcon from "@mui/icons-material/Download"; // Download overlay icon
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline"; // Error icon for failures
+import ReplayIcon from "@mui/icons-material/Replay"; // Retry icon
 import {
   Box,
   CircularProgress,
@@ -8,7 +10,9 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
-import { useAppSelector } from "../../app/hooks";
+import { toast } from "sonner";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { retryFailedAttachments } from "../../features/chat/chatThunks"; // Adjust the path as necessary
 import { selectDownloadedFiles } from "../../features/downloads/downloadedFilesSlice";
 import { Attachment } from "../../models/dataModels";
 import { formatFileSize, getFileExtension } from "../../utils/chatUtils";
@@ -19,9 +23,11 @@ interface AttachmentPreviewProps {
   isUploading?: boolean;
   uploadProgress?: number;
   openFileViewer: (isPreview: boolean, fileName?: string) => void; // Update this line
-  downloadAndStoreFile: (file: Attachment, onProgress?: (progress: number) => void) => Promise<void>;
-  download: (fileName: string) => void;
-
+  downloadAndStoreFile: (
+    file: Attachment,
+    onProgress?: (progress: number) => void
+  ) => Promise<void>;
+  handleSave: (fileName: string) => void;
 }
 
 const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
@@ -29,13 +35,14 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
   uploadProgress,
   openFileViewer,
   downloadAndStoreFile,
-  download,
+  handleSave,
   isUploading,
 }) => {
+  const dispatch = useAppDispatch(); // Initialize dispatch
   const downloadedFiles = useAppSelector(selectDownloadedFiles);
-
-  const [downloadProgresses, setDownloadProgresses] = useState<Record<string, number>>({});
-
+  const [downloadProgresses, setDownloadProgresses] = useState<
+    Record<string, number>
+  >({});
 
   useEffect(() => {
     attachments.forEach((attachment) => {
@@ -66,13 +73,13 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
     });
   };
 
-  const handleSave = async (attachment: Attachment) => {
+  const handleSaveToDevice = async (attachment: Attachment) => {
     // Start downloading the file and track progress
-    download(attachment.fileName);
+    handleSave(attachment.fileName);
   };
 
   // Check if a file is already downloaded
-   const isFileDownloaded = (attachment: Attachment) => {
+  const isFileDownloaded = (attachment: Attachment) => {
     return downloadedFiles.some(
       (file) => file.fileName === attachment.fileName
     );
@@ -86,34 +93,54 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
 
   const getImageSrc = useCallback(
     (attachment: Attachment) => {
+
+      console.groupCollapsed("Getting image src for:", attachment.fileName);
+
       if (attachment.file) {
+        console.log("Using local file");
         return URL.createObjectURL(attachment.file);
       } else {
+        console.log("Using remote URL");
         const downloadedFile = downloadedFiles.find(
           (file) => file.fileName === attachment.fileName
         );
         if (downloadedFile) {
-          return downloadedFile.url;
+          console.log("Downloaded file found, using that");
+          return downloadedFile?.url || "";
         } else {
-          return attachment.url || ""; // Use the original URL or placeholder
+          console.log("Downloaded file not found, using placeholder");
+          console.groupEnd();
+          return undefined;
         }
       }
     },
     [downloadedFiles]
   );
 
-
-
   useEffect(() => {
     console.log("Upload progress:", uploadProgress);
   }, [uploadProgress]);
-
-
 
   // Inside AttachmentPreview component
   useEffect(() => {
     console.log("Download progresses:", downloadProgresses);
   }, [downloadProgresses]);
+
+  // Retry handler
+  const handleRetry = useCallback(
+    (attachment: Attachment) => {
+      if (!attachment.chatId || !attachment.messageId) {
+        console.error("Missing chatId or messageId for the attachment.");
+        toast.error(
+          "Cannot retry upload: Missing chat or message information."
+        );
+        return;
+      }
+
+      dispatch(retryFailedAttachments(attachment.chatId, attachment.messageId));
+    },
+    [dispatch]
+  );
 
   return (
     <Box>
@@ -136,7 +163,9 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
           }}
           onClick={() => handleClick(attachment)}
         >
-          {isUploading && (
+
+          {/* Uploading Progress Overlay */}
+          {attachment.status === "uploading" && (
             <Box
               sx={{
                 display: "flex",
@@ -169,12 +198,51 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
             </Box>
           )}
 
+           {/* Failure Overlay */}
+           {attachment.status === "failed" && (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                position: "absolute",
+                inset: 0,
+                backgroundColor: "rgba(255, 0, 0, 0.6)", // Semi-transparent red
+                zIndex: 1001, // Ensure it's above the uploading overlay
+                color: "white",
+                padding: 2,
+                textAlign: "center",
+              }}
+            >
+              <ErrorOutlineIcon sx={{ fontSize: 40, mb: 1 }} />
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                Upload failed, please retry
+              </Typography>
+              <IconButton
+                sx={{
+                  color: "white",
+                  backgroundColor: "rgba(0, 0, 0, 0.3)",
+                  '&:hover': {
+                    backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  },
+                }}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent triggering the parent onClick
+                  handleRetry(attachment);
+                }}
+              >
+                <ReplayIcon />
+              </IconButton>
+            </Box>
+          )}
+
           {/* Handling Images and Videos */}
           {["image", "video"].includes(attachment.type) ? (
             <>
               {/* If the file is not downloaded */}
               {!isFileDownloaded(attachment) &&
-              attachment.uploadProgress !== 100 ? (
+              attachment.status === "uploading" || attachment.status === "failed" ? (
                 attachment.type === "image" ? (
                   // Image Skeleton while downloading
                   <Skeleton
@@ -352,7 +420,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
                   sx={{ color: "black", ml: "auto" }}
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleSave(attachment);
+                    handleSaveToDevice(attachment);
                   }}
                 >
                   <OpenInNewIcon />

@@ -147,23 +147,43 @@ listenerMiddleware.startListening({
   },
 });
 
-// Listener for the addMessageReducer action
+// Listener for the messages with attachments action
 listenerMiddleware.startListening({
   actionCreator: uploadComplete,
   effect: async (action) => {
+    console.log("uploadComplete listener called. Data:", action.payload);
+
     const { chatId, message, fromServer } = action.payload;
 
     // Skip WebSocket emission if action is from the server
     if (fromServer) return;
 
-    // Add the message to the queue
-    messageQueue.push({ chatId, messageData: message });
+    // Strip the 'file' property only if it exists in each attachment
+    const strippedMessage = {
+      ...message,
+      attachments: message.attachments.map((attachment) => {
+        if (attachment.file) {
+          const { file, ...rest } = attachment;
+          return {
+            ...rest,
+          };
+        }
+        return attachment; // Return attachment as is if file property doesn't exist
+      }),
+    };
+
+    // Add the stripped message to the queue
+    messageQueue.push({ chatId, messageData: strippedMessage });
+
+    console.log("Added message (with file stripped if present) to queue:", strippedMessage);
 
     // Debounce the processing of the message queue
     if (messageTimer) clearTimeout(messageTimer);
     messageTimer = setTimeout(processMessageQueue, DEBOUNCE_TIME);
+    console.log("Set timeout for processing message queue");
   },
 });
+
 
 // Listener for the addChatReducer action
 listenerMiddleware.startListening({

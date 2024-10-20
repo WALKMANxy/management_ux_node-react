@@ -12,17 +12,19 @@ export interface IMessage {
   attachments: Attachment[]; // Array to store attachments with metadata
   status: "pending" | "sent" | "failed"; // Status indicating the message state
   isUploading?: boolean; // Tracks if the message is still uploading
-  uploadProgress?: number; // Tracks the progress of the upload (percentage)
 }
 
 // New Attachment interface
 export interface Attachment {
   url: string;
-  type: "image" | "video" | "pdf" | "word" | "excel" | "csv" | "other";
+  type: "image" | "video" | "pdf" | "word" | "spreadsheet" |  "other";
   fileName: string;
   size: number;
   chatId?: Types.ObjectId;
   messageId?: string; // Store `local_id` or `_id`
+  uploadProgress? : number;
+  status: 'pending' | 'uploading' | 'uploaded' | 'failed';
+
 }
 
 // Rest of the IChat interface remains the same
@@ -69,11 +71,17 @@ const messageSchema = new Schema<IMessage>(
     attachments: [
       {
         url: { type: String, required: true },
-        type: { type: String, enum: ["image", "video", "pdf", "word", "excel", "csv", "other"], required: true },
+        type: { type: String, enum: ["image", "video", "pdf", "word", "spreadsheet",  "other"], required: true },
         fileName: { type: String, required: true },
         size: { type: Number, required: true },
         chatId: { type: Schema.Types.ObjectId, ref: "Chat" },
         messageId: { type: String },
+        uploadProgress: { type: Number, default: 0 },
+        status: {
+          type: String,
+          enum: ["pending", "uploading", "uploaded", "failed"],
+          default: "pending",
+        },
       },
     ],
     status: {
@@ -82,7 +90,6 @@ const messageSchema = new Schema<IMessage>(
       default: "pending",
     },
     isUploading: { type: Boolean, default: false },
-    uploadProgress: { type: Number, default: 0 },
   },
   { _id: false }
 );

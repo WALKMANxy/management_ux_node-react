@@ -24,7 +24,7 @@ import InputBox from "./InputBox";
 
 interface FileViewerProps {
   onClose: () => void;
-  download: (fileName: string) => void;
+  handleSave: (fileName: string) => void;
   currentFile: Attachment | null;
   removeAttachment: (fileName: string) => void;
   selectedAttachments: Attachment[];
@@ -41,7 +41,7 @@ interface FileViewerProps {
 
 const FileViewer: React.FC<FileViewerProps> = ({
   onClose,
-  download,
+  handleSave,
   currentFile,
   removeAttachment,
   selectedAttachments,
@@ -141,7 +141,7 @@ const FileViewer: React.FC<FileViewerProps> = ({
     }
 
     // Proceed to download
-    download(file.fileName);
+    handleSave(file.fileName);
   };
 
   // Function to navigate to the next file
