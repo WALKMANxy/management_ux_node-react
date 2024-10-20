@@ -59,7 +59,7 @@ const ChatView: React.FC = () => {
     isPreview,
     currentFile,
     handleFileSelect,
-    download,
+    handleSave,
     removeAttachment,
     selectedAttachments,
     downloadAndStoreFile,
@@ -279,7 +279,7 @@ const ChatView: React.FC = () => {
             participantsData={participantsData}
             openFileViewer={openFileViewer} // Pass the function here
             downloadAndStoreFile={downloadAndStoreFile}
-            download={download}
+            handleSave={handleSave}
             downloadedFiles={downloadedFiles}
           />
         </Box>
@@ -309,7 +309,7 @@ const ChatView: React.FC = () => {
       {isViewerOpen && (
         <FileViewer
           onClose={() => closeFileViewer(isPreview)}
-          download={download}
+          handleSave={handleSave}
           currentFile={currentFile}
           removeAttachment={removeAttachment}
           selectedAttachments={selectedAttachments}

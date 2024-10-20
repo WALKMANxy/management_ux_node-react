@@ -97,25 +97,22 @@ const chatSlice = createSlice({
         return;
       }
 
-      // Remove the 'file' property from each attachment before storing in the state
-      const strippedMessage: IMessage = {
+      // Initialize uploadProgress and status without removing 'file' property
+      const initializedMessage: IMessage = {
         ...message,
         attachments: message.attachments.map((attachment) => ({
-          ...attachment,
-          file: undefined, // Ensure file is undefined
+          ...attachment, // Retain 'file' property
           uploadProgress: 0, // Initialize upload progress
           status: "pending", // Initialize status
         })),
         isUploading: true,
-        status: "pending",
       };
-
       // Push the modified message to the chat
-      chat.messages.push(strippedMessage);
+      chat.messages.push(initializedMessage);
       chat.updatedAt = new Date();
     },
-     // Updates the upload progress of a specific attachment
-     updateAttachmentProgress: (
+    // Updates the upload progress of a specific attachment
+    updateAttachmentProgress: (
       state,
       action: PayloadAction<{
         chatId: string;
@@ -124,64 +121,29 @@ const chatSlice = createSlice({
         progress: number;
       }>
     ) => {
-      const { chatId, messageLocalId, attachmentFileName, progress } = action.payload;
+      const { chatId, messageLocalId, attachmentFileName, progress } =
+        action.payload;
       const chat = state.chats[chatId];
       if (!chat) {
         console.error("Chat does not exist in the state.");
         return;
       }
-      const message = chat.messages.find((msg) => msg.local_id === messageLocalId);
+      const message = chat.messages.find(
+        (msg) => msg.local_id === messageLocalId
+      );
       if (message) {
         const attachment = message.attachments.find(
           (att) => att.fileName === attachmentFileName
         );
         if (attachment) {
           attachment.uploadProgress = progress;
-          attachment.status = progress < 100 ? "uploading" : "uploaded";
           if (progress === 100) {
-            message.isUploading = false;
-            message.status = "sent";
+            attachment.status = "uploaded";
           }
         }
       }
     },
-       // Marks the upload as complete for a specific attachment
-       uploadAttachmentComplete: (
-        state,
-        action: PayloadAction<{
-          chatId: string;
-          messageLocalId: string;
-          attachmentFileName: string;
-          url: string;
-        }>
-      ) => {
-        const { chatId, messageLocalId, attachmentFileName, url } = action.payload;
-        const chat = state.chats[chatId];
-        if (!chat) {
-          console.error("Chat does not exist in the state.");
-          return;
-        }
-        const message = chat.messages.find((msg) => msg.local_id === messageLocalId);
-        if (message) {
-          const attachment = message.attachments.find(
-            (att) => att.fileName === attachmentFileName
-          );
-          if (attachment) {
-            attachment.url = url;
-            attachment.uploadProgress = 100;
-            attachment.status = "uploaded";
-          }
-          // Check if all attachments are uploaded
-          const allUploaded = message.attachments.every(
-            (att) => att.status === "uploaded"
-          );
-          if (allUploaded) {
-            message.isUploading = false;
-            message.status = "sent";
-          }
-        }
-      },
-        // Marks the upload as failed for a specific attachment
+    // Marks the upload as failed for a specific attachment
     uploadAttachmentFailed: (
       state,
       action: PayloadAction<{
@@ -196,7 +158,9 @@ const chatSlice = createSlice({
         console.error("Chat does not exist in the state.");
         return;
       }
-      const message = chat.messages.find((msg) => msg.local_id === messageLocalId);
+      const message = chat.messages.find(
+        (msg) => msg.local_id === messageLocalId
+      );
       if (message) {
         const attachment = message.attachments.find(
           (att) => att.fileName === attachmentFileName
@@ -205,15 +169,14 @@ const chatSlice = createSlice({
           attachment.uploadProgress = 0;
           attachment.status = "failed";
         }
-        message.isUploading = false;
+        // Mark message as failed if any attachment has failed
         message.status = "failed";
+        message.isUploading = false;
       }
     },
 
-
-
-     // Marks the entire upload as complete for a message
-     uploadComplete: (
+    // Marks the entire upload as complete for a message
+    uploadComplete: (
       state,
       action: PayloadAction<{
         chatId: string;
@@ -221,6 +184,7 @@ const chatSlice = createSlice({
         fromServer?: boolean;
       }>
     ) => {
+      console.log("uploadComplete called");
       const { chatId, message } = action.payload;
       const chat = state.chats[chatId];
       if (!chat) {
@@ -231,51 +195,29 @@ const chatSlice = createSlice({
         (msg) => msg.local_id === message.local_id
       );
       if (existingMessage) {
+        console.log("Marking message as uploaded");
         existingMessage.isUploading = false;
-        existingMessage.status = "sent";
-        existingMessage.uploadProgress = 100;
-        // Do NOT overwrite attachments
-      } else {
-        chat.messages.push({
-          ...message,
-          isUploading: false,
-          status: "sent",
-          uploadProgress: 100,
-          // Ensure attachments are already updated via other actions
+        // Do not alter status here; status remains "pending" until server confirmation
+        // Strip the 'file' property from each attachment
+        existingMessage.attachments = existingMessage.attachments.map((attachment) => {
+          const { file, ...rest } = attachment;
+          return {
+            ...rest,
+          };
         });
+      } else {
+        console.error("Message does not exist in the state.");
+        return;
       }
       // Sort messages by timestamp
+      console.log("Sorting messages by timestamp");
       chat.messages.sort(
         (a, b) =>
           new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
       );
+      console.log("Updating chat's updatedAt timestamp");
       chat.updatedAt = new Date();
     },
-
-    uploadFailed: (
-      state,
-      action: PayloadAction<{ chatId: string; messageId: string }>
-    ) => {
-      const { chatId, messageId } = action.payload;
-      const chat = state.chats[chatId];
-      if (!chat) {
-        console.error("Chat does not exist in the state.");
-        return;
-      }
-      const message = chat.messages.find(
-        (msg) => msg.local_id === messageId || msg._id === messageId
-      );
-      if (message) {
-        // Optionally, mark all attachments as failed
-        message.attachments.forEach((att) => {
-          att.uploadProgress = 0;
-          att.status = "failed";
-        });
-        message.isUploading = false;
-        message.status = "failed";
-      }
-    },
-
 
     updateReadStatusReducer: (
       state,
@@ -320,10 +262,8 @@ const chatSlice = createSlice({
       if (fromServer && chat._id) {
         const localId = chat.local_id;
         if (localId && state.chats[localId]) {
-
           // Check if the current chat is the same as the one being updated
           if (state.currentChat?.local_id === localId) {
-
             // Update the currentChat with the server data
             state.currentChat = {
               ...state.currentChat,
@@ -343,7 +283,6 @@ const chatSlice = createSlice({
           // Remove the old chat entry keyed by local_id
           delete state.chats[localId];
         } else {
-
           // If no matching local_id, add the chat as a new entry keyed by _id
           state.chats[chat._id] = chat;
         }
@@ -351,7 +290,6 @@ const chatSlice = createSlice({
         // Client-originated chat, add to state keyed by local_id
         const localId = chat.local_id;
         if (localId) {
-
           state.chats[localId] = chat;
         }
       }
@@ -558,10 +496,8 @@ export const {
   addMessageReducer,
   addAttachmentMessageReducer,
   updateAttachmentProgress,
-  uploadAttachmentComplete,
   uploadAttachmentFailed,
   uploadComplete,
-  uploadFailed,
   updateReadStatusReducer,
   addChatReducer,
   updateChatReducer,
@@ -587,7 +523,9 @@ export const selectChatById = createSelector(
 // Replace with a simple selector
 export const selectCurrentChat = (state: RootState) => {
   const currentChatId = state.chats.currentChat?._id;
-  return currentChatId ? state.chats.chats[currentChatId] : state.chats.currentChat;
+  return currentChatId
+    ? state.chats.chats[currentChatId]
+    : state.chats.currentChat;
 };
 // Memoized selector for messages from the current chat
 export const selectMessagesFromCurrentChat = createSelector(

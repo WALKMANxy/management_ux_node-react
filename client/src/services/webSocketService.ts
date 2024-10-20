@@ -10,7 +10,6 @@ import {
   addMessageReducer,
   updateChatReducer,
   updateReadStatusReducer,
-  uploadFailed,
 } from "../features/chat/chatSlice";
 import { IChat, IMessage } from "../models/dataModels";
 import { getUniqueIdentifier } from "../utils/cryptoUtils";
@@ -269,24 +268,33 @@ class WebSocketService {
     chatId: string;
     message: IMessage;
   }) => {
+    console.log("Handling new message for chatId:", chatId);
+
     const state = store.getState();
     const chatExists = state.chats.chats[chatId];
     const currentChatId = state.chats.currentChat?._id;
     const currentUserId = state.auth.userId;
 
     if (!chatExists) {
+      console.log(`Chat with ID ${chatId} does not exist. Fetching chat from server.`);
       try {
         const chat = await fetchChatById(chatId);
+        console.log("Fetched chat:", chat);
         store.dispatch(addChatReducer({ chat }));
       } catch (error) {
         console.error("Failed to fetch and add chat:", error);
         return;
       }
+    } else {
+      console.log(`Chat with ID ${chatId} already exists.`);
     }
 
     const firstTimeout = setTimeout(() => {
+      console.log("Dispatching addMessageReducer for message:", message);
       store.dispatch(addMessageReducer({ chatId, message, fromServer: true }));
+
       if (message.sender !== currentUserId) {
+        console.log("Message is from another user. Handling new notification.");
         handleNewNotification(message.sender, message.content, state);
       }
 
@@ -296,6 +304,7 @@ class WebSocketService {
           message.sender !== currentUserId &&
           !message.readBy.includes(currentUserId)
         ) {
+          console.log("Updating read status for message:", message);
           store.dispatch(
             updateReadStatusReducer({
               chatId,
@@ -384,7 +393,6 @@ class WebSocketService {
     }
   };
 
-  // Emit a new message to the server
  // Emit a new message to the server
  public emitNewMessage(chatId: string, message: IMessage) {
   // console.log(`Emitting new message to chat ${chatId}:`, message);
@@ -393,10 +401,7 @@ class WebSocketService {
     console.warn("Socket disconnected. Queuing outgoing message.");
     this.enqueue(this.offlineMessageQueue, { chatId, message });
 
-    // console.log("Dispatching uploadFailed reducer due to offline.");
-    store.dispatch(
-      uploadFailed({ chatId, messageId: message.local_id || message._id })
-    );
+
     return;
   }
 
@@ -410,10 +415,7 @@ class WebSocketService {
         console.warn("Message delivery failed. Queuing message.");
         this.enqueue(this.offlineMessageQueue, { chatId, message });
 
-        // console.log("Dispatching uploadFailed reducer due to server failure.");
-        store.dispatch(
-          uploadFailed({ chatId, messageId: message.local_id || message._id })
-        );
+
       }
     }
   );
@@ -425,9 +427,7 @@ class WebSocketService {
     if (isMessagePending) {
       console.warn("Message acknowledgment timeout. Marking as failed.");
       // console.log("Dispatching uploadFailed reducer due to timeout.");
-      store.dispatch(
-        uploadFailed({ chatId, messageId: message.local_id || message._id })
-      );
+
     }
   }, 5000);
   this.timeoutIds.push(ackTimeout);

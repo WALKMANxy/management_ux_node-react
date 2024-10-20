@@ -79,7 +79,7 @@ const InputBox: React.FC<InputBoxProps> = ({
   }, [viewingFiles]);
 
   const handleSend = useCallback(() => {
-    if (messageInput.trim()) {
+    if (attachments || messageInput.trim()) {
       handleSendMessage(messageInput, messageType, attachments);
       setMessageInput(""); // Clear the input field
       inputRef.current?.focus(); // Keep focus on the input field

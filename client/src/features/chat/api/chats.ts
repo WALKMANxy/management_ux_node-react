@@ -7,7 +7,6 @@ import { apiCall } from "../../../utils/apiUtils";
 import { getChatFileUploadUrl, uploadFileToS3 } from "../../data/api/media";
 import {
   updateAttachmentProgress,
-  uploadAttachmentComplete,
   uploadAttachmentFailed,
   uploadComplete,
 } from "../chatSlice";
@@ -169,18 +168,18 @@ export const uploadAttachments = async (
   message: IMessage,
   dispatch: Dispatch
 ) => {
-  // Check if chatId and messageId are valid before proceeding
-  if (!chatId || !message.local_id) {
-    console.error("Invalid chatId or messageId. Aborting attachment upload.");
-    return;
-  }
-
-  console.log(
+  console.groupCollapsed(
     `Starting attachment upload for chatId=${chatId}, messageId=${message.local_id}`
   );
 
+  const uploadedAttachments = [];
+  let hasFailed = false; // Flag to track any failures
 
   for (const attachment of message.attachments) {
+    console.log(
+      `Processing attachment: file=${attachment.file?.name}, type=${attachment.type}`
+    );
+
     // Check if attachment has necessary properties
     if (!attachment.file || !attachment.chatId || !attachment.messageId) {
       console.error(
@@ -198,7 +197,7 @@ export const uploadAttachments = async (
       let fileToUpload = attachment.file;
       if (attachment.type === "image") {
         const options = {
-          maxSizeMB: 0.5,
+          maxSizeMB: 0.3,
           maxWidthOrHeight: 1920,
           useWebWorker: true,
         };
@@ -209,18 +208,21 @@ export const uploadAttachments = async (
         );
       }
 
-      // Request a pre-signed URL for the file
+      console.log(`Requesting pre-signed URL for file: ${attachment.fileName}`);
       const fileName = encodeURIComponent(attachment.fileName);
+
       const uploadUrl = await getChatFileUploadUrl(
         attachment.chatId,
         attachment.messageId,
         fileName
       );
 
+      console.log(`Received pre-signed URL: ${uploadUrl}`);
+
       console.log(`Uploading to S3 via pre-signed URL: ${uploadUrl}`);
 
       // Upload the file to S3
-      await uploadFileToS3(fileToUpload, uploadUrl, (progress) => {
+      await uploadFileToS3(fileToUpload, uploadUrl, fileName, (progress) => {
         console.log(`Dispatching progress update: progress=${progress}%`);
         dispatch(
           updateAttachmentProgress({
@@ -231,36 +233,43 @@ export const uploadAttachments = async (
           })
         );
       });
-
-       // Dispatch upload complete action
-       dispatch(
-        uploadAttachmentComplete({
-          chatId,
-          messageLocalId: message.local_id,
-          attachmentFileName: attachment.fileName,
-          url: uploadUrl.split("?")[0], // Ensure you store the clean URL
-        })
-      );
-
-
+      // Store the uploaded attachment details
+      uploadedAttachments.push({
+        ...attachment,
+        url: uploadUrl.split("?")[0], // Remove signed query parameters
+      });
 
       console.log(`Attachment uploaded successfully: ${fileToUpload.name}`);
     } catch (error) {
       console.error("Failed to upload attachment:", error);
+      hasFailed = true; // Mark that at least one attachment failed
+
       dispatch(
         uploadAttachmentFailed({
           chatId: attachment.chatId,
           messageLocalId: attachment.messageId!,
-            attachmentFileName: attachment.fileName,
+          attachmentFileName: attachment.fileName,
         })
       );
-      return;
+      continue;
     }
   }
 
+  console.log(`Finished processing all attachments.`);
 
+  if (hasFailed) {
+    console.warn("Some attachments failed to upload.");
+    // Optionally, handle additional logic for partial failures here
+  } else {
+    // All attachments uploaded successfully
+    const updatedMessage: IMessage = {
+      ...message,
+      attachments: uploadedAttachments,
+    };
 
-  console.log(`All attachments uploaded. Dispatching uploadComplete.`);
+    console.log(`All attachments uploaded. Dispatching uploadComplete.`);
+    dispatch(uploadComplete({ chatId, message: updatedMessage }));
+  }
 
-  dispatch(uploadComplete({ chatId, message: { ...message } }));
+  console.groupEnd();
 };
