@@ -214,10 +214,8 @@ const useChatLogic = () => {
       // Failsafe for empty content when attachments exist
       const finalContent =
         content.trim() === "" && attachments && attachments.length > 0
-          ? "." // Use an invisible character (zero-width space)
+          ? "📌"
           : content;
-
-
 
       const messageData: IMessage = {
         _id: localId,
@@ -231,9 +229,10 @@ const useChatLogic = () => {
         status: "pending",
       };
 
+      const hasAttachments = attachments && attachments.length > 0;
+
       try {
-        if (attachments && attachments.length > 0) {
-          // Update attachments to include chatId and messageId
+        if (hasAttachments) {
           const updatedAttachments = attachments.map((attachment) => ({
             ...attachment,
             chatId: currentChatId,
@@ -253,13 +252,9 @@ const useChatLogic = () => {
             })
           );
 
-          // Initiate the upload
+          // Initiate the upload with error handling
           await uploadAttachments(currentChatId, messageData, dispatch);
         } else {
-          console.log(
-            `Dispatching addMessageReducer for message without attachments: ${messageData._id}`
-          );
-
           // Dispatch message without attachments
           dispatch(
             addMessageReducer({ chatId: currentChatId, message: messageData })
@@ -272,15 +267,6 @@ const useChatLogic = () => {
     [currentChatId, currentUserId, dispatch]
   );
 
-  /**
-   * Handles the creation of a new chat.
-   *
-   * @param participants - Array of participant user IDs.
-   * @param chatType - Type of chat: "simple", "group", or "broadcast".
-   * @param name - Optional name for the chat.
-   * @param description - Optional description for the chat.
-   * @param admins - Optional array of admin user IDs (only for "group" and "broadcast" chats).
-   */
   const handleCreateChat = useCallback(
     async (
       participants: string[],
@@ -519,7 +505,6 @@ const useChatLogic = () => {
     dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
   }, [dispatch]);
 
-
   // New function to get unread chats, sorted by the latest message timestamp
   const getUnreadChats = useCallback(() => {
     const unreadChats = chats.filter((chat) => getUnreadCount(chat) > 0);
@@ -585,7 +570,7 @@ const useChatLogic = () => {
     broadcastChat,
     markMessagesAsRead,
     handleEditChat,
-    handleSelectChat
+    handleSelectChat,
   };
 };
 

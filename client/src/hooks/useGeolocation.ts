@@ -91,10 +91,11 @@ export const useGeolocation = (
   autoLocate: "gps" | "ip" | null
 ): UseGeolocationResult => {
   const [location, setLocation] = useState<GeoLocation | null>(null);
-  const [city, setCity] = useState<string | null>(null);
-  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const cachedWeather = getWithExpiry(CACHE_KEY);
+  const [city, setCity] = useState<string | null>(cachedWeather?.city || null);
+  const [weather, setWeather] = useState<WeatherData | null>(cachedWeather);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(!cachedWeather);
 
   /**
    * Effect 1: Fetch User Location

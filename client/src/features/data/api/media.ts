@@ -1,7 +1,7 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosProgressEvent, AxiosResponse } from "axios";
+import { Attachment } from "../../../models/dataModels";
 import { apiCall } from "../../../utils/apiUtils";
 import { cacheFile, getCachedFile } from "../../../utils/cacheUtils";
-import { Attachment } from "../../../models/dataModels";
 
 // Request pre-signed URL for chat file upload
 export const getChatFileUploadUrl = async (
@@ -9,16 +9,26 @@ export const getChatFileUploadUrl = async (
   messageId: string,
   fileName: string
 ): Promise<string> => {
-  console.log(`Requesting pre-signed URL for file upload: chatId=${chatId}, messageId=${messageId}, fileName=${fileName}`);
+  console.log(
+    `Requesting pre-signed URL for file upload: chatId=${chatId}, messageId=${messageId}, fileName=${fileName}`
+  );
 
-  const endpoint = `/media/chats/${chatId}/${messageId}?fileName=${encodeURIComponent(fileName)}`;
+  const endpoint = `/media/chats/${chatId}/${messageId}?fileName=${encodeURIComponent(
+    fileName
+  )}`;
 
-  // Make the API call to get the pre-signed URL
-  const response = await apiCall<{ uploadUrl: string }>(endpoint, "GET");
-
-  console.log(`Received pre-signed URL: ${response.uploadUrl}`);
-
-  return response.uploadUrl; // Return the pre-signed URL for file upload
+  try {
+    // Make the API call to get the pre-signed URL
+    const response = await apiCall<{ uploadUrl: string }>(endpoint, "GET");
+    console.log(`Received pre-signed URL: ${response.uploadUrl}`);
+    return response.uploadUrl; // Return the pre-signed URL for file upload
+  } catch (error) {
+    console.error(
+      `Error fetching pre-signed URL for chat file upload: chatId=${chatId}, messageId=${messageId}, fileName=${fileName}`,
+      error
+    );
+    throw new Error("Failed to obtain pre-signed URL for file upload.");
+  }
 };
 
 // Request pre-signed URL for chat file download
@@ -27,72 +37,106 @@ export const getChatFileDownloadUrl = async (
   messageId: string,
   fileName: string
 ): Promise<string> => {
-  const endpoint = `/media/chats/${chatId}/${messageId}/${encodeURIComponent(fileName)}/download`;
+  const endpoint = `/media/chats/${chatId}/${messageId}/${encodeURIComponent(
+    fileName
+  )}/download`;
 
-  // Make the API call to get the pre-signed URL
-  const response = await apiCall<{ downloadUrl: string }>(endpoint, "GET");
-
-  return response.downloadUrl;
+  try {
+    // Make the API call to get the pre-signed URL
+    const response = await apiCall<{ downloadUrl: string }>(endpoint, "GET");
+    console.log(`Received pre-signed download URL: ${response.downloadUrl}`);
+    return response.downloadUrl;
+  } catch (error) {
+    console.error(
+      `Error fetching pre-signed URL for chat file download: chatId=${chatId}, messageId=${messageId}, fileName=${fileName}`,
+      error
+    );
+    throw new Error("Failed to obtain pre-signed URL for file download.");
+  }
 };
-
 
 // Request pre-signed URL for slideshow file upload
 export const getSlideshowFileUploadUrl = async (
   currentMonth: string,
   fileName: string
 ): Promise<string> => {
-  console.log(`Requesting pre-signed URL for slideshow upload: currentMonth=${currentMonth}, fileName=${fileName}`);
+  console.log(
+    `Requesting pre-signed URL for slideshow upload: currentMonth=${currentMonth}, fileName=${fileName}`
+  );
 
-  const endpoint = `/media/slideshow/${currentMonth}?fileName=${encodeURIComponent(fileName)}`;
+  const endpoint = `/media/slideshow/${currentMonth}?fileName=${encodeURIComponent(
+    fileName
+  )}`;
 
-  const response = await apiCall<{ uploadUrl: string }>(endpoint, "GET");
-
-  console.log(`Received slideshow pre-signed URL: ${response.uploadUrl}`);
-
-  return response.uploadUrl;
+  try {
+    const response = await apiCall<{ uploadUrl: string }>(endpoint, "GET");
+    console.log(`Received slideshow pre-signed URL: ${response.uploadUrl}`);
+    return response.uploadUrl;
+  } catch (error) {
+    console.error(
+      `Error fetching pre-signed URL for slideshow upload: currentMonth=${currentMonth}, fileName=${fileName}`,
+      error
+    );
+    throw new Error("Failed to obtain pre-signed URL for slideshow upload.");
+  }
 };
 
 
-// Upload file to S3 using the pre-signed URL and track progress
 export const uploadFileToS3 = async (
   file: File,
   uploadUrl: string,
+  fileName: string,
   onUploadProgress: (progress: number) => void
 ): Promise<void> => {
-  console.log(`Uploading file to S3: file=${file.name}, uploadUrl=${uploadUrl}`);
-
-     // After successful upload, cache the file
-     try {
-      // Assuming cacheFile takes (fileName: string, blob: Blob) and returns a Promise<string> for the object URL
-      const cachedObjectUrl = await cacheFile(file.name, file);
-      console.log(`File ${file.name} cached successfully. Object URL: ${cachedObjectUrl}`);
-    } catch (cacheError) {
-      // Log caching errors without throwing to avoid interrupting the upload flow
-      console.error(`Failed to cache file ${file.name}:`, cacheError);
-    }
+  console.log(`Uploading file ${file.name} to S3 with URL: ${uploadUrl}`);
 
   try {
-    const response = await axios.put(uploadUrl, file, {
+    console.log("Making PUT request to S3:");
+    const response: AxiosResponse<void> = await axios.put(uploadUrl, file, {
       headers: {
         "Content-Type": file.type,
       },
-      onUploadProgress: (progressEvent) => {
-        const progress = Math.round(
-          (progressEvent.loaded * 100) / (progressEvent.total ?? 0)
-        );
+      onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+        const total = progressEvent.total;
+        const loaded = progressEvent.loaded;
+        const progress = total ? Math.round((loaded * 100) / total) : 0;
         console.log(`Upload progress: ${progress}%`);
         onUploadProgress(progress);
       },
     });
 
-    if (!response.status.toString().startsWith("2")) {
-      throw new Error(`File upload failed with status ${response.status}`);
-    }
+    if (response.status === 200 || response.status === 204) {
+      console.log("File uploaded successfully to S3.");
 
-    console.log("File uploaded successfully to S3");
-  } catch (error) {
-    console.error("Error uploading file to S3:", error);
-    throw error;
+      // After successful upload, cache the file
+      try {
+        // Assuming cacheFile takes (fileName: string, blob: Blob) and returns a Promise<string> for the object URL
+        const cachedObjectUrl = await cacheFile(fileName, file);
+        console.log(
+          `File ${fileName} cached successfully. Object URL: ${cachedObjectUrl}`
+        );
+      } catch (cacheError) {
+        // Log caching errors without throwing to avoid interrupting the upload flow
+        console.error(`Failed to cache file ${file.name}:`, cacheError);
+      }
+    } else {
+      console.error(
+        `Unexpected response status during S3 upload: ${response.status}`
+      );
+      throw new Error(`S3 upload failed with status code ${response.status}`);
+    }
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      console.error("Error uploading file to S3:", axiosError.message);
+      if (axiosError.response) {
+        console.error("S3 response data:", axiosError.response.data);
+      }
+      throw new Error("Failed to upload file to S3.");
+    } else {
+      console.error("Unknown error occurred during file upload:", error);
+      throw new Error("Failed to upload file to S3.");
+    }
   }
 };
 
@@ -105,14 +149,19 @@ export const downloadFileFromS3 = async (
   try {
     // Check if chatId and messageId exist before proceeding
     if (!attachment.chatId || !attachment.messageId) {
-      console.error("Missing chatId or messageId for the attachment.");
+      console.error(
+        "Missing chatId or messageId for the attachment:",
+        attachment
+      );
       return null;
     }
 
     // Check if the file is already cached
     const cachedFile = await getCachedFile(attachment.fileName);
     if (cachedFile) {
-      console.log(`File ${attachment.fileName} found in cache. Using cached version.`);
+      console.log(
+        `File ${attachment.fileName} found in cache. Using cached version.`
+      );
       return cachedFile.objectUrl;
     }
 
@@ -123,26 +172,59 @@ export const downloadFileFromS3 = async (
       attachment.fileName
     );
 
-    const response = await axios.get(downloadUrl, {
+    console.log(`Downloading file from URL: ${downloadUrl}`);
+
+    const response: AxiosResponse<Blob> = await axios.get(downloadUrl, {
       responseType: "blob",
-      onDownloadProgress: (progressEvent) => {
-        const totalLength = progressEvent.total;
-        if (totalLength) {
-          const progress = Math.round(
-            (progressEvent.loaded * 100) / totalLength
-          );
+      onDownloadProgress: (progressEvent: AxiosProgressEvent) => {
+        const total = progressEvent.total;
+        const loaded = progressEvent.loaded;
+        if (total) {
+          const progress = Math.round((loaded * 100) / total);
+          console.log(`Download progress: ${progress}%`);
           onDownloadProgress(progress);
         }
       },
     });
 
-    // Cache the downloaded Blob
-    const blob = response.data as Blob;
-    const cachedObjectUrl = await cacheFile(attachment.fileName, blob);
+    if (response.status === 200) {
+      const blob = response.data;
+      console.log(
+        `File ${attachment.fileName} downloaded successfully. Caching the file.`
+      );
 
-    return cachedObjectUrl;
-  } catch (error) {
-    console.error("Error downloading file from S3:", error);
-    throw error;
+      try {
+        const cachedObjectUrl = await cacheFile(attachment.fileName, blob);
+        console.log(
+          `File ${attachment.fileName} cached successfully. Object URL: ${cachedObjectUrl}`
+        );
+        return cachedObjectUrl;
+      } catch (cacheError) {
+        console.error(
+          `Failed to cache downloaded file ${attachment.fileName}:`,
+          cacheError
+        );
+        return URL.createObjectURL(blob); // Fallback to object URL without caching
+      }
+    } else {
+      console.error(
+        `Unexpected response status during file download: ${response.status}`
+      );
+      throw new Error(
+        `File download failed with status code ${response.status}`
+      );
+    }
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      console.error("Error downloading file from S3:", axiosError.message);
+      if (axiosError.response) {
+        console.error("Download response data:", axiosError.response.data);
+      }
+      throw new Error("Failed to download file from S3.");
+    } else {
+      console.error("Unknown error occurred during file download:", error);
+      throw new Error("Failed to download file from S3.");
+    }
   }
 };

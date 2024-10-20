@@ -66,20 +66,18 @@ export interface IMessage {
   attachments: Attachment[]; // Array to store file metadata for attachments
   status: "pending" | "sent" | "failed"; // Status indicating the message state
   isUploading?: boolean; // Whether the file is still uploading
-  uploadProgress?: number;
 }
 
 export interface Attachment {
   file?: File; // Local file, only for client-side usage
   url: string;
-  type: "image" | "video" | "pdf" | "word" | "excel" | "csv" | "other";
+  type: "image" | "video" | "pdf" | "word" | "spreadsheet" | "other";
   fileName: string;
   size: number;
   chatId?: string;
   messageId?: string;
   uploadProgress : number;
   status: 'pending' | 'uploading' | 'uploaded' | 'failed';
-
 }
 
 export interface IChat {

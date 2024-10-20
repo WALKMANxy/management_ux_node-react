@@ -15,7 +15,7 @@ interface RenderMessageProps {
   participantsData: Partial<User>[];
   openFileViewer: (isPreview: boolean, fileName?: string) => void; // Add this line
   downloadAndStoreFile: (attachment: Attachment) => Promise<void>;
-  download: (fileName: string) => void;
+  handleSave: (fileName: string) => void;
 
   downloadedFiles: Attachment[]
 
@@ -35,7 +35,7 @@ const RenderMessages: React.FC<RenderMessageProps> = ({
   participantsData,
   openFileViewer,
   downloadAndStoreFile,
-  download,
+  handleSave,
   downloadedFiles,
 
 }) => {
@@ -78,7 +78,7 @@ const RenderMessages: React.FC<RenderMessageProps> = ({
                 chatType={chatType}
                 openFileViewer={openFileViewer} // Pass the function here
                 downloadAndStoreFile={downloadAndStoreFile}
-                download={download}
+                handleSave={handleSave}
                 downloadedFiles={downloadedFiles}
               />
             </Box>
