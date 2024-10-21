@@ -32,28 +32,25 @@ import { Attachment } from "../../models/dataModels";
 interface InputBoxProps {
   canUserChat: boolean;
   attachments?: Attachment[];
-  viewingFiles?: boolean;
   handleFileSelect?:
     | ((event: ChangeEvent<HTMLInputElement>) => void)
     | undefined; // New prop
   closeFileViewer: (isPreview: boolean) => void; // New prop
   isPreview: boolean; // New prop
+  isViewerOpen: boolean
 }
-/**
- * InputBox Component
- * Allows users to input and send messages, and select message types.
- *
- * @param {InputBoxProps} props - Component props.
- * @returns {JSX.Element} The rendered component.
- */
+
 const InputBox: React.FC<InputBoxProps> = ({
   canUserChat,
   attachments,
-  viewingFiles,
   handleFileSelect, // Destructure the new props
   closeFileViewer, // Destructure the new props
   isPreview, // Destructure the new props
+  isViewerOpen
 }) => {
+
+  // console.log("InputBox rendering now")
+
   const { t } = useTranslation();
   const [messageInput, setMessageInput] = useState("");
   const [messageType, setMessageType] = useState<
@@ -71,12 +68,19 @@ const InputBox: React.FC<InputBoxProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+    /**
+   * Handler for closing the attachment modal.
+   */
+    const handleAttachmentClose = useCallback(() => {
+      setAttachmentAnchorEl(null);
+    }, []);
+
   // Add this useEffect to reset attachmentAnchorEl when viewingFiles changes
   useEffect(() => {
-    if (viewingFiles) {
-      setAttachmentAnchorEl(null);
+    if (isViewerOpen) {
+      handleAttachmentClose();
     }
-  }, [viewingFiles]);
+  }, [isViewerOpen, handleAttachmentClose]);
 
   const handleSend = useCallback(() => {
     if (attachments || messageInput.trim()) {
@@ -133,12 +137,7 @@ const InputBox: React.FC<InputBoxProps> = ({
     []
   );
 
-  /**
-   * Handler for closing the attachment modal.
-   */
-  const handleAttachmentClose = useCallback(() => {
-    setAttachmentAnchorEl(null);
-  }, []);
+
 
   /**
    * Handler for selecting files.
@@ -159,7 +158,7 @@ const InputBox: React.FC<InputBoxProps> = ({
         backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent background
       }}
     >
-      {!viewingFiles && (
+
         <Box sx={{ display: "flex", alignItems: "center", pr: 1 }}>
           {/* Attachment Button */}
 
@@ -202,7 +201,7 @@ const InputBox: React.FC<InputBoxProps> = ({
             </Tooltip>
           )}
         </Box>
-      )}
+
 
       {/* Message Input Field */}
       <TextField

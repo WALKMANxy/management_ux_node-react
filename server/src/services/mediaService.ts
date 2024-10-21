@@ -1,4 +1,4 @@
-import { S3Client, ListObjectsV2Command, PutObjectCommand, GetObjectCommand  } from '@aws-sdk/client-s3';
+import { S3Client, /* ListObjectsV2Command,*/ PutObjectCommand, GetObjectCommand  } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { config } from '../config/config';
 
@@ -63,7 +63,7 @@ export const generateSlideshowFileUrl = async (currentMonth: string, fileName: s
   return uploadUrl;
 };
 
-// Test S3 Integration: List objects in the bucket
+/* // Test S3 Integration: List objects in the bucket
 const testS3Integration = async () => {
   try {
     const command = new ListObjectsV2Command({ Bucket: bucketName });
@@ -76,3 +76,4 @@ const testS3Integration = async () => {
 
 // Call the test function on initialization
 testS3Integration();
+ */

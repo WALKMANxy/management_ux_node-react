@@ -9,8 +9,7 @@ const useChatView = () => {
   const { t } = useTranslation(); // Initialize translation
   const [error, setError] = useState<string | null>(null);
 
-  // Selectors
-  const currentChat = useAppSelector(selectCurrentChat);
+  const currentChat = useAppSelector(selectCurrentChat)
   const currentUserId = useAppSelector((state) => state.auth.userId);
   const users = useAppSelector((state) => state.users.users);
 
@@ -22,15 +21,14 @@ const useChatView = () => {
     }
   }, [error]);
 
-  // Sort messages by timestamp
   const sortedMessages = useMemo(() => {
-    return currentChat?.messages
-      ? [...currentChat.messages].sort(
-          (a, b) =>
-            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-        )
-      : [];
+    return currentChat?.messages || [];
   }, [currentChat?.messages]);
+
+
+  useEffect(() => {
+    console.log("Sorted messaged:", sortedMessages);
+  }, [sortedMessages]);
 
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(menuAnchorEl);

@@ -1,17 +1,10 @@
 // useLoadOlderMessages.ts
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { fetchOlderMessagesThunk } from "../features/chat/chatThunks";
 
-const useLoadOlderMessages = (currentChatId: string | null) => {
+const useLoadOlderMessages = (currentChatId: string | undefined) => {
   const dispatch = useAppDispatch();
   const messages = useAppSelector((state) =>
     currentChatId ? state.chats.chats[currentChatId]?.messages || [] : []
@@ -30,7 +23,7 @@ const useLoadOlderMessages = (currentChatId: string | null) => {
   }, [currentChatId]);
 
   // Scroll to bottom when chat changes
-  useLayoutEffect(() => {
+  useEffect(() => {
     const container = messagesContainerRef.current;
     if (container) {
       container.scrollTop = container.scrollHeight;

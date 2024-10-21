@@ -1217,7 +1217,8 @@
   "webSocketService": {
     "lostConnection": "Lost connection to the server, attempting to reconnect...",
     "connectionEstablished": "Connection to the server established.",
-    "connectionLost": "Connection to the server lost, refresh the page or try again later."
+    "connectionLost": "Connection to the server lost, refresh the page or try again later.",
+    "connected": "Connected!"
   },
   "dashboard": {
     "welcomeBack": "Welcome back, {{name}}!",
