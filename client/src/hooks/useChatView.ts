@@ -26,9 +26,9 @@ const useChatView = () => {
   }, [currentChat?.messages]);
 
 
-  useEffect(() => {
+/*   useEffect(() => {
     console.log("Sorted messaged:", sortedMessages);
-  }, [sortedMessages]);
+  }, [sortedMessages]); */
 
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(menuAnchorEl);

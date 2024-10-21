@@ -13,14 +13,14 @@ import {
   addMessageReducer,
   clearCurrentChatReducer,
   selectAllChats,
-  selectChatsStatus,
   selectCurrentChat,
+  selectFetchChatsStatus,
   selectMessagesFromCurrentChat,
   setCurrentChatReducer,
   updateChatReducer,
   updateReadStatusReducer,
 } from "../features/chat/chatSlice"; // Ensure correct selectors are imported
-import { fetchAllChatsThunk } from "../features/chat/chatThunks";
+import { fetchAllChatsThunk, uploadAttachmentsThunk } from "../features/chat/chatThunks";
 import { selectClientIds } from "../features/data/dataSlice";
 import { getAllUsersThunk, selectAllUsers } from "../features/users/userSlice";
 import { Attachment, IChat, IMessage } from "../models/dataModels";
@@ -42,15 +42,15 @@ const useChatLogic = () => {
   const messages = useAppSelector(selectMessagesFromCurrentChat); // Use selector to get messages of the current chat
   const [contactsFetched, setContactsFetched] = useState(false);
   const { t } = useTranslation();
-  const chatStatus = useAppSelector(selectChatsStatus);
+  const fetchChatsStatus = useAppSelector(selectFetchChatsStatus);
   const agentClientIds = useSelector(selectClientIds);
   const currentChatId = currentChat?._id;
   const chatRetryCountRef = useRef(0);
 
   // Determine if chats should be fetched
   const shouldFetchChats = useMemo(() => {
-    return chatStatus !== "succeeded";
-  }, [chatStatus]);
+    return fetchChatsStatus !== "succeeded";
+  }, [fetchChatsStatus]);
 
   const fetchChats = useCallback(async () => {
     try {
@@ -92,7 +92,7 @@ const useChatLogic = () => {
     if (
       chatRetryCountRef.current > 0 &&
       chatRetryCountRef.current <= 5 &&
-      chatStatus !== "succeeded"
+      fetchChatsStatus !== "succeeded"
     ) {
       const retryDelay = Math.min(32000, 1000 * 2 ** chatRetryCountRef.current); // Exponential backoff
 
@@ -105,7 +105,7 @@ const useChatLogic = () => {
         clearTimeout(retryTimeout);
       };
     }
-  }, [fetchChats, chatStatus]);
+  }, [fetchChats, fetchChatsStatus]);
 
   // Select a chat
   const selectChat = useCallback(
@@ -252,8 +252,13 @@ const useChatLogic = () => {
             })
           );
 
-          // Initiate the upload with error handling
-          await uploadAttachments(currentChatId, messageData, dispatch);
+          // Dispatch the thunk to handle uploading
+          await dispatch(
+            uploadAttachmentsThunk({
+              chatId: currentChatId,
+              message: messageData,
+            })
+          ).unwrap(); // unwrap() to handle fulfilled/rejected state
         } else {
           // Dispatch message without attachments
           dispatch(

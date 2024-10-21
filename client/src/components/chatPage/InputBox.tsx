@@ -32,17 +32,21 @@ import { Attachment } from "../../models/dataModels";
 interface InputBoxProps {
   canUserChat: boolean;
   attachments?: Attachment[];
+  viewingFiles?: boolean;
+
   handleFileSelect?:
     | ((event: ChangeEvent<HTMLInputElement>) => void)
     | undefined; // New prop
   closeFileViewer: (isPreview: boolean) => void; // New prop
   isPreview: boolean; // New prop
-  isViewerOpen: boolean
+  isViewerOpen?: boolean
 }
 
 const InputBox: React.FC<InputBoxProps> = ({
   canUserChat,
   attachments,
+  viewingFiles,
+
   handleFileSelect, // Destructure the new props
   closeFileViewer, // Destructure the new props
   isPreview, // Destructure the new props
@@ -159,6 +163,7 @@ const InputBox: React.FC<InputBoxProps> = ({
       }}
     >
 
+{!viewingFiles && (
         <Box sx={{ display: "flex", alignItems: "center", pr: 1 }}>
           {/* Attachment Button */}
 
@@ -201,7 +206,7 @@ const InputBox: React.FC<InputBoxProps> = ({
             </Tooltip>
           )}
         </Box>
-
+      )}
 
       {/* Message Input Field */}
       <TextField
