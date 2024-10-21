@@ -17,6 +17,7 @@ import {
   invalidateSession,
   renewSession,
 } from "../utils/sessionUtils";
+import { verifyRefreshTokenJWT } from "../utils/jwtUtils";
 
 export const register = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -104,8 +105,26 @@ export const logout = async (req: Request, res: Response) => {
       .json({ message: "Refresh token is required for logout." });
   }
 
+   // Step 1: Verify and decode the refresh token to extract userId
+   let decodedToken;
+   try {
+     decodedToken = verifyRefreshTokenJWT(refreshToken);
+   } catch (err) {
+     logger.warn("Invalid or expired refresh token", { refreshToken, error: err });
+     return null;
+   }
+
+   const userId = decodedToken.userId;
+   if (!userId) {
+     logger.warn("Refresh token does not contain userId", { refreshToken });
+     return null;
+   }
+
+   // Step 2: Retrieve userAgent from the request
+   const userAgent = req.get("User-Agent") || "Unknown";
+
   try {
-    const invalidated = await invalidateSession(refreshToken, uniqueId!);
+    const invalidated = await invalidateSession(userId, uniqueId!, userAgent!);
     if (invalidated) {
       res.status(200).json({ message: "Logout successful." });
     } else {

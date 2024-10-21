@@ -22,13 +22,6 @@ interface MessageBubbleProps {
   downloadedFiles: Attachment[];
 }
 
-/**
- * MessageBubble Component
- * Displays an individual chat message with appropriate styling and metadata.
- *
- * @param {MessageBubbleProps} props - Component props.
- * @returns {JSX.Element} The rendered component.
- */
 const MessageBubble: React.FC<MessageBubbleProps> = ({
   message,
   participantsData = [],
@@ -37,6 +30,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   downloadAndStoreFile,
   handleSave,
 }) => {
+  // console.log("MessageBubble rendering now");
+
   const { t } = useTranslation();
   const currentUserId = useAppSelector((state: RootState) => state.auth.userId);
   const isOwnMessage = message.sender === currentUserId;

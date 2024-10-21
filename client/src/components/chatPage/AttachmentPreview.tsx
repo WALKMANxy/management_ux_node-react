@@ -1,6 +1,6 @@
 import DownloadIcon from "@mui/icons-material/Download"; // Download overlay icon
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline"; // Error icon for failures
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import ReplayIcon from "@mui/icons-material/Replay"; // Retry icon
 import {
   Box,
@@ -36,7 +36,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
   openFileViewer,
   downloadAndStoreFile,
   handleSave,
-  isUploading,
+  // isUploading,
 }) => {
   const dispatch = useAppDispatch(); // Initialize dispatch
   const downloadedFiles = useAppSelector(selectDownloadedFiles);
@@ -48,8 +48,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
     attachments.forEach((attachment) => {
       if (
         ["image"].includes(attachment.type) &&
-        !attachment.file && // Only download if local file is not available
-        attachment.url &&
+        attachment.status === "uploaded" &&
         attachment.url.startsWith("https://") // Ensure it's a valid S3 URL
       ) {
         // Fetch thumbnail for images/videos with progress tracking
@@ -93,26 +92,13 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
 
   const getImageSrc = useCallback(
     (attachment: Attachment) => {
-
-      console.groupCollapsed("Getting image src for:", attachment.fileName);
-
-      if (attachment.file) {
-        console.log("Using local file");
-        return URL.createObjectURL(attachment.file);
-      } else {
-        console.log("Using remote URL");
-        const downloadedFile = downloadedFiles.find(
-          (file) => file.fileName === attachment.fileName
-        );
-        if (downloadedFile) {
-          console.log("Downloaded file found, using that");
-          return downloadedFile?.url || "";
-        } else {
-          console.log("Downloaded file not found, using placeholder");
-          console.groupEnd();
-          return undefined;
-        }
+      const downloadedFile = downloadedFiles.find(
+        (file) => file.fileName === attachment.fileName
+      );
+      if (downloadedFile) {
+        return downloadedFile.url; // Directly return the cached URL
       }
+      return undefined; // Indicate that the file is not yet downloaded
     },
     [downloadedFiles]
   );
@@ -129,6 +115,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
   // Retry handler
   const handleRetry = useCallback(
     (attachment: Attachment) => {
+      console.log("Retrying attachment:", attachment.fileName);
       if (!attachment.chatId || !attachment.messageId) {
         console.error("Missing chatId or messageId for the attachment.");
         toast.error(
@@ -163,7 +150,6 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
           }}
           onClick={() => handleClick(attachment)}
         >
-
           {/* Uploading Progress Overlay */}
           {attachment.status === "uploading" && (
             <Box
@@ -198,8 +184,8 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
             </Box>
           )}
 
-           {/* Failure Overlay */}
-           {attachment.status === "failed" && (
+          {/* Failure Overlay */}
+          {attachment.status === "failed" && (
             <Box
               sx={{
                 display: "flex",
@@ -208,7 +194,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
                 alignItems: "center",
                 position: "absolute",
                 inset: 0,
-                backgroundColor: "rgba(255, 0, 0, 0.6)", // Semi-transparent red
+                backgroundColor: "rgba(255, 0, 0, 0.2)", // Semi-transparent red
                 zIndex: 1001, // Ensure it's above the uploading overlay
                 color: "white",
                 padding: 2,
@@ -223,7 +209,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
                 sx={{
                   color: "white",
                   backgroundColor: "rgba(0, 0, 0, 0.3)",
-                  '&:hover': {
+                  "&:hover": {
                     backgroundColor: "rgba(0, 0, 0, 0.5)",
                   },
                 }}
@@ -240,9 +226,9 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
           {/* Handling Images and Videos */}
           {["image", "video"].includes(attachment.type) ? (
             <>
-              {/* If the file is not downloaded */}
+              {/* If the file is not downloaded yet and status is not failed */}
               {!isFileDownloaded(attachment) &&
-              attachment.status === "uploading" || attachment.status === "failed" ? (
+              attachment.status !== "failed" ? (
                 attachment.type === "image" ? (
                   // Image Skeleton while downloading
                   <Skeleton

@@ -93,8 +93,7 @@ export class ChatService {
         participants: userId,
       })
         .sort({ updatedAt: -1 }) // Sort by the most recently updated chats
-        .select({ messages: { $slice: -25 } }) // Only fetch the latest message for preview
-        .lean(); // Use lean for faster reads as we're not modifying the data
+        .select({ messages: { $slice: -25 } }); // Only fetch the latest message for preview
 
       return chats;
     } catch (error) {
@@ -133,7 +132,7 @@ export class ChatService {
       const chat = await Chat.findOne({
         _id: chatId,
         participants: userId, // Ensure the user is a participant
-      }).lean();
+      });
 
       return chat;
     } catch (error) {
@@ -155,7 +154,7 @@ export class ChatService {
       const chats = await Chat.find({
         _id: { $in: objectChatIds },
         participants: userId, // Ensure the user is a participant
-      }).lean();
+      });
 
       return chats;
     } catch (error) {
@@ -556,7 +555,7 @@ export class ChatService {
         chatId,
         { $push: { messages: newMessage }, $set: { updatedAt: new Date() } },
         { new: true, runValidators: true }
-      ).lean();
+      );
 
       if (!chat) {
         throw new Error("Chat not found");
