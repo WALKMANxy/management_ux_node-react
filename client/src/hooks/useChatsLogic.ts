@@ -6,7 +6,6 @@ import {
   useAppSelector,
 } from "../app/hooks";
 import { selectUserId, selectUserRole } from "../features/auth/authSlice";
-import { uploadAttachments } from "../features/chat/api/chats";
 import {
   addAttachmentMessageReducer,
   addChatReducer,
@@ -20,7 +19,10 @@ import {
   updateChatReducer,
   updateReadStatusReducer,
 } from "../features/chat/chatSlice"; // Ensure correct selectors are imported
-import { fetchAllChatsThunk, uploadAttachmentsThunk } from "../features/chat/chatThunks";
+import {
+  fetchAllChatsThunk,
+  uploadAttachmentsThunk,
+} from "../features/chat/chatThunks";
 import { selectClientIds } from "../features/data/dataSlice";
 import { getAllUsersThunk, selectAllUsers } from "../features/users/userSlice";
 import { Attachment, IChat, IMessage } from "../models/dataModels";

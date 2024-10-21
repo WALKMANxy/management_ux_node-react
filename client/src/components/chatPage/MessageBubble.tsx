@@ -164,6 +164,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                   openFileViewer={openFileViewer}
                   downloadAndStoreFile={downloadAndStoreFile}
                   handleSave={handleSave}
+                  isOwnMessage={isOwnMessage}
                 />
               </Box>
             )}

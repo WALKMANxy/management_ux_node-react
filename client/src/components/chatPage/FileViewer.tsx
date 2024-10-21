@@ -324,7 +324,7 @@ const FileViewer: React.FC<FileViewerProps> = ({
                 />
               )}
 
-              {isVideo && isFileDownloaded(currentFile) && (
+{isVideo && (isPreview || isFileDownloaded(currentFile)) && (
                 <video
                   src={getImageSrc(currentFile)}
                   controls
@@ -338,7 +338,7 @@ const FileViewer: React.FC<FileViewerProps> = ({
               )}
 
               {/* Mock Video Player */}
-              {isVideo && !isFileDownloaded(currentFile) && (
+              {isVideo && !isFileDownloaded(currentFile) && !isPreview && (
                 <Box
                   sx={{
                     position: "relative",

@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Async thunk to fetch all chats for the user
 
-import { createAsyncThunk, Dispatch } from "@reduxjs/toolkit";
-import { toast } from "sonner";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import imageCompression from "browser-image-compression";
 import { RootState } from "../../app/store";
 import { Attachment, IChat, IMessage } from "../../models/dataModels";
 import { showToast } from "../../services/toastMessage";
@@ -22,7 +22,6 @@ import {
   uploadAttachmentFailed,
   uploadComplete,
 } from "./chatSlice";
-import imageCompression from "browser-image-compression";
 
 interface FetchOlderMessagesParams {
   chatId: string;
@@ -190,15 +189,32 @@ export const updateReadStatusThunk = createAsyncThunk<
   }
 );
 
-// Thunk action to retry failed attachments
-export const retryFailedAttachments =
-  (chatId: string, messageLocalId: string) =>
-  async (dispatch: Dispatch, getState: () => RootState) => {
+// Define the payload structure for the thunk
+interface RetryAttachmentsPayload {
+  chatId: string;
+  messageLocalId: string;
+}
+
+// Define the thunk
+export const retryFailedAttachmentsThunk = createAsyncThunk<
+  void, // Return type
+  RetryAttachmentsPayload, // Argument type
+  { state: RootState; rejectValue: string } // ThunkAPI config
+>(
+  "chats/retryFailedAttachments",
+  async (
+    { chatId, messageLocalId },
+    { dispatch, getState, rejectWithValue }
+  ) => {
+    console.groupCollapsed(
+      `Retrying failed attachments for chatId=${chatId}, messageLocalId=${messageLocalId}`
+    );
+
     const state = getState();
     const chat = state.chats.chats[chatId];
     if (!chat) {
       console.error("Chat does not exist in the state.");
-      return;
+      return rejectWithValue("Chat does not exist in the state.");
     }
 
     const message = chat.messages.find(
@@ -206,10 +222,10 @@ export const retryFailedAttachments =
     );
     if (!message) {
       console.error("Message does not exist in the state.");
-      return;
+      return rejectWithValue("Message does not exist in the state.");
     }
 
-    console.log(`Retrying failed attachments for message: ${message.local_id}`);
+    console.log(`Found message: ${message.local_id}`);
 
     // Find failed attachments
     const failedAttachments = message.attachments.filter(
@@ -220,23 +236,65 @@ export const retryFailedAttachments =
       console.log("No failed attachments to retry.");
       return;
     }
+
+    console.log(
+      `Found ${failedAttachments.length} failed attachment(s) to retry.`
+    );
+
+    let hasFailed = false; // Flag to track any failures
+    const uploadedAttachments: Attachment[] = [];
+
     for (const attachment of failedAttachments) {
       try {
         console.log(`Retrying upload for attachment: ${attachment.fileName}`);
 
-        // Request a new pre-signed URL for the file
-        const uploadUrl = await getChatFileUploadUrl(
-          attachment.chatId!,
-          attachment.messageId!,
-          encodeURIComponent(attachment.fileName)
+        // Validate attachment properties
+        if (!attachment.file || !attachment.chatId || !attachment.messageId) {
+          console.error(
+            "Attachment is missing required properties. Skipping this attachment."
+          );
+          continue;
+        }
+
+        // Compress images if applicable
+        let fileToUpload = attachment.file;
+        if (attachment.type === "image") {
+          const options = {
+            maxSizeMB: 0.3,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+          };
+          console.log(`Compressing image: ${fileToUpload.name}`);
+          fileToUpload = await imageCompression(attachment.file, options);
+          console.log(
+            `Image compressed: original size=${attachment.file.size}, new size=${fileToUpload.size}`
+          );
+        }
+
+        console.log(
+          `Requesting new pre-signed URL for file: ${attachment.fileName}`
         );
-        console.log(`Received pre-signed URL for retry: ${uploadUrl}`);
+        const fileName = encodeURIComponent(attachment.fileName);
+
+        const uploadUrl = await getChatFileUploadUrl(
+          attachment.chatId,
+          attachment.messageId,
+          fileName
+        );
+
+        console.log(`Received new pre-signed URL: ${uploadUrl}`);
+
+        console.log(`Uploading to S3 via pre-signed URL: ${uploadUrl}`);
+
         // Upload the file to S3
         await uploadFileToS3(
-          attachment.file!, // Now accessible
+          fileToUpload,
           uploadUrl,
-          attachment.fileName,
+          fileName,
           (progress: number) => {
+            console.log(
+              `Dispatching progress update: progress=${progress}% for attachment ${attachment.fileName}`
+            );
             dispatch(
               updateAttachmentProgress({
                 chatId: attachment.chatId!,
@@ -247,14 +305,44 @@ export const retryFailedAttachments =
             );
           }
         );
-        console.log(
-          `Attachment ${attachment.fileName} re-uploaded successfully.`
-        );
-      } catch (error) {
+
+        // After upload completes, retrieve the updated attachment from the store
+        const updatedState = getState();
+        const updatedAttachment = selectAttachment(updatedState, {
+          chatId: attachment.chatId,
+          messageLocalId: attachment.messageId!,
+          attachmentFileName: attachment.fileName,
+        });
+
+        if (updatedAttachment) {
+          uploadedAttachments.push({
+            ...updatedAttachment,
+            url: uploadUrl.split("?")[0],
+          });
+          console.log(
+            `Attachment ${attachment.fileName} re-uploaded successfully.`
+          );
+        } else {
+          console.error(
+            `Failed to retrieve attachment ${attachment.fileName} from the store.`
+          );
+          hasFailed = true;
+          dispatch(
+            uploadAttachmentFailed({
+              chatId: attachment.chatId!,
+              messageLocalId: attachment.messageId!,
+              attachmentFileName: attachment.fileName,
+            })
+          );
+          continue;
+        }
+      } catch (error: any) {
         console.error(
           `Failed to re-upload attachment ${attachment.fileName}:`,
           error
         );
+        hasFailed = true; // Mark that at least one attachment failed
+
         dispatch(
           uploadAttachmentFailed({
             chatId: attachment.chatId!,
@@ -262,25 +350,39 @@ export const retryFailedAttachments =
             attachmentFileName: attachment.fileName,
           })
         );
+        continue;
       }
     }
-    // After retrying all, check if all attachments are now uploaded
-    const updatedState = getState();
-    const updatedChat = updatedState.chats.chats[chatId];
-    const updatedMessage = updatedChat.messages.find(
-      (msg) => msg.local_id === messageLocalId
-    );
-    if (updatedMessage?.attachments.every((att) => att.status === "uploaded")) {
+
+    console.log(`Finished retrying attachments.`);
+
+    if (!hasFailed) {
+      // All attachments uploaded successfully
+      const updatedMessage: IMessage = {
+        ...message,
+        attachments: message.attachments.map((att) => {
+          const uploaded = uploadedAttachments.find(
+            (u) => u.fileName === att.fileName
+          );
+          return uploaded ? uploaded : att;
+        }),
+      };
+
+      console.log(
+        `All attachments re-uploaded successfully. Dispatching uploadComplete.`
+      );
       dispatch(uploadComplete({ chatId, message: updatedMessage }));
-      toast.success("All attachments uploaded successfully.");
+      // Optionally, display a success toast
+      // toast.success("All attachments re-uploaded successfully.");
     } else {
-      console.warn("Some attachments still failed to upload after retry.");
-      toast.info("Some attachments failed to upload. Please retry.");
-      // Optionally, you can implement further actions or notifications
+      console.warn("Some attachments failed to re-upload.");
+      // Optionally, display a warning toast
+      // toast.warn("Some attachments failed to re-upload. Please try again.");
     }
-  };
 
-
+    console.groupEnd();
+  }
+);
 
 // Define the payload structure for the thunk
 interface UploadAttachmentsPayload {
@@ -295,21 +397,29 @@ export const uploadAttachmentsThunk = createAsyncThunk<
 >(
   "chats/uploadAttachments",
   async ({ chatId, message }, { dispatch, getState, rejectWithValue }) => {
-    console.groupCollapsed(`Starting attachment upload for chatId=${chatId}, messageId=${message.local_id}`);
+    console.groupCollapsed(
+      `Starting attachment upload for chatId=${chatId}, messageId=${message.local_id}`
+    );
     const uploadedAttachments: Attachment[] = [];
     let hasFailed = false; // Flag to track any failures
 
     for (const attachment of message.attachments) {
-      console.log(`Processing attachment: file=${attachment.file?.name}, type=${attachment.type}`);
+      console.log(
+        `Processing attachment: file=${attachment.file?.name}, type=${attachment.type}`
+      );
 
       // Validate attachment properties
       if (!attachment.file || !attachment.chatId || !attachment.messageId) {
-        console.error("Attachment is missing required properties. Skipping this attachment.");
+        console.error(
+          "Attachment is missing required properties. Skipping this attachment."
+        );
         continue;
       }
 
       try {
-        console.log(`Uploading attachment: file=${attachment.file.name}, type=${attachment.type}`);
+        console.log(
+          `Uploading attachment: file=${attachment.file.name}, type=${attachment.type}`
+        );
 
         // Compress images if applicable
         let fileToUpload = attachment.file;
@@ -321,30 +431,43 @@ export const uploadAttachmentsThunk = createAsyncThunk<
           };
           console.log(`Compressing image: ${fileToUpload.name}`);
           fileToUpload = await imageCompression(attachment.file, options);
-          console.log(`Image compressed: original size=${attachment.file.size}, new size=${fileToUpload.size}`);
+          console.log(
+            `Image compressed: original size=${attachment.file.size}, new size=${fileToUpload.size}`
+          );
         }
 
-        console.log(`Requesting pre-signed URL for file: ${attachment.fileName}`);
+        console.log(
+          `Requesting pre-signed URL for file: ${attachment.fileName}`
+        );
         const fileName = encodeURIComponent(attachment.fileName);
 
-        const uploadUrl = await getChatFileUploadUrl(attachment.chatId, attachment.messageId, fileName);
+        const uploadUrl = await getChatFileUploadUrl(
+          attachment.chatId,
+          attachment.messageId,
+          fileName
+        );
 
         console.log(`Received pre-signed URL: ${uploadUrl}`);
 
         console.log(`Uploading to S3 via pre-signed URL: ${uploadUrl}`);
 
         // Upload the file to S3
-        await uploadFileToS3(fileToUpload, uploadUrl, fileName, (progress: number) => {
-          console.log(`Dispatching progress update: progress=${progress}%`);
-          dispatch(
-            updateAttachmentProgress({
-              chatId: attachment.chatId!,
-              messageLocalId: attachment.messageId!,
-              attachmentFileName: attachment.fileName,
-              progress,
-            })
-          );
-        });
+        await uploadFileToS3(
+          fileToUpload,
+          uploadUrl,
+          fileName,
+          (progress: number) => {
+            // console.log(`Dispatching progress update: progress=${progress}%`);
+            dispatch(
+              updateAttachmentProgress({
+                chatId: attachment.chatId!,
+                messageLocalId: attachment.messageId!,
+                attachmentFileName: attachment.fileName,
+                progress,
+              })
+            );
+          }
+        );
 
         // After upload completes, retrieve the updated attachment from the store
         const state = getState();
@@ -360,8 +483,12 @@ export const uploadAttachmentsThunk = createAsyncThunk<
             url: uploadUrl.split("?")[0],
           });
         } else {
-          console.error(`Failed to retrieve attachment ${attachment.fileName} from the store.`);
-          return rejectWithValue(`Failed to retrieve attachment ${attachment.fileName} from the store.`);
+          console.error(
+            `Failed to retrieve attachment ${attachment.fileName} from the store.`
+          );
+          return rejectWithValue(
+            `Failed to retrieve attachment ${attachment.fileName} from the store.`
+          );
         }
 
         console.log("Uploaded attachments:", uploadedAttachments);
