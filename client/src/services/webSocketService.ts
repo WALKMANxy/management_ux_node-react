@@ -47,7 +47,6 @@ type AutomatedMessageQueueItem = {
 
 class WebSocketService {
   private socket: Socket | null = null;
-  private maxReconnectAttempts = 15;
   private listenersSetUp = false;
 
   // Queues to handle offline updates with size limits
@@ -63,16 +62,28 @@ class WebSocketService {
 
   private offlineAutomatedMessageQueue: AutomatedMessageQueueItem[] = [];
   private connectionLostToastId = "connectionLostToast";
+  private isConnectionLost = false;
+
 
   // Inject the store reference at runtime
   injectStore(_store: AppStore) {
     store = _store;
   }
 
-   // To manage timeouts
-   private timeoutIds: NodeJS.Timeout[] = [];
+  // To manage timeouts
+  private timeoutIds: NodeJS.Timeout[] = [];
 
-
+  // Handle visibility changes
+  private handleVisibilityChange = () => {
+    if (
+      document.visibilityState === "visible" &&
+      this.socket &&
+      !this.socket.connected
+    ) {
+      console.log("Tab is visible. Attempting to reconnect WebSocket.");
+      this.socket.connect();
+    }
+  };
 
   private enqueue<T>(queue: T[], item: T) {
     if (queue.length >= this.MAX_QUEUE_SIZE) {
@@ -103,15 +114,14 @@ class WebSocketService {
         authorization: `Bearer ${accessToken}`,
       },
       reconnection: true, // Enable reconnection
-      reconnectionAttempts: this.maxReconnectAttempts, // Set maximum attempts
-      reconnectionDelay: 5000, // Initial delay before reconnection
-      reconnectionDelayMax: 30000, // Maximum delay between attempts
       autoConnect: false, // Control when to connect
     });
 
     this.setupEventListeners();
     this.listenersSetUp = true;
     this.socket.connect(); // Initiate the connection
+
+    document.addEventListener("visibilitychange", this.handleVisibilityChange);
   }
 
   isConnected(): boolean {
@@ -127,20 +137,13 @@ class WebSocketService {
     this.socket.on("connect_error", this.handleConnectError);
 
     // Handle unauthorized reconnect due to token expiry
-    this.socket.on("reconnect_error", this.handleReconnectError);
-
+    this.socket.on("reconnect:unauthorized", this.handleReconnectUnauthorized);
 
     // Handle reconnection attempts
     this.socket.on("reconnect_attempt", () => {
       // console.log(`Reconnection attempt ${attempt}`);
       // Optionally, update UI or state
     });
-
-    this.socket.on("reconnect_failed", this.handleReconnectFailed);
-
-
-    this.socket.on("reconnect", this.handleReconnect);
-
 
     // Handle incoming chat events
     this.socket.on("chat:newMessage", this.handleNewMessage);
@@ -149,51 +152,64 @@ class WebSocketService {
     this.socket.on("chat:updatedChat", this.handleUpdatedChat);
   }
 
-  private handleConnect = () => {
-    toast.dismiss(this.connectionLostToastId);
-    this.flushOfflineQueues();
-  };
+// Modify handleDisconnect
+private handleDisconnect = (reason: string) => {
+  console.warn(`WebSocket disconnected: ${reason}`);
 
-  private handleDisconnect = (reason: string) => {
-    console.warn(`WebSocket disconnected: ${reason}`);
-    if (!toast(this.connectionLostToastId)) {
-      toast.error(t("webSocketService.lostConnection"), {
-        id: this.connectionLostToastId,
-        duration: Infinity,
-      });
-    }
-  };
-
-  private handleConnectError = (error: Error) => {
-    console.error("WebSocket connection error:", error);
-    if (!toast(this.connectionLostToastId)) {
-      toast.error(t("webSocketService.connectionError"), {
-        id: this.connectionLostToastId,
-        duration: Infinity,
-      });
-    }
-  };
-
-  private handleReconnectError = (error: Error) => {
-    if (error.message === "Unauthorized") {
-      this.handleTokenExpiry();
-    }
-  };
-
-  private handleReconnectFailed = () => {
-    console.error("Reconnection attempts failed.");
-    toast.error(t("webSocketService.connectionLost"), {
+  if (!this.isConnectionLost) {
+    // Show a loading toast indicating connection loss
+    toast.loading(t("webSocketService.lostConnection"), {
       id: this.connectionLostToastId,
+      duration: Infinity,
     });
-  };
+    this.isConnectionLost = true;
+  }
+};
 
-  private handleReconnect = () => {
+// Modify handleConnect
+private handleConnect = () => {
+  console.log("WebSocket connected.");
+
+  if (this.isConnectionLost) {
+    // Dismiss the connection lost toast if it's active
     toast.dismiss(this.connectionLostToastId);
-    toast.success(t("webSocketService.reconnected"), {
-      id: "reconnectedToast",
+    this.isConnectionLost = false;
+  }
+
+  // Show a success toast
+  toast.success(t("webSocketService.connected"), {
+    duration: 500,
+  });
+
+  this.flushOfflineQueues();
+};
+
+// Optionally, handle specific connect_error
+private handleConnectError = (error: Error) => {
+  console.error("WebSocket connection error:", error);
+
+  if (!this.isConnectionLost) {
+    // Show a loading toast indicating connection loss
+    toast.loading(t("webSocketService.connectionLost"), {
+      id: this.connectionLostToastId,
+      duration: Infinity,
     });
-    this.flushOfflineQueues();
-  };
+    this.isConnectionLost = true;
+  }
+};
+
+// Define the handler
+private handleReconnectUnauthorized = () => {
+  console.warn("Unauthorized reconnect attempt detected.");
+
+  // Optionally, show a specific toast or directly handle logout
+  toast.error(t("webSocketService.unauthorized"), {
+    duration: 3000,
+  });
+
+  // Trigger token refresh or logout
+  this.handleTokenExpiry();
+};
 
 
   private handleTokenExpiry = async () => {
@@ -276,7 +292,9 @@ class WebSocketService {
     const currentUserId = state.auth.userId;
 
     if (!chatExists) {
-      console.log(`Chat with ID ${chatId} does not exist. Fetching chat from server.`);
+      console.log(
+        `Chat with ID ${chatId} does not exist. Fetching chat from server.`
+      );
       try {
         const chat = await fetchChatById(chatId);
         console.log("Fetched chat:", chat);
@@ -319,8 +337,8 @@ class WebSocketService {
     this.timeoutIds.push(firstTimeout);
   };
 
-   // Handle incoming message read event
-   public handleMessageRead = ({
+  // Handle incoming message read event
+  public handleMessageRead = ({
     chatId,
     userId,
     messageIds,
@@ -393,48 +411,44 @@ class WebSocketService {
     }
   };
 
- // Emit a new message to the server
- public emitNewMessage(chatId: string, message: IMessage) {
-  // console.log(`Emitting new message to chat ${chatId}:`, message);
+  // Emit a new message to the server
+  public emitNewMessage(chatId: string, message: IMessage) {
+    // console.log(`Emitting new message to chat ${chatId}:`, message);
 
-  if (!this.socket || !this.socket.connected) {
-    console.warn("Socket disconnected. Queuing outgoing message.");
-    this.enqueue(this.offlineMessageQueue, { chatId, message });
+    if (!this.socket || !this.socket.connected) {
+      console.warn("Socket disconnected. Queuing outgoing message.");
+      this.enqueue(this.offlineMessageQueue, { chatId, message });
 
+      return;
+    }
 
-    return;
+    // console.log("Sending message to server via WebSocket.");
+    this.socket.emit(
+      "chat:message",
+      { chatId, message },
+      (ack: { success: boolean }) => {
+        // console.log(`Server acknowledged message with success=${ack.success}`);
+        if (!ack.success) {
+          console.warn("Message delivery failed. Queuing message.");
+          this.enqueue(this.offlineMessageQueue, { chatId, message });
+        }
+      }
+    );
+
+    const ackTimeout = setTimeout(() => {
+      const isMessagePending = this.offlineMessageQueue.find(
+        (msg) => msg.message.local_id === message.local_id
+      );
+      if (isMessagePending) {
+        console.warn("Message acknowledgment timeout. Marking as failed.");
+        // console.log("Dispatching uploadFailed reducer due to timeout.");
+      }
+    }, 5000);
+    this.timeoutIds.push(ackTimeout);
   }
 
-  // console.log("Sending message to server via WebSocket.");
-  this.socket.emit(
-    "chat:message",
-    { chatId, message },
-    (ack: { success: boolean }) => {
-      // console.log(`Server acknowledged message with success=${ack.success}`);
-      if (!ack.success) {
-        console.warn("Message delivery failed. Queuing message.");
-        this.enqueue(this.offlineMessageQueue, { chatId, message });
-
-
-      }
-    }
-  );
-
-  const ackTimeout = setTimeout(() => {
-    const isMessagePending = this.offlineMessageQueue.find(
-      (msg) => msg.message.local_id === message.local_id
-    );
-    if (isMessagePending) {
-      console.warn("Message acknowledgment timeout. Marking as failed.");
-      // console.log("Dispatching uploadFailed reducer due to timeout.");
-
-    }
-  }, 5000);
-  this.timeoutIds.push(ackTimeout);
-}
-
-   // Emit a message read event to the server
-   public emitMessageRead(chatId: string, messageIds: string[]) {
+  // Emit a message read event to the server
+  public emitMessageRead(chatId: string, messageIds: string[]) {
     if (!this.socket || !this.socket.connected) {
       console.warn("Socket disconnected. Queuing read status update.");
       this.enqueue(this.offlineReadStatusQueue, { chatId, messageIds });
@@ -444,17 +458,16 @@ class WebSocketService {
     this.socket.emit("chat:read", { chatId, messageIds });
   }
 
+  // Emit a new chat creation event to the server
+  public emitNewChat(chat: IChat) {
+    if (!this.socket || !this.socket.connected) {
+      console.warn("Socket disconnected. Queuing outgoing chat creation.");
+      this.enqueue(this.offlineChatQueue, { chat });
+      return;
+    }
 
- // Emit a new chat creation event to the server
- public emitNewChat(chat: IChat) {
-  if (!this.socket || !this.socket.connected) {
-    console.warn("Socket disconnected. Queuing outgoing chat creation.");
-    this.enqueue(this.offlineChatQueue, { chat });
-    return;
+    this.socket.emit("chat:create", { chat });
   }
-
-  this.socket.emit("chat:create", { chat });
-}
 
   // Emit a chat update event to the server
   public emitUpdateChat(chatId: string, updatedData: Partial<IChat>) {
@@ -477,23 +490,29 @@ class WebSocketService {
     this.socket.emit("chat:automatedMessage", { targetIds, message });
   }
 
- // Clean up and disconnect
- disconnect() {
-  if (this.socket) {
-    this.socket.removeAllListeners();
-    this.socket.disconnect();
-    this.socket = null;
-    this.listenersSetUp = false;
+  // Clean up and disconnect
+  disconnect() {
+    if (this.socket) {
+      this.socket.removeAllListeners();
+      this.socket.disconnect();
+      this.socket = null;
+      this.listenersSetUp = false;
 
-    // Clear all pending timeouts
-    this.timeoutIds.forEach((id) => clearTimeout(id));
-    this.timeoutIds = [];
+      // Clear all pending timeouts
+      this.timeoutIds.forEach((id) => clearTimeout(id));
+      this.timeoutIds = [];
 
-    // Dismiss all persistent toasts
-    toast.dismiss(this.connectionLostToastId);
-    toast.dismiss("reconnectedToast");
+      // Dismiss all persistent toasts
+      toast.dismiss(this.connectionLostToastId);
+      toast.dismiss("reconnectedToast");
+    }
+
+    // Remove visibility change listener
+    document.removeEventListener(
+      "visibilitychange",
+      this.handleVisibilityChange
+    );
   }
-}
 }
 
 export const webSocketService = new WebSocketService();

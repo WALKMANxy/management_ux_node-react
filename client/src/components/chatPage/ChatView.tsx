@@ -38,6 +38,8 @@ const ChatView: React.FC = () => {
   const dispatch = useAppDispatch();
   const [open, setOpen] = React.useState(false);
 
+/*   console.log("ChatView rendering now");
+ */
   const {
     currentChat,
     sortedMessages,
@@ -50,9 +52,8 @@ const ChatView: React.FC = () => {
     getAdminAvatar,
     participantsData,
     currentUserId,
-  } = useChatView(); // Destructure the hook values
+  } = useChatView();
 
-  // Centralize useFilePreview here
   const {
     isViewerOpen,
     closeFileViewer,
@@ -70,9 +71,7 @@ const ChatView: React.FC = () => {
   const downloadedFiles = useAppSelector(selectDownloadedFiles);
 
   // Hook for loading older messages
-  const { messagesContainerRef, topRef } = useLoadOlderMessages(
-    currentChat?._id || null
-  );
+  const { messagesContainerRef, topRef } = useLoadOlderMessages(currentChat?._id);
 
 
   const handleBackToChats = () => {
@@ -302,6 +301,7 @@ const ChatView: React.FC = () => {
           handleFileSelect={handleFileSelect}
           closeFileViewer={closeFileViewer}
           isPreview={isPreview}
+          isViewerOpen={isViewerOpen}
         />
       </Box>
 

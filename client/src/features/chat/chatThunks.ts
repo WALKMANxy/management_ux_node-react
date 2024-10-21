@@ -189,7 +189,6 @@ export const updateReadStatusThunk = createAsyncThunk<
 );
 
 // Thunk action to retry failed attachments
-// Thunk action to retry failed attachments
 export const retryFailedAttachments =
   (chatId: string, messageLocalId: string) =>
   async (dispatch: Dispatch, getState: () => RootState) => {
@@ -207,6 +206,8 @@ export const retryFailedAttachments =
       console.error("Message does not exist in the state.");
       return;
     }
+
+    console.log(`Retrying failed attachments for message: ${message.local_id}`);
 
     // Find failed attachments
     const failedAttachments = message.attachments.filter(

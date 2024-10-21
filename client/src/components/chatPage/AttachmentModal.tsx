@@ -18,10 +18,13 @@ const AttachmentModal: React.FC<AttachmentModalProps> = ({
   isOpen,
   onClose,
   onFileSelect,
+
 }) => {
   const { t } = useTranslation();
 
   const isDesktop = useMediaQuery("(min-width:800px)");
+
+
 
 
 
