@@ -467,8 +467,8 @@ const FileViewer: React.FC<FileViewerProps> = ({
               isPreview={true}
               canUserChat={true}
               attachments={selectedAttachments}
-              viewingFiles={true}
               closeFileViewer={closeFileViewer}
+              viewingFiles={true}
             />
           </Box>
         )}

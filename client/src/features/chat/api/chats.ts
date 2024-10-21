@@ -238,6 +238,7 @@ export const uploadAttachments = async (
         ...attachment,
         url: uploadUrl.split("?")[0], // Remove signed query parameters
       });
+      console.log("Uploaded attachments:", uploadedAttachments);
 
       console.log(`Attachment uploaded successfully: ${fileToUpload.name}`);
     } catch (error) {

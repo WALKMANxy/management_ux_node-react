@@ -37,8 +37,9 @@ const store = configureStore({
       .concat(listenerMiddleware.middleware)
       .concat(calendarApi.middleware)
       .concat(weatherApi.middleware),
+  // Enable Redux DevTools only in development mode
+  devTools: process.env.NODE_ENV !== "production",
 });
-
 /**
  * Subscribe to store updates to handle state persistence.
  *
