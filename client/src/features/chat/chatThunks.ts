@@ -4,7 +4,7 @@
 import { createAsyncThunk, Dispatch } from "@reduxjs/toolkit";
 import { toast } from "sonner";
 import { RootState } from "../../app/store";
-import { IChat, IMessage } from "../../models/dataModels";
+import { Attachment, IChat, IMessage } from "../../models/dataModels";
 import { showToast } from "../../services/toastMessage";
 import { getChatFileUploadUrl, uploadFileToS3 } from "../data/api/media";
 import {
@@ -17,10 +17,12 @@ import {
   updateReadStatus,
 } from "./api/chats";
 import {
+  selectAttachment,
   updateAttachmentProgress,
   uploadAttachmentFailed,
   uploadComplete,
 } from "./chatSlice";
+import imageCompression from "browser-image-compression";
 
 interface FetchOlderMessagesParams {
   chatId: string;
@@ -277,3 +279,124 @@ export const retryFailedAttachments =
       // Optionally, you can implement further actions or notifications
     }
   };
+
+
+
+// Define the payload structure for the thunk
+interface UploadAttachmentsPayload {
+  chatId: string;
+  message: IMessage;
+}
+
+export const uploadAttachmentsThunk = createAsyncThunk<
+  void, // Return type
+  UploadAttachmentsPayload, // Argument type
+  { state: RootState; rejectValue: string } // ThunkAPI config
+>(
+  "chats/uploadAttachments",
+  async ({ chatId, message }, { dispatch, getState, rejectWithValue }) => {
+    console.groupCollapsed(`Starting attachment upload for chatId=${chatId}, messageId=${message.local_id}`);
+    const uploadedAttachments: Attachment[] = [];
+    let hasFailed = false; // Flag to track any failures
+
+    for (const attachment of message.attachments) {
+      console.log(`Processing attachment: file=${attachment.file?.name}, type=${attachment.type}`);
+
+      // Validate attachment properties
+      if (!attachment.file || !attachment.chatId || !attachment.messageId) {
+        console.error("Attachment is missing required properties. Skipping this attachment.");
+        continue;
+      }
+
+      try {
+        console.log(`Uploading attachment: file=${attachment.file.name}, type=${attachment.type}`);
+
+        // Compress images if applicable
+        let fileToUpload = attachment.file;
+        if (attachment.type === "image") {
+          const options = {
+            maxSizeMB: 0.3,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+          };
+          console.log(`Compressing image: ${fileToUpload.name}`);
+          fileToUpload = await imageCompression(attachment.file, options);
+          console.log(`Image compressed: original size=${attachment.file.size}, new size=${fileToUpload.size}`);
+        }
+
+        console.log(`Requesting pre-signed URL for file: ${attachment.fileName}`);
+        const fileName = encodeURIComponent(attachment.fileName);
+
+        const uploadUrl = await getChatFileUploadUrl(attachment.chatId, attachment.messageId, fileName);
+
+        console.log(`Received pre-signed URL: ${uploadUrl}`);
+
+        console.log(`Uploading to S3 via pre-signed URL: ${uploadUrl}`);
+
+        // Upload the file to S3
+        await uploadFileToS3(fileToUpload, uploadUrl, fileName, (progress: number) => {
+          console.log(`Dispatching progress update: progress=${progress}%`);
+          dispatch(
+            updateAttachmentProgress({
+              chatId: attachment.chatId!,
+              messageLocalId: attachment.messageId!,
+              attachmentFileName: attachment.fileName,
+              progress,
+            })
+          );
+        });
+
+        // After upload completes, retrieve the updated attachment from the store
+        const state = getState();
+        const updatedAttachment = selectAttachment(state, {
+          chatId: attachment.chatId,
+          messageLocalId: attachment.messageId!,
+          attachmentFileName: attachment.fileName,
+        });
+
+        if (updatedAttachment) {
+          uploadedAttachments.push({
+            ...updatedAttachment,
+            url: uploadUrl.split("?")[0],
+          });
+        } else {
+          console.error(`Failed to retrieve attachment ${attachment.fileName} from the store.`);
+          return rejectWithValue(`Failed to retrieve attachment ${attachment.fileName} from the store.`);
+        }
+
+        console.log("Uploaded attachments:", uploadedAttachments);
+        console.log(`Attachment uploaded successfully: ${fileToUpload.name}`);
+      } catch (error: any) {
+        console.error("Failed to upload attachment:", error);
+        hasFailed = true; // Mark that at least one attachment failed
+
+        dispatch(
+          uploadAttachmentFailed({
+            chatId: attachment.chatId,
+            messageLocalId: attachment.messageId!,
+            attachmentFileName: attachment.fileName,
+          })
+        );
+        continue;
+      }
+    }
+
+    console.log(`Finished processing all attachments.`);
+
+    if (hasFailed) {
+      console.warn("Some attachments failed to upload.");
+      // Optionally, handle additional logic for partial failures here
+    } else {
+      // All attachments uploaded successfully
+      const updatedMessage: IMessage = {
+        ...message,
+        attachments: uploadedAttachments,
+      };
+
+      console.log(`All attachments uploaded. Dispatching uploadComplete.`);
+      dispatch(uploadComplete({ chatId, message: updatedMessage }));
+    }
+
+    console.groupEnd();
+  }
+);

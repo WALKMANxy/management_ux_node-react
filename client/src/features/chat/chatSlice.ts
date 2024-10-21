@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WritableDraft } from "immer";
 import { createSelector } from "reselect";
 import { RootState } from "../../app/store";
-import { IChat, IMessage } from "../../models/dataModels";
+import { Attachment, IChat, IMessage } from "../../models/dataModels";
 import {
   createChatThunk,
   createMessageThunk,
@@ -18,6 +18,8 @@ interface ChatState {
   chats: Record<string, IChat>; // Store chats by their IDs
   currentChat: IChat | null; // Currently selected chat
   status: "idle" | "loading" | "succeeded" | "failed"; // Status of the chat fetching/operations
+  fetchChatsStatus: "idle" | "loading" | "succeeded" | "failed";
+
   error: string | null; // To store any errors
 }
 
@@ -26,6 +28,8 @@ const initialState: ChatState = {
   chats: {}, // Chats stored by chat ID
   currentChat: null, // No chat selected initially
   status: "idle", // Initial status
+  fetchChatsStatus: "idle",
+
   error: null, // No errors initially
 };
 
@@ -326,19 +330,19 @@ const chatSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllChatsThunk.pending, (state) => {
-        state.status = "loading";
+        state.fetchChatsStatus = "loading";
         state.error = null;
       })
 
       .addCase(fetchAllChatsThunk.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.fetchChatsStatus = "succeeded";
         action.payload.forEach((chat: WritableDraft<IChat>) => {
           state.chats[chat._id!] = chat;
         });
       })
 
       .addCase(fetchAllChatsThunk.rejected, (state, action) => {
-        state.status = "failed";
+        state.fetchChatsStatus = "failed";
         state.error = action.payload as string;
       })
 
@@ -505,6 +509,9 @@ export const {
 
 export default chatSlice.reducer;
 
+export const selectFetchChatsStatus = (state: RootState) => state.chats.fetchChatsStatus;
+
+
 // Memoized selector for all chats
 export const selectAllChats = createSelector(
   (state: RootState) => state.chats.chats,
@@ -556,3 +563,28 @@ export const selectUnreadMessages = createSelector(
         !message.readBy.includes(userId) && message.sender !== userId
     ) || []
 );
+
+// src/store/slices/chatSlice.ts
+
+// Add this selector at the bottom of your chatSlice.ts file
+export const selectAttachment = (
+  state: RootState,
+  payload: { chatId: string; messageLocalId: string; attachmentFileName: string }
+): Attachment | undefined => {
+  const { chatId, messageLocalId, attachmentFileName } = payload;
+  const chat = state.chats.chats[chatId];
+  if (!chat) {
+    console.error(`Chat with ID ${chatId} does not exist in the state.`);
+    return undefined;
+  }
+  const message = chat.messages.find(msg => msg.local_id === messageLocalId);
+  if (!message) {
+    console.error(`Message with local_id ${messageLocalId} does not exist in chat ${chatId}.`);
+    return undefined;
+  }
+  const attachment = message.attachments.find(att => att.fileName === attachmentFileName);
+  if (!attachment) {
+    console.error(`Attachment with fileName ${attachmentFileName} does not exist in message ${messageLocalId}.`);
+  }
+  return attachment;
+};

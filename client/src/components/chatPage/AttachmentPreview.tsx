@@ -45,12 +45,14 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
   >({});
 
   useEffect(() => {
+    console.group("Downloading attachments");
     attachments.forEach((attachment) => {
       if (
         ["image"].includes(attachment.type) &&
         attachment.status === "uploaded" &&
         attachment.url.startsWith("https://") // Ensure it's a valid S3 URL
       ) {
+        console.log(`Downloading: ${attachment.fileName}`);
         // Fetch thumbnail for images/videos with progress tracking
         downloadAndStoreFile(attachment, (progress: number) => {
           setDownloadProgresses((prev) => ({
@@ -60,6 +62,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
         });
       }
     });
+    console.groupEnd();
   }, [attachments, downloadAndStoreFile]);
 
   // Handle downloading a file
@@ -96,10 +99,12 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
         (file) => file.fileName === attachment.fileName
       );
       if (downloadedFile) {
-        return downloadedFile.url; // Directly return the cached URL
+        return downloadedFile.url;
+      } else {
+        return attachment.url || ""; // Use the original URL or placeholder
       }
-      return undefined; // Indicate that the file is not yet downloaded
     },
+
     [downloadedFiles]
   );
 
@@ -228,7 +233,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
             <>
               {/* If the file is not downloaded yet and status is not failed */}
               {!isFileDownloaded(attachment) &&
-              attachment.status !== "failed" ? (
+              attachment.status !== "uploaded" ? (
                 attachment.type === "image" ? (
                   // Image Skeleton while downloading
                   <Skeleton
