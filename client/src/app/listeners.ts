@@ -48,7 +48,7 @@ let automatedMessageTimer: NodeJS.Timeout | null = null;
 let updateChatTimer: NodeJS.Timeout | null = null;
 
 // Debounce time in milliseconds to group similar WebSocket messages
-const DEBOUNCE_TIME = 100;
+const DEBOUNCE_TIME = 10;
 
 /**
  * Function to process read status updates in batches.

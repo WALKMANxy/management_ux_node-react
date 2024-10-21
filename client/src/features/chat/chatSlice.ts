@@ -140,13 +140,22 @@ const chatSlice = createSlice({
           (att) => att.fileName === attachmentFileName
         );
         if (attachment) {
+          // Set the status to "uploading" as soon as progress starts
+          if (progress > 0 && progress < 100) {
+            attachment.status = "uploading";
+          }
+
+          // Update the progress
           attachment.uploadProgress = progress;
+
+          // Set status to "uploaded" when progress reaches 100
           if (progress === 100) {
             attachment.status = "uploaded";
           }
         }
       }
     },
+
     // Marks the upload as failed for a specific attachment
     uploadAttachmentFailed: (
       state,
