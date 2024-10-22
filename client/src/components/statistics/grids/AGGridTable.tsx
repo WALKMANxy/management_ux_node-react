@@ -30,6 +30,8 @@ const AGGridTable = forwardRef<AgGridReact, AGGridTableProps>(
         suppressHeaderMenuButton: true,
         resizable: true, // Allow columns to be resizable
         sortable: true, // Enable sorting
+        suppressMovable: true, // Prevent column reordering
+        suppressDragLeaveHidesColumns: true, // Prevent column removal
       }),
       []
     );

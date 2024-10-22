@@ -10,7 +10,7 @@ import SidebarList from "./SidebarList";
 
 interface PromosSidebarProps {
   onCreatePromo: () => void;
-  onSelectPromo: (promo: Promo) => void;
+  onSelectPromo: (promoId: string) => void;
 }
 
 const PromosSidebar: React.FC<PromosSidebarProps> = ({
@@ -44,7 +44,7 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
   // Memoize the onSelect handler
   const handleSelectPromo = useCallback(
     (promo: Promo) => {
-      onSelectPromo(promo);
+      onSelectPromo(promo._id!);
     },
     [onSelectPromo]
   );

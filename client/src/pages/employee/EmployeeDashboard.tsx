@@ -1,12 +1,5 @@
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import {
-  Box,
-  Fab,
-  Grid,
-  Skeleton,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Box, Fab, Grid, Skeleton, useMediaQuery } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
@@ -22,8 +15,6 @@ import useLoadingData from "../../hooks/useLoadingData";
 
 const EmployeeDashboard: React.FC = () => {
   const { t } = useTranslation();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery("(min-width:900px) and (max-width:1250px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -44,16 +35,8 @@ const EmployeeDashboard: React.FC = () => {
   }, []);
 
   return (
-    <Box
-      className="employee-dashboard"
-      sx={{
-        px: isMobile ? 1 : 4,
-        bgcolor: "#f4f5f7",
-        position: "relative",
-        pt: isMobile ? 3 : 5,
-      }}
-    >
-      <Box sx={{ mt: 0 }}>
+    <>
+      <Box py={2}>
         {/* Welcome Message */}
         <WelcomeMessage
           name={user?.entityName}
@@ -86,7 +69,7 @@ const EmployeeDashboard: React.FC = () => {
             onClick={handleToggleDrawer}
             sx={{
               position: "absolute",
-              top: 40,
+              top: 80,
               right: 32,
               zIndex: 1000,
             }}
@@ -95,7 +78,7 @@ const EmployeeDashboard: React.FC = () => {
           </Fab>
         ))}
 
-      <Grid container spacing={6} mt={-2}>
+      <Grid container spacing={6} mt={-4}>
         {/* Left Side Components */}
         <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
           <Grid container spacing={3}>
@@ -173,7 +156,7 @@ const EmployeeDashboard: React.FC = () => {
             loadingState={
               userRole === "employee" || userRole === "client"
                 ? loading
-                : loadingState
+                : loading || loadingState
             }
             t={t}
             disableUpcomingVisits
@@ -188,7 +171,7 @@ const EmployeeDashboard: React.FC = () => {
           disableUpcomingVisits
         />
       )}
-    </Box>
+    </>
   );
 };
 

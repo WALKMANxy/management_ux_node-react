@@ -15,7 +15,7 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React, { useMemo, useState } from "react";
+import React, { lazy, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
@@ -26,11 +26,12 @@ import { useFilePreview } from "../../hooks/useFilePreview";
 import { IChat } from "../../models/dataModels";
 import { canUserChat } from "../../utils/chatUtils";
 import Spinner from "../common/Spinner";
-import CreateChatForm from "./CreateChatForm"; // Import CreateChatForm
 import FileViewer from "./FileViewer";
 import InputBox from "./InputBox";
 import RenderMessage from "./RenderMessage"; // Import the RenderMessage component
 import RenderParticipantsAvatars from "./RenderParticipantsAvatars"; // Import the RenderParticipantsAvatars component
+
+const CreateChatForm = lazy(() => import("./CreateChatForm"));
 
 const ChatView: React.FC = () => {
   const { t } = useTranslation();
@@ -38,8 +39,8 @@ const ChatView: React.FC = () => {
   const dispatch = useAppDispatch();
   const [open, setOpen] = React.useState(false);
 
-/*   console.log("ChatView rendering now");
- */
+  /*   console.log("ChatView rendering now");
+   */
   const {
     currentChat,
     sortedMessages,
@@ -71,8 +72,9 @@ const ChatView: React.FC = () => {
   const downloadedFiles = useAppSelector(selectDownloadedFiles);
 
   // Hook for loading older messages
-  const { messagesContainerRef, topRef } = useLoadOlderMessages(currentChat?._id);
-
+  const { messagesContainerRef, topRef } = useLoadOlderMessages(
+    currentChat?._id
+  );
 
   const handleBackToChats = () => {
     dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
