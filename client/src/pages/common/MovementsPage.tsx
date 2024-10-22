@@ -1,7 +1,7 @@
 // src/pages/common/MovementsPage.tsx
 
 import { Box, useMediaQuery } from "@mui/material";
-import React, { lazy, Suspense, useMemo } from "react";
+import React, { lazy, memo, Suspense, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import SkeletonDetails from "../../components/common/SkeletonDetails";
 import Spinner from "../../components/common/Spinner";
@@ -167,4 +167,4 @@ const MovementsPage: React.FC = () => {
   );
 };
 
-export default MovementsPage;
+export default memo(MovementsPage);

@@ -2,6 +2,7 @@
 
 import { keyframes } from "@emotion/react";
 import { memoize } from "lodash";
+import { UserRole } from "../models/entityModels";
 
 
 export const gradients = [
@@ -144,3 +145,16 @@ export const CLIENTS_OR_MESSAGES_PATHS = [
 ];
 
 export const SETTINGS_PATH = "/settings";
+
+export const ALLOWED_ROLES_FOR_PROTECTED_ROUTES: UserRole[] = [
+  "admin",
+  "client",
+  "agent",
+];
+
+export const ALLOWED_ROLES_FOR_UNPROTECTED_ROUTES: UserRole[] = [
+  "admin",
+  "client",
+  "agent",
+  "employee",
+];

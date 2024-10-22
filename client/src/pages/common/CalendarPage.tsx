@@ -11,7 +11,7 @@ import {
   useTheme,
 } from "@mui/material";
 import "animate.css"; // Add animate.css
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, memo, useEffect, useState } from "react";
 import { Calendar } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useTranslation } from "react-i18next";
@@ -290,4 +290,4 @@ const CalendarPage: React.FC = () => {
   );
 };
 
-export default CalendarPage;
+export default memo(CalendarPage);

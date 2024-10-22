@@ -1,6 +1,6 @@
 // src/pages/common/ClientsPage.tsx
 import { Box, useMediaQuery } from "@mui/material";
-import React, { lazy, Suspense, useEffect, useMemo } from "react";
+import React, { lazy, memo, Suspense, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
@@ -253,4 +253,4 @@ const ClientsPage: React.FC = () => {
   );
 };
 
-export default ClientsPage;
+export default memo(ClientsPage);
