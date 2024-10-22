@@ -423,6 +423,23 @@ export const uploadAttachmentsThunk = createAsyncThunk<
 
         // Compress images if applicable
         let fileToUpload = attachment.file;
+
+        /*    // Video compression using FFmpeg
+        if (attachment.type === "video") {
+          console.log(`Compressing video: ${fileToUpload.name}`);
+          const outputFileName = `${
+            fileToUpload.name.split(".")[0]
+          }-compressed.mp4`;
+          const compressedBlob = await compressVideo(
+            fileToUpload,
+            outputFileName
+          );
+          fileToUpload = blobToFile(compressedBlob, outputFileName); // Convert Blob to File
+          console.log(
+            `Video compressed: original size=${attachment.file.size}, new size=${fileToUpload.size}`
+          );
+        } */
+
         if (attachment.type === "image") {
           const options = {
             maxSizeMB: 0.3,

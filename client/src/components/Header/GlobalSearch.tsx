@@ -14,6 +14,8 @@ import { styled } from "@mui/system";
 import React, { KeyboardEvent, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../app/hooks";
+import { selectPromo, selectVisit } from "../../features/data/dataSlice";
 import useGlobalSearch from "../../hooks/useGlobalSearch";
 import { GlobalSearchProps } from "../../models/propsModels";
 import { SearchResult } from "../../models/searchModels";
@@ -67,6 +69,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const theme = useTheme();
+  const dispatch = useAppDispatch();
 
   const {
     input,
@@ -93,7 +96,12 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
             navigate("/clients");
             break;
           case "promo":
-            navigate("/promotions"); // Assuming you have a promotions route
+            dispatch(selectPromo(item.id!));
+            navigate("/promos");
+            break;
+          case "visit":
+            dispatch(selectVisit(item.id!));
+            navigate("/visits");
             break;
           default:
             navigate("/");
@@ -105,7 +113,14 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
       setShowResults(false);
       setSelectedIndex(-1);
     },
-    [isHeaderSearch, navigate, onSelect, setShowResults, setSelectedIndex]
+    [
+      isHeaderSearch,
+      navigate,
+      onSelect,
+      setShowResults,
+      setSelectedIndex,
+      dispatch,
+    ]
   );
 
   const handleKeyDownWrapper = (event: KeyboardEvent<HTMLInputElement>) => {

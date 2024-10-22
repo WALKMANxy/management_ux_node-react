@@ -1,9 +1,7 @@
 // src/utils/constants.ts
 
 import { keyframes } from "@emotion/react";
-import { memoize } from "lodash";
 import { UserRole } from "../models/entityModels";
-
 
 export const gradients = [
   "linear-gradient(135deg, #fffde7 30%, #fff9c4 100%)",
@@ -68,7 +66,7 @@ export const fadeIn = keyframes`
   }
 `;
 
-export const ChartData = memoize((categories: string[], data: number[]) => ({
+export const ChartData = (categories: string[], data: number[]) => ({
   options: {
     chart: {
       id: "basic-bar",
@@ -98,7 +96,7 @@ export const ChartData = memoize((categories: string[], data: number[]) => ({
       data,
     },
   ],
-}));
+});
 
 export const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 6);
@@ -106,13 +104,9 @@ export const generateRandomString = () => {
 
 export const paginationPageSizeSelector = [20, 50, 100, 200, 500];
 
-export const ignoreArticleNames = Object.freeze(new Set([
-  "RESO CARCASSA",
-  "TRASPORTO ",
-  "TRASPORTO URGENTE",
-]));
-
-
+export const ignoreArticleNames = Object.freeze(
+  new Set(["RESO CARCASSA", "TRASPORTO ", "TRASPORTO URGENTE"])
+);
 
 export const agentColorMap: { [key: string]: string } = Object.freeze({
   "10": "#FFFACD", // Lemon Chiffon (Fazio Adriano Salvatore)
@@ -131,7 +125,6 @@ export const agentColorMap: { [key: string]: string } = Object.freeze({
   "99": "#F4A460", // Sandy Brown (Seguito da Avvocato)
   "100": "#D3D3D3", // Light Grey (Non Assegnato)
 });
-
 
 // src/constants/routes.ts
 export const CLIENTS_OR_MESSAGES_PATHS = [

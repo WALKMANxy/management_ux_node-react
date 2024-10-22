@@ -1,17 +1,21 @@
-import PieChartIcon from "@mui/icons-material/PieChart";
-import {
-  Avatar,
-  Box,
-  Divider,
-  Paper,
-  Skeleton,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import { PieChart } from "@mui/x-charts/PieChart";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+import Paper from "@mui/material/Paper";
+import Skeleton from "@mui/material/Skeleton";
+import Typography from "@mui/material/Typography";
+import { useTheme } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { BrandData } from "../../../models/propsModels";
+
+// Dynamically import PieChartIcon and PieChart
+const PieChartIcon = React.lazy(() => import("@mui/icons-material/PieChart"));
+const PieChart = React.lazy(() =>
+  import("@mui/x-charts/PieChart").then((module) => ({
+    default: module.PieChart,
+  }))
+);
 
 const TopBrandsSold: React.FC<{
   topBrandsData: BrandData[];

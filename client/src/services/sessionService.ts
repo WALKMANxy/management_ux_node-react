@@ -1,6 +1,5 @@
 import axios from "axios";
 import { baseUrl } from "../utils/apiUtils";
-import { showToast } from "./toastMessage";
 import { setAccessToken } from "./tokenService";
 import { webSocketService } from "./webSocketService";
 
@@ -17,7 +16,6 @@ export async function refreshAccessToken(): Promise<boolean> {
     localAuthState = JSON.parse(sessionStorage.getItem("authState")!);
   } else {
     console.error("No authState available in local or session storage");
-    showToast.error("No authState available in local or session storage, logging out...");
     return false;
   }
   // console.log("Local auth state:", localAuthState);

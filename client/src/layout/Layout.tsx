@@ -22,9 +22,7 @@ const Layout: React.FC = () => {
     location.pathname === "/promos" ||
     location.pathname === "/calendar" ||
     location.pathname === "/movements" ||
-    location.pathname === "/employee-dashboard" ||
     location.pathname === "/articles" ||
-    location.pathname === "/dashboard" ||
     location.pathname === "/settings";
 
   const isMessagesPage = location.pathname === "/messages";
@@ -37,7 +35,7 @@ const Layout: React.FC = () => {
       } else if (isOtherPage) {
         return isMobile ? 0 : 2; // Other Pages: 0 on mobile, 4 on desktop
       } else {
-        return 4; // Default padding for unspecified pages on desktop
+        return 2; // Default padding for unspecified pages on desktop
       }
     };
   }, [isMessagesPage, isOtherPage, isMobile]);

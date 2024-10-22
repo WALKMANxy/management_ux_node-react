@@ -1,8 +1,8 @@
+/* eslint-disable react-refresh/only-export-components */
 import { lazy, Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Loader from "./components/common/Loader";
 import Layout from "./layout/Layout";
-import StatisticsDashboard from "./pages/statistics/StatisticsDashboard";
 import ProtectedRoute from "./ProtectedRoute";
 import {
   ALLOWED_ROLES_FOR_PROTECTED_ROUTES,
@@ -10,7 +10,7 @@ import {
 } from "./utils/constants";
 
 // Lazy load components for performance optimization
-export const LandingPage = lazy(() => import("./pages/landing/LandingPage"));
+const LandingPage = lazy(() => import("./pages/landing/LandingPage"));
 const ArticlesPage = lazy(() => import("./pages/common/ArticlesPage"));
 const CalendarPage = lazy(() => import("./pages/common/CalendarPage"));
 const ChatPage = lazy(() => import("./pages/common/ChatPage"));
@@ -21,6 +21,9 @@ const UserPage = lazy(() => import("./pages/common/UserPage"));
 const VisitsPage = lazy(() => import("./pages/common/VisitsPage"));
 const EmployeeDashboard = lazy(
   () => import("./pages/employee/EmployeeDashboard")
+);
+const StatisticsDashboard = lazy(
+  () => import("./pages/statistics/StatisticsDashboard")
 );
 
 const router = createBrowserRouter([
@@ -148,5 +151,4 @@ const router = createBrowserRouter([
   },
 ]);
 
-// eslint-disable-next-line react-refresh/only-export-components
 export default router;

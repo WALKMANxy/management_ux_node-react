@@ -1,8 +1,7 @@
 export type SearchResult = {
   id: string;
-  _id?:string;
   name: string;
-  type: "client" | "agent" | "article" | "promo" | "visit" | "alert";
+  type: "client" | "agent" | "article" | "promo" | "visit";
 
   notAvailable?: "Not Available";
 
@@ -28,7 +27,6 @@ export type SearchResult = {
   // (already covered by common fields)
 
   // Article-specific properties
-  articleId?: string;
   brand?: string;
   quantity?: number;
   unitPrice?: string;
@@ -53,16 +51,6 @@ export type SearchResult = {
   pending?: boolean;
   completed?: boolean;
   visitIssuedBy?: string;
-
-  // Alert-specific properties
-  alertReason?: string;
-  message?: string;
-  severity?: "low" | "medium" | "high";
-  createdAt?: string;
-  alertIssuedBy?: string;
-  entityRole?: "admin" | "agent" | "client";
-  entityCode?: string;
-  markedAsRead?: boolean;
 };
 
 export type SearchParams = {

@@ -164,7 +164,7 @@ const CalendarPage: React.FC = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: "100%",
+        height: "100dvh",
         position: "relative",
         paddingBottom: 2,
       }}
@@ -197,7 +197,7 @@ const CalendarPage: React.FC = () => {
         <Fragment>
           <Paper
             elevation={3}
-            sx={{ p: 2, mt: isMobile ? 0 : -3, borderRadius: 5 }}
+            sx={{ py: 1, mt: isMobile ? 0 : -3, borderRadius: 5 }}
             className="animate__animated animate__animate_faster animate__fadeIn"
           >
             <Calendar
@@ -240,8 +240,8 @@ const CalendarPage: React.FC = () => {
       ) : (
         <Box
           sx={{
-            pt: isMobile ? 2 : 0,
-            px: isMobile ? 1.3 : 0,
+            pt: isMobile ? 0.5 : 0,
+            px: isMobile ? 0.5 : 0,
           }}
         >
           <React.Suspense fallback={<Loader fadeout />}>
