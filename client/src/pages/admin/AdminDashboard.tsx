@@ -1,5 +1,5 @@
 // src/pages/admin/AdminDashboard.tsx
-import { Grid, Skeleton, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Grid, Skeleton, useMediaQuery, useTheme } from "@mui/material";
 import React, { Suspense, useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
@@ -7,7 +7,7 @@ import CalendarAndVisitsView from "../../components/DashboardsViews/CalendarAndV
 import DashboardView from "../../components/DashboardsViews/DashboardView";
 import SkeletonView from "../../components/DashboardsViews/SkeletonView";
 import GlobalSearch from "../../components/Header/GlobalSearch";
-import WelcomeMessage from "../../components/dashboard/WelcomeMessage";
+import SearchTitle from "../../components/dashboard/SearchTitle";
 import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
 import { selectCurrentUser } from "../../features/users/userSlice";
 import useLoadingData from "../../hooks/useLoadingData";
@@ -124,11 +124,13 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <>
-      <WelcomeMessage
-        name={user?.entityName}
-        role="admin" // or "agent" or "client"
-        loading={loadingState}
-      />
+      <Box py={1}>
+        <SearchTitle
+          name={user?.entityName}
+          role={userRole!} // or "agent" or "client"
+          loading={loadingState}
+        />
+      </Box>
 
       {loadingState ? (
         <Skeleton
@@ -143,7 +145,7 @@ const AdminDashboard: React.FC = () => {
         <GlobalSearch filter="admin" onSelect={handleSelect} />
       )}
 
-      <Grid container spacing={6} mt={isMobile ? 0 : 2}>
+      <Grid container spacing={6} mt={isMobile ? -3 : -3}>
         <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
           {selectedAgentData && selectedAgent ? (
             <Suspense fallback={<SkeletonView />}>

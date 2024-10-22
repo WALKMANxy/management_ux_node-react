@@ -16,9 +16,9 @@ import React, { memo, Suspense, useEffect } from "react";
 import { useAppSelector } from "../../app/hooks";
 import PromosSidebar from "../../components/promosPage/PromosSidebar";
 import SkeletonView from "../../components/promosPage/SkeletonView";
+import { selectCurrentUser } from "../../features/users/userSlice";
 import useLoadingData from "../../hooks/useLoadingData";
 import usePromos from "../../hooks/usePromos";
-import { selectCurrentUser } from "../../features/users/userSlice";
 
 // Lazy load other components
 const CreatePromoForm = React.lazy(
@@ -47,14 +47,16 @@ const PromosPage: React.FC = () => {
     handleCreatePromo,
     handleUpdatePromo,
     handleSunsetPromo,
+    setMode,
   } = usePromos();
-
 
   const userRole = useAppSelector(selectCurrentUser)?.role;
 
   // Get data fetching status and error
   const status = useAppSelector((state) => state.data.status);
   const error = useAppSelector((state) => state.data.error);
+
+  const selectedPromoId = useAppSelector((state) => state.data.selectedPromoId);
 
   // State variables for collapsible containers
   const [isPromoDetailsCollapsed, setIsPromoDetailsCollapsed] =
@@ -63,16 +65,20 @@ const PromosPage: React.FC = () => {
   const [isEligibleClientsCollapsed, setIsEligibleClientsCollapsed] =
     React.useState(false);
 
- /*  useEffect(() => {
-    console.log("Page mode:", mode);
-  }, [mode]); */
-
   // Reset collapsible sections when selectedPromo or mode changes
   useEffect(() => {
     setIsPromoDetailsCollapsed(false);
     setIsEligibleClientsCollapsed(false);
     setIsEditFormCollapsed(false);
   }, [selectedPromo, mode]);
+
+  useEffect(() => {
+    console.log("Selected promo ID changed:", selectedPromoId);
+    if (selectedPromoId) {
+      console.log("Setting mode to 'view'");
+      setMode("view");
+    }
+  }, [selectedPromoId, setMode]);
 
   // Handle loading state
   if (loading) {
@@ -245,29 +251,29 @@ const PromosPage: React.FC = () => {
                   />
                 </CollapsibleSection>
                 {userRole !== "client" && (
-  <CollapsibleSection
-    title={
-      selectedPromo.global
-        ? "Excluded Clients"
-        : "Eligible Clients"
-    }
-    isCollapsed={isEligibleClientsCollapsed}
-    setIsCollapsed={setIsEligibleClientsCollapsed}
-  >
-    <EligibleClientsGrid
-      isViewing={true}
-      selectedClients={
-        selectedPromo.global ? [] : selectedPromo.clientsId
-      }
-      excludedClients={
-        selectedPromo.global
-          ? selectedPromo.excludedClientsId
-          : []
-      }
-      global={selectedPromo.global}
-    />
-  </CollapsibleSection>
-)}
+                  <CollapsibleSection
+                    title={
+                      selectedPromo.global
+                        ? "Excluded Clients"
+                        : "Eligible Clients"
+                    }
+                    isCollapsed={isEligibleClientsCollapsed}
+                    setIsCollapsed={setIsEligibleClientsCollapsed}
+                  >
+                    <EligibleClientsGrid
+                      isViewing={true}
+                      selectedClients={
+                        selectedPromo.global ? [] : selectedPromo.clientsId
+                      }
+                      excludedClients={
+                        selectedPromo.global
+                          ? selectedPromo.excludedClientsId
+                          : []
+                      }
+                      global={selectedPromo.global}
+                    />
+                  </CollapsibleSection>
+                )}
               </Box>
             ) : isMobile ? null : (
               <Typography variant="h6" sx={{ mt: 2 }}>

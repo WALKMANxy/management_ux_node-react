@@ -28,25 +28,19 @@ import {
   useTheme,
 } from "@mui/material";
 import "animate.css";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../app/hooks";
+import { RootState } from "../../app/store";
 import { handleLogout } from "../../features/auth/authThunks";
 import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
 import { clearSelection } from "../../features/data/dataSlice";
-import { selectCurrentUser } from "../../features/users/userSlice";
 import { UserRole } from "../../models/entityModels";
 import GlobalSearch from "./GlobalSearch";
-import NotificationBell from "./NotificationBell";
-import UserAvatar from "./UserAvatar";
+const NotificationBell = React.lazy(() => import("./NotificationBell"));
+const UserAvatar = React.lazy(() => import("./UserAvatar"));
 
 const Header: React.FC = () => {
   const theme = useTheme();
@@ -55,9 +49,10 @@ const Header: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [iconChange, setIconChange] = useState(false);
   const [showAppBar, setShowAppBar] = useState(true); // New state for showing/hiding AppBar
+  const [lastScrollY, setLastScrollY] = useState(0); // State to track last scroll position
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const userRole = useSelector(selectCurrentUser)?.role;
+  const userRole = useSelector((state: RootState) => state.auth.role);
 
   const location = useLocation();
   const prevLocationRef = useRef<string>(location.pathname);
@@ -66,83 +61,67 @@ const Header: React.FC = () => {
     dispatch(handleLogout());
   };
 
-  const lastScrollYRef = useRef<number>(0);
-  const showAppBarRef = useRef<boolean>(true);
-
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
-      if (currentScrollY > lastScrollYRef.current && currentScrollY > 100) {
-        if (showAppBarRef.current) {
-          setShowAppBar(false);
-          showAppBarRef.current = false;
-        }
-      } else if (currentScrollY < lastScrollYRef.current) {
-        if (!showAppBarRef.current) {
-          setShowAppBar(true);
-          showAppBarRef.current = true;
-        }
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // If scrolling down and past 100px
+        setShowAppBar(false); // Hide AppBar
+      } else if (currentScrollY < lastScrollY) {
+        // If scrolling up
+        setShowAppBar(true); // Show AppBar
       }
-
-      lastScrollYRef.current = currentScrollY;
+      setLastScrollY(currentScrollY);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [lastScrollY]);
 
   useEffect(() => {
-    const prevPath = prevLocationRef.current;
-    const currentPath = location.pathname;
-
-    if (prevPath === "/visits" && currentPath !== "/visits") {
+    if (
+      prevLocationRef.current === "/visits" &&
+      location.pathname !== "/visits"
+    ) {
       dispatch(clearSelection());
     }
-
-    if (prevPath === "/messages" && currentPath !== "/messages") {
-      dispatch(clearCurrentChatReducer());
-    }
-
-    if (prevPath === "/promos" && currentPath !== "/promos") {
-      dispatch(clearSelection());
-    }
-
-    prevLocationRef.current = currentPath;
+    prevLocationRef.current = location.pathname;
   }, [location.pathname, dispatch]);
 
-  // Inside Header component
-  const toggleDrawerTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const toggleDrawer = useCallback(() => {
-    setDrawerOpen((prev) => !prev);
-
-    // Clear any existing timeout
-    if (toggleDrawerTimeoutRef.current) {
-      clearTimeout(toggleDrawerTimeoutRef.current);
+  useEffect(() => {
+    if (
+      prevLocationRef.current === "/messages" &&
+      location.pathname !== "/messages"
+    ) {
+      dispatch(clearCurrentChatReducer());
     }
+    prevLocationRef.current = location.pathname;
+  }, [location.pathname, dispatch]);
 
-    toggleDrawerTimeoutRef.current = setTimeout(() => {
-      setIconChange((prev) => !prev);
-      toggleDrawerTimeoutRef.current = null;
-    }, 500);
-  }, []);
+  useEffect(() => {
+    if (
+      prevLocationRef.current === "/promos" &&
+      location.pathname !== "/promos"
+    ) {
+      dispatch(clearSelection());
+    }
+    prevLocationRef.current = location.pathname;
+  }, [location.pathname, dispatch]);
+
+  const toggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
+    setTimeout(() => {
+      setIconChange(!drawerOpen);
+    }, 50);
+  };
 
   const handleLogoClick = () => {
     navigate("/dashboard"); // Navigate to the consolidated dashboard
   };
 
-  useEffect(() => {
-    return () => {
-      if (toggleDrawerTimeoutRef.current) {
-        clearTimeout(toggleDrawerTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const renderLinks = useMemo(() => {
+  const renderLinks = () => {
     const dashboardLink = "/dashboard";
     const statisticsLink = "/statistics";
     const allowedStatisticsRoles: UserRole[] = ["admin", "client", "agent"];
@@ -161,7 +140,7 @@ const Header: React.FC = () => {
           <ListItemText primary={t("headerDashboard", "Dashboard")} />
         </ListItem>
 
-        {allowedStatisticsRoles.includes(userRole!) && (
+        {allowedStatisticsRoles.includes(userRole) && (
           <ListItem
             button
             component={Link}
@@ -254,7 +233,7 @@ const Header: React.FC = () => {
         )}
       </>
     );
-  }, [userRole, toggleDrawer, t]);
+  };
 
   const renderLogoutLink = () => (
     <ListItem
@@ -371,7 +350,7 @@ const Header: React.FC = () => {
               onClick={handleLogoClick}
             />
           </Box>
-          <List sx={{ flexGrow: 1 }}>{renderLinks}</List>
+          <List sx={{ flexGrow: 1 }}>{renderLinks()}</List>
           <Box sx={{ mt: "auto" }}>{renderLogoutLink()}</Box>
         </Box>
       </Drawer>

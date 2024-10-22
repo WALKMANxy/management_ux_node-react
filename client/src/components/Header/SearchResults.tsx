@@ -1,5 +1,6 @@
 // src/components/SearchResults.tsx
 
+import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
 import LoyaltyIcon from "@mui/icons-material/Loyalty";
 import PersonIcon from "@mui/icons-material/Person";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
@@ -11,7 +12,6 @@ import React, { memo, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 import { SearchResultsProps } from "../../models/propsModels";
-import { generateRandomString } from "../../utils/constants";
 
 const ITEM_HEIGHT = 160; // Adjust based on your design
 const MAX_ITEMS_VISIBLE = 5; // Maximum items visible without scrolling
@@ -48,6 +48,8 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         return <WarehouseIcon />;
       case "promo":
         return <LoyaltyIcon />;
+      case "visit":
+        return <AirplaneTicketIcon />;
       default:
         return null;
     }
@@ -63,6 +65,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       case "promo":
         return "rgba(144, 238, 144, 0.1)"; // Light Green
       case "client":
+        return "rgba(255, 255, 255, 0.1)"; // Light White lmao
+      case "visit":
+        return "rgba(255, 255, 102, 0.1)"; // Light Yellow
       default:
         return "rgba(255, 255, 255, 1)"; // White
     }
@@ -73,10 +78,8 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     const isSelected = index === selectedIndex;
 
     // Handle undefined values gracefully
-    const displayId =
-      result.type === "promo"
-        ? result._id || t("searchResults.idUnknown")
-        : result.id || t("searchResults.idUnknown");
+    const displayId = result.id || t("searchResults.idUnknown");
+
     const displayPhone = result.phone || t("searchResults.phoneUnknown");
     const displayEmail = result.email || t("searchResults.emailUnknown");
     const displayPromoType =
@@ -94,10 +97,20 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       ? dayjs(result.lastSoldDate).format("DD/MM/YYYY")
       : t("searchResults.lastSoldDateUnknown");
 
+    // Visit-specific display variables
+    const displayDate = result.date
+      ? dayjs(result.date).format("DD/MM/YYYY")
+      : t("searchResults.dateUnknown");
+    const displayCompleted = result.completed
+      ? t("searchResults.yes")
+      : t("searchResults.no");
+    const displayIssuedBy =
+      result.visitIssuedBy || t("searchResults.issuedByUnknown");
+
     return (
       <Box
         style={style}
-        key={`${result.id}-${generateRandomString()}`}
+        key={`${result.type}-${result.id}`}
         onClick={() => onSelect(result)}
         sx={{
           cursor: "pointer",
@@ -194,6 +207,26 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                 </Typography>
                 <Typography variant="body2" color="textSecondary" noWrap>
                   {t("searchResults.lastSoldDate")}: {displayLastSoldDate}
+                </Typography>
+              </>
+            )}
+
+            {result.type === "visit" && (
+              <>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.id")}: {displayId}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.visitReason")}: {result.name}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.date")}: {displayDate}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.completed")}: {displayCompleted}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" noWrap>
+                  {t("searchResults.issuedBy")}: {displayIssuedBy}
                 </Typography>
               </>
             )}
