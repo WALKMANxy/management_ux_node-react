@@ -313,7 +313,7 @@ private handleReconnectUnauthorized = () => {
 
       if (message.sender !== currentUserId) {
         console.log("Message is from another user. Handling new notification.");
-        handleNewNotification(message.sender, message.content, state);
+        handleNewNotification(message.sender, message.content,chatId,store,  state);
       }
 
       const secondTimeout = setTimeout(() => {

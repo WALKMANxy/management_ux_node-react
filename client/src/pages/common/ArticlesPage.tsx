@@ -1,5 +1,5 @@
 import { Box, useMediaQuery, useTheme } from "@mui/material";
-import React, { Suspense, useEffect, useMemo } from "react";
+import React, { memo, Suspense, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
@@ -169,4 +169,4 @@ const ArticlesPage: React.FC = () => {
   );
 };
 
-export default ArticlesPage;
+export default memo(ArticlesPage);

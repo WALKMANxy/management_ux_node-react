@@ -12,7 +12,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { Suspense, useEffect } from "react";
+import React, { memo, Suspense, useEffect } from "react";
 import { useAppSelector } from "../../app/hooks";
 import PromosSidebar from "../../components/promosPage/PromosSidebar";
 import SkeletonView from "../../components/promosPage/SkeletonView";
@@ -327,4 +327,4 @@ const CollapsibleSection = ({
   </Box>
 );
 
-export default PromosPage;
+export default memo(PromosPage);
