@@ -22,13 +22,16 @@ const useChatView = () => {
   }, [error]);
 
   const sortedMessages = useMemo(() => {
-    return currentChat?.messages || [];
+    return currentChat?.messages
+      ? [...currentChat.messages].sort(
+          (a, b) =>
+            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        )
+      : [];
   }, [currentChat?.messages]);
 
 
-/*   useEffect(() => {
-    console.log("Sorted messaged:", sortedMessages);
-  }, [sortedMessages]); */
+
 
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(menuAnchorEl);

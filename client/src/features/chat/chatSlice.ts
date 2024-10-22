@@ -47,6 +47,17 @@ const chatSlice = createSlice({
     setCurrentChatReducer: (state, action: PayloadAction<IChat>) => {
       state.currentChat = action.payload;
     },
+    setCurrentChatById: (state, action: PayloadAction<string>) => {
+      const chatId = action.payload;
+      const chat = state.chats[chatId];
+
+      if (chat) {
+        state.currentChat = chat;
+      } else {
+        console.error(`Chat with ID ${chatId} does not exist in the state.`);
+        state.currentChat = null;
+      }
+    },
     // New reducer to clear currentChat
     clearCurrentChatReducer: (state) => {
       state.currentChat = null;
@@ -514,6 +525,7 @@ export const {
   updateReadStatusReducer,
   addChatReducer,
   updateChatReducer,
+  setCurrentChatById
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

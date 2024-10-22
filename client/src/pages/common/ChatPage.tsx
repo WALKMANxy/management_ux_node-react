@@ -1,5 +1,5 @@
 import { Box, Grid, useMediaQuery } from "@mui/material";
-import React from "react";
+import React, { memo } from "react";
 import { useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
 import ChatSidebar from "../../components/chatPage/ChatSidebar";
@@ -64,4 +64,4 @@ const ChatPage: React.FC = () => {
   );
 };
 
-export default ChatPage;
+export default memo(ChatPage);
