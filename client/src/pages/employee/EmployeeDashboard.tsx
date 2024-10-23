@@ -15,7 +15,7 @@ import useLoadingData from "../../hooks/useLoadingData";
 
 const EmployeeDashboard: React.FC = () => {
   const { t } = useTranslation();
-  const isTablet = useMediaQuery("(min-width:900px) and (max-width:1250px)");
+  const isTablet = useMediaQuery("(min-width:900px) and (max-width:1390px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const { loadingState } = useLoadingData();
