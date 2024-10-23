@@ -171,7 +171,7 @@ const TopBrandsSold: React.FC<{
             sx={{ borderRadius: "12px", mt: 2 }}
           />
         ) : (
-          !isMobile && (
+        
             <Box
               sx={{
                 display: "flex",
@@ -206,7 +206,7 @@ const TopBrandsSold: React.FC<{
                 </Box>
               ))}
             </Box>
-          )
+
         )}
       </Box>
     </Paper>

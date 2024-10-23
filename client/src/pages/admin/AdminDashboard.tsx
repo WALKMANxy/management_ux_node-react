@@ -26,7 +26,7 @@ const AdminDashboard: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery("(min-width:900px) and (max-width:1250px)");
+  const isTablet = useMediaQuery("(min-width:900px) and (max-width:1390px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleToggleDrawer = useCallback(() => {
