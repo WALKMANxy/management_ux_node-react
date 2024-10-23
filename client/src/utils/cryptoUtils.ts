@@ -11,7 +11,7 @@ const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
 // Cache for derived keys
-const keyCache = new Map<string, CryptoKey>();
+export const keyCache = new Map<string, CryptoKey>();
 
 const STORAGE_KEY = "app_unique_identifier";
 
