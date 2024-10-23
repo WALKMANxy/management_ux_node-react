@@ -8,7 +8,7 @@ import WarehouseIcon from "@mui/icons-material/Warehouse";
 import { Box, Card, CardContent, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import dayjs from "dayjs";
-import React, { memo, useEffect, useMemo, useRef } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 import { SearchResultsProps } from "../../models/propsModels";
@@ -73,171 +73,174 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     }
   };
 
-  const renderRow = ({ index, style }: ListChildComponentProps) => {
-    const result = results[index];
-    const isSelected = index === selectedIndex;
+  const renderRow = useCallback(
+    ({ index, style }: ListChildComponentProps) => {
+      const result = results[index];
+      const isSelected = index === selectedIndex;
 
-    // Handle undefined values gracefully
-    const displayId = result.id || t("searchResults.idUnknown");
+      // Handle undefined values gracefully
+      const displayId = result.id || t("searchResults.idUnknown");
 
-    const displayPhone = result.phone || t("searchResults.phoneUnknown");
-    const displayEmail = result.email || t("searchResults.emailUnknown");
-    const displayPromoType =
-      result.promoType || t("searchResults.promoTypeUnknown");
-    const displayDiscount =
-      result.discount || t("searchResults.discountUnknown");
-    const displayStartDate = result.startDate
-      ? dayjs(result.startDate).format("DD/MM/YYYY")
-      : t("searchResults.startDateUnknown");
-    const displayEndDate = result.endDate
-      ? dayjs(result.endDate).format("DD/MM/YYYY")
-      : t("searchResults.endDateUnknown");
-    const displayBrand = result.brand || t("searchResults.brandUnknown");
-    const displayLastSoldDate = result.lastSoldDate
-      ? dayjs(result.lastSoldDate).format("DD/MM/YYYY")
-      : t("searchResults.lastSoldDateUnknown");
+      const displayPhone = result.phone || t("searchResults.phoneUnknown");
+      const displayEmail = result.email || t("searchResults.emailUnknown");
+      const displayPromoType =
+        result.promoType || t("searchResults.promoTypeUnknown");
+      const displayDiscount =
+        result.discount || t("searchResults.discountUnknown");
+      const displayStartDate = result.startDate
+        ? dayjs(result.startDate).format("DD/MM/YYYY")
+        : t("searchResults.startDateUnknown");
+      const displayEndDate = result.endDate
+        ? dayjs(result.endDate).format("DD/MM/YYYY")
+        : t("searchResults.endDateUnknown");
+      const displayBrand = result.brand || t("searchResults.brandUnknown");
+      const displayLastSoldDate = result.lastSoldDate
+        ? dayjs(result.lastSoldDate).format("DD/MM/YYYY")
+        : t("searchResults.lastSoldDateUnknown");
 
-    // Visit-specific display variables
-    const displayDate = result.date
-      ? dayjs(result.date).format("DD/MM/YYYY")
-      : t("searchResults.dateUnknown");
-    const displayCompleted = result.completed
-      ? t("searchResults.yes")
-      : t("searchResults.no");
-    const displayIssuedBy =
-      result.visitIssuedBy || t("searchResults.issuedByUnknown");
+      // Visit-specific display variables
+      const displayDate = result.date
+        ? dayjs(result.date).format("DD/MM/YYYY")
+        : t("searchResults.dateUnknown");
+      const displayCompleted = result.completed
+        ? t("searchResults.yes")
+        : t("searchResults.no");
+      const displayIssuedBy =
+        result.visitIssuedBy || t("searchResults.issuedByUnknown");
 
-    return (
-      <Box
-        style={style}
-        key={`${result.type}-${result.id}`}
-        onClick={() => onSelect(result)}
-        sx={{
-          cursor: "pointer",
-          height: "100%",
-          position: "relative",
-          borderRadius: 2,
-          py: 0.5,
-          zIndex: 5000,
-        }}
-      >
-        <Card
-          variant="outlined"
+      return (
+        <Box
+          style={style}
+          key={`${result.type}-${result.id}`}
+          onClick={() => onSelect(result)}
           sx={{
-            position: "relative",
+            cursor: "pointer",
             height: "100%",
+            position: "relative",
             borderRadius: 2,
-            boxShadow: "none",
-            backgroundColor: isSelected
-              ? "rgba(0, 0, 0, 0.08)"
-              : getBackgroundColor(result.type),
-            overflow: "hidden",
-            "&:hover": {
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-            },
+            py: 0.5,
+            zIndex: 5000,
           }}
         >
-          <CardContent>
-            <Typography variant="h6" noWrap>
-              {result.name}
-            </Typography>
+          <Card
+            variant="outlined"
+            sx={{
+              position: "relative",
+              height: "100%",
+              borderRadius: 2,
+              boxShadow: "none",
+              backgroundColor: isSelected
+                ? "rgba(0, 0, 0, 0.08)"
+                : getBackgroundColor(result.type),
+              overflow: "hidden",
+              "&:hover": {
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+              },
+            }}
+          >
+            <CardContent>
+              <Typography variant="h6" noWrap>
+                {result.type === "visit"
+                  ? t("searchResults.visitFor", { resultName: result.name })
+                  : result.name}
+              </Typography>
 
-            {/* Display based on type */}
-            {result.type === "agent" && (
-              <>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.id")}: {displayId}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.phone")}: {displayPhone}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.email")}: {displayEmail}
-                </Typography>
-              </>
-            )}
+              {/* Display based on type */}
+              {result.type === "agent" && (
+                <>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.id")}: {displayId}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.phone")}: {displayPhone}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.email")}: {displayEmail}
+                  </Typography>
+                </>
+              )}
 
-            {result.type === "promo" && (
-              <>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.id")}: {displayId}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.promoType")}: {displayPromoType}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.discount")}: {displayDiscount}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.startDate")}: {displayStartDate}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.endDate")}: {displayEndDate}
-                </Typography>
-              </>
-            )}
+              {result.type === "promo" && (
+                <>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.id")}: {displayId}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.promoType")}: {displayPromoType}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.discount")}: {displayDiscount}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.startDate")}: {displayStartDate}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.endDate")}: {displayEndDate}
+                  </Typography>
+                </>
+              )}
 
-            {result.type === "client" && (
-              <>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.id")}: {displayId}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.province")}:{" "}
-                  {result.province || t("searchResults.provinceUnknown")}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.phone")}: {displayPhone}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.paymentMethod")}:{" "}
-                  {result.paymentMethod ||
-                    t("searchResults.paymentMethodUnknown")}
-                </Typography>
-              </>
-            )}
-            {/* Display based on type */}
-            {result.type === "article" && (
-              <>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.articleId")}: {displayId}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.brand")}: {displayBrand}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.lastSoldDate")}: {displayLastSoldDate}
-                </Typography>
-              </>
-            )}
+              {result.type === "client" && (
+                <>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.id")}: {displayId}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.province")}:{" "}
+                    {result.province || t("searchResults.provinceUnknown")}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.phone")}: {displayPhone}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.paymentMethod")}:{" "}
+                    {result.paymentMethod ||
+                      t("searchResults.paymentMethodUnknown")}
+                  </Typography>
+                </>
+              )}
+              {/* Display based on type */}
+              {result.type === "article" && (
+                <>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.articleId")}: {displayId}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.brand")}: {displayBrand}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.lastSoldDate")}: {displayLastSoldDate}
+                  </Typography>
+                </>
+              )}
 
-            {result.type === "visit" && (
-              <>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.id")}: {displayId}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.visitReason")}: {result.name}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.date")}: {displayDate}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.completed")}: {displayCompleted}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" noWrap>
-                  {t("searchResults.issuedBy")}: {displayIssuedBy}
-                </Typography>
-              </>
-            )}
+              {result.type === "visit" && (
+                <>
+               
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.visitReason")}: {result.name}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.date")}: {displayDate}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.completed")}: {displayCompleted}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" noWrap>
+                    {t("searchResults.issuedBy")}: {displayIssuedBy}
+                  </Typography>
+                </>
+              )}
 
-            {/* Type Icon */}
-            <TypeIconBox>{getTypeIcon(result.type)}</TypeIconBox>
-          </CardContent>
-        </Card>
-      </Box>
-    );
-  };
+              {/* Type Icon */}
+              <TypeIconBox>{getTypeIcon(result.type)}</TypeIconBox>
+            </CardContent>
+          </Card>
+        </Box>
+      );
+    },
+    [results, selectedIndex, onSelect, t]
+  );
 
   // Calculate the height of the list based on the number of results
   const listHeight = useMemo(() => {
