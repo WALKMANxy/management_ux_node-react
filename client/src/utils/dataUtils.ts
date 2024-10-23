@@ -19,22 +19,24 @@ export const calculateTotalRevenue = (clients: Client[]): number => {
   return Number(total.toFixed(2));
 };
 
-
-
 export const calculateNetRevenue = (clients: Client[]): number => {
-  let netTotal = 0;
-  for (const client of clients) {
-    for (const movement of client.movements) {
-      for (const detail of movement.details) {
-        const priceSold = parseFloat(detail.priceSold) || 0;
-        const priceBought =
-          Math.abs(parseFloat(detail.priceBought) || 0) *
-          (detail.quantity || 0);
-        netTotal += priceSold - priceBought;
-      }
-    }
-  }
-  return Number(netTotal.toFixed(2));
+  return clients.reduce((netTotal, client) => {
+    return (
+      netTotal +
+      client.movements.reduce((total, movement) => {
+        return (
+          total +
+          movement.details.reduce((detailTotal, detail) => {
+            const priceSold = parseFloat(detail.priceSold) || 0;
+            const priceBought =
+              Math.abs(parseFloat(detail.priceBought) || 0) *
+              (detail.quantity || 0);
+            return detailTotal + priceSold - priceBought;
+          }, 0)
+        );
+      }, 0)
+    );
+  }, 0);
 };
 
 // Calculate sales distribution data for agents
@@ -114,7 +116,7 @@ export const calculateSalesDistributionData = (
   isMobile: boolean
 ): { label: string; value: number }[] => {
   const topClients = clients
-    .map(client => ({
+    .map((client) => ({
       label: client.name,
       value: parseFloat(client.totalRevenue),
     }))
