@@ -754,7 +754,8 @@
     "brandUnknown": "Unknown Brand",
     "lastSoldDate": "Last Sold Date",
     "lastSoldDateUnknown": "Unknown Last Sold Date",
-    "promoIssuedBy": "Issued By"
+    "promoIssuedBy": "Issued By",
+    "visitFor": "Visit For {{resultName}}"
   },
   "promoDetails": {
     "notFound": "Promo details not found."
@@ -1324,5 +1325,8 @@
     "95": "Thunderstorm",
     "96": "Thunderstorm with slight hail",
     "99": "Thunderstorm with heavy hail"
+  },
+  "searchSlice": {
+    "visitFor": "Visit for {{clientId}}"
   }
 }
