@@ -5,7 +5,7 @@ export type SearchResult = {
 
   notAvailable?: "Not Available";
 
-  // Client-specific properties
+  // Client/Agent-specific properties
   extendedName?: string;
   province?: string;
   phone?: string;
@@ -23,8 +23,7 @@ export type SearchResult = {
   agentName?: string;
   colour?: string;
 
-  // Agent-specific properties
-  // (already covered by common fields)
+
 
   // Article-specific properties
   brand?: string;
@@ -39,6 +38,9 @@ export type SearchResult = {
   discount?: string;
   startDate?: Date;
   endDate?: Date;
+  agentId?: string; // For admins
+  clientsId?: string[]; // For matching clientsId
+
   promoIssuedBy?: string;
 
   // Visit-specific properties
@@ -51,10 +53,12 @@ export type SearchResult = {
   pending?: boolean;
   completed?: boolean;
   visitIssuedBy?: string;
+
 };
 
 export type SearchParams = {
   query: string;
   filter: string;
+  exact?: boolean;
   results?: SearchResult[];
 };

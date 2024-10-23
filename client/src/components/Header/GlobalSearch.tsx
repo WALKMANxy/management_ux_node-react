@@ -15,7 +15,7 @@ import React, { KeyboardEvent, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../app/hooks";
-import { selectPromo, selectVisit } from "../../features/data/dataSlice";
+import { selectClient, selectPromo, selectVisit } from "../../features/data/dataSlice";
 import useGlobalSearch from "../../hooks/useGlobalSearch";
 import { GlobalSearchProps } from "../../models/propsModels";
 import { SearchResult } from "../../models/searchModels";
@@ -100,6 +100,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
             navigate("/promos");
             break;
           case "visit":
+            dispatch(selectClient(item.clientId!));
             dispatch(selectVisit(item.id!));
             navigate("/visits");
             break;
