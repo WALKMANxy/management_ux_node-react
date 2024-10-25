@@ -287,7 +287,7 @@ const ManageUsers: React.FC = () => {
                 textTransform: "capitalize",
               }}
             >
-              {t(`manageUsers.roles.${role}`, role.charAt(0).toUpperCase() + role.slice(1))}
+              {t(`manageUsers.${role}`, role.charAt(0).toUpperCase() + role.slice(1))}
             </Button>
           ))}
         </ButtonGroup>
