@@ -6,10 +6,10 @@ export function registerPWA() {
   const updateSW = registerSW({
     onNeedRefresh() {
       // Use Sonner to show a custom toast for the update with translation from i18n
-      toast(i18n.t("pwa.new_content_available"), {
-        description: i18n.t("pwa.click_to_reload"),
+      toast(i18n.t("pwa.newContentAvailable"), {
+        description: i18n.t("pwa.clickToReload"),
         action: {
-          label: i18n.t("pwa.reload_button"),
+          label: i18n.t("pwa.reloadButton"),
           onClick: () => {
             updateSW(true); // Trigger the service worker update
           },
@@ -18,7 +18,7 @@ export function registerPWA() {
     },
     onOfflineReady() {
       // Show a toast when the app is ready to work offline, using i18n translation
-      toast.success(i18n.t("pwa.offline_ready"));
+      toast.success(i18n.t("pwa.offlineReady"));
     },
   });
 }

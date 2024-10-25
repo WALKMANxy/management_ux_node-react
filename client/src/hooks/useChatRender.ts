@@ -207,7 +207,7 @@ const useChatRender = () => {
 
   // Chat Title
   const getChatTitle = useMemo(() => {
-    if (!currentChat) return t("chat.defaultTitle");
+    if (!currentChat) return t("chats.defaultTitle");
 
     if (currentChat.type === "simple" && currentChat.participants) {
       const participantId = currentChat.participants.find(
@@ -215,10 +215,10 @@ const useChatRender = () => {
       );
       if (participantId) {
         const participant = users[participantId];
-        return participant?.entityName || t("chat.deletedUser");
+        return participant?.entityName || t("chats.deletedUser");
       }
     }
-    return currentChat?.name || t("chat.groupTitle");
+    return currentChat?.name || t("chats.groupTitle");
   }, [currentChat, currentUserId, users, t]);
 
   // Admin Avatar
