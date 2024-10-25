@@ -927,7 +927,24 @@
     "cancelButton": "Cancel",
     "cannotDeleteYourself": "You cannot delete your own entity.",
     "cannotDeleteClient": "Cannot delete Client entities.",
-    "noEntitySelected": "No entity selected for deletion."
+    "noEntitySelected": "No entity selected for deletion.",
+    "entityIdUndefined": "Entity ID is undefined",
+    "deleteAgentSuccess": "Agent deleted successfully",
+    "deleteAdminSuccess": "Admin deleted successfully",
+    "deleteEmployeeSuccess": "Employee deleted successfully",
+    "unknownEntityType": "Unknown entity type",
+    "deleteSuccess": "Entity deleted successfully",
+    "deleteFailed": "Failed to delete entity",
+    "createAgentSuccess": "Agent created successfully",
+    "createAdminSuccess": "Admin created successfully",
+    "createEmployeeSuccess": "Employee created successfully",
+    "createSuccess": "Entity created successfully",
+    "createFailed": "Failed to create entity",
+    "updateAgentSuccess": "Agent updated successfully",
+    "updateAdminSuccess": "Admin updated successfully",
+    "updateEmployeeSuccess": "Employee updated successfully",
+    "updateSuccess": "Entity updated successfully",
+    "updateFailed": "Failed to update entity"
   },
   "manageUsers": {
     "title": "Manage Users",
@@ -984,6 +1001,7 @@
     "userIdUndefined": "User ID is undefined.",
     "userIdUndefinedToast": "User ID is undefined.",
     "loadAdminsErrror": "Failed to load admins. Please try again.",
+    "loadAdminsError": "Failed to load admins",
     "alerts": {
       "success": "Changes saved successfully!",
       "error": "An error occurred. Please try again.",
@@ -1310,7 +1328,7 @@
     "salesDistribution": "Sales Distribution",
     "upcomingVisits": "Upcoming Visits",
     "yourCalendar": "Your Calendar",
-       "SearchTitleAgent": "Search for clients",
+    "SearchTitleAgent": "Search for clients",
     "SearchTitleAdmin": "Search for clients or agents"
   },
   "articlesPage": {
@@ -1401,5 +1419,4 @@
     "reloadButton": "Reload",
     "offlineReady": "App is ready to work offline."
   }
-
 }
