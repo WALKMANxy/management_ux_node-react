@@ -1,4 +1,14 @@
 {
+  "team": {
+    "title": "Nuestro Equipo",
+    "content": {
+      "part1": "Nuestro equipo en Ricambi Centro Sud S.r.l. está compuesto por profesionales dedicados comprometidos a proporcionar servicios y soluciones de primera calidad a nuestros clientes. Con una amplia gama de especializaciones, los miembros de nuestro equipo colaboran de manera fluida para garantizar la satisfacción del cliente y el crecimiento del negocio."
+    }
+  },
+  "calendarPage": {
+    "Title": "Calendario",
+    "HistoryTitle": "Historial de Eventos"
+  },
   "footer": {
     "about": "Acerca de",
     "ourStory": "Nuestra historia",
@@ -11,7 +21,6 @@
     "termsOfService": "Términos de servicio",
     "close": "Cerrar",
     "hours": "Horas"
-
   },
   "ourStory": {
     "title": "Nuestra historia",
@@ -20,6 +29,68 @@
       "part2": "La empresa, ahora en expansión, está ansiosa por ofrecer este servicio cada vez más competente y efectivo directamente a particulares, brindando una oportunidad y ofreciendo soluciones para grandes y pequeños problemas de vehículos. Encontrarás personal calificado en formación continua, capaz de analizar el problema y ofrecer asesoramiento sobre las alternativas correctas. Puedes beneficiarte de la entrega a domicilio y de servicios completos de 360 grados.",
       "part3": "La empresa es distribuidora de marcas de repuestos originales, así como de productos oficialmente reacondicionados directamente por el fabricante. La calidad del servicio en relación con el precio, el área técnica calificada y la gestión/proyecto más allá de la simple venta directa son los tres puntos fuertes y distintivos de Ricambi Centro Sud S.r.l. El área técnica, equipada con herramientas y formación continua, promueve la red funcional en la zona, garantizando actualizaciones y asistencia postventa a los clientes.",
       "part4": "<0>Una empresa que no ha perdido su carácter abierto y familiar</0> pero que hoy está en plena expansión, enfrentando nuevos desafíos. La nueva estructura, que abarca 3.800 metros cuadrados en tres niveles, incluidos oficinas, almacén y punto de venta, con un total de 25 empleados, es capaz de garantizar servicios en diferentes áreas de experiencia en el territorio gracias a agentes de ventas especializados por tipo de producto y marca."
+    }
+  },
+  "privacyPolicy": {
+    "title": "Política de Privacidad",
+    "content": {
+      "part1": "<0>Bienvenido a RCS NEXT</0>, una aplicación basada en navegador proporcionada por Ricambi Centro Sud. Tomamos tu privacidad en serio y nos comprometemos a proteger los datos que recopilamos en cumplimiento con las regulaciones de GDPR. Esta política de privacidad describe los tipos de información que recopilamos, cómo se utiliza y tus derechos con respecto a esa información.",
+      "part2": "Recopilación de Datos",
+      "part3": "Los datos manejados por Ricambi Centro Sud para la aplicación RCS NEXT se recopilan únicamente con el propósito de garantizar el buen funcionamiento de los servicios proporcionados. Podemos recopilar información como tu dirección IP y huella del dispositivo para validar tu identidad y mejorar nuestros procesos de autenticación. Esto nos ayuda a garantizar la seguridad de tu cuenta y prevenir accesos no autorizados.",
+      "part4": "Propósito del Uso de Datos",
+      "part5": "Los datos recopilados se utilizan para que la aplicación RCS NEXT funcione como se pretende. Específicamente, esto incluye habilitar la comunicación a través de chats dentro de la empresa y entre clientes, facilitar el acceso a estadísticas, gestionar visitas, manejar citas de calendario y emitir o ver promociones. No se utilizan herramientas de análisis de terceros; tus datos se procesan únicamente para fines operativos.",
+      "part6": "Compartición de Datos",
+      "part7": "Ricambi Centro Sud no comparte ningún dato recopilado con partes externas. Tus datos son utilizados estrictamente por la empresa para apoyar los servicios y funcionalidades de la aplicación RCS NEXT.",
+      "part8": "Tus Derechos",
+      "part9": "Tienes el derecho de solicitar acceso a los datos personales que hemos recopilado sobre ti, así como el derecho a solicitar la corrección o eliminación de esos datos. Si deseas que tus datos sean eliminados, por favor envía un correo electrónico a info@ricambicentrosud.com.",
+      "part10": "Seguridad de los Datos",
+      "part11": "Tomamos medidas razonables para proteger tu información contra accesos, alteraciones o divulgaciones no autorizadas. Sin embargo, ten en cuenta que ningún sistema puede ser 100% seguro.",
+      "part12": "Cambios a Esta Política",
+      "part13": "Podemos actualizar esta política de privacidad de vez en cuando. Cualquier cambio se reflejará aquí, y te animamos a revisar esta página periódicamente."
+    }
+  },
+  "termsOfService": {
+    "title": "Términos de Servicio",
+    "content": {
+      "part1": "<0>Bienvenido a RCS NEXT</0>, una aplicación basada en navegador operada por Ricambi Centro Sud. Al acceder o utilizar nuestra aplicación, aceptas estar sujeto a estos términos de servicio. Si no estás de acuerdo con estos términos, por favor no utilices la app.",
+      "part2": "Aceptación de los Términos",
+      "part3": "Al utilizar la aplicación RCS NEXT, reconoces que has leído, comprendido y aceptado estos términos de servicio. Podemos actualizar estos términos ocasionalmente, y es tu responsabilidad revisarlos regularmente.",
+      "part4": "Uso del Servicio",
+      "part5": "RCS NEXT está destinado para uso exclusivo de empleados de Ricambi Centro Sud y clientes autorizados. La app proporciona acceso a funciones de comunicación interna, estadísticas de la empresa, gestión de calendarios y promociones. Aceptas usar el servicio solo para los propósitos previstos y abstenerte de cualquier actividad que pueda interrumpir o dañar la app o a otros usuarios.",
+      "part6": "Cuentas de Usuario",
+      "part7": "Eres responsable de mantener la confidencialidad de tus credenciales de cuenta. Cualquier actividad bajo tu cuenta es tu responsabilidad. Si crees que tu cuenta ha sido comprometida, por favor notifícanos inmediatamente.",
+      "part8": "Propiedad del Contenido",
+      "part9": "Todo el contenido dentro de la aplicación RCS NEXT, incluyendo pero no limitado a texto, gráficos y marcas registradas, es propiedad de Ricambi Centro Sud. No puedes copiar, distribuir o crear obras derivadas sin nuestro consentimiento por escrito.",
+      "part10": "Terminación",
+      "part11": "Nos reservamos el derecho de suspender o terminar tu acceso a la app RCS NEXT en cualquier momento, especialmente si violas estos términos de servicio o usas la app de una manera que consideremos inapropiada o dañina.",
+      "part12": "Limitación de Responsabilidad",
+      "part13": "Ricambi Centro Sud proporciona la app RCS NEXT \"tal cual\" y no garantiza su rendimiento o fiabilidad. No somos responsables de ningún daño que surja del uso de la aplicación.",
+      "part14": "Ley Aplicable",
+      "part15": "Estos términos se regirán e interpretarán de acuerdo con las leyes de Italia. Cualquier disputa que surja del uso de la app RCS NEXT estará sujeta a la jurisdicción de los tribunales italianos.",
+      "part16": "Información de Contacto",
+      "part17": "Para preguntas sobre estos términos, por favor contáctanos en info@ricambicentrosud.com."
+    }
+  },
+  "modalContent": {
+    "team": {
+      "title": "Nuestro Equipo",
+      "content": "Conoce a nuestro dedicado equipo de profesionales..."
+    },
+    "facebook": {
+      "title": "Síguenos en Facebook",
+      "content": "Mantente actualizado con nuestras últimas noticias y ofertas en Facebook..."
+    },
+    "instagram": {
+      "title": "Síguenos en Instagram",
+      "content": "Echa un vistazo a nuestro Instagram para contenido detrás de cámaras y más..."
+    },
+    "privacyPolicy": {
+      "title": "Política de Privacidad",
+      "content": "Nuestra política de privacidad describe cómo recopilamos, utilizamos y protegemos tu información personal..."
+    },
+    "termsOfService": {
+      "title": "Términos de Servicio",
+      "content": "Al utilizar nuestros servicios, aceptas los siguientes términos y condiciones..."
     }
   },
   "welcome": "Bienvenido",
@@ -63,7 +134,8 @@
   "monthOverMonthSpendingTrend": {
     "title": "Tendencia Mensual",
     "revenue": "Ingresos",
-    "expense": "Gastos"
+    "expense": "Gastos",
+    "netRevenue": "Netos"
   },
   "salesDistribution": {
     "title": "Distribución de Ventas",
@@ -418,8 +490,10 @@
     },
     "messages": {
       "noContactsFound": "No se encontraron contactos. Intenta ajustar tu búsqueda.",
-      "promoMessage": "¡Eres elegible para una nueva promoción!\n\nTipo: {{promoType}}\nNombre: {{promoName}}\nOferta: {{promoDiscount}}\n\nContacta a uno de nuestros representantes para más información. ¡Que tengas un buen día!",
-      "visitMessage": "¡Se ha programado una nueva visita para ti!\n\nTipo: {{visitType}}\nRazón: {{visitReason}}\nFecha: {{visitDate}}\n\nPor favor prepárate. ¡Gracias!"
+      "promoMessage": "¡Eres elegible para una nueva promoción!\n\nTipo: {{promoType}}\nNombre: {{promoName}}\nOferta: {{promoDiscount}}\n\nContacta a uno de nuestros representantes para más información. ¡Que tengas un gran día!",
+      "visitMessage": "¡Se ha programado una nueva visita para ti!\n\nTipo: {{visitType}}\nRazón: {{visitReason}}\nFecha: {{visitDate}}\n\nPor favor, prepárate. ¡Gracias!",
+      "overdueVisitMessage": "Tienes {{count}} visita vencida. Por favor, actualiza el estado de la visita.",
+      "overdueVisitMessage_plural": "Tienes {{count}} visitas vencidas. Por favor, actualiza el estado de las visitas."
     }
   },
   "dateDivider": {
@@ -493,24 +567,22 @@
   "spentThisMonth": {
     "titleAgent": "Ganado Este Mes",
     "titleClient": "Gastado Este Mes",
-    "iconAlt": "Ícono de Dinero",
-    "more": "más",
-    "neutral": "más",
-    "less": "menos",
-    "even": "igual",
-    "comparedToOtherAgents": "comparado con el promedio.",
-    "comparedToOtherClients": "comparado con el promedio."
+    "more": "",
+    "neutral": "",
+    "less": "",
+    "even": "",
+    "comparedToOtherAgents": "del ingreso total.",
+    "comparedToOtherClients": "del ingreso total."
   },
   "spentThisYear": {
     "titleAgent": "Ganado Este Año",
     "titleClient": "Gastado Este Año",
-    "iconAlt": "Ícono de Bolsa de Dinero",
-    "more": "más",
-    "neutral": "más",
-    "less": "menos",
-    "even": "igual",
-    "comparedToOtherAgents": "comparado con el promedio.",
-    "comparedToOtherClients": "comparado con el promedio."
+    "more": "",
+    "neutral": "",
+    "less": "",
+    "even": "",
+    "comparedToOtherAgents": "del ingreso total.",
+    "comparedToOtherClients": "del ingreso total."
   },
   "topArticleType": {
     "titleAgent": "Más Vendido",
@@ -562,6 +634,8 @@
   "auth": {
     "signIn": "Iniciar sesión",
     "register": "Registrarse",
+    "invalidCredentials": "Credenciales inválidas",
+
     "continueToApp": "Continuar en {{appName}}",
     "email": "Correo Electrónico",
     "password": "Contraseña",
@@ -684,7 +758,8 @@
     "brandUnknown": "Marca Desconocida",
     "lastSoldDate": "Última Fecha de Venta",
     "lastSoldDateUnknown": "Última Fecha de Venta Desconocida",
-    "promoIssuedBy": "Emitida Por"
+    "promoIssuedBy": "Emitida Por",
+    "visitFor": "Visita para {{resultName}}"
   },
   "promoDetails": {
     "notFound": "Detalles de la promoción no encontrados."
@@ -813,10 +888,37 @@
     }
   },
   "sidebar": {
-    "userSettings": "Configuración del Usuario",
-    "accountSettings": "Configuración de la Cuenta",
-    "appSettings": "Configuración de la Aplicación",
-    "manageUsers": "Gestionar Usuarios"
+    "userSettings": "Configuración de Usuario",
+    "accountSettings": "Configuración de Cuenta",
+    "appSettings": "Configuración de la App",
+    "manageUsers": "Gestionar Usuarios",
+    "manageEntities": "Gestionar Entidades"
+  },
+  "manageEntities": {
+    "title": "Gestionar Entidades",
+    "infoTooltip": "Usa los filtros para ver diferentes tipos de entidades. Puedes agregar, editar o eliminar entidades.",
+    "selectEntityPrompt": "Selecciona una entidad para ver los detalles.",
+    "roleSelection": "Selección de rol",
+    "client": "Cliente",
+    "agent": "Agente",
+    "admin": "Administrador",
+    "employee": "Empleado",
+    "searchPlaceholder": "Buscar por nombre o ID",
+    "loadingEntities": "Cargando entidades...",
+    "startTyping": "Comienza a escribir para buscar",
+    "addDisabled": "Agregar Clientes está deshabilitado.",
+    "addEntity": "Agregar Entidad",
+    "actions": "Acciones",
+    "noEntitiesFound": "No se encontraron entidades.",
+    "confirmDelete": "Confirmar Eliminación",
+    "deleteWarning": "¿Estás seguro de que deseas eliminar esta entidad? Esta acción es irreversible. Asegúrate de actualizar cualquier dato relacionado.",
+    "deleteTooltip": "Eliminar",
+    "cancelTooltip": "Cancelar",
+    "deleteButton": "Eliminar",
+    "cancelButton": "Cancelar",
+    "cannotDeleteYourself": "No puedes eliminar tu propia entidad.",
+    "cannotDeleteClient": "No se pueden eliminar entidades de Cliente.",
+    "noEntitySelected": "No se seleccionó ninguna entidad para eliminar."
   },
   "manageUsers": {
     "title": "Gestionar Usuarios",
@@ -950,16 +1052,16 @@
   },
   "editVisitForm": {
     "title": "Editar Visita",
-    "fillAllFields": "Por favor, llena todos los campos obligatorios.",
+    "fillAllFields": "Por favor, complete todos los campos obligatorios.",
     "updateSuccess": "Visita actualizada con éxito.",
     "updateFailed": "Error al actualizar la visita: {{message}}",
     "updateFailedUnknown": "Error al actualizar la visita: Ocurrió un error desconocido.",
     "dateLabel": "Fecha",
     "publicNoteLabel": "Nota Pública",
-    "publicNoteTooltip": "Ingresa una nota pública para la visita.",
+    "publicNoteTooltip": "Ingrese una nota pública para la visita.",
     "privateNoteLabel": "Nota Privada",
-    "privateNoteTooltip": "Ingresa una nota privada para la visita.",
-    "privateNotePlaceholder": "La nota privada solo es visible para ti y los administradores.",
+    "privateNoteTooltip": "Ingrese una nota privada para la visita.",
+    "privateNotePlaceholder": "La nota privada solo es visible para usted y los administradores.",
     "typeLabel": "Tipo",
     "regular": "Regular",
     "urgent": "Urgente",
@@ -970,14 +1072,22 @@
     "saveChangesTooltip": "Guardar Cambios",
     "cancelTooltip": "Cancelar",
     "cancelDialogTitle": "Cancelar Edición",
-    "cancelDialogDescription": "¿Estás seguro de que deseas cancelar la edición de esta visita? Todos los cambios no guardados se perderán.",
+    "cancelDialogDescription": "¿Está seguro de que desea cancelar la edición de esta visita? Todos los cambios no guardados se perderán.",
     "no": "No",
     "yes": "Sí",
-    "completedLabel": "Marcar como Completado",
-    "cancelledLabel": "Marcar como Cancelado",
+    "completedLabel": "Marcar como Completada",
+    "cancelledLabel": "Marcar como Cancelada",
     "pendingLabel": "Pendiente",
-    "completedStatus": "Completado",
-    "cancelledStatus": "Cancelado"
+    "completedStatus": "Completada",
+    "cancelledStatus": "Cancelada",
+    "noChanges": "Debe editar la visita antes de actualizarla.",
+    "fillDate": "Por favor seleccione una fecha.",
+    "visitUpdated": "Visita actualizada con éxito.",
+    "completed": "Completada",
+    "markAsCompleted": "Marcar como Completada",
+    "cancelled": "Cancelada",
+    "markAsCancelled": "Marcar como Cancelada",
+    "pastVisitWarning": "La visita ha pasado de la fecha establecida. ¿La completó? Si es así, por favor agregue su informe y márquela como completada."
   },
   "visitsSidebar": {
     "goBack": "Volver",
@@ -1053,7 +1163,8 @@
       "groupChat": "Crear Chat de Grupo",
       "broadcastChat": "Crear Chat de Difusión",
       "cancel": "Cancelar",
-      "create": "Crear Chat"
+      "create": "Crear Chat",
+      "edit": "Editar Chat"
     },
     "labels": {
       "groupName": "Nombre del Grupo",
@@ -1061,16 +1172,31 @@
       "selectParticipants": "Seleccionar Participantes",
       "cancel": "Cancelar",
       "create": "Crear Chat",
+      "edit": "Editar",
+      "selectAdmins": "Seleccionar Administradores",
+      "searchAdmins": "Buscar Administradores",
       "searchUsers": "Buscar Usuarios",
-      "findParticipants": "Buscar Participantes"
+      "findParticipants": "Encontrar Participantes"
     },
     "errors": {
-      "noParticipants": "Por favor selecciona al menos un participante.",
-      "chatNameRequired": "Se requiere el nombre del chat.",
-      "createChatFailed": "Error al crear el chat. Inténtalo de nuevo."
+      "noParticipants": "Por favor, selecciona al menos un participante.",
+      "chatNameRequired": "El nombre del chat es obligatorio.",
+      "createChatFailed": "No se pudo crear el chat. Por favor, inténtalo de nuevo.",
+      "chatTypeRequired": "El tipo de chat es obligatorio.",
+      "userNotLoggedIn": "Debes estar conectado para crear un chat.",
+      "editChatFailed": "No se pudo editar el chat. Por favor, inténtalo de nuevo."
     },
     "success": {
-      "createChat": "¡Chat creado con éxito!"
+      "createChat": "¡Chat creado con éxito!",
+      "editChat": "¡Chat editado con éxito!"
+    },
+    "buttons": {
+      "deselectAll": "Deseleccionar Todo",
+      "selectAll": "Seleccionar Todo"
+    },
+    "placeholders": {
+      "searchAdminPlaceholder": "Buscar administradores por nombre o ID",
+      "searchPlaceholder": "Buscar usuarios por nombre o ID"
     },
     "userList": {
       "table": "Tabla de Selección de Usuarios",
@@ -1085,7 +1211,8 @@
   "chats": {
     "error": "Ocurrió un error con los chats:",
     "defaultTitle": "Chat",
-    "groupTitle": "Chat de Grupo"
+    "groupTitle": "Chat de Grupo",
+    "deletedUser": "Usuario Eliminado"
   },
   "errors": {
     "userNotFound": "Usuario con ID {{id}} no encontrado.",
@@ -1165,11 +1292,14 @@
     "topArticleType": "Tipos de Artículos Más Vendidos",
     "monthOverMonthSpendingTrend": "Tendencia de Gastos Mes a Mes",
     "topBrandsSold": "Marcas Más Vendidas",
-    "totalEarning": "Ganancias Totales",
+    "totalGross": "Total Bruto",
+    "totalEarning": "Ganancia Total",
     "totalOrders": "Pedidos Totales",
     "salesDistribution": "Distribución de Ventas",
     "upcomingVisits": "Próximas Visitas",
-    "yourCalendar": "Tu Calendario"
+    "yourCalendar": "Tu Calendario",
+       "SearchTitleAgent": "Buscar clientes",
+    "SearchTitleAdmin": "Buscar clientes o agentes"
   },
   "articlesPage": {
     "name": "Nombre",
@@ -1205,7 +1335,7 @@
     "headers": {
       "user": "Usuario",
       "eventType": "Tipo de Evento",
-      "reason": "Razón",
+      "reason": "Motivo",
       "startDate": "Fecha de Inicio",
       "endDate": "Fecha de Fin",
       "status": "Estado",
@@ -1216,10 +1346,52 @@
     },
     "toast": {
       "approveSuccess": "Evento aprobado con éxito.",
-      "approveFailure": "No se pudo aprobar el evento.",
+      "approveFailure": "Error al aprobar el evento.",
       "rejectSuccess": "Evento rechazado con éxito.",
-      "rejectFailure": "No se pudo rechazar el evento.",
+      "rejectFailure": "Error al rechazar el evento.",
       "genericError": "Ocurrió un error."
-    }
+    },
+    "filterSelection": "Selección de filtro",
+    "filterAll": "Todos",
+    "na": "N/A",
+    "system": "Sistema",
+    "unknown": "Desconocido"
+  },
+  "weather": {
+    "0": "Cielo despejado",
+    "1": "Principalmente despejado",
+    "2": "Parcialmente nublado",
+    "3": "Cubierto",
+    "45": "Niebla",
+    "48": "Niebla densa",
+    "51": "Llovizna ligera",
+    "53": "Llovizna moderada",
+    "55": "Llovizna densa",
+    "56": "Llovizna congelante ligera",
+    "57": "Llovizna congelante densa",
+    "61": "Lluvia ligera",
+    "63": "Lluvia moderada",
+    "65": "Lluvia fuerte",
+    "66": "Lluvia congelante ligera",
+    "67": "Lluvia congelante fuerte",
+    "71": "Nevada ligera",
+    "73": "Nevada moderada",
+    "75": "Nevada fuerte",
+    "77": "Granizo",
+    "80": "Llovizna ligera",
+    "81": "Llovizna moderada",
+    "82": "Llovizna violenta",
+    "85": "Nevada ligera",
+    "86": "Nevada fuerte",
+    "95": "Tormenta eléctrica",
+    "96": "Tormenta eléctrica con granizo ligero",
+    "99": "Tormenta eléctrica con granizo fuerte",
+    "Forecast": "Pronóstico:"
+  },
+  "pwa": {
+    "newContentAvailable": "¡Nuevos contenidos están disponibles!",
+    "clickToReload": "Haz clic en el botón de abajo para recargar la aplicación y actualizar a la última versión.",
+    "reloadButton": "Recargar",
+    "offlineReady": "La aplicación está lista para funcionar sin conexión."
   }
 }

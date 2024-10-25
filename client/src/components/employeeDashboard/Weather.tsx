@@ -150,7 +150,7 @@ const WeatherComponent: React.FC = () => {
             variant={isDesktop ? "h5" : "subtitle1"}
             sx={{ textAlign: "left" }}
           >
-            Forecast:
+            {t('weather.Forecast')}
           </Typography>
           {/* Forecast Section */}
           {!isLoading && weather?.forecast && (

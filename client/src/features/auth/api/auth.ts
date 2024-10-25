@@ -1,7 +1,6 @@
 // services/api/auth.ts
 
 import axios from "axios";
-import { setAccessToken } from "../../../services/tokenService";
 import { authApiCall } from "../../../utils/apiUtils";
 import { getUniqueIdentifier } from "../../../utils/cryptoUtils";
 
@@ -24,6 +23,7 @@ export const loginUser = async (credentials: {
   message: string;
   statusCode: number;
   refreshToken: string;
+  accessToken: string;
 }> => {
   const uniqueId = getUniqueIdentifier();
   // console.log("Generated uniqueId for login:", uniqueId);
@@ -41,21 +41,14 @@ export const loginUser = async (credentials: {
 
     // console.log("Login API response:", response);
 
-    // Validate tokens
-    if (!response.accessToken || !response.refreshToken) {
-      console.error("Access token or refresh token missing in login response");
-      throw new Error("Login failed: Access token or Refresh token missing");
-    }
 
-    // Store the access token in memory
-    setAccessToken(response.accessToken);
-    // console.log("Access token set successfully in memory");
 
     return {
       id: response.id,
       message: response.message,
       statusCode: response.statusCode,
       refreshToken: response.refreshToken,
+      accessToken: response.accessToken,
     };
   } catch (error) {
     console.error("Error during login API call:", error);

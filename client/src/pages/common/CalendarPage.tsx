@@ -181,8 +181,8 @@ const CalendarPage: React.FC = () => {
       >
         <Typography variant="h6" sx={{ fontWeight: "bold", color: "black" }}>
           {viewMode === "history"
-            ? t("calendar.HistoryTitle")
-            : t("calendar.Title")}
+            ? t("calendarPage.HistoryTitle")
+            : t("calendarPage.Title")}
         </Typography>
         <IconButton
           onClick={toggleViewMode}
