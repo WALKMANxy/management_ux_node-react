@@ -563,8 +563,8 @@
     "neutral": "",
     "less": "",
     "even": "",
-    "comparedToOtherAgents": "compared to all.",
-    "comparedToOtherClients": "compared to all."
+    "comparedToOtherAgents": "of total revenue.",
+    "comparedToOtherClients":  "of total revenue."
   },
   "spentThisYear": {
     "titleAgent": "Earned This Year",
@@ -574,8 +574,8 @@
     "neutral": "",
     "less": "",
     "even": "",
-    "comparedToOtherAgents": "compared to all.",
-    "comparedToOtherClients": "compared to all."
+    "comparedToOtherAgents":  "of total revenue.",
+    "comparedToOtherClients": "of total revenue."
   },
   "topArticleType": {
     "titleAgent": "Top Sold",

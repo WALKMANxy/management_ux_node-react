@@ -30,6 +30,18 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import PeopleIcon from "@mui/icons-material/People";
 import SettingsIcon from "@mui/icons-material/Settings";
 
+// Preload functions for each page
+const preloadStatistics = () =>
+  import("../../pages/statistics/StatisticsDashboard");
+const preloadMovements = () => import("../../pages/common/MovementsPage");
+const preloadClients = () => import("../../pages/common/ClientsPage");
+const preloadArticles = () => import("../../pages/common/ArticlesPage");
+const preloadVisits = () => import("../../pages/common/VisitsPage");
+const preloadPromos = () => import("../../pages/common/PromosPage");
+const preloadCalendar = () => import("../../pages/common/CalendarPage");
+const preloadMessages = () => import("../../pages/common/ChatPage");
+const preloadSettings = () => import("../../pages/common/UserPage");
+
 const NavigationComponent: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -48,6 +60,7 @@ const NavigationComponent: React.FC = () => {
       label: "Statistics",
       icon: <AssessmentIcon />, // New icon
       onClick: () => navigate("/statistics"),
+      onmouseenter: () => preloadStatistics(),
       color: "#ff9800", // Example color
       path: "/statistics",
       roles: ["admin", "client", "agent"], // Only these roles
@@ -56,6 +69,7 @@ const NavigationComponent: React.FC = () => {
       label: "Movements",
       icon: <HistoryIcon />,
       onClick: () => navigate("/movements"),
+      onmouseenter: () => preloadMovements(),
       color: "#3f51b5",
       path: "/movements",
       roles: ["admin", "client", "agent"], // Exclude 'employee'
@@ -64,6 +78,7 @@ const NavigationComponent: React.FC = () => {
       label: "Clients",
       icon: <PeopleIcon />,
       onClick: () => navigate("/clients"),
+      onmouseenter: () => preloadClients(),
       color: "#4caf50",
       path: "/clients",
       roles: ["admin", "client", "agent"], // Exclude 'employee'
@@ -72,6 +87,7 @@ const NavigationComponent: React.FC = () => {
       label: "Articles",
       icon: <CategoryIcon />,
       onClick: () => navigate("/articles"),
+      onmouseenter: () => preloadArticles(),
       color: "#9c27b0",
       path: "/articles",
       roles: ["admin", "client", "agent"], // Exclude 'employee'
@@ -80,6 +96,7 @@ const NavigationComponent: React.FC = () => {
       label: "Visits",
       icon: <EventNoteIcon />,
       onClick: () => navigate("/visits"),
+      onmouseenter: () => preloadVisits(),
       color: "#ff5722",
       path: "/visits",
       roles: ["admin", "client", "agent"], // Exclude 'employee'
@@ -88,6 +105,7 @@ const NavigationComponent: React.FC = () => {
       label: "Promos",
       icon: <LocalOfferIcon />,
       onClick: () => navigate("/promos"),
+      onmouseenter: () => preloadPromos(),
       color: "#00bcd4",
       path: "/promos",
       roles: ["admin", "client", "agent"], // Exclude 'employee'
@@ -96,6 +114,7 @@ const NavigationComponent: React.FC = () => {
       label: "Calendar",
       icon: <CalendarTodayIcon />,
       onClick: () => navigate("/calendar"),
+      onmouseenter: () => preloadCalendar(),
       color: "#3f51b5",
       path: "/calendar",
       roles: ["admin", "client", "agent", "employee"], // Accessible to 'employee' as well
@@ -104,6 +123,7 @@ const NavigationComponent: React.FC = () => {
       label: "Messages",
       icon: <ChatBubbleOutlineIcon />,
       onClick: () => navigate("/messages"),
+      onmouseenter: () => preloadMessages(),
       color: "#25D366", // WhatsApp-like green
       path: "/messages",
       roles: ["admin", "client", "agent", "employee"],
@@ -112,6 +132,7 @@ const NavigationComponent: React.FC = () => {
       label: "Settings",
       icon: <SettingsIcon />,
       onClick: () => navigate("/settings"),
+      onmouseenter: () => preloadSettings(),
       color: "#9e9e9e", // Gray color
       path: "/settings",
       roles: ["admin", "client", "agent", "employee"],
@@ -166,7 +187,6 @@ const NavigationComponent: React.FC = () => {
           spacing={4}
           sx={{
             width: "auto",
-
           }}
         >
           {filteredNavItems.map((item) => (
@@ -181,12 +201,12 @@ const NavigationComponent: React.FC = () => {
                 justifyContent: "center",
                 alignItems: "center",
               }}
-
             >
               <Tooltip title={item.label} arrow>
                 <IconButton
                   onClick={item.onClick}
                   size="large"
+                  onMouseEnter={item.onmouseenter}
                   sx={{
                     width: isMobile ? "50px" : isTablet ? "60px" : "70px", // Adjust width based on screen size
                     height: isMobile ? "50px" : isTablet ? "60px" : "70px", // Adjust height based on screen size

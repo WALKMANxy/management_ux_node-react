@@ -56,7 +56,7 @@ const EmployeeDashboard: React.FC = () => {
             sx={{
               borderRadius: "50%",
               position: "absolute",
-              top: 40,
+              top: 90,
               right: 32,
               zIndex: 1000,
             }}
@@ -69,7 +69,7 @@ const EmployeeDashboard: React.FC = () => {
             onClick={handleToggleDrawer}
             sx={{
               position: "absolute",
-              top: 80,
+              top: 90,
               right: 32,
               zIndex: 1000,
             }}

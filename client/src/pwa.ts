@@ -1,15 +1,24 @@
 import { registerSW } from "virtual:pwa-register";
+import { toast } from "sonner";
+import i18n from 'i18next'; // Import i18n directly
 
 export function registerPWA() {
   const updateSW = registerSW({
     onNeedRefresh() {
-      // You can show a prompt to the user here if you want to allow manual updates
-      if (confirm("New content available. Reload?")) {
-        updateSW(true);
-      }
+      // Use Sonner to show a custom toast for the update with translation from i18n
+      toast(i18n.t("pwa.new_content_available"), {
+        description: i18n.t("pwa.click_to_reload"),
+        action: {
+          label: i18n.t("pwa.reload_button"),
+          onClick: () => {
+            updateSW(true); // Trigger the service worker update
+          },
+        },
+      });
     },
     onOfflineReady() {
-      console.log("App ready to work offline");
+      // Show a toast when the app is ready to work offline, using i18n translation
+      toast.success(i18n.t("pwa.offline_ready"));
     },
   });
 }
