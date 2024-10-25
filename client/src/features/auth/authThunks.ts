@@ -51,21 +51,22 @@ export const handleLogin = createAsyncThunk(
 );
 
 // Thunk to handle logout with side effects
+// Thunk to handle logout with side effects
 export const handleLogout = createAsyncThunk(
   "auth/handleLogout",
   async (_, { rejectWithValue }) => {
     try {
-      // Call the logout API endpoint
-      await logoutUser();
+      // Attempt to call the logout API endpoint and disconnect WebSocket
+      try {
+        await logoutUser();
+        webSocketService.disconnect();
+      } catch (apiError) {
+        console.error("Logout API call or WebSocket disconnect failed:", apiError);
+      }
 
-      webSocketService.disconnect();
-
-      // Clear tokens
-      //   console.log("Removing auth state from sessionStorage");
+      // Clear tokens and auth state regardless of API outcome
       sessionStorage.removeItem("authState");
-      //   console.log("Removing auth state from localStorage");
       localStorage.removeItem("authState");
-      //   console.log("Clearing access token");
       setAccessToken(null);
 
       return; // No payload needed
