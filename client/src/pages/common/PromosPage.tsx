@@ -73,9 +73,7 @@ const PromosPage: React.FC = () => {
   }, [selectedPromo, mode]);
 
   useEffect(() => {
-    console.log("Selected promo ID changed:", selectedPromoId);
     if (selectedPromoId) {
-      console.log("Setting mode to 'view'");
       setMode("view");
     }
   }, [selectedPromoId, setMode]);

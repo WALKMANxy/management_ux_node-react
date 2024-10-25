@@ -1,4 +1,5 @@
 import { Request } from "express";
+import ms from "ms";
 import { config } from "../config/config";
 import { ISession, Session } from "../models/Session";
 import { AuthenticatedRequest } from "../models/types";
@@ -11,8 +12,6 @@ import {
   verifyRefreshTokenJWT,
 } from "./jwtUtils";
 import { logger } from "./logger";
-
-const ms = require("ms");
 
 const refreshTokenDurationMs = ms(config.jwt.refreshTokenExpiry); // e.g., "7d"
 
@@ -33,12 +32,14 @@ export const createSession = async (
 
     const userId = user?._id?.toString();
 
-     logger.info("Attempting to create session", { userId, uniqueId });
+    logger.info("Attempting to create session", { userId, uniqueId });
 
     const userAgent = req.get("User-Agent") || "Unknown";
-     logger.info("Retrieved User-Agent from request", { userAgent });
+    logger.info("Retrieved User-Agent from request", { userAgent });
 
-    console.log("Checking if a session with the same userId, uniqueId, and userAgent exists");
+    console.log(
+      "Checking if a session with the same userId, uniqueId, and userAgent exists"
+    );
     const existingSession = await Session.findOne({
       userId,
       uniqueId,
@@ -55,12 +56,12 @@ export const createSession = async (
     }
 
     // Generate tokens
-     logger.info("Generating new tokens for user", { userId });
+    logger.info("Generating new tokens for user", { userId });
     const newAccessToken = generateAccessToken(user as IUser, uniqueId);
     const newRefreshToken = generateRefreshToken(user as IUser);
 
     // Create session
-     logger.info("Saving new session to database", { userId, uniqueId });
+    logger.info("Saving new session to database", { userId, uniqueId });
     const session = new Session({
       userId,
       refreshToken: newRefreshToken,
@@ -70,7 +71,7 @@ export const createSession = async (
       uniqueId,
     });
 
-     console.log("Saved session:", session.toObject());
+    console.log("Saved session:", session.toObject());
 
     await session.save();
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
@@ -175,7 +176,6 @@ export const getSessionByAccessToken = async (
   }
 };
 
-
 export const renewSession = async (
   refreshToken: string,
   req: Request,
@@ -195,8 +195,6 @@ export const renewSession = async (
       return null;
     }
 
-
-
     // Optional: Validate uniqueId, IP, User-Agent
     if (uniqueId && session.uniqueId !== uniqueId) {
       logger.warn("Unique identifier mismatch during token refresh", {
@@ -207,24 +205,26 @@ export const renewSession = async (
       return null;
     }
 
-     // Step 1: Verify and decode the refresh token to extract userId
-     let decodedToken;
-     try {
-       decodedToken = verifyRefreshTokenJWT(refreshToken);
-     } catch (err) {
-       logger.warn("Invalid or expired refresh token", { refreshToken, error: err });
-       return null;
-     }
+    // Step 1: Verify and decode the refresh token to extract userId
+    let decodedToken;
+    try {
+      decodedToken = verifyRefreshTokenJWT(refreshToken);
+    } catch (err) {
+      logger.warn("Invalid or expired refresh token", {
+        refreshToken,
+        error: err,
+      });
+      return null;
+    }
 
-     const userId = decodedToken.userId;
-     if (!userId) {
-       logger.warn("Refresh token does not contain userId", { refreshToken });
-       return null;
-     }
+    const userId = decodedToken.userId;
+    if (!userId) {
+      logger.warn("Refresh token does not contain userId", { refreshToken });
+      return null;
+    }
 
-     // Step 2: Retrieve userAgent from the request
-     const userAgent = req.get("User-Agent") || "Unknown";
-
+    // Step 2: Retrieve userAgent from the request
+    const userAgent = req.get("User-Agent") || "Unknown";
 
     if (session.expiresAt < new Date()) {
       logger.warn("Refresh token expired", { sessionId: session._id });
@@ -276,7 +276,11 @@ export const invalidateSession = async (
   uniqueId: string,
   userAgent: string
 ): Promise<boolean> => {
-  console.log(`invalidateSession called with:`, { userId, uniqueId, userAgent });
+  console.log(`invalidateSession called with:`, {
+    userId,
+    uniqueId,
+    userAgent,
+  });
   try {
     const result = await Session.deleteOne({ userId, uniqueId, userAgent });
     console.log(`Deleted session:`, result);
@@ -298,7 +302,6 @@ export const invalidateSession = async (
     return false;
   }
 };
-
 
 /**
  * Invalidates all sessions for a specific user.

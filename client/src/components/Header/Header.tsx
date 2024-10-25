@@ -42,6 +42,16 @@ import GlobalSearch from "./GlobalSearch";
 const NotificationBell = React.lazy(() => import("./NotificationBell"));
 const UserAvatar = React.lazy(() => import("./UserAvatar"));
 
+const preloadStatistics = () =>
+  import("../../pages/statistics/StatisticsDashboard");
+const preloadMovements = () => import("../../pages/common/MovementsPage");
+const preloadClients = () => import("../../pages/common/ClientsPage");
+const preloadArticles = () => import("../../pages/common/ArticlesPage");
+const preloadVisits = () => import("../../pages/common/VisitsPage");
+const preloadPromos = () => import("../../pages/common/PromosPage");
+const preloadCalendar = () => import("../../pages/common/CalendarPage");
+
+
 const Header: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -64,7 +74,7 @@ const Header: React.FC = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+      if (currentScrollY > lastScrollY && currentScrollY > 60) {
         // If scrolling down and past 100px
         setShowAppBar(false); // Hide AppBar
       } else if (currentScrollY < lastScrollY) {
@@ -134,7 +144,7 @@ const Header: React.FC = () => {
           to={dashboardLink}
           onClick={toggleDrawer}
         >
-          <ListItemIcon sx={{ color: "white" }}>
+          <ListItemIcon  sx={{ color: "white" }}>
             <HomeIcon />
           </ListItemIcon>
           <ListItemText primary={t("headerDashboard", "Dashboard")} />
@@ -146,6 +156,7 @@ const Header: React.FC = () => {
             component={Link}
             to={statisticsLink}
             onClick={toggleDrawer}
+            onMouseEnter={preloadStatistics}
           >
             <ListItemIcon sx={{ color: "white" }}>
               <AssessmentIcon />
@@ -161,6 +172,7 @@ const Header: React.FC = () => {
               component={Link}
               to="/movements"
               onClick={toggleDrawer}
+              onMouseEnter={preloadMovements}
             >
               <ListItemIcon sx={{ color: "white" }}>
                 <HistoryIcon />
@@ -173,6 +185,7 @@ const Header: React.FC = () => {
               component={Link}
               to="/clients"
               onClick={toggleDrawer}
+              onMouseEnter={preloadClients}
             >
               <ListItemIcon sx={{ color: "white" }}>
                 <PeopleIcon />
@@ -185,6 +198,7 @@ const Header: React.FC = () => {
               component={Link}
               to="/articles"
               onClick={toggleDrawer}
+              onMouseEnter={preloadArticles}
             >
               <ListItemIcon sx={{ color: "white" }}>
                 <CategoryIcon />
@@ -197,6 +211,7 @@ const Header: React.FC = () => {
               component={Link}
               to="/visits"
               onClick={toggleDrawer}
+              onMouseEnter={preloadVisits}
             >
               <ListItemIcon sx={{ color: "white" }}>
                 <EventNoteIcon />
@@ -209,6 +224,7 @@ const Header: React.FC = () => {
               component={Link}
               to="/promos"
               onClick={toggleDrawer}
+              onMouseEnter={preloadPromos}
             >
               <ListItemIcon sx={{ color: "white" }}>
                 <LocalOfferIcon />
@@ -224,6 +240,7 @@ const Header: React.FC = () => {
             component={Link}
             to="/calendar"
             onClick={toggleDrawer}
+            onMouseEnter={preloadCalendar}
           >
             <ListItemIcon sx={{ color: "white" }}>
               <CalendarMonthIcon />

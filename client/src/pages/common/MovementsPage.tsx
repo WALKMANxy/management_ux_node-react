@@ -11,6 +11,7 @@ import { useMovementsGrid } from "../../hooks/useMovementsGrid";
 import { Movement } from "../../models/dataModels";
 import { MovementColumnDefinition } from "../../models/propsModels"; // Import the new type
 import {
+  calculateTotalNetPriceSold,
   calculateTotalPriceSold,
   calculateTotalQuantity,
   currencyFormatter,
@@ -97,6 +98,15 @@ const MovementsPage: React.FC = () => {
           headerName: t("movementsPage.totalPriceSold"),
           valueGetter: (params: { data: Movement }) =>
             calculateTotalPriceSold(params.data),
+          valueFormatter: (params: { value: number }) =>
+            currencyFormatter(params.value),
+          comparator: numberComparator,
+          sortable: true,
+        },
+        {
+          headerName: t("movementsPage.netRevenue"), // New column for Net Revenue
+          valueGetter: (params: { data: Movement }) =>
+            calculateTotalNetPriceSold(params.data),
           valueFormatter: (params: { value: number }) =>
             currencyFormatter(params.value),
           comparator: numberComparator,

@@ -6,9 +6,17 @@ import { ignoreArticleNames } from "./constants";
 
 // Helper function to get month and year from a date string
 export const getMonthYear = (dateString: string) => {
-  const date = dayjs(dateString);
-  return date.format("YYYY-MM");
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    console.error("Invalid date:", dateString);
+    return "Invalid Date";
+  }
+  const year = date.getFullYear();
+  // getMonth() returns 0-11, so we add 1 and pad with zero if needed
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
 };
+
 
 // Calculate total revenue for a list of clients
 export const calculateTotalRevenue = (clients: Client[]): number => {
@@ -57,9 +65,8 @@ export const calculateSalesDistributionDataForAgents = (
   return isMobile ? sortedData.slice(0, 8) : sortedData.slice(0, 25);
 };
 
-// Calculate total orders for a list of clients
 // Helper function to group movements by order ID
-const groupByOrderId = (
+/* const groupByOrderId = (
   movements: Movement[]
 ): { [orderId: string]: Movement[] } => {
   return movements.reduce((acc, movement) => {
@@ -70,7 +77,7 @@ const groupByOrderId = (
     acc[orderId].push(movement);
     return acc;
   }, {} as { [orderId: string]: Movement[] });
-};
+}; */
 
 // Calculate total orders for a list of clients based on unique order IDs
 export const calculateTotalOrders = (clients: Client[]): number => {
@@ -244,57 +251,63 @@ export const calculateMonthlyRevenue = (
 
 // Calculate monthly data (revenue and orders) from clients
 export const calculateMonthlyData = (clients: Client[]) => {
-  const allMovements = clients.flatMap((client) => client.movements);
+  const monthlyData: {
+    [key: string]: { revenue: number; netRevenue: number; orders: number };
+  } = {};
 
-  const groupedByOrderId = groupByOrderId(allMovements);
+  const orderIdsPerMonth: { [key: string]: Set<string> } = {};
 
-  const monthlyData = Object.values(groupedByOrderId).reduce(
-    (acc, movements) => {
-      const uniqueMovement = movements[0]; // Use the first movement as a representative for the order
-      const monthYear = getMonthYear(uniqueMovement.dateOfOrder);
+  const revenuePerOrderId: {
+    [orderId: string]: { revenue: number; netRevenue: number; monthYear: string };
+  } = {};
+
+  for (const client of clients) {
+    for (const movement of client.movements) {
+      const orderId = movement.id;
+      const dateOfOrder = movement.dateOfOrder;
+      const monthYear = getMonthYear(dateOfOrder);
 
       if (monthYear === "Invalid Date") {
-        console.error("Skipping movement with invalid date:", uniqueMovement);
-        return acc;
+        console.error("Skipping movement with invalid date:", movement);
+        continue;
       }
 
-      const movementRevenue = movements.reduce(
-        (sum, movement) =>
-          sum +
-          movement.details.reduce(
-            (detailSum, detail) => detailSum + parseFloat(detail.priceSold),
-            0
-          ),
-        0
-      );
-
-      const movementNetRevenue = movements.reduce(
-        (sum, movement) =>
-          sum +
-          movement.details.reduce((detailSum, detail) => {
-            const priceSold = parseFloat(detail.priceSold) || 0;
-            const priceBought =
-              Math.abs(parseFloat(detail.priceBought) || 0) *
-              (detail.quantity || 0);
-            return detailSum + priceSold - priceBought;
-          }, 0),
-        0
-      );
-
-      if (!acc[monthYear]) {
-        acc[monthYear] = { revenue: 0, netRevenue: 0, orders: 0 };
+      if (!monthlyData[monthYear]) {
+        monthlyData[monthYear] = { revenue: 0, netRevenue: 0, orders: 0 };
+        orderIdsPerMonth[monthYear] = new Set();
       }
 
-      acc[monthYear].revenue += movementRevenue;
-      acc[monthYear].netRevenue += movementNetRevenue;
-      acc[monthYear].orders += 1; // Each group of movements with the same orderId counts as one order
+      if (!revenuePerOrderId[orderId]) {
+        revenuePerOrderId[orderId] = { revenue: 0, netRevenue: 0, monthYear };
+      }
 
-      return acc;
-    },
-    {} as {
-      [key: string]: { revenue: number; netRevenue: number; orders: number };
+      let movementRevenue = 0;
+      let movementNetRevenue = 0;
+
+      for (const detail of movement.details) {
+        const priceSold = parseFloat(detail.priceSold) || 0;
+        const priceBought =
+          Math.abs(parseFloat(detail.priceBought) || 0) * (detail.quantity || 0);
+        movementRevenue += priceSold;
+        movementNetRevenue += priceSold - priceBought;
+      }
+
+      revenuePerOrderId[orderId].revenue += movementRevenue;
+      revenuePerOrderId[orderId].netRevenue += movementNetRevenue;
+
+      if (!orderIdsPerMonth[monthYear].has(orderId)) {
+        orderIdsPerMonth[monthYear].add(orderId);
+        monthlyData[monthYear].orders += 1;
+      }
     }
-  );
+  }
+
+  // Aggregate revenue and net revenue per month
+  for (const orderId in revenuePerOrderId) {
+    const { revenue, netRevenue, monthYear } = revenuePerOrderId[orderId];
+    monthlyData[monthYear].revenue += revenue;
+    monthlyData[monthYear].netRevenue += netRevenue;
+  }
 
   const months = Object.keys(monthlyData).sort();
   const revenueData = months.map((month) => monthlyData[month].revenue);
@@ -303,6 +316,7 @@ export const calculateMonthlyData = (clients: Client[]) => {
 
   return { months, revenueData, netRevenueData, ordersData };
 };
+
 
 // Calculate total quantity for a movement
 export const calculateTotalQuantity = (movement: Movement): number => {
@@ -316,6 +330,25 @@ export const calculateTotalPriceSold = (movement: Movement): string => {
     0
   );
   return total.toFixed(2);
+};
+
+export const calculateTotalNetPriceSold = (movement: Movement): string => {
+  // Calculate total price sold
+  const totalPriceSold = movement.details.reduce(
+    (total, detail) => total + parseFloat(detail.priceSold),
+    0
+  );
+
+  // Calculate total cost of goods sold (COGS)
+  const totalCostOfGoodsSold = movement.details.reduce(
+    (total, detail) => total + parseFloat(detail.priceBought) * detail.quantity,
+    0
+  );
+
+  // Net revenue is total price sold minus COGS
+  const netRevenue = totalPriceSold - totalCostOfGoodsSold;
+
+  return netRevenue.toFixed(2);
 };
 
 const currencyFormatterInstance = new Intl.NumberFormat("de-DE", {
