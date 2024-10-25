@@ -1,166 +1,174 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { downloadFile, fetchThumbnail } from "../features/chat/api/chats";
+import { v4 as uuidv4 } from "uuid"; // Import UUID function
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { downloadFileFromS3 } from "../features/data/api/media";
+import {
+  addDownloadedFile,
+  clearDownloadedFiles,
+  selectDownloadedFiles,
+} from "../features/downloads/downloadedFilesSlice";
+import { Attachment } from "../models/dataModels";
 
-// Define the structure of the attachment
-export interface Attachment {
-  file?: File; // Local file, only for client-side usage
-  url: string;
-  type: "image" | "video" | "pdf" | "word" | "excel" | "csv" | "other";
-  fileName: string;
-  size: number;
-  thumbnailUrl?: string; // Optional thumbnail for images
-}
-
-
-const MAX_FILES = 10; // Maximum number of files allowed
+const MAX_FILES = 5; // Maximum number of files allowed
 const MAX_FILE_SIZE_MB = 15; // Max size per file in MB
-const MAX_TOTAL_SIZE_MB = 50; // Max total size of all files in MB
+const MAX_TOTAL_SIZE_MB = 75; // Max total size of all files in MB
 
 // Hook to manage file preview and download logic
 export const useFilePreview = () => {
+  const dispatch = useAppDispatch();
+  const downloadedFiles = useAppSelector(selectDownloadedFiles);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [isPreview, setIsPreview] = useState<boolean>(false);
   const [currentFile, setCurrentFile] = useState<Attachment | null>(null);
   const [selectedAttachments, setSelectedAttachments] = useState<Attachment[]>(
     []
   );
-  const [downloadedFiles, setDownloadedFiles] = useState<Attachment[]>([]);
-  const [downloadedThumbnails, setDownloadedThumbnails] = useState<
-    Attachment[]
-  >([]);
 
-  const [isPreview, setIsPreview] = useState<boolean>(false);
+  const downloadedFilesRef = useRef(downloadedFiles);
 
-  const fetchAndStoreThumbnail = useCallback(async (attachment: Attachment) => {
-    try {
-      const downloadThumbnailUrl = await fetchThumbnail(
-        attachment.thumbnailUrl!
-      );
-
-      // Store the downloaded thumbnail in the state using the fileName as the key
-      setDownloadedThumbnails((prev) => [
-        ...prev,
-        { ...attachment, thumbnailUrl: downloadThumbnailUrl },
-      ]);
-    } catch (error) {
-      console.error("Error fetching thumbnail:", error);
-    }
-  }, []);
+  useEffect(() => {
+    downloadedFilesRef.current = downloadedFiles;
+  }, [downloadedFiles]);
 
   const downloadAndStoreFile = useCallback(
-    async (attachment: Attachment) => {
-      try {
-        const downloadUrl = await downloadFile(attachment.url, (progress) => {
-          // Optionally update download progress state here if needed
-          console.log(
-            `Download progress for ${attachment.fileName}: ${progress}%`
-          );
-        });
-
-        // Store the downloaded file in the state
-        setDownloadedFiles((prev) => [
-          ...prev,
-          { ...attachment, url: downloadUrl },
-        ]);
-
-        // Fetch and store the thumbnail if it's an image or video
-        if (["image", "video"].includes(attachment.type)) {
-          fetchAndStoreThumbnail(attachment);
-        }
-
-        toast.success(`${attachment.fileName} downloaded successfully.`);
-      } catch (error) {
-        toast.error(`Failed to download ${attachment.fileName}.`);
-        console.error("Error downloading file:", error);
-      }
-    },
-    [fetchAndStoreThumbnail]
-  );
-
-  const clearDownloadedData = useCallback(() => {
-    // Clear downloaded files
-    setDownloadedFiles((prev) => {
-      prev.forEach((attachment) => URL.revokeObjectURL(attachment.url));
-      return [];
-    });
-
-    // Clear downloaded thumbnails
-    setDownloadedThumbnails((prev) => {
-      prev.forEach((attachment) => URL.revokeObjectURL(attachment.url));
-      return [];
-    });
-  }, []);
-
-
-
-
-  const download = useCallback((attachment: Attachment) => {
-    try {
-      // Check if the attachment URL exists and is valid
-      if (!attachment.url) {
-        toast.error("Invalid file URL.");
+    async (attachment: Attachment, onProgress?: (progress: number) => void) => {
+      if (!attachment.chatId || !attachment.messageId) {
+        toast.error("Missing chatId or messageId for the attachment.");
+        console.error("Attachment is missing chatId or messageId:", attachment);
         return;
       }
 
-      // Create a link element
-      const link = document.createElement("a");
-      link.href = attachment.url; // URL can be a blob or a remote file URL
+      console.groupCollapsed(`Downloading file: ${attachment.fileName}`);
+      try {
+        console.log(`Download request:`, attachment);
 
-      // Set the download attribute with the file name
-      link.download = attachment.fileName;
+        const blobUrl = await downloadFileFromS3(attachment, (progress) => {
+          if (onProgress) {
+            onProgress(progress);
+          }
+        });
 
-      // Trigger the download
-      document.body.appendChild(link); // Append to the DOM temporarily
-      link.click(); // Programmatically click the link to download
-      document.body.removeChild(link); // Remove it after downloading
-    } catch (error) {
-      toast.error("Failed to download the file.");
-      console.error("Error downloading the file:", error);
-    }
-  }, []);
+        // Ensure blobUrl is valid
+        if (!blobUrl) {
+          toast.error(
+            `Failed to retrieve valid Blob URL for ${attachment.fileName}.`
+          );
+          console.error(`Invalid Blob URL for file: ${attachment.fileName}`);
+          return;
+        }
+
+        console.log(`Download complete:`, blobUrl);
+
+        dispatch(
+          addDownloadedFile({
+            ...attachment,
+            url: blobUrl ?? "",
+            file: undefined, // Ensure file is not stored
+            uploadProgress: 100, // Set download progress to 100%
+            status: "uploaded", // Set status to uploaded
+          })
+        );
+      } catch (error) {
+        toast.error(`Failed to download ${attachment.fileName}.`);
+        console.error("Error downloading file:", error);
+      } finally {
+        console.groupEnd();
+      }
+    },
+    [dispatch]
+  );
+
+  const clearDownloadedData = useCallback(() => {
+    dispatch(clearDownloadedFiles());
+  }, [dispatch]);
+
+  const handleSave = useCallback(
+    (fileName: string) => {
+      try {
+        // Use the ref to access the latest downloadedFiles
+        const currentDownloadedFiles = [...downloadedFilesRef.current];
+
+        const fileToDownload = currentDownloadedFiles.find(
+          (file) => file.fileName === fileName
+        );
+
+        if (!fileToDownload || !fileToDownload.url) {
+          toast.error("File not found or invalid file URL.");
+          console.error("File not found with fileName:", fileName);
+          return;
+        }
+
+        // Create a download link and trigger the download
+        const link = document.createElement("a");
+        link.href = fileToDownload.url;
+        link.download = fileToDownload.fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link); // Clean up the link element
+      } catch (error) {
+        toast.error("Failed to download the file.");
+        console.error("Error downloading the file:", error);
+      }
+    },
+    [] // No dependencies needed as we're using downloadedFilesRef
+  );
 
   const openFileViewer = useCallback(
     (isPreview: boolean, fileName?: string) => {
+      console.groupCollapsed("openFileViewer");
+      console.log("isPreview:", isPreview);
+      console.log("fileName:", fileName);
+      console.log("selectedAttachments:", selectedAttachments);
+      console.log("downloadedFiles:", downloadedFilesRef.current);
+      console.groupEnd();
+
       setIsPreview(isPreview);
 
+      let fileToView;
+
       if (isPreview) {
-        // Ensure selectedAttachments array is not empty in preview mode
         if (selectedAttachments.length === 0) {
           toast.error("No attachments available for preview.");
           return;
         }
 
-        // Set the current file to the first attachment in the selectedAttachments array
-        setCurrentFile(selectedAttachments[0]);
-        setIsViewerOpen(true);
+        // Check for a specific fileName, otherwise default to the first attachment
+        fileToView = fileName
+          ? selectedAttachments.find((file) => file.fileName === fileName)
+          : selectedAttachments[0];
+
+        if (!fileToView) {
+          toast.error("Attachment not found for preview.");
+          return;
+        }
       } else {
-        // Find the file in the downloadedFiles array by fileName
-        const fileToView = downloadedFiles.find(
+        fileToView = downloadedFilesRef.current.find(
           (file) => file.fileName === fileName
         );
 
-        // Handle the case where the file isn't found
         if (!fileToView) {
-          toast.error("Unable to open file. File not found.");
+          toast.error("File not found in downloadedFiles.");
+          console.error(
+            "File not found in downloadedFiles with fileName:",
+            fileName
+          );
           return;
         }
-
-        // Set the current file to the clicked attachment
-        setCurrentFile(fileToView);
-        setIsViewerOpen(true);
       }
+
+      // Open the viewer with the selected file (for both preview and downloaded files)
+      setCurrentFile(fileToView);
+      setIsViewerOpen(true);
     },
-    [
-      selectedAttachments,
-      downloadedFiles,
-      setCurrentFile,
-      setIsViewerOpen,
-      setIsPreview,
-    ]
+    [selectedAttachments] // Remove downloadedFilesRef from dependencies
   );
 
   const addAttachments = useCallback(
     (attachments: Attachment[]) => {
+      // Early return if no attachments are provided
+      if (attachments.length === 0) return;
+
       setSelectedAttachments((prev) => {
         // Use a Set for efficient lookups of existing file names and sizes
         const existingAttachmentsSet = new Set(
@@ -173,6 +181,9 @@ export const useFilePreview = () => {
           return !existingAttachmentsSet.has(uniqueKey);
         });
 
+        // If no unique attachments are found, return early
+        if (uniqueAttachments.length === 0) return prev;
+
         // Return the new list of attachments with the unique ones appended
         return [...prev, ...uniqueAttachments];
       });
@@ -183,14 +194,13 @@ export const useFilePreview = () => {
   const removeAttachment = useCallback(
     (fileName: string) => {
       setSelectedAttachments((prev) => {
-        // Find the attachment to remove based on fileName
         const attToRemove = prev.find((att) => att.fileName === fileName);
 
-        // Revoke object URL to prevent memory leaks
         if (attToRemove) {
-          URL.revokeObjectURL(attToRemove.url); // Free up memory for Blob URL
+          URL.revokeObjectURL(attToRemove.url);
         } else {
           console.warn(`Attachment with fileName "${fileName}" not found.`);
+          return prev; // Return the previous state if not found
         }
 
         // Return the filtered attachments, removing the one with the matching fileName
@@ -202,6 +212,8 @@ export const useFilePreview = () => {
 
   const clearAttachments = useCallback(() => {
     setSelectedAttachments((prev) => {
+      if (prev.length === 0) return prev; // Early return if no attachments
+
       // Revoke all object URLs before clearing
       prev.forEach((attachment) => {
         URL.revokeObjectURL(attachment.url);
@@ -216,6 +228,7 @@ export const useFilePreview = () => {
   const closeFileViewer = useCallback(
     (isPreview: boolean) => {
       setIsViewerOpen(false);
+      setIsPreview(false); // Always reset to false when closing
       setCurrentFile(null);
 
       // If in preview mode, clear the attachments
@@ -233,9 +246,9 @@ export const useFilePreview = () => {
       if (files) {
         const selectedFiles = Array.from(files);
 
-        // Check if more than 10 files are selected
+        // Check if more than 5 files are selected
         if (selectedFiles.length > MAX_FILES) {
-          toast.error("You can select up to 10 files at a time");
+          toast.error("You can select up to 5 files at a time");
           return;
         }
 
@@ -261,15 +274,9 @@ export const useFilePreview = () => {
         // Process the files and create the Attachment array
         const fileArray: Attachment[] = selectedFiles
           .map((file) => {
-            const extension = file.name.split(".").pop()?.toLowerCase(); // Extract file extension
-            let fileType:
-              | "image"
-              | "video"
-              | "pdf"
-              | "word"
-              | "excel"
-              | "csv"
-              | "other";
+            const extension = file.name.includes(".")
+              ? file.name.split(".").pop()?.toLowerCase()
+              : null;
 
             // If extension is not found or not supported, show an error
             if (!extension) {
@@ -277,65 +284,94 @@ export const useFilePreview = () => {
               return null;
             }
 
-            // File type determination based on the extension
-            if (["png", "jpg", "jpeg", "gif", "webp"].includes(extension)) {
-              fileType = "image";
-            } else if (
-              [
-                "avi",
-                "mov",
-                "mp4",
-                "m4v",
-                "mpg",
-                "mpeg",
-                "webm",
-                "wmv",
-              ].includes(extension)
-            ) {
-              fileType = "video";
-            } else if (["pdf"].includes(extension)) {
-              fileType = "pdf";
-            } else if (["doc", "docx", "rtf", "wpd"].includes(extension)) {
-              fileType = "word";
-            } else if (["xls", "xlsx", "xlsm", "ods"].includes(extension)) {
-              fileType = "excel";
-            } else if (["csv"].includes(extension)) {
-              fileType = "csv";
-            } else {
-              toast.error("File extension not supported");
-              return;
+            // Determine the file type directly within the returned object
+            const fileType: Attachment["type"] = ((): Attachment["type"] => {
+              if (["png", "jpg", "jpeg", "gif", "webp"].includes(extension)) {
+                return "image";
+              } else if (
+                [
+                  "avi",
+                  "mov",
+                  "mp4",
+                  "m4v",
+                  "mpg",
+                  "mpeg",
+                  "webm",
+                  "wmv",
+                ].includes(extension)
+              ) {
+                return "video";
+              } else if (["pdf"].includes(extension)) {
+                return "pdf";
+              } else if (
+                ["doc", "docx", "rtf", "wpd", "txt"].includes(extension)
+              ) {
+                return "word";
+              } else if (["xls", "xlsx", "xlsm", "ods"].includes(extension)) {
+                return "spreadsheet"; // Use "spreadsheet" here
+              } else {
+                return "other"; // Return "other" for unsupported types
+              }
+            })();
+
+            // Check for empty files (size 0)
+            if (file.size === 0) {
+              toast.error(`File ${file.name} is empty.`);
+              return null;
             }
 
-            // Return the Attachment object with the file stored locally
+            // For image and video files, generate a UUID and keep the extension
+            let fileName;
+            if (fileType === "image" || fileType === "video") {
+              const fileId = uuidv4();
+              fileName = `${fileId}.${extension}`;
+            } else {
+              // For other files, sanitize the name and keep the extension
+              const sanitizedBaseName = file.name
+                .replace(/\s+/g, "_") // Replace spaces with underscores
+                .trim(); // Remove any leading/trailing whitespace
+              fileName = sanitizedBaseName;
+            }
+
+            // Create a new File object with the modified name
+            const newFile = new File([file], fileName, { type: file.type });
+
+            // Create a blob URL for preview and ensure unique file naming
+            const blobUrl = URL.createObjectURL(newFile);
+
             return {
-              file: file, // Keep the file locally on the client side
-              url: URL.createObjectURL(file), // Temporary URL for preview
+              file: newFile,
+              url: blobUrl, // Temporary URL for preview
               type: fileType,
-              fileName: file.name,
-              size: file.size,
-              thumbnailUrl:
-                fileType === "image" ? URL.createObjectURL(file) : undefined, // Only for images
+              fileName, // Use the new fileName
+              size: newFile.size,
+              uploadProgress: 0, // Initialize uploadProgress to 0
+              status: "pending" as Attachment["status"], // Use the status type from Attachment
             };
           })
           .filter((item) => item !== undefined && item !== null); // Filter out null and undefined entries from unsupported extensions
-        // Add the valid attachments to the state
-        addAttachments(fileArray);
 
-        // Open the viewer with the first selected file, if any
-        if (fileArray.length > 0) {
-          openFileViewer(false); // Pass all selected files and the first one to view
-        }
+        addAttachments(fileArray);
       }
     },
-    [addAttachments, openFileViewer]
+    [addAttachments]
   );
+
+  useEffect(() => {
+    if (selectedAttachments.length > 0) {
+      console.log("Opening File Viewer with Attachments:", selectedAttachments);
+      openFileViewer(true);
+    } else {
+      closeFileViewer(true);
+    }
+  }, [selectedAttachments, openFileViewer, closeFileViewer]);
 
   return {
     isViewerOpen,
     currentFile,
     openFileViewer,
     closeFileViewer,
-    download,
+    handleSave,
     setCurrentFile,
     addAttachments,
     removeAttachment,
@@ -343,10 +379,7 @@ export const useFilePreview = () => {
     selectedAttachments,
     handleFileSelect,
     isPreview,
-    downloadAndStoreFile, // New function
-    fetchAndStoreThumbnail, // New function
-    clearDownloadedData, // New function
-    downloadedFiles, // New state
-    downloadedThumbnails, // New state
+    downloadAndStoreFile,
+    clearDownloadedData,
   };
 };

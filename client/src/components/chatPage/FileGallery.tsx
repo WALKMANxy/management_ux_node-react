@@ -1,26 +1,30 @@
 // src/components/fileViewer/FileGallery.tsx
 
-import ArticleIcon from "@mui/icons-material/Article";
 import DeleteIcon from "@mui/icons-material/Delete";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import { Box, IconButton, Tooltip, Typography } from "@mui/material";
+
+import { Box, IconButton, Tooltip, useMediaQuery } from "@mui/material";
 import React, { useEffect, useRef } from "react";
-import { Attachment, useFilePreview } from "../../hooks/useFilePreview";
+import { Attachment } from "../../models/dataModels";
+import { getIconForFileType } from "../../utils/iconUtils";
 
 interface FileGalleryProps {
   attachments: Attachment[];
   currentFile: Attachment;
   onRemoveFile: (fileName: string) => void;
+  setCurrentFile: (file: Attachment | null) => void;
+  isPreview: boolean;
 }
 
 const FileGallery: React.FC<FileGalleryProps> = ({
   attachments,
   currentFile,
   onRemoveFile,
+  setCurrentFile,
+  isPreview,
 }) => {
   const galleryRef = useRef<HTMLDivElement>(null);
 
-  const { setCurrentFile, isPreview } = useFilePreview();
+  const isMobile = useMediaQuery("(max-width: 600px)");
 
   useEffect(() => {
     const currentIndex = attachments.findIndex(
@@ -44,90 +48,91 @@ const FileGallery: React.FC<FileGalleryProps> = ({
       sx={{
         display: "flex",
         overflowX: "auto",
-        gap: "10px",
+        gap: "20px",
         padding: "0 10px",
         scrollSnapType: "x mandatory",
-        "&::webkitScrollbar": {
+        "&::-webkit-scrollbar": {
           display: "none",
         },
+        height: "100%",
       }}
     >
-      {attachments.map((file) => (
-        <Box
+      {attachments.map((file) => {
+        const isSelected = file.fileName === currentFile.fileName;
+        const isImage = ["image"].includes(file.type);
+        return (
+          <Box
           key={file.url}
           sx={{
-            width: { xs: 40, sm: 60 }, // Responsive width for different screen sizes
-            height: { xs: 40, sm: 60 }, // Responsive height for different screen sizes
-            borderRadius: "8px", // Slight rounding of the edges
-            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)", // Slight shadow
+            mt: 1,
+            mb: 2,
+
+            width: { xs: 40, sm: 60 }, // Responsive width
+            height: { xs: 40, sm: 60 }, // Responsive height
+            borderRadius: "8px",
+            overFlowY: "hidden",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             position: "relative",
             cursor: "pointer",
-            flexShrink: 0, // Ensure the files don't shrink
+            flexShrink: 0,
             scrollSnapAlign: "center",
+            transition: "transform 0.2s, border 0.05s", // Added transform transition
+            transform: isSelected ? "scale(1.1)" : "scale(0.9)", // Scale up when selected
           }}
           onClick={() => setCurrentFile(file)}
         >
-          {/* Display file preview or icon based on file type */}
-          {file.type === "image" && file.thumbnailUrl ? (
-            <img
-              src={file.thumbnailUrl}
-              alt={file.fileName}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                borderRadius: "4px",
-              }}
-            />
-          ) : file.type === "pdf" ? (
-            <PictureAsPdfIcon fontSize="large" />
-          ) : file.type === "word" ||
-            file.type === "excel" ||
-            file.type === "csv" ? (
-            <ArticleIcon fontSize="large" />
-          ) : (
-            <Typography
-              variant="caption"
-              sx={{
-                position: "absolute",
-                bottom: 2,
-                right: 2,
-                color: "#fff",
-                backgroundColor: "rgba(0,0,0,0.6)",
-                borderRadius: "2px",
-                padding: "0 2px",
-              }}
-            >
-              {file.type.toUpperCase()}
-            </Typography>
-          )}
-
-          {/* Trash Bin Overlay - Only show if isPreview is true and file is currently selected */}
-          {isPreview && file.url === currentFile.url && (
-            <Tooltip title="Remove File">
-              <IconButton
-                size="small"
-                sx={{
-                  position: "absolute",
-                  top: -5,
-                  right: -5,
-                  bgcolor: "rgba(255, 255, 255, 0.8)",
-                  "&:hover": { bgcolor: "rgba(255, 255, 255, 1)" },
+            {/* Display file preview or icon based on file type */}
+            {isImage ? (
+              <img
+                src={file.url}
+                alt={file.fileName}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "4px",
                 }}
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent triggering onSelectFile
-                  onRemoveFile(file.fileName); // Remove the current selected file
+              />
+            ) : (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%",
+                  height: "100%",
+                  zIndex: 2,
                 }}
               >
-                <DeleteIcon fontSize="small" color="error" />
-              </IconButton>
-            </Tooltip>
-          )}
-        </Box>
-      ))}
+                {getIconForFileType(file.fileName, "large", isMobile ? 50 : 60)}
+              </Box>
+            )}
+
+            {/* Trash Bin Overlay - Only show if isPreview is true and file is currently selected */}
+            {isPreview && isSelected && (
+              <Tooltip title="Remove File">
+                <IconButton
+                  size="large"
+                  sx={{
+                    position: "absolute",
+
+                    bgcolor: "rgba(255, 255, 255, 0.8)",
+                    "&:hover": { bgcolor: "rgba(255, 255, 255, 1)" },
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent triggering onSelectFile
+                    onRemoveFile(file.fileName); // Remove the current selected file
+                  }}
+                >
+                  <DeleteIcon fontSize="small"  />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+        );
+      })}
     </Box>
   );
 };

@@ -1,23 +1,22 @@
 // src/pages/common/MovementsPage.tsx
 
 import { Box, useMediaQuery } from "@mui/material";
-import React, { lazy, Suspense, useMemo } from "react";
+import React, { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import SkeletonDetails from "../../components/common/SkeletonDetails";
 import Spinner from "../../components/common/Spinner";
+import MovementDetails from "../../components/movementsPage/movementsDetails";
 import MovementList from "../../components/statistics/grids/MovementList";
 import useLoadingData from "../../hooks/useLoadingData";
 import { useMovementsGrid } from "../../hooks/useMovementsGrid";
 import { Movement } from "../../models/dataModels";
 import { MovementColumnDefinition } from "../../models/propsModels"; // Import the new type
 import {
+  calculateTotalNetPriceSold,
   calculateTotalPriceSold,
   calculateTotalQuantity,
   currencyFormatter,
   numberComparator,
 } from "../../utils/dataUtils";
-
-const MovementDetails = lazy(() => import("../../components/movementsPage/movementsDetails"));
 
 const MovementsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -104,6 +103,15 @@ const MovementsPage: React.FC = () => {
           comparator: numberComparator,
           sortable: true,
         },
+        {
+          headerName: t("movementsPage.netRevenue"), // New column for Net Revenue
+          valueGetter: (params: { data: Movement }) =>
+            calculateTotalNetPriceSold(params.data),
+          valueFormatter: (params: { value: number }) =>
+            currencyFormatter(params.value),
+          comparator: numberComparator,
+          sortable: true,
+        },
       ].filter(Boolean) as MovementColumnDefinition[], // Filter out null entries
     [handleMovementSelect, t, userRole]
   );
@@ -153,18 +161,16 @@ const MovementsPage: React.FC = () => {
         movementDetailsRef={movementDetailsRef}
       />
       {selectedMovement && (
-        <Suspense fallback={<SkeletonDetails />}>
-          <MovementDetails
-            ref={movementDetailsRef}
-            isLoading={false}
-            selectedMovement={selectedMovement}
-            isMovementDetailsCollapsed={isMovementDetailsCollapsed}
-            setMovementDetailsCollapsed={setMovementDetailsCollapsed}
-          />
-        </Suspense>
+        <MovementDetails
+          ref={movementDetailsRef}
+          isLoading={false}
+          selectedMovement={selectedMovement}
+          isMovementDetailsCollapsed={isMovementDetailsCollapsed}
+          setMovementDetailsCollapsed={setMovementDetailsCollapsed}
+        />
       )}
     </Box>
   );
 };
 
-export default MovementsPage;
+export default memo(MovementsPage);

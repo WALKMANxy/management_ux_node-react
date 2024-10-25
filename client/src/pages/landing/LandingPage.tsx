@@ -6,14 +6,20 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../../app/store";
 import Loader from "../../components/common/Loader";
-import AuthenticationModal from "../../components/landingPage/AuthenticationModal";
-import Footer from "../../components/landingPage/Footer";
+import Spinner from "../../components/common/Spinner";
+const AuthenticationModal = React.lazy(() =>
+  import("../../components/landingPage/AuthenticationModal")
+);
+const Footer = React.lazy(() => import("../../components/landingPage/Footer"));
+
+
+const preloadDashboard = () => import("../../pages/employee/EmployeeDashboard");
 
 const LandingPage: React.FC = () => {
   const { t } = useTranslation();
@@ -30,6 +36,15 @@ const LandingPage: React.FC = () => {
   useEffect(() => {
     const timer = setTimeout(() => setShowLoader(false), 1500);
     return () => clearTimeout(timer);
+  }, []);
+
+   // Preload the AuthenticationModal and Footer components after the page mounts
+   useEffect(() => {
+    const preloadComponents = async () => {
+      await import("../../components/landingPage/AuthenticationModal");
+      await import("../../components/landingPage/Footer");
+    };
+    preloadComponents(); // Preload the components after the page mounts
   }, []);
 
   useEffect(() => {
@@ -68,8 +83,7 @@ const LandingPage: React.FC = () => {
           flexGrow: 1,
         }}
       >
-        {/* Top Shadow */}
-
+        {/* Main Content */}
         <Container
           component="main"
           sx={{
@@ -111,7 +125,7 @@ const LandingPage: React.FC = () => {
                 sx={{
                   mt: isSuperMobile ? 0.5 : 2,
                   fontFamily: "Inter, sans-serif",
-                  fontWeight: 100, // Now using the lighter custom font weight
+                  fontWeight: 100,
                 }}
               >
                 NEXT_
@@ -122,6 +136,7 @@ const LandingPage: React.FC = () => {
                 variant="contained"
                 color="primary"
                 onClick={() => setShowLogin(true)}
+                onMouseEnter={preloadDashboard} // Preload dashboard on hover
                 sx={{
                   mt: isSuperMobile || isMobile ? 0.5 : 4,
                   paddingX: 4,
@@ -148,24 +163,30 @@ const LandingPage: React.FC = () => {
           </Box>
         </Container>
 
-        {/* Footer should stay at the bottom and remain visible */}
-        <Box
-          component="footer"
-          sx={{
-            paddingBottom: "env(safe-area-inset-bottom)", // Ensure padding for safe area
-          }}
-        >
-          <Footer />
-        </Box>
+        {/* Lazy Loaded Footer */}
+        <Suspense fallback={<Spinner />}>
+          <Box
+            component="footer"
+            sx={{
+              paddingBottom: "env(safe-area-inset-bottom)", // Ensure padding for safe area
+            }}
+          >
+            <Footer />
+          </Box>
+        </Suspense>
       </Box>
 
-      {/* Authentication Modal */}
-      <AuthenticationModal
-        open={showLogin}
-        onClose={() => setShowLogin(false)}
-      />
+      {/* Lazy Loaded Authentication Modal */}
+      <Suspense fallback={<Spinner />}>
+        {showLogin && (
+          <AuthenticationModal
+            open={showLogin}
+            onClose={() => setShowLogin(false)}
+          />
+        )}
+      </Suspense>
     </Box>
   );
 };
 
-export default LandingPage;
+export default memo(LandingPage);

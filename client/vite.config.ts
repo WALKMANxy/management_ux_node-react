@@ -31,24 +31,11 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: "autoUpdate",
         includeAssets: [
-          "apple-touch-icon.png",
-          "masked-icon.svg",
           "rcs_icon.png",
-          "locales/en/translation.json",
-          "locales/es/translation.json",
-          "locales/fr/translation.json",
-          "locales/de/translation.json",
-          "locales/it/translation.json",
-          "locales/ru/translation.json",
-          "checkerboard-cross.png",
-          "funky-lines.png",
-          "light_noise_diagonal.png",
+          "locales/**/*.json", // Include all JSON files inside locales
           "logo-appbar.png",
           "logobig.png",
-          "noise_lines.png",
-          "pipes.png",
-          "rough_diagonal.png",
-          "struckaxiom.png",
+          "assets/weather/*.svg",
         ],
         manifest: {
           name: "RCS Next",
@@ -73,7 +60,7 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
-          globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+          globPatterns: ["**/*.{js,css,html,ico,png,svg,json}"],
           maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         },
       }),

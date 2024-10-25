@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/hooks/useGlobalSearch.ts
 import DOMPurify from "dompurify";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -34,28 +35,83 @@ const useGlobalSearch = (filter: string) => {
     }
   }, [error]);
 
+  // Function to parse modifiers and exact matches
+  const parseSearchTerm = useCallback(
+    (searchTerm: string) => {
+      let typeFilter: string | null = null;
+      let exactMatch = false;
+      let actualQuery = searchTerm;
+
+      const modifierRegex = /^(C_|A_|P_|V_)/i;
+      const exactMatchRegex = /^"(.+)"$/;
+
+      // Check for exact match
+      const exactMatchMatch = searchTerm.match(exactMatchRegex);
+      if (exactMatchMatch) {
+        exactMatch = true;
+        actualQuery = exactMatchMatch[1].trim();
+      }
+
+      // Check for type modifier
+      const modifierMatch = actualQuery.match(modifierRegex);
+      if (modifierMatch) {
+        typeFilter = modifierMatch[1].toLowerCase(); // e.g., 'c_', 'a_', etc.
+        actualQuery = actualQuery.slice(modifierMatch[1].length).trim();
+      }
+
+      // Determine the filter based on modifier
+      let finalFilter = filter; // Default to initial filter
+      if (typeFilter) {
+        switch (typeFilter) {
+          case "c_":
+            finalFilter = "client";
+            break;
+          case "a_":
+            finalFilter = "article";
+            break;
+          case "p_":
+            finalFilter = "promo";
+            break;
+          case "v_":
+            finalFilter = "visit";
+            break;
+          default:
+            finalFilter = filter; // Fallback to 'all' if unknown modifier
+            break;
+        }
+      }
+
+      return { query: actualQuery, filter: finalFilter, exact: exactMatch };
+    },
+    [filter]
+  );
+
   // Handle search logic
   const handleSearch = useCallback(async () => {
     const sanitizedInput = DOMPurify.sanitize(debouncedInput.trim());
 
-    if (sanitizedInput === "" || sanitizedInput.length < 3) {
+    if (sanitizedInput === "") {
       dispatch(clearResults());
       setShowResults(false);
       return;
     }
 
-    dispatch(setQuery(sanitizedInput));
+    // Parse the input for modifiers and exact matches
+    const { query, filter, exact } = parseSearchTerm(sanitizedInput);
+
+    // Update the query in the state
+    dispatch(setQuery(query));
 
     try {
-      await dispatch(searchItems({ query: sanitizedInput, filter })).unwrap();
+      // Dispatch the search action with extended parameters
+      await dispatch(searchItems({ query, filter, exact })).unwrap();
       setShowResults(true);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Search error:", err);
       const errorMessage = err.message || t("errors.searchFailed");
       setError(errorMessage);
     }
-  }, [dispatch, debouncedInput, filter, t]);
+  }, [dispatch, debouncedInput, parseSearchTerm, t]);
 
   // Handle clicks outside the search component
   const handleClickOutside = useCallback((event: MouseEvent) => {

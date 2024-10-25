@@ -1,5 +1,11 @@
-import clearDay from "../assets/weather/clear-day.svg";
-import clearNight from "../assets/weather/clear-night.svg";
+import {
+  default as clearDay,
+  default as defaultClearDay,
+} from "../assets/weather/clear-day.svg";
+import {
+  default as clearNight,
+  default as defaultClearNight,
+} from "../assets/weather/clear-night.svg";
 import drizzle from "../assets/weather/drizzle.svg";
 import fogDay from "../assets/weather/fog-day.svg";
 import fogNight from "../assets/weather/fog-night.svg";
@@ -29,7 +35,7 @@ interface WeatherIcons {
   [key: number]: WeatherIcon;
 }
 
-export const weatherIcons: WeatherIcons = {
+const weatherIcons: WeatherIcons = {
   0: { day: clearDay, night: clearNight },
   1: { day: clearDay, night: clearNight },
   2: { day: partlyCloudyDay, night: partlyCloudyNight },
@@ -76,9 +82,7 @@ export const getWeatherIcon = (weatherCode: number): string => {
   }
 
   // Fallback to a default icon if the weather code is not found
-  return isDay
-    ? "/src/assets/weather/clear-day.svg"
-    : "/src/assets/weather/clear-night.svg";
+  return isDay ? defaultClearDay : defaultClearNight;
 };
 
 export const hasLocationChanged = (

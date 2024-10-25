@@ -24,6 +24,7 @@ import promosRoutes from "./routes/promos";
 import usersRoutes from "./routes/users";
 import visitsRoutes from "./routes/visits";
 import citiesRoutes from "./routes/cities";
+import mediaRoutes from "./routes/media";
 import { errorHandler } from "./utils/errorHandler";
 import { logger, logRequestsIp } from "./utils/logger";
 import { csp } from "./middlewares/csp";
@@ -79,6 +80,7 @@ app.use("/calendar", calendarEventsRoutes); // Register the day-off request rout
 app.use("/chats", chatRoutes); // Add chat routes
 app.use("/employees", employeeRoutes);
 app.use("/cities", citiesRoutes);
+app.use("/media", mediaRoutes);
 
 app.use(errorHandler);
 

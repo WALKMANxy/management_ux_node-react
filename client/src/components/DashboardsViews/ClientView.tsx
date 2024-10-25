@@ -12,7 +12,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { memo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { brandColors } from "../../utils/constants";
@@ -294,4 +294,4 @@ const ClientView: React.FC<ClientViewProps> = ({
   );
 };
 
-export default ClientView;
+export default memo(ClientView);

@@ -37,10 +37,10 @@ const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
   return (
     <Typography
       variant="h4"
-      gutterBottom
       sx={{
         fontFamily: "Inter, sans-serif",
         fontWeight: 100, // Now using the lighter custom font weight
+
       }}
     >
       {t(`dashboard.welcomeBack`, {

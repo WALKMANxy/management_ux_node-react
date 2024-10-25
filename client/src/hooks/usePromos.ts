@@ -55,8 +55,9 @@ const usePromos = () => {
 
   // Handle promo selection and set mode to 'view'
   const handlePromoSelect = useCallback(
-    (promo: Promo) => {
-      dispatch(selectPromo(promo._id!));
+    (promoId: string) => {
+      console.log("selecting promo");
+      dispatch(selectPromo(promoId!));
       setMode("view");
     },
     [dispatch]
@@ -241,6 +242,7 @@ const usePromos = () => {
     initiateEditPromo,
     handleSunsetPromo,
     filteredClients,
+    setMode,
   };
 };
 

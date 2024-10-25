@@ -11,7 +11,7 @@ import {
   useTheme,
 } from "@mui/material";
 import "animate.css"; // Add animate.css
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, memo, useEffect, useState } from "react";
 import { Calendar } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useTranslation } from "react-i18next";
@@ -164,7 +164,7 @@ const CalendarPage: React.FC = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: "100%",
+        height: "100dvh",
         position: "relative",
         paddingBottom: 2,
       }}
@@ -181,8 +181,8 @@ const CalendarPage: React.FC = () => {
       >
         <Typography variant="h6" sx={{ fontWeight: "bold", color: "black" }}>
           {viewMode === "history"
-            ? t("calendar.HistoryTitle")
-            : t("calendar.Title")}
+            ? t("calendarPage.HistoryTitle")
+            : t("calendarPage.Title")}
         </Typography>
         <IconButton
           onClick={toggleViewMode}
@@ -197,7 +197,7 @@ const CalendarPage: React.FC = () => {
         <Fragment>
           <Paper
             elevation={3}
-            sx={{ p: 2, mt: isMobile ? 0 : -3, borderRadius: 5 }}
+            sx={{ py: 1, mt: isMobile ? 0 : -3, borderRadius: 5 }}
             className="animate__animated animate__animate_faster animate__fadeIn"
           >
             <Calendar
@@ -240,8 +240,8 @@ const CalendarPage: React.FC = () => {
       ) : (
         <Box
           sx={{
-            pt: isMobile ? 2 : 0,
-            px: isMobile ? 1.3 : 0,
+            pt: isMobile ? 0.5 : 0,
+            px: isMobile ? 0.5 : 0,
           }}
         >
           <React.Suspense fallback={<Loader fadeout />}>
@@ -290,4 +290,4 @@ const CalendarPage: React.FC = () => {
   );
 };
 
-export default CalendarPage;
+export default memo(CalendarPage);

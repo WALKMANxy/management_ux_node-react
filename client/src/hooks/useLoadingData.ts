@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { shallowEqual } from "react-redux";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { RootState } from "../app/store";
@@ -10,11 +11,11 @@ import {
   getVisits,
 } from "../features/data/dataThunks";
 import { selectCurrentUser } from "../features/users/userSlice";
-import { DataSliceState } from "../models/stateModels";
-import { ensureEncryptionInitialized } from "../utils/cacheUtils";
 import { updateUserEntityNameIfMissing } from "../services/checkUserName";
+import { ensureEncryptionInitialized } from "../utils/cacheUtils";
 
 const timeMS = getTimeMs(); // Ensure this is set in your .env file
+
 
 const useLoadingData = () => {
   const dispatch = useAppDispatch();
@@ -25,9 +26,13 @@ const useLoadingData = () => {
   const [retryCount, setRetryCount] = useState<number>(0); // Track retry attempts
   const [fakeLoading, setFakeLoading] = useState(true);
 
+  const retryCountRef = useRef(retryCount);
+  retryCountRef.current = retryCount;
+
   const toastId = "loadingDataToast";
 
-  // Get data from the dataSlice
+  // After Optimization
+
   const {
     clients,
     agents,
@@ -35,10 +40,21 @@ const useLoadingData = () => {
     currentUserDetails,
     status,
     error,
-  } = useAppSelector<RootState, DataSliceState>((state) => state.data);
-
-  const currentUser = useAppSelector(selectCurrentUser);
-  const role = currentUser?.role;
+    currentUser,
+    role,
+  } = useAppSelector(
+    (state: RootState) => ({
+      clients: state.data.clients,
+      agents: state.data.agents,
+      currentUserData: state.data.currentUserData,
+      currentUserDetails: state.data.currentUserDetails,
+      status: state.data.status,
+      error: state.data.error,
+      currentUser: selectCurrentUser(state),
+      role: selectCurrentUser(state)?.role,
+    }),
+    shallowEqual
+  );
 
   const shouldFetchData = useMemo(() => {
     return (
@@ -47,9 +63,10 @@ const useLoadingData = () => {
       (Object.keys(clients).length === 0 ||
         Object.keys(agents).length === 0 ||
         !currentUserData ||
-        !currentUserDetails)
+        !currentUserDetails) &&
+      retryCountRef.current < 5
     );
-  }, [status, clients, agents, currentUserData, currentUserDetails, role]);
+  }, [status, clients, agents, currentUserData, currentUserDetails, role])
 
   const fetchData = useCallback(async () => {
     try {
@@ -71,7 +88,6 @@ const useLoadingData = () => {
       setLocalError(null);
       setRetryCount(0);
 
-
       updateUserEntityNameIfMissing(dispatch, currentUser, currentUserDetails);
     } catch (err: unknown) {
       toast.error(t("useStatsToasts.failedData"), { id: toastId });
@@ -87,15 +103,15 @@ const useLoadingData = () => {
         toast.error(t("useStatsToasts.unknownError"), { id: toastId });
       }
 
-      if (retryCount < 5) {
+      if (retryCountRef.current < 5) {
         setRetryCount((prevCount) => prevCount + 1);
-        console.log(`Retry count incremented: ${retryCount + 1}`);
+        console.log(`Retry count incremented: ${retryCountRef.current + 1}`);
       }
     } finally {
       setLoading(false);
       toast.dismiss(toastId);
     }
-  }, [dispatch, retryCount, currentUser, currentUserDetails, t]);
+  }, [dispatch,  currentUser, currentUserDetails, t]);
 
   useEffect(() => {
     if (role !== "employee" && shouldFetchData) {
@@ -107,7 +123,7 @@ const useLoadingData = () => {
     if (retryCount > 0 && retryCount <= 5) {
       const retryTimeout = setTimeout(() => {
         fetchData();
-      }, 5000);
+      }, 500);
 
       return () => {
         console.log("Clearing retry timeout");

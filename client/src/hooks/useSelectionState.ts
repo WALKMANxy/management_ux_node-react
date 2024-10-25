@@ -10,24 +10,7 @@ import { UseSelectionStateReturn } from "../models/dataSetTypes";
 import { SearchResult } from "../models/searchModels";
 import useStats from "./useStats";
 
-/**
- * Custom hook to manage the selection state of clients and agents.
- *
- * @param {boolean} isMobile - Flag indicating if the view is on a mobile device.
- * @returns {UseSelectionStateReturn} - An object containing selection state and handlers.
- *
- * @example
- * const {
- *   selectedClient,
- *   selectedAgent,
- *   handleSelect,
- *   clearSelection,
- *   clientComparativeStatistics,
- *   clientComparativeStatisticsMonthly,
- *   agentComparativeStatistics,
- *   agentComparativeStatisticsMonthly,
- * } = useSelectionState(isMobile);
- */
+
 const useSelectionState = (isMobile: boolean): UseSelectionStateReturn => {
   const dispatch = useAppDispatch();
   const {

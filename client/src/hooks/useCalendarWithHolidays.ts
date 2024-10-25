@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useGetHolidaysQuery } from "../features/calendar/calendarQuery";
 import { CalendarEvent, Holiday } from "../models/dataModels";
 import { showToast } from "../services/toastMessage";
+import { v4 as uuidv4 } from 'uuid';
+
 
 export const useCalendarWithHolidays = (currentDate: Date) => {
   const year = currentDate.getFullYear();
@@ -17,6 +19,7 @@ export const useCalendarWithHolidays = (currentDate: Date) => {
     if (holidays) {
       return holidays.map(
         (holiday: Holiday): CalendarEvent => ({
+          _id: uuidv4(),
           userId: "holiday", // Assign a special ID for holidays
           startDate: new Date(holiday.date),
           endDate: new Date(holiday.date),

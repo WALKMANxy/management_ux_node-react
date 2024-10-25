@@ -2,8 +2,8 @@ import { Box, Grid, Skeleton, useMediaQuery, useTheme } from "@mui/material";
 import React, { Suspense, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
+import SearchTitle from "../../components/dashboard/SearchTitle";
 import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
-import WelcomeMessage from "../../components/dashboard/WelcomeMessage";
 import CalendarAndVisitsView from "../../components/DashboardsViews/CalendarAndVisitsView";
 import DashboardView from "../../components/DashboardsViews/DashboardView";
 import SkeletonView from "../../components/DashboardsViews/SkeletonView";
@@ -22,7 +22,7 @@ const AgentDashboard: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery("(min-width:900px) and (max-width:1250px)");
+  const isTablet = useMediaQuery("(min-width:900px) and (max-width:1390px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleToggleDrawer = () => {
@@ -57,20 +57,18 @@ const AgentDashboard: React.FC = () => {
     yearlyCategories,
     yearlyOrdersData,
     totalNetRevenue,
-    netRevenueData
+    netRevenueData,
   } = useStats(isMobile);
 
   return (
-    <Box
-      className="agent-dashboard"
-      sx={{ p: isMobile ? 0 : 4, bgcolor: "#f4f5f7" }}
-    >
-      {" "}
-      <WelcomeMessage
-        name={user?.entityName}
-        role="admin" // or "agent" or "client"
-        loading={loadingState}
-      />
+    <>
+      <Box py={1}>
+        <SearchTitle
+          name={user?.entityName}
+          role={userRole!} // or "agent" or "client"
+          loading={loadingState}
+        />
+      </Box>
       {!loadingState ? (
         <GlobalSearch filter="client" onSelect={handleSelect} />
       ) : (
@@ -83,8 +81,8 @@ const AgentDashboard: React.FC = () => {
           aria-label="skeleton"
         />
       )}
-      <Grid container spacing={6} mt={isMobile ? 0 : 2}>
-        <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
+      <Grid container spacing={6} mt={isMobile ? -3 : -3}>
+      <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
           {selectedClient ? (
             <Suspense fallback={<SkeletonView />}>
               <ClientView
@@ -135,7 +133,7 @@ const AgentDashboard: React.FC = () => {
       {isTablet && (
         <DrawerContainer open={drawerOpen} onClose={handleToggleDrawer} />
       )}
-    </Box>
+    </>
   );
 };
 

@@ -128,27 +128,47 @@ export const useAuth = () => {
       }
 
       // Attempt to log in the user
-      const { id, message, statusCode, refreshToken } = await loginUser({
+      const { id, message, statusCode, refreshToken, accessToken } = await loginUser({
         email,
         password,
       });
 
-      // Handle 401 Unauthorized response
-      if (statusCode === 401) {
-        setAlertMessage(t("auth.loginInconsistency")); // Translated message for 401 errors
-        setAlertSeverity("error");
-        setAlertOpen(true);
-        return;
-      }
+         // Handle 401 Unauthorized response
+         if (statusCode === 401) {
+          setAlertMessage(t("auth.loginInconsistency")); // Translated message for 401 errors
+          setAlertSeverity("error");
+          setAlertOpen(true);
+          return;
+        }
 
-      // Check if the login was unsuccessful
-      if (statusCode !== 200) {
-        console.warn("Login failed with status code:", statusCode, "Message:", message);
-        setAlertMessage(t("auth.loginFailed" + message));
-        setAlertSeverity("error");
-        setAlertOpen(true);
-        return;
-      }
+        if (statusCode !== 200) {
+          console.warn("Login failed with status code:", statusCode, "Message:", message);
+
+          // Check for specific error messages and use corresponding translation keys
+          if (message.includes("Invalid credentials")) {
+            setAlertMessage(t("auth.invalidCredentials")); // Translation key for "Invalid credentials"
+          } else if (message.includes("Network Error")) {
+            setAlertMessage(t("auth.serverUnreachable")); // Translation key for "Can't reach the server, try again later"
+          } else {
+            setAlertMessage(t("auth.loginFailed") + " " + message); // General login failure
+          }
+
+          setAlertSeverity("error");
+          setAlertOpen(true);
+          return;
+        }
+
+        // Validate tokens
+    if (!accessToken || !refreshToken) {
+      console.error("Access token or refresh token missing in login response");
+      throw new Error("Login failed: Access token or Refresh token missing");
+    }
+
+    // Store the access token in memory
+    setAccessToken(accessToken);
+    // console.log("Access token set successfully in memory");
+
+
 
       // Proceed if the login was successful
       const userId = id;

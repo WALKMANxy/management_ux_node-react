@@ -20,6 +20,9 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { handleLogout } from "../../features/auth/authThunks";
 import { selectCurrentUser } from "../../features/users/userSlice";
 
+const preloadMessages = () => import("../../pages/common/ChatPage");
+const preloadSettings = () => import("../../pages/common/UserPage");
+
 const UserAvatar: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
@@ -104,6 +107,7 @@ const UserAvatar: React.FC = () => {
                 borderRadius: 2,
                 mb: 1,
               }}
+              onMouseEnter={preloadMessages}
             >
               <ListItemIcon>
                 <ChatIcon />
@@ -121,6 +125,7 @@ const UserAvatar: React.FC = () => {
                 borderRadius: 2,
                 mb: 1,
               }}
+              onMouseEnter={preloadSettings}
             >
               <ListItemIcon>
                 <SettingsIcon />

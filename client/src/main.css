@@ -1,6 +1,6 @@
 /* src/styles/global.css */
 
-/* Import and Define SF Pro Display font */
+/*  Import and Define SF Pro Display font
 @font-face {
   font-family: "SF Pro Display";
   src: url("/src/assets/fonts/SF-Pro-Display-Regular.otf") format("opentype"),
@@ -8,35 +8,22 @@
     url("/src/assets/fonts/SF-Pro-Display-Bold.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
-}
+} */
 
 /* Apply SF Pro Display font to the body */
 body {
   margin: 0;
-  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-    "Helvetica Neue", sans-serif;
+  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont,
+    "Google Sans", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-.agent-dashboard {
-  padding: 0 !important;
 }
 
 @media (max-width: 600px) {
   .MuiChartsLegend-root {
-    visibility: hidden;
+    display: none;
   }
-}
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 code {
@@ -49,19 +36,19 @@ input[class^="ag-"][type="number"]:not(.ag-number-field-input-stepper) {
   appearance: textfield; /* Added line */
 }
 
-html {
-  -webkit-text-size-adjust: 100%; /* For Safari */
-  -moz-text-size-adjust: 100%; /* For Firefox */
-  -ms-text-size-adjust: 100%; /* For Internet Explorer */
-  text-size-adjust: 100%; /* Standard property */
-}
+/* html {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+} */
 
-body {
-  -webkit-text-size-adjust: 100%; /* For Safari */
-  -moz-text-size-adjust: 100%; /* For Firefox */
-  -ms-text-size-adjust: 100%; /* For Internet Explorer */
-  text-size-adjust: 100%; /* Standard property */
-}
+/* body {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+} */
 
 th {
   text-align: inherit; /* Inherits the text-align value from its parent */
@@ -77,7 +64,6 @@ th {
 .ag-center-cols-viewport::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
 }
-
 
 @keyframes ag-shake-left-to-right {
   from {
@@ -98,7 +84,6 @@ th {
   border-radius: var(--ag-border-radius);
   border: solid 1px var(--ag-input-border-color);
   background-color: var(--ag-background-color);
-  padding: var(--ag-grid-size) calc(var(--ag-grid-size) * 2);
   cursor: pointer;
 }
 
@@ -107,17 +92,7 @@ body {
   width: 100vw;
   overflow-x: hidden;
 
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
   scrollbar-width: none;
 
   /* Hide scrollbar for IE/Edge */
-  -ms-overflow-style: none;
 }
-
-/* * {
-  outline: 1px solid #f00 !important;
-}
- */

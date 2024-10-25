@@ -7,6 +7,8 @@ import { selectCurrentUser } from "../../features/users/userSlice";
 import useChatLogic from "../../hooks/useChatsLogic";
 import { IMessage } from "../../models/dataModels";
 import RenderMessages from "../chatPage/RenderMessage";
+import { useFilePreview } from "../../hooks/useFilePreview";
+import { selectDownloadedFiles } from "../../features/downloads/downloadedFilesSlice";
 
 const WhiteboardComponent: React.FC = () => {
   const currentUser = useAppSelector(selectCurrentUser);
@@ -17,6 +19,14 @@ const WhiteboardComponent: React.FC = () => {
     users,
     markMessagesAsRead,
   } = useChatLogic();
+
+  const { openFileViewer,
+    downloadAndStoreFile,
+    handleSave,
+  } = useFilePreview();
+
+  const downloadedFiles = useAppSelector(selectDownloadedFiles);
+
 
   const isMobile = useMediaQuery("(max-width:600px)");
 
@@ -124,6 +134,10 @@ const WhiteboardComponent: React.FC = () => {
             currentUserId={userId!}
             chatType={broadcastChat.type}
             participantsData={broadcastParticipants}
+            openFileViewer={openFileViewer}
+            downloadAndStoreFile={downloadAndStoreFile}
+            handleSave={handleSave}
+            downloadedFiles={downloadedFiles}
           />
         ) : (
           <Typography variant="body2" color="text.secondary">
