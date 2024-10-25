@@ -125,7 +125,7 @@ export function generateAutomatedMessage(
     content = i18next.t("messages.overdueVisitMessage", {
       visitReason: data.visitReason,
       visitDate: data.date.toLocaleDateString(),
-      count, // Pass the count if provided
+      count: count || 1, // Pass the count if provided
     });
   } else if (messageType === "promo" && isPromo(data)) {
     content = i18next.t("messages.promoMessage", {

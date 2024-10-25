@@ -67,7 +67,7 @@ const Footer: React.FC = () => {
         sx={{
           flex: "90%",
           pt: isMobile ? 1 : 2,
-          px: isMobile ? 2 : isSuperMobile ? 0 : 6,
+          px: isMobile ? 1 : isSuperMobile ? 0 : 6,
           pb: isMobile ? 1 : 2,
         }}
       >
@@ -109,7 +109,7 @@ const Footer: React.FC = () => {
               sx={{
                 display: "flex",
                 justifyContent: "flex-end",
-                gap: isSuperMobile ? 1 : isMobile ? 5 : 4,
+                gap: isSuperMobile ? 1 : isMobile ? 4 : 4,
                 flexWrap: "wrap",
               }}
             >
