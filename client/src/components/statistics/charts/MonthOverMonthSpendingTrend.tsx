@@ -1,4 +1,5 @@
 // src/components/MonthOverMonthSpendingTrend.tsx
+
 import ShowChartIcon from "@mui/icons-material/ShowChart"; // Import the ShowChart icon
 import {
   Avatar,
@@ -14,7 +15,7 @@ import React, { useMemo } from "react";
 import Chart from "react-apexcharts";
 import { useTranslation } from "react-i18next";
 import { UserRole } from "../../../models/entityModels";
-import { monthMap } from "../../../utils/constants";
+// Removed monthMap import as we'll handle translation within the component
 import { currencyFormatter } from "../../../utils/dataUtils";
 
 interface MonthOverMonthSpendingTrendProps {
@@ -31,24 +32,23 @@ const MonthOverMonthSpendingTrend: React.FC<MonthOverMonthSpendingTrendProps> = 
   userRole,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation();
+  const { t } = useTranslation(); // Destructure i18n if needed
 
   // Adjust loading condition based on userRole
   const loading =
     revenueData.length === 0 ||
     (userRole !== "client" && netRevenueData.length === 0);
 
-  // Process data to include both revenue and net revenue
+  // Process data to include both revenue and net revenue with translated month names
   const data = useMemo(
     () =>
       months.map((month, index) => {
         const [year, monthNum] = month.split("-");
-        const monthName = monthMap[monthNum];
-        const revenue = revenueData[index];
-        const netRevenue = netRevenueData[index]; // Retrieve Net Revenue
-        return { month: `${monthName} ${year}`, revenue, netRevenue };
+        // Use translation keys for month names
+        const monthName = t(`months.${monthNum}`, "Month"); // Fallback to "Month" if translation is missing
+        return { month: `${monthName} ${year}`, revenue: revenueData[index], netRevenue: netRevenueData[index] };
       }),
-    [months, revenueData, netRevenueData] // Include netRevenueData in dependencies
+    [months, revenueData, netRevenueData, t] // Include 't' in dependencies
   );
 
   // Configure ApexCharts options for multiple series
@@ -60,7 +60,7 @@ const MonthOverMonthSpendingTrend: React.FC<MonthOverMonthSpendingTrendProps> = 
         toolbar: { show: false },
       },
       xaxis: {
-        categories: data.map((d) => d.month.split(" ")[0]),
+        categories: data.map((d) => d.month.split(" ")[0]), // Translated month names
         labels: { rotate: 0 },
       },
       yaxis: {
@@ -134,15 +134,15 @@ const MonthOverMonthSpendingTrend: React.FC<MonthOverMonthSpendingTrendProps> = 
       {
         name:
           userRole === "agent" || userRole === "admin"
-            ? t("monthOverMonthSpendingTrend.revenue")
-            : t("monthOverMonthSpendingTrend.expense"),
+            ? t("monthOverMonthSpendingTrend.revenue", "Revenue")
+            : t("monthOverMonthSpendingTrend.expense", "Expense"),
         data: data.map((d) => d.revenue),
       },
     ];
 
     if (userRole !== "client") {
       baseSeries.push({
-        name: t("monthOverMonthSpendingTrend.netRevenue"), // New series for Net Revenue
+        name: t("monthOverMonthSpendingTrend.netRevenue", "Net Revenue"), // New series for Net Revenue
         data: data.map((d) => d.netRevenue),
       });
     }

@@ -51,19 +51,7 @@ interface HeadCell {
   numeric: boolean;
 }
 
-const headCells: HeadCell[] = [
-  {
-    id: "name",
-    label: "Name",
-    numeric: false,
-  },
-  {
-    id: "id",
-    label: "ID",
-    numeric: true,
-  },
-  // Actions column will be conditionally rendered
-];
+
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
@@ -123,6 +111,20 @@ const ManageEntities: React.FC = () => {
     handleCreateEntity,
     handleUpdateEntity,
   } = useManageEntities();
+
+  const headCells: HeadCell[] = [
+    {
+      id: "name",
+      label: t("manageEntities.nameLabel", "Name"),
+      numeric: false,
+    },
+    {
+      id: "id",
+      label: "ID",
+      numeric: true,
+    },
+    // Actions column will be conditionally rendered
+  ];
 
   useEffect(() => {
     // Update role based on filter selection

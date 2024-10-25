@@ -19,7 +19,8 @@
     "legal": "Legale",
     "privacyPolicy": "Politica sulla privacy",
     "termsOfService": "Termini di servizio",
-    "close": "Chiudi"
+    "close": "Chiudi",
+    "hours": "Orari"
   },
   "ourStory": {
     "title": "La nostra storia",
@@ -136,13 +137,28 @@
     "expense": "Spesa",
     "netRevenue": "Netto"
   },
+  "months": {
+    "01": "Gennaio",
+    "02": "Febbraio",
+    "03": "Marzo",
+    "04": "Aprile",
+    "05": "Maggio",
+    "06": "Giugno",
+    "07": "Luglio",
+    "08": "Agosto",
+    "09": "Settembre",
+    "10": "Ottobre",
+    "11": "Novembre",
+    "12": "Dicembre"
+  },
   "salesDistribution": {
     "title": "Distribuzione delle Vendite",
-    "revenue": "Entrate",
+    "revenue": "",
     "viewClients": "Visualizza Clienti",
     "viewAgents": "Visualizza Agenti",
     "clients": "Clienti",
-    "agents": "Agenti"
+    "agents": "Agenti",
+    "expense": ""
   },
   "topBrandsSold": {
     "titleAgent": "Marchi Più Venduti",
@@ -620,7 +636,7 @@
   "visits": "Visite",
   "promos": "Promozioni",
   "calendar": "Calendario",
-  "logout": "Disconnettersi",
+  "logout": "Logout",
   "search": "Cerca",
   "notifications": "Notifiche",
   "no_notifications": "Nessuna nuova notifica",
@@ -631,7 +647,7 @@
     "defaultUser": "Utente",
     "chats": "Chat",
     "settings": "Impostazioni",
-    "logout": "Disconnettersi"
+    "logout": "Logout"
   },
   "auth": {
     "signIn": "Accedi",
@@ -762,7 +778,6 @@
     "lastSoldDateUnknown": "Ultima Data di Vendita Sconosciuta",
     "promoIssuedBy": "Emesso da",
     "visitFor": "Visita per {{resultName}}"
-
   },
   "promoDetails": {
     "notFound": "Dettagli della promo non trovati."
@@ -939,17 +954,25 @@
     "updateAdminSuccess": "Amministratore aggiornato con successo",
     "updateEmployeeSuccess": "Dipendente aggiornato con successo",
     "updateSuccess": "Entità aggiornata con successo",
-    "updateFailed": "Impossibile aggiornare l'entità"
+    "updateFailed": "Impossibile aggiornare l'entità",
+    "nameLabel": "Nome"
   },
   "manageUsers": {
     "title": "Gestisci Utenti",
+    "searchPlaceholder": "Cerca utente",
+    "client": "Cliente",
+    "agent": "Agente",
+    "admin": "Amministratore",
+    "employee": "Dipendente",
+    "guest": "Guest",
+    "all": "Tutti",
     "columns": {
       "email": "Email",
       "authType": "Tipo di Autenticazione",
       "emailVerified": "Email Verificata",
       "role": "Ruolo",
-      "entityCode": "Codice Ente",
-      "entityName": "Nome Ente",
+      "entityCode": "Codice Entità",
+      "entityName": "Nome Entità",
       "createdAt": "Creato il"
     },
     "infoTooltip": "Perché un utente possa utilizzare l'app, deve essere assegnato a un ente. Puoi usare la tabella qui sotto per selezionare un utente facendo doppio clic sull'email, e quindi procedere con l'assegnazione dell'ente.",
@@ -985,8 +1008,7 @@
     "entityName": "Nome",
     "entityId": "ID",
     "saveChanges": "Salva",
-    "loadAdminsError": "Impossibile caricare gli amministratori"
-,
+    "loadAdminsError": "Impossibile caricare gli amministratori",
     "success": "Modifiche salvate con successo!",
     "error": "Si è verificato un errore. Riprova.",
     "updateSuccess": "Utente aggiornato con successo.",
@@ -1308,7 +1330,7 @@
     "salesDistribution": "Distribuzione delle Vendite",
     "upcomingVisits": "Visite in Arrivo",
     "yourCalendar": "Il Tuo Calendario",
-     "SearchTitleAgent": "Cerca clienti",
+    "SearchTitleAgent": "Cerca clienti",
     "SearchTitleAdmin": "Cerca clienti o agenti"
   },
   "articlesPage": {
@@ -1376,7 +1398,6 @@
     "generic": "Generico"
   },
 
-
   "popOverEvent": {
     "goToVisit": "Vai alla Visita"
   },
@@ -1416,6 +1437,22 @@
     "clickToReload": "Clicca sul pulsante qui sotto per ricaricare l'app e aggiornare all'ultima versione.",
     "reloadButton": "Ricarica",
     "offlineReady": "L'app è pronta per funzionare offline."
+  },
+  "navigation": {
+    "quickNavigation": "Navigazione Rapida",
+    "statistics": "Statistiche",
+    "movements": "Movimenti",
+    "clients": "Clienti",
+    "articles": "Articoli",
+    "visits": "Visite",
+    "promos": "Promozioni",
+    "calendar": "Calendario",
+    "messages": "Messaggi",
+    "settings": "Impostazioni",
+    "logout": "Logout"
+  },
+  "whiteboard": {
+    "companyWhiteboard": "Bacheca Aziendale",
+    "noAdminMessages": "Nessun messaggio disponibile."
   }
-
 }

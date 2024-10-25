@@ -30,6 +30,9 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import PeopleIcon from "@mui/icons-material/People";
 import SettingsIcon from "@mui/icons-material/Settings";
 
+// Import translation hook
+import { useTranslation } from "react-i18next";
+
 // Preload functions for each page
 const preloadStatistics = () =>
   import("../../pages/statistics/StatisticsDashboard");
@@ -50,6 +53,8 @@ const NavigationComponent: React.FC = () => {
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
   const userRole = useAppSelector(selectUserRole); // Access userRole
 
+  const { t } = useTranslation();
+
   const initiateLogout = () => {
     dispatch(handleLogout());
   };
@@ -57,7 +62,8 @@ const NavigationComponent: React.FC = () => {
   // Define navigation items with role-based access
   const navItems = [
     {
-      label: "Statistics",
+      label: "navigation.statistics",
+      defaultLabel: "Statistics",
       icon: <AssessmentIcon />, // New icon
       onClick: () => navigate("/statistics"),
       onmouseenter: () => preloadStatistics(),
@@ -66,7 +72,8 @@ const NavigationComponent: React.FC = () => {
       roles: ["admin", "client", "agent"], // Only these roles
     },
     {
-      label: "Movements",
+      label: "navigation.movements",
+      defaultLabel: "Movements",
       icon: <HistoryIcon />,
       onClick: () => navigate("/movements"),
       onmouseenter: () => preloadMovements(),
@@ -75,7 +82,8 @@ const NavigationComponent: React.FC = () => {
       roles: ["admin", "client", "agent"], // Exclude 'employee'
     },
     {
-      label: "Clients",
+      label: "navigation.clients",
+      defaultLabel: "Clients",
       icon: <PeopleIcon />,
       onClick: () => navigate("/clients"),
       onmouseenter: () => preloadClients(),
@@ -84,7 +92,8 @@ const NavigationComponent: React.FC = () => {
       roles: ["admin", "client", "agent"], // Exclude 'employee'
     },
     {
-      label: "Articles",
+      label: "navigation.articles",
+      defaultLabel: "Articles",
       icon: <CategoryIcon />,
       onClick: () => navigate("/articles"),
       onmouseenter: () => preloadArticles(),
@@ -93,7 +102,8 @@ const NavigationComponent: React.FC = () => {
       roles: ["admin", "client", "agent"], // Exclude 'employee'
     },
     {
-      label: "Visits",
+      label: "navigation.visits",
+      defaultLabel: "Visits",
       icon: <EventNoteIcon />,
       onClick: () => navigate("/visits"),
       onmouseenter: () => preloadVisits(),
@@ -102,7 +112,8 @@ const NavigationComponent: React.FC = () => {
       roles: ["admin", "client", "agent"], // Exclude 'employee'
     },
     {
-      label: "Promos",
+      label: "navigation.promos",
+      defaultLabel: "Promos",
       icon: <LocalOfferIcon />,
       onClick: () => navigate("/promos"),
       onmouseenter: () => preloadPromos(),
@@ -111,7 +122,8 @@ const NavigationComponent: React.FC = () => {
       roles: ["admin", "client", "agent"], // Exclude 'employee'
     },
     {
-      label: "Calendar",
+      label: "navigation.calendar",
+      defaultLabel: "Calendar",
       icon: <CalendarTodayIcon />,
       onClick: () => navigate("/calendar"),
       onmouseenter: () => preloadCalendar(),
@@ -120,7 +132,8 @@ const NavigationComponent: React.FC = () => {
       roles: ["admin", "client", "agent", "employee"], // Accessible to 'employee' as well
     },
     {
-      label: "Messages",
+      label: "navigation.messages",
+      defaultLabel: "Messages",
       icon: <ChatBubbleOutlineIcon />,
       onClick: () => navigate("/messages"),
       onmouseenter: () => preloadMessages(),
@@ -129,7 +142,8 @@ const NavigationComponent: React.FC = () => {
       roles: ["admin", "client", "agent", "employee"],
     },
     {
-      label: "Settings",
+      label: "navigation.settings",
+      defaultLabel: "Settings",
       icon: <SettingsIcon />,
       onClick: () => navigate("/settings"),
       onmouseenter: () => preloadSettings(),
@@ -138,7 +152,8 @@ const NavigationComponent: React.FC = () => {
       roles: ["admin", "client", "agent", "employee"],
     },
     {
-      label: "Logout",
+      label: "navigation.logout",
+      defaultLabel: "Logout",
       icon: <LogoutIcon />,
       onClick: initiateLogout,
       color: "#f44336",
@@ -172,14 +187,14 @@ const NavigationComponent: React.FC = () => {
         }}
       >
         <Typography
-          variant={isMobile ? "h6" : "h4"}
+          variant={isMobile ? "h6" : "h5"}
           sx={{
             mb: 4,
             fontWeight: "700",
             color: "#333",
           }}
         >
-          Quick Navigation
+          {t("navigation.quickNavigation", "Quick Navigation")}
         </Typography>
         {/* Grid Container for Navigation Buttons */}
         <Grid
@@ -202,7 +217,7 @@ const NavigationComponent: React.FC = () => {
                 alignItems: "center",
               }}
             >
-              <Tooltip title={item.label} arrow>
+              <Tooltip title={t(item.label, item.defaultLabel)} arrow>
                 <IconButton
                   onClick={item.onClick}
                   size="large"
@@ -219,7 +234,7 @@ const NavigationComponent: React.FC = () => {
                       backgroundColor: "#e0e0e0",
                     },
                   }}
-                  aria-label={item.label}
+                  aria-label={t(item.label, item.defaultLabel)}
                 >
                   {React.cloneElement(item.icon, {
                     fontSize: isMobile ? "2rem" : "3rem", // Adjust icon size
