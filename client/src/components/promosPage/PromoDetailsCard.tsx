@@ -15,8 +15,8 @@ import dayjs from "dayjs";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
-import usePromos from "../../hooks/usePromos";
 import { selectUserRole } from "../../features/auth/authSlice";
+import usePromos from "../../hooks/usePromos";
 
 interface PromoDetailsCardProps {
   onEditPromo: () => void;
@@ -190,8 +190,8 @@ const PromoDetailsCard: React.FC<PromoDetailsCardProps> = React.memo(
               gap: 2,
             }}
           >
-            {userRole === "admin" && (
-              <React.Fragment>
+            <React.Fragment>
+              {userRole === "admin" && (
                 <Tooltip title={t("promo.editTooltip", "Edit Promo")}>
                   <IconButton
                     onClick={onEditPromo}
@@ -201,7 +201,9 @@ const PromoDetailsCard: React.FC<PromoDetailsCardProps> = React.memo(
                     <EditIcon />
                   </IconButton>
                 </Tooltip>
+              )}
 
+              {userRole === "admin" && (
                 <Tooltip title={t("promo.terminateTooltip", "Terminate Promo")}>
                   <IconButton
                     onClick={onTerminatePromo}
@@ -211,18 +213,19 @@ const PromoDetailsCard: React.FC<PromoDetailsCardProps> = React.memo(
                     <HourglassEmptyIcon />
                   </IconButton>
                 </Tooltip>
+              )}
 
-                <Tooltip title={t("promo.deselectTooltip", "Deselect Promo")}>
-                  <IconButton
-                    onClick={onDeselectPromo}
-                    sx={errorButtonStyles}
-                    aria-label={t("promo.deselect", "Deselect Promo")}
-                  >
-                    <ClearIcon />
-                  </IconButton>
-                </Tooltip>
-              </React.Fragment>
-            )}
+              {/* Allow all roles to access the Deselect button */}
+              <Tooltip title={t("promo.deselectTooltip", "Deselect Promo")}>
+                <IconButton
+                  onClick={onDeselectPromo}
+                  sx={errorButtonStyles}
+                  aria-label={t("promo.deselect", "Deselect Promo")}
+                >
+                  <ClearIcon />
+                </IconButton>
+              </Tooltip>
+            </React.Fragment>
           </Box>
         </Box>
       </Box>

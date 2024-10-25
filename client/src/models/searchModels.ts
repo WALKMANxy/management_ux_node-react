@@ -1,12 +1,11 @@
 export type SearchResult = {
   id: string;
-  _id?:string;
   name: string;
-  type: "client" | "agent" | "article" | "promo" | "visit" | "alert";
+  type: "client" | "agent" | "article" | "promo" | "visit";
 
   notAvailable?: "Not Available";
 
-  // Client-specific properties
+  // Client/Agent-specific properties
   extendedName?: string;
   province?: string;
   phone?: string;
@@ -24,11 +23,9 @@ export type SearchResult = {
   agentName?: string;
   colour?: string;
 
-  // Agent-specific properties
-  // (already covered by common fields)
+
 
   // Article-specific properties
-  articleId?: string;
   brand?: string;
   quantity?: number;
   unitPrice?: string;
@@ -41,6 +38,9 @@ export type SearchResult = {
   discount?: string;
   startDate?: Date;
   endDate?: Date;
+  agentId?: string; // For admins
+  clientsId?: string[]; // For matching clientsId
+
   promoIssuedBy?: string;
 
   // Visit-specific properties
@@ -54,19 +54,11 @@ export type SearchResult = {
   completed?: boolean;
   visitIssuedBy?: string;
 
-  // Alert-specific properties
-  alertReason?: string;
-  message?: string;
-  severity?: "low" | "medium" | "high";
-  createdAt?: string;
-  alertIssuedBy?: string;
-  entityRole?: "admin" | "agent" | "client";
-  entityCode?: string;
-  markedAsRead?: boolean;
 };
 
 export type SearchParams = {
   query: string;
   filter: string;
+  exact?: boolean;
   results?: SearchResult[];
 };

@@ -1,9 +1,8 @@
 // src/components/chatPage/InputBox.tsx
 
-import AttachFileIcon from "@mui/icons-material/AttachFile"; // Import paperclip icon
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SendIcon from "@mui/icons-material/Send";
 import TuneIcon from "@mui/icons-material/Tune";
-
 import {
   Box,
   Divider,
@@ -14,35 +13,52 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useCallback, useRef, useState } from "react";
+import React, {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { Controller, useForm } from "react-hook-form"; // Import useForm and Controller
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { selectUserRole } from "../../features/auth/authSlice"; // Assuming the selector is defined in the auth slice
+import { selectUserRole } from "../../features/auth/authSlice";
 import useChatLogic from "../../hooks/useChatsLogic";
-import { Attachment, useFilePreview } from "../../hooks/useFilePreview";
+import { Attachment } from "../../models/dataModels";
 import AttachmentModal from "./AttachmentModal";
 import MessageTypeModal from "./MessageTypeModal";
 
 interface InputBoxProps {
-  canUserChat: boolean; // Add chatStatus prop
+  canUserChat: boolean;
   attachments?: Attachment[];
   viewingFiles?: boolean;
+  handleFileSelect?: (event: ChangeEvent<HTMLInputElement>) => void;
+  closeFileViewer: (isPreview: boolean) => void;
+  isPreview: boolean;
+  isViewerOpen?: boolean;
 }
 
-/**
- * InputBox Component
- * Allows users to input and send messages, and select message types.
- *
- * @param {InputBoxProps} props - Component props.
- * @returns {JSX.Element} The rendered component.
- */
+interface FormValues {
+  messageInput: string;
+}
+
 const InputBox: React.FC<InputBoxProps> = ({
   canUserChat,
   attachments,
   viewingFiles,
+  handleFileSelect,
+  closeFileViewer,
+  isPreview,
+  isViewerOpen,
 }) => {
   const { t } = useTranslation();
-  const [messageInput, setMessageInput] = useState("");
+  const { control, handleSubmit, reset } = useForm<FormValues>({
+    defaultValues: {
+      messageInput: "",
+    },
+  });
+
   const [messageType, setMessageType] = useState<
     "message" | "alert" | "promo" | "visit"
   >("message");
@@ -53,31 +69,43 @@ const InputBox: React.FC<InputBoxProps> = ({
   const isAttachmentOpen = Boolean(attachmentAnchorEl);
 
   const { handleSendMessage } = useChatLogic();
-  const userRole = useSelector(selectUserRole); // Get the user role from Redux
-  const inputRef = useRef<HTMLInputElement | null>(null); // Ref for the input to retain focus
+  const userRole = useSelector(selectUserRole);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const { handleFileSelect, closeFileViewer, isPreview } = useFilePreview(); // Use the updated hook
-
   /**
-   * Handles sending the message.
+   * Handler for closing the attachment modal.
    */
-  const handleSend = useCallback(() => {
-    if (messageInput.trim()) {
-      handleSendMessage(messageInput, messageType, attachments);
-      setMessageInput(""); // Clear the input field
-      inputRef.current?.focus(); // Keep focus on the input field
+  const handleAttachmentClose = useCallback(() => {
+    setAttachmentAnchorEl(null);
+  }, []);
+
+  // Reset attachmentAnchorEl when viewingFiles changes
+  useEffect(() => {
+    if (isViewerOpen) {
+      handleAttachmentClose();
     }
-    closeFileViewer(isPreview);
-  }, [
-    messageInput,
-    messageType,
-    handleSendMessage,
-    attachments,
-    closeFileViewer,
-    isPreview,
-  ]);
+  }, [isViewerOpen, handleAttachmentClose]);
+
+  const onSubmit = useCallback(
+    (data: FormValues) => {
+      if (attachments || data.messageInput.trim()) {
+        handleSendMessage(data.messageInput, messageType, attachments);
+        reset(); // Clear the input field
+        inputRef.current?.focus(); // Keep focus on the input field
+      }
+      closeFileViewer(isPreview);
+    },
+    [
+      handleSendMessage,
+      messageType,
+      attachments,
+      reset,
+      closeFileViewer,
+      isPreview,
+    ]
+  );
 
   /**
    * Handler for opening the message type dropdown menu.
@@ -118,19 +146,6 @@ const InputBox: React.FC<InputBoxProps> = ({
     []
   );
 
-  /**
-   * Handler for closing the attachment modal.
-   */
-  const handleAttachmentClose = useCallback(() => {
-    setAttachmentAnchorEl(null);
-  }, []);
-
-  /**
-   * Handler for selecting files.
-   *
-   * @param {React.ChangeEvent<HTMLInputElement>} event - The file input change event.
-   */
-
   return (
     <Paper
       elevation={0}
@@ -138,87 +153,99 @@ const InputBox: React.FC<InputBoxProps> = ({
         display: "flex",
         alignItems: "center",
         p: 1,
-        borderRadius: isMobile ? "0px" : "0px", // Rounded corners for the paper
+        borderRadius: isMobile ? "0px" : "0px",
         mt: 0,
-        backdropFilter: "blur(10px)", // Frosted glass effect
-        backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent background
+        backdropFilter: "blur(10px)",
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
       }}
     >
       {!viewingFiles && (
         <Box sx={{ display: "flex", alignItems: "center", pr: 1 }}>
           {/* Attachment Button */}
-          <Tooltip title={t("inputBox.tooltips.attachFile")}>
-            <IconButton
-              color="primary"
-              onClick={handleAttachmentOpen}
-              aria-label={t("inputBox.tooltips.attachFile")}
-              disabled={!canUserChat}
-              sx={{
-                marginRight: 1,
-              }}
-            >
-              <AttachFileIcon />
-            </IconButton>
-          </Tooltip>
+          <IconButton
+            color="primary"
+            onClick={handleAttachmentOpen}
+            aria-label={t("inputBox.tooltips.attachFile")}
+            disabled={!canUserChat}
+            sx={{
+              marginRight: 1,
+            }}
+          >
+            <AttachFileIcon />
+          </IconButton>
 
           {/* Message Type Selection */}
-          {userRole !== "client" && ( // Show the TuneIcon only if the user is not a client
+          {userRole !== "client" && (
             <Tooltip title={t("inputBox.tooltips.selectMessageType")}>
-              <IconButton
-                color="primary"
-                onClick={handleMenuOpen}
-                disabled={!canUserChat}
-                aria-label={t("inputBox.tooltips.selectMessageType")}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "6px",
-                }}
-              >
-                <TuneIcon />
-              </IconButton>
+              <span>
+                <IconButton
+                  color="primary"
+                  onClick={handleMenuOpen}
+                  disabled={!canUserChat}
+                  aria-label={t("inputBox.tooltips.selectMessageType")}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "6px",
+                  }}
+                >
+                  <TuneIcon />
+                </IconButton>
+              </span>
             </Tooltip>
           )}
         </Box>
       )}
 
       {/* Message Input Field */}
-      <TextField
-        variant="outlined"
-        fullWidth
-        placeholder={t("inputBox.placeholders.typeMessage")}
-        value={messageInput}
-        inputRef={inputRef} // Attach the ref to keep focus
-        onChange={(e) => setMessageInput(e.target.value)}
-        onKeyUp={(e) => e.key === "Enter" && handleSend()}
-        autoComplete="off" // Prevents autofill suggestions
-        type="search" // Ensures minimal autofill interference
-        aria-label={t("inputBox.labels.chatInput")}
-        role="textbox"
-        inputProps={{
-          type: "search",
-          inputMode: "text",
-          enterKeyHint: "send",
-          autoCorrect: "on",
-          autoCapitalize: "on",
-          spellCheck: "true",
-          "data-form-type": "other",
-        }}
-        sx={{
-          "& .MuiOutlinedInput-root": {
-            borderRadius: "1.5em",
-            height: "2.9em",
-            padding: "0.5em 0.875em",
-          },
-          "& .MuiInputBase-input": {
-            height: "1.25em",
-            WebkitAppearance: "none",
-            MozAppearance: "none",
-          },
-          mr: 1, // Margin right to separate from the divider
-        }}
-        disabled={!canUserChat} // Disable input if chat is pending
+      <Controller
+        name="messageInput"
+        control={control}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            variant="outlined"
+            fullWidth
+            placeholder={t("inputBox.placeholders.typeMessage")}
+            inputRef={(e) => {
+              field.ref(e);
+              inputRef.current = e; // Maintain the ref
+            }}
+            onKeyUp={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                handleSubmit(onSubmit)();
+              }
+            }}
+            autoComplete="off"
+            type="search"
+            aria-label={t("inputBox.labels.chatInput")}
+            role="textbox"
+            inputProps={{
+              type: "search",
+              inputMode: "text",
+              enterKeyHint: "send",
+              autoCorrect: "on",
+              autoCapitalize: "on",
+              spellCheck: "true",
+              "data-form-type": "other",
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "1.5em",
+                height: "2.9em",
+                padding: "0.5em 0.875em",
+              },
+              "& .MuiInputBase-input": {
+                height: "1.25em",
+                WebkitAppearance: "none",
+                MozAppearance: "none",
+              },
+              mr: 1,
+            }}
+            disabled={!canUserChat}
+          />
+        )}
       />
 
       {/* Divider */}
@@ -229,23 +256,27 @@ const InputBox: React.FC<InputBoxProps> = ({
 
       {/* Send Message Button */}
       <Tooltip title={t("inputBox.tooltips.sendMessage")}>
-        <IconButton
-          color="primary"
-          onClick={handleSend}
-          aria-label={t("inputBox.tooltips.sendMessage")}
-          disabled={!canUserChat}
-        >
-          <SendIcon />
-        </IconButton>
+        <span>
+          <IconButton
+            color="primary"
+            onClick={handleSubmit(onSubmit)}
+            aria-label={t("inputBox.tooltips.sendMessage")}
+            disabled={!canUserChat}
+          >
+            <SendIcon />
+          </IconButton>
+        </span>
       </Tooltip>
 
       {/* Attachment Modal */}
-      <AttachmentModal
-        anchorEl={attachmentAnchorEl}
-        isOpen={isAttachmentOpen}
-        onClose={handleAttachmentClose}
-        onFileSelect={handleFileSelect}
-      />
+      {!isPreview && (
+        <AttachmentModal
+          anchorEl={attachmentAnchorEl}
+          isOpen={isAttachmentOpen}
+          onClose={handleAttachmentClose}
+          onFileSelect={handleFileSelect}
+        />
+      )}
 
       {/* Message Type Menu */}
       <MessageTypeModal

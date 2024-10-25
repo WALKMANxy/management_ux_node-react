@@ -125,7 +125,7 @@ export function generateAutomatedMessage(
     content = i18next.t("messages.overdueVisitMessage", {
       visitReason: data.visitReason,
       visitDate: data.date.toLocaleDateString(),
-      count, // Pass the count if provided
+      count: count || 1, // Pass the count if provided
     });
   } else if (messageType === "promo" && isPromo(data)) {
     content = i18next.t("messages.promoMessage", {
@@ -151,4 +151,15 @@ export function generateAutomatedMessage(
   };
 
   return message;
+}
+
+export const getFileExtension = (fileName: string) =>
+  fileName.split(".").pop()?.toLowerCase(); // Extract file extension
+
+
+export const formatFileSize = (size: number): string => {
+  if (size === 0) return '0 Bytes';
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(size) / Math.log(1024));
+  return `${(size / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
 }

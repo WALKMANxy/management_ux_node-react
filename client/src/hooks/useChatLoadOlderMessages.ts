@@ -4,7 +4,7 @@ import { useInView } from "react-intersection-observer";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { fetchOlderMessagesThunk } from "../features/chat/chatThunks";
 
-const useLoadOlderMessages = (currentChatId: string | null) => {
+const useLoadOlderMessages = (currentChatId: string | undefined) => {
   const dispatch = useAppDispatch();
   const messages = useAppSelector((state) =>
     currentChatId ? state.chats.chats[currentChatId]?.messages || [] : []

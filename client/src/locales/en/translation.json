@@ -1,4 +1,8 @@
 {
+  "calendarPage": {
+    "Title": "Calendar",
+    "HistoryTitle": "Event History"
+  },
   "footer": {
     "about": "About",
     "ourStory": "Our Story",
@@ -11,6 +15,12 @@
     "termsOfService": "Terms of Service",
     "close": "Close",
     "hours": "Hours"
+  },
+  "team": {
+    "title": "Our Team",
+    "content": {
+      "part1": "Our team at Ricambi Centro Sud S.r.l. is composed of dedicated professionals committed to providing top-notch services and solutions to our clients. With a diverse range of expertise, our team members collaborate seamlessly to ensure customer satisfaction and business growth."
+    }
   },
   "ourStory": {
     "title": "Our Story",
@@ -126,7 +136,8 @@
   "monthOverMonthSpendingTrend": {
     "title": "Monthly Trend",
     "revenue": "Revenue",
-    "expense": "Expense"
+    "expense": "Expense",
+    "netRevenue": "Net Revenue"
   },
   "salesDistribution": {
     "title": "Sales Distribution",
@@ -342,45 +353,44 @@
         "status": "Status",
         "actions": "Actions"
       },
-      "unknown": "Unknown",
-      "na": "N/A",
-      "eventTypes": {
-        "absence": "Absence",
-        "event": "Event",
-        "holiday": "Holiday",
-        "generic": "Generic"
-      },
-      "reasons": {
-        "illness": "Illness",
-        "day_off": "Day Off",
-        "unexpected_event": "Unexpected Event",
-        "medical_visit": "Medical Visit",
-        "company_meeting": "Company Meeting",
-        "company_party": "Company Party",
-        "conference": "Conference",
-        "expo": "Expo",
-        "generic": "Generic"
-      },
-      "statuses": {
-        "pending": "Pending",
-        "approved": "Approved",
-        "rejected": "Rejected",
-        "cancelled": "Cancelled"
-      },
       "actions": {
         "na": "N/A"
       },
-      "tooltips": {
-        "approve": "Approve Event",
-        "reject": "Reject Event"
-      },
       "toast": {
-        "approveSuccess": "Event approved successfully!",
-        "approveFailure": "Failed to approve event",
-        "rejectSuccess": "Event rejected successfully!",
-        "rejectFailure": "Failed to reject event",
-        "genericError": "An unexpected error occurred"
-      }
+        "approveSuccess": "Event approved successfully.",
+        "approveFailure": "Failed to approve the event.",
+        "rejectSuccess": "Event rejected successfully.",
+        "rejectFailure": "Failed to reject the event.",
+        "genericError": "An error occurred."
+      },
+      "filterSelection": "Filter selection",
+      "filterAll": "All",
+      "na": "N/A",
+      "system": "System",
+      "unknown": "Unknown"
+    },
+    "eventHistoryTooltips": {
+      "editDisabled": "Editing this event is disabled.",
+      "edit": "Edit Event",
+      "approve": "Approve Event",
+      "reject": "Reject Event",
+      "delete": "Delete Event"
+    },
+    "eventTypes": {
+      "absence": "Absence",
+      "holiday": "Holiday",
+      "event": "Event",
+      "visit": "Visit",
+      "generic": "Generic"
+    },
+
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "popOverEvent": {
+      "goToVisit": "Go to Visit"
     }
   },
   "eventTitle": {
@@ -484,7 +494,9 @@
     "messages": {
       "noContactsFound": "No contacts found. Try adjusting your search.",
       "promoMessage": "You are eligible for a new promotion!\n\nType: {{promoType}}\nName: {{promoName}}\nOffer: {{promoDiscount}}\n\nContact one of our representatives for more information. Have a great day!",
-      "visitMessage": "A new visit has been scheduled for you!\n\nType: {{visitType}}\nReason: {{visitReason}}\nDate: {{visitDate}}\n\nPlease be prepared. Thank you!"
+      "visitMessage": "A new visit has been scheduled for you!\n\nType: {{visitType}}\nReason: {{visitReason}}\nDate: {{visitDate}}\n\nPlease be prepared. Thank you!",
+      "overdueVisitMessage": "You have {{count}} overdue visit. Please update the status of the visit.",
+      "overdueVisitMessage_plural": "You have {{count}} overdue visits. Please update the status of the visits."
     }
   },
   "dateDivider": {
@@ -558,24 +570,22 @@
   "spentThisMonth": {
     "titleAgent": "Earned This Month",
     "titleClient": "Spent This Month",
-    "iconAlt": "Money Icon",
     "more": "",
     "neutral": "",
     "less": "",
     "even": "",
-    "comparedToOtherAgents": "compared to all.",
-    "comparedToOtherClients": "compared to all."
+    "comparedToOtherAgents": "of total revenue.",
+    "comparedToOtherClients": "of total revenue."
   },
   "spentThisYear": {
     "titleAgent": "Earned This Year",
     "titleClient": "Spent This Year",
-    "iconAlt": "Money Bag Icon",
     "more": "",
     "neutral": "",
     "less": "",
     "even": "",
-    "comparedToOtherAgents": "compared to all.",
-    "comparedToOtherClients": "compared to all."
+    "comparedToOtherAgents": "of total revenue.",
+    "comparedToOtherClients": "of total revenue."
   },
   "topArticleType": {
     "titleAgent": "Top Sold",
@@ -679,7 +689,8 @@
     "googleLoginSuccess": "User logged in successfully via Google OAuth.",
     "googleLoginFailed": "Authentication failed via Google OAuth.",
     "invalidStateParameter": "Invalid state parameter",
-    "loginInconsistency": "There were some inconsistencies while attempting to login. Please contact an administrator."
+    "loginInconsistency": "There were some inconsistencies while attempting to login. Please contact an administrator.",
+    "invalidCredentials": "Invalid credentials"
   },
   "movementDetails": {
     "id": "List ID",
@@ -725,6 +736,7 @@
     "id": "ID",
     "idUnknown": "Unknown ID",
     "phone": "Phone",
+
     "phoneUnknown": "Unknown Phone",
     "email": "Email",
     "emailUnknown": "Unknown Email",
@@ -754,7 +766,8 @@
     "brandUnknown": "Unknown Brand",
     "lastSoldDate": "Last Sold Date",
     "lastSoldDateUnknown": "Unknown Last Sold Date",
-    "promoIssuedBy": "Issued By"
+    "promoIssuedBy": "Issued By",
+    "visitFor": "Visit for {{resultName}}"
   },
   "promoDetails": {
     "notFound": "Promo details not found."
@@ -887,7 +900,34 @@
     "userSettings": "User Settings",
     "accountSettings": "Account Settings",
     "appSettings": "App Settings",
-    "manageUsers": "Manage Users"
+    "manageUsers": "Manage Users",
+    "manageEntities": "Manage Entities"
+  },
+  "manageEntities": {
+    "title": "Manage Entities",
+    "infoTooltip": "Use the filters to view different entity types. You can add, edit, or delete entities.",
+    "selectEntityPrompt": "Select an entity to view details.",
+    "roleSelection": "Role selection",
+    "client": "Client",
+    "agent": "Agent",
+    "admin": "Admin",
+    "employee": "Employee",
+    "searchPlaceholder": "Searchs by name or ID",
+    "loadingEntities": "Loading entities...",
+    "startTyping": "Start typing to search",
+    "addDisabled": "Adding Clients is disabled.",
+    "addEntity": "Add Entity",
+    "actions": "Actions",
+    "noEntitiesFound": "No entities found.",
+    "confirmDelete": "Confirm Deletion",
+    "deleteWarning": "Are you sure you want to delete this entity? This action is irreversible. Please make sure to update any related data.",
+    "deleteTooltip": "Delete",
+    "cancelTooltip": "Cancel",
+    "deleteButton": "Delete",
+    "cancelButton": "Cancel",
+    "cannotDeleteYourself": "You cannot delete your own entity.",
+    "cannotDeleteClient": "Cannot delete Client entities.",
+    "noEntitySelected": "No entity selected for deletion."
   },
   "manageUsers": {
     "title": "Manage Users",
@@ -1048,8 +1088,17 @@
     "cancelledLabel": "Mark as Cancelled",
     "pendingLabel": "Pending",
     "completedStatus": "Completed",
-    "cancelledStatus": "Cancelled"
+    "cancelledStatus": "Cancelled",
+    "noChanges": "You must edit the visit before updating it.",
+    "fillDate": "Please select a date.",
+    "visitUpdated": "Visit updated successfully.",
+    "completed": "Completed",
+    "markAsCompleted": "Mark as Completed",
+    "cancelled": "Cancelled",
+    "markAsCancelled": "Mark as Cancelled",
+    "pastVisitWarning": "The visit is past the set date. Have you completed the visit? If so, please add your report and mark as completed."
   },
+
   "visitsSidebar": {
     "goBack": "Go Back",
     "goBackTooltip": "Go back to Agents",
@@ -1125,7 +1174,8 @@
       "groupChat": "Create Group Chat",
       "broadcastChat": "Create Broadcast Chat",
       "cancel": "Cancel",
-      "create": "Create Chat"
+      "create": "Create Chat",
+      "edit": "Edit Chat"
     },
     "labels": {
       "groupName": "Group Name",
@@ -1133,16 +1183,31 @@
       "selectParticipants": "Select Participants",
       "cancel": "Cancel",
       "create": "Create Chat",
+      "edit": "Edit",
+      "selectAdmins": "Select Admins",
+      "searchAdmins": "Search Admins",
       "searchUsers": "Search Users",
       "findParticipants": "Find Participants"
     },
     "errors": {
       "noParticipants": "Please select at least one participant.",
       "chatNameRequired": "Chat name is required.",
-      "createChatFailed": "Failed to create chat. Please try again."
+      "createChatFailed": "Failed to create chat. Please try again.",
+      "chatTypeRequired": "Chat type is required.",
+      "userNotLoggedIn": "You must be logged in to create a chat.",
+      "editChatFailed": "Failed to edit the chat. Please try again."
     },
     "success": {
-      "createChat": "Chat created successfully!"
+      "createChat": "Chat successfully created!",
+      "editChat": "Chat successfully edited!"
+    },
+    "buttons": {
+      "deselectAll": "Deselect All",
+      "selectAll": "Select All"
+    },
+    "placeholders": {
+      "searchAdminPlaceholder": "Search for admins by name or ID",
+      "searchPlaceholder": "Search users by name or ID"
     },
     "userList": {
       "table": "User Selection Table",
@@ -1157,7 +1222,8 @@
   "chats": {
     "error": "An error occured with the chats:",
     "defaultTitle": "Chat",
-    "groupTitle": "Group Chat"
+    "groupTitle": "Group Chat",
+    "deletedUser": "Deleted User"
   },
   "errors": {
     "userNotFound": "User with ID {{id}} not found.",
@@ -1217,7 +1283,8 @@
   "webSocketService": {
     "lostConnection": "Lost connection to the server, attempting to reconnect...",
     "connectionEstablished": "Connection to the server established.",
-    "connectionLost": "Connection to the server lost, refresh the page or try again later."
+    "connectionLost": "Connection to the server lost, refresh the page or try again later.",
+    "connected": "Connected!"
   },
   "dashboard": {
     "welcomeBack": "Welcome back, {{name}}!",
@@ -1237,11 +1304,14 @@
     "topArticleType": "Top Article Types",
     "monthOverMonthSpendingTrend": "Month Over Month Spending Trend",
     "topBrandsSold": "Top Brands Sold",
-    "totalEarning": "Total Earnings",
+    "totalGross": "Total Gross",
+    "totalEarning": "Total Earning",
     "totalOrders": "Total Orders",
     "salesDistribution": "Sales Distribution",
     "upcomingVisits": "Upcoming Visits",
-    "yourCalendar": "Your Calendar"
+    "yourCalendar": "Your Calendar",
+       "SearchTitleAgent": "Search for clients",
+    "SearchTitleAdmin": "Search for clients or agents"
   },
   "articlesPage": {
     "name": "Name",
@@ -1322,6 +1392,14 @@
     "86": "Heavy snow showers",
     "95": "Thunderstorm",
     "96": "Thunderstorm with slight hail",
-    "99": "Thunderstorm with heavy hail"
+    "99": "Thunderstorm with heavy hail",
+    "Forecast": "Forecast:"
+  },
+  "pwa": {
+    "newContentAvailable": "New content is available!",
+    "clickToReload": "Click the button below to reload the app and update to the latest version.",
+    "reloadButton": "Reload",
+    "offlineReady": "App is ready to work offline."
   }
+
 }

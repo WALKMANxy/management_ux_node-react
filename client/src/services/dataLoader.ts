@@ -10,8 +10,7 @@ import { serverClient, serverMovement } from "../models/dataSetTypes";
 
 import { Admin, Agent, Client } from "../models/entityModels";
 
-const workerScriptPath = new URL("./worker.js", import.meta.url);
-
+const workerScriptPath = new URL("../workers/worker.js", import.meta.url);
 // Mapping data to models including the new data types (Visits, Promos, Alerts)
 export const mapDataToModels = async (
   data: serverMovement[],

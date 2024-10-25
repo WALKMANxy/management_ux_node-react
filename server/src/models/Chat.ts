@@ -1,8 +1,6 @@
-// models/Chat.ts
-
 import { Document, Schema, Types, model } from "mongoose";
 
-// Define the IMessage interface with server and client IDs
+// Updated IMessage interface
 export interface IMessage {
   _id: Types.ObjectId; // Server-generated unique identifier
   local_id?: string; // Optional client-generated identifier for matching
@@ -11,41 +9,47 @@ export interface IMessage {
   timestamp: Date;
   readBy: Types.ObjectId[]; // Array of user IDs who have read the message
   messageType: "message" | "alert" | "promo" | "visit"; // Categorizes the message type
-  attachments?: {
-    url: string;
-    type: "image" | "pdf" | "word" | "excel" | "csv" | "video" | "other"; // Added more types
-    fileName: string; // Original file name
-    size: number; // File size in bytes
-    thumbnailUrl?: string; // Thumbnail for images, if applicable
-  }[]; // Array to store attachments with metadata
+  attachments: Attachment[]; // Array to store attachments with metadata
   status: "pending" | "sent" | "failed"; // Status indicating the message state
   isUploading?: boolean; // Tracks if the message is still uploading
-  uploadProgress?: number; // Tracks the progress of the upload (percentage)
 }
 
-// Define the IChat interface with server and client IDs
+// New Attachment interface
+export interface Attachment {
+  url: string;
+  type: "image" | "video" | "pdf" | "word" | "spreadsheet" |  "other";
+  fileName: string;
+  size: number;
+  chatId?: Types.ObjectId;
+  messageId?: string; // Store `local_id` or `_id`
+  uploadProgress? : number;
+  status: 'pending' | 'uploading' | 'uploaded' | 'failed';
+
+}
+
+// Rest of the IChat interface remains the same
 export interface IChat extends Document {
-  _id: Types.ObjectId; // Server-generated unique identifier
-  local_id?: string; // Optional client-generated identifier for matching
-  type: "simple" | "group" | "broadcast"; // Type of chat
-  name?: string; // Optional, mainly for group chats
-  description?: string; // Optional, mainly for groups and broadcasts
-  participants: Types.ObjectId[]; // List of participant user IDs
-  admins?: Types.ObjectId[]; // Admins, mainly for group and broadcast chats
-  messages: IMessage[]; // Array of messages within the chat
+  _id: Types.ObjectId;
+  local_id?: string;
+  type: "simple" | "group" | "broadcast";
+  name?: string;
+  description?: string;
+  participants: Types.ObjectId[];
+  admins?: Types.ObjectId[];
+  messages: IMessage[];
   createdAt: Date;
   updatedAt: Date;
-  status: "pending" | "created" | "failed"; // Status indicating the chat state
+  status: "pending" | "created" | "failed";
 }
 
+// Updated messageSchema
 const messageSchema = new Schema<IMessage>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true }, // Auto-generated server-side
-    local_id: { type: String }, // Client-side generated ID
+    _id: { type: Schema.Types.ObjectId, auto: true },
+    local_id: { type: String },
     content: {
       type: String,
       required: function () {
-        // Content is required only if no attachments are present
         return !(this.attachments && this.attachments.length > 0);
       },
       maxlength: 2000,
@@ -67,10 +71,17 @@ const messageSchema = new Schema<IMessage>(
     attachments: [
       {
         url: { type: String, required: true },
-        type: { type: String, enum: ["image", "pdf", "word", "excel", "csv", "video","other"], required: true }, // Added more file types
-        fileName: { type: String, required: true }, // Original file name
-        size: { type: Number, required: true }, // File size in bytes
-        thumbnail: { type: String }, // Optional thumbnail for images
+        type: { type: String, enum: ["image", "video", "pdf", "word", "spreadsheet",  "other"], required: true },
+        fileName: { type: String, required: true },
+        size: { type: Number, required: true },
+        chatId: { type: Schema.Types.ObjectId, ref: "Chat" },
+        messageId: { type: String },
+        uploadProgress: { type: Number, default: 0 },
+        status: {
+          type: String,
+          enum: ["pending", "uploading", "uploaded", "failed"],
+          default: "pending",
+        },
       },
     ],
     status: {
@@ -78,17 +89,16 @@ const messageSchema = new Schema<IMessage>(
       enum: ["pending", "sent", "failed"],
       default: "pending",
     },
-    isUploading: { type: Boolean, default: false }, // Tracks if the message is still uploading
-    uploadProgress: { type: Number, default: 0 }, // Upload progress percentage
+    isUploading: { type: Boolean, default: false },
   },
-  { _id: false } // Do not override _id behavior
+  { _id: false }
 );
 
-// Define the schema for Chat with client and server IDs
+// The rest of the chatSchema and indexes remain the same
 const chatSchema = new Schema<IChat>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true }, // Auto-generated server-side
-    local_id: { type: String }, // Client-side generated ID
+    _id: { type: Schema.Types.ObjectId, auto: true },
+    local_id: { type: String },
     type: {
       type: String,
       enum: ["simple", "group", "broadcast"],
@@ -112,26 +122,22 @@ const chatSchema = new Schema<IChat>(
   { timestamps: true }
 );
 
-// Unique compound index on type and participants for simple chats
+// Indexes remain the same
 chatSchema.index(
   { type: 1, participants: 1 },
   { unique: true, partialFilterExpression: { type: "simple" } }
 );
 
-// Unique index for group chats based on type and name
 chatSchema.index(
   { type: 1, name: 1 },
   { unique: true, partialFilterExpression: { type: "group" } }
 );
 
-// Unique index for broadcast chats based on type and each admin
-// This ensures that an admin cannot have multiple broadcast chats
 chatSchema.index(
   { type: 1, admins: 1 },
   { unique: true, partialFilterExpression: { type: "broadcast" } }
 );
 
-// Additional indexes for optimized querying
 chatSchema.index({ "messages.timestamp": 1 });
 chatSchema.index({ participants: 1 });
 chatSchema.index({ admins: 1 });

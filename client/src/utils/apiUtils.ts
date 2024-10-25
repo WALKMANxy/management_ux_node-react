@@ -38,7 +38,7 @@ export const axiosInstance: AxiosInstance = axios.create({
   headers: {
     "bypass-tunnel-reminder": "true",
   },
-  timeout: 10000, // Set a timeout to prevent hanging requests
+  timeout: 60000, // Set a timeout to prevent hanging requests
 });
 
 // Request interceptor to attach the access token
@@ -132,20 +132,31 @@ export const authApiCall = async <T>(
       statusCode: response.status,
     };
   } catch (error: unknown) {
+    let message = "An error occurred";
+    let statusCode = 500;
+    let responseData = {} as T;
+
     if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError<Partial<AuthApiResponse>>;
-      if (axiosError.response) {
-        const { data, status } = axiosError.response;
-        return {
-          ...(data as T),
-          message: data?.message || "An error occurred",
-          statusCode: status,
-        };
+      if (error.response) {
+        const { data, status } = error.response;
+        responseData = data as T;
+        message = data?.message || message;
+        statusCode = status;
+      } else {
+        message = error.message || message;
       }
+    } else if (error instanceof Error) {
+      message = error.message || message;
     }
-    throw new Error(`Failed to ${method.toLowerCase()} data from ${endpoint}`);
+
+    return {
+      ...responseData,
+      message,
+      statusCode,
+    };
   }
 };
+
 
 /**
  * Helper function to fetch fresh data and update the cache

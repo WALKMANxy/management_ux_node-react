@@ -15,21 +15,23 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React, { useMemo, useState } from "react";
+import React, { lazy, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAppDispatch } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { clearCurrentChatReducer } from "../../features/chat/chatSlice";
+import { selectDownloadedFiles } from "../../features/downloads/downloadedFilesSlice";
 import useLoadOlderMessages from "../../hooks/useChatLoadOlderMessages";
 import useChatView from "../../hooks/useChatView"; // Import the custom hook
 import { useFilePreview } from "../../hooks/useFilePreview";
 import { IChat } from "../../models/dataModels";
 import { canUserChat } from "../../utils/chatUtils";
 import Spinner from "../common/Spinner";
-import CreateChatForm from "./CreateChatForm"; // Import CreateChatForm
 import FileViewer from "./FileViewer";
 import InputBox from "./InputBox";
 import RenderMessage from "./RenderMessage"; // Import the RenderMessage component
 import RenderParticipantsAvatars from "./RenderParticipantsAvatars"; // Import the RenderParticipantsAvatars component
+
+const CreateChatForm = lazy(() => import("./CreateChatForm"));
 
 const ChatView: React.FC = () => {
   const { t } = useTranslation();
@@ -37,6 +39,8 @@ const ChatView: React.FC = () => {
   const dispatch = useAppDispatch();
   const [open, setOpen] = React.useState(false);
 
+  /*   console.log("ChatView rendering now");
+   */
   const {
     currentChat,
     sortedMessages,
@@ -49,18 +53,29 @@ const ChatView: React.FC = () => {
     getAdminAvatar,
     participantsData,
     currentUserId,
-  } = useChatView(); // Destructure the hook values
+  } = useChatView();
 
-  const { isViewerOpen, closeFileViewer, isPreview } = useFilePreview();
+  const {
+    isViewerOpen,
+    closeFileViewer,
+    isPreview,
+    currentFile,
+    handleFileSelect,
+    handleSave,
+    removeAttachment,
+    selectedAttachments,
+    downloadAndStoreFile,
+    setCurrentFile,
+    openFileViewer,
+  } = useFilePreview();
+
+  const downloadedFiles = useAppSelector(selectDownloadedFiles);
 
   // Hook for loading older messages
   const { messagesContainerRef, topRef } = useLoadOlderMessages(
-    currentChat?._id || null
+    currentChat?._id
   );
 
-  /**
-   * Handles returning to the sidebar on mobile by clearing the current chat.
-   */
   const handleBackToChats = () => {
     dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
   };
@@ -263,6 +278,10 @@ const ChatView: React.FC = () => {
             currentUserId={currentUserId}
             chatType={currentChat?.type || "simple"}
             participantsData={participantsData}
+            openFileViewer={openFileViewer} // Pass the function here
+            downloadAndStoreFile={downloadAndStoreFile}
+            handleSave={handleSave}
+            downloadedFiles={downloadedFiles}
           />
         </Box>
       </Paper>
@@ -278,12 +297,31 @@ const ChatView: React.FC = () => {
           position: "sticky",
         }}
       >
-        <InputBox canUserChat={isUserAllowedToChat} />
+        {/* Pass the necessary functions as props */}
+        <InputBox
+          canUserChat={isUserAllowedToChat}
+          handleFileSelect={handleFileSelect}
+          closeFileViewer={closeFileViewer}
+          isPreview={isPreview}
+          isViewerOpen={isViewerOpen}
+        />
       </Box>
 
       {/* File Viewer */}
       {isViewerOpen && (
-        <FileViewer onClose={() => closeFileViewer(isPreview)} />
+        <FileViewer
+          onClose={() => closeFileViewer(isPreview)}
+          handleSave={handleSave}
+          currentFile={currentFile}
+          removeAttachment={removeAttachment}
+          selectedAttachments={selectedAttachments}
+          isPreview={isPreview}
+          downloadAndStoreFile={downloadAndStoreFile}
+          setCurrentFile={setCurrentFile}
+          handleFileSelect={handleFileSelect}
+          closeFileViewer={closeFileViewer}
+          downloadedFiles={downloadedFiles}
+        />
       )}
 
       {/* Edit Chat Form */}

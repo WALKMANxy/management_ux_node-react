@@ -1,6 +1,7 @@
 // src/components/TotalEarning.tsx
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 
 import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -66,17 +67,13 @@ const TotalEarning: React.FC<TotalEarningProps> = ({
                   mt: 0,
                 }}
               >
-                <img
-                  src="/icons/earning.svg"
-                  alt={t("dashboard.earningIconAlt")}
-                  style={{ width: "100%", height: "100%" }}
-                />
+                  <MonetizationOnIcon />
               </Avatar>
             </Grid>
           </Grid>
 
           {/* Gross Earnings Section */}
-          <Grid item>
+          <Grid item sx={{ ml: -2}}>
             <Grid container alignItems="center">
               <Grid item>
                 <Typography
@@ -119,7 +116,7 @@ const TotalEarning: React.FC<TotalEarningProps> = ({
           </Grid>
 
           {/* Net Earnings Section */}
-          <Grid item>
+          <Grid item sx={{ mr: -2.5}}>
             {/* Container for Net Earnings */}
             <Grid container direction="column" alignItems="flex-end">
               {/* Net Earnings Value and Icon */}

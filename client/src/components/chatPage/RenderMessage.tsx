@@ -2,7 +2,7 @@
 
 import { Box } from "@mui/material";
 import React from "react";
-import { IMessage } from "../../models/dataModels";
+import { Attachment, IMessage } from "../../models/dataModels";
 import { User } from "../../models/entityModels";
 import { isDifferentDay } from "../../utils/chatUtils";
 import DateDivider from "./DateDivider";
@@ -13,6 +13,12 @@ interface RenderMessageProps {
   currentUserId: string;
   chatType: string;
   participantsData: Partial<User>[];
+  openFileViewer: (isPreview: boolean, fileName?: string) => void; // Add this line
+  downloadAndStoreFile: (attachment: Attachment) => Promise<void>;
+  handleSave: (fileName: string) => void;
+
+  downloadedFiles: Attachment[]
+
 }
 
 /**
@@ -27,6 +33,11 @@ const RenderMessages: React.FC<RenderMessageProps> = ({
   currentUserId,
   chatType,
   participantsData,
+  openFileViewer,
+  downloadAndStoreFile,
+  handleSave,
+  downloadedFiles,
+
 }) => {
   /**
    * Determines whether to show a date divider before the current message.
@@ -65,6 +76,10 @@ const RenderMessages: React.FC<RenderMessageProps> = ({
                 message={message}
                 participantsData={participantsData}
                 chatType={chatType}
+                openFileViewer={openFileViewer} // Pass the function here
+                downloadAndStoreFile={downloadAndStoreFile}
+                handleSave={handleSave}
+                downloadedFiles={downloadedFiles}
               />
             </Box>
           </React.Fragment>

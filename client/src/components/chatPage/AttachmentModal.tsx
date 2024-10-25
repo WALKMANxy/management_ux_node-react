@@ -2,15 +2,15 @@
 
 import PhotoIcon from "@mui/icons-material/Photo";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
-import { Box, IconButton, Menu, Tooltip } from "@mui/material";
-import React from "react";
+import { Box, IconButton, Menu, Tooltip, useMediaQuery } from "@mui/material";
+import React, { ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 interface AttachmentModalProps {
   anchorEl: HTMLElement | null;
   isOpen: boolean;
   onClose: () => void;
-  onFileSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onFileSelect: ((event: ChangeEvent<HTMLInputElement>) => void) | undefined;
 }
 
 const AttachmentModal: React.FC<AttachmentModalProps> = ({
@@ -18,12 +18,15 @@ const AttachmentModal: React.FC<AttachmentModalProps> = ({
   isOpen,
   onClose,
   onFileSelect,
+
 }) => {
   const { t } = useTranslation();
 
-  /**
-   * Closes the file preview.
-   */
+  const isDesktop = useMediaQuery("(min-width:800px)");
+
+
+
+
 
   return (
     <Menu
@@ -40,17 +43,17 @@ const AttachmentModal: React.FC<AttachmentModalProps> = ({
       }}
       sx={{
         mt: -2,
+        ml: isDesktop ? 5.5 : null
+
       }}
       PaperProps={{
         sx: {
-          backdropFilter: "blur(10px)",
           backgroundColor: "rgba(255, 255, 255, 0.95)", // Slightly more opaque for better readability
           borderRadius: "8px",
           display: "flex",
           flexDirection: "column",
           gap: 2,
-          padding: 2,
-        },
+px: 1        },
       }}
     >
       {/* Icon buttons for selecting files */}
@@ -59,7 +62,7 @@ const AttachmentModal: React.FC<AttachmentModalProps> = ({
           <IconButton
             onClick={() => document.getElementById("media-upload")?.click()}
             size="medium"
-            sx={{ color: "rgba(0, 0, 255, 0.6)" }}
+
           >
             <PhotoIcon fontSize="large" />
           </IconButton>

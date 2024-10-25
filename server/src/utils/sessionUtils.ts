@@ -1,4 +1,5 @@
 import { Request } from "express";
+import ms from "ms";
 import { config } from "../config/config";
 import { ISession, Session } from "../models/Session";
 import { AuthenticatedRequest } from "../models/types";
@@ -8,20 +9,12 @@ import {
   generateAccessToken,
   generateRefreshToken,
   verifyAccessToken,
+  verifyRefreshTokenJWT,
 } from "./jwtUtils";
 import { logger } from "./logger";
 
-const ms = require("ms");
-
 const refreshTokenDurationMs = ms(config.jwt.refreshTokenExpiry); // e.g., "7d"
 
-/**
- * Creates a new session for the user, handling token generation and existing session invalidation.
- * @param user - The user object.
- * @param req - The authenticated request.
- * @param uniqueId - Unique identifier for the client instance.
- * @returns An object containing the Access Token and Refresh Token.
- */
 export const createSession = async (
   user: Partial<IUser>,
   req: AuthenticatedRequest,
@@ -39,39 +32,36 @@ export const createSession = async (
 
     const userId = user?._id?.toString();
 
-    // logger.info("Attempting to create session", { userId, uniqueId });
+    logger.info("Attempting to create session", { userId, uniqueId });
 
     const userAgent = req.get("User-Agent") || "Unknown";
-    // logger.info("Retrieved User-Agent from request", { userAgent });
+    logger.info("Retrieved User-Agent from request", { userAgent });
 
-    // Check if a session with the same userId, uniqueId, and userAgent exists
+    console.log(
+      "Checking if a session with the same userId, uniqueId, and userAgent exists"
+    );
     const existingSession = await Session.findOne({
       userId,
       uniqueId,
       userAgent,
-      expiresAt: { $gt: new Date() },
     });
 
     if (existingSession) {
-      /* logger.info("Existing session found, invalidating", {
-        sessionId: existingSession._id,
-        userId,
-      }); */
-      await invalidateSession(
-        existingSession.refreshToken,
-        existingSession.uniqueId!
-      );
-    } else {
-      // logger.info("No existing session found for user", { userId, uniqueId });
+      console.log("Found existing session. Invalidating session...");
+      const invalidated = await invalidateSession(userId!, uniqueId, userAgent);
+      if (!invalidated) {
+        console.log("Failed to invalidate existing session.");
+        throw new Error("Failed to invalidate existing session.");
+      }
     }
 
     // Generate tokens
-    // logger.info("Generating new tokens for user", { userId });
+    logger.info("Generating new tokens for user", { userId });
     const newAccessToken = generateAccessToken(user as IUser, uniqueId);
     const newRefreshToken = generateRefreshToken(user as IUser);
 
     // Create session
-    // logger.info("Saving new session to database", { userId, uniqueId });
+    logger.info("Saving new session to database", { userId, uniqueId });
     const session = new Session({
       userId,
       refreshToken: newRefreshToken,
@@ -81,7 +71,7 @@ export const createSession = async (
       uniqueId,
     });
 
-    // console.log("Saved session:", session.toObject());
+    console.log("Saved session:", session.toObject());
 
     await session.save();
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
@@ -186,13 +176,6 @@ export const getSessionByAccessToken = async (
   }
 };
 
-/**
- * Renews a session by validating the Refresh Token and issuing new tokens.
- * @param refreshToken - The Refresh Token provided by the client.
- * @param req - The request object containing userAgent and possibly uniqueId.
- * @param uniqueId - Unique identifier for the client instance.
- * @returns An object containing the new Access Token and Refresh Token, or null if renewal fails.
- */
 export const renewSession = async (
   refreshToken: string,
   req: Request,
@@ -222,9 +205,30 @@ export const renewSession = async (
       return null;
     }
 
+    // Step 1: Verify and decode the refresh token to extract userId
+    let decodedToken;
+    try {
+      decodedToken = verifyRefreshTokenJWT(refreshToken);
+    } catch (err) {
+      logger.warn("Invalid or expired refresh token", {
+        refreshToken,
+        error: err,
+      });
+      return null;
+    }
+
+    const userId = decodedToken.userId;
+    if (!userId) {
+      logger.warn("Refresh token does not contain userId", { refreshToken });
+      return null;
+    }
+
+    // Step 2: Retrieve userAgent from the request
+    const userAgent = req.get("User-Agent") || "Unknown";
+
     if (session.expiresAt < new Date()) {
       logger.warn("Refresh token expired", { sessionId: session._id });
-      await invalidateSession(refreshToken, uniqueId);
+      await invalidateSession(userId!, uniqueId, userAgent);
       return null;
     }
 
@@ -255,7 +259,7 @@ export const renewSession = async (
     session.expiresAt = new Date(Date.now() + refreshTokenDurationMs);
     await session.save();
 
-   /*  logger.info("Session refreshed successfully", {
+    /*  logger.info("Session refreshed successfully", {
       sessionId: session._id,
       newExpiresAt: session.expiresAt,
     }); */
@@ -267,20 +271,34 @@ export const renewSession = async (
   }
 };
 
-/**
- * Invalidates a session by deleting it from the database using the Refresh Token.
- * @param refreshToken - The Refresh Token of the session to invalidate.
- */
 export const invalidateSession = async (
-  refreshToken: string,
-  uniqueId: string
+  userId: string,
+  uniqueId: string,
+  userAgent: string
 ): Promise<boolean> => {
+  console.log(`invalidateSession called with:`, {
+    userId,
+    uniqueId,
+    userAgent,
+  });
   try {
-    await Session.deleteOne({ refreshToken, uniqueId });
-    // logger.info("Session invalidated", { refreshToken });
+    const result = await Session.deleteOne({ userId, uniqueId, userAgent });
+    console.log(`Deleted session:`, result);
+    logger.info("Session invalidated", { userId, uniqueId, userAgent });
     return true;
   } catch (error) {
-    logger.error("Error invalidating session", { refreshToken, error });
+    console.error("Error invalidating session", {
+      userId,
+      uniqueId,
+      userAgent,
+      error,
+    });
+    logger.error("Error invalidating session", {
+      userId,
+      uniqueId,
+      userAgent,
+      error,
+    });
     return false;
   }
 };

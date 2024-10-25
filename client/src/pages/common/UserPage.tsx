@@ -1,7 +1,7 @@
 // src/components/UserPage/UserPage.tsx
 
 import { Box, Divider, useMediaQuery } from "@mui/material";
-import React, { Suspense, useState } from "react";
+import React, { memo, Suspense, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
 import ModifyAccount from "../../components/userPage/ModifyAccount";
@@ -132,4 +132,4 @@ const UserPage: React.FC = () => {
   );
 };
 
-export default UserPage;
+export default memo(UserPage);

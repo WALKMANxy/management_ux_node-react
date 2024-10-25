@@ -14,6 +14,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React, {
+  memo,
   Suspense,
   useCallback,
   useEffect,
@@ -405,4 +406,4 @@ const VisitsPage: React.FC = () => {
   );
 };
 
-export default VisitsPage;
+export default memo(VisitsPage);

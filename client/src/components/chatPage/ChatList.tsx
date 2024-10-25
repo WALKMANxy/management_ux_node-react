@@ -32,6 +32,10 @@ const ChatList: React.FC<ChatListProps> = ({
   searchTerm = "",
   loading = false,
 }) => {
+
+/*   console.log("ChatView rendering now");
+ */
+
   const { t } = useTranslation();
   const {
     getFilteredAndSortedChats,
@@ -44,6 +48,7 @@ const ChatList: React.FC<ChatListProps> = ({
 
   // Retrieve sorted and filtered chats based on the search term
   const sortedChats = getFilteredAndSortedChats(searchTerm);
+
 
   return (
     <List>

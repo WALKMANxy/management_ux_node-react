@@ -1,5 +1,5 @@
 // src/pages/StatisticsDashboard.tsx
-import React, { Suspense } from "react";
+import React, { memo, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
 import Loader from "../../components/common/Loader";
@@ -44,4 +44,4 @@ const StatisticsDashboard: React.FC = () => {
   return <Suspense fallback={<Loader fadeout />}>{renderDashboard()}</Suspense>;
 };
 
-export default StatisticsDashboard;
+export default memo(StatisticsDashboard);

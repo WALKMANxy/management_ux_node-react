@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import {
@@ -6,61 +6,60 @@ import {
   useAppSelector,
 } from "../app/hooks";
 import { selectUserId, selectUserRole } from "../features/auth/authSlice";
-import { uploadAttachments } from "../features/chat/api/chats";
 import {
   addAttachmentMessageReducer,
   addChatReducer,
   addMessageReducer,
   clearCurrentChatReducer,
   selectAllChats,
-  selectChatsStatus,
   selectCurrentChat,
+  selectFetchChatsStatus,
   selectMessagesFromCurrentChat,
   setCurrentChatReducer,
   updateChatReducer,
   updateReadStatusReducer,
 } from "../features/chat/chatSlice"; // Ensure correct selectors are imported
-import { fetchAllChatsThunk } from "../features/chat/chatThunks";
+import {
+  fetchAllChatsThunk,
+  uploadAttachmentsThunk,
+} from "../features/chat/chatThunks";
 import { selectClientIds } from "../features/data/dataSlice";
 import { getAllUsersThunk, selectAllUsers } from "../features/users/userSlice";
-import { IChat, IMessage } from "../models/dataModels";
+import { Attachment, IChat, IMessage } from "../models/dataModels";
 import { sanitizeSearchTerm } from "../utils/chatUtils";
 import { generateId } from "../utils/deviceUtils";
-import { Attachment } from "./useFilePreview";
 
 const useChatLogic = () => {
   const dispatch = useAppDispatch();
   const [loadingContacts, setLoadingContacts] = useState(false);
   const [loadingChats, setLoadingChats] = useState(false);
-  const [chatRetryCount, setChatRetryCount] = useState(0);
   const [chatError, setChatError] = useState<string | null>(null);
 
   // Selectors
-  const currentUserId = useSelector(selectUserId);
-  const userRole = useSelector(selectUserRole);
-  const users = useSelector(selectAllUsers);
-  const chats: IChat[] = useSelector(selectAllChats); // Use selector to get all chats
+  const currentUserId = useAppSelector(selectUserId);
+  const userRole = useAppSelector(selectUserRole);
+  const users = useAppSelector(selectAllUsers);
+  const chats: IChat[] = useAppSelector(selectAllChats); // Use selector to get all chats
   const currentChat: IChat | null = useSelector(selectCurrentChat); // Allow null values
-  const messages = useSelector(selectMessagesFromCurrentChat); // Use selector to get messages of the current chat
+  const messages = useAppSelector(selectMessagesFromCurrentChat); // Use selector to get messages of the current chat
   const [contactsFetched, setContactsFetched] = useState(false);
   const { t } = useTranslation();
-  const chatStatus = useAppSelector(selectChatsStatus);
-
+  const fetchChatsStatus = useAppSelector(selectFetchChatsStatus);
   const agentClientIds = useSelector(selectClientIds);
-
-  const currentChatId = useMemo(() => currentChat?._id, [currentChat]);
+  const currentChatId = currentChat?._id;
+  const chatRetryCountRef = useRef(0);
 
   // Determine if chats should be fetched
   const shouldFetchChats = useMemo(() => {
-    return chatStatus !== "succeeded";
-  }, [chatStatus]);
+    return fetchChatsStatus !== "succeeded";
+  }, [fetchChatsStatus]);
 
   const fetchChats = useCallback(async () => {
     try {
       setLoadingChats(true);
       await dispatch(fetchAllChatsThunk()).unwrap();
-      setChatError(null); // Clear any previous errors if successful
-      setChatRetryCount(0); // Reset retry count on success
+      setChatError(null);
+      chatRetryCountRef.current = 0; // Reset retry count on success
     } catch (err: unknown) {
       console.error("Error fetching chats:", err);
       if (err instanceof Error) {
@@ -69,13 +68,13 @@ const useChatLogic = () => {
         setChatError("An unknown error occurred while fetching chats.");
       }
       // Increment retry count only if it's less than the limit
-      if (chatRetryCount < 5) {
-        setChatRetryCount((prevCount) => prevCount + 1);
+      if (chatRetryCountRef.current < 5) {
+        chatRetryCountRef.current += 1;
       }
     } finally {
       setLoadingChats(false);
     }
-  }, [dispatch, chatRetryCount]);
+  }, [dispatch]);
 
   // Initial fetch effect
   useEffect(() => {
@@ -93,14 +92,14 @@ const useChatLogic = () => {
   // Retry mechanism
   useEffect(() => {
     if (
-      chatRetryCount > 0 &&
-      chatRetryCount <= 5 &&
-      chatStatus !== "succeeded"
+      chatRetryCountRef.current > 0 &&
+      chatRetryCountRef.current <= 5 &&
+      fetchChatsStatus !== "succeeded"
     ) {
-      const retryDelay = Math.min(32000, 1000 * 2 ** chatRetryCount); // Exponential backoff
+      const retryDelay = Math.min(32000, 1000 * 2 ** chatRetryCountRef.current); // Exponential backoff
 
       const retryTimeout = setTimeout(() => {
-        console.log(`Retry attempt #${chatRetryCount}`);
+        console.log(`Retry attempt #${chatRetryCountRef.current}`);
         fetchChats();
       }, retryDelay);
 
@@ -108,7 +107,7 @@ const useChatLogic = () => {
         clearTimeout(retryTimeout);
       };
     }
-  }, [chatRetryCount, fetchChats, chatStatus]);
+  }, [fetchChats, fetchChatsStatus]);
 
   // Select a chat
   const selectChat = useCallback(
@@ -217,7 +216,7 @@ const useChatLogic = () => {
       // Failsafe for empty content when attachments exist
       const finalContent =
         content.trim() === "" && attachments && attachments.length > 0
-          ? "\u200B" // Use an invisible character (zero-width space)
+          ? "📌"
           : content;
 
       const messageData: IMessage = {
@@ -232,19 +231,38 @@ const useChatLogic = () => {
         status: "pending",
       };
 
+      const hasAttachments = attachments && attachments.length > 0;
+
       try {
-        if (attachments && attachments.length > 0) {
-          // Use the new reducer for messages with attachments
+        if (hasAttachments) {
+          const updatedAttachments = attachments.map((attachment) => ({
+            ...attachment,
+            chatId: currentChatId,
+            messageId: localId,
+          }));
+          messageData.attachments = updatedAttachments;
+
+          console.log(
+            `Dispatching addAttachmentMessageReducer for message with attachments: ${messageData._id}`
+          );
+
+          // Dispatch message with attachments
           dispatch(
             addAttachmentMessageReducer({
               chatId: currentChatId,
               message: messageData,
             })
           );
-          // Initiate the upload
-          await uploadAttachments(currentChatId, messageData, dispatch);
+
+          // Dispatch the thunk to handle uploading
+          await dispatch(
+            uploadAttachmentsThunk({
+              chatId: currentChatId,
+              message: messageData,
+            })
+          ).unwrap(); // unwrap() to handle fulfilled/rejected state
         } else {
-          // Use the existing reducer for messages without attachments
+          // Dispatch message without attachments
           dispatch(
             addMessageReducer({ chatId: currentChatId, message: messageData })
           );
@@ -256,15 +274,6 @@ const useChatLogic = () => {
     [currentChatId, currentUserId, dispatch]
   );
 
-  /**
-   * Handles the creation of a new chat.
-   *
-   * @param participants - Array of participant user IDs.
-   * @param chatType - Type of chat: "simple", "group", or "broadcast".
-   * @param name - Optional name for the chat.
-   * @param description - Optional description for the chat.
-   * @param admins - Optional array of admin user IDs (only for "group" and "broadcast" chats).
-   */
   const handleCreateChat = useCallback(
     async (
       participants: string[],
@@ -355,7 +364,7 @@ const useChatLogic = () => {
 
       try {
         // Check if there's an existing chat with this contact
-        const existingChat = Object.values(chats).find(
+        const existingChat = chats.find(
           (chat) =>
             chat.type === "simple" &&
             chat.participants.includes(contactId) &&
@@ -497,10 +506,11 @@ const useChatLogic = () => {
     },
     [currentUserId]
   );
+
   // Function to handle returning to the sidebar on mobile
-  const handleBackToChats = () => {
+  const handleBackToChats = useCallback(() => {
     dispatch(clearCurrentChatReducer()); // Clear currentChat to navigate back to sidebar
-  };
+  }, [dispatch]);
 
   // New function to get unread chats, sorted by the latest message timestamp
   const getUnreadChats = useCallback(() => {
@@ -563,11 +573,11 @@ const useChatLogic = () => {
     getUnreadCount,
     handleBackToChats,
     getUnreadChats,
-    handleSelectChat,
     employeeWhiteboardBroadcast,
     broadcastChat,
     markMessagesAsRead,
     handleEditChat,
+    handleSelectChat,
   };
 };
 

@@ -7,6 +7,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
 import {
+  Box, // Ensure TablePagination is imported
+  Button,
+  ButtonGroup,
   IconButton,
   Paper,
   Table,
@@ -14,7 +17,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  // Removed TablePagination
+  TablePagination,
   TableRow,
   TableSortLabel,
   Tooltip,
@@ -87,37 +90,37 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
   const [orderBy, setOrderBy] = useState<keyof CalendarEvent | "actions">(
     "updatedAt"
   );
-  // Removed Pagination state
-  // const [page, setPage] = useState(0);
-  // const [rowsPerPage, setRowsPerPage] = useState(20);
 
-  // Removed Pagination handlers
-  /*
+  // Pagination state
+  const [page, setPage] = useState(0);
+  const rowsPerPage = 50; // Hardcoded to 50
+
+  // Filter state
+  const [filter, setFilter] = useState<
+    "All" | "Absence" | "Holiday" | "Event" | "Visit"
+  >("All");
+
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-  */
-
-  const filteredEvents = useMemo(
-    () =>
-      events
-        .filter((event) => event.eventType !== "holiday")
-        .sort(
-          (a, b) =>
-            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-        ),
-    [events]
-  );
+  // Removed handleChangeRowsPerPage since rowsPerPage is fixed
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Adjusted for MUI theme breakpoints
+
+  // Apply filtering
+  const filteredEvents = useMemo(() => {
+    return events
+      .filter((event) => {
+        if (filter === "All") return true;
+        return event.eventType === filter.toLowerCase();
+      })
+      .sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      );
+  }, [events, filter]);
 
   const eventsWithUsers = useMemo(() => {
     return filteredEvents.map((event) => {
@@ -130,6 +133,14 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
   const sortedEvents = useMemo(() => {
     return [...eventsWithUsers].sort(getComparator(order, orderBy));
   }, [eventsWithUsers, order, orderBy]);
+
+  // Apply pagination
+  const paginatedEvents = useMemo(() => {
+    return sortedEvents.slice(
+      page * rowsPerPage,
+      page * rowsPerPage + rowsPerPage
+    );
+  }, [sortedEvents, page, rowsPerPage]);
 
   const handleRequestSort = (property: keyof CalendarEvent | "actions") => {
     const isAsc = orderBy === property && order === "asc";
@@ -165,14 +176,20 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
 
   // Responsive font size and padding
   const getTableCellStyles = () => ({
-    padding: isMobile ? '10px 8px' : '16px',
-    fontSize: isMobile ? '0.8rem' : '0.875rem',
+    padding: isMobile ? "10px 8px" : "16px",
+    fontSize: isMobile ? "0.8rem" : "0.875rem",
     whiteSpace: "nowrap" as const,
     // Adjust minWidth for better layout on mobile
-    minWidth: isMobile ? '80px' : 'auto',
+    minWidth: isMobile ? "80px" : "auto",
   });
 
-
+  // Handler to update filter and reset page to 0
+  const handleFilterChange = (
+    newFilter: "All" | "Absence" | "Holiday" | "Event" | "Visit"
+  ) => {
+    setFilter(newFilter);
+    setPage(0); // Reset page to 0 whenever filter changes
+  };
 
   return (
     <Paper
@@ -180,10 +197,81 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
       elevation={3}
       sx={{ borderRadius: 2, padding: isMobile ? 1 : 2 }}
     >
+      {/* Filter ButtonGroup */}
+      <Box display="flex" justifyContent="flex-end" alignItems="center" mb={2}>
+        <ButtonGroup
+          variant="contained"
+          aria-label={t("eventHistory.filterSelection", "Filter selection")}
+          sx={{
+            boxShadow: "none",
+            gap: 1,
+            transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
+            transformOrigin: "top left", // Anchor the scale to the top-left corner
+            width: isMobile ? "133.33%" : "auto",
+          }}
+        >
+          <Button
+            onClick={() => handleFilterChange("All")}
+            sx={{
+              backgroundColor: filter === "All" ? "grey" : "black",
+              "&:hover": {
+                backgroundColor: filter === "All" ? "darkgrey" : "gray",
+              },
+            }}
+          >
+            {t("eventHistory.filterAll", "All")}
+          </Button>
+          <Button
+            onClick={() => handleFilterChange("Absence")}
+            sx={{
+              backgroundColor: filter === "Absence" ? "orange" : "black",
+              "&:hover": {
+                backgroundColor: filter === "Absence" ? "darkorange" : "gray",
+              },
+            }}
+          >
+            {t("eventTypes.absence", "Absence")}
+          </Button>
+          <Button
+            onClick={() => handleFilterChange("Holiday")}
+            sx={{
+              backgroundColor: filter === "Holiday" ? "green" : "black",
+              "&:hover": {
+                backgroundColor: filter === "Holiday" ? "darkgreen" : "gray",
+              },
+            }}
+          >
+            {t("eventTypes.holiday", "Holiday")}
+          </Button>
+          <Button
+            onClick={() => handleFilterChange("Event")}
+            sx={{
+              backgroundColor: filter === "Event" ? "blue" : "black",
+              "&:hover": {
+                backgroundColor: filter === "Event" ? "darkblue" : "gray",
+              },
+            }}
+          >
+            {t("eventTypes.event", "Event")}
+          </Button>
+          <Button
+            onClick={() => handleFilterChange("Visit")}
+            sx={{
+              backgroundColor: filter === "Visit" ? "purple" : "black",
+              "&:hover": {
+                backgroundColor: filter === "Visit" ? "darkpurple" : "gray",
+              },
+            }}
+          >
+            {t("eventTypes.visit", "Visit")}
+          </Button>
+        </ButtonGroup>
+      </Box>
+
       <TableContainer
         component={Paper}
         sx={{
-          maxHeight: "82dvh",
+          maxHeight: "70vh", // Adjusted to accommodate ButtonGroup
           overflowY: "auto",
           overflowX: "auto", // Enable horizontal scroll on small screens
           "&::-webkitScrollbar": {
@@ -266,13 +354,13 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {sortedEvents.map((event) => (
+            {paginatedEvents.map((event) => (
               <TableRow
                 key={event._id}
                 sx={{ backgroundColor: getBackgroundColor(event) }}
               >
                 <TableCell sx={getTableCellStyles()}>
-                  {event.user?.entityName || t("eventHistory.unknown")}
+                  {event.user?.entityName || t("eventHistory.system") || t("eventHistory.unknown")}
                 </TableCell>
                 <TableCell sx={getTableCellStyles()}>
                   {t(`eventTypes.${event.eventType || "generic"}`)}
@@ -306,14 +394,14 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                                 bgcolor: "primary.main",
                                 color: "white",
                                 borderRadius: "50%",
-                                padding: isMobile ? '4px' : '8px',
+                                padding: isMobile ? "4px" : "8px",
                                 "&:hover": { bgcolor: "primary.dark" },
                               }}
                               onClick={() => handleGoToVisit(event)} // Call handleGoToVisit for visits
                             >
                               <AirplaneTicketIcon
                                 sx={{
-                                  fontSize: isMobile ? '1rem' : '1.25rem',
+                                  fontSize: isMobile ? "1rem" : "1.25rem",
                                 }}
                               />
                             </IconButton>
@@ -331,7 +419,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                               color: "white",
                               marginRight: isMobile ? 0.5 : 1,
                               borderRadius: "50%",
-                              padding: isMobile ? '4px' : '8px',
+                              padding: isMobile ? "4px" : "8px",
                               "&:hover": {
                                 backgroundColor: "darkgreen",
                               },
@@ -339,7 +427,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                           >
                             <CheckIcon
                               sx={{
-                                fontSize: isMobile ? '1rem' : '1.25rem',
+                                fontSize: isMobile ? "1rem" : "1.25rem",
                               }}
                             />
                           </IconButton>
@@ -352,7 +440,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                               backgroundColor: "red",
                               color: "white",
                               borderRadius: "50%",
-                              padding: isMobile ? '4px' : '8px',
+                              padding: isMobile ? "4px" : "8px",
                               "&:hover": {
                                 backgroundColor: "darkred",
                               },
@@ -360,7 +448,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                           >
                             <CloseIcon
                               sx={{
-                                fontSize: isMobile ? '1rem' : '1.25rem',
+                                fontSize: isMobile ? "1rem" : "1.25rem",
                               }}
                             />
                           </IconButton>
@@ -375,9 +463,9 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                               onClick={() => handleEditEvent(event)}
                               sx={{
                                 ...getEditButtonStyles(event, userRole),
-                                padding: isMobile ? '4px' : '8px',
-                                '& .MuiSvgIcon-root': {
-                                  fontSize: isMobile ? '1rem' : '1.25rem',
+                                padding: isMobile ? "4px" : "8px",
+                                "& .MuiSvgIcon-root": {
+                                  fontSize: isMobile ? "1rem" : "1.25rem",
                                 },
                               }}
                               disabled={isDisabled(event, userRole)} // Disable button for past events
@@ -393,9 +481,9 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                               onClick={() => handleDeleteEvent(event)}
                               sx={{
                                 ...getDeleteButtonStyles(event, userRole),
-                                padding: isMobile ? '4px' : '8px',
-                                '& .MuiSvgIcon-root': {
-                                  fontSize: isMobile ? '1rem' : '1.25rem',
+                                padding: isMobile ? "4px" : "8px",
+                                "& .MuiSvgIcon-root": {
+                                  fontSize: isMobile ? "1rem" : "1.25rem",
                                 },
                               }}
                               disabled={isDisabled(event, userRole)} // Disable button for past events
@@ -415,25 +503,31 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
           </TableBody>
         </Table>
       </TableContainer>
-      {/* Removed TablePagination */}
-      {/*
+      {/* Table Pagination */}
       <TablePagination
-        rowsPerPageOptions={[50]}
+        rowsPerPageOptions={[]} // Empty array hides the rows per page selector
         component="div"
-        count={eventsWithUsers.length}
+        count={sortedEvents.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
+        // Remove onRowsPerPageChange since rowsPerPage is fixed
+        labelRowsPerPage="" // Hide the "Rows per page" label
         sx={{
-          "& .MuiTablePagination-actions": {
+          "& .MuiTablePagination-toolbar": {
             display: "flex",
-            justifyContent: "flex-end", // Align actions to the right horizontally
-            alignItems: "center", // Center actions vertically
+            justifyContent: "flex-end", // Align pagination controls to the right
+          },
+          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-select": {
+            display: "none", // Hide any remaining parts of the rows per page selector
+          },
+          "& .MuiTablePagination-displayedRows": {
+            marginRight: 2,
+            marginTop: 2, // Add some spacing if needed
           },
         }}
       />
-      */}
+
       <EventForm
         key={editingEvent ? editingEvent._id : "new-event"}
         open={openForm}

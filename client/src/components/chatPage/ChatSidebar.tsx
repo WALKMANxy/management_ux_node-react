@@ -34,6 +34,10 @@ import ContactsList from "./ContactsList";
 const CreateChatForm = lazy(() => import("./CreateChatForm"));
 
 const ChatSidebar: React.FC = () => {
+
+/*   console.log("ChatList rendering now");
+ */
+
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [showContacts, setShowContacts] = useState(false);
@@ -58,8 +62,6 @@ const ChatSidebar: React.FC = () => {
   useEffect(() => {
     // After the first mount, set isFirstMount to false
     setIsFirstMount(false);
-    // Cleanup animation class if necessary
-    return () => {};
   }, []);
 
   // Determine the animation class
@@ -67,15 +69,27 @@ const ChatSidebar: React.FC = () => {
     ? "animate__fadeInLeft animate_faster"
     : animationClass;
 
-  const handleToggleContacts = useCallback(() => {
-    // Apply fadeOut animation
-    setAnimationClass("animate__fadeOut");
-    // After fadeOut, toggle the view and apply fadeIn
-    setTimeout(() => {
-      setShowContacts((prev) => !prev);
-      setAnimationClass("animate__fadeIn");
-    }, 50); // Duration should match the animation duration
-  }, []);
+// Inside ChatSidebar component
+const toggleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+const handleToggleContacts = useCallback(() => {
+  // Apply fadeOut animation
+  setAnimationClass("animate__fadeOut");
+  // After fadeOut, toggle the view and apply fadeIn
+  toggleTimeoutRef.current = setTimeout(() => {
+    setShowContacts((prev) => !prev);
+    setAnimationClass("animate__fadeIn");
+    toggleTimeoutRef.current = null;
+  }, 50); // Duration should match the animation duration
+}, []);
+
+useEffect(() => {
+  return () => {
+    if (toggleTimeoutRef.current) {
+      clearTimeout(toggleTimeoutRef.current);
+    }
+  };
+}, []);
 
   useEffect(() => {
     if (!contactsFetched) {
