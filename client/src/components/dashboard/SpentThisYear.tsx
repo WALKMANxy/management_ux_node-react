@@ -2,6 +2,8 @@
 
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+
 import { Avatar, Box, Grid, Paper, Tooltip, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
@@ -163,11 +165,7 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
                     mt: 1,
                   }}
                 >
-                  <img
-                    src="/icons/moneybag.svg"
-                    alt={t("spentThisYear.iconAlt", "Money Bag Icon")}
-                    style={{ width: "100%", height: "100%" }}
-                  />
+                  <MonetizationOnIcon />
                 </Avatar>
               </Grid>
             </Grid>

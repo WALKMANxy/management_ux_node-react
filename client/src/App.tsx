@@ -21,7 +21,7 @@ import {
 /* console.log("Vite mode:", import.meta.env.MODE);
  */
 
-const timeMS = getTimeMs(); // Ensure this is set in your .env file
+const timeMS = getTimeMs(); 
 
 // src/App.tsx
 function App() {

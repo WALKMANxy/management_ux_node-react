@@ -26,6 +26,8 @@ const StatisticsDashboard = lazy(
   () => import("./pages/statistics/StatisticsDashboard")
 );
 
+
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -61,7 +63,6 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      // Removed individual dashboard routes (agent-dashboard, admin-dashboard, client-dashboard)
       {
         path: "clients",
         element: (
@@ -142,7 +143,6 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      // Redirect any unknown routes to /dashboard or another appropriate page
       {
         path: "*",
         element: <Navigate to="/dashboard" replace />,
