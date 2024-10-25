@@ -912,6 +912,8 @@
     "agent": "Agent",
     "admin": "Admin",
     "employee": "Employee",
+    "all": "All",
+    "guest": "Guest",
     "searchPlaceholder": "Searchs by name or ID",
     "loadingEntities": "Loading entities...",
     "startTyping": "Start typing to search",
@@ -944,7 +946,8 @@
     "updateAdminSuccess": "Admin updated successfully",
     "updateEmployeeSuccess": "Employee updated successfully",
     "updateSuccess": "Entity updated successfully",
-    "updateFailed": "Failed to update entity"
+    "updateFailed": "Failed to update entity",
+    "nameLabel": "Name"
   },
   "manageUsers": {
     "title": "Manage Users",
@@ -964,7 +967,8 @@
     "yes": "Yes",
     "no": "No",
     "na": "N/A",
-    "userTable": "User Table"
+    "userTable": "User Table",
+    "searchPlaceholder": "Search user..."
   },
   "userCard": {
     "avatarAlt": "Avatar for",
@@ -1418,5 +1422,36 @@
     "clickToReload": "Click the button below to reload the app and update to the latest version.",
     "reloadButton": "Reload",
     "offlineReady": "App is ready to work offline."
+  },
+  "months": {
+    "01": "January",
+    "02": "February",
+    "03": "March",
+    "04": "April",
+    "05": "May",
+    "06": "June",
+    "07": "July",
+    "08": "August",
+    "09": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December"
+  },
+  "navigation": {
+    "quickNavigation": "Quick Navigation",
+    "statistics": "Statistics",
+    "movements": "Movements",
+    "clients": "Clients",
+    "articles": "Articles",
+    "visits": "Visits",
+    "promos": "Promos",
+    "calendar": "Calendar",
+    "messages": "Messages",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "whiteboard": {
+    "companyWhiteboard": "Company Whiteboard",
+    "noAdminMessages": "No messages available."
   }
 }

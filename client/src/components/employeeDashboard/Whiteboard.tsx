@@ -10,7 +10,12 @@ import RenderMessages from "../chatPage/RenderMessage";
 import { useFilePreview } from "../../hooks/useFilePreview";
 import { selectDownloadedFiles } from "../../features/downloads/downloadedFilesSlice";
 
+// Import translation hook
+import { useTranslation } from "react-i18next";
+
 const WhiteboardComponent: React.FC = () => {
+  const { t } = useTranslation();
+
   const currentUser = useAppSelector(selectCurrentUser);
   const userId = currentUser?._id;
   const {
@@ -20,13 +25,9 @@ const WhiteboardComponent: React.FC = () => {
     markMessagesAsRead,
   } = useChatLogic();
 
-  const { openFileViewer,
-    downloadAndStoreFile,
-    handleSave,
-  } = useFilePreview();
+  const { openFileViewer, downloadAndStoreFile, handleSave } = useFilePreview();
 
   const downloadedFiles = useAppSelector(selectDownloadedFiles);
-
 
   const isMobile = useMediaQuery("(max-width:600px)");
 
@@ -106,7 +107,7 @@ const WhiteboardComponent: React.FC = () => {
         }}
       >
         <Typography variant="h6" gutterBottom>
-          Company Whiteboard
+          {t("whiteboard.companyWhiteboard", "Company Whiteboard")}
         </Typography>
       </Box>
 
@@ -141,7 +142,7 @@ const WhiteboardComponent: React.FC = () => {
           />
         ) : (
           <Typography variant="body2" color="text.secondary">
-            No admin messages available.
+            {t("whiteboard.noAdminMessages", "No admin messages available.")}
           </Typography>
         )}
         {/* Dummy div to scroll into view */}
