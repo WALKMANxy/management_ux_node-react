@@ -357,13 +357,20 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
 
             <Typography
               variant="body2"
-              sx={{ marginBottom: "10px", cursor: "pointer" }}
+              sx={{
+                marginBottom: "10px",
+                cursor: "pointer",
+                fontSize: "1rem",
+              }}
               onClick={handleForgotPassword}
             >
               {t("auth.forgotPassword")}
             </Typography>
 
-            <Typography variant="body2" sx={{ marginBottom: "10px" }}>
+            <Typography
+              variant="body2"
+              sx={{ marginBottom: "10px", fontSize: "1rem" }}
+            >
               {isLoginMode ? (
                 <>
                   {t("auth.newToApp", { appName: "RCS Next" })}{" "}
@@ -372,7 +379,7 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
                     sx={{
                       textDecoration: "underline",
                       cursor: "pointer",
-                      fontSize: "14px",
+                      fontSize: "1rem",
                       color: "#6C63FF",
                     }}
                     onClick={toggleMode}
@@ -388,7 +395,7 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
                     sx={{
                       textDecoration: "underline",
                       cursor: "pointer",
-                      fontSize: "14px",
+                      fontSize: "1rem",
                       color: "#6C63FF",
                     }}
                     onClick={toggleMode}
