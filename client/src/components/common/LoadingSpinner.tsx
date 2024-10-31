@@ -1,5 +1,4 @@
 // src/components/LoadingSpinner.tsx
-
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Box, CircularProgress } from "@mui/material";
@@ -33,7 +32,7 @@ const StyledImage = styled.img`
 `;
 
 const LoadingSpinner: React.FC<{ fadeoutDelay?: number }> = ({
-  fadeoutDelay = 1500, // Default delay of 1.5 seconds
+  fadeoutDelay = 1500,
 }) => {
   const [fadeOutEffect, setFadeOutEffect] = useState("false");
 
@@ -51,7 +50,7 @@ const LoadingSpinner: React.FC<{ fadeoutDelay?: number }> = ({
     <SpinnerContainer fadeout={fadeOutEffect}>
       <Box
         sx={{
-          height: "12%", // Adjust as needed
+          height: "12%",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -64,7 +63,7 @@ const LoadingSpinner: React.FC<{ fadeoutDelay?: number }> = ({
           style={{ height: "60%", marginBottom: "10%" }}
         />
         <CircularProgress
-          style={{ color: "#9e9e9e", height: "9%", width: "9%" }} // Changed color to gray
+          style={{ color: "#9e9e9e", height: "9%", width: "9%" }} 
           aria-label="loading"
         />
       </Box>

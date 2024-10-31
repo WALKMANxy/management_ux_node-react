@@ -4,6 +4,9 @@ import { Admin, Agent, Client, UserRole } from "../models/entityModels";
 import { BrandData } from "../models/propsModels";
 import { ignoreArticleNames } from "./constants";
 
+export const now = dayjs();
+
+
 // Helper function to get month and year from a date string
 export const getMonthYear = (dateString: string) => {
   const date = new Date(dateString);
@@ -12,11 +15,39 @@ export const getMonthYear = (dateString: string) => {
     return "Invalid Date";
   }
   const year = date.getFullYear();
-  // getMonth() returns 0-11, so we add 1 and pad with zero if needed
   const month = String(date.getMonth() + 1).padStart(2, '0');
   return `${year}-${month}`;
 };
 
+export const formatPhoneNumber = (phone: string): string => {
+  return phone.replace(/[\s./-]/g, "");
+};
+
+export const formatDate = (date: Date | string | number) => {
+  return dayjs(date).format("DD/MM/YYYY");
+};
+
+export const formatDateForecast = (dateString: string): string => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${day}/${month}`;
+};
+
+export const getDotColor = (
+  type: string
+): "primary" | "success" | "error" | "grey" => {
+  switch (type) {
+    case "visits":
+      return "primary";
+    case "sales":
+      return "success";
+    case "alerts":
+      return "error";
+    default:
+      return "grey";
+  }
+};
 
 // Calculate total revenue for a list of clients
 export const calculateTotalRevenue = (clients: Client[]): number => {

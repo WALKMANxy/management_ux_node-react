@@ -1,7 +1,7 @@
 // src/components/promosPage/SearchBar.tsx
-import React, { ChangeEvent } from "react";
-import { TextField, InputAdornment, Tooltip } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { InputAdornment, TextField, Tooltip } from "@mui/material";
+import React, { ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 interface SearchBarProps {
@@ -9,17 +9,15 @@ interface SearchBarProps {
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-
-const SearchBar: React.FC<SearchBarProps> = ({ searchTerm, onSearchChange }) => {
+const SearchBar: React.FC<SearchBarProps> = ({
+  searchTerm,
+  onSearchChange,
+}) => {
   const { t } = useTranslation();
-
-
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     onSearchChange(e);
   };
-
-
 
   return (
     <Tooltip title={t("promosSidebar.searchTooltip", "Search Promos")} arrow>

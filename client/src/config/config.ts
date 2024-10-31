@@ -1,4 +1,4 @@
-// config.ts
+//src/config/config.ts
 
 /* console.log("Environment Variables:", import.meta.env);
  */

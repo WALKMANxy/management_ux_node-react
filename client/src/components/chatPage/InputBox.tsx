@@ -1,5 +1,4 @@
 // src/components/chatPage/InputBox.tsx
-
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SendIcon from "@mui/icons-material/Send";
 import TuneIcon from "@mui/icons-material/Tune";
@@ -20,7 +19,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Controller, useForm } from "react-hook-form"; // Import useForm and Controller
+import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { selectUserRole } from "../../features/auth/authSlice";
@@ -92,8 +91,8 @@ const InputBox: React.FC<InputBoxProps> = ({
     (data: FormValues) => {
       if (attachments || data.messageInput.trim()) {
         handleSendMessage(data.messageInput, messageType, attachments);
-        reset(); // Clear the input field
-        inputRef.current?.focus(); // Keep focus on the input field
+        reset();
+        inputRef.current?.focus();
       }
       closeFileViewer(isPreview);
     },
@@ -107,27 +106,17 @@ const InputBox: React.FC<InputBoxProps> = ({
     ]
   );
 
-  /**
-   * Handler for opening the message type dropdown menu.
-   *
-   * @param {React.MouseEvent<HTMLElement>} event - The click event.
-   */
+
   const handleMenuOpen = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setMenuAnchorEl(event.currentTarget);
   }, []);
 
-  /**
-   * Handler for closing the message type dropdown menu.
-   */
+
   const handleMenuClose = useCallback(() => {
     setMenuAnchorEl(null);
   }, []);
 
-  /**
-   * Handler for selecting a message type.
-   *
-   * @param {("message" | "alert" | "promo" | "visit")} type - The selected message type.
-   */
+
   const handleMessageTypeSelect = useCallback(
     (type: "message" | "alert" | "promo" | "visit") => {
       setMessageType(type);
@@ -136,9 +125,7 @@ const InputBox: React.FC<InputBoxProps> = ({
     [handleMenuClose]
   );
 
-  /**
-   * Handler for opening the attachment modal.
-   */
+
   const handleAttachmentOpen = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
       setAttachmentAnchorEl(event.currentTarget);
@@ -210,7 +197,7 @@ const InputBox: React.FC<InputBoxProps> = ({
             placeholder={t("inputBox.placeholders.typeMessage")}
             inputRef={(e) => {
               field.ref(e);
-              inputRef.current = e; // Maintain the ref
+              inputRef.current = e; 
             }}
             onKeyUp={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {

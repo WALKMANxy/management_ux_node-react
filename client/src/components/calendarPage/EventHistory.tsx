@@ -1,5 +1,4 @@
 // src/components/calendarPage/EventHistory.tsx
-
 import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -32,7 +31,6 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectClient, selectVisit } from "../../features/data/dataSlice";
 import { selectAllUsers } from "../../features/users/userSlice";
-// Removed useCalendar import
 import { CalendarEvent } from "../../models/dataModels";
 import {
   getComparator,
@@ -45,25 +43,25 @@ interface EventHistoryProps {
   events: CalendarEvent[];
   userRole: string;
   handleDeleteEvent: (event: CalendarEvent) => void;
-  handleApproveEvent: (eventId: string) => void; // Added
-  handleRejectEvent: (eventId: string) => void;   // Added
-  handleEditEvent: (event: CalendarEvent) => void; // Added
-  openForm: boolean; // Added
-  handleFormSubmit: (eventData: CalendarEvent) => void; // Added
-  handleFormCancel: () => void; // Added
-  isCreating: boolean; // Added
-  selectedDays: Date[]; // Added
-  isLoading: boolean; // Added
+  handleApproveEvent: (eventId: string) => void;
+  handleRejectEvent: (eventId: string) => void;
+  handleEditEvent: (event: CalendarEvent) => void;
+  openForm: boolean;
+  handleFormSubmit: (eventData: CalendarEvent) => void;
+  handleFormCancel: () => void;
+  isCreating: boolean;
+  selectedDays: Date[];
+  isLoading: boolean;
 }
 
 export const EventHistory: React.FC<EventHistoryProps> = ({
   events,
   userRole,
   handleDeleteEvent,
-  handleApproveEvent, // Added
-  handleRejectEvent,  // Added
-  handleEditEvent,    // Added
-  isLoading,          // Added
+  handleApproveEvent,
+  handleRejectEvent,
+  handleEditEvent,
+  isLoading,
 }) => {
   const { t } = useTranslation();
 
@@ -71,14 +69,14 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
   const dispatch = useAppDispatch();
 
   const handleGoToVisit = (event: CalendarEvent) => {
-    dispatch(selectClient(event.visitClientId!)); // Select client
-    dispatch(selectVisit(event._id!)); // Select visit
-    navigate("/visits"); // Navigate to /visits
+    dispatch(selectClient(event.visitClientId!));
+    dispatch(selectVisit(event._id!));
+    navigate("/visits");
   };
 
   const getEditButtonTooltip = (event: CalendarEvent) => {
     return isDisabled(event, userRole)
-      ? t("eventHistoryTooltips.editDisabled") // New tooltip for past events
+      ? t("eventHistoryTooltips.editDisabled")
       : t("eventHistoryTooltips.edit");
   };
 
@@ -91,7 +89,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
 
   // Pagination state
   const [page, setPage] = useState(0);
-  const rowsPerPage = 50; // Hardcoded to 50
+  const rowsPerPage = 50;
 
   // Filter state
   const [filter, setFilter] = useState<
@@ -103,12 +101,12 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
   };
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Adjusted for MUI theme breakpoints
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // Apply filtering
   const filteredEvents = useMemo(() => {
     return events
-      .filter((event) => event.eventType !== "holiday") // Exclude Holiday events
+      .filter((event) => event.eventType !== "holiday")
       .filter((event) => {
         if (filter === "All") return true;
         return event.eventType === filter.toLowerCase();
@@ -145,12 +143,6 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
     setOrderBy(property);
   };
 
-  /**
-   * Determines the background color of a table row based on event type and status.
-   *
-   * @param {CalendarEvent} event - The event object.
-   * @returns {string} The background color.
-   */
   const getBackgroundColor = (event: CalendarEvent) => {
     if (event.eventType === "event") {
       return "rgba(0, 0, 255, 0.05)"; // Faint blue for events
@@ -185,7 +177,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
     newFilter: "All" | "Absence" | "Holiday" | "Event" | "Visit"
   ) => {
     setFilter(newFilter);
-    setPage(0); // Reset page to 0 whenever filter changes
+    setPage(0);
   };
 
   return (
@@ -202,8 +194,8 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
           sx={{
             boxShadow: "none",
             gap: 1,
-            transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
-            transformOrigin: "top left", // Anchor the scale to the top-left corner
+            transform: isMobile ? "scale(0.75)" : "none",
+            transformOrigin: "top left",
             width: isMobile ? "133.33%" : "auto",
           }}
         >
@@ -268,15 +260,13 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
       <TableContainer
         component={Paper}
         sx={{
-          maxHeight: "70vh", // Adjusted to accommodate ButtonGroup
+          maxHeight: "70vh",
           overflowY: "auto",
-          overflowX: "auto", // Enable horizontal scroll on small screens
+          overflowX: "auto",
           "&::-webkitScrollbar": {
             display: "none",
           },
-          // For Firefox
           scrollbarWidth: "none",
-          // For IE and Edge
           MsOverflowStyle: "none",
         }}
       >
@@ -357,7 +347,9 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                 sx={{ backgroundColor: getBackgroundColor(event) }}
               >
                 <TableCell sx={getTableCellStyles()}>
-                  {event.user?.entityName || t("eventHistory.system") || t("eventHistory.unknown")}
+                  {event.user?.entityName ||
+                    t("eventHistory.system") ||
+                    t("eventHistory.unknown")}
                 </TableCell>
                 <TableCell sx={getTableCellStyles()}>
                   {t(`eventTypes.${event.eventType || "generic"}`)}
@@ -394,7 +386,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                                 padding: isMobile ? "4px" : "8px",
                                 "&:hover": { bgcolor: "primary.dark" },
                               }}
-                              onClick={() => handleGoToVisit(event)} // Call handleGoToVisit for visits
+                              onClick={() => handleGoToVisit(event)}
                             >
                               <AirplaneTicketIcon
                                 sx={{
@@ -405,7 +397,8 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                           </Tooltip>
                         )}
                       </>
-                    ) : event.eventType === "absence" && event.status === "pending" ? (
+                    ) : event.eventType === "absence" &&
+                      event.status === "pending" ? (
                       <>
                         {/* Approve and Reject Buttons for Absence Events (Visible only to admin) */}
                         <Tooltip title={t("eventHistoryTooltips.approve")}>
@@ -466,7 +459,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                                   fontSize: isMobile ? "1rem" : "1.25rem",
                                 },
                               }}
-                              disabled={isDisabled(event, userRole)} // Disable button for past events
+                              disabled={isDisabled(event, userRole)}
                             >
                               <EditIcon />
                             </IconButton>
@@ -484,7 +477,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                                   fontSize: isMobile ? "1rem" : "1.25rem",
                                 },
                               }}
-                              disabled={isDisabled(event, userRole)} // Disable button for past events
+                              disabled={isDisabled(event, userRole)}
                             >
                               <DeleteIcon />
                             </IconButton>
@@ -503,31 +496,28 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
       </TableContainer>
       {/* Table Pagination */}
       <TablePagination
-        rowsPerPageOptions={[]} // Empty array hides the rows per page selector
+        rowsPerPageOptions={[]}
         component="div"
         count={sortedEvents.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
         // Remove onRowsPerPageChange since rowsPerPage is fixed
-        labelRowsPerPage="" // Hide the "Rows per page" label
+        labelRowsPerPage=""
         sx={{
           "& .MuiTablePagination-toolbar": {
             display: "flex",
-            justifyContent: "flex-end", // Align pagination controls to the right
+            justifyContent: "flex-end",
           },
           "& .MuiTablePagination-selectLabel, & .MuiTablePagination-select": {
-            display: "none", // Hide any remaining parts of the rows per page selector
+            display: "none",
           },
           "& .MuiTablePagination-displayedRows": {
             marginRight: 2,
-            marginTop: 2, // Add some spacing if needed
+            marginTop: 2,
           },
         }}
       />
-
-      {/* EventForm is now controlled by CalendarPage and passed via props */}
-      {/* Removed EventForm from EventHistory */}
     </Paper>
   );
 };

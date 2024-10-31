@@ -1,3 +1,4 @@
+//src/components/chatPage/FileViewer.tsx
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DownloadIcon from "@mui/icons-material/Download";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
@@ -118,7 +119,6 @@ const FileViewer: React.FC<FileViewerProps> = ({
 
   // Function to handle downloading files with progress tracking
   const handleDownloadWithProgress = async (file: Attachment) => {
-    // Check if file is already downloaded
     const isDownloaded = downloadedFiles.some(
       (f) => f.fileName === file.fileName
     );
@@ -168,7 +168,7 @@ const FileViewer: React.FC<FileViewerProps> = ({
   const handlers = useSwipeable({
     onSwipedLeft: () => navigateNext(),
     onSwipedRight: () => navigatePrev(),
-    trackMouse: true, // Optional: allows swipe with mouse for testing
+    trackMouse: true,
   });
 
   const getImageSrc = useCallback(
@@ -182,7 +182,7 @@ const FileViewer: React.FC<FileViewerProps> = ({
         if (downloadedFile) {
           return downloadedFile.url;
         } else {
-          return attachment.url || ""; // Use the original URL or placeholder
+          return attachment.url || "";
         }
       }
     },
@@ -223,8 +223,8 @@ const FileViewer: React.FC<FileViewerProps> = ({
         position: "fixed",
         top: 0,
         left: 0,
-        width: "100%", // Changed from 100vw to 100%
-        height: "100%", // Changed from 100vh to 100%
+        width: "100%",
+        height: "100%",
         bgcolor: "rgba(0,0,0,0.8)",
         backdropFilter: "blur(5px)",
         zIndex: 1300,
@@ -252,11 +252,11 @@ const FileViewer: React.FC<FileViewerProps> = ({
         {/* Top Action Bar */}
         <Box
           sx={{
-            height: "60px", // Fixed height for consistency
+            height: "60px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0 10px", // Adjusted padding
+            padding: "0 10px",
             borderBottom: "1px solid #e0e0e0",
             backgroundColor: "#f5f5f5",
           }}
@@ -324,7 +324,7 @@ const FileViewer: React.FC<FileViewerProps> = ({
                 />
               )}
 
-{isVideo && (isPreview || isFileDownloaded(currentFile)) && (
+              {isVideo && (isPreview || isFileDownloaded(currentFile)) && (
                 <video
                   src={getImageSrc(currentFile)}
                   controls
@@ -477,14 +477,14 @@ const FileViewer: React.FC<FileViewerProps> = ({
         {!isPreview && (
           <Box
             sx={{
-              height: "60px", // Fixed height for consistency
+              height: "60px",
               display: "flex",
               justifyContent: "flex-end",
               alignItems: "center",
               borderTop: "1px solid #e0e0e0",
               backgroundColor: "#f5f5f5",
               gap: "10px",
-              padding: "0 10px", // Adjusted padding
+              padding: "0 10px", 
             }}
           >
             <Tooltip title="Download">

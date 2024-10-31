@@ -40,13 +40,13 @@ const infoStyles = {
     fontWeight: 500,
     fontSize: "0.9rem",
     lineHeight: 1.4,
-    wordBreak: "break-word", // Ensures long text wraps appropriately
+    wordBreak: "break-word",
   },
 };
 
 const PromoDetailsCard: React.FC<PromoDetailsCardProps> = React.memo(
   ({ onEditPromo, onDeselectPromo, onTerminatePromo }) => {
-    const { selectedPromo } = usePromos(); // Get selectedPromo from the hook
+    const { selectedPromo } = usePromos();
     const { t } = useTranslation();
 
     const userRole = useAppSelector(selectUserRole);
@@ -57,7 +57,6 @@ const PromoDetailsCard: React.FC<PromoDetailsCardProps> = React.memo(
         ? users[selectedPromo.promoIssuedBy]?.entityName
         : undefined;
 
-    // Memoize styles to avoid recreating them on every render
     const boxStyles = useMemo(
       () => ({
         display: "flex",
@@ -68,10 +67,10 @@ const PromoDetailsCard: React.FC<PromoDetailsCardProps> = React.memo(
         bgcolor: "white",
         borderRadius: 4,
         boxShadow: "0 1px 4px rgba(0, 0, 0, 0.1)",
-        width: "auto", // Full width to ensure responsiveness
+        width: "auto",
         position: "relative" as const,
         "@media (min-width: 600px)": {
-          flexDirection: "row", // Stack horizontally on larger screens
+          flexDirection: "row",
         },
       }),
       []

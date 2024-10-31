@@ -1,5 +1,4 @@
 // src/components/chatPage/ContactsList.tsx
-
 import {
   Avatar,
   Badge,
@@ -12,37 +11,29 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useMemo } from "react";
-import { User } from "../../models/entityModels"; // Adjust the import path based on your project structure
+import { User } from "../../models/entityModels";
 import { useTranslation } from "react-i18next";
+import { sanitizeSearchTerm } from "../../utils/chatUtils";
 
 interface ContactsListProps {
-  contacts: Partial<User>[]; // Adjust this type based on your user model
-  searchTerm?: string; // Make searchTerm optional
+  contacts: Partial<User>[];
+  searchTerm?: string;
   handleContactSelect: (contactId: string) => void;
-  loading: boolean; // Loading state prop
+  loading: boolean;
 }
 
-// Utility to sanitize the search term
-const sanitizeSearchTerm = (term: string) =>
-  term.replace(/[^\w\s]/gi, "").toLowerCase();
 
-/**
- * ContactsList Component
- * Displays a list of contacts with avatars, names, and roles.
- *
- * @param {ContactsListProps} props - Component props.
- * @returns {JSX.Element} The rendered component.
- */
+
+
 const ContactsList: React.FC<ContactsListProps> = ({
   contacts,
-  searchTerm = "", // Default searchTerm to an empty string if not provided
+  searchTerm = "",
   handleContactSelect,
   loading,
 }) => {
   const { t } = useTranslation();
 
   /*
-    Uncomment the following lines for debugging purposes.
     console.log("ContactsList rendering now");
     console.log("Contacts received:", contacts);
     console.log("Search term:", searchTerm);
@@ -86,7 +77,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
           >
             <ListItemAvatar>
               <Badge
-                badgeContent={0} // Optional: can display notifications related to the contact
+                badgeContent={0} 
                 color="secondary"
                 anchorOrigin={{
                   vertical: "top",

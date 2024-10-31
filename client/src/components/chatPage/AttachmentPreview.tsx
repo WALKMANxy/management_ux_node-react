@@ -1,12 +1,12 @@
-// src/components/AttachmentPreview.tsx
+// src/components/chatPage/AttachmentPreview.tsx
 
 import { Box } from "@mui/material";
 import React from "react";
 import { Attachment } from "../../models/dataModels";
-import AttachmentItem from "./AttachmentItem"; // Import the child component
+import AttachmentItem from "./AttachmentItem";
 
 interface AttachmentPreviewProps {
-  attachments: Attachment[]; // Handle multiple attachments
+  attachments: Attachment[]; 
   openFileViewer: (isPreview: boolean, fileName?: string) => void;
   downloadAndStoreFile: (
     file: Attachment,

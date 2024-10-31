@@ -17,12 +17,11 @@ const MovementDetailsHistory: React.FC<MovementDetailsHistoryProps> = ({
   const { t } = useTranslation();
   const userRole = useSelector((state: RootState) => state.auth.role);
 
-  /*  // Log the movementDetails to inspect the data structure
+  /*  // Log the movementDetails
   useEffect(() => {
     console.log("Movement Details:", movementDetails);
   }, [movementDetails]); */
 
-  // Define a stable formatter function to prevent unnecessary re-creations
 
   const columnDefinitions = useMemo(() => {
     const baseColumns = [

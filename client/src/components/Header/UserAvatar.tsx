@@ -1,3 +1,4 @@
+//src/components/Header/UserAvatar.tsx
 import ChatIcon from "@mui/icons-material/Chat";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -56,7 +57,7 @@ const UserAvatar: React.FC = () => {
 
   const handleLogoutClick = () => {
     initiateLogout();
-    navigate("/"); // Redirect to landing page after logout
+    navigate("/");
     handleClose();
   };
 
@@ -82,11 +83,11 @@ const UserAvatar: React.FC = () => {
           vertical: "top",
           horizontal: "right",
         }}
-        disableScrollLock={true} // Prevent scroll lock issues
+        disableScrollLock={true}
         PaperProps={{
           sx: {
-            backdropFilter: "blur(10px)", // Frosted glass effect
-            backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent background
+            backdropFilter: "blur(10px)",
+            backgroundColor: "rgba(255, 255, 255, 0.7)",
             borderRadius: "8px",
             padding: 2,
           },
@@ -96,7 +97,7 @@ const UserAvatar: React.FC = () => {
           <Typography variant="h6" component="h2" gutterBottom>
             {currentUser?.entityName || t("userAvatar.defaultUser", "User")}
           </Typography>
-          <Divider sx={{ mb: 2 }} /> {/* Subtle divider below the title */}
+          <Divider sx={{ mb: 2 }} />
           <List>
             {/* Chats Link */}
             <ListItem

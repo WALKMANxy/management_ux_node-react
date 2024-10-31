@@ -1,5 +1,4 @@
 // src/components/chatPage/MessageBubble.tsx
-
 import { Avatar, Box, Tooltip, Typography } from "@mui/material";
 import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
@@ -14,9 +13,9 @@ import MessageStatusIcon from "./MessageStatusIcon";
 
 interface MessageBubbleProps {
   message: IMessage;
-  participantsData: Partial<User>[]; // Array of participants data passed from ChatView
+  participantsData: Partial<User>[];
   chatType: string;
-  openFileViewer: (isPreview: boolean, fileName?: string) => void; // Add this line
+  openFileViewer: (isPreview: boolean, fileName?: string) => void;
   downloadAndStoreFile: (attachment: Attachment) => Promise<void>;
   handleSave: (fileName: string) => void;
   downloadedFiles: Attachment[];
@@ -37,7 +36,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   const isOwnMessage = message.sender === currentUserId;
   const currentChat = useAppSelector(selectCurrentChat);
   const currentChatType = currentChat?.type;
-  // Find the sender's details from the participants data
   const sender = participantsData.find((user) => user._id === message.sender);
   const senderAvatar = sender?.avatar || "";
   const senderName = sender?.entityName || "";
@@ -59,7 +57,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 
   const getBackgroundColor = () => {
     if (message.status === "failed") {
-      return "rgba(128, 128, 128, 0.3)"; // Gray background for failed messages
+      return "rgba(128, 128, 128, 0.3)";
     }
 
     switch (message.messageType) {
@@ -95,10 +93,10 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
       className={animationClass}
       sx={{
         display: "flex",
-        flexDirection: isOwnMessage ? "row-reverse" : "row", // Control the message direction
+        flexDirection: isOwnMessage ? "row-reverse" : "row",
         alignItems: "flex-end",
         justifyContent: isOwnMessage ? "flex-end" : "flex-start",
-        maxWidth: "75%", // Control bubble width without making it float away from its anchor
+        maxWidth: "75%",
       }}
     >
       {/* Show sender avatar only if the message is not from the current user and in group chats */}
@@ -112,7 +110,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 
       {/* Container for Sender's Name and Message Bubble */}
       <Box>
-        {/* Conditionally render the sender's name */}
         {shouldDisplaySenderName() && (
           <Typography
             variant="caption"
@@ -134,16 +131,16 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
               bgcolor: getBackgroundColor(),
               borderRadius: "1em",
               boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
-              maxWidth: "100%", // Ensure the bubble doesn’t exceed the parent width
-              textAlign: "left", // Align text based on the message direction
-              backdropFilter: "blur(10px)", // Frosted glass effect
+              maxWidth: "100%",
+              textAlign: "left",
+              backdropFilter: "blur(10px)",
             }}
           >
             <Typography
               variant="body2"
               sx={{
-                wordBreak: "break-word", // Allows long words to break and wrap to the next line
-                overflowWrap: "break-word", // Ensures text wraps within the container
+                wordBreak: "break-word",
+                overflowWrap: "break-word", 
               }}
             >
               {message.content}

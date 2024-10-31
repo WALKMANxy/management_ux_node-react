@@ -29,22 +29,19 @@ const ClientList: React.FC<ClientListProps> = ({
   isClientListCollapsed,
   setClientListCollapsed,
   isMobile,
-  clientDetailsRef, // Add the clientDetailsRef prop
+  clientDetailsRef,
 }) => {
   const { t } = useTranslation();
 
-  // Memoized handler for collapsing/expanding the clients list
   const handleCollapseToggle = useCallback(() => {
     setClientListCollapsed(!isClientListCollapsed);
   }, [isClientListCollapsed, setClientListCollapsed]);
 
-  // Memoized handler for exporting data as CSV
   const handleExportCSV = useCallback(() => {
     exportDataAsCsv();
     handleMenuClose();
   }, [exportDataAsCsv, handleMenuClose]);
 
-  // Memoize column definitions
   const memoizedColumnDefs = useMemo(() => columnDefs, [columnDefs]);
 
   return (
@@ -145,7 +142,7 @@ const ClientList: React.FC<ClientListProps> = ({
             ref={gridRef}
             columnDefs={memoizedColumnDefs}
             rowData={filteredClients}
-            paginationPageSize={100} // Adjusted to a more manageable number
+            paginationPageSize={100}
             quickFilterText={quickFilterText}
           />
         </Box>

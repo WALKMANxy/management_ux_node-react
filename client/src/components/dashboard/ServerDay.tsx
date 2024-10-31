@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 export interface HighlightedDay {
   date: number;
   color: string;
-  label?: string; // Optional descriptive label for accessibility
+  label?: string;
 }
 
 export interface ServerDayProps extends PickersDayProps<Dayjs> {
@@ -22,7 +22,7 @@ const ServerDay: React.FC<ServerDayProps> = (props) => {
     highlightedDays = [],
     day,
     outsideCurrentMonth,
-    onDayClick, // Destructure onDayClick here
+    onDayClick,
     ...other
   } = props;
 
@@ -65,7 +65,7 @@ const ServerDay: React.FC<ServerDayProps> = (props) => {
             cursor: isSelected ? "pointer" : "default",
             "&:hover": {
               backgroundColor: highlightedDay?.color
-                ? `${highlightedDay.color}80` // Adding opacity on hover (assuming hex color)
+                ? `${highlightedDay.color}80`
                 : "rgba(255, 235, 59, 0.3)",
             },
           }}

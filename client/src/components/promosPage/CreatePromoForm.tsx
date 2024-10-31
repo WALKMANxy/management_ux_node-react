@@ -29,9 +29,9 @@ import EligibleClientsGrid from "./EligibleClientsGrid";
 
 interface CreatePromoFormProps {
   onClose: () => void;
-  promoData?: Promo; // For editing
-  isCreating: boolean; // True for creation, false for editing
-  onSubmit: (promoData: Promo) => Promise<void>; // Submit handler
+  promoData?: Promo;
+  isCreating: boolean;
+  onSubmit: (promoData: Promo) => Promise<void>;
 }
 
 const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
@@ -56,17 +56,14 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
     onClose,
   });
 
-  // Memoizing locale to prevent unnecessary re-renders
   const memoizedLocale = useMemo(() => selectedLocale, [selectedLocale]);
 
-  // Extract form values using watch
   const isGlobal = watch("global");
   const selectedClients = watch("selectedClients");
   const excludedClients = watch("excludedClients");
 
   const isMobile = useMediaQuery("(max-width:600px)");
 
-  // Setter functions to update the values
   const setSelectedClients = (clients: string[]) =>
     setValue("selectedClients", clients);
   const setExcludedClients = (clients: string[]) =>
@@ -91,8 +88,6 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
           display: "flex",
           flexDirection: "column",
           height: "auto",
-
-
         }}
       >
         {isCreating && (
@@ -175,7 +170,6 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
               )}
             />
           </Grid>
-
           {/* Start Date */}
           <Grid item xs={10} sm={6}>
             <Controller
@@ -208,7 +202,6 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
               </Typography>
             )}
           </Grid>
-
           {/* End Date */}
           <Grid item xs={10} sm={6}>
             <Controller
@@ -250,7 +243,6 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
               </Typography>
             )}
           </Grid>
-
           {/* Discount Description */}
           <Grid item xs={12} sm={12} sx={{ mb: 2 }}>
             <Controller
@@ -284,7 +276,6 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
             />
           </Grid>
         </Grid>
-
         {/* Unified Clients Selector - Read-Only Selector */}
         <Grid item xs={12}>
           <FormControl fullWidth disabled variant="outlined">
@@ -322,7 +313,6 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
             </Select>
           </FormControl>
         </Grid>
-
         {/* Eligible Clients Grid */}
         <Grid item xs={12}>
           <EligibleClientsGrid

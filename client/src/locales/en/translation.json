@@ -19,22 +19,22 @@
   "team": {
     "title": "Our Team",
     "content": {
-      "part1": "Our team at Ricambi Centro Sud S.r.l. is composed of dedicated professionals committed to providing top-notch services and solutions to our clients. With a diverse range of expertise, our team members collaborate seamlessly to ensure customer satisfaction and business growth."
+      "part1": "Our team at Random Company is composed of dedicated professionals committed to providing top-notch services and solutions to our clients. With a diverse range of expertise, our team members collaborate seamlessly to ensure customer satisfaction and business growth."
     }
   },
   "ourStory": {
     "title": "Our Story",
     "content": {
-      "part1": "<0>Ricambi Centro Sud S.r.l.</0> operates in the commercial vehicle, bus, truck, and auto parts sectors for diesel and gasoline engines, also dealing with bodywork and industrial, agricultural, maritime, and railway vehicles. Since 1995 in Catania, it offers services for choosing and selling the products offered with professionalism and competence, meeting the needs of public and private entities, spare parts dealers, pump specialists, mechanics, and electricians.",
+      "part1": "<0>Random Company</0> operates in the commercial vehicle, bus, truck, and auto parts sectors for diesel and gasoline engines, also dealing with bodywork and industrial, agricultural, maritime, and railway vehicles. Since 1995 in Catania, it offers services for choosing and selling the products offered with professionalism and competence, meeting the needs of public and private entities, spare parts dealers, pump specialists, mechanics, and electricians.",
       "part2": "The company, now expanding, is eager to offer this increasingly competent and effective service directly to private individuals, providing an opportunity and offering solutions for big and small vehicle problems. You will find qualified personnel in continuous training, capable of analyzing the problem and offering advice on the right alternatives. You can benefit from home delivery and complete 360-degree services.",
-      "part3": "The company is a distributor of original spare parts brands, as well as officially reconditioned products directly from the manufacturer. The quality of service compared to price, the qualified technical area, and the management/project beyond simple direct sales are the three strong and distinctive points of Ricambi Centro Sud S.r.l. The technical area, equipped with tools and continuous training, promotes the functional network in the area, guaranteeing updates and post-sales assistance to customers.",
+      "part3": "The company is a distributor of original spare parts brands, as well as officially reconditioned products directly from the manufacturer. The quality of service compared to price, the qualified technical area, and the management/project beyond simple direct sales are the three strong and distinctive points of Random Company The technical area, equipped with tools and continuous training, promotes the functional network in the area, guaranteeing updates and post-sales assistance to customers.",
       "part4": "<0>A company that has not lost its open and family-friendly character</0> but is in great expansion today, facing new challenges. The new structure, which spans 3,800 sqm over three levels, including offices, warehouse, and sales point, with a total of 25 employees, is able to guarantee service in different areas of expertise across the territory thanks to specialized sales agents by product type and brand."
     }
   },
   "privacyPolicy": {
     "title": "Privacy Policy",
     "content": {
-      "part1": "<0>Welcome to RCS NEXT</0>, a browser-based application provided by Ricambi Centro Sud. We take your privacy seriously and are committed to protecting the data we collect in compliance with GDPR regulations. This privacy policy outlines the types of information we collect, how it is used, and your rights regarding that information.",
+      "part1": "<0>Welcome to RCS NEXT</0>, a browser-based application provided byRandom Company We take your privacy seriously and are committed to protecting the data we collect in compliance with GDPR regulations. This privacy policy outlines the types of information we collect, how it is used, and your rights regarding that information.",
       "part2": "Data Collection",
       "part3": "The data handled by Ricambi Centro Sud for the RCS NEXT app is collected solely for the purpose of ensuring the smooth functioning of the services provided. We may collect information such as your IP address and device fingerprint to validate your identity and enhance our authentication processes. This helps us ensure the security of your account and prevent unauthorized access.",
       "part4": "Purpose of Data Use",
@@ -52,7 +52,7 @@
   "termsOfService": {
     "title": "Terms of Service",
     "content": {
-      "part1": "<0>Welcome to RCS NEXT</0>, a browser-based application operated by Ricambi Centro Sud. By accessing or using our application, you agree to be bound by these terms of service. If you do not agree with these terms, please do not use the app.",
+      "part1": "<0>Welcome to RCS NEXT</0>, a browser-based application operated byRandom Company By accessing or using our application, you agree to be bound by these terms of service. If you do not agree with these terms, please do not use the app.",
       "part2": "Acceptance of Terms",
       "part3": "By using the RCS NEXT app, you acknowledge that you have read, understood, and agree to these terms of service. We may update these terms occasionally, and it is your responsibility to review them regularly.",
       "part4": "Use of Service",
@@ -60,7 +60,7 @@
       "part6": "User Accounts",
       "part7": "You are responsible for maintaining the confidentiality of your account credentials. Any activity under your account is your responsibility. If you believe your account has been compromised, please notify us immediately.",
       "part8": "Content Ownership",
-      "part9": "All content within the RCS NEXT application, including but not limited to text, graphics, and trademarks, is the property of Ricambi Centro Sud. You may not copy, distribute, or create derivative works without our written consent.",
+      "part9": "All content within the RCS NEXT application, including but not limited to text, graphics, and trademarks, is the property ofRandom Company You may not copy, distribute, or create derivative works without our written consent.",
       "part10": "Termination",
       "part11": "We reserve the right to suspend or terminate your access to the RCS NEXT app at any time, particularly if you violate these terms of service or use the app in a manner that we deem inappropriate or harmful.",
       "part12": "Limitation of Liability",
@@ -1233,13 +1233,6 @@
     "selectedVisit": "Selected Visit: {{reason}} on {{date}}.",
     "visitsNotEditable": "Visits cannot be edited from the calendar.",
     "selectedEvent": "Selected {{reason}} on {{date}}.",
-    "roleNotAssigned": "Please wait for your account to be assigned a role before attempting to log in.",
-    "accountVerificationPending": "Your account is still being verified by the admins.",
-    "roleFetchingError": "Failed to fetch user role.",
-    "errorDuringLogin": "An error occurred during login: {{error}}",
-    "registrationSuccess": "Registration successful: {{message}}",
-    "registrationFailed": "Registration failed: {{message}}",
-    "loginFailed": "Login failed: {{message}}",
     "viewModes": {
       "calendar": "calendar",
       "history": "history"

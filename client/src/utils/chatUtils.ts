@@ -10,11 +10,12 @@ export type OverdueSummary = {
 // Utility to sanitize the search term
 const sanitizeRegex = /[^\w\s]/gi;
 
+
 export const sanitizeSearchTerm = (term: string) =>
   term.replace(sanitizeRegex, "").toLowerCase();
 
 // Format date for the chat preview
-export const formatDate = (date: Date) => {
+export const formatDateChats = (date: Date) => {
   const dayjsDate = dayjs(date);
   const dayDifference = dayjs().diff(dayjsDate, "day");
   if (dayDifference === 0) {

@@ -1,24 +1,4 @@
 // src/components/dashboard/NavigationComponent.tsx
-
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { selectUserRole } from "../../features/auth/authSlice";
-import { handleLogout } from "../../features/auth/authThunks";
-
-// Import Material-UI components
-import {
-  Box,
-  Grid,
-  IconButton,
-  Paper,
-  Tooltip,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
-
-// Import Material-UI icons
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CategoryIcon from "@mui/icons-material/Category";
@@ -29,11 +9,23 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PeopleIcon from "@mui/icons-material/People";
 import SettingsIcon from "@mui/icons-material/Settings";
-
-// Import translation hook
+import {
+  Box,
+  Grid,
+  IconButton,
+  Paper,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import React from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { selectUserRole } from "../../features/auth/authSlice";
+import { handleLogout } from "../../features/auth/authThunks";
 
-// Preload functions for each page
 const preloadStatistics = () =>
   import("../../pages/statistics/StatisticsDashboard");
 const preloadMovements = () => import("../../pages/common/MovementsPage");
@@ -51,8 +43,7 @@ const NavigationComponent: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
-  const userRole = useAppSelector(selectUserRole); // Access userRole
-
+  const userRole = useAppSelector(selectUserRole);
   const { t } = useTranslation();
 
   const initiateLogout = () => {
@@ -64,12 +55,12 @@ const NavigationComponent: React.FC = () => {
     {
       label: "navigation.statistics",
       defaultLabel: "Statistics",
-      icon: <AssessmentIcon />, // New icon
+      icon: <AssessmentIcon />,
       onClick: () => navigate("/statistics"),
       onmouseenter: () => preloadStatistics(),
-      color: "#ff9800", // Example color
+      color: "#ff9800",
       path: "/statistics",
-      roles: ["admin", "client", "agent"], // Only these roles
+      roles: ["admin", "client", "agent"],
     },
     {
       label: "navigation.movements",
@@ -79,7 +70,7 @@ const NavigationComponent: React.FC = () => {
       onmouseenter: () => preloadMovements(),
       color: "#3f51b5",
       path: "/movements",
-      roles: ["admin", "client", "agent"], // Exclude 'employee'
+      roles: ["admin", "client", "agent"],
     },
     {
       label: "navigation.clients",
@@ -89,7 +80,7 @@ const NavigationComponent: React.FC = () => {
       onmouseenter: () => preloadClients(),
       color: "#4caf50",
       path: "/clients",
-      roles: ["admin", "client", "agent"], // Exclude 'employee'
+      roles: ["admin", "client", "agent"],
     },
     {
       label: "navigation.articles",
@@ -99,7 +90,7 @@ const NavigationComponent: React.FC = () => {
       onmouseenter: () => preloadArticles(),
       color: "#9c27b0",
       path: "/articles",
-      roles: ["admin", "client", "agent"], // Exclude 'employee'
+      roles: ["admin", "client", "agent"],
     },
     {
       label: "navigation.visits",
@@ -109,7 +100,7 @@ const NavigationComponent: React.FC = () => {
       onmouseenter: () => preloadVisits(),
       color: "#ff5722",
       path: "/visits",
-      roles: ["admin", "client", "agent"], // Exclude 'employee'
+      roles: ["admin", "client", "agent"],
     },
     {
       label: "navigation.promos",
@@ -119,7 +110,7 @@ const NavigationComponent: React.FC = () => {
       onmouseenter: () => preloadPromos(),
       color: "#00bcd4",
       path: "/promos",
-      roles: ["admin", "client", "agent"], // Exclude 'employee'
+      roles: ["admin", "client", "agent"],
     },
     {
       label: "navigation.calendar",
@@ -129,7 +120,7 @@ const NavigationComponent: React.FC = () => {
       onmouseenter: () => preloadCalendar(),
       color: "#3f51b5",
       path: "/calendar",
-      roles: ["admin", "client", "agent", "employee"], // Accessible to 'employee' as well
+      roles: ["admin", "client", "agent", "employee"],
     },
     {
       label: "navigation.messages",
@@ -137,7 +128,7 @@ const NavigationComponent: React.FC = () => {
       icon: <ChatBubbleOutlineIcon />,
       onClick: () => navigate("/messages"),
       onmouseenter: () => preloadMessages(),
-      color: "#25D366", // WhatsApp-like green
+      color: "#25D366",
       path: "/messages",
       roles: ["admin", "client", "agent", "employee"],
     },
@@ -147,7 +138,7 @@ const NavigationComponent: React.FC = () => {
       icon: <SettingsIcon />,
       onClick: () => navigate("/settings"),
       onmouseenter: () => preloadSettings(),
-      color: "#9e9e9e", // Gray color
+      color: "#9e9e9e",
       path: "/settings",
       roles: ["admin", "client", "agent", "employee"],
     },
@@ -223,8 +214,8 @@ const NavigationComponent: React.FC = () => {
                   size="large"
                   onMouseEnter={item.onmouseenter}
                   sx={{
-                    width: isMobile ? "50px" : isTablet ? "60px" : "70px", // Adjust width based on screen size
-                    height: isMobile ? "50px" : isTablet ? "60px" : "70px", // Adjust height based on screen size
+                    width: isMobile ? "50px" : isTablet ? "60px" : "70px",
+                    height: isMobile ? "50px" : isTablet ? "60px" : "70px",
                     backgroundColor: "#ffffff",
                     borderRadius: "12px",
                     boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
@@ -237,7 +228,7 @@ const NavigationComponent: React.FC = () => {
                   aria-label={t(item.label, item.defaultLabel)}
                 >
                   {React.cloneElement(item.icon, {
-                    fontSize: isMobile ? "2rem" : "3rem", // Adjust icon size
+                    fontSize: isMobile ? "2rem" : "3rem",
                   })}
                 </IconButton>
               </Tooltip>

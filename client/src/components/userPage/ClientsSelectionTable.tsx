@@ -1,5 +1,4 @@
 // src/components/userPage/ClientsSelectionTable.tsx
-
 import {
   Box,
   Checkbox,
@@ -41,7 +40,7 @@ const ClientsSelectionTable: React.FC<ClientsSelectionTableProps> = ({
     loadingEntities,
     visibleRows,
     entityOptions,
-    ref, // Destructure the ref from the hook
+    ref,
   } = useManageEntities();
 
   const isSelected = (id: string) =>
@@ -59,7 +58,7 @@ const ClientsSelectionTable: React.FC<ClientsSelectionTableProps> = ({
     if (checked) {
       const newSelections = clients.map((client) => ({
         id: client.id,
-        colour: "", // Initialize with empty colour or default value
+        colour: "",
       }));
       setSelectedClients(newSelections);
     } else {
@@ -114,7 +113,7 @@ const ClientsSelectionTable: React.FC<ClientsSelectionTableProps> = ({
               Array.from({ length: visibleRows }).map((_, index) => (
                 <TableRow
                   key={index}
-                  className="animate__animated animate__fadeOut" // Animate fadeOut when loading
+                  className="animate__animated animate__fadeOut" 
                 >
                   <TableCell>
                     <Skeleton variant="text" />

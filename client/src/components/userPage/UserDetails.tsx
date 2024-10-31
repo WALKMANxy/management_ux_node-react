@@ -1,5 +1,4 @@
 // src/components/UserPage/UserDetails.tsx
-
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import InfoIcon from "@mui/icons-material/Info";
 import SaveIcon from "@mui/icons-material/Save";
@@ -102,8 +101,8 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
           sx={{
             boxShadow: "none",
             gap: 2,
-            transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
-            transformOrigin: "top left", // Anchor the scale to the top-left corner
+            transform: isMobile ? "scale(0.75)" : "none",
+            transformOrigin: "top left",
             width: isMobile ? "133.33%" : "100%",
           }}
         >
@@ -205,8 +204,8 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
         <TableContainer
           sx={{
             maxHeight: 400,
-            transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
-            transformOrigin: "top left", // Anchor the scale to the top-left corner
+            transform: isMobile ? "scale(0.75)" : "none",
+            transformOrigin: "top left",
             width: isMobile ? "133.33%" : "100%",
             mt: isMobile ? -2.5 : 0,
           }}
@@ -223,7 +222,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
                 ? Array.from({ length: visibleRows }).map((_, index) => (
                     <TableRow
                       key={index}
-                      className="animate__animated animate__fadeOut" // Animate fadeOut when loading
+                      className="animate__animated animate__fadeOut"
                     >
                       <TableCell>
                         <Skeleton variant="text" />
@@ -246,8 +245,8 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
                             ? "rgba(0, 0, 0, 0.08)"
                             : "inherit",
                       }}
-                      className="animate__animated animate__fadeIn" // Animate fadeIn when loaded
-                      ref={index === visibleRows - 1 ? ref : null} // Attach ref to the last row
+                      className="animate__animated animate__fadeIn"
+                      ref={index === visibleRows - 1 ? ref : null}
                     >
                       <TableCell>{entity.name}</TableCell>
                       <TableCell>{entity.id}</TableCell>
@@ -276,14 +275,12 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onBack }) => {
                 code: selectedEntity.id,
                 name: selectedEntity.name,
               }}
-              isnew={"true"} // Apply faint green styling for new entity details
+              isnew={"true"}
               onDeleteUser={handleDeleteUser}
             />
           </Box>
         )}
-
         <Divider sx={{ mb: isMobile ? 0 : 2 }} />
-
         <LoadingButton
           color="secondary"
           onClick={handleSaveChanges}

@@ -1,5 +1,4 @@
-// src/components/SpentThisMonth.tsx
-
+// src/components/dashboard/SpentThisMonth.tsx
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
@@ -26,12 +25,7 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
 
   const formattedAmount = currencyFormatter(parseFloat(amount));
 
-  /**
-   * Determines the comparison result based on the value and user role.
-   *
-   * @param {number} value - The comparison value.
-   * @returns {ComparisonResult} The comparison result object.
-   */
+
   const getComparisonResult = (value: number): ComparisonResult => {
     const isAgentComparison = userRole === "admin" && isAgentSelected;
     const isClientComparison =
@@ -130,20 +124,20 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
       mr: 1,
       mt: 1.75,
       mb: 0.75,
-      wordBreak: "break-word", // Ensure long amounts wrap
+      wordBreak: "break-word",
     },
     title: {
       fontSize: "1.5rem",
       fontWeight: 500,
       color: "#000",
-      whiteSpace: "normal", // Allow text to wrap
-      wordBreak: "break-word", // Ensure long titles wrap
+      whiteSpace: "normal",
+      wordBreak: "break-word",
     },
     comparison: {
       fontSize: "1.65rem",
       fontWeight: 500,
       paddingTop: 1,
-      wordBreak: "break-word", // Ensure long comparison texts wrap
+      wordBreak: "break-word",
     },
   };
 
@@ -220,5 +214,4 @@ const SpentThisMonth: React.FC<SpentThisMonthProps> = ({
   );
 };
 
-// Correct usage of React.memo with export
 export default React.memo(SpentThisMonth);
