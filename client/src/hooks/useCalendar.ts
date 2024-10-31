@@ -12,7 +12,7 @@ import {
   useCreateEventMutation,
   useDeleteEventMutation,
   useEditEventMutation,
-  useGetEventsByMonthForAdminQuery,
+  useGetEventsByMonthQuery,
   useUpdateEventStatusMutation,
 } from "../features/calendar/calendarQuery";
 import { selectClient, selectVisit } from "../features/data/dataSlice";
@@ -72,7 +72,7 @@ export const useCalendar = () => {
     data: adminEventsData,
     isLoading: isAdminLoading,
     error: adminError,
-  } = useGetEventsByMonthForAdminQuery({
+  } = useGetEventsByMonthQuery({
     year: currentYear,
     month: currentMonth,
   });
@@ -211,7 +211,8 @@ export const useCalendar = () => {
             eventType: data.eventType,
             reason: data.reason as CalendarEvent["reason"],
             note: data.note?.trim() || undefined,
-            // Optionally include startDate and endDate if editing dates is allowed
+            startDate: data.startDate, // Include startDate
+            endDate: data.endDate,     // Include endDate
           },
         };
 
@@ -285,9 +286,8 @@ export const useCalendar = () => {
       setSelectedDays([new Date(event.startDate), new Date(event.endDate)]);
       setOpenForm(true);
       console.log("Opening form for editing event", event);
-      showToast.info(t("calendarHook.editingEvent", { reason: event.reason }));
     },
-    [t]
+    []
   );
 
   const handleFormCancel = () => {

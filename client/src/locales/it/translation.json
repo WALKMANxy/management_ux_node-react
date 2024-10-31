@@ -19,7 +19,8 @@
     "legal": "Legale",
     "privacyPolicy": "Politica sulla privacy",
     "termsOfService": "Termini di servizio",
-    "close": "Chiudi"
+    "close": "Chiudi",
+    "hours": "Orari"
   },
   "ourStory": {
     "title": "La nostra storia",
@@ -136,13 +137,33 @@
     "expense": "Spesa",
     "netRevenue": "Netto"
   },
+  "months": {
+    "01": "Gennaio",
+    "02": "Febbraio",
+    "03": "Marzo",
+    "04": "Aprile",
+    "05": "Maggio",
+    "06": "Giugno",
+    "07": "Luglio",
+    "08": "Agosto",
+    "09": "Settembre",
+    "10": "Ottobre",
+    "11": "Novembre",
+    "12": "Dicembre"
+  },
+  "visitsPage": {
+    "VisitsContainer": "Visite",
+    "ClientDetailsContainer": "Dettagli Cliente",
+    "visitsHistory": "Storico Visite"
+  },
   "salesDistribution": {
     "title": "Distribuzione delle Vendite",
-    "revenue": "Entrate",
+    "revenue": "",
     "viewClients": "Visualizza Clienti",
     "viewAgents": "Visualizza Agenti",
     "clients": "Clienti",
-    "agents": "Agenti"
+    "agents": "Agenti",
+    "expense": ""
   },
   "topBrandsSold": {
     "titleAgent": "Marchi Più Venduti",
@@ -247,7 +268,8 @@
     "New Client": "Nuovo Cliente",
     "unexpected_event": "Evento Imprevisto",
     "company_meeting": "Riunione Aziendale",
-    "medical_visit": "Visita Medica"
+    "medical_visit": "Visita Medica",
+    "company_holiday": "Ferie Aziendali"
   },
   "confirmDialog": {
     "cancel": "Annulla",
@@ -267,7 +289,19 @@
   },
   "articleDetails": {
     "title": "Dettagli Articolo",
-    "noHistory": "Nessuna storia disponibile"
+    "noHistory": "Nessuna storia disponibile.",
+    "noArticleSelected": "Nessun articolo selezionato.",
+    "id": "ID Articolo",
+    "name": "Nome",
+    "brand": "Marca",
+    "quantity": "Quantità",
+    "unitPrice": "Prezzo Unitario",
+    "priceSold": "Prezzo Vendita",
+    "priceBought": "Prezzo Acquisto",
+    "expandTooltip": "Espandi dettagli",
+    "collapseTooltip": "Comprimi dettagli",
+    "expand": "Espandi dettagli",
+    "collapse": "Comprimi dettagli"
   },
   "calendarEvent": {
     "unknown": "Sconosciuto",
@@ -293,154 +327,157 @@
       "month": "Mese",
       "week": "Settimana",
       "day": "Giorno"
-    },
+    }
+  },
 
-    "eventForm": {
-      "title": "Crea Nuovo Evento",
-      "editTitle": "Modifica Evento",
-      "titleMarkAbsence": "Segna Assenza",
-      "labels": {
-        "startTime": "Ora di Inizio",
-        "endTime": "Ora di Fine",
-        "eventType": "Tipo di Evento",
-        "reason": "Motivo",
-        "note": "Nota (Opzionale)",
-        "cancel": "Annulla",
-        "create": "Crea"
-      },
-      "options": {
-        "absence": "Assenza",
-        "event": "Evento",
-        "holiday": "Vacanza"
-      },
-      "reasons": {
-        "illness": "Malattia",
-        "day_off": "Giorno di Riposo",
-        "unexpected_event": "Evento Imprevisto",
-        "medical_visit": "Visita Medica",
-        "public_holiday": "Festa Pubblica",
-        "company_holiday": "Ferie Aziendali",
-        "company_meeting": "Riunione Aziendale",
-        "company_party": "Festa Aziendale",
-        "conference": "Conferenza",
-        "expo": "Expo",
-        "generic": "Generico"
-      },
-      "validation": {
-        "startTimeRequired": "L'ora di inizio è obbligatoria",
-        "endTimeRequired": "L'ora di fine è obbligatoria",
-        "eventTypeRequired": "Il tipo di evento è obbligatorio",
-        "reasonRequired": "Il motivo è obbligatorio",
-        "dateTooFar": "Non puoi scegliere una data di assenza oltre due mesi da oggi. Seleziona una data prima di {{date}}."
-      },
-      "tooltips": {
-        "cancel": "Annulla",
-        "create": "Crea Evento"
-      },
-      "eventHistory": {
-        "title": "Storia dell'Evento",
-        "headers": {
-          "user": "Utente",
-          "eventType": "Tipo di Evento",
-          "reason": "Motivo",
-          "startDate": "Data Inizio",
-          "endDate": "Data Fine",
-          "status": "Stato",
-          "actions": "Azioni"
-        },
-        "unknown": "Sconosciuto",
-        "na": "N/A",
-        "eventTypes": {
-          "absence": "Assenza",
-          "event": "Evento",
-          "holiday": "Vacanza",
-          "generic": "Generico"
-        },
-        "reasons": {
-          "illness": "Malattia",
-          "day_off": "Giorno di Riposo",
-          "unexpected_event": "Evento Imprevisto",
-          "medical_visit": "Visita Medica",
-          "company_meeting": "Riunione Aziendale",
-          "company_party": "Festa Aziendale",
-          "conference": "Conferenza",
-          "expo": "Expo",
-          "generic": "Generico"
-        },
-        "statuses": {
-          "pending": "In Attesa",
-          "approved": "Approvato",
-          "rejected": "Respinto",
-          "cancelled": "Annullato"
-        },
-        "actions": {
-          "na": "N/A"
-        },
-        "tooltips": {
-          "approve": "Approva Evento",
-          "reject": "Rifiuta Evento"
-        },
-        "toast": {
-          "approveSuccess": "Evento approvato con successo!",
-          "approveFailure": "Errore durante l'approvazione dell'evento",
-          "rejectSuccess": "Evento rifiutato con successo!",
-          "rejectFailure": "Errore durante il rifiuto dell'evento",
-          "genericError": "Si è verificato un errore imprevisto"
-        }
-      }
-    },
-    "eventTitle": {
-      "unknown": "Sconosciuto",
-      "reasons": {
-        "illness": "Malattia",
-        "day_off": "Giorno di Riposo",
-        "unexpected_event": "Evento Imprevisto",
-        "medical_visit": "Visita Medica",
-        "public_holiday": "Festa Pubblica",
-        "company_holiday": "Ferie Aziendali",
-        "company_meeting": "Riunione Aziendale",
-        "company_party": "Festa Aziendale",
-        "conference": "Conferenza",
-        "expo": "Expo",
-        "generic": "Generico"
-      },
-      "tooltips": {
-        "illness": "Motivo: Malattia",
-        "day_off": "Motivo: Giorno di Riposo",
-        "unexpected_event": "Motivo: Evento Imprevisto",
-        "medical_visit": "Motivo: Visita Medica",
-        "public_holiday": "Motivo: Festa Pubblica",
-        "company_holiday": "Motivo: Ferie Aziendali",
-        "company_meeting": "Motivo: Riunione Aziendale",
-        "company_party": "Motivo: Festa Aziendale",
-        "conference": "Motivo: Conferenza",
-        "expo": "Motivo: Expo",
-        "generic": "Motivo: Generico",
-        "unknown": "Entità Sconosciuta"
-      }
-    },
-    "popOverEvent": {
-      "type": "Tipo",
+  "eventForm": {
+    "title": "Crea Nuovo Evento",
+    "editTitle": "Modifica Evento",
+    "titleMarkAbsence": "Segna Assenza",
+    "labels": {
+      "startTime": "Ora di Inizio",
+      "endTime": "Ora di Fine",
+      "eventType": "Tipo di Evento",
       "reason": "Motivo",
-      "note": "Nota",
-      "unknown": "Sconosciuto",
-      "visit": "Visita",
-      "issue": "Problema",
-      "routine": "Routine",
-      "newClient": "Nuovo Cliente",
-      "edit": "Modifica Evento",
-      "delete": "Elimina Evento",
-      "status": "Stato",
-      "startsAt": "Inizia alle",
-      "endsAt": "Finisce alle"
+      "note": "Nota (Opzionale)",
+      "cancel": "Annulla",
+      "create": "Crea"
     },
+    "options": {
+      "absence": "Assenza",
+      "event": "Evento",
+      "holiday": "Vacanza"
+    },
+    "reasons": {
+      "illness": "Malattia",
+      "day_off": "Giorno di Riposo",
+      "unexpected_event": "Evento Imprevisto",
+      "medical_visit": "Visita Medica",
+      "public_holiday": "Festa Pubblica",
+      "company_holiday": "Ferie Aziendali",
+      "company_meeting": "Riunione Aziendale",
+      "company_party": "Festa Aziendale",
+      "conference": "Conferenza",
+      "expo": "Expo",
+      "generic": "Generico"
+    },
+    "validation": {
+      "startTimeRequired": "L'ora di inizio è obbligatoria.",
+      "endTimeRequired": "L'ora di fine è obbligatoria.",
+      "eventTypeRequired": "Il tipo di evento è obbligatorio.",
+      "reasonRequired": "Il motivo è obbligatorio.",
+      "dateTooFar": "La data selezionata è troppo lontana nel futuro. Si prega di selezionare una data prima del {{date}}.",
+      "startAfterEnd": "La data di inizio deve essere precedente alla data di fine.",
+      "endBeforeStart": "La data di fine deve essere successiva alla data di inizio.",
+      "durationTooLong": "La durata dell'evento non può superare le due settimane."
+    },
+    "tooltips": {
+      "cancel": "Annulla",
+      "create": "Crea Evento"
+    }
+  },
+  "eventHistory": {
+    "title": "Storia dell'Evento",
+    "headers": {
+      "user": "Utente",
+      "eventType": "Tipo di Evento",
+      "reason": "Motivo",
+      "startDate": "Data Inizio",
+      "endDate": "Data Fine",
+      "status": "Stato",
+      "actions": "Azioni"
+    },
+    "unknown": "Sconosciuto",
+    "na": "N/A",
+    "filterSelection": "Selezione filtro",
+    "filterAll": "Tutti",
+    "system": "Sistema",
     "eventTypes": {
       "absence": "Assenza",
-      "holiday": "Vacanza",
       "event": "Evento",
-      "generic": "Generico",
-      "visit": "Visita"
+      "holiday": "Vacanza",
+      "generic": "Generico"
+    },
+    "reasons": {
+      "illness": "Malattia",
+      "day_off": "Giorno di Riposo",
+      "unexpected_event": "Evento Imprevisto",
+      "medical_visit": "Visita Medica",
+      "company_meeting": "Riunione Aziendale",
+      "company_party": "Festa Aziendale",
+      "company_holiday": "Ferie Aziendali",
+      "conference": "Conferenza",
+      "expo": "Expo",
+      "generic": "Generico"
+    },
+    "statuses": {
+      "pending": "In Attesa",
+      "approved": "Approvato",
+      "rejected": "Respinto",
+      "cancelled": "Annullato"
+    },
+    "actions": {
+      "na": "N/A"
+    },
+    "tooltips": {
+      "approve": "Approva Evento",
+      "reject": "Rifiuta Evento"
+    },
+    "toast": {
+      "approveSuccess": "Evento approvato con successo!",
+      "approveFailure": "Errore durante l'approvazione dell'evento",
+      "rejectSuccess": "Evento rifiutato con successo!",
+      "rejectFailure": "Errore durante il rifiuto dell'evento",
+      "genericError": "Si è verificato un errore imprevisto"
     }
+  },
+
+  "eventTitle": {
+    "unknown": "Sconosciuto",
+    "reasons": {
+      "illness": "Malattia",
+      "day_off": "Giorno di Riposo",
+      "unexpected_event": "Evento Imprevisto",
+      "medical_visit": "Visita Medica",
+      "public_holiday": "Festa Pubblica",
+      "company_holiday": "Ferie Aziendali",
+      "company_meeting": "Riunione Aziendale",
+      "company_party": "Festa Aziendale",
+      "conference": "Conferenza",
+      "expo": "Expo",
+      "generic": "Generico"
+    },
+    "tooltips": {
+      "illness": "Motivo: Malattia",
+      "day_off": "Motivo: Giorno di Riposo",
+      "unexpected_event": "Motivo: Evento Imprevisto",
+      "medical_visit": "Motivo: Visita Medica",
+      "public_holiday": "Motivo: Festa Pubblica",
+      "company_holiday": "Motivo: Ferie Aziendali",
+      "company_meeting": "Motivo: Riunione Aziendale",
+      "company_party": "Motivo: Festa Aziendale",
+      "conference": "Motivo: Conferenza",
+      "expo": "Motivo: Expo",
+      "generic": "Motivo: Generico",
+      "unknown": "Entità Sconosciuta"
+    }
+  },
+  "popOverEvent": {
+    "type": "Tipo",
+    "reason": "Motivo",
+    "note": "Nota",
+    "unknown": "Sconosciuto",
+    "visit": "Visita",
+    "issue": "Problema",
+    "routine": "Routine",
+    "newClient": "Nuovo Cliente",
+    "edit": "Modifica Evento",
+    "delete": "Elimina Evento",
+    "status": "Stato",
+    "startsAt": "Inizia alle",
+    "endsAt": "Finisce alle",
+    "goToVisit": "Vai alla Visita",
+    "noNote": "Nessuna nota inserita."
   },
   "chatList": {
     "noChatsFound": "Nessuna chat trovata.",
@@ -455,7 +492,8 @@
     "tooltips": {
       "refreshContacts": "Aggiorna Contatti",
       "showChats": "Mostra Chat",
-      "showContacts": "Mostra Contatti"
+      "showContacts": "Mostra Contatti",
+      "createChat": "Crea Chat"
     },
     "placeholders": {
       "searchChats": "Cerca chat...",
@@ -564,9 +602,16 @@
     "close": "Chiudi",
     "occurredAt": "Si è verificato alle"
   },
+  "activityOverview": {
+    "title": "{{type}} - Agente: {{agent}}",
+    "details": "{{reason}} - Cliente: {{clientId}}",
+    "saleTitle": "Vendita",
+    "saleDetails": "Cliente: {{clientId}}, {{clientName}} - Entrate: {{revenue}}",
+    "orderDate": "Data Ordine: {{orderDate}}"
+  },
 
   "spentThisMonth": {
-    "titleAgent": "Guadagnato Questo Mese",
+    "titleAgent": "Entrate Questo Mese",
     "titleClient": "Speso Questo Mese",
     "more": "",
     "neutral": "",
@@ -576,7 +621,7 @@
     "comparedToOtherClients": "del reddito totale."
   },
   "spentThisYear": {
-    "titleAgent": "Guadagnato Quest'Anno",
+    "titleAgent": "Entrate Quest'Anno",
     "titleClient": "Speso Quest'Anno",
     "more": "",
     "neutral": "",
@@ -600,13 +645,23 @@
   },
   "upcomingVisits": {
     "title": "Prossime Visite",
-    "visitType": "Tipo di Visita",
-    "visitReason": "Motivo della Visita",
-    "clientId": "ID Cliente",
     "noProgrammedVisits": "Nessuna visita programmata.",
-    "viewDetails": "Visualizza Dettagli",
     "viewAllVisits": "Visualizza Tutte le Visite",
-    "iconAlt": "Icona Prossime Visite"
+    "iconAlt": "Icona Prossime Visite",
+    "visitTypeLabel": "Tipo di Visita",
+    "visitType": {
+      "regular": "Regolare",
+      "urgent": "Urgente"
+    },
+    "visitReasonLabel": "Motivo della Visita",
+    "visitReason": {
+      "issue": "Problema",
+      "routine": "Routine",
+      "newclient": "Nuovo Cliente"
+    },
+    "clientId": "ID Cliente",
+    "na": "N/D",
+    "viewDetails": "Visualizza Dettagli"
   },
   "errorBoundary": {
     "title": "Oops! Qualcosa è andato storto.",
@@ -620,7 +675,7 @@
   "visits": "Visite",
   "promos": "Promozioni",
   "calendar": "Calendario",
-  "logout": "Disconnettersi",
+  "logout": "Logout",
   "search": "Cerca",
   "notifications": "Notifiche",
   "no_notifications": "Nessuna nuova notifica",
@@ -631,7 +686,7 @@
     "defaultUser": "Utente",
     "chats": "Chat",
     "settings": "Impostazioni",
-    "logout": "Disconnettersi"
+    "logout": "Logout"
   },
   "auth": {
     "signIn": "Accedi",
@@ -690,7 +745,7 @@
     "serverUnreachable": "Impossibile raggiungere il server, riprova più tardi"
   },
   "movementDetails": {
-    "id": "ID Elenco",
+    "id": "ID Lista",
     "dateOfOrder": "Data dell'Ordine",
     "title": "Dettagli del Movimento",
     "expand": "Espandi dettagli",
@@ -762,7 +817,6 @@
     "lastSoldDateUnknown": "Ultima Data di Vendita Sconosciuta",
     "promoIssuedBy": "Emesso da",
     "visitFor": "Visita per {{resultName}}"
-
   },
   "promoDetails": {
     "notFound": "Dettagli della promo non trovati."
@@ -922,17 +976,42 @@
     "cancelButton": "Annulla",
     "cannotDeleteYourself": "Non puoi eliminare la tua stessa entità.",
     "cannotDeleteClient": "Non è possibile eliminare le entità Cliente.",
-    "noEntitySelected": "Nessuna entità selezionata per l'eliminazione."
+    "noEntitySelected": "Nessuna entità selezionata per l'eliminazione.",
+    "entityIdUndefined": "ID dell'entità non definito",
+    "deleteAgentSuccess": "Agente eliminato con successo",
+    "deleteAdminSuccess": "Amministratore eliminato con successo",
+    "deleteEmployeeSuccess": "Dipendente eliminato con successo",
+    "unknownEntityType": "Tipo di entità sconosciuto",
+    "deleteSuccess": "Entità eliminata con successo",
+    "deleteFailed": "Impossibile eliminare l'entità",
+    "createAgentSuccess": "Agente creato con successo",
+    "createAdminSuccess": "Amministratore creato con successo",
+    "createEmployeeSuccess": "Dipendente creato con successo",
+    "createSuccess": "Entità creata con successo",
+    "createFailed": "Impossibile creare l'entità",
+    "updateAgentSuccess": "Agente aggiornato con successo",
+    "updateAdminSuccess": "Amministratore aggiornato con successo",
+    "updateEmployeeSuccess": "Dipendente aggiornato con successo",
+    "updateSuccess": "Entità aggiornata con successo",
+    "updateFailed": "Impossibile aggiornare l'entità",
+    "nameLabel": "Nome"
   },
   "manageUsers": {
     "title": "Gestisci Utenti",
+    "searchPlaceholder": "Cerca utente",
+    "client": "Cliente",
+    "agent": "Agente",
+    "admin": "Amministratore",
+    "employee": "Dipendente",
+    "guest": "Guest",
+    "all": "Tutti",
     "columns": {
       "email": "Email",
       "authType": "Tipo di Autenticazione",
       "emailVerified": "Email Verificata",
       "role": "Ruolo",
-      "entityCode": "Codice Ente",
-      "entityName": "Nome Ente",
+      "entityCode": "Codice Entità",
+      "entityName": "Nome Entità",
       "createdAt": "Creato il"
     },
     "infoTooltip": "Perché un utente possa utilizzare l'app, deve essere assegnato a un ente. Puoi usare la tabella qui sotto per selezionare un utente facendo doppio clic sull'email, e quindi procedere con l'assegnazione dell'ente.",
@@ -951,6 +1030,9 @@
     "name": "Nome",
     "none": "Nessuno"
   },
+  "promoPage": {
+    "startScreen": "Seleziona una promozione dalla barra laterale, o creane una."
+  },
   "userDetails": {
     "goBack": "Torna indietro",
     "selectRole": "Seleziona un nuovo ruolo.",
@@ -968,6 +1050,7 @@
     "entityName": "Nome",
     "entityId": "ID",
     "saveChanges": "Salva",
+    "loadAdminsError": "Impossibile caricare gli amministratori",
     "success": "Modifiche salvate con successo!",
     "error": "Si è verificato un errore. Riprova.",
     "updateSuccess": "Utente aggiornato con successo.",
@@ -978,7 +1061,23 @@
     "updateUnknownErrorToast": "Aggiornamento utente fallito: Si è verificato un errore sconosciuto.",
     "userIdUndefined": "ID Utente non definito.",
     "userIdUndefinedToast": "ID Utente non definito.",
-    "loadAdminsErrror": "Errore nel caricamento degli amministratori. Riprova."
+    "loadAdminsErrror": "Errore nel caricamento degli amministratori. Riprova.",
+    "deleteSuccessToast": "Utente eliminato con successo.",
+    "deleteFailedToast": "Eliminazione dell'utente non riuscita: {{message}}",
+    "deleteUnknownErrorToast": "Eliminazione dell'utente non riuscita: si è verificato un errore sconosciuto.",
+    "alerts": {
+      "success": "Modifiche salvate con successo!",
+      "error": "Si è verificato un errore. Riprova.",
+      "updateSuccess": "Utente aggiornato con successo.",
+      "updateSuccessToast": "Utente aggiornato con successo.",
+      "updateFailed": "Aggiornamento dell'utente non riuscito: {{message}}",
+      "updateFailedToast": "Aggiornamento dell'utente non riuscito: {{message}}",
+      "updateUnknownError": "Aggiornamento dell'utente non riuscito: si è verificato un errore sconosciuto.",
+      "updateUnknownErrorToast": "Aggiornamento dell'utente non riuscito: si è verificato un errore sconosciuto.",
+      "userIdUndefined": "ID utente non definito.",
+      "userIdUndefinedToast": "ID utente non definito.",
+      "loadAdminsErrror": "Caricamento degli admin non riuscito. Riprova."
+    }
   },
   "createVisitForm": {
     "title": "Crea Nuova Visita",
@@ -1104,6 +1203,7 @@
   "visitsTable": {
     "tableAriaLabel": "Tabella delle Visite",
     "type": "Tipo",
+    "clientId":"ID Cliente",
     "reason": "Motivo",
     "date": "Data",
     "completed": "Completata",
@@ -1114,7 +1214,16 @@
     "no": "No",
     "selectVisitError": "Impossibile selezionare la visita.",
     "noVisits": "Nessuna visita trovata.",
-    "unknown": "Sconosciuto"
+    "unknown": "Sconosciuto",
+    "visitType": {
+      "regular": "Regolare",
+      "urgent": "Urgente"
+    },
+    "visitReason": {
+      "issue": "Problema",
+      "routine": "Routine",
+      "newclient": "Nuovo Cliente"
+    }
   },
   "calendarHook": {
     "weekendsNotSelectable": "I fine settimana non sono selezionabili.",
@@ -1263,7 +1372,8 @@
   "webSocketService": {
     "lostConnection": "Connessione al server persa, tentativo di riconnessione in corso...",
     "connectionEstablished": "Connessione al server stabilita.",
-    "connectionLost": "Connessione al server persa, aggiorna la pagina o riprova più tardi."
+    "connectionLost": "Connessione al server persa, aggiorna la pagina o riprova più tardi.",
+    "connected": "Connesso!"
   },
   "dashboard": {
     "welcomeBack": "Bentornato, {{name}}!",
@@ -1289,7 +1399,7 @@
     "salesDistribution": "Distribuzione delle Vendite",
     "upcomingVisits": "Visite in Arrivo",
     "yourCalendar": "Il Tuo Calendario",
-     "SearchTitleAgent": "Cerca clienti",
+    "SearchTitleAgent": "Cerca clienti",
     "SearchTitleAdmin": "Cerca clienti o agenti"
   },
   "articlesPage": {
@@ -1301,12 +1411,13 @@
     "quantitySold": "Quantità Venduta"
   },
   "movementsPage": {
-    "id": "ID Elenco",
+    "id": "ID Lista",
     "clientName": "Cliente",
     "agentName": "Agente",
     "dateOfOrder": "Data",
     "totalQuantity": "Articoli venduti",
-    "totalPriceSold": "Totale"
+    "totalPriceSold": "Totale",
+    "netRevenue": "Netto"
   },
   "status": {
     "pending": "In Sospeso",
@@ -1321,45 +1432,12 @@
     "edit": "Modifica Evento",
     "visit": "Vai alla Visita"
   },
-  "eventHistory": {
-    "title": "Storico Eventi",
-    "headers": {
-      "user": "Utente",
-      "eventType": "Tipo di Evento",
-      "reason": "Motivo",
-      "startDate": "Data Inizio",
-      "endDate": "Data Fine",
-      "status": "Stato",
-      "actions": "Azioni"
-    },
-    "actions": {
-      "na": "N/D"
-    },
-    "toast": {
-      "approveSuccess": "Evento approvato con successo.",
-      "approveFailure": "Impossibile approvare l'evento.",
-      "rejectSuccess": "Evento rifiutato con successo.",
-      "rejectFailure": "Impossibile rifiutare l'evento.",
-      "genericError": "Si è verificato un errore."
-    },
-    "filterSelection": "Selezione filtro",
-    "filterAll": "Tutti",
-    "na": "N/D",
-    "system": "Sistema",
-    "unknown": "Sconosciuto"
-  },
-
   "eventTypes": {
     "absence": "Assenza",
     "holiday": "Vacanza",
     "event": "Evento",
     "visit": "Visita",
     "generic": "Generico"
-  },
-
-
-  "popOverEvent": {
-    "goToVisit": "Vai alla Visita"
   },
   "weather": {
     "0": "Cielo sereno",
@@ -1397,6 +1475,22 @@
     "clickToReload": "Clicca sul pulsante qui sotto per ricaricare l'app e aggiornare all'ultima versione.",
     "reloadButton": "Ricarica",
     "offlineReady": "L'app è pronta per funzionare offline."
+  },
+  "navigation": {
+    "quickNavigation": "Navigazione Rapida",
+    "statistics": "Statistiche",
+    "movements": "Movimenti",
+    "clients": "Clienti",
+    "articles": "Articoli",
+    "visits": "Visite",
+    "promos": "Promozioni",
+    "calendar": "Calendario",
+    "messages": "Messaggi",
+    "settings": "Impostazioni",
+    "logout": "Logout"
+  },
+  "whiteboard": {
+    "companyWhiteboard": "Bacheca Aziendale",
+    "noAdminMessages": "Nessun messaggio disponibile."
   }
-
 }

@@ -1,6 +1,5 @@
 // src/services/movementService.ts
 import Movement, { IMovement } from "../models/Movement";
-import { serverMovement } from "../models/types";
 import { logger } from "../utils/logger"; // Assuming logger is exported from utils/logger.ts
 
 export class MovementService {
@@ -83,7 +82,7 @@ export class MovementService {
    */
   static async replaceMovement(
     numeroLista: number,
-    movementData: serverMovement
+    movementData: IMovement
   ): Promise<{ message: string }> {
     try {
       // Replace all movements with the given Numero Lista
@@ -122,7 +121,7 @@ export class MovementService {
    */
   static async updateMovement(
     numeroLista: number,
-    movementData: Partial<serverMovement>
+    movementData: Partial<IMovement>
   ): Promise<{ message: string }> {
     try {
       // Update all movements with the given Numero Lista

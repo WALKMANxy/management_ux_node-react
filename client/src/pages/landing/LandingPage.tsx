@@ -6,18 +6,17 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React, { memo, useEffect, useState, Suspense } from "react";
+import React, { memo, Suspense, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../../app/store";
 import Loader from "../../components/common/Loader";
 import Spinner from "../../components/common/Spinner";
-const AuthenticationModal = React.lazy(() =>
-  import("../../components/landingPage/AuthenticationModal")
+const AuthenticationModal = React.lazy(
+  () => import("../../components/landingPage/AuthenticationModal")
 );
 const Footer = React.lazy(() => import("../../components/landingPage/Footer"));
-
 
 const preloadDashboard = () => import("../../pages/employee/EmployeeDashboard");
 
@@ -32,14 +31,15 @@ const LandingPage: React.FC = () => {
 
   const isSuperMobile = useMediaQuery("(min-width:0px) and (max-width:420px)");
   const isMobile = useMediaQuery("(min-width:0px) and (max-width:600px)");
+  const isLandscape = useMediaQuery("(orientation: landscape)");
 
   useEffect(() => {
     const timer = setTimeout(() => setShowLoader(false), 1500);
     return () => clearTimeout(timer);
   }, []);
 
-   // Preload the AuthenticationModal and Footer components after the page mounts
-   useEffect(() => {
+  // Preload the AuthenticationModal and Footer components after the page mounts
+  useEffect(() => {
     const preloadComponents = async () => {
       await import("../../components/landingPage/AuthenticationModal");
       await import("../../components/landingPage/Footer");
@@ -63,10 +63,8 @@ const LandingPage: React.FC = () => {
         flex: 1,
         display: "flex",
         flexDirection: "column",
-        mineHeight: "-webkit-fill-available",
         position: "relative",
         overflow: "hidden",
-        flexGrow: 1,
       }}
     >
       {showLoader && <Loader fadeout={!showLoader} />}
@@ -101,7 +99,6 @@ const LandingPage: React.FC = () => {
             sx={{
               width: "100%",
               display: "flex",
-              flexDirection: { xs: "column", md: "row" },
               justifyContent: "center",
               alignItems: "center",
               textAlign: "center",
@@ -110,14 +107,24 @@ const LandingPage: React.FC = () => {
             <Box
               sx={{
                 padding: "1rem",
-                flex: { xs: "0 1 auto", md: "0 1 50%" },
+                flex: {
+                  xs: "0 1 50%",
+                  sm: isLandscape ? "0 1 30%" : "0 1 50%",
+                  md: isLandscape ? "0 1 30%" : "0 1 60%",
+                },
               }}
             >
               <img
                 src="/images/logobig.png"
                 alt="Welcome Logo"
-                style={{ width: "100%", height: "auto" }}
+                style={{
+                  maxWidth: "100%",
+                  width: "auto",
+                  height: "auto",
+                  objectFit: "contain",
+                }}
               />
+
               <Divider sx={{ my: isSuperMobile ? 0.5 : 2 }} />
               <Typography
                 variant="h2"

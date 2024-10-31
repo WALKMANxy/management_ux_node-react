@@ -29,14 +29,14 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { StaticDateTimePicker } from "@mui/x-date-pickers/StaticDateTimePicker";
 import { renderTimeViewClock } from "@mui/x-date-pickers/timeViewRenderers";
 import dayjs, { Dayjs } from "dayjs";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
 import { createVisitAsync } from "../../features/data/dataThunks";
+import { locale } from "../../services/localizer";
 import { showToast } from "../../services/toastMessage";
 import VisitCard from "./VisitCard"; // Import the VisitCard component
-import { locale } from "../../services/localizer";
 
 // Styled IconButton for Send and Cancel actions
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
@@ -65,11 +65,13 @@ const StyledCloseButton = styled(IconButton)(({ theme }) => ({
 interface CreateVisitFormProps {
   clientId: string;
   onClose: () => void;
+  onLoad?: () => void; // Add the onLoad prop
 }
 
 const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
   clientId,
   onClose,
+  onLoad,
 }) => {
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector(
@@ -100,6 +102,12 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
 
   // Confirmation Dialog state
   const [openConfirm, setOpenConfirm] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (onLoad) {
+      onLoad(); // Notify parent that the component has loaded
+    }
+  }, [onLoad]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {

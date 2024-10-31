@@ -26,7 +26,7 @@ router.get("/:id", fetchAdminById);
 router.post("/", createAdmin);
 
 // PUT method to update an existing admin by ID
-router.put("/:id", updateAdmin);
+router.patch("/:id", updateAdmin);
 
 // DELETE method to delete an admin by ID
 router.delete("/:id", deleteAdmin);

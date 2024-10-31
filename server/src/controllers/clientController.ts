@@ -188,9 +188,9 @@ export class ClientController {
       const {
         CODICE,
         "RAGIONE SOCIALE": RAGIONE_SOCIALE,
-        "RAGIONE SOCIALE AGG.": RAGIONE_SOCIALE_AGG,
+        "RAGIONE SOCIALE AGG": RAGIONE_SOCIALE_AGG,
         INDIRIZZO,
-        "C.A.P. - COMUNE (PROV.)": CAP_COMUNE_PROV,
+        "CAP": CAP_COMUNE_PROV,
         TELEFONO,
         EMAIL,
         "EMAIL PEC": EMAIL_PEC,
@@ -224,9 +224,9 @@ export class ClientController {
       const newClientData: IClient = {
         CODICE,
         "RAGIONE SOCIALE": RAGIONE_SOCIALE,
-        "RAGIONE SOCIALE AGG.": RAGIONE_SOCIALE_AGG || "",
+        "RAGIONE SOCIALE AGG": RAGIONE_SOCIALE_AGG || "",
         INDIRIZZO,
-        "C.A.P. - COMUNE (PROV.)": CAP_COMUNE_PROV,
+        "CAP": CAP_COMUNE_PROV,
         TELEFONO,
         EMAIL: EMAIL || "",
         "EMAIL PEC": EMAIL_PEC || "",

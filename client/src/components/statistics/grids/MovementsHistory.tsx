@@ -35,15 +35,16 @@ const MovementsHistory: React.FC<MovementsHistoryProps> = ({ movements }) => {
         sortable: true,
       },
       {
-        headerName: t("movementsHistory.brand"),
-        field: "brand",
-        sortable: true,
-      },
-      {
         headerName: t("movementsHistory.oemId"),
         field: "articleId",
         sortable: true,
       },
+      {
+        headerName: t("movementsHistory.brand"),
+        field: "brand",
+        sortable: true,
+      },
+
       {
         headerName: t("movementsHistory.name"),
         field: "name",

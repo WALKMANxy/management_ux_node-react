@@ -18,6 +18,37 @@ import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
 import { RootState } from "../../app/store";
 
+const preloadCreateVisitForm = () => import("./CreateVisitForm");
+
+// Custom styles for titles and subtitles
+const infoStyles = {
+  title: {
+    fontFamily: "'Open Sans', sans-serif",
+    color: "#4d4b5f",
+    fontSize: "1.1rem",
+    lineHeight: 1.2,
+    fontWeight: 600,
+    marginBottom: "0.5rem",
+  },
+  subtitle: {
+    fontFamily: "'Open Sans', sans-serif",
+    color: "black",
+    fontWeight: 400,
+    fontSize: "0.85rem",
+    lineHeight: 1.4,
+    marginBottom: "0.3rem",
+  },
+  highlight: {
+    fontFamily: "'Open Sans', sans-serif",
+    color: "black",
+    fontSize: "1.1rem",
+    lineHeight: 1.2,
+    fontWeight: 600,
+    marginBottom: "0.5rem",
+  },
+};
+
+
 // Styled IconButton for Actions
 const StyledActionButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
@@ -154,6 +185,7 @@ const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({
             >
               <StyledActionButton
                 onClick={onCreateVisit}
+                onMouseEnter={preloadCreateVisitForm}
                 aria-label={t("clientDetailsCard.createVisit", "Create Visit")}
               >
                 <AirplaneTicketIcon />
@@ -184,32 +216,6 @@ const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({
   );
 };
 
-// Custom styles for titles and subtitles
-const infoStyles = {
-  title: {
-    fontFamily: "'Open Sans', sans-serif",
-    color: "#4d4b5f",
-    fontSize: "1.1rem",
-    lineHeight: 1.2,
-    fontWeight: 600,
-    marginBottom: "0.5rem",
-  },
-  subtitle: {
-    fontFamily: "'Open Sans', sans-serif",
-    color: "black",
-    fontWeight: 400,
-    fontSize: "0.85rem",
-    lineHeight: 1.4,
-    marginBottom: "0.3rem",
-  },
-  highlight: {
-    fontFamily: "'Open Sans', sans-serif",
-    color: "black",
-    fontSize: "1.1rem",
-    lineHeight: 1.2,
-    fontWeight: 600,
-    marginBottom: "0.5rem",
-  },
-};
+
 
 export default ClientDetailsCard;
