@@ -1,5 +1,4 @@
 // src/components/calendarPage/PopOverEvent.tsx
-
 import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -18,9 +17,6 @@ import { CalendarEvent } from "../../models/dataModels";
 import { isNotDefaultTime } from "../../utils/calendarUtils";
 import EventTitle from "./EventTitle";
 
-/**
- * Props for the PopOverEvent component.
- */
 interface PopOverEventProps {
   open: boolean;
   anchorEl: HTMLElement | null;
@@ -29,17 +25,10 @@ interface PopOverEventProps {
   onEdit?: (event: CalendarEvent) => void;
   onDelete?: (event: CalendarEvent) => void;
   onApprove?: (eventId: string) => void; // Added for approving absence
-  onReject?: (eventId: string) => void;  // Added for rejecting absence
+  onReject?: (eventId: string) => void; // Added for rejecting absence
   userRole: string;
 }
 
-/**
- * PopOverEvent Component
- * Displays detailed information about a calendar event in a popover.
- *
- * @param {PopOverEventProps} props - Component props.
- * @returns {JSX.Element} The rendered component.
- */
 const PopOverEvent: React.FC<PopOverEventProps> = ({
   open,
   anchorEl,
@@ -63,9 +52,9 @@ const PopOverEvent: React.FC<PopOverEventProps> = ({
   // Function to handle visit navigation
   const handleGoToVisit = () => {
     if (event.eventType === "visit") {
-      dispatch(selectClient(event.visitClientId!)); // Select client
-      dispatch(selectVisit(event._id!)); // Select visit
-      navigate("/visits"); // Navigate to /visits
+      dispatch(selectClient(event.visitClientId!));
+      dispatch(selectVisit(event._id!));
+      navigate("/visits");
     }
   };
 
@@ -73,7 +62,7 @@ const PopOverEvent: React.FC<PopOverEventProps> = ({
   const handleApprove = () => {
     if (onApprove && event._id) {
       onApprove(event._id);
-      handleClose(new MouseEvent("approve")); // Close popover after action
+      handleClose(new MouseEvent("approve"));
     }
   };
 
@@ -81,7 +70,7 @@ const PopOverEvent: React.FC<PopOverEventProps> = ({
   const handleReject = () => {
     if (onReject && event._id) {
       onReject(event._id);
-      handleClose(new MouseEvent("reject")); // Close popover after action
+      handleClose(new MouseEvent("reject"));
     }
   };
 
@@ -100,8 +89,8 @@ const PopOverEvent: React.FC<PopOverEventProps> = ({
       }}
       PaperProps={{
         sx: {
-          backdropFilter: "blur(10px)", // Frosted glass effect
-          backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent background
+          backdropFilter: "blur(10px)",
+          backgroundColor: "rgba(255, 255, 255, 0.7)",
           borderRadius: "8px",
           padding: 2,
         },
@@ -166,7 +155,12 @@ const PopOverEvent: React.FC<PopOverEventProps> = ({
         )}
 
         {/* Edit, Approve, Reject, and Delete Buttons (Visible based on roles and event types) */}
-        <Stack direction="row" justifyContent={"flex-end"} spacing={2} sx={{ mt: 2 }}>
+        <Stack
+          direction="row"
+          justifyContent={"flex-end"}
+          spacing={2}
+          sx={{ mt: 2 }}
+        >
           {/* Go to Visit Button for Visit Events (Visible for admin, agent, client roles) */}
           {["admin", "agent", "client"].includes(userRole) &&
             event.eventType === "visit" && (
@@ -179,7 +173,7 @@ const PopOverEvent: React.FC<PopOverEventProps> = ({
                     borderRadius: "50%",
                     "&:hover": { bgcolor: "primary.dark" },
                   }}
-                  onClick={handleGoToVisit} // Call handleGoToVisit for visits
+                  onClick={handleGoToVisit}
                 >
                   <AirplaneTicketIcon />
                 </IconButton>
@@ -200,7 +194,7 @@ const PopOverEvent: React.FC<PopOverEventProps> = ({
                       borderRadius: "50%",
                       "&:hover": { bgcolor: "darkgreen" },
                     }}
-                    onClick={handleApprove} // Approve handler
+                    onClick={handleApprove}
                   >
                     <CheckIcon />
                   </IconButton>
@@ -214,7 +208,7 @@ const PopOverEvent: React.FC<PopOverEventProps> = ({
                       borderRadius: "50%",
                       "&:hover": { bgcolor: "darkred" },
                     }}
-                    onClick={handleReject} // Reject handler
+                    onClick={handleReject}
                   >
                     <CloseIcon />
                   </IconButton>

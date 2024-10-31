@@ -1,17 +1,14 @@
 // src/components/dashboard/WhiteboardComponent.tsx
-
 import { Box, Paper, Typography, useMediaQuery } from "@mui/material";
 import React, { useEffect, useMemo, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
+import { selectDownloadedFiles } from "../../features/downloads/downloadedFilesSlice";
 import { selectCurrentUser } from "../../features/users/userSlice";
 import useChatLogic from "../../hooks/useChatsLogic";
+import { useFilePreview } from "../../hooks/useFilePreview";
 import { IMessage } from "../../models/dataModels";
 import RenderMessages from "../chatPage/RenderMessage";
-import { useFilePreview } from "../../hooks/useFilePreview";
-import { selectDownloadedFiles } from "../../features/downloads/downloadedFilesSlice";
-
-// Import translation hook
-import { useTranslation } from "react-i18next";
 
 const WhiteboardComponent: React.FC = () => {
   const { t } = useTranslation();
@@ -89,7 +86,7 @@ const WhiteboardComponent: React.FC = () => {
       sx={{
         p: 2,
         borderRadius: "12px",
-        maxHeight: isMobile ? "550px" : "40dvh", // Adjusted height for better visibility
+        maxHeight: isMobile ? "550px" : "40dvh",
         display: "flex",
         flexDirection: "column",
         bgcolor: "#f5f5f5",
@@ -103,7 +100,7 @@ const WhiteboardComponent: React.FC = () => {
           top: 0,
           bgcolor: "#f5f5f5",
           zIndex: 1,
-          pb: 1, // Padding bottom for separation
+          pb: 1,
         }}
       >
         <Typography variant="h6" gutterBottom>
@@ -117,17 +114,16 @@ const WhiteboardComponent: React.FC = () => {
           flexGrow: 1,
 
           overflowY: "auto",
-          mt: 1, // Margin top for spacing below header
-          pb: 1, // Padding bottom for spacing above the scroll target
-          // Hide scrollbar
+          mt: 1,
+          pb: 1,
           "&.webkitScrollbar": {
             display: "none",
           },
-          msOverflowStyle: "none", // IE and Edge
-          scrollbarWidth: "none", // Firefox
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
         }}
         ref={messagesContainerRef}
-        onClick={handleWhiteboardClick} // Attach click handler
+        onClick={handleWhiteboardClick}
       >
         {broadcastChat && employeeWhiteboardBroadcast.length > 0 ? (
           <RenderMessages

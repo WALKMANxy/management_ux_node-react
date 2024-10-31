@@ -111,6 +111,8 @@ const LandingPage: React.FC = () => {
                   xs: "0 1 50%",
                   sm: isLandscape ? "0 1 30%" : "0 1 50%",
                   md: isLandscape ? "0 1 30%" : "0 1 60%",
+                  lg:  "0 1 60%",
+                  xl:  "0 1 60%",
                 },
               }}
             >

@@ -1,7 +1,7 @@
 // src/components/Weather/ForecastGrid.tsx
-
 import { Box, Grid, useMediaQuery } from "@mui/material";
 import React from "react";
+import { formatDateForecast } from "../../utils/dataUtils";
 import DailyForecast from "./DailyForecast";
 
 type Forecast = {
@@ -18,7 +18,6 @@ type ForecastGridProps = {
 const ForecastGrid: React.FC<ForecastGridProps> = ({ forecast }) => {
   const isDesktop = useMediaQuery("(min-width:786px)");
   const isMobile = useMediaQuery("(min-width:0px) and (max-width:600px)");
-
 
   const numberOfDays = isDesktop ? 14 : 2;
 
@@ -40,7 +39,7 @@ const ForecastGrid: React.FC<ForecastGridProps> = ({ forecast }) => {
         {displayedForecast.map((day) => (
           <Grid item key={day.date}>
             <DailyForecast
-              date={formatDate(day.date)}
+              date={formatDateForecast(day.date)}
               maxTemp={day.maxTemp}
               minTemp={day.minTemp}
               weatherCode={day.weatherCode}
@@ -50,14 +49,6 @@ const ForecastGrid: React.FC<ForecastGridProps> = ({ forecast }) => {
       </Grid>
     </Box>
   );
-};
-
-// Helper function to format date from "YYYY-MM-DD" to "DD/MM"
-const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  return `${day}/${month}`;
 };
 
 export default React.memo(ForecastGrid);

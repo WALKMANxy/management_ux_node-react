@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// ListItemComponent.tsx
+//src/components/visitPage/SidebarList.tsx
 import React from "react";
 import {
   ListItem,
@@ -16,7 +16,7 @@ import StatusIndicatorSidebar from "./StatusIndicatorSidebar";
 
 interface ListItemComponentProps {
   item: Agent | Client;
-  counts?: any; // Define a proper type based on counts structure
+  counts?: any; 
   isSelected: boolean;
   onClick: () => void;
 }

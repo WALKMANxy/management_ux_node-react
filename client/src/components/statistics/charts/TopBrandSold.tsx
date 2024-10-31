@@ -1,3 +1,4 @@
+//src/components/statistics/charts/TopBrandSold.tsx
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
@@ -9,7 +10,6 @@ import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { BrandData } from "../../../models/propsModels";
 
-// Dynamically import PieChartIcon and PieChart
 const PieChartIcon = React.lazy(() => import("@mui/icons-material/PieChart"));
 const PieChart = React.lazy(() =>
   import("@mui/x-charts/PieChart").then((module) => ({
@@ -27,7 +27,6 @@ const TopBrandsSold: React.FC<{
   const { t } = useTranslation();
   const loading = topBrandsData.length === 0;
 
-  // Memoize data transformation
   const data = useMemo(() => {
     return topBrandsData.map((brand) => ({
       label: brand.label,
@@ -75,7 +74,7 @@ const TopBrandsSold: React.FC<{
         sx={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between", // Distributes items to the start and end of the box
+          justifyContent: "space-between", 
           width: "100%",
           mb: 1,
         }}
@@ -171,7 +170,7 @@ const TopBrandsSold: React.FC<{
             sx={{ borderRadius: "12px", mt: 2 }}
           />
         ) : (
-        
+
             <Box
               sx={{
                 display: "flex",

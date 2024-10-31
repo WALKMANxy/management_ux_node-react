@@ -1,5 +1,4 @@
-// src/components/TotalOrder.tsx
-
+//src/components/dashboard/TotalOrders.tsx
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined";
 import {
@@ -35,7 +34,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [timeValue, setTimeValue] = React.useState<boolean>(true); // Initialize with "month" chart
+  const [timeValue, setTimeValue] = React.useState<boolean>(true);
 
   // Get the current month index (0 = January, 1 = February, etc.)
   const currentMonthIndex = useMemo(() => new Date().getMonth(), []);
@@ -101,7 +100,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
               maximumFractionDigits: 0,
             }).format(val),
           title: {
-            formatter: () => "", // Remove the "Total orders:" label
+            formatter: () => "",
           },
         },
       },
@@ -137,7 +136,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
       theme: {
         palette: "palette2",
       },
-      colors: [theme.palette.primary.main, theme.palette.secondary.main], // Assign distinct colors
+      colors: [theme.palette.primary.main, theme.palette.secondary.main],
       legend: {
         position: "top",
         horizontalAlign: "center",
@@ -153,7 +152,6 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
       theme.palette.primary.main,
       theme.palette.secondary.main,
       theme.palette.text.primary,
-      // Removed 't' from dependencies since it's not used inside options anymore
     ]
   );
 
@@ -179,8 +177,8 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
         color: "#000",
         position: "relative",
         overflow: "hidden",
-        minHeight: "250px", // Set a minimum height but allow to grow
-        height: "auto", // Allow the paper to adjust based on content
+        minHeight: "250px",
+        height: "auto",
         "&:after": {
           content: '""',
           position: "absolute",
@@ -205,12 +203,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
       }}
     >
       <Box sx={{ p: 1.5 }}>
-        <Grid
-          container
-          direction="column"
-          sx={{ height: "auto" }} // Allow grid to expand with content
-          wrap="wrap" // Wrap content to avoid overflow
-        >
+        <Grid container direction="column" sx={{ height: "auto" }} wrap="wrap">
           <Grid item>
             <Grid container justifyContent="space-between" alignItems="center">
               <Grid item>
@@ -314,7 +307,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
                   options={options}
                   series={series}
                   type="area"
-                  height={isMobile ? 150 : 150} // Maintain current size
+                  height={isMobile ? 150 : 150}
                 />
               </Grid>
             </Grid>

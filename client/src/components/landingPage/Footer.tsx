@@ -1,4 +1,4 @@
-// Footer.tsx
+//src/components/landingPage/Footer.tsx
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CallIcon from "@mui/icons-material/Call"; // Import the Call icon
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery("(min-width:600px) and (max-width:785px)");
+  const isTablet = useMediaQuery("(min-width:600px) and (max-width:900px)");
   const isSuperMobile = useMediaQuery("(min-width:0px) and (max-width:380px)");
   const handleLogoClick = () => {
     window.scrollTo(0, 0);
@@ -97,7 +97,7 @@ const Footer: React.FC = () => {
                   style={{ height: "40px", marginRight: "16px" }}
                 />
                 <Typography variant="h6" sx={{ color: "#FFFFFF" }}>
-                  #RicambiCentroSud
+                  #RandomCompany
                 </Typography>
               </Box>
             </Grid>
@@ -121,7 +121,11 @@ const Footer: React.FC = () => {
                   sx={{
                     mb: 1,
                     borderBottom: "0.5px solid rgba(176,176,176,0.5)",
-                    fontSize: isSuperMobile ? "0.8rem" : isMobile ? "0.9rem" : "1rem",
+                    fontSize: isSuperMobile
+                      ? "0.8rem"
+                      : isMobile
+                      ? "0.9rem"
+                      : "1rem",
                   }}
                 >
                   {t("footer.about")}
@@ -132,7 +136,11 @@ const Footer: React.FC = () => {
                     cursor: "pointer",
                     mb: 0.5,
                     color: "#b0b0b0",
-                    fontSize: isSuperMobile ? "0.65rem" : isMobile ? "0.75rem" : "0.875rem",
+                    fontSize: isSuperMobile
+                      ? "0.65rem"
+                      : isMobile
+                      ? "0.75rem"
+                      : "0.875rem",
                   }}
                   onClick={() => handleOpenModal("ourStory")}
                 >
@@ -143,7 +151,11 @@ const Footer: React.FC = () => {
                   sx={{
                     cursor: "pointer",
                     color: "#b0b0b0",
-                    fontSize: isSuperMobile ? "0.65rem" : isMobile ? "0.75rem" : "0.875rem",
+                    fontSize: isSuperMobile
+                      ? "0.65rem"
+                      : isMobile
+                      ? "0.75rem"
+                      : "0.875rem",
                   }}
                   onClick={() => handleOpenModal("team")}
                 >
@@ -159,7 +171,11 @@ const Footer: React.FC = () => {
                   sx={{
                     mb: 1,
                     borderBottom: "0.5px solid rgba(176,176,176,0.5)",
-                    fontSize: isSuperMobile ? "0.8rem" : isMobile ? "0.9rem" : "1rem",
+                    fontSize: isSuperMobile
+                      ? "0.8rem"
+                      : isMobile
+                      ? "0.9rem"
+                      : "1rem",
                   }}
                 >
                   {t("footer.hours") || "HOURS"}
@@ -169,14 +185,22 @@ const Footer: React.FC = () => {
                     sx={{
                       mr: 0.5,
                       color: "#b0b0b0",
-                      fontSize: isSuperMobile ? "small" : isMobile ? "medium" : "default",
+                      fontSize: isSuperMobile
+                        ? "small"
+                        : isMobile
+                        ? "medium"
+                        : "default",
                     }}
                   />
                   <Typography
                     variant="body2"
                     sx={{
                       color: "#b0b0b0",
-                      fontSize: isSuperMobile ? "0.65rem" : isMobile ? "0.75rem" : "0.875rem",
+                      fontSize: isSuperMobile
+                        ? "0.65rem"
+                        : isMobile
+                        ? "0.75rem"
+                        : "0.875rem",
                     }}
                   >
                     8:30-13:00
@@ -187,14 +211,22 @@ const Footer: React.FC = () => {
                     sx={{
                       mr: 0.5,
                       color: "#b0b0b0",
-                      fontSize: isSuperMobile ? "small" : isMobile ? "medium" : "default",
+                      fontSize: isSuperMobile
+                        ? "small"
+                        : isMobile
+                        ? "medium"
+                        : "default",
                     }}
                   />
                   <Typography
                     variant="body2"
                     sx={{
                       color: "#b0b0b0",
-                      fontSize: isSuperMobile ? "0.65rem" : isMobile ? "0.75rem" : "0.875rem",
+                      fontSize: isSuperMobile
+                        ? "0.65rem"
+                        : isMobile
+                        ? "0.75rem"
+                        : "0.875rem",
                     }}
                   >
                     15:00-18:30
@@ -210,7 +242,11 @@ const Footer: React.FC = () => {
                   sx={{
                     mb: 1,
                     borderBottom: "0.5px solid rgba(176,176,176,0.5)",
-                    fontSize: isSuperMobile ? "0.8rem" : isMobile ? "0.9rem" : "1rem",
+                    fontSize: isSuperMobile
+                      ? "0.8rem"
+                      : isMobile
+                      ? "0.9rem"
+                      : "1rem",
                   }}
                 >
                   {t("footer.legal")}
@@ -221,7 +257,11 @@ const Footer: React.FC = () => {
                     cursor: "pointer",
                     mb: 0.5,
                     color: "#b0b0b0",
-                    fontSize: isSuperMobile ? "0.65rem" : isMobile ? "0.75rem" : "0.875rem",
+                    fontSize: isSuperMobile
+                      ? "0.65rem"
+                      : isMobile
+                      ? "0.75rem"
+                      : "0.875rem",
                   }}
                   onClick={() => handleOpenModal("privacyPolicy")}
                 >
@@ -232,11 +272,17 @@ const Footer: React.FC = () => {
                   sx={{
                     cursor: "pointer",
                     color: "#b0b0b0",
-                    fontSize: isSuperMobile ? "0.65rem" : isMobile ? "0.75rem" : "0.875rem",
+                    fontSize: isSuperMobile
+                      ? "0.65rem"
+                      : isMobile
+                      ? "0.75rem"
+                      : "0.875rem",
                   }}
                   onClick={() => handleOpenModal("termsOfService")}
                 >
-                  <Trans i18nKey="footer.termsOfService">Terms of Service</Trans>
+                  <Trans i18nKey="footer.termsOfService">
+                    Terms of Service
+                  </Trans>
                 </Typography>
               </Box>
             </Box>
@@ -277,25 +323,37 @@ const Footer: React.FC = () => {
             sx={{ color: "green", mr: -1.2 }}
             aria-label="Call"
           >
-            <CallIcon sx={{ fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null  }} />
+            <CallIcon
+              sx={{
+                fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null,
+              }}
+            />
           </IconButton>
           <IconButton
-            href="mailto:info@ricambicentrosud.com" // Added missing @ in email
+            href="mailto:info@ricambicentrosud.com"
             sx={{ color: "#D44638", mr: -1.4 }}
             aria-label="Email"
           >
-            <MailIcon sx={{ fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null  }} />
+            <MailIcon
+              sx={{
+                fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null,
+              }}
+            />
           </IconButton>
 
           {/* Google Maps IconButton */}
           <IconButton
             href="https://goo.gl/maps/MFy1cqdn3BbQNmtW6"
-            sx={{ color: "#4285F4", mr: -1.3 }} // Added margin for spacing
+            sx={{ color: "#4285F4", mr: -1.3 }}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Google Maps"
           >
-            <FmdGoodIcon sx={{ fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null  }} />
+            <FmdGoodIcon
+              sx={{
+                fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null,
+              }}
+            />
           </IconButton>
 
           {/* Facebook IconButton */}
@@ -306,7 +364,11 @@ const Footer: React.FC = () => {
             rel="noopener noreferrer"
             aria-label="Facebook"
           >
-            <FacebookIcon sx={{ fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null  }} />
+            <FacebookIcon
+              sx={{
+                fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null,
+              }}
+            />
           </IconButton>
 
           {/* Instagram IconButton */}
@@ -317,7 +379,11 @@ const Footer: React.FC = () => {
             rel="noopener noreferrer"
             aria-label="Instagram"
           >
-            <InstagramIcon sx={{ fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null  }} />
+            <InstagramIcon
+              sx={{
+                fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null,
+              }}
+            />
           </IconButton>
 
           {/* LinkedIn IconButton */}
@@ -328,7 +394,11 @@ const Footer: React.FC = () => {
             rel="noopener noreferrer"
             aria-label="LinkedIn"
           >
-            <LinkedInIcon sx={{ fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null }} />
+            <LinkedInIcon
+              sx={{
+                fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null,
+              }}
+            />
           </IconButton>
         </Box>
       </Box>
@@ -348,7 +418,7 @@ const Footer: React.FC = () => {
             height: "100%",
             padding: 2,
           }}
-          onClick={handleCloseModal} // Handle click on the overlay to close modal
+          onClick={handleCloseModal} 
         >
           <Paper
             elevation={3}

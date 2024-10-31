@@ -1,5 +1,4 @@
 // src/components/chatPage/ChatView.tsx
-
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
@@ -92,7 +91,7 @@ const ChatView: React.FC = () => {
   const tooltipContent = (
     <Box>
       {participantsData
-        .filter((user) => user.entityName) // Ensure entityName exists
+        .filter((user) => user.entityName)
         .map((user, index) => (
           <Typography
             key={index}
@@ -119,15 +118,12 @@ const ChatView: React.FC = () => {
 
   // Handle MenuItem clicks
   const handleMenuItemClick = (option: string) => {
-    handleMenuClose(); // Close the menu first
+    handleMenuClose();
 
     if (option === "edit_group" || option === "edit_broadcast") {
       setChatToEdit(currentChat);
       setIsEditChatFormOpen(true);
     }
-
-    // Handle other options like mute, archive_chat, delete_chat as needed
-    // e.g., if (option === "mute") { ... }
   };
 
   // Fallback if currentChat is not set
@@ -142,11 +138,11 @@ const ChatView: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         height: "100dvh",
-        px: isMobile ? 0 : 1, // Remove padding on mobile
+        px: isMobile ? 0 : 1,
         paddingTop: isMobile ? 1 : 0,
         bgcolor: "#ffffff",
-        borderTopRightRadius: 12, // 16px equivalent
-        borderBottomRightRadius: 12, // 16px equivalent
+        borderTopRightRadius: 12,
+        borderBottomRightRadius: 12,
       }}
     >
       {/* Chat Header */}
@@ -155,13 +151,13 @@ const ChatView: React.FC = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          position: "sticky", // Keeps the header at the top
+          position: "sticky",
           top: 0,
           zIndex: 10,
           bgcolor: "#ffffff",
-          flexShrink: 0, // Prevent shrinking
+          flexShrink: 0,
           p: isMobile ? 1 : 2,
-          borderBottom: "1px solid #e0e0e0", // Optional: a border for separation
+          borderBottom: "1px solid #e0e0e0",
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -242,15 +238,15 @@ const ChatView: React.FC = () => {
         elevation={1}
         sx={{
           flexGrow: 1,
-          borderRadius: "1.5em", // Rounded corners for the paper
-          overflowY: "auto", // Enable scrolling for messages
+          borderRadius: "1.5em",
+          overflowY: "auto",
           display: "flex",
           flexDirection: "column",
           "&::webkitScrollbar": {
             display: "none",
           },
           position: "relative",
-          height: "100dvh", // Adjust height based on mobile or desktop
+          height: "100dvh",
         }}
       >
         <Box
@@ -259,7 +255,7 @@ const ChatView: React.FC = () => {
             p: 1,
             bgcolor: "#f9f9f9",
             borderRadius: 6,
-            overflowY: "auto", // Enable scrolling for messages
+            overflowY: "auto",
             display: "flex",
             pb: 10,
 
@@ -272,13 +268,13 @@ const ChatView: React.FC = () => {
           }}
           ref={messagesContainerRef} // Attach the ref from useLoadOlderMessages
         >
-          <div ref={topRef} style={{}}></div> {/* Add this line */}
+          <div ref={topRef} style={{}}></div>
           <RenderMessage
             messages={sortedMessages || []}
             currentUserId={currentUserId}
             chatType={currentChat?.type || "simple"}
             participantsData={participantsData}
-            openFileViewer={openFileViewer} // Pass the function here
+            openFileViewer={openFileViewer}
             downloadAndStoreFile={downloadAndStoreFile}
             handleSave={handleSave}
             downloadedFiles={downloadedFiles}
@@ -290,8 +286,8 @@ const ChatView: React.FC = () => {
       <Box
         sx={{
           mt: isMobile ? -10 : 0,
-          flexShrink: 0, // Prevent shrinking of the input box
-          borderRadius: isMobile ? "0px" : "25px", // Rounded corners for the input box
+          flexShrink: 0,
+          borderRadius: isMobile ? "0px" : "25px",
           zIndex: 10,
           bottom: 0,
           position: "sticky",
@@ -330,9 +326,9 @@ const ChatView: React.FC = () => {
           open={isEditChatFormOpen}
           onClose={() => {
             setIsEditChatFormOpen(false);
-            setChatToEdit(null); // Reset the chat to edit
+            setChatToEdit(null);
           }}
-          chat={chatToEdit} // Pass the chat data to prefill the form
+          chat={chatToEdit}
         />
       )}
     </Box>

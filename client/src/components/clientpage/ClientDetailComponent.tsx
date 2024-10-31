@@ -1,10 +1,10 @@
 // src/components/chatPage/DetailComponent.tsx
-import FingerprintIcon from "@mui/icons-material/Fingerprint";
-import ContactEmergencyIcon from '@mui/icons-material/ContactEmergency';
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import ContactEmergencyIcon from "@mui/icons-material/ContactEmergency";
 import EmailIcon from "@mui/icons-material/Email";
+import FingerprintIcon from "@mui/icons-material/Fingerprint";
 import HomeIcon from "@mui/icons-material/Home";
 import PaymentIcon from "@mui/icons-material/Payment";
 import PersonIcon from "@mui/icons-material/Person";
@@ -13,25 +13,15 @@ import { Box, Grid, Link, Skeleton, Tooltip, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { ClientProp } from "../../models/propsModels";
-import { currencyFormatter } from "../../utils/dataUtils";
+import { currencyFormatter, formatPhoneNumber } from "../../utils/dataUtils";
 
 type DetailValue = string | number | undefined;
 
-/**
- * DetailComponent Props Interface
- */
 interface DetailComponentProps {
   detail: ClientProp["detail"];
   isLoading: boolean;
 }
 
-/**
- * DetailComponent
- * Displays various client details with corresponding icons and formatted values.
- *
- * @param {DetailComponentProps} props - Component props.
- * @returns {JSX.Element} The rendered component.
- */
 const DetailComponent: React.FC<DetailComponentProps> = ({
   detail,
   isLoading,
@@ -85,47 +75,17 @@ const DetailComponent: React.FC<DetailComponentProps> = ({
     agentName: <PersonIcon />,
   };
 
-  /**
-   * Formats the phone number by removing spaces, dots, slashes, and hyphens.
-   *
-   * @param {string} phone - The raw phone number.
-   * @returns {string} The formatted phone number.
-   */
-  const formatPhoneNumber = (phone: string): string => {
-    return phone.replace(/[\s./-]/g, "");
-  };
-
-  /**
-   * Generates a Google Maps search link for a given address.
-   *
-   * @param {string} address - The address to search.
-   * @returns {string} The Google Maps search URL.
-   */
   const getGoogleMapsLink = (address: string): string => {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
       address
     )}`;
   };
 
-  /**
-   * Formats the address by appending the province code.
-   *
-   * @param {string} address - The street address.
-   * @param {string} province - The full province name.
-   * @returns {string} The formatted address.
-   */
   const formatAddress = (address: string, province: string): string => {
     const provinceCode = province.split(" ")[0];
     return `${address}, ${provinceCode}`;
   };
 
-  /**
-   * Renders the value for a given detail key with appropriate formatting and links.
-   *
-   * @param {keyof ClientProp["detail"]} key - The detail key.
-   * @param {DetailValue} value - The detail value.
-   * @returns {React.ReactNode} The rendered value.
-   */
   const renderValue = (
     key: keyof ClientProp["detail"],
     value: DetailValue
@@ -208,8 +168,8 @@ const DetailComponent: React.FC<DetailComponentProps> = ({
       sx={{
         p: 3,
         borderRadius: "30px",
-        background: "rgba(255, 255, 255, 0.7)", // Frosted glass effect
-        backdropFilter: "blur(10px)", // Frosted glass effect
+        background: "rgba(255, 255, 255, 0.7)",
+        backdropFilter: "blur(10px)",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
       }}
     >

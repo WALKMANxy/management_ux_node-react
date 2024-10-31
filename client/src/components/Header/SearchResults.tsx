@@ -1,5 +1,4 @@
 // src/components/SearchResults.tsx
-
 import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
 import LoyaltyIcon from "@mui/icons-material/Loyalty";
 import PersonIcon from "@mui/icons-material/Person";
@@ -13,10 +12,9 @@ import { useTranslation } from "react-i18next";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 import { SearchResultsProps } from "../../models/propsModels";
 
-const ITEM_HEIGHT = 160; // Adjust based on your design
-const MAX_ITEMS_VISIBLE = 5; // Maximum items visible without scrolling
+const ITEM_HEIGHT = 160;
+const MAX_ITEMS_VISIBLE = 5;
 
-// Styled component for type icons at the bottom right
 const TypeIconBox = styled(Box)(({ theme }) => ({
   position: "absolute",
   bottom: theme.spacing(1),
@@ -37,7 +35,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     }
   }, [selectedIndex]);
 
-  // Define the icons based on the result type
   const getTypeIcon = (type: string) => {
     switch (type) {
       case "client":
@@ -59,17 +56,17 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   const getBackgroundColor = (type: string) => {
     switch (type) {
       case "agent":
-        return "rgba(173, 216, 230, 0.1)"; // Light Blue
+        return "rgba(173, 216, 230, 0.1)";
       case "article":
-        return "rgba(255, 165, 0, 0.1)"; // Light Orange
+        return "rgba(255, 165, 0, 0.1)";
       case "promo":
-        return "rgba(144, 238, 144, 0.1)"; // Light Green
+        return "rgba(144, 238, 144, 0.1)";
       case "client":
-        return "rgba(255, 255, 255, 0.1)"; // Light White lmao
+        return "rgba(255, 255, 255, 0.1)";
       case "visit":
-        return "rgba(255, 255, 102, 0.1)"; // Light Yellow
+        return "rgba(255, 255, 102, 0.1)";
       default:
-        return "rgba(255, 255, 255, 1)"; // White
+        return "rgba(255, 255, 255, 1)";
     }
   };
 
@@ -77,10 +74,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     ({ index, style }: ListChildComponentProps) => {
       const result = results[index];
       const isSelected = index === selectedIndex;
-
-      // Handle undefined values gracefully
       const displayId = result.id || t("searchResults.idUnknown");
-
       const displayPhone = result.phone || t("searchResults.phoneUnknown");
       const displayEmail = result.email || t("searchResults.emailUnknown");
       const displayPromoType =
@@ -97,8 +91,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       const displayLastSoldDate = result.lastSoldDate
         ? dayjs(result.lastSoldDate).format("DD/MM/YYYY")
         : t("searchResults.lastSoldDateUnknown");
-
-      // Visit-specific display variables
       const displayDate = result.date
         ? dayjs(result.date).format("DD/MM/YYYY")
         : t("searchResults.dateUnknown");
@@ -216,7 +208,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({
 
               {result.type === "visit" && (
                 <>
-
                   <Typography variant="body2" color="textSecondary" noWrap>
                     {t("searchResults.visitReason")}: {result.name}
                   </Typography>
@@ -242,7 +233,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     [results, selectedIndex, onSelect, t]
   );
 
-  // Calculate the height of the list based on the number of results
   const listHeight = useMemo(() => {
     return results.length < MAX_ITEMS_VISIBLE
       ? results.length * ITEM_HEIGHT

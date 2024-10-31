@@ -46,9 +46,9 @@ const NotificationBell: React.FC = () => {
       showToast.error("Chat ID is missing.");
       return;
     }
-    handleSelectChat(chatId); // Select chat using the handler from the hook
+    handleSelectChat(chatId);
     setAnchorEl(null);
-    navigate("/messages"); // Navigate to the chat view page
+    navigate("/messages");
   };
 
   const handleClose = () => {
@@ -72,7 +72,7 @@ const NotificationBell: React.FC = () => {
           color="secondary"
           sx={{
             "& .MuiBadge-badge": {
-              backgroundColor: unreadChats.length > 0 ? "red" : "inherit", // Set to red if there are unread notifications
+              backgroundColor: unreadChats.length > 0 ? "red" : "inherit",
             },
           }}
         >
@@ -84,7 +84,7 @@ const NotificationBell: React.FC = () => {
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
         onClose={handleClose}
-        disableScrollLock={true} // Prevent scroll lock issues
+        disableScrollLock={true}
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "right",
@@ -95,8 +95,8 @@ const NotificationBell: React.FC = () => {
         }}
         PaperProps={{
           sx: {
-            backdropFilter: "blur(10px)", // Frosted glass effect
-            backgroundColor: "rgba(255, 255, 255, 0.4)", // Semi-transparent background
+            backdropFilter: "blur(10px)",
+            backgroundColor: "rgba(255, 255, 255, 0.4)", 
             borderRadius: "8px",
           },
         }}

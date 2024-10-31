@@ -1,5 +1,4 @@
 // src/components/calendarPage/EventTitle.tsx
-
 import { Box } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -11,17 +10,10 @@ interface EventTitleProps {
   entityName?: string;
 }
 
-/**
- * EventTitle Component
- * Displays the title of a calendar event with an associated icon.
- *
- * @param {EventTitleProps} props - Component props.
- * @returns {JSX.Element} The rendered component.
- */
+
 const EventTitle: React.FC<EventTitleProps> = ({ event, entityName }) => {
   const { t } = useTranslation();
 
-  // Determine the display title based on event type and reason
   let title: React.ReactNode;
 
   if (event.eventType === "event") {

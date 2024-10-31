@@ -11,3 +11,5 @@ export const getUserAgent = (): string => {
 
 // Generates a unique localId using UUID
 export const generateId = () => uuidv4();
+
+

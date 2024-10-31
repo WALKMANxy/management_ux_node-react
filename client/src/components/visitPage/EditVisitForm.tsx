@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/visitPage/EditVisitForm.tsx
-
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
@@ -43,7 +42,6 @@ import { locale } from "../../services/localizer";
 import { showToast } from "../../services/toastMessage";
 import VisitCard from "./VisitCard";
 
-// Styled IconButton for Save and Cancel actions
 const StyledSaveButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.success.main,
   color: theme.palette.common.white,
@@ -55,7 +53,6 @@ const StyledSaveButton = styled(IconButton)(({ theme }) => ({
   height: 48,
 }));
 
-// Styled Cancel Button
 const StyledCancelButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.error.main,
   color: theme.palette.common.white,
@@ -74,20 +71,11 @@ interface EditVisitFormProps {
 
 const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
   const dispatch = useAppDispatch();
-
   const { t } = useTranslation();
-
-  // Retrieve userRole from the Redux store or context
   const userRole = useAppSelector(selectUserRole);
-
-  // Responsive Design
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
-  // Determine if the visit date is in the past
   const isPastVisit = dayjs(visit.date).isBefore(dayjs(), "minute");
-
-  // Form state
   const [date, setDate] = useState<Dayjs | null>(dayjs(visit.date));
   const [notePublic, setNotePublic] = useState<string>(visit.notePublic || "");
   const [notePrivate, setNotePrivate] = useState<string>(
@@ -96,7 +84,6 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
   const [pending, setPending] = useState<boolean>(visit.pending);
   const [completed, setCompleted] = useState<boolean>(visit.completed);
 
-  // Track initial state for change detection and button logic
   const initialState = useMemo(
     () => ({
       date: dayjs(visit.date).toISOString(),
@@ -108,14 +95,12 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
     [visit]
   );
 
-  // Snackbar state
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success"
   );
 
-  // Confirmation Dialog state
   const [openConfirm, setOpenConfirm] = useState<boolean>(false);
 
   // Handle form submission
@@ -193,11 +178,10 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
           error
         );
       }
-      throw error; // Re-throw to handle in the component
+      throw error;
     }
   };
 
-  // Handle Snackbar close
   const handleSnackbarClose = (
     _event?: React.SyntheticEvent | Event,
     reason?: string
@@ -208,31 +192,25 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
     setSnackbarOpen(false);
   };
 
-  // Handle Cancel button click
   const handleCancelClick = () => {
     setOpenConfirm(true);
   };
 
-  // Confirm cancellation
   const handleConfirmCancel = useCallback(() => {
     setOpenConfirm(false);
     onClose();
   }, [onClose]);
 
-  // Deny cancellation
   const handleDenyCancel = useCallback(() => {
     setOpenConfirm(false);
   }, []);
 
-  // Determine if the visit was initially cancelled
   const isVisitInitiallyCancelled =
     initialState.pending === false && initialState.completed === false;
 
-  // Current State Variables
   const isCancelled = !pending && !completed;
   const isCompleted = completed;
 
-  // Button Labels
   const completedButtonLabel = isCompleted
     ? t("editVisitForm.completed", "Completed")
     : t("editVisitForm.markAsCompleted", "Mark as Completed");
@@ -241,12 +219,10 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
     ? t("editVisitForm.cancelled", "Cancelled")
     : t("editVisitForm.markAsCancelled", "Mark as Cancelled");
 
-  // Button Disabled States
   const completedButtonDisabled =
     isCompleted || (isVisitInitiallyCancelled && userRole !== "admin");
   const cancelledButtonDisabled = isCancelled;
 
-  // Event Handlers
   const handleToggleCompleted = useCallback(() => {
     setCompleted(true);
     setPending(false);
@@ -433,7 +409,6 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
 
             {/* Status Buttons and Exclamation Message */}
             <Grid item xs={12}>
-              {/* Exclamation Message */}
               {isPastVisit && pending && !completed && (
                 <Box
                   sx={{
@@ -518,7 +493,6 @@ const EditVisitForm: React.FC<EditVisitFormProps> = ({ visit, onClose }) => {
                 </Button>
               </Box>
             </Grid>
-
             {/* Visit Preview Card */}
             <Grid item xs={12}>
               <VisitCard

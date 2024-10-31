@@ -1,7 +1,5 @@
 // src/app/rootReducer.ts
-
 // Root reducer that combines all slices of state and handles global actions.
-
 import { Action, combineReducers } from "@reduxjs/toolkit";
 import authReducer from "../features/auth/authSlice";
 import { calendarApi } from "../features/calendar/calendarQuery";
@@ -14,10 +12,7 @@ import { userApi } from "../features/users/userQueries";
 import userReducer from "../features/users/userSlice";
 import { weatherApi } from "../features/weather/weatherQuery.ts";
 
-/**
- * Combine all individual reducers into a single app-level reducer.
- * This includes both the slices you defined and API slices created by RTK Query.
- */
+
 const appReducer = combineReducers({
   auth: authReducer,
   search: searchReducer,
@@ -55,10 +50,7 @@ const rootReducer = (
   return appReducer(state as ReturnType<typeof appReducer>, action);
 };
 
-/**
- * Type alias for the state managed by the root reducer.
- * This is useful for type-checking in selectors and other parts of the application.
- */
+
 export type State = ReturnType<typeof rootReducer>;
 
 export default rootReducer;

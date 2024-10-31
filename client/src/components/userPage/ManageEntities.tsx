@@ -1,5 +1,4 @@
 // src/components/userPage/ManageEntities.tsx
-
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -32,7 +31,6 @@ import {
   useTheme,
 } from "@mui/material";
 import "animate.css";
-
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
@@ -50,8 +48,6 @@ interface HeadCell {
   label: string;
   numeric: boolean;
 }
-
-
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
@@ -123,14 +119,11 @@ const ManageEntities: React.FC = () => {
       label: "ID",
       numeric: true,
     },
-    // Actions column will be conditionally rendered
   ];
 
   useEffect(() => {
-    // Update role based on filter selection
     setRole(filter);
-    setSelectedEntity(null); // Reset selected entity on filter change
-    // Reset sorting when filter changes
+    setSelectedEntity(null);
     setOrder("asc");
     setOrderBy("name");
   }, [filter, setRole, setSelectedEntity]);
@@ -311,8 +304,8 @@ const ManageEntities: React.FC = () => {
         sx={{
           boxShadow: "none",
           gap: 2,
-          transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
-          transformOrigin: "top left", // Anchor the scale to the top-left corner
+          transform: isMobile ? "scale(0.75)" : "none",
+          transformOrigin: "top left",
           width: isMobile ? "133.33%" : "100%",
           mb: 2.5,
         }}
@@ -387,7 +380,7 @@ const ManageEntities: React.FC = () => {
         <IconButton
           onClick={handleAddButtonClick}
           color="primary"
-          disabled={filter === "client"} // Disable Add button for Clients
+          disabled={filter === "client"}
           title={
             filter === "client"
               ? t("manageEntities.addDisabled", "Adding Clients is disabled.")
@@ -432,7 +425,7 @@ const ManageEntities: React.FC = () => {
               Array.from({ length: visibleRows }).map((_, index) => (
                 <TableRow
                   key={index}
-                  className="animate__animated animate__fadeOut" // Animate fadeOut when loading
+                  className="animate__animated animate__fadeOut"
                 >
                   <TableCell>
                     <Skeleton variant="text" />
@@ -456,7 +449,7 @@ const ManageEntities: React.FC = () => {
                         ? "rgba(0, 0, 0, 0.08)"
                         : "inherit",
                   }}
-                  className="animate__animated animate__fadeIn" // Animate fadeIn when loaded
+                  className="animate__animated animate__fadeIn"
                 >
                   <TableCell>{entity.name}</TableCell>
                   <TableCell>{entity.id}</TableCell>
@@ -525,7 +518,7 @@ const ManageEntities: React.FC = () => {
                 onClick={confirmDeleteEntity}
                 color="error"
                 aria-label={t("manageEntities.deleteButton", "Delete")}
-                disabled={loadingAction || filter === "client"} // Additional safety
+                disabled={loadingAction || filter === "client"}
               >
                 {loadingAction ? (
                   <CircularProgress size={24} />
@@ -560,7 +553,6 @@ const ManageEntities: React.FC = () => {
         }
         onSave={() => {
           setAddEditModalOpen(false);
-          // Optionally, refetch or update entities after save
         }}
         onCreate={handleCreateEntity}
         onUpdate={handleUpdateEntity}

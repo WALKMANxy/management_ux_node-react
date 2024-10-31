@@ -1,3 +1,4 @@
+//src/components/userPage/AppSettings.tsx
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"; // Import Info Icon
 import {
   Alert,
@@ -15,7 +16,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import React, { useCallback, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next"; // Ensure react-i18next is imported
+import { useTranslation } from "react-i18next";
 import { showToast } from "../../services/toastMessage";
 
 const Section = styled(Paper)(({ theme }) => ({
@@ -128,7 +129,7 @@ const ThemeOptionBox = styled(Box)<{
 });
 
 const AppSettings: React.FC = () => {
-  const { t } = useTranslation(); // Initialize translation
+  const { t } = useTranslation();
 
   // Load initial state from localStorage or default to true
   const [notificationsEnabled, setNotificationsEnabled] = useState(
@@ -216,14 +217,13 @@ const AppSettings: React.FC = () => {
     }
   }, [notificationsEnabled, notificationStatus, t]);
 
-  // Handle Theme Change
+  // Handle Theme Change, placeholder for the actual implementation
   const handleThemeChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       try {
         const newTheme = event.target.value as "light" | "dark" | "auto";
         setThemeChoice(newTheme);
         showToast.success(t(`appSettings.themeChanged`, { theme: newTheme }));
-        // Implement theme change logic here (e.g., update context or global state)
       } catch (error: unknown) {
         if (error instanceof Error) {
           showToast.error(

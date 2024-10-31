@@ -1,5 +1,4 @@
 // src/components/Weather/WeatherComponent.tsx
-
 import {
   Box,
   Divider,
@@ -13,24 +12,21 @@ import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useGeolocation } from "../../hooks/useGeolocation";
 import { getWeatherIcon, isDayTime } from "../../utils/weatherUtils";
-import ForecastGrid from "./ForecastGrid"; // Import the ForecastGrid component
+import ForecastGrid from "./ForecastGrid";
 import { getBackgroundStyles } from "./WeatherBackground";
 
 const WeatherComponent: React.FC = () => {
   const isDesktop = useMediaQuery("(min-width:786px)");
-  // Optionally, you can define isMobile and other breakpoints if needed
 
-  const { t } = useTranslation(); // React i18n hook for translations
+  const { t } = useTranslation();
   const { city, weather, isLoading, error } = useGeolocation("gps");
 
   const isDay = useMemo(() => isDayTime(), []);
 
-  // Memoize background styles to optimize performance
   const backgroundStyles = useMemo(() => {
     if (weather?.weatherCode) {
       return getBackgroundStyles(weather.weatherCode, isDay);
     }
-    // Default styles if weatherCode is not available
     return {
       backgroundColor: "#87CEEB",
       shapes: [],
@@ -67,7 +63,7 @@ const WeatherComponent: React.FC = () => {
           color: "#fff",
           borderRadius: "12px",
           position: "relative",
-          zIndex: 1, // Ensure content is above shapes
+          zIndex: 1,
           height: "100%",
         }}
       >
@@ -98,7 +94,7 @@ const WeatherComponent: React.FC = () => {
               ) : (
                 <>
                   <img
-                    src={getWeatherIcon(weather?.weatherCode || 0)} // Get the appropriate weather icon
+                    src={getWeatherIcon(weather?.weatherCode || 0)}
                     alt="Weather Icon"
                     width={50}
                     height={50}
@@ -129,7 +125,7 @@ const WeatherComponent: React.FC = () => {
                 {isLoading ? (
                   <Skeleton width={120} />
                 ) : (
-                  t(`weather.${weather?.weatherCode || 0}`) // Fetch dynamic weather description
+                  t(`weather.${weather?.weatherCode || 0}`)
                 )}
               </Typography>
             </Grid>
@@ -144,13 +140,12 @@ const WeatherComponent: React.FC = () => {
             mt: 2,
           }}
         />
-
         <Box sx={{ pt: 2 }}>
           <Typography
             variant={isDesktop ? "h5" : "subtitle1"}
             sx={{ textAlign: "left" }}
           >
-            {t('weather.Forecast')}
+            {t("weather.Forecast")}
           </Typography>
           {/* Forecast Section */}
           {!isLoading && weather?.forecast && (

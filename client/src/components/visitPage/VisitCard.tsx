@@ -1,3 +1,4 @@
+//src/components/visitPage/VisitCard.tsx
 import {
   Avatar,
   Box,
@@ -18,14 +19,13 @@ interface VisitCardProps {
   reason: string;
   date: Dayjs | null;
   notePublic: string;
-  notePrivate?: string; // Optional prop for private notes
-  pending: boolean; // Required prop to indicate if the visit is pending
-  completed: boolean; // Required prop to indicate if the visit is completed
-  visitIssuedBy: string; // Required prop to indicate who issued the visit
-  isNew?: boolean; // Optional flag to indicate if this is a new visit
+  notePrivate?: string;
+  pending: boolean;
+  completed: boolean;
+  visitIssuedBy: string;
+  isNew?: boolean;
 }
 
-// Custom styles for titles and subtitles
 const infoStyles = {
   title: {
     fontFamily: "'Open Sans', sans-serif",
@@ -58,17 +58,14 @@ const VisitCard: React.FC<VisitCardProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Use the selector to get the user by ID
   const visitIssuer = useAppSelector((state) =>
     selectUserById(state, visitIssuedBy)
   );
 
-  // Fallback if the user is not found
-  const issuerName = visitIssuer?.entityName || t("visitCard.unknown", "Unknown");
-
+  const issuerName =
+    visitIssuer?.entityName || t("visitCard.unknown", "Unknown");
   const currentUser = useAppSelector((state) => state.data.currentUserDetails);
-  const userRole = currentUser?.role || "client"; // Default to 'client' if role is not defined
-
+  const userRole = currentUser?.role || "client";
   return (
     <Box sx={{ m: 2 }}>
       <Card
@@ -80,8 +77,8 @@ const VisitCard: React.FC<VisitCardProps> = ({
             : "0 2px 8px rgba(0, 0, 0, 0.1)",
           display: "flex",
           flexDirection: "column",
-          height: "100%", // Ensure the card takes full height
-          bgcolor: isNew ? "#e6f7e6" : "white", // Highlight new visits
+          height: "100%",
+          bgcolor: isNew ? "#e6f7e6" : "white",
         }}
       >
         <CardContent sx={{ flexGrow: 1 }}>
@@ -108,28 +105,30 @@ const VisitCard: React.FC<VisitCardProps> = ({
 
               <Typography sx={infoStyles.subtitle}>
                 {t("visitCard.date", "Date")}:{" "}
-                {date ? date.format("DD/MM/YYYY HH:mm") : t("visitCard.na", "N/A")}
+                {date
+                  ? date.format("DD/MM/YYYY HH:mm")
+                  : t("visitCard.na", "N/A")}
               </Typography>
               <Divider sx={{ m: 1 }} />
 
               <Typography sx={infoStyles.subtitle}>
-                {t("visitCard.note", "Note")}: {notePublic || t("visitCard.na", "N/A")}
+                {t("visitCard.note", "Note")}:{" "}
+                {notePublic || t("visitCard.na", "N/A")}
               </Typography>
               <Divider sx={{ m: 1 }} />
-
               {userRole !== "client" && notePrivate && (
                 <>
                   <Typography sx={infoStyles.subtitle}>
                     {t("visitCard.privateNote", "Private Note")}: {notePrivate}
                   </Typography>
                   <Divider sx={{ my: 1 }} />
-
                 </>
               )}
-
               <Typography sx={infoStyles.subtitle}>
                 {t("visitCard.completed", "Completed")}:{" "}
-                {completed ? t("visitCard.yes", "Yes") : t("visitCard.no", "No")}
+                {completed
+                  ? t("visitCard.yes", "Yes")
+                  : t("visitCard.no", "No")}
               </Typography>
               <Divider sx={{ m: 1 }} />
 

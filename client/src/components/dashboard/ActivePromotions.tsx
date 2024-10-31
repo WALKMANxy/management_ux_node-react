@@ -1,5 +1,4 @@
 // src/components/clientpage/ActivePromotions.tsx
-
 import LoyaltyIcon from "@mui/icons-material/Loyalty";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import Timeline from "@mui/lab/Timeline";
@@ -12,14 +11,15 @@ import TimelineSeparator from "@mui/lab/TimelineSeparator";
 import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import React from "react";
-import { useTranslation } from "react-i18next"; // Ensure useTranslation is imported
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
 import { selectPromos } from "../../features/promoVisits/promoVisitsSelectors";
 import { Promo } from "../../models/dataModels";
+import { formatDate } from "../../utils/dataUtils";
 
 interface ActivePromotionsProps {
-  clientSelected?: string; // Optional prop to filter by selected client
+  clientSelected?: string;
 }
 
 const ActivePromotions: React.FC<ActivePromotionsProps> = ({
@@ -27,12 +27,7 @@ const ActivePromotions: React.FC<ActivePromotionsProps> = ({
 }) => {
   const promos = useAppSelector(selectPromos);
   const navigate = useNavigate();
-  const { t } = useTranslation(); // Initialize translation
-
-  // Function to format the end date without time
-  const formatEndDate = (date: Date | string) => {
-    return dayjs(date).format("DD/MM/YYYY");
-  };
+  const { t } = useTranslation();
 
   // Filter and sort active promotions (non-expired, limited to 5 oldest based on createdAt)
   const activePromos = promos
@@ -54,8 +49,8 @@ const ActivePromotions: React.FC<ActivePromotionsProps> = ({
       // If no clientSelected, return all active promos
       return isPromoActive;
     })
-    .sort((a, b) => dayjs(a.createdAt).diff(dayjs(b.createdAt))) // Sort from oldest to newest
-    .slice(0, 5); // Limit to 5 promos
+    .sort((a, b) => dayjs(a.createdAt).diff(dayjs(b.createdAt)))
+    .slice(0, 5);
 
   // Render Actual Promotions
   const renderPromotions = () => (
@@ -74,7 +69,7 @@ const ActivePromotions: React.FC<ActivePromotionsProps> = ({
               color="text.secondary"
             >
               {t("activePromotions.endsAt", "Ends at")}{" "}
-              {formatEndDate(promo.endDate)}
+              {formatDate(promo.endDate)}
             </TimelineOppositeContent>
             <TimelineSeparator>
               <TimelineConnector />

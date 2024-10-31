@@ -2,9 +2,6 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-
 import {
   Box,
   Collapse,
@@ -15,7 +12,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
 import React, { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -43,18 +42,15 @@ const MovementList: React.FC<MovementListProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Memoized handler for collapsing/expanding the movements list
   const handleCollapseToggle = useCallback(() => {
     setMovementListCollapsed(!isMovementListCollapsed);
   }, [isMovementListCollapsed, setMovementListCollapsed]);
 
-  // Memoized handler for exporting data as CSV
   const handleExportCSV = useCallback(() => {
     exportDataAsCsv();
     handleMenuClose();
   }, [exportDataAsCsv, handleMenuClose]);
 
-  // Memoize filtered movements to prevent unnecessary re-renders
   const memoizedFilteredMovements = useMemo(
     () => filteredMovements,
     [filteredMovements]
@@ -141,12 +137,12 @@ const MovementList: React.FC<MovementListProps> = ({
                   setEndDate(newDate?.toISOString() ?? "")
                 }
                 slotProps={{
-                  actionBar: { hidden: true }, // This hides the toolbar
+                  actionBar: { hidden: true },
                   textField: {
                     sx: {
                       "& .MuiInputBase-root": {
-                        maxHeight: "50px", // Adjust to match TextField height
-                        fontSize: "0.875rem", // Adjust font size if needed
+                        maxHeight: "50px",
+                        fontSize: "0.875rem",
                         maxWidth: "150px",
                       },
                     },
@@ -161,12 +157,12 @@ const MovementList: React.FC<MovementListProps> = ({
                   setStartDate(newDate?.toISOString() ?? "")
                 }
                 slotProps={{
-                  actionBar: { hidden: true }, // This hides the toolbar
+                  actionBar: { hidden: true },
                   textField: {
                     sx: {
                       "& .MuiInputBase-root": {
-                        maxHeight: "50px", // Adjust to match TextField height
-                        fontSize: "0.875rem", // Adjust font size if needed
+                        maxHeight: "50px",
+                        fontSize: "0.875rem",
                         maxWidth: "150px",
                       },
                     },
@@ -200,13 +196,11 @@ const MovementList: React.FC<MovementListProps> = ({
             ref={gridRef}
             columnDefs={memoizedColumnDefs}
             rowData={memoizedFilteredMovements}
-            paginationPageSize={100} // Adjusted to a more manageable number
+            paginationPageSize={100}
             quickFilterText={quickFilterText}
           />
         </Box>
       </Collapse>
-
-      {/* Reference for Movement Details (if needed for scrolling) */}
       <div ref={movementDetailsRef} />
     </Paper>
   );

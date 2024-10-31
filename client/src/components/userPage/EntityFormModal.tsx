@@ -1,5 +1,4 @@
 // src/components/userPage/EntityFormModal.tsx
-
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import {
@@ -14,7 +13,6 @@ import {
   TextField,
   Tooltip,
 } from "@mui/material";
-
 import React, { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -101,8 +99,6 @@ const EntityFormModal: React.FC<EntityFormModalProps> = ({
     },
   });
 
-  // Local state for Agent's clients
-  // Change the type of selectedClients to { id: string; colour?: string }[]
   const [selectedClients, setSelectedClients] = useState<
     { id: string; colour?: string }[]
   >(
@@ -150,7 +146,6 @@ const EntityFormModal: React.FC<EntityFormModalProps> = ({
   }, [entity, entityType, reset]);
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    // Validation: Ensure required fields based on entityType
     if (!data.id || !data.name) {
       showToast.error(
         t(
@@ -165,7 +160,6 @@ const EntityFormModal: React.FC<EntityFormModalProps> = ({
 
     // Construct the new entity object based on entityType
     if (entityType === "admin") {
-      // Type newEntity as Partial<Admin>
       newEntity = {
         id: data.id,
         name: data.name,
@@ -190,14 +184,12 @@ const EntityFormModal: React.FC<EntityFormModalProps> = ({
         })) as ClientReference[],
       };
     } else if (entityType === "employee") {
-      // Type newEntity as Partial<Employee>
       newEntity = {
         id: data.id,
         name: data.name,
         email: data.email || undefined,
       };
     } else {
-      // Handle unknown entityType
       showToast.error(
         t("entityFormModal.unknownEntityType", "Unknown entity type.")
       );

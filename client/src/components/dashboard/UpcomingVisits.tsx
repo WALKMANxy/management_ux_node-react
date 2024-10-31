@@ -1,5 +1,4 @@
-// src/components/UpcomingVisits.tsx
-
+//src/components/dashboard/UpcomingVisits.tsx
 import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
 import {
   Timeline,

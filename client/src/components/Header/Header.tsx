@@ -1,5 +1,4 @@
-// Header.tsx
-
+//src/components/Header/Header.tsx
 import {
   Category as CategoryIcon,
   Close as CloseIcon,
@@ -58,8 +57,8 @@ const Header: React.FC = () => {
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [iconChange, setIconChange] = useState(false);
-  const [showAppBar, setShowAppBar] = useState(true); // New state for showing/hiding AppBar
-  const [lastScrollY, setLastScrollY] = useState(0); // State to track last scroll position
+  const [showAppBar, setShowAppBar] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const userRole = useSelector((state: RootState) => state.auth.role);
@@ -76,10 +75,10 @@ const Header: React.FC = () => {
       const currentScrollY = window.scrollY;
       if (currentScrollY > lastScrollY && currentScrollY > 60) {
         // If scrolling down and past 100px
-        setShowAppBar(false); // Hide AppBar
+        setShowAppBar(false);
       } else if (currentScrollY < lastScrollY) {
         // If scrolling up
-        setShowAppBar(true); // Show AppBar
+        setShowAppBar(true);
       }
       setLastScrollY(currentScrollY);
     };
@@ -128,7 +127,7 @@ const Header: React.FC = () => {
   };
 
   const handleLogoClick = () => {
-    navigate("/dashboard"); // Navigate to the consolidated dashboard
+    navigate("/dashboard");
   };
 
   const renderLinks = () => {
@@ -281,8 +280,8 @@ const Header: React.FC = () => {
           right: "auto",
           left: "auto",
           maxWidth: "100vw",
-          transition: "top 0.3s ease-in-out", // Smooth transition
-          top: showAppBar ? "0" : "-64px", // Hide/show the AppBar based on scroll
+          transition: "top 0.3s ease-in-out",
+          top: showAppBar ? "0" : "-64px", 
         }}
         className="animate__animated animate__fadeInDown"
       >

@@ -1,5 +1,4 @@
 // src/components/articlepage/ArticleDetailComponent.tsx
-
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import FingerprintIcon from "@mui/icons-material/Fingerprint";
 import HomeIcon from "@mui/icons-material/Home";
@@ -26,13 +25,7 @@ interface ArticleDetailComponentProps {
   isLoading: boolean;
 }
 
-/**
- * ArticleDetailComponent
- * Displays various article details with corresponding icons and formatted values.
- *
- * @param {ArticleDetailComponentProps} props - Component props.
- * @returns {JSX.Element} The rendered component.
- */
+
 const ArticleDetailComponent: React.FC<ArticleDetailComponentProps> = ({
   detail,
   isLoading,
@@ -53,7 +46,6 @@ const ArticleDetailComponent: React.FC<ArticleDetailComponentProps> = ({
     unitPrice: t("articleDetails.unitPrice", "Unit Price"),
     priceSold: t("articleDetails.priceSold", "Price Sold"),
     priceBought: t("articleDetails.priceBought", "Price Bought"),
-    // Add more mappings as necessary
   };
 
   // Mapping of detail keys to corresponding icons
@@ -65,26 +57,14 @@ const ArticleDetailComponent: React.FC<ArticleDetailComponentProps> = ({
     unitPrice: <LocalOfferIcon />,
     priceSold: <AttachMoneyIcon />,
     priceBought: <AttachMoneyIcon />,
-    // Add more icons as necessary
   };
 
-  /**
-   * Formats price values to the desired currency format.
-   *
-   * @param {number} value - The price value to format.
-   * @returns {string} The formatted price string.
-   */
+
   const formatPrice = (value: number): string => {
     return currencyFormatter(value);
   };
 
-  /**
-   * Renders the value for a given detail key with appropriate formatting and links.
-   *
-   * @param {keyof ArticleProp["detail"]} key - The detail key.
-   * @param {DetailValue} value - The detail value.
-   * @returns {React.ReactNode} The rendered value.
-   */
+
   const renderValue = (
     key: keyof ArticleProp["detail"],
     value: DetailValue
@@ -106,7 +86,6 @@ const ArticleDetailComponent: React.FC<ArticleDetailComponentProps> = ({
       case "priceSold":
       case "priceBought":
         return formatPrice(Number(value));
-      // Add more cases if specific formatting is needed
       default:
         return value;
     }
@@ -124,8 +103,8 @@ const ArticleDetailComponent: React.FC<ArticleDetailComponentProps> = ({
       sx={{
         p: 3,
         borderRadius: "30px",
-        background: "rgba(255, 255, 255, 0.7)", // Frosted glass effect
-        backdropFilter: "blur(10px)", // Frosted glass effect
+        background: "rgba(255, 255, 255, 0.7)",
+        backdropFilter: "blur(10px)",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
       }}
     >
@@ -134,7 +113,7 @@ const ArticleDetailComponent: React.FC<ArticleDetailComponentProps> = ({
           if (excludedKeys.includes(key)) return null;
 
           const value = detail[key] as DetailValue;
-          const displayKey = keyMap[key] || key; // Use translated key or fallback to the original
+          const displayKey = keyMap[key] || key; 
 
           const displayValue = renderValue(key, value);
 

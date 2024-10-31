@@ -1,4 +1,5 @@
-import GarageIcon from '@mui/icons-material/Garage';
+//src/components/dashboard/TopArticleType.tsx
+import GarageIcon from "@mui/icons-material/Garage";
 import { Avatar, Box, Divider, Grid, Paper, Typography } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -24,12 +25,12 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({
         "&:after, &:before": {
           content: '""',
           position: "absolute",
-          zIndex: 0, // Ensure the bubbles are behind
+          zIndex: 0,
         },
         "&:after": {
           width: 210,
           height: 210,
-          background: "#1e88e5", // Dark Blue
+          background: "#1e88e5",
           borderRadius: "50%",
           top: -85,
           right: -95,
@@ -37,7 +38,7 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({
         "&:before": {
           width: 210,
           height: 210,
-          background: "#90caf9", // Light Blue
+          background: "#90caf9",
           borderRadius: "50%",
           top: -125,
           right: -15,
@@ -53,7 +54,7 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({
                 <Avatar
                   variant="rounded"
                   sx={{
-                    bgcolor: "#1e88e5", // Dark Blue
+                    bgcolor: "#1e88e5",
                     color: "#000",
                     mt: 1,
                   }}
@@ -65,7 +66,7 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({
             <Grid item>
               <Typography
                 sx={{
-                  fontSize: "1.605rem", // Increased by 7%
+                  fontSize: "1.605rem",
                   fontWeight: 500,
                   color: "#000",
                   zIndex: 1,
@@ -74,8 +75,8 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({
               >
                 {t(
                   isAgentSelected
-                    ? "topArticleType.titleAgent" // Translated to "Top Sold"
-                    : "topArticleType.titleClient" // Translated to "Top Bought"
+                    ? "topArticleType.titleAgent"
+                    : "topArticleType.titleClient"
                 )}
               </Typography>
             </Grid>
@@ -88,16 +89,16 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({
                   sx={{
                     fontSize: "1.2rem",
                     fontWeight: 500,
-                    wordBreak: "break-word", // Allows text to wrap to the next line if necessary
+                    wordBreak: "break-word",
                   }}
                 >
                   {article.name} (ID: {article.id})
                 </Typography>
                 <Typography
-                  variant="subtitle2" // Adjusted to use subtitle variant
+                  variant="subtitle2"
                   sx={{
                     color: "#000",
-                    wordBreak: "break-word", // Ensure text wraps within the container
+                    wordBreak: "break-word",
                   }}
                 >
                   {t("topArticleType.amountPurchased")}: {article.quantity}
@@ -105,7 +106,6 @@ const TopArticleType: React.FC<TopArticleTypeProps> = ({
                 {index < articles.length - 1 && (
                   <Divider sx={{ my: 2, borderRadius: "12px" }} />
                 )}{" "}
-                {/* Add a subtle divider between items */}
               </Box>
             ))}
           </Grid>

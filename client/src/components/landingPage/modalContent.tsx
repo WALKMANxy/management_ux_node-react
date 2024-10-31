@@ -1,4 +1,5 @@
-import CloseIcon from "@mui/icons-material/Close"; // Import Close Icon
+//src/components/landingPage/modalContent.tsx
+import CloseIcon from "@mui/icons-material/Close";
 import { Box, Divider, IconButton, Typography } from "@mui/material";
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
@@ -32,11 +33,11 @@ const ModalContent: React.FC<ModalContentProps> = ({ contentKey, onClose }) => {
             {/* Content Parts */}
             <Typography variant="body2" sx={{ textIndent: "2rem", mb: 2 }}>
               <Trans i18nKey="ourStory.content.part1">
-                <strong>Ricambi Centro Sud S.r.l.</strong> operates in the
-                commercial vehicle, bus, truck, and auto parts sectors for
-                diesel and gasoline engines, also dealing with bodywork and
-                industrial, agricultural, maritime, and railway vehicles. Since
-                1995 in Catania, it offers services for choosing and selling the
+                <strong>Random Company</strong> operates in the commercial
+                vehicle, bus, truck, and auto parts sectors for diesel and
+                gasoline engines, also dealing with bodywork and industrial,
+                agricultural, maritime, and railway vehicles. Since 1995 in
+                Catania, it offers services for choosing and selling the
                 products offered with professionalism and competence, meeting
                 the needs of public and private entities, spare parts dealers,
                 pump specialists, mechanics, and electricians.
@@ -60,9 +61,9 @@ const ModalContent: React.FC<ModalContentProps> = ({ contentKey, onClose }) => {
                 manufacturer. The quality of service compared to price, the
                 qualified technical area, and the management/project beyond
                 simple direct sales are the three strong and distinctive points
-                of Ricambi Centro Sud S.r.l. The technical area, equipped with
-                tools and continuous training, promotes the functional network
-                in the area, guaranteeing updates and post-sales assistance to
+                of Random Company The technical area, equipped with tools and
+                continuous training, promotes the functional network in the
+                area, guaranteeing updates and post-sales assistance to
                 customers.
               </Trans>
             </Typography>
@@ -80,8 +81,6 @@ const ModalContent: React.FC<ModalContentProps> = ({ contentKey, onClose }) => {
                 agents by product type and brand.
               </Trans>
             </Typography>
-
-            {/* Add more content parts as needed */}
           </Box>
         );
 
@@ -105,7 +104,7 @@ const ModalContent: React.FC<ModalContentProps> = ({ contentKey, onClose }) => {
             <Typography variant="body2" sx={{ textIndent: "2rem", mb: 2 }}>
               <Trans i18nKey="privacyPolicy.content.part1">
                 <strong>Welcome to RCS NEXT</strong>, a browser-based
-                application provided by Ricambi Centro Sud. We take your privacy
+                application provided byRandom Company We take your privacy
                 seriously and are committed to protecting the data we collect in
                 compliance with GDPR regulations. This privacy policy outlines
                 the types of information we collect, how it is used, and your
@@ -205,10 +204,9 @@ const ModalContent: React.FC<ModalContentProps> = ({ contentKey, onClose }) => {
             <Typography variant="body2" sx={{ textIndent: "2rem", mb: 2 }}>
               <Trans i18nKey="termsOfService.content.part1">
                 <strong>Welcome to RCS NEXT</strong>, a browser-based
-                application operated by Ricambi Centro Sud. By accessing or
-                using our application, you agree to be bound by these terms of
-                service. If you do not agree with these terms, please do not use
-                the app.
+                application operated byRandom Company By accessing or using our
+                application, you agree to be bound by these terms of service. If
+                you do not agree with these terms, please do not use the app.
               </Trans>
             </Typography>
             <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
@@ -253,7 +251,7 @@ const ModalContent: React.FC<ModalContentProps> = ({ contentKey, onClose }) => {
               <Trans i18nKey="termsOfService.content.part9">
                 All content within the RCS NEXT application, including but not
                 limited to text, graphics, and trademarks, is the property of
-                Ricambi Centro Sud. You may not copy, distribute, or create
+                Random Company You may not copy, distribute, or create
                 derivative works without our written consent.
               </Trans>
             </Typography>
@@ -305,7 +303,6 @@ const ModalContent: React.FC<ModalContentProps> = ({ contentKey, onClose }) => {
       case "team":
         return (
           <Box>
-            {/* Example content for the Team modal */}
             <Typography variant="h4" sx={{ mb: 2 }}>
               {t("team.title")}
             </Typography>
@@ -319,14 +316,13 @@ const ModalContent: React.FC<ModalContentProps> = ({ contentKey, onClose }) => {
             />
             <Typography variant="body2" sx={{ textIndent: "2rem", mb: 2 }}>
               <Trans i18nKey="team.content.part1">
-                Our team at Ricambi Centro Sud S.r.l. is composed of dedicated
+                Our team at Random Company is composed of dedicated
                 professionals committed to providing top-notch services and
                 solutions to our clients. With a diverse range of expertise, our
                 team members collaborate seamlessly to ensure customer
                 satisfaction and business growth.
               </Trans>
             </Typography>
-            {/* Add more team-related content as needed */}
           </Box>
         );
 
@@ -338,7 +334,6 @@ const ModalContent: React.FC<ModalContentProps> = ({ contentKey, onClose }) => {
   return (
     <Box>
       {renderContent()}
-      {/* Close Button Positioned at Bottom Right */}
       <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
         <IconButton
           onClick={onClose}
