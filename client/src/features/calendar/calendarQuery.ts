@@ -52,7 +52,7 @@ export const calendarApi = createApi({
   baseQuery: baseQueryWithAxios, // Default to the query with credentials
   tagTypes: ["CalendarEvent"],
   endpoints: (builder) => ({
-    getEventsByMonthForAdmin: builder.query<
+    getEventsByMonth: builder.query<
       CalendarEvent[],
       { year: number; month: number }
     >({
@@ -71,43 +71,18 @@ export const calendarApi = createApi({
           updatedAt: normalizeDate(event.updatedAt),
         }));
       },
-      providesTags: (result) =>
-        result
-          ? result.map(({ _id }) => ({ type: "CalendarEvent", _id }))
-          : ["CalendarEvent"],
+      providesTags: (result) => [
+        // Provide a general tag for the whole list
+        { type: "CalendarEvent", id: "LIST" },
+        // Provide specific tags for each event
+        ...(result?.map(({ _id }) => ({
+          type: "CalendarEvent" as const,
+          id: _id
+        })) ?? []),
+      ],
     }),
 
-    getEventsByStatusAndUser: builder.query<
-      CalendarEvent[],
-      { year: number; month: number }
-    >({
-      query: ({ year, month }) => ({
-        url: `/calendar/events/user`,
-        method: "GET",
-        params: { year, month },
-      }),
-      transformResponse: (response: GetEventsByMonthResponse) => {
-        // Normalize date strings to Date objects
-        return response.map((event) => ({
-          ...event,
-          createdAt: normalizeDate(event.createdAt),
-          startDate: normalizeDate(event.startDate),
-          endDate: normalizeDate(event.endDate),
-          updatedAt: normalizeDate(event.updatedAt),
-        }));
-      },
-      providesTags: (result) => {
-        if (result && Array.isArray(result)) {
-          /*           console.log("User Events Fetched:", result);
-           */ return result.map(
-            ({ _id }) => ({ type: "CalendarEvent", _id: _id } as const)
-          );
-        } else {
-          console.error("No User Events Found or Fetch Failed.");
-          return ["CalendarEvent"];
-        }
-      },
-    }),
+
 
     createEvent: builder.mutation<CalendarEvent, CreateEventPayload>({
       query: (newEvent) => {
@@ -118,19 +93,23 @@ export const calendarApi = createApi({
           data: newEvent,
         };
       },
-      invalidatesTags: ["CalendarEvent"],
+      invalidatesTags: [{ type: "CalendarEvent", id: "LIST" }],
     }),
     updateEventStatus: builder.mutation<
       CalendarEvent,
       UpdateEventStatusPayload
     >({
-      query: ({ eventId, status }) => ({
-        url: `calendar/events/${eventId}/status`,
-        method: "PATCH",
-        data: { status },
-      }),
+      query: ({ eventId, status }) => {
+        console.log("Updating event status:", { eventId, status });
+        return {
+          url: `calendar/events/${eventId}/status`,
+          method: "PATCH",
+          data: { status },
+        };
+      },
       invalidatesTags: (_result, _error, { eventId }) => [
-        { type: "CalendarEvent", _id: eventId },
+        { type: "CalendarEvent", id: "LIST" },
+        { type: "CalendarEvent", id: eventId },
       ],
     }),
     deleteEvent: builder.mutation<{ message: string }, string>({
@@ -139,7 +118,8 @@ export const calendarApi = createApi({
         method: "DELETE",
       }),
       invalidatesTags: (_result, _error, eventId) => [
-        { type: "CalendarEvent", _id: eventId },
+        { type: "CalendarEvent", id: "LIST" },
+        { type: "CalendarEvent", id: eventId },
       ],
     }),
     // Mutation to edit a calendar event
@@ -153,7 +133,8 @@ export const calendarApi = createApi({
         data: data,
       }),
       invalidatesTags: (_result, _error, { eventId }) => [
-        { type: "CalendarEvent", _id: eventId },
+        { type: "CalendarEvent", id: "LIST" },
+        { type: "CalendarEvent", id: eventId },
       ],
     }),
 
@@ -201,8 +182,7 @@ export const calendarApi = createApi({
 });
 
 export const {
-  useGetEventsByMonthForAdminQuery,
-  useGetEventsByStatusAndUserQuery,
+  useGetEventsByMonthQuery,
   useCreateEventMutation,
   useUpdateEventStatusMutation,
   useEditEventMutation, // Newly added

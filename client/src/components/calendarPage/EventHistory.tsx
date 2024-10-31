@@ -7,7 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
 import {
-  Box, // Ensure TablePagination is imported
+  Box,
   Button,
   ButtonGroup,
   IconButton,
@@ -24,7 +24,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import "animate.css"; // Add animate.css for animations
+import "animate.css";
 import dayjs from "dayjs";
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -32,7 +32,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectClient, selectVisit } from "../../features/data/dataSlice";
 import { selectAllUsers } from "../../features/users/userSlice";
-import { useCalendar } from "../../hooks/useCalendar";
+// Removed useCalendar import
 import { CalendarEvent } from "../../models/dataModels";
 import {
   getComparator,
@@ -40,18 +40,30 @@ import {
   getEditButtonStyles,
   isDisabled,
 } from "../../utils/calendarUtils";
-import { EventForm } from "./EventForm";
 
 interface EventHistoryProps {
   events: CalendarEvent[];
   userRole: string;
   handleDeleteEvent: (event: CalendarEvent) => void;
+  handleApproveEvent: (eventId: string) => void; // Added
+  handleRejectEvent: (eventId: string) => void;   // Added
+  handleEditEvent: (event: CalendarEvent) => void; // Added
+  openForm: boolean; // Added
+  handleFormSubmit: (eventData: CalendarEvent) => void; // Added
+  handleFormCancel: () => void; // Added
+  isCreating: boolean; // Added
+  selectedDays: Date[]; // Added
+  isLoading: boolean; // Added
 }
 
 export const EventHistory: React.FC<EventHistoryProps> = ({
   events,
   userRole,
   handleDeleteEvent,
+  handleApproveEvent, // Added
+  handleRejectEvent,  // Added
+  handleEditEvent,    // Added
+  isLoading,          // Added
 }) => {
   const { t } = useTranslation();
 
@@ -63,20 +75,6 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
     dispatch(selectVisit(event._id!)); // Select visit
     navigate("/visits"); // Navigate to /visits
   };
-
-  const {
-    openForm,
-    handleApprove,
-    handleReject,
-    handleFormSubmit,
-    handleFormCancel,
-    isCreating,
-    handleEditEvent, // Exposed edit handler
-    isEditing,
-    editingEvent,
-    selectedDays,
-    isLoading,
-  } = useCalendar();
 
   const getEditButtonTooltip = (event: CalendarEvent) => {
     return isDisabled(event, userRole)
@@ -104,14 +102,13 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
     setPage(newPage);
   };
 
-  // Removed handleChangeRowsPerPage since rowsPerPage is fixed
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Adjusted for MUI theme breakpoints
 
   // Apply filtering
   const filteredEvents = useMemo(() => {
     return events
+      .filter((event) => event.eventType !== "holiday") // Exclude Holiday events
       .filter((event) => {
         if (filter === "All") return true;
         return event.eventType === filter.toLowerCase();
@@ -408,11 +405,12 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                           </Tooltip>
                         )}
                       </>
-                    ) : event.status === "pending" && userRole === "admin" ? (
+                    ) : event.eventType === "absence" && event.status === "pending" ? (
                       <>
+                        {/* Approve and Reject Buttons for Absence Events (Visible only to admin) */}
                         <Tooltip title={t("eventHistoryTooltips.approve")}>
                           <IconButton
-                            onClick={() => handleApprove(event._id!)}
+                            onClick={() => handleApproveEvent(event._id!)}
                             disabled={isLoading}
                             sx={{
                               backgroundColor: "green",
@@ -434,7 +432,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
                         </Tooltip>
                         <Tooltip title={t("eventHistoryTooltips.reject")}>
                           <IconButton
-                            onClick={() => handleReject(event._id!)}
+                            onClick={() => handleRejectEvent(event._id!)}
                             disabled={isLoading}
                             sx={{
                               backgroundColor: "red",
@@ -528,15 +526,8 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
         }}
       />
 
-      <EventForm
-        key={editingEvent ? editingEvent._id : "new-event"}
-        open={openForm}
-        selectedDays={selectedDays}
-        onSubmit={handleFormSubmit}
-        onCancel={handleFormCancel}
-        isSubmitting={isCreating || isEditing}
-        initialData={editingEvent}
-      />
+      {/* EventForm is now controlled by CalendarPage and passed via props */}
+      {/* Removed EventForm from EventHistory */}
     </Paper>
   );
 };

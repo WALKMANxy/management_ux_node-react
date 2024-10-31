@@ -10,24 +10,25 @@ import mongoose from "mongoose";
 import { Server as SocketIOServer } from "socket.io";
 import { config } from "./config/config";
 import { authenticateUser } from "./middlewares/authentication";
+import { csp } from "./middlewares/csp";
 import { setupWebSocket } from "./middlewares/webSocket";
 import adminRoutes from "./routes/admins";
 import agentRoutes from "./routes/agents";
 import authRoutes from "./routes/auth";
 import calendarEventsRoutes from "./routes/calendarEvents"; // Import the new day-off request routes
 import chatRoutes from "./routes/chats"; // Import chat routes
+import citiesRoutes from "./routes/cities";
 import clientRoutes from "./routes/clients";
 import employeeRoutes from "./routes/employees";
+import mediaRoutes from "./routes/media";
 import movementsRoutes from "./routes/movements";
 import oauthRoutes from "./routes/OAuth";
 import promosRoutes from "./routes/promos";
 import usersRoutes from "./routes/users";
 import visitsRoutes from "./routes/visits";
-import citiesRoutes from "./routes/cities";
-import mediaRoutes from "./routes/media";
+import utilsRoutes from "./routes/utils";
 import { errorHandler } from "./utils/errorHandler";
 import { logger, logRequestsIp } from "./utils/logger";
-import { csp } from "./middlewares/csp";
 
 const app = express();
 const PORT = config.port || "3000";
@@ -40,7 +41,7 @@ mongoose
   .catch((err) => logger.error("MongoDB connection error:", { error: err }));
 
 const corsOptions: cors.CorsOptions = {
-  origin: [config.appUrl, 'https://rcsnext.com'],
+  origin: [config.appUrl, "https://rcsnext.com"],
   credentials: true,
   optionsSuccessStatus: 200,
 };
@@ -61,6 +62,13 @@ const limiter = rateLimit({
 });
 
 app.use(limiter);
+
+
+// Data Scrambling utility routes.
+
+ app.use("/utils", utilsRoutes);
+
+
 
 // Public routes
 app.use("/auth", authRoutes);

@@ -47,6 +47,12 @@ export const dataSlice = createSlice({
     selectVisit(state, action: PayloadAction<string>) {
       state.selectedVisitId = action.payload;
     },
+    clearSelectedClient(state) {
+      state.selectedClientId = null;
+    },
+    clearSelectedAgent(state) {
+      state.selectedAgentId = null;
+    },
     clearSelectedVisit(state) {
       state.selectedVisitId = null;
     },
@@ -309,6 +315,8 @@ export const {
   selectAgent,
   selectPromo,
   selectVisit,
+  clearSelectedClient,
+  clearSelectedAgent,
   clearSelectedPromo,
   clearSelectedVisit,
   setCurrentUserVisits,

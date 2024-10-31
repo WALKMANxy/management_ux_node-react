@@ -1,4 +1,4 @@
-// pages/CalendarPage.tsx
+// src/pages/CalendarPage.tsx
 
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import ViewListIcon from "@mui/icons-material/ViewList";
@@ -11,7 +11,7 @@ import {
   useTheme,
 } from "@mui/material";
 import "animate.css"; // Add animate.css
-import React, { Fragment, memo, useEffect, useState } from "react";
+import React, { Fragment, memo, Suspense, useEffect, useState } from "react";
 import { Calendar } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useTranslation } from "react-i18next";
@@ -33,13 +33,14 @@ import "./CalendarPage.css"; // Import the CSS file
 const EventHistory = React.lazy(
   () => import("../../components/calendarPage/EventHistory")
 );
+
 const CalendarPage: React.FC = () => {
   const { t } = useTranslation();
 
   const {
     viewMode,
     openForm,
-    serverEvents,
+    serverEvents, // Now directly reflects combined events
     isServerLoading,
     serverError,
     handleSelectSlot,
@@ -60,6 +61,8 @@ const CalendarPage: React.FC = () => {
     editingEvent,
     handleEventPopoverClose,
     selectedDays,
+    handleApprove,
+    handleReject,
   } = useCalendar();
 
   const { holidayEvents, isHolidaysLoading, holidaysError } =
@@ -244,16 +247,26 @@ const CalendarPage: React.FC = () => {
             px: isMobile ? 0.5 : 0,
           }}
         >
-          <React.Suspense fallback={<Loader fadeout />}>
+          <Suspense fallback={<Loader fadeout />}>
             <EventHistory
               events={displayEvents}
               userRole={userRole!}
               handleDeleteEvent={handleDeleteEventWithConfirmation}
+              handleApproveEvent={handleApprove} // Passed as prop
+              handleRejectEvent={handleReject} // Passed as prop
+              handleEditEvent={handleEditEvent} // Passed as prop
+              openForm={openForm} // Passed as prop
+              handleFormSubmit={handleFormSubmit} // Passed as prop
+              handleFormCancel={handleFormCancel} // Passed as prop
+              isCreating={isCreating} // Passed as prop
+              selectedDays={selectedDays} // Passed as prop
+              isLoading={isLoading} // Passed as prop
             />
-          </React.Suspense>
+          </Suspense>
         </Box>
       )}
 
+      {/* EventForm is now controlled by CalendarPage */}
       <EventForm
         key={editingEvent ? editingEvent._id : "new-event"}
         open={openForm}
@@ -274,6 +287,8 @@ const CalendarPage: React.FC = () => {
           userRole={userRole!}
           onEdit={handleEditEvent} // Connect to edit handler
           onDelete={handleDeleteEventWithConfirmation} // Connect to delete handler with confirmation
+          onApprove={handleApprove} // Connect to approve handler
+          onReject={handleReject} // Connect to reject handler
         />
       )}
       {/* Confirm Delete Dialog */}

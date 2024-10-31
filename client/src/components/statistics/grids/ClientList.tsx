@@ -9,7 +9,6 @@ import {
   Menu,
   MenuItem,
   Paper,
-  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -20,10 +19,6 @@ import AGGridTable from "./AGGridTable";
 
 const ClientList: React.FC<ClientListProps> = ({
   quickFilterText,
-  startDate,
-  setStartDate,
-  endDate,
-  setEndDate,
   filteredClients,
   columnDefs,
   gridRef,
@@ -115,28 +110,6 @@ const ClientList: React.FC<ClientListProps> = ({
                 flex: 1,
               }}
             >
-              <TextField
-                type="date"
-                label={t("clientList.startDate")}
-                InputLabelProps={{ shrink: true }}
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                fullWidth={isMobile}
-                InputProps={{
-                  "aria-label": t("clientList.startDateAriaLabel"),
-                }}
-              />
-              <TextField
-                type="date"
-                label={t("clientList.endDate")}
-                InputLabelProps={{ shrink: true }}
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                fullWidth={isMobile}
-                InputProps={{
-                  "aria-label": t("clientList.endDateAriaLabel"),
-                }}
-              />
               <Tooltip title={t("clientList.options")}>
                 <IconButton
                   onClick={handleMenuOpen}

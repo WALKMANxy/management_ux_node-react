@@ -141,11 +141,18 @@
   },
   "salesDistribution": {
     "title": "Sales Distribution",
-    "revenue": "Revenue",
+    "revenue": "",
     "viewClients": "View Clients",
     "viewAgents": "View Agents",
     "clients": "Clients",
-    "agents": "Agents"
+    "agents": "Agents",
+    "expense": ""
+  },
+  "visitsPage": {
+    "VisitsContainer": "Visits",
+    "ClientDetailsContainer": "Client Details",
+    "visitsHistory": "Visits History"
+
   },
   "topBrandsSold": {
     "titleAgent": "Top Brands Sold",
@@ -251,7 +258,8 @@
     "New Client": "New Client",
     "unexpected_event": "Unexpected Event",
     "company_meeting": "Company Meeting",
-    "medical_visit": "Medical Visit"
+    "medical_visit": "Medical Visit",
+    "company_holiday": "Company Holiday"
   },
   "confirmDialog": {
     "cancel": "Cancel",
@@ -272,7 +280,19 @@
 
   "articleDetails": {
     "title": "Article Details",
-    "noHistory": "No history available"
+    "noHistory": "No history available.",
+    "noArticleSelected": "No article selected.",
+    "id": "Article ID",
+    "name": "Name",
+    "brand": "Brand",
+    "quantity": "Quantity",
+    "unitPrice": "Unit Price",
+    "priceSold": "Price Sold",
+    "priceBought": "Price Bought",
+    "expandTooltip": "Expand details",
+    "collapseTooltip": "Collapse details",
+    "expand": "Expand details",
+    "collapse": "Collapse details"
   },
   "calendarEvent": {
     "unknown": "Unknown",
@@ -301,7 +321,7 @@
     }
   },
   "eventForm": {
-    "title": "Create New Event",
+    "title": "Create Event",
     "editTitle": "Edit Event",
     "titleMarkAbsence": "Mark Absence",
     "labels": {
@@ -309,38 +329,39 @@
       "endTime": "End Time",
       "eventType": "Event Type",
       "reason": "Reason",
-      "note": "Note (Optional)",
+      "note": "Note",
       "cancel": "Cancel",
       "create": "Create"
     },
     "options": {
       "absence": "Absence",
-      "event": "Event",
-      "holiday": "Holiday"
+      "event": "Event"
     },
     "reasons": {
       "illness": "Illness",
       "day_off": "Day Off",
       "unexpected_event": "Unexpected Event",
       "medical_visit": "Medical Visit",
-      "public_holiday": "Public Holiday",
-      "company_holiday": "Company Holiday",
+      "generic": "Generic",
       "company_meeting": "Company Meeting",
       "company_party": "Company Party",
       "conference": "Conference",
       "expo": "Expo",
-      "generic": "Generic"
-    },
-    "validation": {
-      "startTimeRequired": "Start time is required",
-      "endTimeRequired": "End time is required",
-      "eventTypeRequired": "Event type is required",
-      "reasonRequired": "Reason is required",
-      "dateTooFar": "You can't pick an absence date further than two months from today. Please, select an absence date before {{date}}."
+      "company_holiday": "Company Holiday"
     },
     "tooltips": {
-      "cancel": "Cancel",
-      "create": "Create Event"
+      "cancel": "Cancel the form",
+      "create": "Submit the form"
+    },
+    "validation": {
+      "startTimeRequired": "Start time is required.",
+      "endTimeRequired": "End time is required.",
+      "eventTypeRequired": "Event type is required.",
+      "reasonRequired": "Reason is required.",
+      "dateTooFar": "The selected date is too far in the future. Please select a date before {{date}}.",
+      "startAfterEnd": "Start date must be before the end date.",
+      "endBeforeStart": "End date must be after the start date.",
+      "durationTooLong": "Event duration cannot exceed two weeks."
     },
     "eventHistory": {
       "title": "Event History",
@@ -436,7 +457,9 @@
     "delete": "Delete Event",
     "status": "Status",
     "startsAt": "Starts At",
-    "endsAt": "Ends At"
+    "endsAt": "Ends At",
+    "goToVisit": "Go to Visit",
+    "noNote": "No notes available."
   },
   "eventTypes": {
     "absence": "Absence",
@@ -458,12 +481,20 @@
     "tooltips": {
       "refreshContacts": "Refresh Contacts",
       "showChats": "Show Chats",
-      "showContacts": "Show Contacts"
+      "showContacts": "Show Contacts",
+      "createChat": "Create Chat"
     },
     "placeholders": {
       "searchChats": "Search chats...",
       "searchContacts": "Search contacts..."
     }
+  },
+  "activityOverview": {
+    "title": "{{type}} - Agent: {{agent}}",
+    "details": "{{reason}} - Client: {{clientId}}",
+    "saleTitle": "Sale",
+    "saleDetails": "Client: {{clientId}}, {{clientName}} - Revenue: {{revenue}}",
+    "orderDate": "Order Date: {{orderDate}}"
   },
   "chatView": {
     "labels": {
@@ -602,13 +633,23 @@
   },
   "upcomingVisits": {
     "title": "Upcoming Visits",
-    "visitType": "Type",
-    "visitReason": "Reason",
-    "clientId": "Client ID",
     "noProgrammedVisits": "No upcoming visits scheduled.",
-    "viewDetails": "View Details",
     "viewAllVisits": "View All Visits",
-    "iconAlt": "Upcoming Visits Icon"
+    "iconAlt": "Upcoming Visits Icon",
+    "visitTypeLabel": "Visit Type",
+    "visitType": {
+      "regular": "Regular",
+      "urgent": "Urgent"
+    },
+    "visitReasonLabel": "Visit Reason",
+    "visitReason": {
+      "issue": "Issue",
+      "routine": "Routine",
+      "newclient": "New Client"
+    },
+    "clientId": "Client ID",
+    "na": "N/A",
+    "viewDetails": "View Details"
   },
   "errorBoundary": {
     "title": "Oops! Something went wrong.",
@@ -977,6 +1018,9 @@
     "name": "Name",
     "none": "None"
   },
+  "promoPage": {
+    "startScreen": "Please select a promo from the sidebar or create a new one."
+  },
   "userDetails": {
     "goBack": "Go back",
     "selectRole": "Select a new role.",
@@ -1006,6 +1050,9 @@
     "userIdUndefinedToast": "User ID is undefined.",
     "loadAdminsErrror": "Failed to load admins. Please try again.",
     "loadAdminsError": "Failed to load admins",
+    "deleteSuccessToast": "User deleted successfully.",
+    "deleteFailedToast": "Failed to delete user: {{message}}",
+    "deleteUnknownErrorToast": "Failed to delete user: An unknown error occurred.",
     "alerts": {
       "success": "Changes saved successfully!",
       "error": "An error occurred. Please try again.",
@@ -1145,6 +1192,7 @@
   "visitsTable": {
     "tableAriaLabel": "Visits Table",
     "type": "Type",
+    "clientId": "Client ID",
     "reason": "Reason",
     "date": "Date",
     "completed": "Completed",
@@ -1155,7 +1203,16 @@
     "no": "No",
     "selectVisitError": "Unable to select visit.",
     "noVisits": "No visits found.",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "visitType": {
+      "regular": "Regular",
+      "urgent": "Urgent"
+    },
+    "visitReason": {
+      "issue": "Issue",
+      "routine": "Routine",
+      "newclient": "New Client"
+    }
   },
   "calendarHook": {
     "weekendsNotSelectable": "Weekends are not selectable.",
@@ -1349,7 +1406,8 @@
     "agentName": "Agent",
     "dateOfOrder": "Date",
     "totalQuantity": "Items sold",
-    "totalPriceSold": "Total"
+    "totalPriceSold": "Total",
+    "netRevenue": "Net"
   },
   "status": {
     "pending": "Pending",

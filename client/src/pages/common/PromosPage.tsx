@@ -19,6 +19,7 @@ import SkeletonView from "../../components/promosPage/SkeletonView";
 import { selectCurrentUser } from "../../features/users/userSlice";
 import useLoadingData from "../../hooks/useLoadingData";
 import usePromos from "../../hooks/usePromos";
+import { t } from "i18next";
 
 // Lazy load other components
 const CreatePromoForm = React.lazy(
@@ -275,7 +276,7 @@ const PromosPage: React.FC = () => {
               </Box>
             ) : isMobile ? null : (
               <Typography variant="h6" sx={{ mt: 2 }}>
-                Please select a promo from the sidebar or create a new one.
+                {t("promoPage.startScreen")}
               </Typography>
             )}
           </Suspense>

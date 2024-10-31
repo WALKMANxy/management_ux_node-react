@@ -44,6 +44,28 @@ export const VisitItem: React.FC<VisitItemProps> = ({
     }).format(time);
   };
 
+  /**
+   * Generates a translation key for visit type.
+   *
+   * @param {string} type - The visit type.
+   * @returns {string} - The translation key.
+   */
+  const getVisitTypeTranslation = (type: string): string => {
+    return t(`upcomingVisits.visitType.${type.toLowerCase()}`, type);
+  };
+
+  /**
+   * Generates a translation key for visit reason.
+   *
+   * @param {string} reason - The visit reason.
+   * @returns {string} - The translation key.
+   */
+  const getVisitReasonTranslation = (reason: string): string => {
+    // Remove spaces and convert to lowercase to match translation keys
+    const key = reason.replace(/\s+/g, "").toLowerCase();
+    return t(`upcomingVisits.visitReason.${key}`, reason);
+  };
+
   return (
     <TimelineItem>
       {/* Opposite Content: Visit Date and Time */}
@@ -76,7 +98,10 @@ export const VisitItem: React.FC<VisitItemProps> = ({
             wordBreak: "break-word", // Prevent overflow
           }}
         >
-          {t("upcomingVisits.visitType", "Visit Type")}: {visit.type}
+          {t("upcomingVisits.visitTypeLabel", "Visit Type")}:{" "}
+          {visit.type
+            ? getVisitTypeTranslation(visit.type)
+            : t("upcomingVisits.na", "N/A")}
         </Typography>
 
         {/* Visit Reason */}
@@ -87,7 +112,10 @@ export const VisitItem: React.FC<VisitItemProps> = ({
             wordBreak: "break-word",
           }}
         >
-          {t("upcomingVisits.visitReason", "Visit Reason")}: {visit.visitReason}
+          {t("upcomingVisits.visitReasonLabel", "Visit Reason")}:{" "}
+          {visit.visitReason
+            ? getVisitReasonTranslation(visit.visitReason)
+            : t("upcomingVisits.na", "N/A")}
         </Typography>
 
         {/* Client ID */}
