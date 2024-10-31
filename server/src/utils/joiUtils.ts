@@ -34,12 +34,6 @@ export const createEventSchema = Joi.object({
           .required(),
       },
       {
-        is: "holiday",
-        then: Joi.string()
-          .valid("public_holiday", "company_holiday", "religious_holiday")
-          .required(),
-      },
-      {
         is: "event",
         then: Joi.string()
           .valid(
@@ -47,7 +41,8 @@ export const createEventSchema = Joi.object({
             "company_party",
             "conference",
             "expo",
-            "generic"
+            "generic",
+            "company_holiday"
           )
           .required(),
       },

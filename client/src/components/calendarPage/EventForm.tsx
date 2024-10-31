@@ -15,24 +15,26 @@ import {
   Select,
   TextField,
   Tooltip,
+  Alert, // Import Alert
 } from "@mui/material";
 import {
   DateTimePicker,
   LocalizationProvider,
+  renderDateViewCalendar,
   renderTimeViewClock,
 } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { selectUserRole } from "../../features/auth/authSlice";
 import { CalendarEvent } from "../../models/dataModels";
 import { CreateEventPayload } from "../../models/propsModels";
+import { locale } from "../../services/localizer";
 import { showToast } from "../../services/toastMessage";
 import { getTwoMonthsFromNow } from "../../utils/dataUtils";
-import { locale } from "../../services/localizer";
 
 interface EventFormProps {
   open: boolean;
@@ -43,7 +45,8 @@ interface EventFormProps {
   initialData?: CalendarEvent | null; // For editing
 }
 
-const reasonOptions: Record<"absence" | "event" | "holiday", string[]> = {
+// Updated reasonOptions: Removed 'holiday' and added 'company_holiday' under 'event'
+const reasonOptions: Record<"absence" | "event", string[]> = {
   absence: [
     "illness",
     "day_off",
@@ -51,8 +54,14 @@ const reasonOptions: Record<"absence" | "event" | "holiday", string[]> = {
     "medical_visit",
     "generic",
   ],
-  event: ["company_meeting", "company_party", "conference", "expo", "generic"],
-  holiday: ["company_holiday"],
+  event: [
+    "company_meeting",
+    "company_party",
+    "conference",
+    "expo",
+    "generic",
+    "company_holiday",
+  ],
 };
 
 export const EventForm: React.FC<EventFormProps> = ({
@@ -66,12 +75,16 @@ export const EventForm: React.FC<EventFormProps> = ({
   const { t } = useTranslation();
   const userRole = useSelector(selectUserRole);
 
+  const isInitialMount = useRef(true);
+
   const {
     control,
     handleSubmit,
     watch,
     reset,
     setValue,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<CreateEventPayload>({
     defaultValues: {
@@ -87,8 +100,12 @@ export const EventForm: React.FC<EventFormProps> = ({
   });
 
   const eventType = watch("eventType");
+  const startDate = watch("startDate");
+  const endDate = watch("endDate");
 
-  // Reset form when it's opened
+  // State for form-level errors
+  const [formError, setFormError] = useState<string | null>(null);
+
   useEffect(() => {
     if (open) {
       const twoMonthsFromNow = getTwoMonthsFromNow();
@@ -120,14 +137,53 @@ export const EventForm: React.FC<EventFormProps> = ({
       });
 
       setValue("eventType", eventTypeValue as CreateEventPayload["eventType"]);
+
+      // Reset the initial mount flag when the form is opened
+      isInitialMount.current = true;
     }
   }, [open, reset, userRole, selectedDays, onCancel, t, initialData, setValue]);
 
+  // Reset reason field whenever eventType changes, but skip the initial mount
   useEffect(() => {
-    if (eventType === "holiday") {
-      setValue("reason", "company_holiday");
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+    } else {
+      setValue("reason", ""); // Reset to empty or a default value if needed
     }
   }, [eventType, setValue]);
+
+  // Cross-field validation for startDate and endDate
+  useEffect(() => {
+    if (startDate && endDate) {
+      const start = dayjs(startDate);
+      const end = dayjs(endDate);
+
+      if (start.isAfter(end)) {
+        setFormError(t("eventForm.validation.startAfterEnd"));
+        setError("startDate", {
+          type: "manual",
+          message: t("eventForm.validation.startAfterEnd"),
+        });
+        setError("endDate", {
+          type: "manual",
+          message: t("eventForm.validation.endBeforeStart"),
+        });
+      } else {
+        // Maximum duration validation: 2 weeks
+        const maxDuration = dayjs(startDate).add(2, "week");
+        if (end.isAfter(maxDuration)) {
+          setFormError(t("eventForm.validation.durationTooLong"));
+          setError("endDate", {
+            type: "manual",
+            message: t("eventForm.validation.durationTooLong"),
+          });
+        } else {
+          setFormError(null);
+          clearErrors(["startDate", "endDate"]);
+        }
+      }
+    }
+  }, [startDate, endDate, setError, clearErrors, t]);
 
   const handleFormSubmit = (data: CreateEventPayload) => {
     const formattedStartDate = dayjs(data.startDate).toDate();
@@ -154,14 +210,21 @@ export const EventForm: React.FC<EventFormProps> = ({
         }}
       >
         <DialogTitle>
-          {
-            initialData
-              ? t("eventForm.editTitle") // Use editTitle if initialData exists
-              : userRole === "admin"
-              ? t("eventForm.title") // Default title for admin
-              : t("eventForm.titleMarkAbsence") // Default title for non-admin users
+          {initialData
+            ? t("eventForm.editTitle") // Use editTitle if initialData exists
+            : userRole === "admin"
+            ? t("eventForm.title") // Default title for admin
+            : t("eventForm.titleMarkAbsence") // Default title for non-admin users
           }
         </DialogTitle>
+
+        {/* Display form-level error using MUI Alert */}
+        {formError && (
+          <DialogContent>
+            <Alert severity="error">{formError}</Alert>
+          </DialogContent>
+        )}
+
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <DialogContent sx={{ padding: 2 }}>
             {/* Start Time Picker */}
@@ -176,18 +239,11 @@ export const EventForm: React.FC<EventFormProps> = ({
                   value={field.value ? dayjs(field.value) : null}
                   onChange={(newValue) => {
                     if (newValue) {
-                      // Keep the original date, update the time
-                      const updatedDate = dayjs(selectedDays[0])
-                        .hour(newValue.hour())
-                        .minute(newValue.minute())
-                        .second(newValue.second());
-                      setValue("startDate", updatedDate.toDate());
+                      setValue("startDate", newValue.toDate());
                     }
                   }}
                   viewRenderers={{
-                    day: () => null,
-                    month: () => null,
-                    year: () => null,
+                    day: renderDateViewCalendar,
                     hours: renderTimeViewClock,
                     minutes: renderTimeViewClock,
                   }}
@@ -196,6 +252,12 @@ export const EventForm: React.FC<EventFormProps> = ({
                 />
               )}
             />
+            {/* Display field-specific error for startDate */}
+            {errors.startDate && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {errors.startDate.message}
+              </Alert>
+            )}
 
             {/* End Time Picker */}
             <Controller
@@ -209,16 +271,7 @@ export const EventForm: React.FC<EventFormProps> = ({
                   value={field.value ? dayjs(field.value) : null}
                   onChange={(newValue) => {
                     if (newValue) {
-                      // Keep the original date, update the time
-                      const updatedDate = dayjs(
-                        selectedDays.length > 1
-                          ? selectedDays[1]
-                          : selectedDays[0]
-                      )
-                        .hour(newValue.hour())
-                        .minute(newValue.minute())
-                        .second(newValue.second());
-                      setValue("endDate", updatedDate.toDate());
+                      setValue("endDate", newValue.toDate());
                     }
                   }}
                   viewRenderers={{
@@ -233,6 +286,12 @@ export const EventForm: React.FC<EventFormProps> = ({
                 />
               )}
             />
+            {/* Display field-specific error for endDate */}
+            {errors.endDate && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {errors.endDate.message}
+              </Alert>
+            )}
 
             {/* Event Type Field */}
             <FormControl fullWidth margin="normal">
@@ -258,14 +317,14 @@ export const EventForm: React.FC<EventFormProps> = ({
                     <MenuItem value="event">
                       {t("eventForm.options.event")}
                     </MenuItem>
-                    <MenuItem value="holiday">
-                      {t("eventForm.options.holiday")}
-                    </MenuItem>
+                    {/* Removed 'holiday' option */}
                   </Select>
                 )}
               />
               {errors.eventType && (
-                <span style={{ color: "red" }}>{errors.eventType.message}</span>
+                <Alert severity="error" sx={{ mt: 1 }}>
+                  {errors.eventType.message}
+                </Alert>
               )}
             </FormControl>
 
@@ -285,9 +344,7 @@ export const EventForm: React.FC<EventFormProps> = ({
                     label={t("eventForm.labels.reason")}
                     disabled={userRole === "admin" ? !eventType : false} // Disable only if admin and eventType not selected
                   >
-                    {(eventType === "absence" ||
-                      eventType === "event" ||
-                      eventType === "holiday") &&
+                    {(eventType === "absence" || eventType === "event") && // Removed 'holiday'
                       reasonOptions[eventType]?.map((reason) => (
                         <MenuItem key={reason} value={reason}>
                           {t(`eventForm.reasons.${reason}`)}
@@ -297,7 +354,9 @@ export const EventForm: React.FC<EventFormProps> = ({
                 )}
               />
               {errors.reason && (
-                <span style={{ color: "red" }}>{errors.reason.message}</span>
+                <Alert severity="error" sx={{ mt: 1 }}>
+                  {errors.reason.message}
+                </Alert>
               )}
             </FormControl>
 
@@ -334,7 +393,7 @@ export const EventForm: React.FC<EventFormProps> = ({
               <IconButton
                 type="submit"
                 color="primary"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !!formError} // Disable if submitting or form has errors
                 aria-label={t("eventForm.labels.create")}
               >
                 {isSubmitting ? <CircularProgress size={24} /> : <CheckIcon />}

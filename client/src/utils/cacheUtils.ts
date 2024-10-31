@@ -1,9 +1,8 @@
 // src/utils/cacheUtils.ts
 
-import { Agent } from "http";
 import { Promo, Visit } from "../models/dataModels";
 import { serverClient, serverMovement } from "../models/dataSetTypes";
-import { Admin } from "../models/entityModels";
+import { Admin, Agent } from "../models/entityModels";
 import { appCache, CacheEntry, FileCacheEntry } from "../services/cache";
 import { showToast } from "../services/toastMessage";
 import {

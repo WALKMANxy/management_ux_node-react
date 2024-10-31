@@ -121,20 +121,30 @@ const Footer: React.FC = () => {
                   sx={{
                     mb: 1,
                     borderBottom: "0.5px solid rgba(176,176,176,0.5)",
+                    fontSize: isSuperMobile ? "0.8rem" : isMobile ? "0.9rem" : "1rem",
                   }}
                 >
                   {t("footer.about")}
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ cursor: "pointer", mb: 0.5, color: "#b0b0b0" }}
+                  sx={{
+                    cursor: "pointer",
+                    mb: 0.5,
+                    color: "#b0b0b0",
+                    fontSize: isSuperMobile ? "0.65rem" : isMobile ? "0.75rem" : "0.875rem",
+                  }}
                   onClick={() => handleOpenModal("ourStory")}
                 >
                   <Trans i18nKey="footer.ourStory">Our Story</Trans>
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ cursor: "pointer", color: "#b0b0b0" }}
+                  sx={{
+                    cursor: "pointer",
+                    color: "#b0b0b0",
+                    fontSize: isSuperMobile ? "0.65rem" : isMobile ? "0.75rem" : "0.875rem",
+                  }}
                   onClick={() => handleOpenModal("team")}
                 >
                   <Trans i18nKey="footer.team">Team</Trans>
@@ -149,23 +159,44 @@ const Footer: React.FC = () => {
                   sx={{
                     mb: 1,
                     borderBottom: "0.5px solid rgba(176,176,176,0.5)",
+                    fontSize: isSuperMobile ? "0.8rem" : isMobile ? "0.9rem" : "1rem",
                   }}
                 >
                   {t("footer.hours") || "HOURS"}
                 </Typography>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 0.5 }}>
                   <AccessTimeIcon
-                    sx={{ mr: 0.5, color: "#b0b0b0", fontSize: "medium" }}
+                    sx={{
+                      mr: 0.5,
+                      color: "#b0b0b0",
+                      fontSize: isSuperMobile ? "small" : isMobile ? "medium" : "default",
+                    }}
                   />
-                  <Typography variant="body2" sx={{ color: "#b0b0b0" }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "#b0b0b0",
+                      fontSize: isSuperMobile ? "0.65rem" : isMobile ? "0.75rem" : "0.875rem",
+                    }}
+                  >
                     8:30-13:00
                   </Typography>
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <AccessTimeIcon
-                    sx={{ mr: 0.5, color: "#b0b0b0", fontSize: "medium" }}
+                    sx={{
+                      mr: 0.5,
+                      color: "#b0b0b0",
+                      fontSize: isSuperMobile ? "small" : isMobile ? "medium" : "default",
+                    }}
                   />
-                  <Typography variant="body2" sx={{ color: "#b0b0b0" }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "#b0b0b0",
+                      fontSize: isSuperMobile ? "0.65rem" : isMobile ? "0.75rem" : "0.875rem",
+                    }}
+                  >
                     15:00-18:30
                   </Typography>
                 </Box>
@@ -179,25 +210,33 @@ const Footer: React.FC = () => {
                   sx={{
                     mb: 1,
                     borderBottom: "0.5px solid rgba(176,176,176,0.5)",
+                    fontSize: isSuperMobile ? "0.8rem" : isMobile ? "0.9rem" : "1rem",
                   }}
                 >
                   {t("footer.legal")}
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ cursor: "pointer", mb: 0.5, color: "#b0b0b0" }}
+                  sx={{
+                    cursor: "pointer",
+                    mb: 0.5,
+                    color: "#b0b0b0",
+                    fontSize: isSuperMobile ? "0.65rem" : isMobile ? "0.75rem" : "0.875rem",
+                  }}
                   onClick={() => handleOpenModal("privacyPolicy")}
                 >
                   <Trans i18nKey="footer.privacyPolicy">Privacy Policy</Trans>
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ cursor: "pointer", color: "#b0b0b0" }}
+                  sx={{
+                    cursor: "pointer",
+                    color: "#b0b0b0",
+                    fontSize: isSuperMobile ? "0.65rem" : isMobile ? "0.75rem" : "0.875rem",
+                  }}
                   onClick={() => handleOpenModal("termsOfService")}
                 >
-                  <Trans i18nKey="footer.termsOfService">
-                    Terms of Service
-                  </Trans>
+                  <Trans i18nKey="footer.termsOfService">Terms of Service</Trans>
                 </Typography>
               </Box>
             </Box>
@@ -238,14 +277,14 @@ const Footer: React.FC = () => {
             sx={{ color: "green", mr: -1.2 }}
             aria-label="Call"
           >
-            <CallIcon />
+            <CallIcon sx={{ fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null  }} />
           </IconButton>
           <IconButton
             href="mailto:info@ricambicentrosud.com" // Added missing @ in email
             sx={{ color: "#D44638", mr: -1.4 }}
             aria-label="Email"
           >
-            <MailIcon />
+            <MailIcon sx={{ fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null  }} />
           </IconButton>
 
           {/* Google Maps IconButton */}
@@ -256,7 +295,7 @@ const Footer: React.FC = () => {
             rel="noopener noreferrer"
             aria-label="Google Maps"
           >
-            <FmdGoodIcon />
+            <FmdGoodIcon sx={{ fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null  }} />
           </IconButton>
 
           {/* Facebook IconButton */}
@@ -267,7 +306,7 @@ const Footer: React.FC = () => {
             rel="noopener noreferrer"
             aria-label="Facebook"
           >
-            <FacebookIcon />
+            <FacebookIcon sx={{ fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null  }} />
           </IconButton>
 
           {/* Instagram IconButton */}
@@ -278,7 +317,7 @@ const Footer: React.FC = () => {
             rel="noopener noreferrer"
             aria-label="Instagram"
           >
-            <InstagramIcon />
+            <InstagramIcon sx={{ fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null  }} />
           </IconButton>
 
           {/* LinkedIn IconButton */}
@@ -289,7 +328,7 @@ const Footer: React.FC = () => {
             rel="noopener noreferrer"
             aria-label="LinkedIn"
           >
-            <LinkedInIcon />
+            <LinkedInIcon sx={{ fontSize: isSuperMobile ? "1rem" : isMobile ? "1.2rem" : null }} />
           </IconButton>
         </Box>
       </Box>

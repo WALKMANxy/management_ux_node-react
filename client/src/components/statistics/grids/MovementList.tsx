@@ -2,6 +2,9 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+
 import {
   Box,
   Collapse,
@@ -9,13 +12,15 @@ import {
   Menu,
   MenuItem,
   Paper,
-  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker/DatePicker";
+import dayjs, { Dayjs } from "dayjs";
 import React, { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { MovementListProps } from "../../../models/propsModels";
+import { locale } from "../../../services/localizer";
 import AGGridTable from "./AGGridTable";
 
 const MovementList: React.FC<MovementListProps> = ({
@@ -124,25 +129,51 @@ const MovementList: React.FC<MovementListProps> = ({
               </IconButton>
             </Tooltip>
 
-            {/* Start Date Filter */}
-            <TextField
-              type="date"
-              label={t("movementList.startDate")}
-              InputLabelProps={{ shrink: true }}
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              fullWidth={isMobile}
-            />
-
-            {/* End Date Filter */}
-            <TextField
-              type="date"
-              label={t("movementList.endDate")}
-              InputLabelProps={{ shrink: true }}
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              fullWidth={isMobile}
-            />
+            <LocalizationProvider
+              dateAdapter={AdapterDayjs}
+              adapterLocale={locale}
+            >
+              {/* End Date Filter */}
+              <DatePicker
+                label={t("movementList.endDate")}
+                value={endDate ? dayjs(endDate) : null}
+                onChange={(newDate: Dayjs | null) =>
+                  setEndDate(newDate?.toISOString() ?? "")
+                }
+                slotProps={{
+                  actionBar: { hidden: true }, // This hides the toolbar
+                  textField: {
+                    sx: {
+                      "& .MuiInputBase-root": {
+                        maxHeight: "50px", // Adjust to match TextField height
+                        fontSize: "0.875rem", // Adjust font size if needed
+                        maxWidth: "150px",
+                      },
+                    },
+                  },
+                }}
+              />
+              {/* Start Date Filter */}
+              <DatePicker
+                label={t("movementList.startDate")}
+                value={startDate ? dayjs(startDate) : null}
+                onChange={(newDate: Dayjs | null) =>
+                  setStartDate(newDate?.toISOString() ?? "")
+                }
+                slotProps={{
+                  actionBar: { hidden: true }, // This hides the toolbar
+                  textField: {
+                    sx: {
+                      "& .MuiInputBase-root": {
+                        maxHeight: "50px", // Adjust to match TextField height
+                        fontSize: "0.875rem", // Adjust font size if needed
+                        maxWidth: "150px",
+                      },
+                    },
+                  },
+                }}
+              />
+            </LocalizationProvider>
           </Box>
 
           {/* Options Menu */}

@@ -1,7 +1,7 @@
 // src/controllers/movementController.ts
 import { Response } from "express";
 import { IMovement } from "../models/Movement";
-import { AuthenticatedRequest, serverMovement } from "../models/types";
+import { AuthenticatedRequest } from "../models/types";
 import { MovementService } from "../services/movementService";
 import { logger } from "../utils/logger";
 
@@ -84,7 +84,7 @@ export class MovementController {
         return;
       }
 
-      const movementData: serverMovement = req.body;
+      const movementData: IMovement = req.body;
 
       // Optional: Validate that movementData["Numero Lista"] matches the URL parameter
       if (movementData["Numero Lista"] !== numeroLista) {
@@ -135,7 +135,7 @@ export class MovementController {
         return;
       }
 
-      const movementData: Partial<serverMovement> = req.body;
+      const movementData: Partial<IMovement> = req.body;
 
       const result = await MovementService.updateMovement(
         numeroLista,

@@ -1,3 +1,5 @@
+// src/components/TotalOrder.tsx
+
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined";
 import {
@@ -6,6 +8,7 @@ import {
   Button,
   Grid,
   Paper,
+  Tooltip,
   Typography,
   useMediaQuery,
 } from "@mui/material";
@@ -14,7 +17,6 @@ import dayjs from "dayjs";
 import React, { useMemo } from "react";
 import Chart from "react-apexcharts";
 import { useTranslation } from "react-i18next";
-import { ChartData } from "../../utils/constants";
 
 interface TotalOrderProps {
   totalOrder: number;
@@ -25,7 +27,6 @@ interface TotalOrderProps {
 }
 
 const TotalOrder: React.FC<TotalOrderProps> = ({
-  totalOrder,
   monthlyOrders,
   yearlyOrders,
   monthlyCategories,
@@ -34,7 +35,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [timeValue, setTimeValue] = React.useState(true); // Initialize with "month" chart
+  const [timeValue, setTimeValue] = React.useState<boolean>(true); // Initialize with "month" chart
 
   // Get the current month index (0 = January, 1 = February, etc.)
   const currentMonthIndex = useMemo(() => new Date().getMonth(), []);
@@ -48,13 +49,125 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
 
   // Display the current month's orders or the total orders based on timeValue
   const displayedTotal = useMemo(() => {
-    return timeValue ? monthlyOrders[currentMonthIndex] || 0 : totalOrder;
-  }, [timeValue, monthlyOrders, totalOrder, currentMonthIndex]);
+    return timeValue ? monthlyOrders[currentMonthIndex] || 0 : yearlyOrders;
+  }, [timeValue, monthlyOrders, yearlyOrders, currentMonthIndex]);
 
+  // Format categories to display month numbers or years
   const formattedMonthlyCategories = useMemo(
     () => monthlyCategories.map((date) => dayjs(date).format("MM")),
     [monthlyCategories]
   );
+
+  const formattedYearlyCategories = useMemo(
+    () => yearlyCategories.map((date) => dayjs(date).format("YYYY")),
+    [yearlyCategories]
+  );
+
+  // Configure ApexCharts options to match the style of MonthOverMonthSpendingTrend
+  const options: ApexCharts.ApexOptions = useMemo(
+    () => ({
+      chart: {
+        type: "area",
+        background: "transparent",
+        toolbar: { show: false },
+      },
+      xaxis: {
+        categories: timeValue
+          ? formattedMonthlyCategories
+          : formattedYearlyCategories,
+        labels: { rotate: 0 },
+      },
+      yaxis: {
+        labels: {
+          formatter: (value: number) =>
+            new Intl.NumberFormat(undefined, {
+              style: "decimal",
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
+            }).format(value),
+        },
+        axisTicks: {
+          show: false,
+        },
+      },
+      dataLabels: { enabled: false },
+      tooltip: {
+        shared: true, // Enable shared tooltips to display both series
+        y: {
+          formatter: (val: number) =>
+            new Intl.NumberFormat(undefined, {
+              style: "decimal",
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
+            }).format(val),
+          title: {
+            formatter: () => "", // Remove the "Total orders:" label
+          },
+        },
+      },
+      fill: {
+        type: "gradient",
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.7,
+          opacityTo: 0.3,
+        },
+      },
+      stroke: {
+        curve: "smooth",
+      },
+      markers: {
+        size: 3,
+      },
+      grid: {
+        show: true,
+        borderColor: "#e0e0e0",
+        strokeDashArray: 1,
+        xaxis: {
+          lines: {
+            show: true,
+          },
+        },
+        yaxis: {
+          lines: {
+            show: false,
+          },
+        },
+      },
+      theme: {
+        palette: "palette2",
+      },
+      colors: [theme.palette.primary.main, theme.palette.secondary.main], // Assign distinct colors
+      legend: {
+        position: "top",
+        horizontalAlign: "center",
+        labels: {
+          colors: theme.palette.text.primary,
+        },
+      },
+    }),
+    [
+      timeValue,
+      formattedMonthlyCategories,
+      formattedYearlyCategories,
+      theme.palette.primary.main,
+      theme.palette.secondary.main,
+      theme.palette.text.primary,
+      // Removed 't' from dependencies since it's not used inside options anymore
+    ]
+  );
+
+  // Define series with Orders
+  const series = useMemo(() => {
+    const baseSeries = [
+      {
+        name: t("totalOrder.orders", "Orders"),
+        data: timeValue ? monthlyOrders : yearlyOrders,
+      },
+    ];
+
+    return baseSeries;
+  }, [timeValue, monthlyOrders, yearlyOrders, t]);
 
   return (
     <Paper
@@ -67,7 +180,6 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
         position: "relative",
         overflow: "hidden",
         minHeight: "250px", // Set a minimum height but allow to grow
-
         height: "auto", // Allow the paper to adjust based on content
         "&:after": {
           content: '""',
@@ -130,7 +242,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
                   }}
                   onClick={(e) => handleChangeTime(e, true)}
                 >
-                  {t("totalOrder.month")}
+                  {t("totalOrder.month", "Month")}
                 </Button>
                 <Button
                   disableElevation
@@ -147,7 +259,7 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
                   }}
                   onClick={(e) => handleChangeTime(e, false)}
                 >
-                  {t("totalOrder.year")}
+                  {t("totalOrder.year", "Year")}
                 </Button>
               </Grid>
             </Grid>
@@ -161,17 +273,25 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
               <Grid item xs={10} md={5} textAlign="left">
                 <Grid container alignItems="center" justifyContent="flex-start">
                   <Grid item>
-                    <Typography
-                      sx={{
-                        fontSize: "2.5rem",
-                        fontWeight: 500,
-                        mr: 1,
-                        mt: 1.5,
-                        mb: 0.5,
-                      }}
+                    <Tooltip
+                      title={t(
+                        "totalOrder.tooltipTotalOrders",
+                        "Total orders:"
+                      )}
                     >
-                      {displayedTotal}
-                    </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: "2.5rem",
+                          fontWeight: 500,
+                          mr: 1,
+                          mt: 1.5,
+                          mb: 0.5,
+                          cursor: "pointer",
+                        }}
+                      >
+                        {displayedTotal}
+                      </Typography>
+                    </Tooltip>
                   </Grid>
                   <Grid item>
                     <Avatar
@@ -190,17 +310,12 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
                 </Grid>
               </Grid>
               <Grid item xs={10} md={6} sx={{}}>
-                {timeValue ? (
-                  <Chart
-                    {...ChartData(formattedMonthlyCategories, monthlyOrders)}
-                    height="150"
-                  />
-                ) : (
-                  <Chart
-                    {...ChartData(yearlyCategories, yearlyOrders)}
-                    height="150"
-                  />
-                )}
+                <Chart
+                  options={options}
+                  series={series}
+                  type="area"
+                  height={isMobile ? 150 : 150} // Maintain current size
+                />
               </Grid>
             </Grid>
           </Grid>
@@ -213,8 +328,8 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
               }}
             >
               {timeValue
-                ? t("totalOrder.ordersThisMonth")
-                : t("totalOrder.totalOrders")}
+                ? t("totalOrder.ordersThisMonth", "Orders this month")
+                : t("totalOrder.totalOrders", "Total orders")}
             </Typography>
           </Grid>
         </Grid>
@@ -223,4 +338,4 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
   );
 };
 
-export default TotalOrder;
+export default React.memo(TotalOrder);
