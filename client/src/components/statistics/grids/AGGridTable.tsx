@@ -15,22 +15,20 @@ const AGGridTable = forwardRef<AgGridReact, AGGridTableProps>(
 
     const isMobile = useMediaQuery("(max-width: 600px)");
 
-    // In AGGridTable component
     const onGridReady = (params: { api: { sizeColumnsToFit: () => void } }) => {
       params.api.sizeColumnsToFit();
     };
 
-    // Memoize defaultColDef
     const defaultColDef = useMemo<AgGridReactProps["defaultColDef"]>(
       () => ({
         flex: 1,
         minWidth: 150,
         filter: true,
-        floatingFilter: true, // Enable floating filters
+        floatingFilter: true,
         suppressHeaderMenuButton: true,
-        resizable: true, // Allow columns to be resizable
-        sortable: true, // Enable sorting
-        suppressMovable: true, // Prevent column reordering
+        resizable: true,
+        sortable: true,
+        suppressMovable: true,
       }),
       []
     );
@@ -40,9 +38,9 @@ const AGGridTable = forwardRef<AgGridReact, AGGridTableProps>(
         className="ag-theme-quartz"
         style={{
           height: 600,
-          transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
-          transformOrigin: "top left", // Anchor the scale to the top-left corner
-          width: isMobile ? "133.33%" : "100%", // Adjust width to prevent clipping
+          transform: isMobile ? "scale(0.75)" : "none",
+          transformOrigin: "top left",
+          width: isMobile ? "133.33%" : "100%",
         }}
       >
         <AgGridReact
@@ -52,11 +50,11 @@ const AGGridTable = forwardRef<AgGridReact, AGGridTableProps>(
           pagination={false}
           paginationPageSize={100}
           paginationPageSizeSelector={paginationPageSizeSelector}
-          quickFilterText={quickFilterText} // Pass quickFilterText to AgGridReact
+          quickFilterText={quickFilterText}
           enableCellTextSelection={true}
           onGridReady={onGridReady}
           rowBuffer={5}
-          suppressPaginationPanel={true} // Add this line to hide the pagination panel
+          suppressPaginationPanel={true} 
           suppressColumnVirtualisation={false}
           defaultColDef={defaultColDef}
         />

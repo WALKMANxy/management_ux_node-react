@@ -67,8 +67,8 @@ const FileGallery: React.FC<FileGalleryProps> = ({
             mt: 1,
             mb: 2,
 
-            width: { xs: 40, sm: 60 }, // Responsive width
-            height: { xs: 40, sm: 60 }, // Responsive height
+            width: { xs: 40, sm: 60 },
+            height: { xs: 40, sm: 60 },
             borderRadius: "8px",
             overFlowY: "hidden",
             display: "flex",
@@ -78,8 +78,8 @@ const FileGallery: React.FC<FileGalleryProps> = ({
             cursor: "pointer",
             flexShrink: 0,
             scrollSnapAlign: "center",
-            transition: "transform 0.2s, border 0.05s", // Added transform transition
-            transform: isSelected ? "scale(1.1)" : "scale(0.9)", // Scale up when selected
+            transition: "transform 0.2s, border 0.05s",
+            transform: isSelected ? "scale(1.1)" : "scale(0.9)",
           }}
           onClick={() => setCurrentFile(file)}
         >
@@ -122,8 +122,8 @@ const FileGallery: React.FC<FileGalleryProps> = ({
                     "&:hover": { bgcolor: "rgba(255, 255, 255, 1)" },
                   }}
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent triggering onSelectFile
-                    onRemoveFile(file.fileName); // Remove the current selected file
+                    e.stopPropagation();
+                    onRemoveFile(file.fileName); 
                   }}
                 >
                   <DeleteIcon fontSize="small"  />

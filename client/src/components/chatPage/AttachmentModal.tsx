@@ -1,5 +1,4 @@
 // src/components/chatPage/AttachmentModal.tsx
-
 import PhotoIcon from "@mui/icons-material/Photo";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import { Box, IconButton, Menu, Tooltip, useMediaQuery } from "@mui/material";
@@ -18,15 +17,10 @@ const AttachmentModal: React.FC<AttachmentModalProps> = ({
   isOpen,
   onClose,
   onFileSelect,
-
 }) => {
   const { t } = useTranslation();
 
   const isDesktop = useMediaQuery("(min-width:800px)");
-
-
-
-
 
   return (
     <Menu
@@ -43,17 +37,17 @@ const AttachmentModal: React.FC<AttachmentModalProps> = ({
       }}
       sx={{
         mt: -2,
-        ml: isDesktop ? 5.5 : null
-
+        ml: isDesktop ? 5.5 : null,
       }}
       PaperProps={{
         sx: {
-          backgroundColor: "rgba(255, 255, 255, 0.95)", // Slightly more opaque for better readability
+          backgroundColor: "rgba(255, 255, 255, 0.95)", 
           borderRadius: "8px",
           display: "flex",
           flexDirection: "column",
           gap: 2,
-px: 1        },
+          px: 1,
+        },
       }}
     >
       {/* Icon buttons for selecting files */}
@@ -62,7 +56,6 @@ px: 1        },
           <IconButton
             onClick={() => document.getElementById("media-upload")?.click()}
             size="medium"
-
           >
             <PhotoIcon fontSize="large" />
           </IconButton>

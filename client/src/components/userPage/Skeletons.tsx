@@ -57,12 +57,9 @@ export const ManageUsersSkeleton = () => (
 // 3. ExtendedManageUsersSkeleton
 export const ExtendedManageUsersSkeleton = () => (
   <Box display="flex" flexDirection="column" gap={2} width="100%">
-    {/* Small Rounded Skeleton */}
     <Box display="flex" alignItems="center" gap={2}>
       <Skeleton variant="circular" height={25} width={25} />
-      {/* You can add more elements here if needed */}
     </Box>
-    {/* Other Skeletons */}
     <Skeleton
       variant="rectangular"
       animation="wave"

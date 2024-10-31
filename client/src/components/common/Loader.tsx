@@ -43,7 +43,7 @@ const Loader: React.FC<{ fadeout: boolean }> = () => {
     <FullScreenBox fadeout={fadeOutEffect}>
       <Box
         sx={{
-          height: "12%", // 10% bigger than previous value
+          height: "12%",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -59,7 +59,6 @@ const Loader: React.FC<{ fadeout: boolean }> = () => {
           style={{ color: "white", height: "9%", width: "9%" }}
           aria-label="loading"
         />{" "}
-        {/* 10% smaller */}
       </Box>
     </FullScreenBox>
   );

@@ -1,5 +1,4 @@
 // src/components/visitPage/CreateVisitForm.tsx
-
 import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
 import {
@@ -36,9 +35,8 @@ import { RootState } from "../../app/store";
 import { createVisitAsync } from "../../features/data/dataThunks";
 import { locale } from "../../services/localizer";
 import { showToast } from "../../services/toastMessage";
-import VisitCard from "./VisitCard"; // Import the VisitCard component
+import VisitCard from "./VisitCard";
 
-// Styled IconButton for Send and Cancel actions
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
   color: theme.palette.common.white,
@@ -50,7 +48,6 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
   height: 48,
 }));
 
-// Styled Close Button
 const StyledCloseButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.error.main,
   color: theme.palette.common.white,
@@ -65,7 +62,7 @@ const StyledCloseButton = styled(IconButton)(({ theme }) => ({
 interface CreateVisitFormProps {
   clientId: string;
   onClose: () => void;
-  onLoad?: () => void; // Add the onLoad prop
+  onLoad?: () => void;
 }
 
 const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
@@ -85,7 +82,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
   const [reason, setReason] = useState<string>("");
   const [date, setDate] = useState<Dayjs | null>(dayjs());
   const [notePublic, setNotePublic] = useState<string>("");
-  const [notePrivate, setNotePrivate] = useState<string>(""); // Private note field
+  const [notePrivate, setNotePrivate] = useState<string>("");
 
   // Validation error states
   const [typeError, setTypeError] = useState<boolean>(false);
@@ -105,7 +102,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
 
   useEffect(() => {
     if (onLoad) {
-      onLoad(); // Notify parent that the component has loaded
+      onLoad();
     }
   }, [onLoad]);
 
@@ -179,10 +176,10 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
       type,
       visitReason: reason,
       date: dayjs(date).toDate(),
-      createdAt: new Date(), // Current date
+      createdAt: new Date(),
 
       notePublic: notePublic.trim() === "" ? undefined : notePublic.trim(),
-      notePrivate: notePrivate.trim() === "" ? undefined : notePrivate.trim(), // Handle private note
+      notePrivate: notePrivate.trim() === "" ? undefined : notePrivate.trim(),
       visitIssuedBy: currentUser?.userId || "unknown",
       pending: true,
       completed: false,
@@ -195,7 +192,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
       setReason("");
       setDate(dayjs());
       setNotePublic("");
-      setNotePrivate(""); // Reset private note
+      setNotePrivate("");
       onClose();
       showToast.success(
         t("createVisitForm.visitCreated", "Visit created successfully.")
@@ -219,7 +216,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
           error
         );
       }
-      throw error; // Re-throw to handle in the component
+      throw error;
     }
   };
 
@@ -263,7 +260,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
           backgroundColor: "#fff",
           display: "flex",
           flexDirection: "column",
-          height: "100%", // Ensures the form takes full height
+          height: "100%",
         }}
       >
         <Typography
@@ -404,12 +401,12 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
                     fullWidth
                     multiline
                     minRows={2}
-                    maxRows={10} // Allow expansion up to 10 rows
+                    maxRows={10}
                     variant="outlined"
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         "& fieldset": {
-                          borderRadius: 2, // Adjust this value to change the border radius
+                          borderRadius: 2,
                         },
                       },
                     }}
@@ -446,7 +443,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         "& fieldset": {
-                          borderRadius: 2, // Adjust this value to change the border radius
+                          borderRadius: 2,
                           ...(notePrivateError && {
                             borderColor: "rgba(244, 67, 54, 0.2)",
                           }),
@@ -467,7 +464,7 @@ const CreateVisitForm: React.FC<CreateVisitFormProps> = ({
               reason={reason}
               date={date}
               notePublic={notePublic}
-              notePrivate={notePrivate} // Pass private note
+              notePrivate={notePrivate} 
               pending={true}
               completed={false}
               visitIssuedBy={currentUser?.name || "unknown"}

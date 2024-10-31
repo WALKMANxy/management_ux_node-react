@@ -35,15 +35,15 @@ const PromoListItem: React.FC<PromoListItemProps> = ({
           display: "flex",
           alignItems: "center",
           bgcolor: isActive
-            ? "rgba(144, 238, 144, 0.05)" // Faint green for active promos
-            : "rgba(255, 165, 0, 0.05)", // Faint orange for inactive promos
+            ? "rgba(144, 238, 144, 0.05)"
+            : "rgba(255, 165, 0, 0.05)",
           "&:hover": {
             bgcolor: isActive
               ? "rgba(144, 238, 144, 0.2)"
               : "rgba(255, 165, 0, 0.2)",
           },
-          borderRadius: "12px", // Rounded corners
-          mb: 1, // Margin bottom for spacing
+          borderRadius: "12px",
+          mb: 1,
         }}
       >
         <ListItemAvatar>

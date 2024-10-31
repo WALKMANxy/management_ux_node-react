@@ -1,3 +1,4 @@
+//src/app/listeners.ts
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 import {
   addChatReducer,
@@ -60,7 +61,7 @@ const processReadStatusQueue = () => {
     readStatusQueue.forEach(({ chatId, messageIds }) => {
       webSocketService.emitMessageRead(chatId, messageIds);
     });
-    readStatusQueue = []; // Clear the queue after processing
+    readStatusQueue = [];
   }
 };
 
@@ -74,7 +75,7 @@ const processMessageQueue = () => {
     messageQueue.forEach(({ chatId, messageData }) => {
       webSocketService.emitNewMessage(chatId, messageData);
     });
-    messageQueue = []; // Clear the queue after processing
+    messageQueue = [];
   }
 };
 
@@ -88,7 +89,7 @@ const processChatQueue = () => {
     chatQueue.forEach((chatData) => {
       webSocketService.emitNewChat(chatData);
     });
-    chatQueue = []; // Clear the queue after processing
+    chatQueue = [];
   }
 };
 
@@ -108,7 +109,7 @@ const processAutomatedMessageQueue = () => {
       // Emit the message to all targetIds at once
       webSocketService.emitAutomatedMessage(targetId, message);
     });
-    automatedMessageQueue = []; // Clear the queue after processing
+    automatedMessageQueue = [];
   }
 };
 // Listener for the updateReadStatusReducer action
@@ -151,8 +152,8 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: uploadComplete,
   effect: async (action) => {
-    console.log("uploadComplete listener called. Data:", action.payload);
-
+/*     console.log("uploadComplete listener called. Data:", action.payload);
+ */
     const { chatId, message, fromServer } = action.payload;
 
     // Skip WebSocket emission if action is from the server
@@ -175,15 +176,17 @@ listenerMiddleware.startListening({
     // Add the stripped message to the queue
     messageQueue.push({ chatId, messageData: strippedMessage });
 
-    console.log("Added message (with file stripped if present) to queue:", strippedMessage);
-
+  /*   console.log(
+      "Added message (with file stripped if present) to queue:",
+      strippedMessage
+    );
+ */
     // Debounce the processing of the message queue
     if (messageTimer) clearTimeout(messageTimer);
     messageTimer = setTimeout(processMessageQueue, DEBOUNCE_TIME);
-    console.log("Set timeout for processing message queue");
-  },
+/*     console.log("Set timeout for processing message queue");
+ */  },
 });
-
 
 // Listener for the addChatReducer action
 listenerMiddleware.startListening({
@@ -326,8 +329,8 @@ listenerMiddleware.startListening({
   },
 });
 
-// listenerMiddleware.ts
 
+// Listener for the automated messages (visits)
 listenerMiddleware.startListening({
   actionCreator: getVisits.fulfilled,
   effect: async (_action, listenerApi) => {
@@ -359,7 +362,7 @@ listenerMiddleware.startListening({
       now.getTime() - lastAlertSent.getTime() >= millisecondsIn24Hours;
 
     if (!shouldSendAlert) {
-      console.log("Alert already sent within the last 24 hours. Skipping.");
+      console.warn("Alert already sent within the last 24 hours. Skipping.");
       return;
     }
 
@@ -371,7 +374,7 @@ listenerMiddleware.startListening({
     });
 
     if (overdueVisits.length === 0) {
-      console.log("No overdue visits found.");
+      console.warn("No overdue visits found.");
       return;
     }
 

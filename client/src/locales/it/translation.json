@@ -2,7 +2,7 @@
   "team": {
     "title": "Il Nostro Team",
     "content": {
-      "part1": "Il nostro team di Ricambi Centro Sud S.r.l. è composto da professionisti dedicati impegnati a fornire servizi e soluzioni di alto livello ai nostri clienti. Con una vasta gamma di competenze, i membri del nostro team collaborano senza soluzione di continuità per garantire la soddisfazione del cliente e la crescita aziendale."
+      "part1": "Il nostro team di Random Company è composto da professionisti dedicati impegnati a fornire servizi e soluzioni di alto livello ai nostri clienti. Con una vasta gamma di competenze, i membri del nostro team collaborano senza soluzione di continuità per garantire la soddisfazione del cliente e la crescita aziendale."
     }
   },
   "calendarPage": {
@@ -25,16 +25,16 @@
   "ourStory": {
     "title": "La nostra storia",
     "content": {
-      "part1": "<0>Ricambi Centro Sud S.r.l.</0> opera nei settori dei veicoli commerciali, autobus, camion e ricambi per auto per motori diesel e a benzina, occupandosi anche di carrozzeria e veicoli industriali, agricoli, marittimi e ferroviari. Dal 1995 a Catania, offre servizi di scelta e vendita dei prodotti proposti con professionalità e competenza, soddisfacendo le esigenze di enti pubblici e privati, ricambisti, specialisti in pompe, meccanici ed elettricisti.",
+      "part1": "<0>Random Company</0> opera nei settori dei veicoli commerciali, autobus, camion e ricambi per auto per motori diesel e a benzina, occupandosi anche di carrozzeria e veicoli industriali, agricoli, marittimi e ferroviari. Dal 1995 a Catania, offre servizi di scelta e vendita dei prodotti proposti con professionalità e competenza, soddisfacendo le esigenze di enti pubblici e privati, ricambisti, specialisti in pompe, meccanici ed elettricisti.",
       "part2": "L'azienda, ora in espansione, è desiderosa di offrire questo servizio sempre più competente ed efficace direttamente ai privati, fornendo un'opportunità e offrendo soluzioni per i grandi e piccoli problemi dei veicoli. Troverai personale qualificato in formazione continua, capace di analizzare il problema e offrire consulenze sulle giuste alternative. Puoi beneficiare della consegna a domicilio e di servizi completi a 360 gradi.",
-      "part3": "L'azienda è distributore di marchi di ricambi originali, nonché di prodotti ufficialmente ricondizionati direttamente dal produttore. La qualità del servizio rispetto al prezzo, l'area tecnica qualificata e la gestione/progetto oltre la semplice vendita diretta sono i tre punti forti e distintivi di Ricambi Centro Sud S.r.l. L'area tecnica, dotata di strumenti e formazione continua, promuove la rete funzionale nell'area, garantendo aggiornamenti e assistenza post-vendita ai clienti.",
+      "part3": "L'azienda è distributore di marchi di ricambi originali, nonché di prodotti ufficialmente ricondizionati direttamente dal produttore. La qualità del servizio rispetto al prezzo, l'area tecnica qualificata e la gestione/progetto oltre la semplice vendita diretta sono i tre punti forti e distintivi di Random Company L'area tecnica, dotata di strumenti e formazione continua, promuove la rete funzionale nell'area, garantendo aggiornamenti e assistenza post-vendita ai clienti.",
       "part4": "<0>Un'azienda che non ha perso il suo carattere aperto e familiare</0> ma che oggi è in grande espansione, affrontando nuove sfide. La nuova struttura, che si estende su 3.800 mq su tre livelli, inclusi uffici, magazzino e punto vendita, con un totale di 25 dipendenti, è in grado di garantire servizi in diverse aree di competenza nel territorio grazie a venditori specializzati per tipo di prodotto e marca."
     }
   },
   "privacyPolicy": {
     "title": "Privacy Policy",
     "content": {
-      "part1": "<0>Benvenuto in RCS NEXT</0>, un'applicazione basata su browser fornita da Ricambi Centro Sud. Prendiamo seriamente la tua privacy e ci impegniamo a proteggere i dati che raccogliamo in conformità con le normative GDPR. Questa politica sulla privacy descrive i tipi di informazioni che raccogliamo, come vengono utilizzate e i tuoi diritti riguardo a tali informazioni.",
+      "part1": "<0>Benvenuto in RCS NEXT</0>, un'applicazione basata su browser fornita daRandom Company Prendiamo seriamente la tua privacy e ci impegniamo a proteggere i dati che raccogliamo in conformità con le normative GDPR. Questa politica sulla privacy descrive i tipi di informazioni che raccogliamo, come vengono utilizzate e i tuoi diritti riguardo a tali informazioni.",
       "part2": "Raccolta dei Dati",
       "part3": "I dati gestiti da Ricambi Centro Sud per l'app RCS NEXT vengono raccolti esclusivamente allo scopo di garantire il corretto funzionamento dei servizi offerti. Potremmo raccogliere informazioni come il tuo indirizzo IP e l'impronta del dispositivo per convalidare la tua identità e migliorare i nostri processi di autenticazione. Questo ci aiuta a garantire la sicurezza del tuo account e a prevenire accessi non autorizzati.",
       "part4": "Scopo dell'Uso dei Dati",
@@ -52,7 +52,7 @@
   "termsOfService": {
     "title": "Termini di Servizio",
     "content": {
-      "part1": "<0>Benvenuto in RCS NEXT</0>, un'applicazione basata su browser gestita da Ricambi Centro Sud. Accedendo o utilizzando la nostra applicazione, accetti di essere vincolato da questi termini di servizio. Se non sei d'accordo con questi termini, ti preghiamo di non utilizzare l'app.",
+      "part1": "<0>Benvenuto in RCS NEXT</0>, un'applicazione basata su browser gestita daRandom Company Accedendo o utilizzando la nostra applicazione, accetti di essere vincolato da questi termini di servizio. Se non sei d'accordo con questi termini, ti preghiamo di non utilizzare l'app.",
       "part2": "Accettazione dei Termini",
       "part3": "Utilizzando l'app RCS NEXT, riconosci di aver letto, compreso e accettato questi termini di servizio. Potremmo aggiornare occasionalmente questi termini ed è tua responsabilità rivederli regolarmente.",
       "part4": "Uso del Servizio",
@@ -60,7 +60,7 @@
       "part6": "Account Utente",
       "part7": "Sei responsabile della riservatezza delle credenziali del tuo account. Qualsiasi attività sotto il tuo account è tua responsabilità. Se ritieni che il tuo account sia stato compromesso, ti preghiamo di informarci immediatamente.",
       "part8": "Proprietà dei Contenuti",
-      "part9": "Tutti i contenuti all'interno dell'applicazione RCS NEXT, inclusi ma non limitati a testo, grafica e marchi, sono di proprietà di Ricambi Centro Sud. Non puoi copiare, distribuire o creare opere derivate senza il nostro consenso scritto.",
+      "part9": "Tutti i contenuti all'interno dell'applicazione RCS NEXT, inclusi ma non limitati a testo, grafica e marchi, sono di proprietà diRandom Company Non puoi copiare, distribuire o creare opere derivate senza il nostro consenso scritto.",
       "part10": "Terminazione",
       "part11": "Ci riserviamo il diritto di sospendere o terminare il tuo accesso all'app RCS NEXT in qualsiasi momento, specialmente se violi questi termini di servizio o utilizzi l'app in modo che riteniamo inappropriato o dannoso.",
       "part12": "Limitazione di Responsabilità",
@@ -726,7 +726,7 @@
     "enterNewPassword": "Inserisci la tua nuova password",
     "enterVerificationCode": "Inserisci il codice di verifica fornito nella tua email",
     "passwordUpdatedToast": "Password aggiornata con successo. Ora puoi accedere!",
-    "registrationSuccess": "Registrazione avvenuta con successo!",
+    "registrationSuccess": "Registrazione avvenuta con successo! Controlla la tua email per verificare l'account.",
     "registrationFailed": "Registrazione fallita: {{error}}",
     "loginFailed": "Accesso fallito: {{message}}",
     "roleNotAssigned": "Attendi che al tuo account venga assegnato un ruolo prima di tentare di accedere.",
@@ -1244,13 +1244,6 @@
     "selectedVisit": "Visita selezionata: {{reason}} il {{date}}.",
     "visitsNotEditable": "Le visite non possono essere modificate dal calendario.",
     "selectedEvent": "{{reason}} selezionato il {{date}}.",
-    "roleNotAssigned": "Attendi che al tuo account venga assegnato un ruolo prima di tentare di accedere.",
-    "accountVerificationPending": "Il tuo account è ancora in fase di verifica da parte degli amministratori.",
-    "roleFetchingError": "Impossibile recuperare il ruolo dell'utente.",
-    "errorDuringLogin": "Si è verificato un errore durante l'accesso: {{error}}",
-    "registrationSuccess": "Registrazione avvenuta con successo: {{message}}",
-    "registrationFailed": "Registrazione fallita: {{message}}",
-    "loginFailed": "Accesso fallito: {{message}}",
     "viewModes": {
       "calendar": "calendario",
       "history": "storia"
@@ -1320,12 +1313,6 @@
     "unknown": "Si è verificato un errore sconosciuto.",
     "unknownAgent": "Agente Sconosciuto",
     "searchFailed": "Ricerca fallita. Riprova."
-  },
-  "signin": {
-    "loginSuccess": "Accesso avvenuto con successo!",
-    "registrationSuccess": "Registrazione avvenuta con successo!",
-    "loginWithGoogleSuccess": "Accesso con Google avvenuto con successo!",
-    "passwordMismatch": "Le password non coincidono."
   },
   "promoForm": {
     "success": "Promo inviata con successo!",

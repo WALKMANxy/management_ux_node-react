@@ -1,3 +1,4 @@
+//src/components/userPage/ManageUsers.tsx
 import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import InfoIcon from "@mui/icons-material/Info";
 import {
@@ -60,11 +61,11 @@ const ManageUsers: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<Partial<User> | null>(null);
   const loading = useAppSelector(selectUsersLoading);
 
-  const [visibleRows, setVisibleRows] = useState<number>(20); // Start with 20 rows visible
+  const [visibleRows, setVisibleRows] = useState<number>(20);
 
   // Sorting state
   const [order, setOrder] = useState<Order>("asc");
-  const [orderBy, setOrderBy] = useState<keyof User>("email"); // Default sort by 'email'
+  const [orderBy, setOrderBy] = useState<keyof User>("email");
 
   // Filter states
   const [roleFilter, setRoleFilter] = useState<"admin" | "guest" | "client" | "agent" | "employee" | "all">("all");
@@ -78,7 +79,7 @@ const ManageUsers: React.FC = () => {
   // Handle lazy loading with Intersection Observer
   const { ref, inView } = useInView({
     triggerOnce: false,
-    threshold: 0.1, // Load more rows when 10% of the trigger is visible
+    threshold: 0.1,
   });
 
     // Filtering users
@@ -105,7 +106,7 @@ const ManageUsers: React.FC = () => {
 
   useEffect(() => {
     if (inView && visibleRows < filteredUsers.length) {
-      setVisibleRows((prev) => prev + 20); // Load 20 more rows when scrolled to bottom
+      setVisibleRows((prev) => prev + 20);
     }
   }, [inView, filteredUsers.length, visibleRows]);
 
@@ -268,8 +269,8 @@ const ManageUsers: React.FC = () => {
         sx={{
           boxShadow: "none",
           gap: 2,
-          transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
-          transformOrigin: "top left", // Anchor the scale to the top-left corner
+          transform: isMobile ? "scale(0.75)" : "none",
+          transformOrigin: "top left",
           width: isMobile ? "133.33%" : "100%",
           mb: 2.5,
         }}
@@ -353,7 +354,7 @@ const ManageUsers: React.FC = () => {
                   ? Array.from({ length: visibleRows }).map((_, index) => (
                       <TableRow
                         key={index}
-                        className="animate__animated animate__fadeOut" // Fade out when loading
+                        className="animate__animated animate__fadeOut" 
                       >
                         {columns.map((column) => (
                           <TableCell key={column.id}>

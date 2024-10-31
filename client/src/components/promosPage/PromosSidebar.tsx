@@ -31,7 +31,6 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
   const theme = useTheme();
   const isMobile = theme.breakpoints.down("sm");
 
-  // Memoize isActive mapping to prevent re-computation
   const promosWithActiveStatus = useMemo(
     () =>
       filteredPromos.map((promo) => ({
@@ -41,7 +40,6 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
     [filteredPromos, isPromoActive]
   );
 
-  // Memoize the onSelect handler
   const handleSelectPromo = useCallback(
     (promo: Promo) => {
       onSelectPromo(promo._id!);
@@ -54,7 +52,7 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
       sx={{
         pt: 2,
         px: 2,
-        flex: 1, // Allows the sidebar to grow and shrink
+        flex: 1,
         display: "flex",
         flexDirection: "column",
         boxSizing: "border-box",
@@ -78,12 +76,11 @@ const PromosSidebar: React.FC<PromosSidebarProps> = ({
       <Box
         sx={{
           height: isMobile ? "79vh" : "100%",
-          overflowY: "auto", // Enable vertical scrolling
-          // Hide scrollbar but allow scrolling
-          scrollbarWidth: "none", // Firefox
-          msOverflowStyle: "none", // IE 10+
+          overflowY: "auto",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
           "&::-webkit-scrollbar": {
-            display: "none", // Chrome, Safari, Opera
+            display: "none", 
           },
         }}
       >

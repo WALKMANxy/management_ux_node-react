@@ -1,5 +1,4 @@
 // src/components/visitPage/SkeletonClientDetailsCard.tsx
-
 import { Box, Skeleton } from "@mui/material";
 import React from "react";
 

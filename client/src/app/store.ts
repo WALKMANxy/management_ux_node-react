@@ -1,5 +1,4 @@
 // src/app/store.ts
-
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { calendarApi } from "../features/calendar/calendarQuery";
@@ -29,17 +28,19 @@ const store = configureStore({
   preloadedState,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      thunk: true, // Enables support for thunk middleware, commonly used for async logic
-      serializableCheck: false, // Disables checks for non-serializable data, useful for certain API payloads
-      immutableCheck: false, // Disables checks for state immutability, which can be performance-intensive
+      thunk: true, // Enables support for thunk middleware
+      serializableCheck: false, // Disables checks for non-serializable data
+      immutableCheck: false, // Disables checks for state immutability
     })
       .concat(userApi.middleware)
       .concat(listenerMiddleware.middleware)
       .concat(calendarApi.middleware)
       .concat(weatherApi.middleware),
+
   // Enable Redux DevTools only in development mode
   devTools: process.env.NODE_ENV !== "production",
 });
+
 /**
  * Subscribe to store updates to handle state persistence.
  *

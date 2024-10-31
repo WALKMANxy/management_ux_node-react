@@ -1,5 +1,4 @@
 // src/components/clientpage/AgentActivityOverview.tsx
-
 import LoyaltyIcon from "@mui/icons-material/Loyalty";
 import {
   Timeline,
@@ -12,21 +11,19 @@ import {
   TimelineSeparator,
 } from "@mui/lab";
 import { CardHeader, Paper, Typography, useMediaQuery } from "@mui/material";
-import dayjs from "dayjs";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../app/hooks";
 import { selectVisits } from "../../features/promoVisits/promoVisitsSelectors";
 import { Agent } from "../../models/entityModels";
-import { ActivityItem, generateActivityList } from "../../utils/activityUtils"; // Import ActivityItem
+import { ActivityItem, generateActivityList } from "../../utils/activityUtils";
+import { formatDate, getDotColor } from "../../utils/dataUtils";
 
-// Props for the OrderItem component
 interface OrderItemProps {
   item: ActivityItem;
   lastTimeline: boolean;
 }
 
-// Props for the AgentActivityOverview component
 interface AgentActivityOverviewProps {
   selectedAgent: Agent;
 }
@@ -34,14 +31,14 @@ interface AgentActivityOverviewProps {
 const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({
   selectedAgent,
 }) => {
-  const promos = useAppSelector(selectVisits); // Assuming 'selectVisits' fetches promotion-related visits
-  const { t } = useTranslation(); // Initialize translation
+  const promos = useAppSelector(selectVisits);
+  const { t } = useTranslation();
 
   const isMobile = useMediaQuery("(max-width: 600px)");
   // Generate activity list using the utility function
   const activityList: ActivityItem[] = useMemo(
     () => generateActivityList(selectedAgent.clients, selectedAgent.id, promos),
-    [selectedAgent.id, selectedAgent.clients, promos] // More granular dependencies
+    [selectedAgent.id, selectedAgent.clients, promos]
   );
 
   return (
@@ -99,38 +96,7 @@ const AgentActivityOverview: React.FC<AgentActivityOverviewProps> = ({
 
 const OrderItem: React.FC<OrderItemProps> = ({ item, lastTimeline }) => {
   const { type, title, time, details } = item;
-  const { t } = useTranslation(); // Initialize translation
-
-  /**
-   * Determines the color of the TimelineDot based on the activity type.
-   *
-   * @param {string} type - The type of activity.
-   * @returns {"primary" | "success" | "error" | "grey"} The color for the TimelineDot.
-   */
-  const getDotColor = (
-    type: string
-  ): "primary" | "success" | "error" | "grey" => {
-    switch (type) {
-      case "visits":
-        return "primary";
-      case "sales":
-        return "success";
-      case "alerts":
-        return "error";
-      default:
-        return "grey";
-    }
-  };
-
-  /**
-   * Formats the date to exclude the time component.
-   *
-   * @param {string} time - The ISO date string.
-   * @returns {string} The formatted date string (DD/MM/YYYY).
-   */
-  const formatDate = (time: number): string => {
-    return dayjs(time).format("DD/MM/YYYY");
-  };
+  const { t } = useTranslation();
 
   return (
     <TimelineItem>
@@ -145,7 +111,6 @@ const OrderItem: React.FC<OrderItemProps> = ({ item, lastTimeline }) => {
       <TimelineSeparator>
         <TimelineConnector />
         <TimelineDot color={getDotColor(type)} aria-label={type}>
-          {/* Optional: Add ARIA hidden if decorative */}
           <LoyaltyIcon aria-hidden="true" />
         </TimelineDot>
         {!lastTimeline && <TimelineConnector />}

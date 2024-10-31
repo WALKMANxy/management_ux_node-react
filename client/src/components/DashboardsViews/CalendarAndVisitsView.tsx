@@ -32,7 +32,7 @@ const CalendarAndVisitsSection: React.FC<CalendarAndVisitsSectionProps> = ({
             gutterBottom
             sx={{
               fontFamily: "Inter, sans-serif",
-              fontWeight: 100, // Now using the lighter custom font weight
+              fontWeight: 100, 
             }}
           >
             {t("dashboard.calendar")}

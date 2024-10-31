@@ -1,10 +1,10 @@
-// src/components/AnimatedBox.tsx
+// src/components/common/AnimatedBox.tsx
 import React from 'react';
 import { Box, BoxProps } from '@mui/material';
 
 interface AnimatedBoxProps extends BoxProps {
-  animation?: string; // e.g., "fadeInUp"
-  duration?: string;  // e.g., "0.5s"
+  animation?: string;
+  duration?: string;
 }
 
 const AnimatedBox: React.FC<AnimatedBoxProps> = ({
@@ -18,7 +18,7 @@ const AnimatedBox: React.FC<AnimatedBoxProps> = ({
       className={`animate__animated animate__${animation}`}
       sx={{
         animationDuration: duration,
-        ...rest.sx, // Merge existing sx props
+        ...rest.sx, 
       }}
     >
       {children}
