@@ -15,8 +15,8 @@ onmessage = function (event) {
       client = {
         id: clientId,
         name: item["Ragione Sociale Cliente"],
-        extendedName: clientDetail ? clientDetail["RAGIONE SOCIALE AGG."] : "",
-        province: clientDetail ? clientDetail["C.A.P. - COMUNE (PROV.)"] : "",
+        extendedName: clientDetail ? clientDetail["RAGIONE SOCIALE AGG"] : "",
+        province: clientDetail ? clientDetail["CAP"] : "",
         phone: clientDetail ? clientDetail["TELEFONO"] : "",
         totalOrders: 0,
         totalRevenue: 0,
@@ -67,11 +67,15 @@ onmessage = function (event) {
     movement.details.push(detail);
 
     // Update movementTimestamp
-    const movementTimestamp = new Date(item["Data Documento Precedente"]).getTime();
+    const movementTimestamp = new Date(
+      item["Data Documento Precedente"]
+    ).getTime();
     if (!isNaN(movementTimestamp)) {
       if (movementTimestamp > movement.movementTimestamp) {
         movement.movementTimestamp = movementTimestamp;
-        movement.dateOfOrder = new Date(movementTimestamp).toISOString().split("T")[0];
+        movement.dateOfOrder = new Date(movementTimestamp)
+          .toISOString()
+          .split("T")[0];
       }
       if (movementTimestamp > client.latestMovementTimestamp) {
         client.latestMovementTimestamp = movementTimestamp;

@@ -3,6 +3,7 @@
 import { VisitWithAgent } from "../features/promoVisits/promoVisitsSelectors";
 import { Client } from "../models/entityModels";
 import { calculateRevenue, currencyFormatter } from "./dataUtils";
+import { t } from "i18next"; // Make sure you import the i18next correctly.
 
 // Define the structure of an activity item
 export interface ActivityItem {
@@ -15,14 +16,12 @@ export interface ActivityItem {
 }
 
 export const generateActivityList = (
-  clients: Client[], // Accept clients directly from the selected agent
-  agentId: string, // Accept agentId for filtering visits and alerts
-  visits: VisitWithAgent[] // Use visits from the selectVisits selector
+  clients: Client[],
+  agentId: string,
+  visits: VisitWithAgent[]
 ): ActivityItem[] => {
 
   // Process completed visits for the agent, limit to the first 5
-  /* console.log("Generating activity list for agent", agentId);
-  console.log("Visits:", visits); */
   const agentVisits = visits
     .filter((visit) => visit.agentId === agentId && visit.completed)
     .map((visit) => ({
@@ -37,9 +36,9 @@ export const generateActivityList = (
     .map<ActivityItem>((visit) => ({
       id: visit._id || "",
       type: "visits",
-      title: `Visit - Agent: ${visit.agentName || visit.agentId}`,
+      title: t("activityOverview.title", { type: "Visit", agent: visit.agentName || visit.agentId }),
       time: visit.timestamp,
-      details: `${visit.visitReason} - Client: ${visit.clientId}`,
+      details: t("activityOverview.details", { reason: visit.visitReason, clientId: visit.clientId }),
       subDetails: visit.notePublic
         ? visit.notePublic.length > 50
           ? `${visit.notePublic.slice(0, 50)}...`
@@ -63,38 +62,40 @@ export const generateActivityList = (
       return {
         id: movement.id,
         type: "sales",
-        title: "Sale",
+        title: t("activityOverview.saleTitle"),
         time: movement.timestamp,
-        details: `Client: ${movement.client.id}, ${movement.client.name} - Revenue: ${currencyFormatter(
-          revenue
-        )}`,
-        subDetails: `Order Date: ${new Date(
-          movement.dateOfOrder
-        ).toLocaleDateString()}`,
+        details: t("activityOverview.saleDetails", {
+          clientId: movement.client.id,
+          clientName: movement.client.name,
+          revenue: currencyFormatter(revenue),
+        }),
+        subDetails: t("activityOverview.orderDate", {
+          orderDate: new Date(movement.dateOfOrder).toLocaleDateString(),
+        }),
       };
     });
 
- // Merge the two sorted arrays (agentVisits and recentMovements) and limit to 10 items
- const mergedActivities: ActivityItem[] = [];
- let i = 0;
- let j = 0;
+  // Merge the two sorted arrays (agentVisits and recentMovements) and limit to 10 items
+  const mergedActivities: ActivityItem[] = [];
+  let i = 0;
+  let j = 0;
 
- while (
-   mergedActivities.length < 10 &&
-   (i < agentVisits.length || j < recentMovements.length)
- ) {
-   if (
-     i < agentVisits.length &&
-     (j >= recentMovements.length ||
-       agentVisits[i].time >= recentMovements[j].time)
-   ) {
-     mergedActivities.push(agentVisits[i]);
-     i++;
-   } else if (j < recentMovements.length) {
-     mergedActivities.push(recentMovements[j]);
-     j++;
-   }
- }
+  while (
+    mergedActivities.length < 10 &&
+    (i < agentVisits.length || j < recentMovements.length)
+  ) {
+    if (
+      i < agentVisits.length &&
+      (j >= recentMovements.length ||
+        agentVisits[i].time >= recentMovements[j].time)
+    ) {
+      mergedActivities.push(agentVisits[i]);
+      i++;
+    } else if (j < recentMovements.length) {
+      mergedActivities.push(recentMovements[j]);
+      j++;
+    }
+  }
 
- return mergedActivities;
+  return mergedActivities;
 };

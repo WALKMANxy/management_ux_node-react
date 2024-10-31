@@ -6,31 +6,6 @@
     "auditLog": "logs\\.786d7e49d453ca42e276166e9540b344152f158f-audit.json",
     "files": [
         {
-            "date": 1728690241473,
-            "name": "logs\\application-2024-10-12.log",
-            "hash": "673830d9b88f42042b4ad60d88b73536b9455e79b5e093c62ec81b9d3be20b7f"
-        },
-        {
-            "date": 1728840873865,
-            "name": "logs\\application-2024-10-13.log",
-            "hash": "caf15daadf6437be16472b23e6cb6f73a0e75d3b74e5a2911d6d1acb8bd7dd97"
-        },
-        {
-            "date": 1728946900803,
-            "name": "logs\\application-2024-10-15.log",
-            "hash": "df1b27ee5ea11f051a0cb9d50b346c1a99ab3b1dd1fdc2731d9898b8197a2f62"
-        },
-        {
-            "date": 1729035844691,
-            "name": "logs\\application-2024-10-16.log",
-            "hash": "2555c70cb95c1dc77f747bac482ed3bee9921a10685d13786e03beeb88045874"
-        },
-        {
-            "date": 1729116117738,
-            "name": "logs\\application-2024-10-17.log",
-            "hash": "6fa8242c5edcbc5509172192a0095186916eedb99cfb8604b7734a20d0ab7c60"
-        },
-        {
             "date": 1729216852512,
             "name": "logs\\application-2024-10-18.log",
             "hash": "956dbeda26008abfccf03db5ec00fd0b79c638e53e7f787ba05a2fd0fb760d8c"
@@ -69,6 +44,31 @@
             "date": 1729894039057,
             "name": "logs\\application-2024-10-26.log",
             "hash": "21965af7249a1fc694f6e14306f83edc7eef78786197733f3436a84e226bfb70"
+        },
+        {
+            "date": 1730054763732,
+            "name": "logs\\application-2024-10-27.log",
+            "hash": "81578c5ebd60dc1c98479110ced8ee21b4e220b466ba03dbfdf6a365afe5ad26"
+        },
+        {
+            "date": 1730102293695,
+            "name": "logs\\application-2024-10-28.log",
+            "hash": "d7603e1aaed0f364153f4888c37b0972799731e399d7c4fee5fbc663c27b53f6"
+        },
+        {
+            "date": 1730191727510,
+            "name": "logs\\application-2024-10-29.log",
+            "hash": "993d6323743959ac22135d3a6cd1eb19b311ecb8431e293d7b5eb23d928ceafc"
+        },
+        {
+            "date": 1730260933796,
+            "name": "logs\\application-2024-10-30.log",
+            "hash": "61fe5c90bdb0008e0e5c6771c8a7b80e1ee1a5ad42ecd4b24c6669967e439dea"
+        },
+        {
+            "date": 1730374804786,
+            "name": "logs\\application-2024-10-31.log",
+            "hash": "8e883a019d365e77f4e4c1657fea9333ee5653ac3ff0ed0525c7c4d415857331"
         }
     ],
     "hashType": "sha256"

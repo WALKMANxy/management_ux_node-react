@@ -157,7 +157,6 @@ export const authApiCall = async <T>(
   }
 };
 
-
 /**
  * Helper function to fetch fresh data and update the cache
  * @param storeName - The name of the Dexie table
@@ -197,7 +196,8 @@ export const loadMovementsDataWithCache = async (): Promise<
     /*     console.log("loadMovementsDataWithCache: Fetched from API");
      */ await setCachedDataSafe("movements", data);
     /*     console.log("loadMovementsDataWithCache: Cached successfully");
-     */ return data;
+     */
+    return data;
   } catch (error) {
     console.error(
       "loadMovementsDataWithCache: Failed to load movements data",

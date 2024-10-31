@@ -486,12 +486,12 @@ const useChatLogic = () => {
         if (participantId) {
           // Find the participant in the users array
           const participant = users.find((user) => user._id === participantId);
-          return participant?.entityName || "Chat";
+          return participant?.entityName || t("chat.deletedUser");
         }
       }
       return chat.name || "Group Chat";
     },
-    [currentUserId, users]
+    [currentUserId, users, t]
   );
 
   // Function to get unread messages count
