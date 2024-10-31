@@ -45,6 +45,12 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
     }
   }, [viewMode, salesDistributionDataClients, salesDistributionDataAgents]);
 
+  // State to track the clicked data point
+  const [selectedPoint, setSelectedPoint] = useState<{
+    x: string;
+    y: number;
+  } | null>(null);
+
   const options: ApexOptions = useMemo(
     () => ({
       chart: {
@@ -53,6 +59,26 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
           show: false,
         },
         background: "transparent",
+        events: {
+          // Handle click events on data points
+          dataPointSelection: (_event, _chartContext, config) => {
+            const dataPointIndex = config.dataPointIndex;
+            const seriesIndex = config.seriesIndex;
+            const x = config.w.globals.labels[dataPointIndex];
+            const y = config.w.globals.series[seriesIndex][dataPointIndex];
+
+            // Toggle the selected point
+            if (
+              selectedPoint &&
+              selectedPoint.x === x &&
+              selectedPoint.y === y
+            ) {
+              setSelectedPoint(null);
+            } else {
+              setSelectedPoint({ x, y });
+            }
+          },
+        },
       },
       plotOptions: {
         bar: {
@@ -78,31 +104,9 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
         enabled: false,
       },
       tooltip: {
-        custom: function ({ series, seriesIndex, dataPointIndex }) {
-          const fullLabel = dataset[dataPointIndex].label;
-          const value = series[seriesIndex][dataPointIndex];
-          const formattedValue = currencyFormatter(value);
-
-          return `
-            <div style="
-              padding: 12px;
-              backgroundColor: rgba(255, 255, 255, 0.3);
-              border-radius: 8px;
-              box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-              backdrop-filter: blur(6px);
-              font-family: 'Roboto', sans-serif;
-              font-size: 14px;
-              color: ${theme.palette.text.primary};
-            ">
-              <strong>${fullLabel}</strong><br/>
-
-               ${formattedValue}
-            </div>
-          `;
-        },
-        fixed: {
-          enabled: true,
-          position: "topRight",
+        enabled: true,
+        y: {
+          formatter: (value: number) => currencyFormatter(value),
         },
       },
       theme: {
@@ -111,8 +115,34 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
       fill: {
         colors: ["#26a69a"],
       },
+      // Conditionally add annotations based on selectedPoint
+      annotations: selectedPoint
+        ? {
+            points: [
+              {
+                x: selectedPoint.x,
+                y: selectedPoint.y,
+                marker: {
+                  size: 6,
+                  fillColor: "#fff",
+                  strokeColor: theme.palette.success.main,
+                  radius: 2,
+                },
+                label: {
+                  borderColor: theme.palette.success.main,
+                  offsetY: -10,
+                  style: {
+                    color: "#fff",
+                    background: theme.palette.success.main,
+                  },
+                  text: currencyFormatter(selectedPoint.y),
+                },
+              },
+            ],
+          }
+        : {},
     }),
-    [dataset, theme]
+    [dataset, selectedPoint, theme.palette.success.main]
   );
 
   // Define series data
@@ -132,6 +162,8 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
   // Handle view mode toggle
   const handleViewModeToggle = useCallback((mode: "clients" | "agents") => {
     setViewMode(mode);
+    // Reset selectedPoint when view mode changes
+    setSelectedPoint(null);
   }, []);
 
   return (

@@ -36,19 +36,7 @@ input[class^="ag-"][type="number"]:not(.ag-number-field-input-stepper) {
   appearance: textfield; /* Added line */
 }
 
-/* html {
-  -webkit-text-size-adjust: 100%;
-  -moz-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-} */
 
-/* body {
-  -webkit-text-size-adjust: 100%;
-  -moz-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-} */
 
 th {
   text-align: inherit; /* Inherits the text-align value from its parent */
@@ -85,6 +73,25 @@ th {
   border: solid 1px var(--ag-input-border-color);
   background-color: var(--ag-background-color);
   cursor: pointer;
+}
+
+.fadeInUp-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.fadeInUp-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 500ms, transform 500ms;
+}
+.fadeInUp-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+.fadeInUp-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 500ms, transform 500ms;
 }
 
 html,

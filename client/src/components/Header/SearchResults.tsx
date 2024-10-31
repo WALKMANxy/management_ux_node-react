@@ -119,7 +119,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             position: "relative",
             borderRadius: 2,
             py: 0.5,
-            zIndex: 5000,
+            zIndex: 1001,
           }}
         >
           <Card
@@ -216,7 +216,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
 
               {result.type === "visit" && (
                 <>
-               
+
                   <Typography variant="body2" color="textSecondary" noWrap>
                     {t("searchResults.visitReason")}: {result.name}
                   </Typography>

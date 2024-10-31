@@ -68,26 +68,39 @@ const useManageEntities = () => {
   const [alertSeverity, setAlertSeverity] = useState<AlertSeverity>();
 
   /**
+   * Fetch admins and employees from APIs.
+   */
+  const fetchEntities = useCallback(async () => {
+    setLoadingEntities(true);
+
+    try {
+      const [adminData, employeeData] = await Promise.all([
+        loadAdminDetailsData(),
+        getAllEmployees(),
+      ]);
+      setAdmins(adminData); // Store fetched admins
+      setEmployees(employeeData); // Store fetched employees
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        showToast.error(
+          `${t("userDetails.loadAdminsError", "Failed to load admins")}: ${error.message}`
+        );
+        console.error("Error fetching admin or employee data:", error);
+      } else {
+        showToast.error(t("userDetails.loadAdminsError", "Failed to load admins"));
+        console.error("Unknown error fetching admin or employee data:", error);
+      }
+    } finally {
+      setLoadingEntities(false);
+    }
+  }, [t]);
+
+  /**
    * Fetch admins and employees when the hook mounts.
    */
   useEffect(() => {
-    setLoadingEntities(true);
-
-    // Load both admins and employees in parallel
-    Promise.all([loadAdminDetailsData(), getAllEmployees()])
-      .then(([adminData, employeeData]) => {
-        setAdmins(adminData); // Store fetched admins
-        setEmployees(employeeData); // Store fetched employees
-        setLoadingEntities(false);
-      })
-      .catch((error: Error) => {
-        showToast.error(
-          t("userDetails.loadAdminsError") + ": " + error.message
-        );
-        console.error("Error fetching admin or employee data:", error);
-        setLoadingEntities(false);
-      });
-  }, [t]);
+    fetchEntities();
+  }, [fetchEntities]);
 
   /**
    * Sorted lists for each entity type.
@@ -232,6 +245,9 @@ const useManageEntities = () => {
         );
         setAlertSeverity("success");
         setSelectedEntity(null);
+
+        // Refetch entities to reflect changes
+        await fetchEntities();
       } catch (error: unknown) {
         let errorMessage = "An unknown error occurred";
 
@@ -253,7 +269,7 @@ const useManageEntities = () => {
         setLoadingAction(false);
       }
     },
-    [dispatch, role, t]
+    [dispatch, role, t, fetchEntities]
   );
 
   /**
@@ -307,6 +323,9 @@ const useManageEntities = () => {
           t("manageEntities.createSuccess", "Entity created successfully")
         );
         setAlertSeverity("success");
+
+        // Refetch entities to reflect changes
+        await fetchEntities();
       } catch (error: unknown) {
         let errorMessage = "An unknown error occurred";
 
@@ -328,7 +347,7 @@ const useManageEntities = () => {
         setLoadingAction(false);
       }
     },
-    [dispatch, role, t]
+    [dispatch, role, t, fetchEntities]
   );
 
   /**
@@ -381,6 +400,9 @@ const useManageEntities = () => {
         );
         setAlertSeverity("success");
         setSelectedEntity(null);
+
+        // Refetch entities to reflect changes
+        await fetchEntities();
       } catch (error: unknown) {
         let errorMessage = "An unknown error occurred";
 
@@ -402,7 +424,7 @@ const useManageEntities = () => {
         setLoadingAction(false);
       }
     },
-    [dispatch, role, t]
+    [dispatch, role, t, fetchEntities]
   );
 
   return {

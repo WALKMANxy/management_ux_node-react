@@ -2,42 +2,42 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface IMovement extends Document {
-  dataDocumentoPrecedente: string;
-  numeroLista: number;
-  mese: number;
-  anno: number;
-  ragioneSocialeCliente: string;
-  codiceCliente: string;
-  codiceAgente: string;
-  codiceArticolo: string;
-  marcaArticolo: string;
-  descrizioneArticolo: string;
-  quantita: number;
-  valore: number;
-  costo: number;
-  prezzoArticolo: number;
+  "Data Documento Precedente"?: string;
+  "Numero Lista"?: number;
+  "Mese"?: number;
+  "Anno"?: number;
+  "Ragione Sociale Cliente"?: string;
+  "Codice Cliente"?: string;
+  "Codice Agente"?: string;
+  "Codice Articolo"?: string;
+  "Marca Articolo"?: string;
+  "Descrizione Articolo"?: string;
+  "Quantita"?: number;
+  "Valore"?: number;
+  "Costo"?: number;
+  "Prezzo Articolo"?: number;
 }
 
 const MovementSchema: Schema = new Schema({
-  dataDocumentoPrecedente: { type: String, required: true },
-  numeroLista: { type: Number, required: true },
-  mese: { type: Number, required: true },
-  anno: { type: Number, required: true },
-  ragioneSocialeCliente: { type: String, required: true },
-  codiceCliente: { type: String, required: true, index: true },
-  codiceAgente: { type: String, required: true, index: true },
-  codiceArticolo: { type: String, required: true },
-  marcaArticolo: { type: String, required: true },
-  descrizioneArticolo: { type: String, required: true },
-  quantita: { type: Number, required: true },
-  valore: { type: Number, required: true },
-  costo: { type: Number, required: true },
-  prezzoArticolo: { type: Number, required: true },
+  "Data Documento Precedente": { type: String },
+  "Numero Lista": { type: Number },
+  "Mese": { type: Number },
+  "Anno": { type: Number },
+  "Ragione Sociale Cliente": { type: String },
+  "Codice Cliente": { type: String, index: true },
+  "Codice Agente": { type: String, index: true },
+  "Codice Articolo": { type: String },
+  "Marca Articolo": { type: String },
+  "Descrizione Articolo": { type: String },
+  "Quantita": { type: Number },
+  "Valore": { type: Number },
+  "Costo": { type: Number },
+  "Prezzo Articolo": { type: Number },
 });
 
 // Indexes for optimized queries
-MovementSchema.index({ numeroLista: 1 });
-MovementSchema.index({ codiceCliente: 1 });
-MovementSchema.index({ codiceAgente: 1 });
+MovementSchema.index({ "Numero Lista": 1 });
+MovementSchema.index({ "Codice Cliente": 1 });
+MovementSchema.index({ "Codice Agente": 1 });
 
 export default mongoose.model<IMovement>("Movement", MovementSchema);

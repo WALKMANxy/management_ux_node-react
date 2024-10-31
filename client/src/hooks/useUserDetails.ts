@@ -181,23 +181,17 @@ const useUserDetails = (user: Partial<User>) => {
       setLoading(true);
       dispatch(deleteUserByIdThunk(userId))
         .then(() => {
-          setAlertMessage(t("userDetails.deleteSuccess"));
-          setAlertSeverity("success");
           showToast.success(t("userDetails.deleteSuccessToast"));
         })
         .catch((error: unknown) => {
           if (error instanceof Error) {
-            setAlertMessage(
-              t("userDetails.deleteFailed", { message: error.message })
-            );
+
             showToast.error(
               t("userDetails.deleteFailedToast", { message: error.message })
             );
           } else {
-            setAlertMessage(t("userDetails.deleteUnknownError"));
             showToast.error(t("userDetails.deleteUnknownErrorToast"));
           }
-          setAlertSeverity("error");
           console.error("Error deleting user:", error);
         })
         .finally(() => {

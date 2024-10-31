@@ -1,5 +1,5 @@
 import { Box, useMediaQuery, useTheme } from "@mui/material";
-import React, { memo, useEffect, useMemo } from "react";
+import React, { memo, useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
@@ -50,25 +50,26 @@ const ArticlesPage: React.FC = () => {
     }
   }, [handleArticleSelect]);
 
+  const renderClickableCell = useCallback(
+    (params: { data: MovementDetail; value: string }) => (
+      <span
+        onClick={() => handleArticleSelect(params.data.articleId)}
+        style={{ cursor: "pointer" }}
+      >
+        {params.value}
+      </span>
+    ),
+    [handleArticleSelect]
+  );
+
   const columnDefinitions: ArticleColumnDefinition[] = useMemo(() => {
     const baseColumns: ArticleColumnDefinition[] = [
       {
-        headerName: t("articlesPage.name"),
-        field: "name",
+        headerName: t("articlesPage.oemId"),
+        field: "articleId",
         filter: "agTextColumnFilter",
         sortable: true,
-        cellRenderer: (params: { data: MovementDetail; value: string }) => {
-          return (
-            <span
-              onClick={() => handleArticleSelect(params.data.articleId)}
-              style={{
-                cursor: "pointer",
-              }}
-            >
-              {params.value}
-            </span>
-          );
-        },
+        cellRenderer: renderClickableCell,
       },
       {
         headerName: t("articlesPage.brand"),
@@ -77,10 +78,11 @@ const ArticlesPage: React.FC = () => {
         sortable: true,
       },
       {
-        headerName: t("articlesPage.oemId"),
-        field: "articleId",
+        headerName: t("articlesPage.name"),
+        field: "name",
         filter: "agTextColumnFilter",
         sortable: true,
+        cellRenderer: renderClickableCell,
       },
     ];
 
@@ -113,7 +115,7 @@ const ArticlesPage: React.FC = () => {
     }
 
     return baseColumns;
-  }, [handleArticleSelect, t, userRole, totalQuantitySold]);
+  }, [t, userRole, totalQuantitySold, renderClickableCell]);
 
   // Handle loading state
   if (loading) {

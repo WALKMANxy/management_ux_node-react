@@ -40,9 +40,9 @@ export interface Agent {
 export interface Client {
   CODICE: string;
   "RAGIONE SOCIALE": string;
-  "RAGIONE SOCIALE AGG.": string;
+  "RAGIONE SOCIALE AGG": string;
   INDIRIZZO: string;
-  "C.A.P. - COMUNE (PROV.)": string;
+  "CAP": string;
   TELEFONO: string;
   EMAIL: string;
   "EMAIL PEC": string;
