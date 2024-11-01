@@ -1,3 +1,4 @@
+//src/routes/visits.ts
 import express from "express";
 import { visitValidationRules } from "../constants/validationRules";
 import { VisitController } from "../controllers/visitsController";
@@ -10,7 +11,6 @@ import { checkValidation } from "../middlewares/validate";
 
 const router = express.Router();
 
-// Middleware to authenticate and authorize user
 router.use(authenticateUser);
 
 // GET method to retrieve all visits

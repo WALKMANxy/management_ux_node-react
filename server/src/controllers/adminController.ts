@@ -1,24 +1,18 @@
 // src/controllers/adminController.ts
 import { Request, Response } from "express";
 import {
+  createAdminService,
+  deleteAdminService,
   getAdminById,
   getAllAdmins,
-  createAdminService,
   updateAdminService,
-  deleteAdminService,
 } from "../services/adminService";
 
-// src/types/mongoError.ts
 export interface MongoDuplicateKeyError extends Error {
   code: number;
   keyValue: { [key: string]: any };
 }
 
-/**
- * Type guard to check if an error is a MongoDuplicateKeyError.
- * @param error - The error to check.
- * @returns True if the error is a MongoDuplicateKeyError, false otherwise.
- */
 export const isMongoDuplicateKeyError = (
   error: unknown
 ): error is MongoDuplicateKeyError => {
@@ -30,9 +24,6 @@ export const isMongoDuplicateKeyError = (
   );
 };
 
-/**
- * Fetch all admins and include empty agents and clients arrays.
- */
 export const fetchAllAdmins = async (req: Request, res: Response) => {
   try {
     const admins = await getAllAdmins();
@@ -51,9 +42,6 @@ export const fetchAllAdmins = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Fetch a single admin by ID and include empty agents and clients arrays.
- */
 export const fetchAdminById = async (req: Request, res: Response) => {
   try {
     const admin = await getAdminById(req.params.id);
@@ -75,16 +63,15 @@ export const fetchAdminById = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Create a new admin.
- */
 export const createAdmin = async (req: Request, res: Response) => {
   try {
     const { id, name, email } = req.body;
 
     // Validate input
     if (!id || !name || !email) {
-      return res.status(400).json({ message: "id, name, and email are required" });
+      return res
+        .status(400)
+        .json({ message: "id, name, and email are required" });
     }
 
     const newAdmin = await createAdminService({ id, name, email });
@@ -98,7 +85,6 @@ export const createAdmin = async (req: Request, res: Response) => {
     console.error("Error in createAdmin:", error);
 
     if (isMongoDuplicateKeyError(error)) {
-      // Determine which field caused the duplicate key error
       const duplicatedField = Object.keys(error.keyValue)[0];
       return res.status(409).json({
         message: `Admin with the given ${duplicatedField} already exists`,
@@ -109,17 +95,17 @@ export const createAdmin = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Update an existing admin by ID.
- */
 export const updateAdmin = async (req: Request, res: Response) => {
   try {
     const adminId = req.params.id;
     const { name, email } = req.body;
 
-    // At least one field must be provided for update
     if (!name && !email) {
-      return res.status(400).json({ message: "At least one of name or email must be provided for update" });
+      return res
+        .status(400)
+        .json({
+          message: "At least one of name or email must be provided for update",
+        });
     }
 
     const updatedAdmin = await updateAdminService(adminId, { name, email });
@@ -133,14 +119,15 @@ export const updateAdmin = async (req: Request, res: Response) => {
       name: updatedAdmin.name,
       email: updatedAdmin.email,
     });
-  }catch (error) {
+  } catch (error) {
     console.error(`Error in updateAdmin for id ${req.params.id}:`, error);
 
     if (isMongoDuplicateKeyError(error)) {
-      // Determine which field caused the duplicate key error
       const duplicatedField = Object.keys(error.keyValue)[0];
       return res.status(409).json({
-        message: `${duplicatedField.charAt(0).toUpperCase() + duplicatedField.slice(1)} already in use`,
+        message: `${
+          duplicatedField.charAt(0).toUpperCase() + duplicatedField.slice(1)
+        } already in use`,
       });
     }
 
@@ -148,9 +135,6 @@ export const updateAdmin = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Delete an admin by ID.
- */
 export const deleteAdmin = async (req: Request, res: Response) => {
   try {
     const adminId = req.params.id;

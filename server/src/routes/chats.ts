@@ -1,5 +1,4 @@
-// routes/chatRoutes.ts
-
+// src/routes/chatRoutes.ts
 import express from "express";
 import { ChatController } from "../controllers/chatController";
 import { authenticateUser } from "../middlewares/authentication";
@@ -7,7 +6,6 @@ import { checkAllowedRole } from "../middlewares/roleChecker";
 
 const router = express.Router();
 
-// Protect all routes with authenticateUser middleware
 router.use(authenticateUser);
 router.use(checkAllowedRole);
 
@@ -32,6 +30,6 @@ router.post("/create", ChatController.createChat);
 router.post("/:chatId/messages", ChatController.addMessage);
 
 // Route to update read status for multiple messages in a chat
-router.patch("/:chatId/messages/read", ChatController.updateReadStatus); // Adjusted to match new controller behavior
+router.patch("/:chatId/messages/read", ChatController.updateReadStatus);
 
 export default router;

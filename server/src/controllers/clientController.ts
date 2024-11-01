@@ -6,9 +6,6 @@ import { ClientService } from "../services/clientService";
 import { isMongoDuplicateKeyError } from "./adminController";
 
 export class ClientController {
-  /**
-   * Fetch all clients.
-   */
   static async getClients(
     req: AuthenticatedRequest,
     res: Response
@@ -29,9 +26,6 @@ export class ClientController {
     }
   }
 
-  /**
-   * Fetch a client by CODICE.
-   */
   static async getClientById(req: Request, res: Response): Promise<void> {
     try {
       const codice = req.params.codice;
@@ -56,9 +50,6 @@ export class ClientController {
     }
   }
 
-  /**
-   * Fetch clients associated with the authenticated agent.
-   */
   static async getClientsForAgent(
     req: AuthenticatedRequest,
     res: Response
@@ -99,9 +90,6 @@ export class ClientController {
     }
   }
 
-  /**
-   * Replace a client by CODICE.
-   */
   static async replaceClient(
     req: AuthenticatedRequest,
     res: Response
@@ -110,7 +98,6 @@ export class ClientController {
       const codice = req.params.id;
       const clientData: IClient = req.body;
 
-      // Validate that clientData.CODICE matches the URL parameter
       if (clientData.CODICE !== codice) {
         res.status(400).json({
           message: "CODICE in request body does not match URL parameter.",
@@ -142,9 +129,6 @@ export class ClientController {
     }
   }
 
-  /**
-   * Update a client by CODICE.
-   */
   static async updateClient(
     req: AuthenticatedRequest,
     res: Response
@@ -177,9 +161,6 @@ export class ClientController {
     }
   }
 
-  /**
-   * Create a new client.
-   */
   static async createClient(
     req: AuthenticatedRequest,
     res: Response
@@ -190,7 +171,7 @@ export class ClientController {
         "RAGIONE SOCIALE": RAGIONE_SOCIALE,
         "RAGIONE SOCIALE AGG": RAGIONE_SOCIALE_AGG,
         INDIRIZZO,
-        "CAP": CAP_COMUNE_PROV,
+        CAP: CAP_COMUNE_PROV,
         TELEFONO,
         EMAIL,
         "EMAIL PEC": EMAIL_PEC,
@@ -202,7 +183,6 @@ export class ClientController {
         AG,
       } = req.body;
 
-      // Validate required fields
       if (
         !CODICE ||
         !RAGIONE_SOCIALE ||
@@ -226,7 +206,7 @@ export class ClientController {
         "RAGIONE SOCIALE": RAGIONE_SOCIALE,
         "RAGIONE SOCIALE AGG": RAGIONE_SOCIALE_AGG || "",
         INDIRIZZO,
-        "CAP": CAP_COMUNE_PROV,
+        CAP: CAP_COMUNE_PROV,
         TELEFONO,
         EMAIL: EMAIL || "",
         "EMAIL PEC": EMAIL_PEC || "",
@@ -238,7 +218,9 @@ export class ClientController {
         AG,
       } as IClient;
 
-      const createdClient = await ClientService.createClientService(newClientData);
+      const createdClient = await ClientService.createClientService(
+        newClientData
+      );
 
       res.status(201).json({
         message: "Client created successfully",
@@ -268,9 +250,6 @@ export class ClientController {
     }
   }
 
-  /**
-   * Delete a client by CODICE.
-   */
   static async deleteClient(
     req: AuthenticatedRequest,
     res: Response

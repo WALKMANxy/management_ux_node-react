@@ -1,4 +1,4 @@
-// middleware/csp.ts
+//src/middlewares/csp.ts
 
 import { Request, Response, NextFunction } from "express";
 

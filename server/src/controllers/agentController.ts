@@ -12,9 +12,7 @@ import {
 import { IAgent } from '../models/Agent';
 import { isMongoDuplicateKeyError } from './adminController';
 
-/**
- * Fetch all agents.
- */
+
 export const fetchAllAgents = async (req: Request, res: Response) => {
   try {
     const agents = await getAllAgents();
@@ -25,9 +23,7 @@ export const fetchAllAgents = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Fetch an agent by ID.
- */
+
 export const fetchAgentById = async (req: Request, res: Response) => {
   try {
     const agent = await getAgentById(req.params.id);
@@ -41,15 +37,12 @@ export const fetchAgentById = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Fetch an agent by client's entity code.
- */
+
 export const fetchAgentByClientEntityCode = async (
   req: Request,
   res: Response
 ) => {
   try {
-    // Assuming req.user.entityCode is available via authentication middleware
     const clientEntityCode = (req as any).user?.entityCode;
 
     if (!clientEntityCode) {
@@ -80,14 +73,11 @@ export const fetchAgentByClientEntityCode = async (
   }
 };
 
-/**
- * Create a new agent.
- */
+
 export const createAgent = async (req: Request, res: Response) => {
   try {
     const { id, name, email, clients } = req.body;
 
-    // Validate required fields
     if (!id || !name) {
       return res
         .status(400)
@@ -106,7 +96,6 @@ export const createAgent = async (req: Request, res: Response) => {
     console.error('Error in createAgent:', error);
 
     if (isMongoDuplicateKeyError(error)) {
-      // Determine which field caused the duplicate key error
       const duplicatedField = Object.keys(error.keyValue)[0];
       return res.status(409).json({
         message: `Agent with the given ${duplicatedField} already exists`,
@@ -117,9 +106,6 @@ export const createAgent = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Update an existing agent by ID.
- */
 export const updateAgent = async (req: Request, res: Response) => {
   try {
     const adminId = req.params.id;
@@ -165,9 +151,7 @@ export const updateAgent = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Delete an agent by ID.
- */
+
 export const deleteAgent = async (req: Request, res: Response) => {
   try {
     const agentId = req.params.id;
@@ -184,14 +168,11 @@ export const deleteAgent = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Replace an agent by ID.
- */
+
 export const replaceAgent = async (req: Request, res: Response) => {
   try {
     const { id, name, email, phone, clients } = req.body;
 
-    // Validate required fields
     if (!id || !name) {
       return res
         .status(400)
@@ -204,7 +185,7 @@ export const replaceAgent = async (req: Request, res: Response) => {
       email,
       phone,
       clients: clients || [],
-    } as IAgent); // Ensure type casting aligns with your IAgent interface
+    } as IAgent);
 
     if (!replacedAgent) {
       return res.status(404).json({ message: 'Agent not found' });

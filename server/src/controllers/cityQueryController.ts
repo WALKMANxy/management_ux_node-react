@@ -1,3 +1,4 @@
+//src/controllers/cityQueryController.ts
 import { Request, Response } from "express";
 import { CityService } from "../services/cityQueryService";
 
@@ -15,9 +16,9 @@ export class CityController {
       const latitude = parseFloat(lat as string);
       const longitude = parseFloat(lon as string);
 
-      console.log(
+     /*  console.log(
         `Finding nearby city for lat: ${latitude}, lon: ${longitude}`
-      );
+      ); */
 
       const cityName = await this.cityService.findNearbyCity(
         latitude,
@@ -25,10 +26,10 @@ export class CityController {
       );
 
       if (cityName) {
-        console.log(`Found nearby city: ${cityName}`);
+        // console.log(`Found nearby city: ${cityName}`);
         res.status(200).json({ city: cityName });
       } else {
-        console.log("No nearby city found");
+        // console.log("No nearby city found");
         res.status(404).json({ message: "No nearby city found" });
       }
     } catch (error) {

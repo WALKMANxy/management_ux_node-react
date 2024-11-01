@@ -1,3 +1,4 @@
+//src/controllers/visitsController.ts
 import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../models/types";
 import { VisitService } from "../services/visitService";
@@ -5,15 +6,14 @@ import { VisitService } from "../services/visitService";
 export class VisitController {
   static async getAllVisits(req: Request, res: Response): Promise<void> {
     try {
-      const role = req.query.role as string; // Extract role from query parameters
-      const clientId = req.query.clientId as string; // Extract clientId from query parameters
+      const role = req.query.role as string;
+      const clientId = req.query.clientId as string;
 
       if (!role) {
         res.status(400).json({ message: "Role is required." });
         return;
       }
 
-      // Validate parameters based on role
       if (role === "client" && !clientId) {
         res
           .status(400)
@@ -26,7 +26,7 @@ export class VisitController {
 
       // If role is 'client', strip out the notePrivate
       const processedVisits = visits.map((visit) => {
-        const visitObj = visit.toObject(); // Assuming Mongoose document
+        const visitObj = visit.toObject();
         if (role === "client") {
           delete visitObj.notePrivate;
         }
@@ -49,17 +49,17 @@ export class VisitController {
     res: Response
   ): Promise<void> {
     try {
-      console.log("Creating visit:", req.body);
+      // console.log("Creating visit:", req.body);
       // Convert date string to Date object
       const visitData = {
         ...req.body,
-        date: req.body.date ? new Date(req.body.date) : null, // Ensure the date is a Date object
+        date: req.body.date ? new Date(req.body.date) : null,
       };
 
-      console.log("Visit data:", visitData);
+      // console.log("Visit data:", visitData);
 
       const visit = await VisitService.createVisit(visitData);
-      console.log("Created visit:", visit);
+      // console.log("Created visit:", visit);
       res.status(201).json(visit);
     } catch (err) {
       console.error("Error creating visit:", err);

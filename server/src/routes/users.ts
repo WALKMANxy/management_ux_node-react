@@ -1,3 +1,4 @@
+//src/routes/users.ts
 import express from "express";
 import { userValidationRules } from "../constants/validationRules";
 import { UserController } from "../controllers/userController";
@@ -11,7 +12,6 @@ import { checkValidation } from "../middlewares/validate";
 
 const router = express.Router();
 
-// Middleware to authenticate user
 router.use(authenticateUser);
 
 // GET method to retrieve all users (Admin only)
@@ -44,26 +44,26 @@ router.patch(
 // PATCH method to update user email
 router.patch(
   "/:id/update-email",
-  checkAgentOrAdminOrClientRole, // Ensure the user is authorized
-  userValidationRules, // Specific validation rules for updating email
+  checkAgentOrAdminOrClientRole,
+  userValidationRules,
   checkValidation,
-  UserController.updateUserEmail // Controller method to update email
+  UserController.updateUserEmail
 );
 
 // PATCH method to update user password
 router.patch(
   "/:id/update-password",
-  checkAgentOrAdminOrClientRole, // Ensure the user is authorized
-  userValidationRules, // Specific validation rules for updating password
+  checkAgentOrAdminOrClientRole,
+  userValidationRules,
   checkValidation,
-  UserController.updateUserPassword // Controller method to update password
+  UserController.updateUserPassword
 );
 
 router.delete(
   "/:id",
-  checkValidation, // Validate the request
-  checkAdminRole,   // Ensure the user is an admin
-  UserController.deleteUser // Controller method to delete the user
+  checkValidation,
+  checkAdminRole,
+  UserController.deleteUser
 );
 
 export default router;
