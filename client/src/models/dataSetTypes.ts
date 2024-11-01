@@ -1,5 +1,4 @@
 //src/models/dataSetTypes.ts
-
 import { Agent, Client } from "./entityModels";
 import { SearchResult } from "./searchModels";
 
@@ -63,8 +62,8 @@ export type TopArticleType = {
 
 // Define a reusable type for comparative statistics
 export interface ComparativeStatistics {
-  revenuePercentage: string; // Consider using number if unformatted
-  ordersPercentage: string; // Consider using number if unformatted
+  revenuePercentage: string;
+  ordersPercentage: string; 
 }
 
 export interface UseSelectionStateReturn {

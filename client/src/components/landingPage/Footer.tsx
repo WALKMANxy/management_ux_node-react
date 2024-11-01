@@ -319,7 +319,7 @@ const Footer: React.FC = () => {
         <Box>
           {/* Call IconButton */}
           <IconButton
-            href="tel:+390954190006"
+            // href="tel:+390954190006"
             sx={{ color: "green", mr: -1.2 }}
             aria-label="Call"
           >
@@ -330,7 +330,7 @@ const Footer: React.FC = () => {
             />
           </IconButton>
           <IconButton
-            href="mailto:info@ricambicentrosud.com"
+            // href="mailto:info@ricambicentrosud.com"
             sx={{ color: "#D44638", mr: -1.4 }}
             aria-label="Email"
           >
@@ -343,10 +343,10 @@ const Footer: React.FC = () => {
 
           {/* Google Maps IconButton */}
           <IconButton
-            href="https://goo.gl/maps/MFy1cqdn3BbQNmtW6"
+            // href="https://goo.gl/maps/MFy1cqdn3BbQNmtW6"
             sx={{ color: "#4285F4", mr: -1.3 }}
-            target="_blank"
-            rel="noopener noreferrer"
+            // target="_blank"
+            // rel="noopener noreferrer"
             aria-label="Google Maps"
           >
             <FmdGoodIcon
@@ -358,10 +358,10 @@ const Footer: React.FC = () => {
 
           {/* Facebook IconButton */}
           <IconButton
-            href="https://www.facebook.com/RicambiCentroSud/"
+            // href="https://www.facebook.com/RicambiCentroSud/"
             sx={{ color: "#3b5998", mr: -1.1 }}
-            target="_blank"
-            rel="noopener noreferrer"
+            // target="_blank"
+            // rel="noopener noreferrer"
             aria-label="Facebook"
           >
             <FacebookIcon
@@ -373,10 +373,10 @@ const Footer: React.FC = () => {
 
           {/* Instagram IconButton */}
           <IconButton
-            href="https://www.instagram.com/ricambicentrosud/"
+            // href="https://www.instagram.com/ricambicentrosud/"
             sx={{ color: "#E1306C", mr: -1.2 }}
-            target="_blank"
-            rel="noopener noreferrer"
+            // target="_blank"
+            // rel="noopener noreferrer"
             aria-label="Instagram"
           >
             <InstagramIcon
@@ -388,10 +388,10 @@ const Footer: React.FC = () => {
 
           {/* LinkedIn IconButton */}
           <IconButton
-            href="https://www.linkedin.com/company/7007068/"
+            // href="https://www.linkedin.com/company/7007068/"
             sx={{ color: "#0077B5" }}
-            target="_blank"
-            rel="noopener noreferrer"
+            // target="_blank"
+            // rel="noopener noreferrer"
             aria-label="LinkedIn"
           >
             <LinkedInIcon
@@ -418,7 +418,7 @@ const Footer: React.FC = () => {
             height: "100%",
             padding: 2,
           }}
-          onClick={handleCloseModal} 
+          onClick={handleCloseModal}
         >
           <Paper
             elevation={3}

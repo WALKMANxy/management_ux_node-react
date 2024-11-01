@@ -1,5 +1,4 @@
 // src/hooks/useManageEntities.ts
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useInView } from "react-intersection-observer";
@@ -28,42 +27,22 @@ import { showToast } from "../services/toastMessage";
 
 type AlertSeverity = "success" | "error";
 
-/**
- * Custom hook for managing entities (Agent, Admin, Employee).
- * Create and update actions are excluded for Clients.
- */
 const useManageEntities = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-
-  // Access clients and agents from the Redux store
   const clients = useAppSelector((state) => state.data.clients);
   const agents = useAppSelector((state) => state.data.agents);
-
-  // Local state for admins and employees fetched from APIs
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
-
-  // Current role filter (default to "client")
   const [role, setRole] = useState<UserRole>("client");
-
-  // Search text for filtering entities
   const [entitySearchText, setEntitySearchText] = useState("");
-
-  // Selected entity for viewing details or performing actions
   const [selectedEntity, setSelectedEntity] = useState<
     Client | Agent | Admin | Employee | null
   >(null);
-
-  // Loading states
   const [loadingEntities, setLoadingEntities] = useState(false);
   const [loadingAction, setLoadingAction] = useState(false);
-
-  // Infinite scroll setup
   const { ref, inView } = useInView({ triggerOnce: false, threshold: 0.1 });
   const [visibleRows, setVisibleRows] = useState(20);
-
-  // Alert message state
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertSeverity, setAlertSeverity] = useState<AlertSeverity>();
 
@@ -78,16 +57,20 @@ const useManageEntities = () => {
         loadAdminDetailsData(),
         getAllEmployees(),
       ]);
-      setAdmins(adminData); // Store fetched admins
-      setEmployees(employeeData); // Store fetched employees
+      setAdmins(adminData);
+      setEmployees(employeeData);
     } catch (error: unknown) {
       if (error instanceof Error) {
         showToast.error(
-          `${t("userDetails.loadAdminsError", "Failed to load admins")}: ${error.message}`
+          `${t("userDetails.loadAdminsError", "Failed to load admins")}: ${
+            error.message
+          }`
         );
         console.error("Error fetching admin or employee data:", error);
       } else {
-        showToast.error(t("userDetails.loadAdminsError", "Failed to load admins"));
+        showToast.error(
+          t("userDetails.loadAdminsError", "Failed to load admins")
+        );
         console.error("Unknown error fetching admin or employee data:", error);
       }
     } finally {
@@ -119,9 +102,9 @@ const useManageEntities = () => {
     () =>
       Object.values(clients)
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map(client => ({
+        .map((client) => ({
           ...client,
-          colour: client.colour || "", // Initialize colour if not present
+          colour: client.colour || "",
         })),
     [clients]
   );
@@ -187,7 +170,7 @@ const useManageEntities = () => {
    */
   const handleEntitySearch = useCallback((searchText: string) => {
     setEntitySearchText(searchText);
-    setVisibleRows(20); // Reset pagination on new search
+    setVisibleRows(20);
   }, []);
 
   /**
@@ -256,7 +239,10 @@ const useManageEntities = () => {
         }
 
         showToast.error(
-          `${t("manageEntities.deleteFailed", "Failed to delete entity")}: ${errorMessage}`
+          `${t(
+            "manageEntities.deleteFailed",
+            "Failed to delete entity"
+          )}: ${errorMessage}`
         );
 
         setAlertMessage(
@@ -334,7 +320,10 @@ const useManageEntities = () => {
         }
 
         showToast.error(
-          `${t("manageEntities.createFailed", "Failed to create entity")}: ${errorMessage}`
+          `${t(
+            "manageEntities.createFailed",
+            "Failed to create entity"
+          )}: ${errorMessage}`
         );
 
         setAlertMessage(
@@ -411,7 +400,10 @@ const useManageEntities = () => {
         }
 
         showToast.error(
-          `${t("manageEntities.updateFailed", "Failed to update entity")}: ${errorMessage}`
+          `${t(
+            "manageEntities.updateFailed",
+            "Failed to update entity"
+          )}: ${errorMessage}`
         );
 
         setAlertMessage(
@@ -428,7 +420,6 @@ const useManageEntities = () => {
   );
 
   return {
-    // State and setters
     role,
     setRole,
     entityOptions,
@@ -438,12 +429,11 @@ const useManageEntities = () => {
     loadingAction,
     selectedEntity,
     setSelectedEntity,
-    ref, // For infinite scrolling
+    ref,
     visibleRows,
     alertMessage,
     setAlertMessage,
     alertSeverity,
-    // Action handlers
     handleDeleteEntity,
     handleCreateEntity,
     handleUpdateEntity,

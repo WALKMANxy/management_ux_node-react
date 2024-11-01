@@ -8,7 +8,7 @@ import { Agent, Client } from "../models/entityModels";
 import { showToast } from "../services/toastMessage";
 
 export const useClientsGrid = () => {
-  const { t } = useTranslation(); // Initialize translation
+  const { t } = useTranslation();
 
   const [error, setError] = useState<string | null>(null);
 
@@ -21,8 +21,6 @@ export const useClientsGrid = () => {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isClientListCollapsed, setClientListCollapsed] = useState(false);
   const [isClientDetailsCollapsed, setClientDetailsCollapsed] = useState(false);
-  /*  const userRole = useSelector((state: RootState) => state.auth.role);
-  const userId = useSelector((state: RootState) => state.auth.id); */
   const [quickFilterText, setQuickFilterText] = useState("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -34,7 +32,7 @@ export const useClientsGrid = () => {
   useEffect(() => {
     if (error) {
       showToast.error(error);
-      setError(null); // Reset error after displaying
+      setError(null);
     }
   }, [error]);
 
@@ -86,25 +84,6 @@ export const useClientsGrid = () => {
     [clients, agentDetails, addAgentNameToClient]
   );
 
-  /* const filteredClients = useCallback(() => {
-    let filtered = clients;
-    if (userRole === "agent") {
-      filtered = filtered.filter((client) => client.agent === userId);
-    } else if (userRole === "client") {
-      filtered = filtered.filter((client) => client.id === userId);
-    }
-    if (startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      filtered = filtered.filter((client: Client) => {
-        return client.movements.some((movement) => {
-          const movementDate = new Date(movement.dateOfOrder);
-          return movementDate >= start && movementDate <= end;
-        });
-      });
-    }
-    return filtered.map((client) => addAgentNameToClient(client, agentDetails));
-  }, [clients, userRole, userId, startDate, endDate, agentDetails]); */
 
   const clientsWithAgentNames = useMemo(() => {
     try {

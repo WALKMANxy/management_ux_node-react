@@ -1,21 +1,19 @@
 // src/services/cache.ts
-
 import Dexie, { Table } from "dexie";
 
-// Existing CacheEntry interface (for reference)
 export interface CacheEntry {
-  id?: number; // Optional ID for auto-increment
-  data: string; // Encrypted data as a base64 string
-  timestamp: number; // Unix timestamp in milliseconds
+  id?: number;
+  data: string;
+  timestamp: number;
 }
 
 // Define a new interface for file cache entries
 export interface FileCacheEntry {
-  id?: number; // Optional ID for auto-increment
-  fileName: string; // Unique identifier, preferably including path or unique hash
-  blob: Blob; // The actual file data as a Blob
-  objectUrl: string; // URL created from the Blob for display
-  timestamp: number; // Unix timestamp in milliseconds
+  id?: number;
+  fileName: string;
+  blob: Blob;
+  objectUrl: string;
+  timestamp: number;
 }
 
 // Extend the AppCache class to include the files table
@@ -26,7 +24,7 @@ class AppCache extends Dexie {
   admins: Table<CacheEntry>;
   visits: Table<CacheEntry>;
   promos: Table<CacheEntry>;
-  files: Table<FileCacheEntry>; // Separate the FileCacheEntry type
+  files: Table<FileCacheEntry>;
 
   constructor() {
     super("AppCache");
@@ -37,7 +35,7 @@ class AppCache extends Dexie {
       admins: "++id,timestamp",
       visits: "++id,timestamp",
       promos: "++id,timestamp",
-      files: "++id,fileName,timestamp", // Add the files table
+      files: "++id,fileName,timestamp",
     });
 
     // Initialize the CacheEntry tables

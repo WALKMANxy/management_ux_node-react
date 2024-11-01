@@ -1,5 +1,4 @@
 // src/features/search/searchSlice.ts
-
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import dayjs from "dayjs";
 import { RootState } from "../../app/store";
@@ -12,7 +11,6 @@ import {
   VisitWithAgent,
 } from "../promoVisits/promoVisitsSelectors";
 
-// Initial state
 const initialState: SearchState = {
   query: "",
   results: [],
@@ -20,7 +18,6 @@ const initialState: SearchState = {
   error: null,
 };
 
-// Async thunk for searching items
 export const searchItems = createAsyncThunk<
   SearchResult[],
   SearchParams,
@@ -186,9 +183,7 @@ export const searchItems = createAsyncThunk<
                   entityRole === "admin" ? promo.promoIssuedBy : undefined, // Include agentId if role is admin
                 clientsId: promo.clientsId, // Include clientsId if needed for matching
               }))
-              .filter(
-                (promo) => promo.id.trim() !== "" // Ensure id is valid
-              )
+              .filter((promo) => promo.id.trim() !== "")
           : [];
 
         // Filter out duplicates using the seen Map
@@ -202,7 +197,7 @@ export const searchItems = createAsyncThunk<
       // ====== Visits ======
       if (filter === "all" || filter === "visit") {
         if (entityRole === "admin") {
-          // Admin case: visits are already processed with agent information
+          // Admin case
           const visitResults = (visits as VisitWithAgent[])
             .filter(
               (visit) =>
@@ -232,8 +227,8 @@ export const searchItems = createAsyncThunk<
               pending: visit.pending,
               completed: visit.completed,
               visitIssuedBy: visit.visitIssuedBy,
-              clientId: visit.clientId, // Included by selector
-              agentId: visit.agentId, // Included by selector if needed
+              clientId: visit.clientId,
+              agentId: visit.agentId,
             }))
             .filter(
               (result) =>
@@ -244,7 +239,7 @@ export const searchItems = createAsyncThunk<
 
           searchResults = searchResults.concat(visitResults);
         } else {
-          // Non-admin case: visits are already processed with agent information
+          // Non-admin case
           const visitResults = (visits as VisitWithAgent[])
             .filter(
               (visit) =>
@@ -274,8 +269,8 @@ export const searchItems = createAsyncThunk<
               pending: visit.pending,
               completed: visit.completed,
               issuedBy: visit.visitIssuedBy,
-              clientId: visit.clientId, // Included by selector
-              agentId: visit.agentId, // Included by selector if needed
+              clientId: visit.clientId,
+              agentId: visit.agentId,
             }))
             .filter(
               (visit) =>
@@ -294,10 +289,8 @@ export const searchItems = createAsyncThunk<
       // Narrow the unknown error to the expected error type
       const typedError = error as ThunkError;
 
-      // Enhanced error logging with fallback handling
       console.error("Error searching items:", typedError);
 
-      // Reject with a specific error message or fallback
       return rejectWithValue(
         typedError.message || "An unknown error occurred."
       );
@@ -335,7 +328,6 @@ const searchSlice = createSlice({
   },
 });
 
-// Export actions and reducer
 export const { setQuery, clearResults } = searchSlice.actions;
 
 export default searchSlice.reducer;

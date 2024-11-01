@@ -1,3 +1,4 @@
+//src/pages/dashboard/Dashboard.tsx
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { Box, Fab, Grid, Skeleton, useMediaQuery } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -13,7 +14,7 @@ import Whiteboard from "../../components/employeeDashboard/Whiteboard";
 import { selectCurrentUser } from "../../features/users/userSlice";
 import useLoadingData from "../../hooks/useLoadingData";
 
-const EmployeeDashboard: React.FC = () => {
+const Dashboard: React.FC = () => {
   const { t } = useTranslation();
   const isTablet = useMediaQuery("(min-width:900px) and (max-width:1390px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -175,4 +176,4 @@ const EmployeeDashboard: React.FC = () => {
   );
 };
 
-export default React.memo(EmployeeDashboard);
+export default React.memo(Dashboard);

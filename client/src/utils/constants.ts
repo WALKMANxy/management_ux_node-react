@@ -109,24 +109,23 @@ export const ignoreArticleNames = Object.freeze(
 );
 
 export const agentColorMap: { [key: string]: string } = Object.freeze({
-  "10": "#FFFACD", // Lemon Chiffon (Fazio Adriano Salvatore)
-  "11": "#FFB6C1", // Light Pink (Salvatore Spinella)
-  "12": "#B0E0E6", // Powder Blue (Riccardo Carpentiere)
-  "13": "#98FB98", // Pale Green (Vito D'Antonio)
-  "14": "#FFB6C1", // Light Pink (G.C.)
-  "15": "#FFDAB9", // Peach Puff (Luddeni Renato)
-  "16": "#20B2AA", // Light Sea Green (Luca Scaffo) *Kept as is since it's already relatively light
-  "50": "#E6E6FA", // Lavender (Marco Coppola)
-  "60": "#D3D3D3", // Light Grey (Web)
-  "90": "#E6E6FA", // Lavender (Direzionale)
-  "91": "#FFA07A", // Light Salmon (Direzionale Diesel)
-  "92": "#B0C4DE", // Light Steel Blue (Direzionale D)
-  "95": "#FFA07A", // Light Salmon (Cliente Agente)
-  "99": "#F4A460", // Sandy Brown (Seguito da Avvocato)
-  "100": "#D3D3D3", // Light Grey (Non Assegnato)
+  "10": "#FFFACD",
+  "11": "#FFB6C1",
+  "12": "#B0E0E6",
+  "13": "#98FB98",
+  "14": "#FFB6C1",
+  "15": "#FFDAB9",
+  "16": "#20B2AA",
+  "50": "#E6E6FA",
+  "60": "#D3D3D3",
+  "90": "#E6E6FA",
+  "91": "#FFA07A",
+  "92": "#B0C4DE",
+  "95": "#FFA07A",
+  "99": "#F4A460",
+  "100": "#D3D3D3",
 });
 
-// src/constants/routes.ts
 export const CLIENTS_OR_MESSAGES_PATHS = [
   "/clients",
   "/messages",
@@ -136,15 +135,12 @@ export const CLIENTS_OR_MESSAGES_PATHS = [
   "/movements",
   "/articles",
 ];
-
 export const SETTINGS_PATH = "/settings";
-
 export const ALLOWED_ROLES_FOR_PROTECTED_ROUTES: UserRole[] = [
   "admin",
   "client",
   "agent",
 ];
-
 export const ALLOWED_ROLES_FOR_UNPROTECTED_ROUTES: UserRole[] = [
   "admin",
   "client",

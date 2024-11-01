@@ -1,3 +1,4 @@
+//src/pages/landing/LandingPage.tsx
 import {
   Box,
   Button,
@@ -13,17 +14,19 @@ import { useNavigate } from "react-router-dom";
 import { RootState } from "../../app/store";
 import Loader from "../../components/common/Loader";
 import Spinner from "../../components/common/Spinner";
+
 const AuthenticationModal = React.lazy(
   () => import("../../components/landingPage/AuthenticationModal")
 );
+
 const Footer = React.lazy(() => import("../../components/landingPage/Footer"));
 
-const preloadDashboard = () => import("../../pages/employee/EmployeeDashboard");
+const preloadDashboard = () => import("../dashboard/Dashboard");
 
 const LandingPage: React.FC = () => {
   const { t } = useTranslation();
   const [showLoader, setShowLoader] = useState(true);
-  const [showLogin, setShowLogin] = useState(false); // Control modal visibility
+  const [showLogin, setShowLogin] = useState(false);
   const [isRedirected, setIsRedirected] = useState(false);
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
   const userRole = useSelector((state: RootState) => state.auth.role);
@@ -44,13 +47,13 @@ const LandingPage: React.FC = () => {
       await import("../../components/landingPage/AuthenticationModal");
       await import("../../components/landingPage/Footer");
     };
-    preloadComponents(); // Preload the components after the page mounts
+    preloadComponents();
   }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       if (isLoggedIn && userRole !== "guest") {
-        setIsRedirected(true); // Set the flag as redirected
+        setIsRedirected(true);
         navigate("/dashboard");
       }
     }, 500);
@@ -111,8 +114,8 @@ const LandingPage: React.FC = () => {
                   xs: "0 1 50%",
                   sm: isLandscape ? "0 1 30%" : "0 1 50%",
                   md: isLandscape ? "0 1 30%" : "0 1 60%",
-                  lg:  "0 1 60%",
-                  xl:  "0 1 60%",
+                  lg: "0 1 60%",
+                  xl: "0 1 60%",
                 },
               }}
             >
@@ -145,7 +148,7 @@ const LandingPage: React.FC = () => {
                 variant="contained"
                 color="primary"
                 onClick={() => setShowLogin(true)}
-                onMouseEnter={preloadDashboard} // Preload dashboard on hover
+                onMouseEnter={preloadDashboard}
                 sx={{
                   mt: isSuperMobile || isMobile ? 0.5 : 4,
                   paddingX: 4,
@@ -177,7 +180,7 @@ const LandingPage: React.FC = () => {
           <Box
             component="footer"
             sx={{
-              paddingBottom: "env(safe-area-inset-bottom)", // Ensure padding for safe area
+              paddingBottom: "env(safe-area-inset-bottom)",
             }}
           >
             <Footer />

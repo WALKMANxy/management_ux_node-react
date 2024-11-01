@@ -14,14 +14,14 @@ import { showToast } from "../services/toastMessage";
 import useDebounce from "./useDebounce";
 
 const useGlobalSearch = (filter: string) => {
-  const { t } = useTranslation(); // Initialize translation
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
 
   const [input, setInput] = useState("");
   const searchRef = useRef<HTMLDivElement>(null);
   const [showResults, setShowResults] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [error, setError] = useState<string | null>(null); // Error state
+  const [error, setError] = useState<string | null>(null);
 
   const debouncedInput = useDebounce(input, 300);
   const results = useAppSelector((state: RootState) => state.search.results);
@@ -31,7 +31,7 @@ const useGlobalSearch = (filter: string) => {
   useEffect(() => {
     if (error) {
       showToast.error(error);
-      setError(null); // Reset error after displaying
+      setError(null);
     }
   }, [error]);
 
@@ -55,7 +55,7 @@ const useGlobalSearch = (filter: string) => {
       // Check for type modifier
       const modifierMatch = actualQuery.match(modifierRegex);
       if (modifierMatch) {
-        typeFilter = modifierMatch[1].toLowerCase(); // e.g., 'c_', 'a_', etc.
+        typeFilter = modifierMatch[1].toLowerCase();
         actualQuery = actualQuery.slice(modifierMatch[1].length).trim();
       }
 
@@ -138,7 +138,7 @@ const useGlobalSearch = (filter: string) => {
   // Reset selectedIndex when results change
   useEffect(() => {
     if (results.length > 0) {
-      setSelectedIndex(0); // Highlight the first item
+      setSelectedIndex(0);
     } else {
       setSelectedIndex(-1);
     }

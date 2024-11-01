@@ -1,5 +1,4 @@
 // src/hooks/usePromos.ts
-
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
@@ -19,7 +18,7 @@ type PromoMode = "view" | "create" | "edit";
 const usePromos = () => {
   const dispatch = useAppDispatch();
   const promos = useAppSelector(selectPromos);
-  const { t } = useTranslation(); // Initialize translation
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
 
   const clients = useAppSelector((state) => state.data.clients);
@@ -56,7 +55,7 @@ const usePromos = () => {
   // Handle promo selection and set mode to 'view'
   const handlePromoSelect = useCallback(
     (promoId: string) => {
-      console.log("selecting promo");
+      // console.log("selecting promo");
       dispatch(selectPromo(promoId!));
       setMode("view");
     },
@@ -76,7 +75,7 @@ const usePromos = () => {
         await dispatch(createPromoAsync(promoData)).unwrap();
         showToast.success(t("usePromos.createSuccess"));
 
-        dispatch(getPromos()); // Refresh the list of promos
+        dispatch(getPromos());
       } catch (error: unknown) {
         if (error instanceof Error) {
           showToast.error(
@@ -90,7 +89,7 @@ const usePromos = () => {
             error
           );
         }
-        throw error; // Re-throw to handle in the component
+        throw error;
       }
     },
     [dispatch, t]
@@ -107,7 +106,7 @@ const usePromos = () => {
           updatePromoAsync({ _id: promoData._id, promoData })
         ).unwrap();
         showToast.success(t("usePromos.updateSuccess"));
-        dispatch(getPromos()); // Refresh the list of promos
+        dispatch(getPromos());
       } catch (error: unknown) {
         if (error instanceof Error) {
           showToast.error(
@@ -121,7 +120,7 @@ const usePromos = () => {
             error
           );
         }
-        throw error; // Re-throw to handle in the component
+        throw error;
       }
     },
     [dispatch, t]
@@ -129,11 +128,10 @@ const usePromos = () => {
 
   // Handle promo sunset
   const handleSunsetPromo = useCallback(async () => {
-    // Check if selectedPromo is defined
     if (!selectedPromo) {
       showToast.error(t("usePromos.sunsetNoPromoSelected"));
       console.error("No promo selected for sunset.");
-      return; // Exit the function if no promo is selected
+      return;
     }
 
     const promoData: Promo = selectedPromo;
@@ -147,8 +145,8 @@ const usePromos = () => {
       const updatedPromoData: Promo = {
         ...promoData,
         endDate: new Date(),
-        startDate: new Date(promoData.startDate), // Ensure startDate is a Date object
-        createdAt: new Date(promoData.createdAt), // Ensure createdAt is a Date object
+        startDate: new Date(promoData.startDate),
+        createdAt: new Date(promoData.createdAt),
       };
 
       // Dispatch the update promo action with the modified endDate
@@ -172,7 +170,7 @@ const usePromos = () => {
           error
         );
       }
-      throw error; // Re-throw to handle in the component
+      throw error;
     }
   }, [dispatch, selectedPromo, t]);
 

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// src/models/propsModels.ts
 import { PickersDayProps } from "@mui/x-date-pickers/PickersDay";
 import {
   ColDef,
@@ -29,7 +31,7 @@ export interface ServerDayProps extends PickersDayProps<Dayjs> {
 
 export type GlobalSearchProps = {
   filter: string;
-  onSelect?: (item: SearchResult) => void; // Change the callback to accept SearchResult
+  onSelect?: (item: SearchResult) => void;
   placeholder?: string;
   isHeaderSearch?: boolean;
 };
@@ -61,7 +63,7 @@ export type ClientProp = {
   detail: {
     id: string;
     name: string;
-    extendedName?: string; // New property
+    extendedName?: string;
     province?: string;
     phone?: string;
     totalOrders: number;
@@ -69,11 +71,11 @@ export type ClientProp = {
     unpaidRevenue: string;
     address?: string;
     email?: string;
-    pec?: string; // New property
-    taxCode?: string; // New property
-    extendedTaxCode?: string; // New property
-    paymentMethodID?: string; // New property
-    paymentMethod?: string; // New property
+    pec?: string;
+    taxCode?: string;
+    extendedTaxCode?: string;
+    paymentMethodID?: string;
+    paymentMethod?: string;
     agent: string;
     agentName?: string;
     movements: Movement[];
@@ -84,7 +86,7 @@ export type ClientProp = {
 };
 
 export type SearchResultsProps = {
-  onSelect: (item: SearchResult) => void; // Change this to accept SearchResult
+  onSelect: (item: SearchResult) => void;
   selectedIndex: number;
   results: SearchResult[];
 };
@@ -131,13 +133,13 @@ export type ClientColumnDefinition = {
 
 export type MovementColumnDefinition = {
   headerName: string;
-  field?: keyof Movement | string; // Allow fields from Movement or string for additional calculated fields
-  filter?: string; // Filter type for the column
+  field?: keyof Movement | string;
+  filter?: string;
   sortable: boolean;
   cellRenderer?: (params: { data: Movement; value: string }) => JSX.Element;
   valueFormatter?: (params: ValueFormatterParams) => string;
   valueGetter?: (params: ValueGetterParams) => number | string;
-  comparator?: (valueA: number, valueB: number) => number; // Comparator function for sorting
+  comparator?: (valueA: number, valueB: number) => number;
 };
 
 export type ActivePromotionsProps = {
@@ -182,7 +184,7 @@ export type ClientListProps = {
   setStartDate: (value: string) => void;
   endDate: string;
   setEndDate: (value: string) => void;
-  filteredClients: EnrichedClient[]; // Update this to use EnrichedClient type
+  filteredClients: EnrichedClient[];
   columnDefs: ColDef[];
   gridRef: React.RefObject<AgGridReact>;
   handleMenuOpen: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -192,7 +194,7 @@ export type ClientListProps = {
   isClientListCollapsed: boolean;
   setClientListCollapsed: (value: boolean) => void;
   isMobile: boolean;
-  clientDetailsRef: React.RefObject<HTMLDivElement>; // Added clientDetailsRef
+  clientDetailsRef: React.RefObject<HTMLDivElement>;
 };
 
 export type MovementListProps = {
@@ -238,12 +240,10 @@ export type UpcomingVisitsProps = {
 };
 
 export type AGGridTableProps = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columnDefs: any[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rowData: any;
   paginationPageSize: number;
-  quickFilterText: string; // Added quickFilterText prop
+  quickFilterText: string;
 };
 
 export type MovementsHistoryProps = {
@@ -255,7 +255,7 @@ export type ClientDetailsProps = {
   isClientDetailsCollapsed: boolean;
   setClientDetailsCollapsed: (value: boolean) => void;
   isLoading: boolean;
-  ref: React.Ref<HTMLDivElement>; // Add ref prop
+  ref: React.Ref<HTMLDivElement>;
 };
 
 export type ArticlesListProps = {
@@ -278,7 +278,7 @@ export type ArticleDetailsProps = {
   selectedArticle: MovementDetail | null;
   isArticleDetailsCollapsed: boolean;
   setArticleDetailsCollapsed: (value: boolean) => void;
-  clientMovements?: Movement[]; // Optional prop for client movements
+  clientMovements?: Movement[]; 
   isLoading: boolean;
 };
 

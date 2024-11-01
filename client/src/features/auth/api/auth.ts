@@ -1,5 +1,4 @@
-// services/api/auth.ts
-
+//src/features/auth/api/auth.ts
 import axios from "axios";
 import { authApiCall } from "../../../utils/apiUtils";
 import { getUniqueIdentifier } from "../../../utils/cryptoUtils";
@@ -76,7 +75,7 @@ export const logoutUser = async (): Promise<void> => {
   try {
     await axios.post(
       `${baseUrl}/auth/logout`,
-      {}, // No body required
+      {},
       {
         headers: {
           Authorization: `Bearer ${refreshToken}`,

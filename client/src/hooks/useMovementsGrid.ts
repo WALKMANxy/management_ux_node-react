@@ -9,7 +9,7 @@ import { Client } from "../models/entityModels";
 import { showToast } from "../services/toastMessage";
 
 export const useMovementsGrid = () => {
-  const { t } = useTranslation(); // Initialize translation
+  const { t } = useTranslation();
 
   const clients = Object.values(
     useSelector((state: RootState) => state.data.clients)
@@ -39,6 +39,7 @@ export const useMovementsGrid = () => {
     console.log("User ID:", userId);
   }, [clients, agentDetails, userRole, userId]);
  */
+
   // Handle menu open
   const handleMenuOpen = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -59,7 +60,6 @@ export const useMovementsGrid = () => {
     }
   }, []);
 
-  // Memoize agentMap to prevent unnecessary recalculations
   const agentMap = useMemo(() => {
     const map: Record<string, string> = {};
     agentDetails.forEach((agent) => {
@@ -76,7 +76,6 @@ export const useMovementsGrid = () => {
     }));
   }, [clients, agentMap, t]);
 
-  // Error Handling: No explicit error-prone operations, but adding try-catch for DOM interactions
   const handleMovementSelect = useCallback(
     (movementId: string) => {
       try {
@@ -165,6 +164,6 @@ export const useMovementsGrid = () => {
     handleMenuClose,
     anchorEl,
     exportDataAsCsv,
-    userRole, // Added userRole to return object
+    userRole,
   };
 };
