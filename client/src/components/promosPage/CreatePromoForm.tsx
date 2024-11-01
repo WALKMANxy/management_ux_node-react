@@ -1,5 +1,4 @@
 // src/components/promosPage/CreatePromoForm.tsx
-
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
@@ -23,6 +22,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
 import React, { useMemo } from "react";
 import { Controller } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import usePromoForm from "../../hooks/usePromoForm";
 import { Promo } from "../../models/dataModels";
 import EligibleClientsGrid from "./EligibleClientsGrid";
@@ -46,7 +46,6 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
     control,
     selectedLocale,
     clients,
-    t,
     errors,
     setValue,
   } = usePromoForm({
@@ -56,12 +55,11 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
     onClose,
   });
 
+  const { t } = useTranslation();
   const memoizedLocale = useMemo(() => selectedLocale, [selectedLocale]);
-
   const isGlobal = watch("global");
   const selectedClients = watch("selectedClients");
   const excludedClients = watch("excludedClients");
-
   const isMobile = useMediaQuery("(max-width:600px)");
 
   const setSelectedClients = (clients: string[]) =>

@@ -1,3 +1,4 @@
+//src/layout/Layout.tsx
 import { Box, useMediaQuery } from "@mui/material";
 import "animate.css";
 import React, { useEffect, useMemo, useState } from "react";
@@ -31,11 +32,11 @@ const Layout: React.FC = () => {
   const determinePadding = useMemo(() => {
     return () => {
       if (isMessagesPage) {
-        return isMobile ? 0 : 1; // Messages Page: 0 on mobile, 1 on desktop
+        return isMobile ? 0 : 1;
       } else if (isOtherPage) {
-        return isMobile ? 0 : 2; // Other Pages: 0 on mobile, 4 on desktop
+        return isMobile ? 0 : 2;
       } else {
-        return 2; // Default padding for unspecified pages on desktop
+        return 2;
       }
     };
   }, [isMessagesPage, isOtherPage, isMobile]);
@@ -68,12 +69,9 @@ const Layout: React.FC = () => {
           key={location.pathname}
           className="animate__animated animate__fadeIn"
           sx={{
-            flex: 1, // Let main content grow to fill available space
-
-            p: determinePadding(), // Apply dynamic padding
-
+            flex: 1,
+            p: determinePadding(),
             overflowY: "auto",
-
             m: 0,
           }}
         >

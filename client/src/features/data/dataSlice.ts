@@ -1,5 +1,4 @@
 // src/features/data/dataSlice.ts
-
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createSelector } from "reselect";
 import { RootState } from "../../app/store";
@@ -8,9 +7,6 @@ import { Agent, Client } from "../../models/entityModels";
 import { DataSliceState } from "../../models/stateModels";
 import { fetchInitialData } from "./dataThunks";
 import { createAgentAsync, updateAgentAsync, deleteAgentAsync } from "./entityThunks";
-
-
-
 
 const initialState: DataSliceState = {
   clients: {},
@@ -37,12 +33,12 @@ export const dataSlice = createSlice({
     },
     selectClient(state, action: PayloadAction<string>) {
       state.selectedClientId = action.payload;
-      state.selectedVisitId = null; // Reset selected visit when client changes
+      state.selectedVisitId = null;
     },
     selectAgent(state, action: PayloadAction<string>) {
       state.selectedAgentId = action.payload;
-      state.selectedClientId = null; // Reset selected client when agent changes
-      state.selectedVisitId = null; // Reset selected visit
+      state.selectedClientId = null;
+      state.selectedVisitId = null;
     },
     selectVisit(state, action: PayloadAction<string>) {
       state.selectedVisitId = action.payload;
@@ -90,7 +86,6 @@ export const dataSlice = createSlice({
           Array.isArray(state.currentUserVisits) ||
           state.currentUserVisits === null
         ) {
-          // Initialize currentUserVisits as GlobalVisits if it's not already
           state.currentUserVisits = {} as GlobalVisits;
         }
 
@@ -140,7 +135,6 @@ export const dataSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Existing fetchInitialData cases
       .addCase(fetchInitialData.pending, (state) => {
         state.status = "loading";
       })
@@ -151,7 +145,6 @@ export const dataSlice = createSlice({
         if (role === "client" && "clientData" in userData!) {
           const { clientData } = userData;
 
-          // Store client data
           state.clients[clientData.id] = clientData;
           state.currentUserData = clientData;
           state.currentUserDetails = {
@@ -163,12 +156,12 @@ export const dataSlice = createSlice({
           // Check if agentData exists within clientData and store it
           if (clientData.agentData) {
             clientData.agentData.forEach((agent: Agent) => {
-              state.agents[agent.id] = agent; // Store each agent in the state
+              state.agents[agent.id] = agent;
             });
           }
         } else if (role === "agent" && "agentData" in userData!) {
           // Handle agent data
-          const { agentData /* visits, promos */ } = userData;
+          const { agentData  } = userData;
 
           // Populate agent and assign its clients
           state.agents[agentData.id] = agentData;
@@ -217,14 +210,18 @@ export const dataSlice = createSlice({
           };
         } else if (role === "employee") {
           // Handle employee role
-          state.currentUserDetails = {
-            id: userId!, // Assuming userId is unique for employees
+
+          /* state.currentUserDetails = {
+            id: userId!,
             role: "employee",
-            name: "Employee Name", // Replace with actual name if available
+            name: "Employee Name",
             userId: userId!,
-          };
+          }; */
+          state.currentUserDetails = null;
           state.currentUserData = null;
-          // Optionally, you can reset other state properties if needed
+
+          // TODO: Handle employee data
+
         } else {
           // Handle unexpected data structure
           console.error(
@@ -239,12 +236,11 @@ export const dataSlice = createSlice({
       .addCase(fetchInitialData.rejected, (state, action) => {
         state.status = "failed";
 
-        // Enhanced error logging
         console.error("fetchInitialData rejected:", {
           errorMessage: action.error.message,
           errorStack: action.error.stack,
-          actionError: action.error, // Entire error object
-          actionPayload: action.meta.arg, // Payload that was passed to the action
+          actionError: action.error,
+          actionPayload: action.meta.arg,
         });
 
         if (action.error && action.error.message) {
@@ -254,11 +250,7 @@ export const dataSlice = createSlice({
         }
       })
 
-
-
-      // ----------------------------
       // Agent Thunks Cases
-      // ----------------------------
 
       // Create Agent
       .addCase(createAgentAsync.pending, (state) => {

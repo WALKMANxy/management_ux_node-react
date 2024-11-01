@@ -2,24 +2,24 @@
 import { Box, Grid, Skeleton, useMediaQuery, useTheme } from "@mui/material";
 import React, { Suspense, useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAppSelector } from "../../app/hooks";
-import CalendarAndVisitsView from "../../components/DashboardsViews/CalendarAndVisitsView";
-import DashboardView from "../../components/DashboardsViews/DashboardView";
-import SkeletonView from "../../components/DashboardsViews/SkeletonView";
-import GlobalSearch from "../../components/Header/GlobalSearch";
-import SearchTitle from "../../components/dashboard/SearchTitle";
-import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
-import { selectCurrentUser } from "../../features/users/userSlice";
-import useLoadingData from "../../hooks/useLoadingData";
-import useSelectionState from "../../hooks/useSelectionState";
-import useStats from "../../hooks/useStats";
-import { calculateMonthlyData } from "../../utils/dataUtils";
+import { useAppSelector } from "../../../app/hooks";
+import CalendarAndVisitsView from "../../../components/DashboardsViews/CalendarAndVisitsView";
+import DashboardView from "../../../components/DashboardsViews/DashboardView";
+import SkeletonView from "../../../components/DashboardsViews/SkeletonView";
+import GlobalSearch from "../../../components/Header/GlobalSearch";
+import SearchTitle from "../../../components/dashboard/SearchTitle";
+import DrawerContainer from "../../../components/dashboard/tabletCalendarContainer";
+import { selectCurrentUser } from "../../../features/users/userSlice";
+import useLoadingData from "../../../hooks/useLoadingData";
+import useSelectionState from "../../../hooks/useSelectionState";
+import useStats from "../../../hooks/useStats";
+import { calculateMonthlyData } from "../../../utils/dataUtils";
 
 const AgentView = React.lazy(
-  () => import("../../components/DashboardsViews/AgentView")
+  () => import("../../../components/DashboardsViews/AgentView")
 );
 const ClientView = React.lazy(
-  () => import("../../components/DashboardsViews/ClientView")
+  () => import("../../../components/DashboardsViews/ClientView")
 );
 
 const AdminDashboard: React.FC = () => {
@@ -68,7 +68,6 @@ const AdminDashboard: React.FC = () => {
 
   const userRole = user?.role;
 
-  // Optimized Implementation
   const selectedAgentData = useMemo(() => {
     if (!selectedAgent) return null;
     return (
@@ -78,7 +77,6 @@ const AdminDashboard: React.FC = () => {
     );
   }, [selectedAgent, salesDistributionDataAgents.agents]);
 
-  // Example: Memoizing Props for DashboardView
   const dashboardViewProps = useMemo(
     () => ({
       t,
@@ -127,7 +125,7 @@ const AdminDashboard: React.FC = () => {
       <Box py={1}>
         <SearchTitle
           name={user?.entityName}
-          role={userRole!} // or "agent" or "client"
+          role={userRole!}
           loading={loadingState}
         />
       </Box>
@@ -195,7 +193,6 @@ const AdminDashboard: React.FC = () => {
           <CalendarAndVisitsView loadingState={loadingState} t={t} />
         )}
       </Grid>
-
       {/* Drawer Container for Calendar and Upcoming Visits */}
       {isTablet && (
         <DrawerContainer open={drawerOpen} onClose={handleToggleDrawer} />

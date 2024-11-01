@@ -1,4 +1,4 @@
-// useVisitSidebar.ts
+// src/hooks/useVisitSidebar.ts
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
@@ -111,7 +111,7 @@ export const useVisitSidebar = () => {
       }
 
       setFilteredList(list);
-    }, ); // 300ms debounce delay
+    }, 300); // 300ms delay
 
     // Cleanup function to clear the timeout if the user continues typing
     return () => {

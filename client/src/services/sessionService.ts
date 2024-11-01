@@ -1,11 +1,10 @@
+//src/services/sessionService.ts
 import axios from "axios";
 import { baseUrl } from "../utils/apiUtils";
 import { setAccessToken } from "./tokenService";
 import { webSocketService } from "./webSocketService";
 
-/**
- * Function to refresh the access token using the refresh token.
- */
+
 export async function refreshAccessToken(): Promise<boolean> {
   // console.log("Entering refreshAccessToken function");
 
@@ -56,7 +55,6 @@ export async function refreshAccessToken(): Promise<boolean> {
       "authState",
       JSON.stringify({ ...localAuthState, refreshToken: newRefreshToken })
     );
-
     webSocketService.connect();
     return true;
   } catch (error) {

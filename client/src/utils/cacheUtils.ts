@@ -1,5 +1,4 @@
 // src/utils/cacheUtils.ts
-
 import { Promo, Visit } from "../models/dataModels";
 import { serverClient, serverMovement } from "../models/dataSetTypes";
 import { Admin, Agent } from "../models/entityModels";
@@ -12,21 +11,19 @@ import {
   keyCache,
 } from "./cryptoUtils";
 
-const FILE_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+const FILE_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000;
 
-const MAX_CACHE_SIZE = 100 * 1024 * 1024; // 100 MB for example
+const MAX_CACHE_SIZE = 100 * 1024 * 1024;
 
-// Define cache durations in milliseconds
 const CACHE_DURATIONS: Record<string, number> = {
-  movements: 24 * 60 * 60 * 1000, // 24 hours
+  movements: 24 * 60 * 60 * 1000,
   clients: 24 * 60 * 60 * 1000,
   agents: 24 * 60 * 60 * 1000,
   admins: 24 * 60 * 60 * 1000,
-  visits: 2 * 60 * 60 * 1000, // 2 hours
+  visits: 2 * 60 * 60 * 1000,
   promos: 2 * 60 * 60 * 1000,
 };
 
-// Define the mapping from store names to their data types
 type StoreData = {
   movements: serverMovement[];
   clients: serverClient[];
@@ -38,7 +35,6 @@ type StoreData = {
 
 export type StoreName = keyof StoreData;
 
-// Manage the encryption key within cacheUtils.ts
 let encryptionKey: CryptoKey | null = null;
 let keyInitializationPromise: Promise<void> | null = null;
 
@@ -53,8 +49,8 @@ export const clearEncryption = () => {
 export const getCachedData = async <T>(
   storeName: StoreName
 ): Promise<T | null> => {
-  /*   const startTime = Date.now();
-   */ if (!encryptionKey) {
+  // const startTime = Date.now();
+  if (!encryptionKey) {
     if (keyInitializationPromise) {
       await keyInitializationPromise;
     } else {
@@ -71,28 +67,19 @@ export const getCachedData = async <T>(
   }
 
   try {
-    // Fetch the latest entry directly using Dexie's querying capabilities
     const latestEntry = await appCache[storeName]
       .orderBy("timestamp")
       .reverse()
       .first();
-
     if (!latestEntry) return null;
-
     const currentTime = Date.now();
-
     if (currentTime - latestEntry.timestamp > CACHE_DURATIONS[storeName]) {
-      // Cache is stale
       await appCache[storeName].clear();
       return null;
     }
-
     let decryptedData = await decryptData(latestEntry.data, encryptionKey);
     const parsedData = JSON.parse(decryptedData) as T;
-
-    // Overwrite decryptedData
     decryptedData = "";
-
     return parsedData;
   } catch (error) {
     if (error instanceof DOMException && error.name === "OperationError") {
@@ -114,11 +101,7 @@ export const getCachedData = async <T>(
     } else {
       console.error(`Unknown error in getCachedData(${storeName}):`, error);
     }
-
-    // Clear all encrypted caches to prevent potential data leaks
     await clearAllEncryptedCaches();
-
-    // Optionally, you might want to clear the encryption key as well
     showToast.error(
       "An error occurred while accessing cached data. All cached data has been cleared."
     );
@@ -155,7 +138,7 @@ export const setCachedData = async <T>(
       data: encryptedData,
       timestamp: Date.now(),
     };
-    await appCache[storeName].add(entry); // Ensure 'id' is optional in CacheEntry
+    await appCache[storeName].add(entry);
   } catch (error) {
     console.error(`Error encrypting data for ${storeName}:`, error);
     showToast.error(`Failed to cache data for ${storeName}.`);
@@ -175,7 +158,6 @@ export const initializeUserEncryption = async (params: {
   timeMS: string;
 }): Promise<void> => {
   if (keyInitializationPromise) {
-    // If initialization is already in progress, wait for it
     return keyInitializationPromise;
   }
 
@@ -188,12 +170,11 @@ export const initializeUserEncryption = async (params: {
     } catch (error) {
       console.error("Encryption initialization failed:", error);
       initializeEncryption(null);
-      throw error; // Re-throw to allow upstream handling
+      throw error;
     } finally {
-      keyInitializationPromise = null; // Reset the promise after initialization
+      keyInitializationPromise = null;
     }
   })();
-
   return keyInitializationPromise;
 };
 export const ensureEncryptionInitialized = async (params?: {
@@ -203,13 +184,10 @@ export const ensureEncryptionInitialized = async (params?: {
 }): Promise<void> => {
   if (!encryptionKey) {
     if (keyInitializationPromise) {
-      // If initialization is already in progress, wait for it
       await keyInitializationPromise;
     } else if (params) {
-      // If no initialization in progress, start initializing
       await initializeUserEncryption(params);
     } else {
-      // Cannot initialize without params
       throw new Error(
         "Encryption key not initialized and no initialization in progress."
       );
@@ -236,7 +214,6 @@ export const setCachedDataSafe = async <T>(
   return setCachedData<T>(storeName, data);
 };
 
-// Add this new function to clear all encrypted caches
 export const clearAllEncryptedCaches = async (): Promise<void> => {
   const encryptedStores: StoreName[] = [
     "movements",
@@ -246,13 +223,11 @@ export const clearAllEncryptedCaches = async (): Promise<void> => {
     "visits",
     "promos",
   ];
-
   try {
     await Promise.all(encryptedStores.map((store) => appCache[store].clear()));
     console.warn(
       "All encrypted caches have been cleared due to a decryption error."
     );
-    // Clear the keyCache
     keyCache.clear();
   } catch (error) {
     console.error("Error clearing all encrypted caches:", error);
@@ -270,15 +245,10 @@ export const getCachedFile = async (
 
     const currentTime = Date.now();
     if (currentTime - fileEntry.timestamp > FILE_CACHE_DURATION) {
-      // Cache is stale; remove the entry
       await appCache.files.where({ fileName }).delete();
       return null;
     }
-
-    // Regenerate objectURL for the cached Blob
     const objectUrl = URL.createObjectURL(fileEntry.blob);
-
-    // Return the updated file entry with the new object URL
     return { ...fileEntry, objectUrl };
   } catch (error) {
     console.error(`Error retrieving cached file (${fileName}):`, error);
@@ -286,27 +256,19 @@ export const getCachedFile = async (
   }
 };
 
-/**
- * Caches a file by storing its Blob and generating an object URL.
- * @param fileName - Unique identifier for the file.
- * @param blob - The file data as a Blob.
- * @returns The generated object URL.
- */
 export const cacheFile = async (
   fileName: string,
   blob: Blob
 ): Promise<string> => {
   try {
-    // Store the file in IndexedDB
     const fileEntry: FileCacheEntry = {
       fileName,
       blob,
-      objectUrl: "", // The object URL will be generated later when fetching the file
+      objectUrl: "",
       timestamp: Date.now(),
     };
     await appCache.files.put(fileEntry);
 
-    // Return the generated object URL for immediate usage
     const objectUrl = URL.createObjectURL(blob);
     return objectUrl;
   } catch (error) {
@@ -315,16 +277,11 @@ export const cacheFile = async (
   }
 };
 
-/**
- * Clears all cached files (optional, for maintenance or logout).
- */
+
 export const clearAllCachedFiles = async (): Promise<void> => {
   try {
-    // Revoke all object URLs to free memory
     const allFiles = await appCache.files.toArray();
     allFiles.forEach((file) => URL.revokeObjectURL(file.objectUrl));
-
-    // Clear the files table
     await appCache.files.clear();
   } catch (error) {
     console.error("Error clearing cached files:", error);
@@ -332,10 +289,7 @@ export const clearAllCachedFiles = async (): Promise<void> => {
   }
 };
 
-/**
- * Removes a specific cached file by fileName.
- * @param fileName - Unique identifier for the file.
- */
+
 export const removeCachedFile = async (fileName: string): Promise<void> => {
   try {
     const fileEntry = await appCache.files.get({ fileName });
@@ -389,14 +343,13 @@ export const enforceCacheSizeLimit = async (): Promise<void> => {
       const file = allFiles[i];
       await removeCachedFile(file.fileName);
       totalSize -= file.blob.size;
-
       // Break early if the total size is reduced below the limit
       if (totalSize <= MAX_CACHE_SIZE) break;
     }
 
-    console.log(
+  /*   console.log(
       `Deleted ${numFilesToDelete} files to enforce cache size limit.`
-    );
+    ); */
   } catch (error) {
     console.error("Error enforcing cache size limit:", error);
   }

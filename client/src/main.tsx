@@ -1,3 +1,4 @@
+//src/main.tsx
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { I18nextProvider } from "react-i18next";
@@ -26,8 +27,8 @@ root.render(
           theme="system"
           richColors
           closeButton
-          position="bottom-center" // Position the toast at the bottom center
-          toastOptions={{ duration: 3000 }}
+          position="bottom-center"
+          toastOptions={{ duration: 2500 }}
         />
         <App />
       </I18nextProvider>

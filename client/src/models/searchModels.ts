@@ -1,10 +1,9 @@
+//src/models/searchModels.ts
 export type SearchResult = {
   id: string;
   name: string;
   type: "client" | "agent" | "article" | "promo" | "visit";
-
   notAvailable?: "Not Available";
-
   // Client/Agent-specific properties
   extendedName?: string;
   province?: string;
@@ -22,9 +21,6 @@ export type SearchResult = {
   agent?: string;
   agentName?: string;
   colour?: string;
-
-
-
   // Article-specific properties
   brand?: string;
   quantity?: number;
@@ -32,17 +28,14 @@ export type SearchResult = {
   priceSold?: string;
   priceBought?: string;
   lastSoldDate?: string;
-
   // Promo-specific properties
   promoType?: string;
   discount?: string;
   startDate?: Date;
   endDate?: Date;
-  agentId?: string; // For admins
-  clientsId?: string[]; // For matching clientsId
-
+  agentId?: string;
+  clientsId?: string[];
   promoIssuedBy?: string;
-
   // Visit-specific properties
   clientId?: string;
   visitType?: string;
@@ -53,7 +46,6 @@ export type SearchResult = {
   pending?: boolean;
   completed?: boolean;
   visitIssuedBy?: string;
-
 };
 
 export type SearchParams = {

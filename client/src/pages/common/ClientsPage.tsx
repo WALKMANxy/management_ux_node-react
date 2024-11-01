@@ -57,7 +57,7 @@ const ClientsPage: React.FC = () => {
       if (item.type === "client") {
         handleClientSelect(item.id);
       }
-      sessionStorage.removeItem("searchedItem"); // Clear the item from storage
+      sessionStorage.removeItem("searchedItem");
     }
   }, [handleClientSelect]);
 
@@ -98,7 +98,7 @@ const ClientsPage: React.FC = () => {
         headerName: t("clientsPage.ordersThisMonth"),
         valueGetter: (params) => {
           const { months, ordersData } = calculateMonthlyData([params.data]);
-          return ordersData[months.length - 1] || 0; // Get the latest month's data
+          return ordersData[months.length - 1] || 0;
         },
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
@@ -126,7 +126,7 @@ const ClientsPage: React.FC = () => {
         headerName: t("clientsPage.revenueThisMonth"),
         valueGetter: (params) => {
           const { months, revenueData } = calculateMonthlyData([params.data]);
-          return revenueData[months.length - 1] || 0; // Get the latest month's data
+          return revenueData[months.length - 1] || 0;
         },
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
@@ -139,7 +139,7 @@ const ClientsPage: React.FC = () => {
           const { months, netRevenueData } = calculateMonthlyData([
             params.data,
           ]);
-          return netRevenueData[months.length - 1] || 0; // Get the latest month's data
+          return netRevenueData[months.length - 1] || 0;
         },
         filter: "agNumberColumnFilter",
         comparator: numberComparator,
@@ -232,7 +232,6 @@ const ClientsPage: React.FC = () => {
           />
           {selectedClient && (
             <>
-              {/* Invisible div with ref for scrolling */}
               <ClientDetails
                 isLoading={false}
                 selectedClient={selectedClient}

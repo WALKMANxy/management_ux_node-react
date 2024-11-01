@@ -1,5 +1,4 @@
 // src/pages/PromosPage.tsx
-
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
@@ -12,6 +11,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import { t } from "i18next";
 import React, { memo, Suspense, useEffect } from "react";
 import { useAppSelector } from "../../app/hooks";
 import PromosSidebar from "../../components/promosPage/PromosSidebar";
@@ -19,9 +19,7 @@ import SkeletonView from "../../components/promosPage/SkeletonView";
 import { selectCurrentUser } from "../../features/users/userSlice";
 import useLoadingData from "../../hooks/useLoadingData";
 import usePromos from "../../hooks/usePromos";
-import { t } from "i18next";
 
-// Lazy load other components
 const CreatePromoForm = React.lazy(
   () => import("../../components/promosPage/CreatePromoForm")
 );
@@ -52,21 +50,15 @@ const PromosPage: React.FC = () => {
   } = usePromos();
 
   const userRole = useAppSelector(selectCurrentUser)?.role;
-
-  // Get data fetching status and error
   const status = useAppSelector((state) => state.data.status);
   const error = useAppSelector((state) => state.data.error);
-
   const selectedPromoId = useAppSelector((state) => state.data.selectedPromoId);
-
-  // State variables for collapsible containers
   const [isPromoDetailsCollapsed, setIsPromoDetailsCollapsed] =
     React.useState(false);
   const [isEditFormCollapsed, setIsEditFormCollapsed] = React.useState(false);
   const [isEligibleClientsCollapsed, setIsEligibleClientsCollapsed] =
     React.useState(false);
 
-  // Reset collapsible sections when selectedPromo or mode changes
   useEffect(() => {
     setIsPromoDetailsCollapsed(false);
     setIsEligibleClientsCollapsed(false);
@@ -116,6 +108,52 @@ const PromosPage: React.FC = () => {
     );
   }
 
+  const CollapsibleSection = ({
+    title,
+    isCollapsed,
+    setIsCollapsed,
+    children,
+  }: {
+    title: string;
+    isCollapsed: boolean;
+    setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+    children: React.ReactNode;
+  }) => (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        flexShrink: 0,
+        mb: 0, // Add margin-bottom to separate from next section
+        px: 1,
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          bgcolor: "#f4f5f7",
+          p: 1,
+          pt: 1,
+          pb: 2,
+          pl: 2,
+          boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+          borderRadius: 6,
+          mb: 2,
+        }}
+      >
+        <Typography variant="h4" sx={{ ml: 1 }}>
+          {title}
+        </Typography>
+        <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
+          {isCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+        </IconButton>
+      </Box>
+      <Collapse in={!isCollapsed}>{children}</Collapse>
+    </Box>
+  );
+
   return (
     <Box
       sx={{
@@ -140,13 +178,13 @@ const PromosPage: React.FC = () => {
                   : "block",
             },
             borderRight: "1px solid #e0e0e0",
-            height: "100%", // Ensure sidebar fills available height
+            height: "100%",
             minHeight: 0,
           }}
         >
           <PromosSidebar
             onCreatePromo={initiateCreatePromo}
-            onSelectPromo={handlePromoSelect} // Pass handlePromoSelect here
+            onSelectPromo={handlePromoSelect}
           />
         </Grid>
         <Grid
@@ -156,14 +194,13 @@ const PromosPage: React.FC = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            flexGrow: 1, // Allow the content area to grow and fill the available space
+            flexGrow: 1,
             overflow: "auto",
-            height: "100%", // Ensure full height
+            height: "100%",
             "&::-webkit-scrollbar": {
-              display: "none", // Hide scrollbar in WebKit browsers
+              display: "none",
             },
-            msOverflowStyle: "none", // Hide scrollbar in IE and Edge
-
+            msOverflowStyle: "none",
             px: isMobile ? 0 : 2,
           }}
         >
@@ -177,9 +214,9 @@ const PromosPage: React.FC = () => {
                   borderRadius: 2,
                   height: "auto",
                   "&::-webkit-scrollbar": {
-                    display: "none", // Hide scrollbar in WebKit browsers
+                    display: "none",
                   },
-                  msOverflowStyle: "none", // Hide scrollbar in IE and Edge
+                  msOverflowStyle: "none",
                 }}
               >
                 <CreatePromoForm
@@ -196,9 +233,9 @@ const PromosPage: React.FC = () => {
                   borderRadius: 2,
                   height: "auto",
                   "&::-webkit-scrollbar": {
-                    display: "none", // Hide scrollbar in WebKit browsers
+                    display: "none",
                   },
-                  msOverflowStyle: "none", // Hide scrollbar in IE and Edge
+                  msOverflowStyle: "none",
                 }}
               >
                 <CollapsibleSection
@@ -233,9 +270,9 @@ const PromosPage: React.FC = () => {
                   borderRadius: 2,
                   height: "auto",
                   "&::-webkit-scrollbar": {
-                    display: "none", // Hide scrollbar in WebKit browsers
+                    display: "none",
                   },
-                  msOverflowStyle: "none", // Hide scrollbar in IE and Edge
+                  msOverflowStyle: "none",
                 }}
               >
                 <CollapsibleSection
@@ -285,51 +322,5 @@ const PromosPage: React.FC = () => {
     </Box>
   );
 };
-
-const CollapsibleSection = ({
-  title,
-  isCollapsed,
-  setIsCollapsed,
-  children,
-}: {
-  title: string;
-  isCollapsed: boolean;
-  setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
-  children: React.ReactNode;
-}) => (
-  <Box
-    sx={{
-      display: "flex",
-      flexDirection: "column",
-      flexShrink: 0,
-      mb: 0, // Add margin-bottom to separate from next section
-      px: 1,
-    }}
-  >
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        bgcolor: "#f4f5f7",
-        p: 1,
-        pt: 1,
-        pb: 2,
-        pl: 2,
-        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-        borderRadius: 6,
-        mb: 2,
-      }}
-    >
-      <Typography variant="h4" sx={{ ml: 1 }}>
-        {title}
-      </Typography>
-      <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
-        {isCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-      </IconButton>
-    </Box>
-    <Collapse in={!isCollapsed}>{children}</Collapse>
-  </Box>
-);
 
 export default memo(PromosPage);

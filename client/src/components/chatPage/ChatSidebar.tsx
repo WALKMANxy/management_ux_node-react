@@ -33,8 +33,8 @@ import ContactsList from "./ContactsList";
 const CreateChatForm = lazy(() => import("./CreateChatForm"));
 
 const ChatSidebar: React.FC = () => {
-  /*   console.log("ChatList rendering now");
-   */
+  //  console.log("ChatList rendering now");
+
 
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");

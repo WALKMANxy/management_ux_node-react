@@ -1,21 +1,22 @@
+//src/pages/agent/AgentDashboard.tsx
 import { Box, Grid, Skeleton, useMediaQuery, useTheme } from "@mui/material";
 import React, { Suspense, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAppSelector } from "../../app/hooks";
-import SearchTitle from "../../components/dashboard/SearchTitle";
-import DrawerContainer from "../../components/dashboard/tabletCalendarContainer";
-import CalendarAndVisitsView from "../../components/DashboardsViews/CalendarAndVisitsView";
-import DashboardView from "../../components/DashboardsViews/DashboardView";
-import SkeletonView from "../../components/DashboardsViews/SkeletonView";
-import GlobalSearch from "../../components/Header/GlobalSearch";
-import { selectCurrentUser } from "../../features/users/userSlice";
-import useLoadingData from "../../hooks/useLoadingData";
-import useSelectionState from "../../hooks/useSelectionState";
-import useStats from "../../hooks/useStats";
-import { calculateMonthlyData } from "../../utils/dataUtils";
+import { useAppSelector } from "../../../app/hooks";
+import SearchTitle from "../../../components/dashboard/SearchTitle";
+import DrawerContainer from "../../../components/dashboard/tabletCalendarContainer";
+import CalendarAndVisitsView from "../../../components/DashboardsViews/CalendarAndVisitsView";
+import DashboardView from "../../../components/DashboardsViews/DashboardView";
+import SkeletonView from "../../../components/DashboardsViews/SkeletonView";
+import GlobalSearch from "../../../components/Header/GlobalSearch";
+import { selectCurrentUser } from "../../../features/users/userSlice";
+import useLoadingData from "../../../hooks/useLoadingData";
+import useSelectionState from "../../../hooks/useSelectionState";
+import useStats from "../../../hooks/useStats";
+import { calculateMonthlyData } from "../../../utils/dataUtils";
 
 const ClientView = React.lazy(
-  () => import("../../components/DashboardsViews/ClientView")
+  () => import("../../../components/DashboardsViews/ClientView")
 );
 
 const AgentDashboard: React.FC = () => {
@@ -30,7 +31,6 @@ const AgentDashboard: React.FC = () => {
   };
 
   const user = useAppSelector(selectCurrentUser);
-
   const userRole = user?.role;
 
   const {
@@ -65,7 +65,7 @@ const AgentDashboard: React.FC = () => {
       <Box py={1}>
         <SearchTitle
           name={user?.entityName}
-          role={userRole!} // or "agent" or "client"
+          role={userRole!}
           loading={loadingState}
         />
       </Box>
@@ -82,7 +82,7 @@ const AgentDashboard: React.FC = () => {
         />
       )}
       <Grid container spacing={6} mt={isMobile ? -3 : -3}>
-      <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
+        <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
           {selectedClient ? (
             <Suspense fallback={<SkeletonView />}>
               <ClientView

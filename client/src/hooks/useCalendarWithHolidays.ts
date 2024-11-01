@@ -1,10 +1,10 @@
+//src/hooks/useCalendarWithHolidays.ts
 import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { v4 as uuidv4 } from "uuid";
 import { useGetHolidaysQuery } from "../features/calendar/calendarQuery";
 import { CalendarEvent, Holiday } from "../models/dataModels";
 import { showToast } from "../services/toastMessage";
-import { v4 as uuidv4 } from 'uuid';
-
 
 export const useCalendarWithHolidays = (currentDate: Date) => {
   const year = currentDate.getFullYear();
@@ -20,14 +20,14 @@ export const useCalendarWithHolidays = (currentDate: Date) => {
       return holidays.map(
         (holiday: Holiday): CalendarEvent => ({
           _id: uuidv4(),
-          userId: "holiday", // Assign a special ID for holidays
+          userId: "holiday",
           startDate: new Date(holiday.date),
           endDate: new Date(holiday.date),
           eventType: "holiday",
           eventName: holiday.localName,
           reason: "public_holiday",
-          note: holiday.name, // Optional: Store the English name as a note
-          status: "approved", // Holidays are always approved
+          note: holiday.name,
+          status: "approved",
           createdAt: new Date(holiday.date),
           updatedAt: new Date(holiday.date),
         })

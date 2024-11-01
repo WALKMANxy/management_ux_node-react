@@ -1,3 +1,4 @@
+//src/models/stateModels.ts
 import { GlobalVisits, Promo, Visit } from "./dataModels";
 import { Admin, Agent, Client, UserRole } from "./entityModels";
 import { SearchResult } from "./searchModels";
@@ -83,5 +84,5 @@ export type FetchDataPayload = {
 export type ThunkError = {
   message: string;
   stack?: string;
-  [key: string]: unknown; // To handle any additional properties that may exist
+  [key: string]: unknown; 
 };
