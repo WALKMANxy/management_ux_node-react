@@ -1,27 +1,25 @@
-/* In your CSS file, e.g., animations.css */
+/* src/Styles/animate.css */
 .animate__animated.animate__fadeInUp {
-  animation-duration: 0.2s; /* Adjust to desired speed */
+  animation-duration: 0.2s;
 }
 
 .animate__animated.animate__fadeInDown {
-  animation-duration: 0.2s; /* Adjust to desired speed */
+  animation-duration: 0.2s;
 }
 
 .animate_animated.animate_fadein {
-  animation-duration: 0.05s; /* Adjust to desired speed */
+  animation-duration: 0.05s;
 }
 
 .animate_animated.animate_fadeOut {
-  animation-duration: 0.05s; /* Adjust to desired speed */
+  animation-duration: 0.05s;
 }
 
-/* src/Styles/hiddenScrollbar.css */
-
 .hidden-scrollbar {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .hidden-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
 }

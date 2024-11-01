@@ -1,5 +1,4 @@
 // src/utils/cryptoUtils.ts
-
 import {
   decode as base64Decode,
   encode as base64Encode,
@@ -14,6 +13,15 @@ const decoder = new TextDecoder();
 export const keyCache = new Map<string, CryptoKey>();
 
 const STORAGE_KEY = "app_unique_identifier";
+
+// Fallback function to generate a UUID
+const generateUUID = (): string => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
 
 export const getUniqueIdentifier = (): string => {
   try {
@@ -35,15 +43,6 @@ export const getUniqueIdentifier = (): string => {
     // If localStorage fails or crypto.randomUUID is unavailable, generate a UUID
     return crypto.randomUUID ? crypto.randomUUID() : generateUUID();
   }
-};
-
-// Fallback function to generate a UUID
-const generateUUID = (): string => {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
 };
 
 export const deriveKeyFromAuthState = async (
@@ -73,7 +72,7 @@ export const deriveKeyFromAuthState = async (
       {
         name: "PBKDF2",
         salt: saltBuffer,
-        iterations: 50000, // Adjusted iterations
+        iterations: 50000,
         hash: "SHA-256",
       },
       importedKey,

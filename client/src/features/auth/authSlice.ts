@@ -1,5 +1,4 @@
 //src/features/auth/authSlice.ts
-
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AuthState } from "../../models/stateModels";
 import { showToast } from "../../services/toastMessage";
@@ -17,8 +16,6 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // Optional: Define synchronous actions if needed
-    // For example, to update user info without side effects
     updateUserInfo: (
       state,
       action: PayloadAction<{
@@ -49,14 +46,11 @@ const authSlice = createSlice({
         state.refreshToken = "";
       })
       .addCase(handleLogin.rejected, (_state, action) => {
-        // Optionally, handle login errors
         showToast.error("Failed to login: " + action.payload);
 
         console.error(action.payload);
       })
       .addCase(handleLogout.rejected, (_state, action) => {
-        // Optionally, handle logout errors
-
         console.error(action.payload);
       });
   },
@@ -66,7 +60,6 @@ export const { updateUserInfo } = authSlice.actions;
 
 export default authSlice.reducer;
 
-// Memoized selectors using reselect
 
 // Selector to get the logged-in state
 export const selectIsLoggedIn = (state: { auth: AuthState }) =>
@@ -78,4 +71,5 @@ export const selectUserRole = (state: { auth: AuthState }) => state.auth.role;
 // Selector to get the user ID
 export const selectUserId = (state: { auth: AuthState }) => state.auth.userId;
 
+// Selector to get the entity ID
 export const selectId = (state: { auth: AuthState }) => state.auth.id;

@@ -1,5 +1,4 @@
 // src/utils/iconUtils.tsx
-
 import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
 import BlindsClosedIcon from "@mui/icons-material/BlindsClosed";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
@@ -64,7 +63,6 @@ export const getBackgroundColorForEvent = (
       event.status === "approved" &&
       userRole !== "admin"
     ) {
-      // Return faint green for non-admin users
       return "#C7E7B6";
     }
     return typeColors[event.status] || typeColors.default || "";
@@ -99,7 +97,6 @@ export const descendingComparator = <T,>(a: T, b: T, orderBy: keyof T) => {
   return 0;
 };
 
-// Custom comparator for sorting by pending actions first and then by date
 export const actionComparator = (
   a: CalendarEvent,
   b: CalendarEvent,
@@ -123,42 +120,30 @@ export const isNotDefaultTime = (date: Date | undefined) => {
   return date && dayjs(date).format("HH:mm") !== "00:00";
 };
 
-/**
- * Determines if a button should be disabled based on the event and user role.
- * @param event - The calendar event.
- * @param userRole - The role of the current user.
- * @returns A boolean indicating if the button should be disabled.
- */
 export const isDisabled = (event: CalendarEvent, userRole: string): boolean => {
   // Disable if the user is not an admin
-  if (userRole !== 'admin') {
+  if (userRole !== "admin") {
     return true;
   }
   // Additionally disable if the event is in the past
   return dayjs(event.endDate).isBefore(dayjs());
 };
 
-/**
- * Returns the appropriate styles for the edit button based on the event and user role.
- * @param event - The calendar event.
- * @param userRole - The role of the current user.
- * @returns An object containing the style properties.
- */
 export const getEditButtonStyles = (event: CalendarEvent, userRole: string) => {
   if (isDisabled(event, userRole)) {
     return {
-      backgroundColor: "gray", // Grayed out background
+      backgroundColor: "gray",
       color: "white",
       marginRight: 1,
       borderRadius: "50%",
-      cursor: "not-allowed", // Indicate disabled state
+      cursor: "not-allowed",
       "&:hover": {
-        backgroundColor: "gray", // Maintain gray on hover
+        backgroundColor: "gray",
       },
     };
   }
   return {
-    bgcolor: "primary.main", // Regular background for admins
+    bgcolor: "primary.main",
     color: "white",
     marginRight: 1,
     borderRadius: "50%",
@@ -168,13 +153,10 @@ export const getEditButtonStyles = (event: CalendarEvent, userRole: string) => {
   };
 };
 
-/**
- * Returns the appropriate styles for the delete button based on the event and user role.
- * @param event - The calendar event.
- * @param userRole - The role of the current user.
- * @returns An object containing the style properties.
- */
-export const getDeleteButtonStyles = (event: CalendarEvent, userRole: string) => {
+export const getDeleteButtonStyles = (
+  event: CalendarEvent,
+  userRole: string
+) => {
   if (isDisabled(event, userRole)) {
     return {
       backgroundColor: "gray",

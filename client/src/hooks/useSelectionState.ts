@@ -10,7 +10,6 @@ import { UseSelectionStateReturn } from "../models/dataSetTypes";
 import { SearchResult } from "../models/searchModels";
 import useStats from "./useStats";
 
-
 const useSelectionState = (isMobile: boolean): UseSelectionStateReturn => {
   const dispatch = useAppDispatch();
   const {

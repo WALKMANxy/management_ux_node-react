@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+//src/utils/dataUtils.ts
 import dayjs from "dayjs";
 import { Movement } from "../models/dataModels";
 import { Admin, Agent, Client, UserRole } from "../models/entityModels";
@@ -5,7 +7,6 @@ import { BrandData } from "../models/propsModels";
 import { ignoreArticleNames } from "./constants";
 
 export const now = dayjs();
-
 
 // Helper function to get month and year from a date string
 export const getMonthYear = (dateString: string) => {
@@ -15,7 +16,7 @@ export const getMonthYear = (dateString: string) => {
     return "Invalid Date";
   }
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0");
   return `${year}-${month}`;
 };
 
@@ -53,7 +54,7 @@ export const getDotColor = (
 export const calculateTotalRevenue = (clients: Client[]): number => {
   let total = 0;
   for (let i = 0; i < clients.length; i++) {
-    total += parseFloat(clients[i].totalRevenue); // Assuming you store it as a string
+    total += parseFloat(clients[i].totalRevenue);
   }
   return Number(total.toFixed(2));
 };
@@ -96,21 +97,6 @@ export const calculateSalesDistributionDataForAgents = (
   return isMobile ? sortedData.slice(0, 8) : sortedData.slice(0, 25);
 };
 
-// Helper function to group movements by order ID
-/* const groupByOrderId = (
-  movements: Movement[]
-): { [orderId: string]: Movement[] } => {
-  return movements.reduce((acc, movement) => {
-    const orderId = movement.id;
-    if (!acc[orderId]) {
-      acc[orderId] = [];
-    }
-    acc[orderId].push(movement);
-    return acc;
-  }, {} as { [orderId: string]: Movement[] });
-}; */
-
-// Calculate total orders for a list of clients based on unique order IDs
 export const calculateTotalOrders = (clients: Client[]): number => {
   const orderIds = new Set<string>();
   for (const client of clients) {
@@ -135,7 +121,6 @@ export const calculateTopBrandsData = (movements: Movement[]): BrandData[] => {
       }
     }
   }
-
   const topBrands = Array.from(brandCount.values())
     .sort((a, b) => b.quantity - a.quantity)
     .slice(0, 10)
@@ -148,7 +133,6 @@ export const calculateTopBrandsData = (movements: Movement[]): BrandData[] => {
   return topBrands;
 };
 
-// Calculate sales distribution data for a list of clients
 export const calculateSalesDistributionData = (
   clients: Client[],
   isMobile: boolean
@@ -289,7 +273,11 @@ export const calculateMonthlyData = (clients: Client[]) => {
   const orderIdsPerMonth: { [key: string]: Set<string> } = {};
 
   const revenuePerOrderId: {
-    [orderId: string]: { revenue: number; netRevenue: number; monthYear: string };
+    [orderId: string]: {
+      revenue: number;
+      netRevenue: number;
+      monthYear: string;
+    };
   } = {};
 
   for (const client of clients) {
@@ -318,7 +306,8 @@ export const calculateMonthlyData = (clients: Client[]) => {
       for (const detail of movement.details) {
         const priceSold = parseFloat(detail.priceSold) || 0;
         const priceBought =
-          Math.abs(parseFloat(detail.priceBought) || 0) * (detail.quantity || 0);
+          Math.abs(parseFloat(detail.priceBought) || 0) *
+          (detail.quantity || 0);
         movementRevenue += priceSold;
         movementNetRevenue += priceSold - priceBought;
       }
@@ -333,13 +322,11 @@ export const calculateMonthlyData = (clients: Client[]) => {
     }
   }
 
-  // Aggregate revenue and net revenue per month
   for (const orderId in revenuePerOrderId) {
     const { revenue, netRevenue, monthYear } = revenuePerOrderId[orderId];
     monthlyData[monthYear].revenue += revenue;
     monthlyData[monthYear].netRevenue += netRevenue;
   }
-
   const months = Object.keys(monthlyData).sort();
   const revenueData = months.map((month) => monthlyData[month].revenue);
   const netRevenueData = months.map((month) => monthlyData[month].netRevenue);
@@ -347,7 +334,6 @@ export const calculateMonthlyData = (clients: Client[]) => {
 
   return { months, revenueData, netRevenueData, ordersData };
 };
-
 
 // Calculate total quantity for a movement
 export const calculateTotalQuantity = (movement: Movement): number => {
@@ -396,7 +382,6 @@ export const currencyFormatter = (value: number | string): string => {
   return currencyFormatterInstance.format(numberValue);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const customCurrencyFormatter = (params: any): string => {
   const value = params.value;
   if (value === null || value === undefined || value === "") {

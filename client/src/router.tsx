@@ -1,4 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
+//src/router.tsx
 import { lazy, Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Loader from "./components/common/Loader";
@@ -9,7 +10,6 @@ import {
   ALLOWED_ROLES_FOR_UNPROTECTED_ROUTES,
 } from "./utils/constants";
 
-// Lazy load components for performance optimization
 const LandingPage = lazy(() => import("./pages/landing/LandingPage"));
 const ArticlesPage = lazy(() => import("./pages/common/ArticlesPage"));
 const CalendarPage = lazy(() => import("./pages/common/CalendarPage"));
@@ -19,14 +19,10 @@ const MovementsPage = lazy(() => import("./pages/common/MovementsPage"));
 const PromosPage = lazy(() => import("./pages/common/PromosPage"));
 const UserPage = lazy(() => import("./pages/common/UserPage"));
 const VisitsPage = lazy(() => import("./pages/common/VisitsPage"));
-const EmployeeDashboard = lazy(
-  () => import("./pages/employee/EmployeeDashboard")
-);
+const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
 const StatisticsDashboard = lazy(
   () => import("./pages/statistics/StatisticsDashboard")
 );
-
-
 
 const router = createBrowserRouter([
   {
@@ -47,12 +43,11 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requiredRoles={ALLOWED_ROLES_FOR_UNPROTECTED_ROUTES}>
             <Suspense fallback={<Loader fadeout />}>
-              <EmployeeDashboard />
+              <Dashboard />
             </Suspense>
           </ProtectedRoute>
         ),
       },
-      // Statistics Route
       {
         path: "statistics",
         element: (

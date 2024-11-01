@@ -1,5 +1,4 @@
-// src/api/chatApi.ts
-
+//src/features/chat/api/chats.ts
 import { IChat, IMessage } from "../../../models/dataModels";
 import { apiCall } from "../../../utils/apiUtils";
 
@@ -74,11 +73,10 @@ export const fetchMessagesFromMultipleChats = async (
     if (!chatIds || !Array.isArray(chatIds) || chatIds.length === 0) {
       throw new Error("Invalid chat IDs array.");
     }
-    // Send chatIds in the request body instead of query params
     return await apiCall<{ chatId: string; messages: IMessage[] }[]>(
       `/chats/messages`,
       "POST",
-      { chatIds } // Pass chatIds in the body
+      { chatIds }
     );
   } catch (error) {
     console.error("Error fetching messages from multiple chats:", error);
@@ -89,7 +87,6 @@ export const fetchMessagesFromMultipleChats = async (
 // Create a new chat (simple, group, or broadcast)
 export const createChat = async (chatData: Partial<IChat>): Promise<IChat> => {
   try {
-    // Perform client-side validation before sending the request
     if (
       !chatData.type ||
       !["simple", "group", "broadcast"].includes(chatData.type)
@@ -118,7 +115,6 @@ export const sendMessage = async (
   messageData: Partial<IMessage>
 ): Promise<IMessage> => {
   try {
-    // Validate chatId and message content
     if (!chatId || !messageData.content || !messageData.sender) {
       throw new Error("Invalid message data.");
     }
@@ -139,7 +135,6 @@ export const updateReadStatus = async (
   messageIds: string[]
 ): Promise<IChat> => {
   try {
-    // Validate IDs
     if (!chatId || !Array.isArray(messageIds) || messageIds.length === 0) {
       throw new Error("Invalid chat ID or message IDs.");
     }

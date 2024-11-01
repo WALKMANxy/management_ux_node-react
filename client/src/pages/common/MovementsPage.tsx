@@ -1,5 +1,4 @@
 // src/pages/common/MovementsPage.tsx
-
 import { Box, useMediaQuery } from "@mui/material";
 import React, { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -9,7 +8,7 @@ import MovementList from "../../components/statistics/grids/MovementList";
 import useLoadingData from "../../hooks/useLoadingData";
 import { useMovementsGrid } from "../../hooks/useMovementsGrid";
 import { Movement } from "../../models/dataModels";
-import { MovementColumnDefinition } from "../../models/propsModels"; // Import the new type
+import { MovementColumnDefinition } from "../../models/propsModels";
 import {
   calculateTotalNetPriceSold,
   calculateTotalPriceSold,
@@ -21,7 +20,6 @@ import {
 const MovementsPage: React.FC = () => {
   const { t } = useTranslation();
   const isMobile = useMediaQuery("(max-width:600px)");
-
   const { loading } = useLoadingData();
 
   const {
@@ -104,7 +102,7 @@ const MovementsPage: React.FC = () => {
           sortable: true,
         },
         {
-          headerName: t("movementsPage.netRevenue"), // New column for Net Revenue
+          headerName: t("movementsPage.netRevenue"),
           valueGetter: (params: { data: Movement }) =>
             calculateTotalNetPriceSold(params.data),
           valueFormatter: (params: { value: number }) =>
@@ -112,11 +110,10 @@ const MovementsPage: React.FC = () => {
           comparator: numberComparator,
           sortable: true,
         },
-      ].filter(Boolean) as MovementColumnDefinition[], // Filter out null entries
+      ].filter(Boolean) as MovementColumnDefinition[],
     [handleMovementSelect, t, userRole]
   );
 
-  // Handle loading state
   if (loading) {
     return (
       <Box

@@ -92,10 +92,11 @@ export const hasLocationChanged = (
   lon2: number,
   threshold: number = 0.01
 ): boolean => {
+
   // Calculate the absolute difference between latitudes and longitudes
   const latDiff = Math.abs(lat1 - lat2);
   const lonDiff = Math.abs(lon1 - lon2);
-
+  
   // Check if the difference is greater than the threshold
   return latDiff > threshold || lonDiff > threshold;
 };

@@ -38,8 +38,8 @@ const ChatView: React.FC = () => {
   const dispatch = useAppDispatch();
   const [open, setOpen] = React.useState(false);
 
-  /*   console.log("ChatView rendering now");
-   */
+  //  console.log("ChatView rendering now");
+
   const {
     currentChat,
     sortedMessages,

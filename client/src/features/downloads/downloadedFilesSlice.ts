@@ -17,7 +17,7 @@ const downloadedFilesSlice = createSlice({
   initialState,
   reducers: {
     addDownloadedFile(state, action: PayloadAction<Attachment>) {
-      console.debug(`Adding downloaded file: ${action.payload.fileName}`);
+      // console.debug(`Adding downloaded file: ${action.payload.fileName}`);
       const existingFile = state.files.find(
         (file) =>
           file.fileName === action.payload.fileName &&
@@ -38,7 +38,7 @@ const downloadedFilesSlice = createSlice({
         messageId: string;
       }>
     ) {
-      console.debug(`Removing downloaded file: ${action.payload.fileName}`);
+      // console.debug(`Removing downloaded file: ${action.payload.fileName}`);
       state.files = state.files.filter(
         (file) =>
           file.fileName !== action.payload.fileName ||
@@ -48,8 +48,7 @@ const downloadedFilesSlice = createSlice({
     },
 
     clearDownloadedFiles(state) {
-      console.debug("Clearing all downloaded files");
-      // Clear all files
+      // console.debug("Clearing all downloaded files");
       state.files = [];
     },
   },

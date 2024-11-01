@@ -2,13 +2,18 @@
 import React, { memo, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
-import Loader from "../../components/common/Loader";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { selectUserRole } from "../../features/auth/authSlice";
 
-// Lazy load the dashboard components
-const AdminDashboard = React.lazy(() => import("../admin/AdminDashboard"));
-const ClientDashboard = React.lazy(() => import("../client/ClientDashboard"));
-const AgentDashboard = React.lazy(() => import("../agent/AgentDashboard"));
+const AdminDashboard = React.lazy(
+  () => import("../dashboard/admin/AdminDashboard")
+);
+const ClientDashboard = React.lazy(
+  () => import("../dashboard/client/ClientDashboard")
+);
+const AgentDashboard = React.lazy(
+  () => import("../dashboard/agent/AgentDashboard")
+);
 
 const StatisticsDashboard: React.FC = () => {
   const userRole = useAppSelector(selectUserRole);
@@ -41,7 +46,7 @@ const StatisticsDashboard: React.FC = () => {
     }
   };
 
-  return <Suspense fallback={<Loader fadeout />}>{renderDashboard()}</Suspense>;
+  return <Suspense fallback={<LoadingSpinner />}>{renderDashboard()}</Suspense>;
 };
 
 export default memo(StatisticsDashboard);

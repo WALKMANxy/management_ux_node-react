@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { createApi /* fetchBaseQuery */ } from "@reduxjs/toolkit/query/react";
+//src/features/calendar/calendarQuery.ts
+import { createApi } from "@reduxjs/toolkit/query/react";
 import { AxiosError } from "axios";
 import { CalendarEvent, Holiday } from "../../models/dataModels";
 import {
@@ -8,26 +9,21 @@ import {
   GetEventsByMonthResponse,
   UpdateEventStatusPayload,
 } from "../../models/propsModels";
-/* import { getAccessToken } from "../../services/tokenService";
- */ import { axiosInstance } from "../../utils/apiUtils";
+import { axiosInstance } from "../../utils/apiUtils";
 
-/* const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
- */
 const currentLocale = (navigator.language || navigator.languages[0]).replace(
   /^[a-z]{2}-/,
   ""
 );
-/* console.debug(`Modified locale (region only): ${currentLocale}`);
- */
+
+//console.debug(`Modified locale (region only): ${currentLocale}`);
 
 // Utility function to convert strings to Date objects
 const normalizeDate = (date: string | Date): Date => {
-  // Only convert if the date is a string
   return typeof date === "string" ? new Date(date) : date;
 };
 
-/* const accessToken = getAccessToken();
- */
+// Base query with axios instance to manage access/refresh tokens
 export const baseQueryWithAxios = async (
   args: any,
   _api: any,
@@ -49,7 +45,7 @@ export const baseQueryWithAxios = async (
 
 export const calendarApi = createApi({
   reducerPath: "calendarApi",
-  baseQuery: baseQueryWithAxios, // Default to the query with credentials
+  baseQuery: baseQueryWithAxios,
   tagTypes: ["CalendarEvent"],
   endpoints: (builder) => ({
     getEventsByMonth: builder.query<
@@ -72,17 +68,13 @@ export const calendarApi = createApi({
         }));
       },
       providesTags: (result) => [
-        // Provide a general tag for the whole list
         { type: "CalendarEvent", id: "LIST" },
-        // Provide specific tags for each event
         ...(result?.map(({ _id }) => ({
           type: "CalendarEvent" as const,
-          id: _id
+          id: _id,
         })) ?? []),
       ],
     }),
-
-
 
     createEvent: builder.mutation<CalendarEvent, CreateEventPayload>({
       query: (newEvent) => {
@@ -122,7 +114,6 @@ export const calendarApi = createApi({
         { type: "CalendarEvent", id: eventId },
       ],
     }),
-    // Mutation to edit a calendar event
     editEvent: builder.mutation<
       CalendarEvent,
       { eventId: string; data: Partial<CreateEventPayload> }
@@ -143,21 +134,20 @@ export const calendarApi = createApi({
       async queryFn({ year }, _queryApi, _extraOptions, fetchWithBQ) {
         let countryCode = "IT"; // Default to Italy
 
-        /*         console.debug(`Current locale: ${currentLocale}`);
-         */ // Map i18n language to the country code
+        // console.debug(`Current locale: ${currentLocale}`);
+        // Map i18n language to the country code
         countryCode = currentLocale.toUpperCase();
-        /*         console.debug(`Country code set to: ${countryCode}`);
-         */ const url = `https://date.nager.at/api/v3/PublicHolidays/${year}/${countryCode}`;
+        //console.debug(`Country code set to: ${countryCode}`);
+        const url = `https://date.nager.at/api/v3/PublicHolidays/${year}/${countryCode}`;
 
         try {
           const result = await fetchWithBQ({
             url,
             method: "GET",
-            credentials: "omit", // Explicitly omit credentials for CORS compliance
+            credentials: "omit",
           });
 
           if (result.error) {
-            // Ensure the error object matches the expected structure
             return {
               error: {
                 status: result.error.status,
@@ -168,7 +158,6 @@ export const calendarApi = createApi({
 
           return { data: result.data as Holiday[] };
         } catch (error) {
-          // Ensure the caught error is properly formatted
           return {
             error: {
               status: 500,
@@ -185,7 +174,7 @@ export const {
   useGetEventsByMonthQuery,
   useCreateEventMutation,
   useUpdateEventStatusMutation,
-  useEditEventMutation, // Newly added
-  useDeleteEventMutation, // Newly added
+  useEditEventMutation,
+  useDeleteEventMutation,
   useGetHolidaysQuery,
 } = calendarApi;

@@ -1,3 +1,4 @@
+//src/pages/common/ChatPage.tsx
 import { Box, Grid, useMediaQuery } from "@mui/material";
 import React, { memo } from "react";
 import { useAppSelector } from "../../app/hooks";
@@ -9,7 +10,6 @@ const ChatPage: React.FC = () => {
   const isMobile = useMediaQuery("(max-width:800px)");
   const isTablet = useMediaQuery("(min-width:800px) and (max-width:1250px)");
 
-  // Get currentChat from Redux state
   const currentChat = useAppSelector(
     (state: RootState) => state.chats.currentChat
   );
@@ -19,7 +19,7 @@ const ChatPage: React.FC = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: isMobile ? "100dvh" : "calc(100vh - 80px)", // Adjust height based on view
+        height: isMobile ? "100dvh" : "calc(100vh - 80px)",
         bgcolor: "#f4f5f7",
         overflow: "hidden",
       }}
@@ -31,19 +31,18 @@ const ChatPage: React.FC = () => {
           xs={isTablet ? 3 : 12}
           md={3}
           sx={{
-            display: { xs: isMobile && currentChat ? "none" : "block" }, // Hide sidebar on mobile if chat is open
+            display: { xs: isMobile && currentChat ? "none" : "block" },
             borderRight: "1px solid #e0e0e0",
-            height: "100%", // Ensure sidebar fills available height
-            overflowY: "auto", // Enable scrolling if content overflows
+            height: "100%",
+            overflowY: "auto",
             minWidth: "20dvh",
-            position: isMobile ? "absolute" : "relative", // Make sidebar absolute on mobile for better positioning
-            zIndex: isMobile ? 1 : "auto", // Ensure it's above chat view
-            width: isMobile ? "100%" : "auto", // Full width on mobile
+            position: isMobile ? "absolute" : "relative",
+            zIndex: isMobile ? 1 : "auto",
+            width: isMobile ? "100%" : "auto",
           }}
         >
           <ChatSidebar />
         </Grid>
-
         {/* Main chat view, hidden by default on mobile */}
         <Grid
           item
@@ -52,9 +51,9 @@ const ChatPage: React.FC = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            height: "100%", // Ensure chat view fills available height
-            width: "100%", // Full width for chat view on mobile
-            position: isMobile ? "relative" : "static", // Adjust positioning for mobile
+            height: "100%",
+            width: "100%",
+            position: isMobile ? "relative" : "static",
           }}
         >
           {currentChat && <ChatView />}

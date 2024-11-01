@@ -121,7 +121,7 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
               variant="body2"
               sx={{ marginBottom: "24px", color: "text.secondary" }}
             >
-              {t("auth.continueToApp", { appName: "RCS Next" })}
+              {t("auth.continueToApp", { appName: "NEXT_" })}
             </Typography>
 
             <Collapse in={alertOpen}>

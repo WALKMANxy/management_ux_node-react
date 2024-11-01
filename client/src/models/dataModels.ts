@@ -1,11 +1,11 @@
-// models/dataModels.ts
+// src/models/dataModels.ts
 
 export type MovementDetail = {
   articleId: string;
   name: string;
   brand: string;
-  quantity: number; // Added quantity
-  unitPrice: string; // Added unit price
+  quantity: number;
+  unitPrice: string;
   priceSold: string;
   priceBought: string;
 };
@@ -23,7 +23,7 @@ export type Movement = {
 
 export type Visit = {
   _id?: string;
-  clientId: string; // Client associated with this visit
+  clientId: string;
   type: string;
   visitReason: string;
   createdAt: Date;
@@ -43,7 +43,7 @@ export interface GlobalVisits {
 
 export type Promo = {
   _id?: string;
-  clientsId: string[]; // Array of client IDs this promo applies to
+  clientsId: string[];
   global?: boolean;
   excludedClientsId?: string[];
   promoType: string;
@@ -56,42 +56,42 @@ export type Promo = {
 };
 
 export interface IMessage {
-  _id: string; // Server-generated unique identifier
-  local_id?: string; // Client-generated identifier for matching
+  _id: string;
+  local_id?: string;
   content: string;
-  sender: string; // User ID of the sender
+  sender: string;
   timestamp: Date;
-  readBy: string[]; // Array of user IDs who have read the message
-  messageType: "message" | "alert" | "promo" | "visit"; // Categorizes the message type
-  attachments: Attachment[]; // Array to store file metadata for attachments
-  status: "pending" | "sent" | "failed"; // Status indicating the message state
-  isUploading?: boolean; // Whether the file is still uploading
+  readBy: string[];
+  messageType: "message" | "alert" | "promo" | "visit";
+  attachments: Attachment[];
+  status: "pending" | "sent" | "failed";
+  isUploading?: boolean;
 }
 
 export interface Attachment {
-  file?: File; // Local file, only for client-side usage
+  file?: File;
   url: string;
   type: "image" | "video" | "pdf" | "word" | "spreadsheet" | "other";
   fileName: string;
   size: number;
   chatId?: string;
   messageId?: string;
-  uploadProgress : number;
-  status: 'pending' | 'uploading' | 'uploaded' | 'failed';
+  uploadProgress: number;
+  status: "pending" | "uploading" | "uploaded" | "failed";
 }
 
 export interface IChat {
-  _id?: string; // Server-generated unique identifier
-  local_id: string; // Client-generated identifier for matching
-  type: "simple" | "group" | "broadcast"; // Type of chat
-  name?: string; // Optional, mainly for group chats
-  description?: string; // Optional, mainly for groups and broadcasts
-  participants: string[]; // List of participant user IDs
-  admins?: string[]; // Admins, mainly for group and broadcast chats
-  messages: IMessage[]; // Array of messages within the chat
+  _id?: string;
+  local_id: string;
+  type: "simple" | "group" | "broadcast";
+  name?: string;
+  description?: string;
+  participants: string[];
+  admins?: string[];
+  messages: IMessage[];
   createdAt: Date;
   updatedAt?: Date;
-  status: "pending" | "created" | "failed"; // Status indicating the chat state
+  status: "pending" | "created" | "failed";
 }
 
 export type CalendarEvent = {
@@ -125,7 +125,7 @@ export type CalendarEvent = {
 };
 
 export interface Holiday {
-  date: string; // ISO date string (e.g., "2024-01-01")
+  date: string;
   localName: string;
   name: string;
   countryCode: string;
