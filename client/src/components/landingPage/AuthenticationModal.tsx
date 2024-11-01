@@ -373,7 +373,7 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
             >
               {isLoginMode ? (
                 <>
-                  {t("auth.newToApp", { appName: "RCS Next" })}{" "}
+                  {t("auth.newToApp", { appName: "NEXT_" })}{" "}
                   <Typography
                     component="span"
                     sx={{

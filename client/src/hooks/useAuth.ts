@@ -15,6 +15,7 @@ import { showToast } from "../services/toastMessage";
 import { setAccessToken } from "../services/tokenService";
 import { initializeUserEncryption } from "../utils/cacheUtils";
 import { getUniqueIdentifier } from "../utils/cryptoUtils";
+import { setRegistered } from "../utils/landingUtils";
 
 const timeMS = getTimeMs();
 
@@ -99,6 +100,7 @@ export const useAuth = () => {
       setAlertMessage(t("auth.registrationSuccess"));
       setAlertSeverity(statusCode === 201 ? "success" : "error");
       setAlertOpen(true);
+      setRegistered(true);
     } catch (error) {
       console.warn("Registration error:", (error as Error).message);
 
@@ -119,8 +121,15 @@ export const useAuth = () => {
   ) => {
     try {
       // Check if email or password is empty
-      if (!email || !password) {
-        setAlertMessage(t("auth.enterEmailAndPassword"));
+      if (!email) {
+        setAlertMessage(t("auth.enterEmail"));
+        setAlertSeverity("error");
+        setAlertOpen(true);
+        return;
+      }
+
+      if (!password) {
+        setAlertMessage(t("auth.enterPassword"));
         setAlertSeverity("error");
         setAlertOpen(true);
         return;
@@ -172,6 +181,7 @@ export const useAuth = () => {
       }
 
       // Store the access token in memory
+      setRegistered(true);
       setAccessToken(accessToken);
       // console.log("Access token set successfully in memory");
 
@@ -336,6 +346,7 @@ export const useAuth = () => {
             refreshToken,
           })
         );
+        setRegistered(true);
       } else {
         showToast.error(t("auth.googleLoginFailed"));
       }

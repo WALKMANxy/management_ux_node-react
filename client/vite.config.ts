@@ -38,8 +38,8 @@ export default defineConfig(({ mode }) => {
           "assets/weather/*.svg",
         ],
         manifest: {
-          name: "RCS Next",
-          short_name: "RCS",
+          name: "NEXT_",
+          short_name: "N_",
           description: "Internal management application.",
           start_url: "/",
           display: "standalone",

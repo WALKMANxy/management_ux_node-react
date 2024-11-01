@@ -50,7 +50,6 @@ const preloadVisits = () => import("../../pages/common/VisitsPage");
 const preloadPromos = () => import("../../pages/common/PromosPage");
 const preloadCalendar = () => import("../../pages/common/CalendarPage");
 
-
 const Header: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -143,7 +142,7 @@ const Header: React.FC = () => {
           to={dashboardLink}
           onClick={toggleDrawer}
         >
-          <ListItemIcon  sx={{ color: "white" }}>
+          <ListItemIcon sx={{ color: "white" }}>
             <HomeIcon />
           </ListItemIcon>
           <ListItemText primary={t("headerDashboard", "Dashboard")} />
@@ -281,7 +280,7 @@ const Header: React.FC = () => {
           left: "auto",
           maxWidth: "100vw",
           transition: "top 0.3s ease-in-out",
-          top: showAppBar ? "0" : "-64px", 
+          top: showAppBar ? "0" : "-64px",
         }}
         className="animate__animated animate__fadeInDown"
       >
@@ -298,7 +297,7 @@ const Header: React.FC = () => {
             </IconButton>
           </Fade>
           <img
-            src="/images/logo-appbar.png"
+            src="/images/rcs_icon.png"
             alt="Logo"
             style={{ height: "40px", marginRight: "16px", cursor: "pointer" }}
             onClick={handleLogoClick}
