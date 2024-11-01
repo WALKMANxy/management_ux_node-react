@@ -390,7 +390,7 @@ const ManageUsers: React.FC = () => {
                       role="checkbox"
                       tabIndex={-1}
                       key={user._id}
-                      onDoubleClick={() => handleRowDoubleClick(user)}
+                      onClick={() => handleRowDoubleClick(user)}
                       sx={{
                         cursor: "pointer",
                         "&:last-child td, &:last-child th": { border: 0 },

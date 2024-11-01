@@ -3,11 +3,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { showToast } from "../services/toastMessage";
 import { useAuth } from "./useAuth";
+import { isRegistered } from "../utils/landingUtils";
 
 export const useHandleSignin = (onClose: () => void) => {
   const { t } = useTranslation();
 
-  const [isLoginMode, setIsLoginMode] = useState(true);
+  const [isLoginMode, setIsLoginMode] = useState<boolean>(() => isRegistered());
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

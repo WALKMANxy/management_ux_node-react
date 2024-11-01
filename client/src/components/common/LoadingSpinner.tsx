@@ -23,14 +23,6 @@ const SpinnerContainer = styled(Box)<{ fadeout: string }>`
   transition: opacity 0.5s;
 `;
 
-const StyledImage = styled.img`
-  height: 60%;
-  margin-bottom: 10%;
-  background-color: rgba(0, 0, 0, 0.01); /* Faint black background */
-  border-radius: 8px; /* Rounded corners */
-  padding: 10px; /* Optional padding to give some space around the image */
-`;
-
 const LoadingSpinner: React.FC<{ fadeoutDelay?: number }> = ({
   fadeoutDelay = 1500,
 }) => {
@@ -57,13 +49,8 @@ const LoadingSpinner: React.FC<{ fadeoutDelay?: number }> = ({
           justifyContent: "center",
         }}
       >
-        <StyledImage
-          src="/images/logo-appbar.png"
-          alt="RCS Logo"
-          style={{ height: "60%", marginBottom: "10%" }}
-        />
         <CircularProgress
-          style={{ color: "#9e9e9e", height: "9%", width: "9%" }} 
+          style={{ color: "#9e9e9e", height: "9%", width: "9%" }}
           aria-label="loading"
         />
       </Box>

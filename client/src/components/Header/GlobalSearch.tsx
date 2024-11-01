@@ -9,7 +9,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { styled } from "@mui/system";
+import { styled, useMediaQuery } from "@mui/system";
 import React, { KeyboardEvent, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -72,6 +72,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const dispatch = useAppDispatch();
 
   const {
@@ -167,7 +168,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
         sx={{
           "& .MuiOutlinedInput-root": {
             borderRadius: "24px",
-            height: 45,
+            height: isMobile ? 35 : 40,
             padding: "6px 8px",
           },
           "& .MuiInputBase-input": {
