@@ -1,5 +1,4 @@
 // src/components/dashboard/ClockComponent.tsx
-
 import { Box, Paper, Typography, useMediaQuery, useTheme } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Clock from "react-clock";
@@ -7,7 +6,6 @@ import "react-clock/dist/Clock.css";
 
 const ClockComponent: React.FC = () => {
   const [value, setValue] = useState(new Date());
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery("(min-width:600px) and (max-width:785px)");
@@ -29,7 +27,7 @@ const ClockComponent: React.FC = () => {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    hour12: false, // Ensures 24-hour format
+    hour12: false,
   });
   const formattedDate = value.toLocaleDateString([], {
     weekday: "long",
@@ -90,9 +88,7 @@ const ClockComponent: React.FC = () => {
             minuteHandLength={80}
             hourMarksWidth={2.5}
           />{" "}
-          {/* Increased size by 25% */}
         </Box>
-
         {/* Digital Time and Date */}
         <Box
           sx={{

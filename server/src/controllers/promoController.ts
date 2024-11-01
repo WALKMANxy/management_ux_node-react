@@ -1,3 +1,4 @@
+//src/controllers/promoController.ts
 import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../models/types";
 import { PromoService } from "../services/promosService";
@@ -23,7 +24,6 @@ export class PromoController {
     try {
       const promoData = req.body;
 
-      // Ensure clientsId is empty if the promo is global
       if (promoData.global) {
         promoData.clientsId = [];
       }
@@ -46,7 +46,6 @@ export class PromoController {
     try {
       const promoData = req.body;
 
-      // Ensure clientsId is empty if the promo is global
       if (promoData.global) {
         promoData.clientsId = [];
       }
@@ -54,7 +53,7 @@ export class PromoController {
       const promo = await PromoService.replacePromo(req.params.id, promoData);
       if (!promo) {
         res.status(200).json({ message: "Promo not found" });
-        return; // Ensure the function stops execution here
+        return;
       }
       res.status(200).json(promo);
     } catch (err) {
@@ -74,7 +73,6 @@ export class PromoController {
     try {
       const promoData = req.body;
 
-      // Ensure clientsId is empty if the promo is global
       if (promoData.global) {
         promoData.clientsId = [];
       }
@@ -82,7 +80,7 @@ export class PromoController {
       const promo = await PromoService.updatePromo(req.params.id, promoData);
       if (!promo) {
         res.status(200).json({ message: "Promo not found" });
-        return; // Ensure the function stops execution here
+        return;
       }
       res.status(200).json(promo);
     } catch (err) {

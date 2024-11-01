@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/dashboard/AgentView.tsx
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CloseIcon from "@mui/icons-material/Close";
@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import React, { memo } from "react";
 import { useTranslation } from "react-i18next";
-
 import { brandColors } from "../../utils/constants";
 import { calculateTopBrandsData } from "../../utils/dataUtils";
 import AgentActivityOverview from "../dashboard/AgentActivityOverview";
@@ -25,14 +24,14 @@ import MonthOverMonthSpendingTrend from "../statistics/charts/MonthOverMonthSpen
 import TopBrandsSold from "../statistics/charts/TopBrandSold";
 
 interface AgentViewProps {
-  selectedAgentData: any; // Replace `any` with appropriate type
+  selectedAgentData: any;
   handleToggleDrawer: () => void;
   clearSelection: () => void;
-  calculateTotalSpentThisMonth: Function; // Replace `Function` with specific type
+  calculateTotalSpentThisMonth: Function;
   calculateTotalSpentThisYearForAgents: Function;
   calculateTopArticleType: Function;
   calculateMonthlyData: Function;
-  agentComparativeStatisticsMonthly: any; // Replace `any` with appropriate type
+  agentComparativeStatisticsMonthly: any;
   agentComparativeStatistics: any;
   salesDistributionDataAgents: any;
   loadingState: boolean;
@@ -121,7 +120,7 @@ const AgentView: React.FC<AgentViewProps> = ({
         )}
       </Box>
 
-      <Grid container spacing={2}>
+      <Grid container spacing={4}>
         <Grid item xs={12} md={4}>
           {loadingState ? (
             <Skeleton
@@ -197,7 +196,6 @@ const AgentView: React.FC<AgentViewProps> = ({
             />
           )}
         </Grid>
-
         <Grid item xs={12} md={6}>
           {loadingState ? (
             <Skeleton
@@ -244,7 +242,6 @@ const AgentView: React.FC<AgentViewProps> = ({
           <AgentActivityOverview selectedAgent={selectedAgentData} />
         </Grid>
       </Grid>
-
       {/* Close Selection FAB */}
       {loadingState ? (
         <Skeleton

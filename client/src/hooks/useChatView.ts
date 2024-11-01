@@ -6,18 +6,18 @@ import { showToast } from "../services/toastMessage";
 import { selectCurrentChat } from "../features/chat/chatSlice";
 
 const useChatView = () => {
-  const { t } = useTranslation(); // Initialize translation
+  const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
 
   const currentChat = useAppSelector(selectCurrentChat)
   const currentUserId = useAppSelector((state) => state.auth.userId);
   const users = useAppSelector((state) => state.users.users);
 
-  // Error Handling: Display toast when an error occurs
+  // Error Handling
   useEffect(() => {
     if (error) {
       showToast.error(error);
-      setError(null); // Reset error after displaying
+      setError(null);
     }
   }, [error]);
 
@@ -86,7 +86,6 @@ const useChatView = () => {
   }, [currentChat, currentUserId]);
 
   // Determine the chat title and admin avatar based on chat type
-  // Chat Title
   const getChatTitle = useMemo(() => {
     if (!currentChat) return t("chat.defaultTitle");
 

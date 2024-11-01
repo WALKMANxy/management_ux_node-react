@@ -1,5 +1,4 @@
-// src/components/AttachmentItem.tsx
-
+//src/components/chatPage/AttachmentItem.tsx
 import CloudUploadIcon from "@mui/icons-material/CloudUpload"; // Import Upload Icon
 import DownloadIcon from "@mui/icons-material/Download";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
@@ -47,8 +46,8 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
   const dispatch = useAppDispatch();
   const downloadedFiles = useAppSelector(selectDownloadedFiles);
   const [downloadProgress, setDownloadProgress] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(true); // For images and videos
-  const [downloadError, setDownloadError] = useState<boolean>(false); // New state to track download errors
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [downloadError, setDownloadError] = useState<boolean>(false);
 
   // Select the latest attachment data from Redux
   const latestAttachment = useAppSelector((state) =>
@@ -70,12 +69,12 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
           setDownloadProgress(progress);
         })
           .then(() => {
-            setIsLoading(false); // Image is ready
-            setDownloadError(false); // Reset download error on success
+            setIsLoading(false);
+            setDownloadError(false);
           })
           .catch(() => {
-            setIsLoading(false); // Handle download failure
-            setDownloadError(true); // Set download error to true
+            setIsLoading(false);
+            setDownloadError(true);
             toast.error(`Failed to download ${latestAttachment.fileName}.`);
           });
       } else if (isOwnMessage) {
@@ -84,12 +83,12 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
           setDownloadProgress(progress);
         })
           .then(() => {
-            setIsLoading(false); // Download is complete
-            setDownloadError(false); // Reset download error on success
+            setIsLoading(false);
+            setDownloadError(false);
           })
           .catch(() => {
-            setIsLoading(false); // Handle download failure
-            setDownloadError(true); // Set download error to true
+            setIsLoading(false);
+            setDownloadError(true);
             toast.error(`Failed to download ${latestAttachment.fileName}.`);
           });
       } else {
@@ -110,18 +109,18 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
   // Handle downloading a file manually
   const handleDownload = async () => {
     if (latestAttachment) {
-      setIsLoading(true); // Start loading
-      setDownloadError(false); // Reset download error before attempting
+      setIsLoading(true);
+      setDownloadError(false);
       await downloadAndStoreFile(latestAttachment, (progress: number) => {
         setDownloadProgress(progress);
       })
         .then(() => {
-          setIsLoading(false); // Download complete
-          setDownloadError(false); // Reset download error on success
+          setIsLoading(false);
+          setDownloadError(false);
         })
         .catch(() => {
-          setIsLoading(false); // Handle download failure
-          setDownloadError(true); // Set download error to true
+          setIsLoading(false);
+          setDownloadError(true);
           toast.error(`Failed to download ${latestAttachment.fileName}.`);
         });
     }
@@ -143,9 +142,9 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
 
   // Handle retrying upload
   const handleRetry = useCallback(() => {
-    console.log("Retrying attachment:", latestAttachment!.fileName);
+    // console.log("Retrying attachment:", latestAttachment!.fileName);
     if (!latestAttachment?.chatId || !latestAttachment?.messageId) {
-      console.error("Missing chatId or messageId for the attachment.");
+      // console.error("Missing chatId or messageId for the attachment.");
       toast.error("Cannot retry upload: Missing chat or message information.");
       return;
     }
@@ -158,9 +157,9 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
     )
       .unwrap()
       .then(() => {
-        console.log(
-          `Attachment ${latestAttachment.fileName} retried successfully.`
-        );
+        /*  // console.log(
+        //   `Attachment ${latestAttachment.fileName} retried successfully.`
+        // ); */
         toast.success(
           `Attachment ${latestAttachment.fileName} re-uploaded successfully.`
         );
@@ -179,18 +178,18 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
   // Handle retrying download
   const handleRetryDownload = async () => {
     if (latestAttachment) {
-      setDownloadError(false); // Reset download error before retrying
-      setIsLoading(true); // Start loading
+      setDownloadError(false);
+      setIsLoading(true);
       await downloadAndStoreFile(latestAttachment, (progress: number) => {
         setDownloadProgress(progress);
       })
         .then(() => {
-          setIsLoading(false); // Download complete
-          setDownloadError(false); // Reset download error on success
+          setIsLoading(false);
+          setDownloadError(false);
         })
         .catch(() => {
-          setIsLoading(false); // Handle download failure
-          setDownloadError(true); // Set download error to true
+          setIsLoading(false);
+          setDownloadError(true);
           toast.error(`Failed to download ${latestAttachment.fileName}.`);
         });
     }
@@ -218,14 +217,14 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
     openFileViewer(false, latestAttachment?.fileName);
   };
 
-  // Inside your component
-  useEffect(() => {
+  // Debug
+  /*   useEffect(() => {
     console.log(
       "Latest Attachment upload status:",
       latestAttachment?.status,
       latestAttachment?.uploadProgress
     );
-  }, [latestAttachment]);
+  }, [latestAttachment]); */
 
   // Render different UI based on attachment type and status
   return (
@@ -265,7 +264,7 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
             value={latestAttachment.uploadProgress || 0}
             sx={{ color: "white" }}
           />
-          {/* Add a label to show the progress value */}
+          {/* Label to show the progress value */}
           <Typography
             variant="caption"
             sx={{
@@ -289,8 +288,8 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
             alignItems: "center",
             position: "absolute",
             inset: 0,
-            backgroundColor: "rgba(255, 0, 0, 0.2)", // Semi-transparent red
-            zIndex: 1001, // Ensure it's above the uploading overlay
+            backgroundColor: "rgba(255, 0, 0, 0.2)",
+            zIndex: 1001,
             color: "white",
             padding: 2,
             textAlign: "center",
@@ -309,7 +308,7 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
               },
             }}
             onClick={(e) => {
-              e.stopPropagation(); // Prevent triggering the parent onClick
+              e.stopPropagation();
               handleRetry();
             }}
           >
@@ -323,7 +322,6 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
         <>
           {/* Image Handling */}
           {isLoading ? (
-            // Show Skeleton while loading
             <Skeleton
               variant="rectangular"
               width="100%"
@@ -349,7 +347,7 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
               onLoad={() => {
                 setTimeout(() => {
                   setIsLoading(false);
-                }, 500); // Add a delay of 500ms before removing the loading state
+                }, 500);
               }}
               onClick={handleClick}
             />
@@ -369,7 +367,7 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
                   top: "50%",
                   left: "50%",
                   transform: "translate(-50%, -50%)",
-                  zIndex: 3, // Ensure it's above other elements
+                  zIndex: 3,
                 }}
               />
             )}
@@ -410,9 +408,9 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
             onLoadedData={() => {
               setTimeout(() => {
                 setIsLoading(false);
-              }, 500); // Add a delay of 500ms before removing the loading state
-            }} // Ensure isLoading is false once video is ready
-            onClick={handleVideoClick} // Handle click to open viewer
+              }, 500);
+            }}
+            onClick={handleVideoClick}
           />
 
           {/* Downloading Progress Overlay for Videos */}
@@ -423,9 +421,9 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
               sx={{
                 position: "absolute",
                 color: "white",
-                width: "50px", // Explicit size
-                height: "50px", // Explicit size
-                boxSizing: "border-box", // Ensures it respects sizing correctly
+                width: "50px",
+                height: "50px",
+                boxSizing: "border-box",
               }}
             />
           )}
@@ -448,7 +446,7 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
                 }}
                 disabled
               >
-                <CloudUploadIcon /> {/* Display upload icon */}
+                <CloudUploadIcon />
               </IconButton>
             ) : downloadError ? (
               // Show retry icon if download failed
@@ -459,22 +457,21 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
                   left: "50%",
                   transform: "translate(-50%, -50%)",
                   color: "white",
-                  backgroundColor: "rgba(255, 0, 0, 0.3)", // Red background for error
+                  backgroundColor: "rgba(255, 0, 0, 0.3)",
                   "&:hover": {
                     backgroundColor: "rgba(255, 0, 0, 0.5)",
                   },
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleRetryDownload(); // Retry download
+                  handleRetryDownload();
                 }}
               >
-                <ReplayIcon /> {/* Display retry icon */}
+                <ReplayIcon />
               </IconButton>
             ) : null
           ) : // For received messages, show download button or retry icon based on downloadError
           isOwnMessage ? null : downloadError ? (
-            // Show retry icon if download failed
             <IconButton
               sx={{
                 position: "absolute",
@@ -482,17 +479,17 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 color: "white",
-                backgroundColor: "rgba(255, 0, 0, 0.3)", // Red background for error
+                backgroundColor: "rgba(255, 0, 0, 0.3)",
                 "&:hover": {
                   backgroundColor: "rgba(255, 0, 0, 0.5)",
                 },
               }}
               onClick={(e) => {
                 e.stopPropagation();
-                handleRetryDownload(); // Retry download
+                handleRetryDownload();
               }}
             >
-              <ReplayIcon /> {/* Display retry icon */}
+              <ReplayIcon />
             </IconButton>
           ) : !isDownloading && !isFileDownloaded() ? (
             // Download Button
@@ -556,7 +553,7 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
             latestAttachment?.status === "uploading" ? (
               // Show upload icon instead of download icon for own uploads
               <IconButton sx={{ color: "black", ml: "auto" }} disabled>
-                <CloudUploadIcon /> {/* Display upload icon */}
+                <CloudUploadIcon />
               </IconButton>
             ) : latestAttachment?.status === "uploaded" ? (
               // Show checkmark icon after upload completes
@@ -576,10 +573,10 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
                 sx={{ color: "black", ml: "auto" }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleRetryDownload(); // Retry download
+                  handleRetryDownload();
                 }}
               >
-                <ReplayIcon /> {/* Display retry icon */}
+                <ReplayIcon />
               </IconButton>
             ) : null
           ) : latestAttachment?.status === "uploading" ? (
@@ -604,10 +601,10 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({
               sx={{ color: "black", ml: "auto" }}
               onClick={(e) => {
                 e.stopPropagation();
-                handleRetryDownload(); // Retry download
+                handleRetryDownload();
               }}
             >
-              <ReplayIcon /> {/* Display retry icon */}
+              <ReplayIcon />
             </IconButton>
           ) : !isDownloading && !isFileDownloaded() ? (
             // Download Button

@@ -1,5 +1,4 @@
-// Header.tsx
-
+//src/components/Header/Header.tsx
 import {
   Category as CategoryIcon,
   Close as CloseIcon,
@@ -51,15 +50,14 @@ const preloadVisits = () => import("../../pages/common/VisitsPage");
 const preloadPromos = () => import("../../pages/common/PromosPage");
 const preloadCalendar = () => import("../../pages/common/CalendarPage");
 
-
 const Header: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [iconChange, setIconChange] = useState(false);
-  const [showAppBar, setShowAppBar] = useState(true); // New state for showing/hiding AppBar
-  const [lastScrollY, setLastScrollY] = useState(0); // State to track last scroll position
+  const [showAppBar, setShowAppBar] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const userRole = useSelector((state: RootState) => state.auth.role);
@@ -76,10 +74,10 @@ const Header: React.FC = () => {
       const currentScrollY = window.scrollY;
       if (currentScrollY > lastScrollY && currentScrollY > 60) {
         // If scrolling down and past 100px
-        setShowAppBar(false); // Hide AppBar
+        setShowAppBar(false);
       } else if (currentScrollY < lastScrollY) {
         // If scrolling up
-        setShowAppBar(true); // Show AppBar
+        setShowAppBar(true);
       }
       setLastScrollY(currentScrollY);
     };
@@ -128,7 +126,7 @@ const Header: React.FC = () => {
   };
 
   const handleLogoClick = () => {
-    navigate("/dashboard"); // Navigate to the consolidated dashboard
+    navigate("/dashboard");
   };
 
   const renderLinks = () => {
@@ -144,7 +142,7 @@ const Header: React.FC = () => {
           to={dashboardLink}
           onClick={toggleDrawer}
         >
-          <ListItemIcon  sx={{ color: "white" }}>
+          <ListItemIcon sx={{ color: "white" }}>
             <HomeIcon />
           </ListItemIcon>
           <ListItemText primary={t("headerDashboard", "Dashboard")} />
@@ -281,8 +279,8 @@ const Header: React.FC = () => {
           right: "auto",
           left: "auto",
           maxWidth: "100vw",
-          transition: "top 0.3s ease-in-out", // Smooth transition
-          top: showAppBar ? "0" : "-64px", // Hide/show the AppBar based on scroll
+          transition: "top 0.3s ease-in-out",
+          top: showAppBar ? "0" : "-64px",
         }}
         className="animate__animated animate__fadeInDown"
       >
@@ -299,7 +297,7 @@ const Header: React.FC = () => {
             </IconButton>
           </Fade>
           <img
-            src="/images/logo-appbar.png"
+            src="/images/rcs_icon.png"
             alt="Logo"
             style={{ height: "40px", marginRight: "16px", cursor: "pointer" }}
             onClick={handleLogoClick}

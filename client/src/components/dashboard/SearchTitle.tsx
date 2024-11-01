@@ -42,7 +42,7 @@ const SearchTitle: React.FC<SearchTitleProps> = ({ role, loading }) => {
       variant={isMobile ? "h5" : "h4"}
       sx={{
         fontFamily: "Inter, sans-serif",
-        fontWeight: 100, // Using the lighter custom font weight
+        fontWeight: 100, 
         fontSize: isMobile ? "1.7rem" : null,
       }}
     >

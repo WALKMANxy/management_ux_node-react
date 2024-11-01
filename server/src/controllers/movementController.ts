@@ -6,9 +6,6 @@ import { MovementService } from "../services/movementService";
 import { logger } from "../utils/logger";
 
 export class MovementController {
-  /**
-   * Fetch all movements.
-   */
   static async getAllMovements(
     req: AuthenticatedRequest,
     res: Response
@@ -29,9 +26,6 @@ export class MovementController {
     }
   }
 
-  /**
-   * Fetch filtered movements based on user role and entity code.
-   */
   static async getFilteredMovements(
     req: AuthenticatedRequest,
     res: Response
@@ -69,9 +63,6 @@ export class MovementController {
     }
   }
 
-  /**
-   * Replace movements by Numero Lista.
-   */
   static async replaceMovement(
     req: AuthenticatedRequest,
     res: Response
@@ -86,7 +77,6 @@ export class MovementController {
 
       const movementData: IMovement = req.body;
 
-      // Optional: Validate that movementData["Numero Lista"] matches the URL parameter
       if (movementData["Numero Lista"] !== numeroLista) {
         logger.warn(
           `Numero Lista mismatch: URL parameter ${numeroLista} vs body ${movementData["Numero Lista"]}`
@@ -120,9 +110,6 @@ export class MovementController {
     }
   }
 
-  /**
-   * Update movements by Numero Lista with partial data.
-   */
   static async updateMovement(
     req: AuthenticatedRequest,
     res: Response

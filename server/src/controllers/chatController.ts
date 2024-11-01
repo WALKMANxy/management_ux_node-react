@@ -1,11 +1,17 @@
-// controllers/chatController.ts
-
+//src/controllers/chatController.ts
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 import { AuthenticatedRequest } from "../models/types";
 import { ChatService } from "../services/chatService";
 import { messageSchema } from "../utils/joiUtils";
 import { logger } from "../utils/logger";
+
+function sanitizeHtml(
+  _content: any,
+  _arg1: { allowedTags: never[]; allowedAttributes: {} }
+): any {
+  throw new Error("Function not implemented.");
+}
 
 export class ChatController {
   // Fetch all chats for the authenticated user with the latest message preview
@@ -15,7 +21,7 @@ export class ChatController {
   ): Promise<void> {
     try {
       if (req.user) {
-        const userId = req.user.id; // Assuming user ID is available in the request object after authentication
+        const userId = req.user.id;
         const chats = await ChatService.getAllChats(userId);
         res.status(200).json(chats);
         return;
@@ -123,7 +129,7 @@ export class ChatController {
       const { chatId } = req.params;
       const { oldestTimestamp, limit } = req.query as {
         oldestTimestamp: string;
-        limit: string; // Parse limit as a string initially
+        limit: string;
       };
 
       /*  console.log("Received Request with Parameters:", {
@@ -176,7 +182,7 @@ export class ChatController {
     res: Response
   ): Promise<void> {
     try {
-      const { chatIds } = req.body; // Extract chatIds from the body
+      const { chatIds } = req.body;
 
       if (!chatIds || !Array.isArray(chatIds) || chatIds.length === 0) {
         res
@@ -284,7 +290,7 @@ export class ChatController {
   ): Promise<void> {
     try {
       const { chatId } = req.params;
-      const { messageIds } = req.body; // Accept message IDs as an array in the request body
+      const { messageIds } = req.body;
 
       if (!req.user) {
         res.status(401).json({ message: "User not authenticated" });
@@ -313,11 +319,4 @@ export class ChatController {
       return;
     }
   }
-}
-
-function sanitizeHtml(
-  content: any,
-  arg1: { allowedTags: never[]; allowedAttributes: {} }
-): any {
-  throw new Error("Function not implemented.");
 }

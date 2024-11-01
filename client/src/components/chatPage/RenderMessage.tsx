@@ -1,5 +1,4 @@
 // src/components/chatPage/RenderMessage.tsx
-
 import { Box } from "@mui/material";
 import React from "react";
 import { Attachment, IMessage } from "../../models/dataModels";
@@ -13,21 +12,13 @@ interface RenderMessageProps {
   currentUserId: string;
   chatType: string;
   participantsData: Partial<User>[];
-  openFileViewer: (isPreview: boolean, fileName?: string) => void; // Add this line
+  openFileViewer: (isPreview: boolean, fileName?: string) => void;
   downloadAndStoreFile: (attachment: Attachment) => Promise<void>;
   handleSave: (fileName: string) => void;
 
-  downloadedFiles: Attachment[]
-
+  downloadedFiles: Attachment[];
 }
 
-/**
- * RenderMessages Component
- * Renders a list of messages, inserting date dividers where necessary.
- *
- * @param {RenderMessageProps} props - Component props.
- * @returns {JSX.Element} The rendered component.
- */
 const RenderMessages: React.FC<RenderMessageProps> = ({
   messages = [],
   currentUserId,
@@ -37,16 +28,9 @@ const RenderMessages: React.FC<RenderMessageProps> = ({
   downloadAndStoreFile,
   handleSave,
   downloadedFiles,
-
 }) => {
-  /**
-   * Determines whether to show a date divider before the current message.
-   *
-   * @param {number} index - The current message index.
-   * @returns {boolean} Whether to show the date divider.
-   */
   const shouldShowDivider = (index: number): boolean => {
-    if (index === 0) return true; // Always show divider for the first message
+    if (index === 0) return true;
     const currentMessageDate = new Date(messages[index].timestamp);
     const previousMessageDate = new Date(messages[index - 1].timestamp);
     return isDifferentDay(currentMessageDate, previousMessageDate);
@@ -76,7 +60,7 @@ const RenderMessages: React.FC<RenderMessageProps> = ({
                 message={message}
                 participantsData={participantsData}
                 chatType={chatType}
-                openFileViewer={openFileViewer} // Pass the function here
+                openFileViewer={openFileViewer}
                 downloadAndStoreFile={downloadAndStoreFile}
                 handleSave={handleSave}
                 downloadedFiles={downloadedFiles}

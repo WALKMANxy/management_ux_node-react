@@ -1,5 +1,4 @@
 // src/components/visitPage/ClientDetailsCard.tsx
-
 import AirplaneTicketIcon from "@mui/icons-material/AirplaneTicket";
 import CloseIcon from "@mui/icons-material/Close";
 import {
@@ -20,7 +19,6 @@ import { RootState } from "../../app/store";
 
 const preloadCreateVisitForm = () => import("./CreateVisitForm");
 
-// Custom styles for titles and subtitles
 const infoStyles = {
   title: {
     fontFamily: "'Open Sans', sans-serif",
@@ -49,7 +47,6 @@ const infoStyles = {
 };
 
 
-// Styled IconButton for Actions
 const StyledActionButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
   color: theme.palette.common.white,
@@ -61,7 +58,6 @@ const StyledActionButton = styled(IconButton)(({ theme }) => ({
   height: 48,
 }));
 
-// Styled Close Button
 const StyledCloseButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.error.main,
   color: theme.palette.common.white,
@@ -95,15 +91,12 @@ const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({
   );
   const userRole = currentUser?.role;
 
-  // If client data is not available, render nothing
   if (!client) return null;
 
-  // Find the agent associated with this client
   const agent = Object.values(agents).find((agent) =>
     agent.clients.some((c) => c.id === client.id)
   );
 
-  // Handlers for confirmation dialog
   const handleOpenConfirm = () => {
     onDeselectClient();
   };
@@ -117,7 +110,7 @@ const ClientDetailsCard: React.FC<ClientDetailsCardProps> = ({
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
           display: "flex",
           flexDirection: "column",
-          height: "100%", // Ensure the card takes full height to position buttons at the bottom
+          height: "100%", 
         }}
       >
         <CardContent sx={{ flexGrow: 1 }}>

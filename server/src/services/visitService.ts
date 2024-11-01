@@ -1,7 +1,14 @@
+//src/services/visitService.ts
 import { IVisit, Visit } from "../models/Visit";
 
 export class VisitService {
-  static async getAllVisits({ role, clientId }: { role: string; clientId?: string; }): Promise<IVisit[]> {
+  static async getAllVisits({
+    role,
+    clientId,
+  }: {
+    role: string;
+    clientId?: string;
+  }): Promise<IVisit[]> {
     try {
       let query = {};
 
@@ -25,7 +32,6 @@ export class VisitService {
 
   static async createVisit(visitData: Partial<IVisit>): Promise<IVisit> {
     try {
-      // Ensure date is a Date object before saving
       if (typeof visitData.date === "string") {
         visitData.date = new Date(visitData.date);
       }

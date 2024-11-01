@@ -1,3 +1,4 @@
+//src/hooks/useStats.ts
 import { useCallback, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { RootState } from "../app/store";
@@ -33,7 +34,7 @@ import useLoadingData from "./useLoadingData";
 interface SalesDistributionData {
   agents: Agent[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any[]; // Replace `any` with the actual type
+  data: any[];
 }
 
 interface ComparativeStatistics {
@@ -55,10 +56,10 @@ const useStats = (isMobile: boolean) => {
   } = useLoadingData();
 
   // Get data from the dataSlice
-  const {
-    selectedClientId, // ID of the currently selected client
-    selectedAgentId, // ID of the currently selected agent
-  } = useAppSelector<RootState, DataSliceState>((state) => state.data);
+  const { selectedClientId, selectedAgentId } = useAppSelector<
+    RootState,
+    DataSliceState
+  >((state) => state.data);
 
   // Precompute current date details
   const currentDate = useMemo(() => new Date(), []);
@@ -90,14 +91,12 @@ const useStats = (isMobile: boolean) => {
     return map;
   }, [clients]);
 
-  // Sales Distribution Data Clients precomputed
   const salesDistributionDataClients = useMemo(() => {
     if (!currentUserData) return [];
 
     return calculateSalesDistributionData(Object.values(clients), isMobile);
   }, [currentUserData, clients, isMobile]);
 
-  // Create memoized selectors for selectedClient and selectedAgent
   const selectedClient = useMemo(
     () => (selectedClientId ? clients[selectedClientId] : null),
     [clients, selectedClientId]
@@ -108,7 +107,6 @@ const useStats = (isMobile: boolean) => {
     [agents, selectedAgentId]
   );
 
-  // Update the clearSelection, selectClient, and selectAgent functions
   const clearSelectionHandler = useCallback(() => {
     dispatch(clearSelection());
   }, [dispatch]);
@@ -127,7 +125,6 @@ const useStats = (isMobile: boolean) => {
     [dispatch]
   );
 
-  // Calculation Functions
   const calculateTotalSpentThisMonth = useCallback((movements: Movement[]) => {
     return calculateMonthlyRevenue(movements);
   }, []);
@@ -153,7 +150,6 @@ const useStats = (isMobile: boolean) => {
     []
   );
 
-  // Cached Percentage Calculation
   const calculatePercentageCached = useMemo(() => {
     const cache = new Map<string, string>();
 
@@ -213,7 +209,12 @@ const useStats = (isMobile: boolean) => {
   // Monthly Revenue and Orders Data
   const { months, revenueData, netRevenueData, ordersData } = useMemo(() => {
     if (!currentUserData)
-      return { months: [], revenueData: [], netRevenueData: [], ordersData: [] };
+      return {
+        months: [],
+        revenueData: [],
+        netRevenueData: [],
+        ordersData: [],
+      };
 
     let clientData: Client[] = [];
 
@@ -435,13 +436,13 @@ const useStats = (isMobile: boolean) => {
     return calculateTotalRevenue(clientList);
   }, [role, currentUserData, clients]);
 
-    // Total Revenue and Orders
-    const totalNetRevenue = useMemo<number>(() => {
-      if (!currentUserData || !role) return 0;
+  // Total Revenue and Orders
+  const totalNetRevenue = useMemo<number>(() => {
+    if (!currentUserData || !role) return 0;
 
-      const clientList = getAdjustedClients(role, currentUserData, clients);
-      return calculateNetRevenue(clientList);
-    }, [role, currentUserData, clients]);
+    const clientList = getAdjustedClients(role, currentUserData, clients);
+    return calculateNetRevenue(clientList);
+  }, [role, currentUserData, clients]);
 
   const totalOrders = useMemo<number>(() => {
     if (!currentUserData || !role) return 0;
@@ -478,7 +479,7 @@ const useStats = (isMobile: boolean) => {
     agentComparativeStatistics,
     agentComparativeStatisticsMonthly,
     totalNetRevenue,
-    error: localError || error, // Prefer local error if set, otherwise Redux error
+    error: localError || error,
   };
 };
 

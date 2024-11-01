@@ -1,7 +1,10 @@
-import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+//src/components/userPage/ManageUsers.tsx
 import InfoIcon from "@mui/icons-material/Info";
 import {
   Box,
+  Button,
+  ButtonGroup,
+  debounce,
   Skeleton,
   Table,
   TableBody,
@@ -9,16 +12,21 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
+  TextField,
   Tooltip,
   Typography,
-  useTheme,
-  TableSortLabel,
-  Button,
-  ButtonGroup,
-  TextField,
   useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import "animate.css";
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { useInView } from "react-intersection-observer";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
@@ -30,7 +38,6 @@ import {
 import { User, UserRole } from "../../models/entityModels";
 import { showToast } from "../../services/toastMessage";
 import { ExtendedManageUsersSkeleton } from "./Skeletons";
-import debounce from "lodash/debounce"; // Import debounce
 
 const UserDetails = React.lazy(() => import("./UserDetails"));
 
@@ -60,14 +67,16 @@ const ManageUsers: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<Partial<User> | null>(null);
   const loading = useAppSelector(selectUsersLoading);
 
-  const [visibleRows, setVisibleRows] = useState<number>(20); // Start with 20 rows visible
+  const [visibleRows, setVisibleRows] = useState<number>(20);
 
   // Sorting state
   const [order, setOrder] = useState<Order>("asc");
-  const [orderBy, setOrderBy] = useState<keyof User>("email"); // Default sort by 'email'
+  const [orderBy, setOrderBy] = useState<keyof User>("email");
 
   // Filter states
-  const [roleFilter, setRoleFilter] = useState<"admin" | "guest" | "client" | "agent" | "employee" | "all">("all");
+  const [roleFilter, setRoleFilter] = useState<
+    "admin" | "guest" | "client" | "agent" | "employee" | "all"
+  >("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   // Fetch all users when the component mounts
@@ -78,34 +87,37 @@ const ManageUsers: React.FC = () => {
   // Handle lazy loading with Intersection Observer
   const { ref, inView } = useInView({
     triggerOnce: false,
-    threshold: 0.1, // Load more rows when 10% of the trigger is visible
+    threshold: 0.1,
   });
 
-    // Filtering users
-    const filteredUsers = useMemo(() => {
-      let filtered = [...users];
+  // Filtering users
+  const filteredUsers = useMemo(() => {
+    let filtered = [...users];
 
-      // Filter by role if not 'all'
-      if (roleFilter !== "all") {
-        filtered = filtered.filter((user) => user.role?.toLowerCase() === roleFilter);
-      }
+    // Filter by role if not 'all'
+    if (roleFilter !== "all") {
+      filtered = filtered.filter(
+        (user) => user.role?.toLowerCase() === roleFilter
+      );
+    }
 
-      // Filter by search term (email or entityName)
-      if (searchTerm.trim() !== "") {
-        const lowerSearch = searchTerm.toLowerCase();
-        filtered = filtered.filter(
-          (user) =>
-            (user.email && user.email.toLowerCase().includes(lowerSearch)) ||
-            (user.entityName && user.entityName.toLowerCase().includes(lowerSearch))
-        );
-      }
+    // Filter by search term (email or entityName)
+    if (searchTerm.trim() !== "") {
+      const lowerSearch = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (user) =>
+          (user.email && user.email.toLowerCase().includes(lowerSearch)) ||
+          (user.entityName &&
+            user.entityName.toLowerCase().includes(lowerSearch))
+      );
+    }
 
-      return filtered;
-    }, [users, roleFilter, searchTerm]);
+    return filtered;
+  }, [users, roleFilter, searchTerm]);
 
   useEffect(() => {
     if (inView && visibleRows < filteredUsers.length) {
-      setVisibleRows((prev) => prev + 20); // Load 20 more rows when scrolled to bottom
+      setVisibleRows((prev) => prev + 20);
     }
   }, [inView, filteredUsers.length, visibleRows]);
 
@@ -168,8 +180,6 @@ const ManageUsers: React.FC = () => {
     },
     [orderBy, order]
   );
-
-
 
   const sortedUsers = useMemo(() => {
     return [...filteredUsers].sort(comparator);
@@ -263,38 +273,49 @@ const ManageUsers: React.FC = () => {
       <Box sx={{ mb: 2 }}>
         {/* Role Selection Buttons */}
         <ButtonGroup
-        variant="contained"
-        aria-label={t("manageEntities.roleSelection", "Role selection")}
-        sx={{
-          boxShadow: "none",
-          gap: 2,
-          transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
-          transformOrigin: "top left", // Anchor the scale to the top-left corner
-          width: isMobile ? "133.33%" : "100%",
-          mb: 2.5,
-        }}
-      >
-          {["all", "client", "agent", "admin", "employee", "guest"].map((role) => (
-            <Button
-              key={role}
-              onClick={() => setRoleFilter(role as UserRole)}
-              sx={{
-                backgroundColor: roleFilter === role ? roleColors[role].color : "black",
-                "&:hover": {
+          variant="contained"
+          aria-label={t("manageEntities.roleSelection", "Role selection")}
+          sx={{
+            boxShadow: "none",
+            gap: 2,
+            transform: isMobile ? "scale(0.75)" : "none",
+            transformOrigin: "top left",
+            width: isMobile ? "133.33%" : "100%",
+            mb: 2.5,
+          }}
+        >
+          {["all", "client", "agent", "admin", "employee", "guest"].map(
+            (role) => (
+              <Button
+                key={role}
+                onClick={() => setRoleFilter(role as UserRole)}
+                sx={{
                   backgroundColor:
-                    roleFilter === role ? roleColors[role].hoverColor : "gray",
-                },
-                textTransform: "capitalize",
-              }}
-            >
-              {t(`manageUsers.${role}`, role.charAt(0).toUpperCase() + role.slice(1))}
-            </Button>
-          ))}
+                    roleFilter === role ? roleColors[role].color : "black",
+                  "&:hover": {
+                    backgroundColor:
+                      roleFilter === role
+                        ? roleColors[role].hoverColor
+                        : "gray",
+                  },
+                  textTransform: "capitalize",
+                }}
+              >
+                {t(
+                  `manageUsers.${role}`,
+                  role.charAt(0).toUpperCase() + role.slice(1)
+                )}
+              </Button>
+            )
+          )}
         </ButtonGroup>
 
         {/* Search Field */}
         <TextField
-          label={t("manageUsers.searchPlaceholder", "Search by Email or Entity Name")}
+          label={t(
+            "manageUsers.searchPlaceholder",
+            "Search by Email or Entity Name"
+          )}
           onChange={handleSearchChange}
           variant="outlined"
           fullWidth
@@ -349,64 +370,64 @@ const ManageUsers: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {loading
-                  ? Array.from({ length: visibleRows }).map((_, index) => (
-                      <TableRow
-                        key={index}
-                        className="animate__animated animate__fadeOut" // Fade out when loading
-                      >
-                        {columns.map((column) => (
-                          <TableCell key={column.id}>
-                            <Skeleton variant="text" />
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  : visibleUsers.length > 0 ? (
-                    visibleUsers.map((user) => (
-                      <TableRow
-                        hover
-                        role="checkbox"
-                        tabIndex={-1}
-                        key={user._id}
-                        onDoubleClick={() => handleRowDoubleClick(user)}
-                        sx={{
-                          cursor: "pointer",
-                          "&:last-child td, &:last-child th": { border: 0 },
-                          "&:hover": {
-                            backgroundColor: theme.palette.action.hover,
-                          },
-                        }}
-                        className="animate__animated animate__fadeIn"
-                      >
-                        <TableCell sx={{ color: "primary.main" }}>
-                          {user.email}
+                {loading ? (
+                  Array.from({ length: visibleRows }).map((_, index) => (
+                    <TableRow
+                      key={index}
+                      className="animate__animated animate__fadeOut"
+                    >
+                      {columns.map((column) => (
+                        <TableCell key={column.id}>
+                          <Skeleton variant="text" />
                         </TableCell>
-                        <TableCell>{user.role}</TableCell>
-                        <TableCell>{user.entityCode}</TableCell>
-                        <TableCell>
-                          {user.entityName || t("manageUsers.na", "N/A")}
-                        </TableCell>
-                        <TableCell>{user.authType}</TableCell>
-                        <TableCell>
-                          {user.isEmailVerified
-                            ? t("manageUsers.yes", "Yes")
-                            : t("manageUsers.no", "No")}
-                        </TableCell>
-                        <TableCell>
-                          {user.createdAt
-                            ? new Date(user.createdAt).toLocaleDateString()
-                            : t("manageUsers.na", "N/A")}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={columns.length} align="center">
-                        {t("manageUsers.noUsersFound", "No users found.")}
+                      ))}
+                    </TableRow>
+                  ))
+                ) : visibleUsers.length > 0 ? (
+                  visibleUsers.map((user) => (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={user._id}
+                      onClick={() => handleRowDoubleClick(user)}
+                      sx={{
+                        cursor: "pointer",
+                        "&:last-child td, &:last-child th": { border: 0 },
+                        "&:hover": {
+                          backgroundColor: theme.palette.action.hover,
+                        },
+                      }}
+                      className="animate__animated animate__fadeIn"
+                    >
+                      <TableCell sx={{ color: "primary.main" }}>
+                        {user.email}
+                      </TableCell>
+                      <TableCell>{user.role}</TableCell>
+                      <TableCell>{user.entityCode}</TableCell>
+                      <TableCell>
+                        {user.entityName || t("manageUsers.na", "N/A")}
+                      </TableCell>
+                      <TableCell>{user.authType}</TableCell>
+                      <TableCell>
+                        {user.isEmailVerified
+                          ? t("manageUsers.yes", "Yes")
+                          : t("manageUsers.no", "No")}
+                      </TableCell>
+                      <TableCell>
+                        {user.createdAt
+                          ? new Date(user.createdAt).toLocaleDateString()
+                          : t("manageUsers.na", "N/A")}
                       </TableCell>
                     </TableRow>
-                  )}
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} align="center">
+                      {t("manageUsers.noUsersFound", "No users found.")}
+                    </TableCell>
+                  </TableRow>
+                )}
                 {/* Sentinel row for Intersection Observer */}
                 <TableRow ref={ref}>
                   <TableCell colSpan={columns.length} />

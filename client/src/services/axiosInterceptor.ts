@@ -1,5 +1,4 @@
 // src/services/api/apiUtils.ts
-
 import { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import store from "../app/store";
 import { handleLogout } from "../features/auth/authThunks";
@@ -15,26 +14,16 @@ interface RequestWithRetry extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
-/**
- * Function to process queued requests after a new access token is fetched.
- * @param token The new access token.
- */
 function onAccessTokenFetched(token: string) {
   refreshSubscribers.forEach((callback) => callback(token));
   refreshSubscribers = [];
 }
 
-/**
- * Function to add subscribers (requests) to the queue while the token is being refreshed.
- * @param callback The callback to execute once the token is refreshed.
- */
 function addRefreshSubscriber(callback: (token: string) => void) {
   refreshSubscribers.push(callback);
 }
 
 // Response interceptor to handle errors
-// src/services/api/apiUtils.ts
-
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError) => {

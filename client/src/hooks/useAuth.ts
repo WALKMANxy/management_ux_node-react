@@ -1,23 +1,23 @@
+//src/hooks/useAuth.ts
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "../app/hooks";
 import store from "../app/store";
-
-import { setCurrentUser } from "../features/users/userSlice";
-import { User } from "../models/entityModels";
-
-import { useTranslation } from "react-i18next";
 import { getTimeMs } from "../config/config";
 import { loginUser, registerUser } from "../features/auth/api/auth";
 import { handleLogin, handleLogout } from "../features/auth/authThunks";
 import { getUserById } from "../features/users/api/users";
+import { setCurrentUser } from "../features/users/userSlice";
+import { User } from "../models/entityModels";
 import { FetchUserRoleError } from "../services/errorHandling";
 import { saveAuthState } from "../services/localStorage";
 import { showToast } from "../services/toastMessage";
 import { setAccessToken } from "../services/tokenService";
 import { initializeUserEncryption } from "../utils/cacheUtils";
 import { getUniqueIdentifier } from "../utils/cryptoUtils";
+import { setRegistered } from "../utils/landingUtils";
 
-const timeMS = getTimeMs(); // Ensure this is set in your .env file
+const timeMS = getTimeMs();
 
 export const useAuth = () => {
   const dispatch = useAppDispatch();
@@ -30,7 +30,7 @@ export const useAuth = () => {
     setAlertSeverity: (severity: "success" | "error") => void,
     setAlertOpen: (open: boolean) => void
   ) => {
-    console.log("Attempting to register with credentials:", { email });
+    // console.log("Attempting to register with credentials:", { email });
 
     // Client-side validation for email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -38,7 +38,7 @@ export const useAuth = () => {
       setAlertMessage("Invalid email address.");
       setAlertSeverity("error");
       setAlertOpen(true);
-      return; // Stop execution if validation fails
+      return;
     }
 
     // Client-side validation for password
@@ -93,13 +93,14 @@ export const useAuth = () => {
         return;
       }
 
-      console.log("Response from registerUser:", {
+      /*  console.log("Response from registerUser:", {
         statusCode,
-      });
+      }); */
 
-      setAlertMessage(t("auth.registrationSuccess")); // translation key
+      setAlertMessage(t("auth.registrationSuccess"));
       setAlertSeverity(statusCode === 201 ? "success" : "error");
       setAlertOpen(true);
+      setRegistered(true);
     } catch (error) {
       console.warn("Registration error:", (error as Error).message);
 
@@ -120,55 +121,69 @@ export const useAuth = () => {
   ) => {
     try {
       // Check if email or password is empty
-      if (!email || !password) {
-        setAlertMessage(t("auth.enterEmailAndPassword")); // Translated message for empty fields
+      if (!email) {
+        setAlertMessage(t("auth.enterEmail"));
+        setAlertSeverity("error");
+        setAlertOpen(true);
+        return;
+      }
+
+      if (!password) {
+        setAlertMessage(t("auth.enterPassword"));
         setAlertSeverity("error");
         setAlertOpen(true);
         return;
       }
 
       // Attempt to log in the user
-      const { id, message, statusCode, refreshToken, accessToken } = await loginUser({
-        email,
-        password,
-      });
+      const { id, message, statusCode, refreshToken, accessToken } =
+        await loginUser({
+          email,
+          password,
+        });
 
-         // Handle 401 Unauthorized response
-         if (statusCode === 401) {
-          setAlertMessage(t("auth.loginInconsistency")); // Translated message for 401 errors
-          setAlertSeverity("error");
-          setAlertOpen(true);
-          return;
+      // Handle 401 Unauthorized response
+      if (statusCode === 401) {
+        setAlertMessage(t("auth.loginInconsistency"));
+        setAlertSeverity("error");
+        setAlertOpen(true);
+        return;
+      }
+
+      if (statusCode !== 200) {
+        console.warn(
+          "Login failed with status code:",
+          statusCode,
+          "Message:",
+          message
+        );
+
+        // Check for specific error messages and use corresponding translation keys
+        if (message.includes("Invalid credentials")) {
+          setAlertMessage(t("auth.invalidCredentials"));
+        } else if (message.includes("Network Error")) {
+          setAlertMessage(t("auth.serverUnreachable"));
+        } else {
+          setAlertMessage(t("auth.loginFailed") + " " + message);
         }
 
-        if (statusCode !== 200) {
-          console.warn("Login failed with status code:", statusCode, "Message:", message);
+        setAlertSeverity("error");
+        setAlertOpen(true);
+        return;
+      }
 
-          // Check for specific error messages and use corresponding translation keys
-          if (message.includes("Invalid credentials")) {
-            setAlertMessage(t("auth.invalidCredentials")); // Translation key for "Invalid credentials"
-          } else if (message.includes("Network Error")) {
-            setAlertMessage(t("auth.serverUnreachable")); // Translation key for "Can't reach the server, try again later"
-          } else {
-            setAlertMessage(t("auth.loginFailed") + " " + message); // General login failure
-          }
+      // Validate tokens
+      if (!accessToken || !refreshToken) {
+        console.error(
+          "Access token or refresh token missing in login response"
+        );
+        throw new Error("Login failed: Access token or Refresh token missing");
+      }
 
-          setAlertSeverity("error");
-          setAlertOpen(true);
-          return;
-        }
-
-        // Validate tokens
-    if (!accessToken || !refreshToken) {
-      console.error("Access token or refresh token missing in login response");
-      throw new Error("Login failed: Access token or Refresh token missing");
-    }
-
-    // Store the access token in memory
-    setAccessToken(accessToken);
-    // console.log("Access token set successfully in memory");
-
-
+      // Store the access token in memory
+      setRegistered(true);
+      setAccessToken(accessToken);
+      // console.log("Access token set successfully in memory");
 
       // Proceed if the login was successful
       const userId = id;
@@ -229,13 +244,19 @@ export const useAuth = () => {
       if (error instanceof FetchUserRoleError) {
         errorMessage = t("auth.roleNotAssigned");
         errorSeverity = "info";
-      } else if (error instanceof Error && error.message.includes("undefined")) {
+      } else if (
+        error instanceof Error &&
+        error.message.includes("undefined")
+      ) {
         errorMessage = t("auth.serverUnreachable");
         setAlertMessage(errorMessage);
         setAlertSeverity(errorSeverity);
         setAlertOpen(true);
-      } else if (error instanceof Error && error.message.includes("Forbidden")) {
-        errorMessage = t("auth.accountEntityAssignmentPending"); // Translated message for "Forbidden" error
+      } else if (
+        error instanceof Error &&
+        error.message.includes("Forbidden")
+      ) {
+        errorMessage = t("auth.accountEntityAssignmentPending");
         setAlertMessage(errorMessage);
         setAlertSeverity("info");
         setAlertOpen(true);
@@ -274,7 +295,7 @@ export const useAuth = () => {
     const state = Math.random().toString(36).substring(2, 15);
     sessionStorage.setItem("oauth_state", state);
 
-    const uniqueId = getUniqueIdentifier(); // Fetch or generate the uniqueId for the device
+    const uniqueId = getUniqueIdentifier();
 
     const googleAuthUrl = `${
       import.meta.env.VITE_API_BASE_URL
@@ -302,15 +323,14 @@ export const useAuth = () => {
       sessionStorage.removeItem("oauth_state");
 
       if (state !== expectedState) {
-        showToast.error(t("auth.invalidStateParameter")); // Toast for invalid OAuth state
+        showToast.error(t("auth.invalidStateParameter"));
         return;
       }
 
       if (status === "success" && user) {
         showToast.success(t("auth.googleLoginSuccess")); // Toast for Google OAuth success
-        // Derive the encryption key using Google ID and email
-        // Derive the encryption key using userId, userAgent, and salt
-        const userId = user._id; // Adjust based on your user model
+        const userId = user._id;
+
         await initializeUserEncryption({
           userId,
           timeMS,
@@ -326,8 +346,9 @@ export const useAuth = () => {
             refreshToken,
           })
         );
+        setRegistered(true);
       } else {
-        showToast.error(t("auth.googleLoginFailed")); // Toast for Google OAuth failure
+        showToast.error(t("auth.googleLoginFailed"));
       }
     };
 

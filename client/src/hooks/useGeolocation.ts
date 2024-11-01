@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { findCityByCoordinates } from "../features/weather/apis/reverseGeo";
-import { useGetWeatherQuery } from "../features/weather/weatherQuery";
+import { useLazyGetWeatherQuery } from "../features/weather/weatherQuery";
 import {
   cacheCityData,
   getCachedCityData,
@@ -38,8 +38,8 @@ type WeatherData = {
   forecast: Forecast[];
 };
 const CACHE_KEY = "weatherData";
-const CACHE_TTL = 1000 * 60 * 60; // 1 hour in milliseconds
-const LOCATION_THRESHOLD = 0.05; // Threshold for lat/lon change to invalidate city cache
+const CACHE_TTL = 1000 * 60 * 60;
+const LOCATION_THRESHOLD = 0.05;
 
 const geoFind = (): Promise<GeoLocation | null> => {
   return new Promise((resolve, reject) => {
@@ -188,81 +188,59 @@ export const useGeolocation = (
     fetchCity();
   }, [location]);
 
+  const [triggerGetWeather, { data: apiData, error: apiError, isFetching }] =
+    useLazyGetWeatherQuery();
+
+  const fetchWeather = useCallback(async () => {
+    if (!location || !city) return;
+
+    try {
+      const cachedWeather = getWithExpiry(CACHE_KEY);
+
+      if (cachedWeather && cachedWeather.city === city) {
+        setWeather(cachedWeather);
+        setIsLoading(false);
+      } else {
+        triggerGetWeather({ latitude: location.lat, longitude: location.lon });
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred while fetching weather data");
+      }
+    }
+  }, [location, city, triggerGetWeather]);
+
   /**
    * Step 3: Fetch weather data
    */
   useEffect(() => {
-    const fetchWeather = async () => {
-      if (!location || !city) return;
-
-      try {
-        const cachedWeather = getWithExpiry(CACHE_KEY);
-
-        if (cachedWeather && cachedWeather.city === city) {
-          setWeather(cachedWeather);
-          setIsLoading(false);
-        } else {
-          // Fetch weather using RTK Query
-          // Note: RTK Query will handle the fetching and caching in Redux store
-          // We'll leverage its data here without replacing the manual cache
-          // We'll fetch the data using RTK Query's hook below
-        }
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("An unexpected error occurred while fetching weather data");
-        }
-      }
-    };
-
     fetchWeather();
-  }, [city, location]);
-
-  /**
-   * Use RTK Query to fetch weather data if not cached
-   */
-  const {
-    data: apiData,
-    error: apiError,
-    isFetching,
-  } = useGetWeatherQuery(
-    location && city
-      ? { latitude: location.lat, longitude: location.lon }
-      : { latitude: 0, longitude: 0 }, // Provide default values or handle appropriately
-    {
-      skip: !location || !city || getWithExpiry(CACHE_KEY)?.city === city, // Skip if cached
-    }
-  );
+  }, [city, location, fetchWeather]);
 
   /**
    * Effect 4: Process Weather Data from RTK Query
    */
   useEffect(() => {
-    const processWeather = () => {
-      if (apiData && city) {
-        const weatherData: WeatherData = {
-          temp: apiData.current_weather.temperature,
-          weatherCode: apiData.current_weather.weathercode,
-          description: apiData.current_weather.weathercode.toString(),
-          city: city,
-          forecast: apiData.daily.time.map((date: string, index: number) => ({
-            date: date,
-            maxTemp: apiData.daily.temperature_2m_max[index],
-            minTemp: apiData.daily.temperature_2m_min[index],
-            weatherCode: apiData.daily.weathercode[index],
-          })),
-        };
+    if (apiData && city) {
+      const weatherData: WeatherData = {
+        temp: apiData.current_weather.temperature,
+        weatherCode: apiData.current_weather.weathercode,
+        description: apiData.current_weather.weathercode.toString(),
+        city: city,
+        forecast: apiData.daily.time.map((date: string, index: number) => ({
+          date: date,
+          maxTemp: apiData.daily.temperature_2m_max[index],
+          minTemp: apiData.daily.temperature_2m_min[index],
+          weatherCode: apiData.daily.weathercode[index],
+        })),
+      };
 
-        // Cache weather data with expiry
-        setWithExpiry(CACHE_KEY, weatherData, CACHE_TTL);
-        setWeather(weatherData);
-        setIsLoading(false);
-      }
-    };
-
-    if (apiData) {
-      processWeather();
+      // Cache weather data with expiry
+      setWithExpiry(CACHE_KEY, weatherData, CACHE_TTL);
+      setWeather(weatherData);
+      setIsLoading(false);
     }
 
     if (apiError) {

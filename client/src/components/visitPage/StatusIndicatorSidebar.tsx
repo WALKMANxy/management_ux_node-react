@@ -1,4 +1,4 @@
-// StatusIndicator.tsx
+//src/components/visitPage/StatusIndicatorSidebar.tsx
 import ErrorIcon from "@mui/icons-material/Error";
 import { Box, Tooltip } from "@mui/material";
 import React from "react";

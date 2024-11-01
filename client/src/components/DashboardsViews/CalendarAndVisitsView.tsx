@@ -28,17 +28,16 @@ const CalendarAndVisitsSection: React.FC<CalendarAndVisitsSectionProps> = ({
           />
         ) : (
           <Typography
-            variant="h5"
-            gutterBottom
+            variant="h6"
             sx={{
               fontFamily: "Inter, sans-serif",
-              fontWeight: 100, // Now using the lighter custom font weight
+              fontWeight: 100,
             }}
           >
             {t("dashboard.calendar")}
           </Typography>
         )}
-        <Divider sx={{ my: 2, borderRadius: "12px" }} />
+        <Divider sx={{ my: 1, mb: 1.5, borderRadius: "12px" }} />
         {loadingState ? (
           <Skeleton
             animation="wave"

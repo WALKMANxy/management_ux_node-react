@@ -1,5 +1,7 @@
+//src/services/cityQueryService.ts
 import { config } from "../config/config";
 import { City } from "../models/City";
+import { logger } from "../utils/logger";
 
 export class CityService {
   // Method to find a nearby city, fallback to reverse geocoding if not found
@@ -9,9 +11,9 @@ export class CityService {
     threshold: number = 20 // Fixed to 10km
   ): Promise<string | null> {
     try {
-      console.log(
+      /*   logger.info(
         `Finding nearby city for lat: ${lat}, lon: ${lon}, threshold: ${threshold} km`
-      );
+      ); */
 
       // Find nearby city within the 10km range (converted to meters)
       const nearbyCity = await City.findOne({
@@ -28,12 +30,12 @@ export class CityService {
 
       // If found, return the city name
       if (nearbyCity && nearbyCity.name) {
-        console.log(`Found nearby city: ${nearbyCity.name}`);
+        // logger.info(`Found nearby city: ${nearbyCity.name}`);
         return nearbyCity.name;
       }
 
       // If not found, fallback to reverse geocode using the third-party API
-      console.log("No nearby city found, calling reverse geocode API...");
+      // logger.info("No nearby city found, calling reverse geocode API...");
       const cityFromAPI = await reverseGeocodeLocationIQ(lat, lon);
 
       // Store the city retrieved from the API for future lookups
@@ -71,7 +73,7 @@ export class CityService {
           },
         });
         await newCity.save();
-        console.log(`Stored new city: ${name}`);
+        logger.info(`Stored new city: ${name}`);
       }
     } catch (error) {
       console.error("Error storing city in the database:", error);

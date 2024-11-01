@@ -1,3 +1,4 @@
+//src/components/chatPage/CreateChatForm.tsx
 import CellTowerIcon from "@mui/icons-material/CellTower";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -35,13 +36,13 @@ import UserList from "./UserList";
 interface CreateChatFormProps {
   open: boolean;
   onClose: () => void;
-  chat?: IChat; // Optional chat prop for editing
+  chat?: IChat;
 }
 
 interface CreateChatFormData {
   chatType: "group" | "broadcast";
   chatName: string;
-  participants: string[]; // Array of user IDs
+  participants: string[];
 }
 
 const CreateChatForm: React.FC<CreateChatFormProps> = ({
@@ -52,11 +53,11 @@ const CreateChatForm: React.FC<CreateChatFormProps> = ({
   const { t } = useTranslation();
   const users = useAppSelector(selectAllUsers);
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
-  const [selectedAdminIds, setSelectedAdminIds] = useState<string[]>([]); // State for admins
+  const [selectedAdminIds, setSelectedAdminIds] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { handleCreateChat, handleEditChat } = useChatLogic(); // Ensure handleEditChat is available
-  const [searchTerm, setSearchTerm] = useState(""); // Search state for users
-  const [searchAdminTerm, setSearchAdminTerm] = useState(""); // Search state for admins
+  const { handleCreateChat, handleEditChat } = useChatLogic();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchAdminTerm, setSearchAdminTerm] = useState("");
 
   const currentUserId = useAppSelector(selectCurrentUser)?._id;
 
@@ -85,15 +86,14 @@ const CreateChatForm: React.FC<CreateChatFormProps> = ({
   useEffect(() => {
     if (open) {
       if (chat) {
-        // Editing an existing chat
         reset({
-          chatType: chat.type as "group" | "broadcast", // Adjust if necessary
+          chatType: chat.type as "group" | "broadcast",
           chatName: chat.name || "",
           participants: chat.participants || [],
         });
         setSelectedUserIds(chat.participants || []);
         setSelectedAdminIds(chat.admins || []);
-        setRole("all"); // You might want to set this based on chat data
+        setRole("all");
         setSelectAll(false);
         setSearchTerm("");
         setSearchAdminTerm("");
@@ -170,7 +170,7 @@ const CreateChatForm: React.FC<CreateChatFormProps> = ({
           showToast.error(
             "Something wrong happened while selecting the users, please try refreshing the page"
           );
-          return false; // Safeguard to stop selection process
+          return false;
         }
         return selectedUserIds.includes(user._id);
       });
@@ -222,7 +222,7 @@ const CreateChatForm: React.FC<CreateChatFormProps> = ({
       if (chat && chat._id) {
         // Editing an existing chat
         await handleEditChat(
-          chat._id, // Assuming chat has an '_id' field
+          chat._id,
           {
             name: data.chatName,
             participants,
@@ -300,8 +300,8 @@ const CreateChatForm: React.FC<CreateChatFormProps> = ({
             "&::-webkit-scrollbar": {
               display: "none",
             },
-            msOverflowStyle: "none", // IE and Edge
-            scrollbarWidth: "none", // Firefox
+            msOverflowStyle: "none",
+            scrollbarWidth: "none",
           }}
         >
           {/* Chat Type Selection */}
@@ -311,9 +311,9 @@ const CreateChatForm: React.FC<CreateChatFormProps> = ({
                 onClick={() => {
                   setValue("chatType", "group");
                   setSelectedUserIds([]);
-                  setSelectedAdminIds([]); // Reset admins when chat type changes
-                  setSelectAll(false); // Reset selectAll when chat type changes
-                }} // Set chatType to "group"
+                  setSelectedAdminIds([]);
+                  setSelectAll(false);
+                }}
                 color={chatType === "group" ? "primary" : "default"}
               >
                 <GroupIcon fontSize="large" />
@@ -324,9 +324,9 @@ const CreateChatForm: React.FC<CreateChatFormProps> = ({
                 onClick={() => {
                   setValue("chatType", "broadcast");
                   setSelectedUserIds([]);
-                  setSelectedAdminIds([]); // Reset admins when chat type changes
-                  setSelectAll(false); // Reset selectAll when chat type changes
-                }} // Set chatType to "broadcast"
+                  setSelectedAdminIds([]);
+                  setSelectAll(false);
+                }}
                 color={chatType === "broadcast" ? "primary" : "default"}
               >
                 <CellTowerIcon fontSize="large" />
@@ -539,7 +539,7 @@ const CreateChatForm: React.FC<CreateChatFormProps> = ({
                   // Select all currently filtered users
                   const filteredUserIds = filteredUsers
                     .map((user) => user._id)
-                    .filter((id): id is string => id !== undefined); // Safeguard for undefined values
+                    .filter((id): id is string => id !== undefined); 
 
                   setSelectedUserIds((prevSelected) =>
                     Array.from(new Set([...prevSelected, ...filteredUserIds]))

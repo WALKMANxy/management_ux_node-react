@@ -3,6 +3,7 @@
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import {
+  Alert,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -15,7 +16,6 @@ import {
   Select,
   TextField,
   Tooltip,
-  Alert, // Import Alert
 } from "@mui/material";
 import {
   DateTimePicker,
@@ -148,7 +148,7 @@ export const EventForm: React.FC<EventFormProps> = ({
     if (isInitialMount.current) {
       isInitialMount.current = false;
     } else {
-      setValue("reason", ""); // Reset to empty or a default value if needed
+      setValue("reason", "");
     }
   }, [eventType, setValue]);
 
@@ -211,14 +211,13 @@ export const EventForm: React.FC<EventFormProps> = ({
       >
         <DialogTitle>
           {initialData
-            ? t("eventForm.editTitle") // Use editTitle if initialData exists
+            ? t("eventForm.editTitle")
             : userRole === "admin"
-            ? t("eventForm.title") // Default title for admin
-            : t("eventForm.titleMarkAbsence") // Default title for non-admin users
-          }
+            ? t("eventForm.title")
+            : t("eventForm.titleMarkAbsence")}
         </DialogTitle>
 
-        {/* Display form-level error using MUI Alert */}
+        {/* Display form-level error  */}
         {formError && (
           <DialogContent>
             <Alert severity="error">{formError}</Alert>
@@ -309,7 +308,7 @@ export const EventForm: React.FC<EventFormProps> = ({
                     {...field}
                     labelId="event-type-label"
                     label={t("eventForm.labels.eventType")}
-                    disabled={userRole !== "admin"} // Disable for non-admin users
+                    disabled={userRole !== "admin"}
                   >
                     <MenuItem value="absence">
                       {t("eventForm.options.absence")}
@@ -317,7 +316,6 @@ export const EventForm: React.FC<EventFormProps> = ({
                     <MenuItem value="event">
                       {t("eventForm.options.event")}
                     </MenuItem>
-                    {/* Removed 'holiday' option */}
                   </Select>
                 )}
               />
@@ -342,9 +340,9 @@ export const EventForm: React.FC<EventFormProps> = ({
                     {...field}
                     labelId="reason-label"
                     label={t("eventForm.labels.reason")}
-                    disabled={userRole === "admin" ? !eventType : false} // Disable only if admin and eventType not selected
+                    disabled={userRole === "admin" ? !eventType : false}
                   >
-                    {(eventType === "absence" || eventType === "event") && // Removed 'holiday'
+                    {(eventType === "absence" || eventType === "event") &&
                       reasonOptions[eventType]?.map((reason) => (
                         <MenuItem key={reason} value={reason}>
                           {t(`eventForm.reasons.${reason}`)}
@@ -393,7 +391,7 @@ export const EventForm: React.FC<EventFormProps> = ({
               <IconButton
                 type="submit"
                 color="primary"
-                disabled={isSubmitting || !!formError} // Disable if submitting or form has errors
+                disabled={isSubmitting || !!formError}
                 aria-label={t("eventForm.labels.create")}
               >
                 {isSubmitting ? <CircularProgress size={24} /> : <CheckIcon />}

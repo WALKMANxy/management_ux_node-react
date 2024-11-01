@@ -1,5 +1,4 @@
 // src/components/UserPage/ModifyAccount.tsx
-
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
@@ -30,7 +29,7 @@ const Section = styled(Box)(({ theme }) => ({
 const ModifyAccount: React.FC = () => {
   const theme = useTheme();
 
-  const { t } = useTranslation(); // Initialize translation
+  const { t } = useTranslation();
 
   const currentUser = useAppSelector(selectCurrentUser);
   const {
@@ -260,7 +259,7 @@ const ModifyAccount: React.FC = () => {
                     color: "white",
                     "&:hover": {
                       boxShadow: theme.shadows[3],
-                      bgcolor: "black", // Maintain background color
+                      bgcolor: "black",
                     },
                   }}
                   aria-label={t("modifyAccount.updateEmailButtonAria")}
@@ -452,7 +451,7 @@ const ModifyAccount: React.FC = () => {
                     transition: "border 0.3s",
                     "&:hover": {
                       boxShadow: theme.shadows[3],
-                      bgcolor: "black", // Maintain background color
+                      bgcolor: "black",
                     },
                   }}
                   aria-label={t("modifyAccount.updatePasswordButtonAria")}
@@ -467,7 +466,7 @@ const ModifyAccount: React.FC = () => {
 
       <Divider sx={{ my: 3 }} />
 
-      {/* Modify Avatar Section (Disabled for now) */}
+      {/* Modify Avatar Section (Disabled until we implement it. S3 is already in use, so it shouldn't be too much of a problem) */}
       {/*
       <Section
         sx={{

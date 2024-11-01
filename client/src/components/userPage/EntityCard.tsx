@@ -14,7 +14,6 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Admin, Agent, Client, Employee } from "../../models/entityModels";
 
-// Define styled components for better maintainability
 const CardContainer = styled(Box)(
   ({ theme, isnew }: { theme: any; isnew: string }) => ({
     display: "flex",
@@ -28,7 +27,7 @@ const CardContainer = styled(Box)(
     width: "100%",
     maxWidth: 600,
     transition: "box-shadow 0.3s, background-color 0.3s",
-    position: "relative", // For positioning the delete button if needed
+    position: "relative",
   })
 );
 
@@ -69,7 +68,6 @@ const EntityDetails: React.FC<EntityDetailsProps> = ({
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { t } = useTranslation();
 
-  // Helper function to display value or 'N/A'
   const displayValue = (value: any) => {
     if (value === undefined || value === null || value === "") {
       return t("entityDetails.na", "N/A");
@@ -207,7 +205,9 @@ const EntityDetails: React.FC<EntityDetailsProps> = ({
 
             {/* New Field: Number of Assigned Clients */}
             <Box display="flex" alignItems="center">
-              <Label>{t("entityDetails.assignedClients", "Assigned Clients")}:</Label>
+              <Label>
+                {t("entityDetails.assignedClients", "Assigned Clients")}:
+              </Label>
               <Value sx={{ ml: 0.5 }}>
                 {agent.clients ? agent.clients.length : 0}
               </Value>
@@ -269,30 +269,25 @@ const EntityDetails: React.FC<EntityDetailsProps> = ({
 
   return (
     <CardContainer
-      isnew="false" // Adjust based on your logic if needed
+      isnew="false"
       theme={theme}
       sx={{
         borderRadius: 6,
-        transform: isMobile ? "scale(0.95)" : "none", // Adjust scaling as needed
+        transform: isMobile ? "scale(0.95)" : "none",
         transformOrigin: "top left",
         width: isMobile ? "100%" : "100%",
       }}
     >
-      {/* Entity Avatar - Optional, customize based on entity type if needed */}
       <Avatar
-        src="/default-avatar.png" // Replace with dynamic avatar if available
+        src="/default-avatar.png"
         alt={
           t("entityDetails.avatarAlt", "Avatar for") +
           ` ${displayValue(entity.name)}`
         }
         sx={{ borderRadius: 2, width: 56, height: 56 }}
       />
-
       {/* Entity Information */}
       <EntityInfo>{renderFields()}</EntityInfo>
-
-      {/* Additional Actions (e.g., Delete) can be added here if needed */}
-      {/* For now, it's omitted as per your request */}
     </CardContainer>
   );
 };

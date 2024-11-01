@@ -1,3 +1,4 @@
+//src/components/clientpage/ClientDetails.tsx
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
@@ -17,14 +18,7 @@ import { ClientDetailsProps } from "../../models/propsModels";
 import MovementsHistory from "../statistics/grids/MovementsHistory";
 import DetailComponent from "./ClientDetailComponent";
 
-/**
- * ClientDetails Component
- * Displays detailed information about a selected client, including their details and movement history.
- *
- * @param {ClientDetailsProps} props - Component props.
- * @param {React.Ref<HTMLDivElement>} ref - Forwarded ref.
- * @returns {JSX.Element} The rendered component.
- */
+
 const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
   (
     {
@@ -50,7 +44,7 @@ const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
     // Calculate height based on expansion state and mobile view
     const height = useMemo(() => {
       if (isMobile) {
-        return isClientDetailsCollapsed ? "100%" : 1050 * 1.33; // Similar height logic as in MovementDetails
+        return isClientDetailsCollapsed ? "100%" : 1050 * 1.33;
       }
       return "100%";
     }, [isMobile, isClientDetailsCollapsed]);
@@ -66,9 +60,9 @@ const ClientDetails = React.forwardRef<HTMLDivElement, ClientDetailsProps>(
         height,
         maxHeight: height,
         position: "relative" as const,
-        overflowX: "hidden", // Ensure no horizontal overflow
+        overflowX: "hidden",
         "&::-webkit-scrollbar": {
-          display: "none", // Hide scrollbar
+          display: "none", 
         },
         "&:after": {
           content: '""',

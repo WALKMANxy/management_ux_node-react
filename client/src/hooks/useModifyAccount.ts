@@ -1,18 +1,17 @@
 // src/hooks/useModifyAccount.ts
-
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "../app/hooks";
+import { handleLogout } from "../features/auth/authThunks";
 import {
   updateUserEmail,
   updateUserPassword,
 } from "../features/users/api/users";
 import { showToast } from "../services/toastMessage";
-import { handleLogout } from "../features/auth/authThunks";
 
 const useModifyAccount = () => {
   const dispatch = useAppDispatch();
-  const { t } = useTranslation(); // Initialize translation
+  const { t } = useTranslation();
 
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertSeverity] = useState<"success" | "error">("success");
@@ -60,7 +59,7 @@ const useModifyAccount = () => {
     newEmail: string
   ) => {
     if (!validateEmail(newEmail)) {
-      return; // Stop execution if validation fails
+      return;
     }
 
     setLoading(true);
@@ -74,7 +73,6 @@ const useModifyAccount = () => {
         setAlertMessage(
           t("modifyAccount.updateEmailFailed", { message: error.message })
         );
-        // Assuming there's an alert component listening to alertMessage and alertSeverity
         console.error("Failed to update account information:", error);
       } else {
         // Unknown error: Use toast
@@ -95,7 +93,7 @@ const useModifyAccount = () => {
     newPassword: string
   ) => {
     if (!validatePassword(newPassword)) {
-      return; // Stop execution if validation fails
+      return;
     }
 
     setLoading(true);
@@ -109,7 +107,6 @@ const useModifyAccount = () => {
         setAlertMessage(
           t("modifyAccount.updatePasswordFailed", { message: error.message })
         );
-        // Assuming there's an alert component listening to alertMessage and alertSeverity
         console.error("Failed to update password:", error);
       } else {
         // Unknown error: Use toast

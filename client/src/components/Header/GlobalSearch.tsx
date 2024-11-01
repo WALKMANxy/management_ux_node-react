@@ -1,5 +1,4 @@
 // src/components/GlobalSearch.tsx
-
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -10,12 +9,16 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { styled } from "@mui/system";
+import { styled, useMediaQuery } from "@mui/system";
 import React, { KeyboardEvent, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../app/hooks";
-import { selectClient, selectPromo, selectVisit } from "../../features/data/dataSlice";
+import {
+  selectClient,
+  selectPromo,
+  selectVisit,
+} from "../../features/data/dataSlice";
 import useGlobalSearch from "../../hooks/useGlobalSearch";
 import { GlobalSearchProps } from "../../models/propsModels";
 import { SearchResult } from "../../models/searchModels";
@@ -44,9 +47,9 @@ const SearchResultsContainer = styled(Paper)(({ theme }) => ({
   maxHeight: 500,
   overflowY: "auto",
   marginTop: theme.spacing(1),
-  backdropFilter: "blur(15px)", // Ensure this is effective
-  WebkitBackdropFilter: "blur(15px)", // For Safari support
-  backgroundColor: "rgba(255, 255, 255, 0.97)", // Reduced opacity for better blur effect
+  backdropFilter: "blur(15px)",
+  WebkitBackdropFilter: "blur(15px)",
+  backgroundColor: "rgba(255, 255, 255, 0.97)",
   borderRadius: "12px",
   padding: theme.spacing(2),
   border: `1px solid rgba(255, 255, 255, 0.3)`,
@@ -54,9 +57,9 @@ const SearchResultsContainer = styled(Paper)(({ theme }) => ({
   "&::-webkit-scrollbar": {
     display: "none",
   },
-  width: "100%", // Default width
+  width: "100%",
   [theme.breakpoints.down("sm")]: {
-    width: "80vw", // 80% of the viewport width on small screens
+    width: "80vw",
   },
 }));
 
@@ -69,6 +72,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const dispatch = useAppDispatch();
 
   const {
@@ -140,8 +144,6 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
         if (selectedIndex >= 0 && selectedIndex < results.length) {
           handleSelect(results[selectedIndex]);
         } else {
-          // If no item is selected, perform the search
-          // Optionally, you can prevent the default behavior here
           event.preventDefault();
         }
         break;
@@ -150,7 +152,6 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
         setSelectedIndex(-1);
         break;
       default:
-        // No default action
         break;
     }
   };
@@ -166,12 +167,12 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
         autoComplete="off"
         sx={{
           "& .MuiOutlinedInput-root": {
-            borderRadius: "24px", // Set the border radius here
-            height: 45, // Adjust height if needed
-            padding: "6px 8px", // Adjust padding if needed
+            borderRadius: "24px",
+            height: isMobile ? 35 : 40,
+            padding: "6px 8px",
           },
           "& .MuiInputBase-input": {
-            fontSize: "1rem", // Adjust font size if needed
+            fontSize: "1rem",
           },
         }}
         InputProps={{

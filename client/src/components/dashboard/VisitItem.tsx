@@ -1,5 +1,4 @@
-// src/components/VisitItem.tsx
-
+//src/components/dashboard/VisitItem.tsx
 import {
   TimelineConnector,
   TimelineContent,
@@ -14,7 +13,6 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { VisitWithAgent } from "../../features/promoVisits/promoVisitsSelectors";
 
-// Helper component for individual visit items
 interface VisitItemProps {
   visit: VisitWithAgent;
   lastTimeline: boolean;
@@ -27,12 +25,7 @@ export const VisitItem: React.FC<VisitItemProps> = ({
   const { t } = useTranslation();
   const theme = useTheme();
 
-  /**
-   * Formats a Date object into a localized date and time string.
-   *
-   * @param {Date} time - The date and time to format.
-   * @returns {string} - The formatted date and time string.
-   */
+
   const formatDateTime = (time: Date): string => {
     return new Intl.DateTimeFormat(undefined, {
       day: "2-digit",
@@ -44,24 +37,13 @@ export const VisitItem: React.FC<VisitItemProps> = ({
     }).format(time);
   };
 
-  /**
-   * Generates a translation key for visit type.
-   *
-   * @param {string} type - The visit type.
-   * @returns {string} - The translation key.
-   */
+
   const getVisitTypeTranslation = (type: string): string => {
     return t(`upcomingVisits.visitType.${type.toLowerCase()}`, type);
   };
 
-  /**
-   * Generates a translation key for visit reason.
-   *
-   * @param {string} reason - The visit reason.
-   * @returns {string} - The translation key.
-   */
+
   const getVisitReasonTranslation = (reason: string): string => {
-    // Remove spaces and convert to lowercase to match translation keys
     const key = reason.replace(/\s+/g, "").toLowerCase();
     return t(`upcomingVisits.visitReason.${key}`, reason);
   };
@@ -81,8 +63,6 @@ export const VisitItem: React.FC<VisitItemProps> = ({
       {/* Timeline Separator with Dot and Connector */}
       <TimelineSeparator>
         <TimelineDot color="primary">
-          {/* Optional: Add an icon inside the dot */}
-          {/* <YourIcon /> */}
         </TimelineDot>
         {!lastTimeline && <TimelineConnector />}
       </TimelineSeparator>
@@ -95,7 +75,7 @@ export const VisitItem: React.FC<VisitItemProps> = ({
           sx={{
             fontWeight: 600,
             color: theme.palette.text.primary,
-            wordBreak: "break-word", // Prevent overflow
+            wordBreak: "break-word",
           }}
         >
           {t("upcomingVisits.visitTypeLabel", "Visit Type")}:{" "}
@@ -129,13 +109,7 @@ export const VisitItem: React.FC<VisitItemProps> = ({
           {t("upcomingVisits.clientId", "Client ID")}: {visit.clientId}
         </Typography>
 
-        {/* Optional: Additional Details or Actions */}
-        {/* For example, a button to view visit details */}
-        {/*
-        <Button variant="outlined" size="small" sx={{ mt: 1 }}>
-          {t("upcomingVisits.viewDetails", "View Details")}
-        </Button>
-        */}
+      
       </TimelineContent>
     </TimelineItem>
   );

@@ -5,7 +5,7 @@ import { User } from "../../models/entityModels";
 
 interface RenderParticipantsAvatarsProps {
   participantsData: Partial<User>[];
-  chatType: string; // Add chatType as a prop to control rendering
+  chatType: string;
   onClick?: () => void;
 }
 
@@ -13,7 +13,6 @@ const RenderParticipantsAvatars = React.forwardRef<
   HTMLDivElement,
   RenderParticipantsAvatarsProps & React.HTMLAttributes<HTMLDivElement>
 >(({ participantsData, chatType, ...rest }, ref) => {
-  // Render avatars only if the chat is of type 'group'
   if (chatType !== "group" || participantsData.length === 0) return null;
 
   const limitedParticipants = participantsData.slice(0, 3);
@@ -24,9 +23,7 @@ const RenderParticipantsAvatars = React.forwardRef<
       sx={{ width: 30, height: 30, ml: -1 }}
     />
   ));
-
   const remainingParticipants = participantsData.length - 3;
-
   return (
     <Box ref={ref} {...rest} sx={{ display: "flex", alignItems: "center" }}>
       {participantAvatars}

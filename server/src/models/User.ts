@@ -1,3 +1,4 @@
+//src/models/User.ts
 import bcrypt from "bcryptjs";
 import { CallbackError, Document, Schema, model } from "mongoose";
 
@@ -15,7 +16,7 @@ export interface IUser extends Document {
   updatedAt: Date;
   isEmailVerified: boolean;
   refreshTokens: string[];
-  authType: "email" | "google"; // New field to distinguish authentication type
+  authType: "email" | "google";
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -39,7 +40,7 @@ const userSchema = new Schema<IUser>(
     updatedAt: { type: Date, default: Date.now },
     isEmailVerified: { type: Boolean, default: false },
     refreshTokens: [{ type: String }],
-    authType: { type: String, required: true, enum: ["email", "google"] }, // New field
+    authType: { type: String, required: true, enum: ["email", "google"] },
   },
   { timestamps: true }
 );
@@ -53,11 +54,11 @@ userSchema.pre<IUser>("save", async function (next) {
   }
 
   try {
-    const salt = await bcrypt.genSalt(10); // bcryptjs uses the same API as bcrypt
+    const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
     next();
   } catch (error) {
-    next(error as CallbackError); // Ensure the error is correctly typed
+    next(error as CallbackError);
   }
 });
 
@@ -83,7 +84,6 @@ userSchema.methods.validateResetCode = async function (
   return bcrypt.compare(code, user.passwordResetToken || "");
 };
 
-// Indexes
 userSchema.index({ email: 1 });
 userSchema.index({ googleId: 1 });
 

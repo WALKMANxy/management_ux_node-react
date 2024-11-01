@@ -1,3 +1,4 @@
+//src/components/calendarPage/CalendarEventComponent.tsx
 import { useMediaQuery, useTheme } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import React from "react";

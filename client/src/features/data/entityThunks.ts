@@ -1,5 +1,4 @@
-// src/thunks/entityThunks.ts
-
+// src/features/data/entityThunks.ts
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Admin, Agent, Client, Employee } from "../../models/entityModels";
 import { DataSliceState } from "../../models/stateModels";
@@ -11,9 +10,6 @@ import {
   updateEmployee,
 } from "./api/employees";
 
-/**
- * Utility function to map server entities to client entities.
- */
 export const mapDataToAgent = (
   clients: Client[],
   agentDetail: Agent
@@ -24,15 +20,8 @@ export const mapDataToAgent = (
   };
 };
 
-/**
- * ----------------------------
- * Admin Thunks
- * ----------------------------
- */
+// Admin Thunks
 
-/**
- * Create a new Admin.
- */
 export const createAdminAsync = createAsyncThunk<
   Admin, // Return type
   Admin, // Argument type (includes 'id')
@@ -50,9 +39,6 @@ export const createAdminAsync = createAsyncThunk<
   }
 });
 
-/**
- * Update an existing Admin.
- */
 export const updateAdminAsync = createAsyncThunk<
   Admin, // Return type
   { id: string; updatedData: Partial<Admin> }, // Argument type (includes 'id' in updatedData)
@@ -70,9 +56,6 @@ export const updateAdminAsync = createAsyncThunk<
   }
 });
 
-/**
- * Delete an Admin.
- */
 export const deleteAdminAsync = createAsyncThunk<
   string, // Return type (deleted Admin ID)
   string, // Argument type (Admin ID)
@@ -90,28 +73,18 @@ export const deleteAdminAsync = createAsyncThunk<
   }
 });
 
-/**
- * ----------------------------
- * Agent Thunks
- * ----------------------------
- */
+// Agent Thunks
 
-/**
- * Create a new Agent.
- */
 export const createAgentAsync = createAsyncThunk<
-  Agent, // Return type
-  Agent, // Return type
-  { rejectValue: string; state: { data: DataSliceState } } // Reject type and state type
+  Agent,
+  Agent,
+  { rejectValue: string; state: { data: DataSliceState } }
 >("agent/createAgent", async (agentData, { rejectWithValue, getState }) => {
   try {
-    // Create the agent via API
     const newAgent = await createAgent(agentData);
 
-    // Get current clients from state
     const { clients } = (getState() as { data: DataSliceState }).data;
 
-    // Map the agent to include its clients
     const mappedAgent = mapDataToAgent(Object.values(clients), newAgent);
 
     return mappedAgent;
@@ -124,28 +97,20 @@ export const createAgentAsync = createAsyncThunk<
   }
 });
 
-/**
- * Update an existing Agent.
- */
 export const updateAgentAsync = createAsyncThunk<
-  Agent, // Return type
-  { id: string; updatedData: Partial<Agent> }, // Argument type (includes 'id' in updatedData)
+  Agent,
+  { id: string; updatedData: Partial<Agent> },
   { rejectValue: string; state: { data: DataSliceState } }
 >(
   "agent/updateAgent",
   async ({ id, updatedData }, { rejectWithValue, getState }) => {
     try {
-      // Exclude 'createdAt', 'updatedAt', and 'clients' from updatedData
-
-      // Update the agent via API
       const updatedAgent = await updateAgent(id, updatedData);
 
-      // Get current clients from state
       const { clients: currentClients } = (
         getState() as { data: DataSliceState }
       ).data;
 
-      // Map the agent to include its clients
       const mappedAgent = mapDataToAgent(
         Object.values(currentClients),
         updatedAgent
@@ -162,12 +127,9 @@ export const updateAgentAsync = createAsyncThunk<
   }
 );
 
-/**
- * Delete an Agent.
- */
 export const deleteAgentAsync = createAsyncThunk<
-  string, // Return type (deleted Agent ID)
-  string, // Argument type (Agent ID)
+  string,
+  string,
   { rejectValue: string }
 >("agent/deleteAgent", async (id, { rejectWithValue }) => {
   try {
@@ -182,18 +144,11 @@ export const deleteAgentAsync = createAsyncThunk<
   }
 });
 
-/**
- * ----------------------------
- * Employee Thunks
- * ----------------------------
- */
+// Employee Thunks
 
-/**
- * Create a new Employee.
- */
 export const createEmployeeAsync = createAsyncThunk<
-  Employee, // Return type
-  Employee, // Return type
+  Employee,
+  Employee,
   { rejectValue: string }
 >("employee/createEmployee", async (employeeData, { rejectWithValue }) => {
   try {
@@ -208,19 +163,14 @@ export const createEmployeeAsync = createAsyncThunk<
   }
 });
 
-/**
- * Update an existing Employee.
- */
 export const updateEmployeeAsync = createAsyncThunk<
-  Employee, // Return type
-  { id: string; updatedData: Partial<Employee> }, // Argument type (includes 'id' in updatedData)
+  Employee,
+  { id: string; updatedData: Partial<Employee> },
   { rejectValue: string }
 >(
   "employee/updateEmployee",
   async ({ id, updatedData }, { rejectWithValue }) => {
     try {
-      // Exclude 'createdAt' and 'updatedAt' from updatedData
-
       const updatedEmployee = await updateEmployee(id, updatedData);
       return updatedEmployee;
     } catch (error: unknown) {
@@ -233,12 +183,9 @@ export const updateEmployeeAsync = createAsyncThunk<
   }
 );
 
-/**
- * Delete an Employee.
- */
 export const deleteEmployeeAsync = createAsyncThunk<
-  string, // Return type (deleted Employee ID)
-  string, // Argument type (Employee ID)
+  string,
+  string,
   { rejectValue: string }
 >("employee/deleteEmployee", async (id, { rejectWithValue }) => {
   try {

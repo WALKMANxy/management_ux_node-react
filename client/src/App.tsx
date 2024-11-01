@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { RouterProvider } from "react-router-dom";
 import { useAppDispatch } from "./app/hooks";
 import Loader from "./components/common/Loader";
-import "./components/statistics/grids/AGGridTable.css"; // Import the custom AG Grid CSS
+import "./components/statistics/grids/AGGridTable.css";
 import { getTimeMs } from "./config/config";
 import { handleLogout } from "./features/auth/authThunks";
 import { fetchUserById, setCurrentUser } from "./features/users/userSlice";
@@ -18,18 +18,17 @@ import {
   enforceCacheSizeLimit,
   initializeUserEncryption,
 } from "./utils/cacheUtils";
-/* console.log("Vite mode:", import.meta.env.MODE);
- */
 
-const timeMS = getTimeMs(); 
+// console.log("Vite mode:", import.meta.env.MODE);
 
-// src/App.tsx
+const timeMS = getTimeMs();
+
 function App() {
   const dispatch = useAppDispatch();
-  const [isInitializing, setIsInitializing] = useState(true); // Initialization state
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    let isMounted = true; // Flag to track if the component is mounted
+    let isMounted = true;
 
     const initializeApp = async () => {
       if (!isMounted) return;
@@ -88,16 +87,14 @@ function App() {
     initializeApp();
 
     return () => {
-      isMounted = false; // Cleanup flag on unmount
+      isMounted = false;
     };
   }, [dispatch]);
 
-  // Conditional rendering based on initialization state
   if (isInitializing) {
     return <Loader fadeout={!isInitializing} />;
   }
 
-  // Main application rendering after initialization
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

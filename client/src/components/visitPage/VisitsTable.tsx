@@ -7,9 +7,9 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   TableSortLabel,
-  TablePagination,
 } from "@mui/material";
 import dayjs from "dayjs";
 import React, { useCallback, useMemo, useState } from "react";
@@ -17,8 +17,8 @@ import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectVisit } from "../../features/data/dataSlice";
 import { selectVisits } from "../../features/promoVisits/promoVisitsSelectors";
-import { showToast } from "../../services/toastMessage";
 import { Visit } from "../../models/dataModels";
+import { showToast } from "../../services/toastMessage";
 
 // Styled Components
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
@@ -58,21 +58,15 @@ interface HeadCell {
   sortable: boolean;
 }
 
-
 const VisitsTable: React.FC<VisitsTableProps> = ({ clientId }) => {
   const dispatch = useAppDispatch();
   const visits = useAppSelector(selectVisits);
   const { t } = useTranslation();
-
-  // Sorting state
   const [order, setOrder] = useState<Order>("asc");
   const [orderBy, setOrderBy] = useState<keyof Visit>("date");
-
-  // Pagination state
   const [page, setPage] = useState(0);
-  const rowsPerPage = 10; // You can adjust this value or make it dynamic
+  const rowsPerPage = 10;
 
-  // Define table headers
   const headCells: HeadCell[] = useMemo(() => {
     const cells: HeadCell[] = [
       {
@@ -118,36 +112,34 @@ const VisitsTable: React.FC<VisitsTableProps> = ({ clientId }) => {
     return cells;
   }, [t, clientId]);
 
-  const descendingComparator = useCallback((a: Visit, b: Visit, orderBy: keyof Visit) => {
-    const aValue = a?.[orderBy];
-    const bValue = b?.[orderBy];
+  const descendingComparator = useCallback(
+    (a: Visit, b: Visit, orderBy: keyof Visit) => {
+      const aValue = a?.[orderBy];
+      const bValue = b?.[orderBy];
 
-    if (bValue === undefined) return -1;
-    if (aValue === undefined) return 1;
+      if (bValue === undefined) return -1;
+      if (aValue === undefined) return 1;
 
-    if (bValue < aValue) {
-      return -1;
-    }
-    if (bValue > aValue) {
-      return 1;
-    }
-    return 0;
-  }, []);
+      if (bValue < aValue) {
+        return -1;
+      }
+      if (bValue > aValue) {
+        return 1;
+      }
+      return 0;
+    },
+    []
+  );
 
   // Comparator function for sorting
   const getComparator = useCallback(
-    (
-      order: Order,
-      orderBy: keyof Visit
-    ): ((a: Visit, b: Visit) => number) => {
+    (order: Order, orderBy: keyof Visit): ((a: Visit, b: Visit) => number) => {
       return order === "desc"
         ? (a, b) => descendingComparator(a, b, orderBy)
         : (a, b) => -descendingComparator(a, b, orderBy);
     },
     [descendingComparator]
   );
-
-
 
   // Filter and sort visits
   const sortedVisits = useMemo(() => {
@@ -168,11 +160,16 @@ const VisitsTable: React.FC<VisitsTableProps> = ({ clientId }) => {
 
   // Paginate visits
   const paginatedVisits = useMemo(() => {
-    return sortedVisits.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    return sortedVisits.slice(
+      page * rowsPerPage,
+      page * rowsPerPage + rowsPerPage
+    );
   }, [sortedVisits, page, rowsPerPage]);
 
-  // Function to determine the row background color based on visit status
-  const getRowBackgroundColor = (completed: boolean, pending: boolean): string => {
+  const getRowBackgroundColor = (
+    completed: boolean,
+    pending: boolean
+  ): string => {
     if (completed && !pending) {
       return "#e6f4ea"; // Faint Green
     } else if (!completed && !pending) {
@@ -184,26 +181,25 @@ const VisitsTable: React.FC<VisitsTableProps> = ({ clientId }) => {
     }
   };
 
-  // Handler for row click
   const handleRowClick = useCallback(
     (visitId: string) => {
       if (visitId) {
         dispatch(selectVisit(visitId));
       } else {
-        showToast.error(t("visitsTable.selectVisitError", "Unable to select visit."));
+        showToast.error(
+          t("visitsTable.selectVisitError", "Unable to select visit.")
+        );
       }
     },
     [dispatch, t]
   );
 
-  // Handler for sorting
   const handleRequestSort = (property: keyof Visit) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
-  // Handler for page change
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -222,7 +218,9 @@ const VisitsTable: React.FC<VisitsTableProps> = ({ clientId }) => {
                     <TableSortLabel
                       active={orderBy === headCell.id}
                       direction={orderBy === headCell.id ? order : "asc"}
-                      onClick={() => handleRequestSort(headCell.id as keyof Visit)}
+                      onClick={() =>
+                        handleRequestSort(headCell.id as keyof Visit)
+                      }
                     >
                       {headCell.label}
                     </TableSortLabel>
@@ -285,7 +283,10 @@ const VisitsTable: React.FC<VisitsTableProps> = ({ clientId }) => {
             {paginatedVisits.length === 0 && (
               <TableRow>
                 <TableCell colSpan={headCells.length} align="center">
-                  {t("visitsTable.noVisits", "No visits found for this client.")}
+                  {t(
+                    "visitsTable.noVisits",
+                    "No visits found for this client."
+                  )}
                 </TableCell>
               </TableRow>
             )}
@@ -306,10 +307,9 @@ const VisitsTable: React.FC<VisitsTableProps> = ({ clientId }) => {
             display: "flex",
             justifyContent: "flex-end",
           },
-          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-select":
-            {
-              display: "none",
-            },
+          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-select": {
+            display: "none",
+          },
           "& .MuiTablePagination-displayedRows": {
             marginRight: 2,
             marginTop: 2,

@@ -1,4 +1,4 @@
-// src/api/promoVisitApi.ts
+// src/features/promoVisits/api/promoVisitApi.ts
 
 import { Promo, Visit } from "../../../models/dataModels";
 import { apiCall } from "../../../utils/apiUtils";

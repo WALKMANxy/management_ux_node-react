@@ -1,3 +1,4 @@
+//src/components/statistics/charts/SalesDistribution.tsx
 import PollIcon from "@mui/icons-material/Poll";
 import {
   Avatar,
@@ -20,7 +21,6 @@ import { RootState } from "../../../app/store";
 import { SalesDistributionProps } from "../../../models/propsModels";
 import { currencyFormatter } from "../../../utils/dataUtils";
 
-// SalesDistribution.tsx
 
 const SalesDistribution: React.FC<SalesDistributionProps> = ({
   salesDistributionDataClients,
@@ -97,7 +97,7 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
       },
       yaxis: {
         labels: {
-          formatter: (value: number) => currencyFormatter(value), // Apply currency formatting
+          formatter: (value: number) => currencyFormatter(value),
         },
       },
       dataLabels: {
@@ -115,7 +115,6 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
       fill: {
         colors: ["#26a69a"],
       },
-      // Conditionally add annotations based on selectedPoint
       annotations: selectedPoint
         ? {
             points: [
@@ -159,10 +158,8 @@ const SalesDistribution: React.FC<SalesDistributionProps> = ({
     [dataset, t, viewMode]
   );
 
-  // Handle view mode toggle
   const handleViewModeToggle = useCallback((mode: "clients" | "agents") => {
     setViewMode(mode);
-    // Reset selectedPoint when view mode changes
     setSelectedPoint(null);
   }, []);
 

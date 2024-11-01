@@ -1,3 +1,4 @@
+//src/components/statistics/grids/ArticleHistory.tsx
 import { Box, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";

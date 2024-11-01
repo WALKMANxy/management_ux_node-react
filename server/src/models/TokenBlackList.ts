@@ -1,3 +1,5 @@
+//src/models/TokenBlackList.ts
+// Old leftover i don't know we'll need again.
 import { Document, Schema, model } from "mongoose";
 
 export interface ITokenBlacklist extends Document {
