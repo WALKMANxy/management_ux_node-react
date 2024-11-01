@@ -1,9 +1,11 @@
+//src/services/userService.ts
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { Types } from "mongoose";
 import { config } from "../config/config";
 import { IUser, User } from "../models/User";
 import { sendUserChangesConfirmationEmail } from "../utils/sendEmail";
-import { Types } from "mongoose";
+import { IpInfo } from "../models/types";
 
 export class UserService {
   static async getAllUsers(): Promise<IUser[]> {
@@ -30,7 +32,6 @@ export class UserService {
     }
   }
 
-
   static async updateUser(
     id: string,
     userData: Partial<IUser>
@@ -51,12 +52,10 @@ export class UserService {
 
   static async getUsersByIds(ids: string[]): Promise<Partial<IUser>[]> {
     try {
-      // Convert string IDs to ObjectId instances
-      const objectIds = ids.map(id => new Types.ObjectId(id));
+      const objectIds = ids.map((id) => new Types.ObjectId(id));
 
-      // Find users by the provided ObjectId array and select only the required fields
       return await User.find({ _id: { $in: objectIds } })
-        .select("_id avatar role entityName entityCode") // Select only the fields needed
+        .select("_id avatar role entityName entityCode")
         .exec();
     } catch (err) {
       throw new Error(
@@ -71,9 +70,11 @@ export class UserService {
     id: string,
     currentEmail: string,
     currentPassword: string,
-    newEmail: string
+    newEmail: string,
+    ipInfo: IpInfo | null
   ): Promise<IUser | null> {
     try {
+
       const user = await User.findById(id).exec();
 
       if (!user) {
@@ -100,7 +101,7 @@ export class UserService {
       });
 
       // Send verification email
-      await sendUserChangesConfirmationEmail(newEmail, verificationToken);
+      await sendUserChangesConfirmationEmail(newEmail, verificationToken, ipInfo);
 
       return user;
     } catch (err) {
@@ -117,7 +118,8 @@ export class UserService {
     id: string,
     currentEmail: string,
     currentPassword: string,
-    newPassword: string
+    newPassword: string,
+    ipInfo: IpInfo | null
   ): Promise<IUser | null> {
     try {
       const user = await User.findById(id).exec();
@@ -146,7 +148,7 @@ export class UserService {
       });
 
       // Send confirmation email
-      await sendUserChangesConfirmationEmail(user.email, verificationToken);
+      await sendUserChangesConfirmationEmail(user.email, verificationToken, ipInfo);
 
       return user;
     } catch (err) {
@@ -173,5 +175,4 @@ export class UserService {
       );
     }
   }
-  
 }

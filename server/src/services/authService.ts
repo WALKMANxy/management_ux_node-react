@@ -1,3 +1,4 @@
+//src/services/authService.ts
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config";
@@ -56,7 +57,7 @@ export const registerUserService = async (
   const verificationToken = jwt.sign({ id: user._id }, JWT_SECRET, {
     expiresIn: "1d",
   });
-  logger.info("Verification token generated", { verificationToken });
+  // logger.info("Verification token generated", { verificationToken });
 
   await sendVerificationEmail(email, verificationToken);
   logger.info("Verification email sent", { email });
@@ -140,22 +141,22 @@ export const generateResetCodeService = async (
   email: string,
   ipInfo: IpInfo | null
 ): Promise<void> => {
-  console.log(`Generating reset code for user: ${email}`);
+  logger.info(`Generating reset code for user: ${email}`);
   const user = await User.findOne({ email });
   if (!user) {
-    console.log(`User not found for email: ${email}`);
+    logger.warn(`User not found for email: ${email}`);
     return;
   }
 
   const resetCode = generatePasscode();
-  console.log(`Generated reset code for user: ${email}`, resetCode);
+  logger.log(`Generated reset code for user: ${email}`, resetCode);
 
   user.passwordResetToken = await bcrypt.hash(resetCode, 10);
   user.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000);
   await user.save();
 
   await sendPasswordResetEmail(user.email, resetCode, ipInfo);
-  console.log(`Password reset email sent successfully for user: ${email}`);
+  logger.info(`Password reset email sent successfully for user: ${email}`);
 };
 
 // Verify reset code

@@ -3,9 +3,6 @@ import { Request, Response } from "express";
 import { EmployeeService } from "../services/employeeService";
 import { isMongoDuplicateKeyError } from "./adminController";
 
-/**
- * Fetch all employees and return as a response
- */
 export const fetchAllEmployees = async (req: Request, res: Response) => {
   try {
     const employees = await EmployeeService.getAllEmployees();
@@ -16,9 +13,6 @@ export const fetchAllEmployees = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Fetch a specific employee by ID
- */
 export const fetchEmployeeById = async (req: Request, res: Response) => {
   try {
     const employee = await EmployeeService.getEmployeeById(req.params.id);
@@ -32,21 +26,19 @@ export const fetchEmployeeById = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Create a new employee.
- */
 export const createEmployee = async (req: Request, res: Response) => {
   try {
     const { id, name, email } = req.body;
 
-    // Validate required fields
     if (!id || !name) {
-      return res
-        .status(400)
-        .json({ message: "id and name are required" });
+      return res.status(400).json({ message: "id and name are required" });
     }
 
-    const newEmployee = await EmployeeService.createEmployeeService({ id, name, email });
+    const newEmployee = await EmployeeService.createEmployeeService({
+      id,
+      name,
+      email,
+    });
 
     res.status(201).json({
       id: newEmployee.id,
@@ -68,22 +60,21 @@ export const createEmployee = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Update an existing employee by ID.
- */
 export const updateEmployee = async (req: Request, res: Response) => {
   try {
     const employeeId = req.params.id;
     const { name, email } = req.body;
 
-    // At least one field must be provided for update
     if (!name && !email) {
       return res.status(400).json({
         message: "At least one of name or email must be provided for update",
       });
     }
 
-    const updatedEmployee = await EmployeeService.updateEmployeeService(employeeId, { name, email });
+    const updatedEmployee = await EmployeeService.updateEmployeeService(
+      employeeId,
+      { name, email }
+    );
 
     if (!updatedEmployee) {
       return res.status(404).json({ message: "Employee not found" });
@@ -100,7 +91,9 @@ export const updateEmployee = async (req: Request, res: Response) => {
     if (isMongoDuplicateKeyError(error)) {
       const duplicatedField = Object.keys(error.keyValue)[0];
       return res.status(409).json({
-        message: `${duplicatedField.charAt(0).toUpperCase() + duplicatedField.slice(1)} already in use`,
+        message: `${
+          duplicatedField.charAt(0).toUpperCase() + duplicatedField.slice(1)
+        } already in use`,
       });
     }
 
@@ -108,9 +101,6 @@ export const updateEmployee = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Delete an employee by ID.
- */
 export const deleteEmployee = async (req: Request, res: Response) => {
   try {
     const employeeId = req.params.id;

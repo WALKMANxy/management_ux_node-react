@@ -1,15 +1,7 @@
 // src/services/employeeService.ts
+import { Employee, IEmployee } from "../models/Employee";
 
-import { IEmployee, Employee } from "../models/Employee";
-
-/**
- * Service class for Employee-related operations.
- */
 export class EmployeeService {
-  /**
-   * Fetch all employees from the database.
-   * @returns Promise resolving to an array of Employee documents.
-   */
   static async getAllEmployees(): Promise<IEmployee[]> {
     try {
       const employees = await Employee.find().exec();
@@ -24,11 +16,6 @@ export class EmployeeService {
     }
   }
 
-  /**
-   * Fetch a single employee by ID from the database.
-   * @param id - The ID of the employee to fetch.
-   * @returns Promise resolving to an Employee document or null if not found.
-   */
   static async getEmployeeById(id: string): Promise<IEmployee | null> {
     try {
       const employee = await Employee.findOne({ id }).exec();
@@ -43,11 +30,6 @@ export class EmployeeService {
     }
   }
 
-  /**
-   * Create a new employee in the database.
-   * @param employeeData - The data for the new employee.
-   * @returns Promise resolving to the created Employee document.
-   */
   static async createEmployeeService(employeeData: {
     id: string;
     name: string;
@@ -59,16 +41,10 @@ export class EmployeeService {
       return newEmployee;
     } catch (err: any) {
       console.error("Error creating employee:", err);
-      throw err; // Let the controller handle specific error responses
+      throw err;
     }
   }
 
-  /**
-   * Update an existing employee by ID with provided data.
-   * @param id - The ID of the employee to update.
-   * @param updatedData - Partial data to update the employee.
-   * @returns Promise resolving to the updated Employee document or null if not found.
-   */
   static async updateEmployeeService(
     id: string,
     updatedData: Partial<{ name: string; email: string }>
@@ -77,20 +53,15 @@ export class EmployeeService {
       const updatedEmployee = await Employee.findOneAndUpdate(
         { id },
         { $set: updatedData },
-        { new: true, runValidators: true } // Return the updated document and run validators
+        { new: true, runValidators: true }
       ).exec();
       return updatedEmployee;
     } catch (err: any) {
       console.error(`Error updating employee with id ${id}:`, err);
-      throw err; // Let the controller handle specific error responses
+      throw err;
     }
   }
 
-  /**
-   * Delete an employee by ID.
-   * @param id - The ID of the employee to delete.
-   * @returns Promise resolving to true if deleted, false if not found.
-   */
   static async deleteEmployeeService(id: string): Promise<boolean> {
     try {
       const result = await Employee.deleteOne({ id }).exec();

@@ -1,27 +1,34 @@
-import { S3Client, /* ListObjectsV2Command,*/ PutObjectCommand, GetObjectCommand  } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { config } from '../config/config';
+//src/services/mediaService.ts
+import {
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { config } from "../config/config";
 
-// Initialize S3 client once in the service
 const s3 = new S3Client({
   credentials: {
-    accessKeyId: config.accessKeyId,    // Loaded from environment variables
+    accessKeyId: config.accessKeyId,
     secretAccessKey: config.secretAccessKey,
   },
-  region: config.region,                // Specify the S3 bucket region
+  region: config.region,
 });
 
-const bucketName = config.bucketName!;  // Load bucket name from environment variables
+const bucketName = config.bucketName!;
 
 // Generate pre-signed URL for chat file upload
-export const generateChatFileUrl = async (chatId: string, messageId: string, fileName: string) => {
+export const generateChatFileUrl = async (
+  chatId: string,
+  messageId: string,
+  fileName: string
+) => {
   const filePath = `chats/${chatId}/${messageId}/${fileName}`;
 
-  // Create a PutObjectCommand for uploading the file
   const command = new PutObjectCommand({
     Bucket: bucketName,
     Key: filePath,
-    ACL: 'private',  // Set the permissions (private by default)
+    ACL: "private",
   });
 
   // Generate the pre-signed URL (valid for 5 minutes)
@@ -31,33 +38,37 @@ export const generateChatFileUrl = async (chatId: string, messageId: string, fil
 };
 
 // Generate pre-signed URL for chat file download
-export const generateChatFileDownloadUrl = async (chatId: string, messageId: string, fileName: string) => {
+export const generateChatFileDownloadUrl = async (
+  chatId: string,
+  messageId: string,
+  fileName: string
+) => {
   const filePath = `chats/${chatId}/${messageId}/${fileName}`;
 
-  // Create a GetObjectCommand for downloading the file
   const command = new GetObjectCommand({
     Bucket: bucketName,
     Key: filePath,
   });
 
-  // Generate the pre-signed URL (valid for 5 minutes)
   const downloadUrl = await getSignedUrl(s3, command, { expiresIn: 300 });
 
   return downloadUrl;
 };
 
 // Generate pre-signed URL for slideshow file upload
-export const generateSlideshowFileUrl = async (currentMonth: string, fileName: string) => {
+export const generateSlideshowFileUrl = async (
+  currentMonth: string,
+  fileName: string
+) => {
   const filePath = `slideshow/${currentMonth}/${fileName}`;
 
   // Create a PutObjectCommand for the slideshow file
   const command = new PutObjectCommand({
     Bucket: bucketName,
     Key: filePath,
-    ACL: 'private',  // Set the permissions
+    ACL: "private",
   });
 
-  // Generate the pre-signed URL (valid for 5 minutes)
   const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 300 });
 
   return uploadUrl;

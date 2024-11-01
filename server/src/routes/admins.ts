@@ -1,18 +1,17 @@
 // src/routes/adminRoutes.ts
 import express from "express";
 import {
+  createAdmin,
+  deleteAdmin,
   fetchAdminById,
   fetchAllAdmins,
-  createAdmin,
   updateAdmin,
-  deleteAdmin,
 } from "../controllers/adminController";
 import { authenticateUser } from "../middlewares/authentication";
 import { checkAdminRole } from "../middlewares/roleChecker";
 
 const router = express.Router();
 
-// Middleware to authenticate and authorize user
 router.use(authenticateUser);
 router.use(checkAdminRole);
 

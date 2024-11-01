@@ -1,12 +1,8 @@
 // src/services/movementService.ts
 import Movement, { IMovement } from "../models/Movement";
-import { logger } from "../utils/logger"; // Assuming logger is exported from utils/logger.ts
+import { logger } from "../utils/logger";
 
 export class MovementService {
-  /**
-   * Fetch all movements from the database.
-   * @returns Promise resolving to an array of Movement documents.
-   */
   static async getAllMovements(): Promise<IMovement[]> {
     try {
       const movements = await Movement.find().exec();
@@ -25,12 +21,6 @@ export class MovementService {
     }
   }
 
-  /**
-   * Fetch movements filtered by role and entity code.
-   * @param role - The role of the user (e.g., "agent", "client").
-   * @param entityCode - The entity code associated with the user.
-   * @returns Promise resolving to an array of Movement documents.
-   */
   static async getFilteredMovementsByRole(
     role: string,
     entityCode: string
@@ -72,14 +62,6 @@ export class MovementService {
     }
   }
 
-  /**
-   * Replace a movement by Numero Lista.
-   * Note: Since Numero Lista is not unique, this operation might affect multiple documents.
-   * Ensure this aligns with your application logic.
-   * @param numeroLista - The Numero Lista of the movement(s) to replace.
-   * @param movementData - The new movement data.
-   * @returns Promise resolving to an object with a message.
-   */
   static async replaceMovement(
     numeroLista: number,
     movementData: IMovement
@@ -95,9 +77,9 @@ export class MovementService {
         throw new Error("Movement not found");
       }
 
-      logger.info(
+      /* logger.info(
         `Replaced ${result.modifiedCount} movement(s) with Numero Lista ${numeroLista}`
-      );
+      ); */
       return { message: "Movement(s) replaced successfully" };
     } catch (err) {
       logger.error(
@@ -113,12 +95,6 @@ export class MovementService {
     }
   }
 
-  /**
-   * Update movements by Numero Lista with partial data.
-   * @param numeroLista - The Numero Lista of the movement(s) to update.
-   * @param movementData - Partial movement data to update.
-   * @returns Promise resolving to an object with a message.
-   */
   static async updateMovement(
     numeroLista: number,
     movementData: Partial<IMovement>
@@ -134,9 +110,9 @@ export class MovementService {
         throw new Error("Movement not found");
       }
 
-      logger.info(
+      /*  logger.info(
         `Updated ${result.modifiedCount} movement(s) with Numero Lista ${numeroLista}`
-      );
+      ); */
       return { message: "Movement(s) updated successfully" };
     } catch (err) {
       logger.error(

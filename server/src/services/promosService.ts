@@ -1,3 +1,4 @@
+//src/services/promosService.ts
 import { IPromo, Promo } from "../models/Promo";
 
 export class PromoService {

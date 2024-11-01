@@ -7,23 +7,18 @@ import {
   checkAgentOrAdminOrClientRole,
 } from "../middlewares/roleChecker";
 import {
-  validateCreateClient,
-  validateUpdateClient,
-  validateDeleteClient,
   handleValidation,
+  validateCreateClient,
+  validateDeleteClient,
+  validateUpdateClient,
 } from "../middlewares/validateClient";
 
 const router = express.Router();
 
-// Middleware to authenticate user
 router.use(authenticateUser);
 
 // GET method to retrieve all clients
-router.get(
-  "/",
-  checkAgentOrAdminOrClientRole,
-  ClientController.getClients
-);
+router.get("/", checkAgentOrAdminOrClientRole, ClientController.getClients);
 
 // GET method to retrieve a client by CODICE
 router.get(

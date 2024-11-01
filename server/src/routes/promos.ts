@@ -1,3 +1,4 @@
+//src/routes/promos.ts
 import express from "express";
 import { promoValidationRules } from "../constants/validationRules";
 import { PromoController } from "../controllers/promoController";
@@ -10,7 +11,6 @@ import { checkValidation } from "../middlewares/validate";
 
 const router = express.Router();
 
-// Middleware to authenticate and authorize user
 router.use(authenticateUser);
 
 // GET method to retrieve all promos

@@ -1,13 +1,13 @@
 // src/routes/agentRoutes.ts
 import express from "express";
 import {
+  createAgent,
+  deleteAgent,
   fetchAgentByClientEntityCode,
   fetchAgentById,
   fetchAllAgents,
   replaceAgent,
   updateAgent,
-  createAgent,
-  deleteAgent,
 } from "../controllers/agentController";
 import { authenticateUser } from "../middlewares/authentication";
 import {
@@ -16,15 +16,14 @@ import {
   checkAgentOrAdminRole,
 } from "../middlewares/roleChecker";
 import {
-  validateCreateAgent,
-  validateUpdateAgent,
-  validateDeleteAgent,
   handleValidation,
+  validateCreateAgent,
+  validateDeleteAgent,
+  validateUpdateAgent,
 } from "../middlewares/validateAgent";
 
 const router = express.Router();
 
-// Middleware to authenticate and authorize user
 router.use(authenticateUser);
 
 // GET method to retrieve an agent by the client's entity code

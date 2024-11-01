@@ -1,3 +1,4 @@
+//src/models/Promo.ts
 import { Document, Schema, model } from "mongoose";
 
 export interface IPromo extends Document {
@@ -15,7 +16,7 @@ export interface IPromo extends Document {
 
 const promoSchema = new Schema<IPromo>({
   clientsId: { type: [String], required: false }, // Optional reference to client collection
-  global: { type: Boolean, default: false }, // New global field with default false
+  global: { type: Boolean, default: false },
   excludedClientsId: { type: [String], required: false }, // Optional array for excluded clients
   promoType: { type: String, required: true },
   name: { type: String, required: true },
@@ -26,8 +27,6 @@ const promoSchema = new Schema<IPromo>({
   promoIssuedBy: { type: String, required: true },
 });
 
-// Remove the promoIssuedBy index if it existed
-// Add an index for the global field
 promoSchema.index({ global: 1 });
 
 export const Promo = model<IPromo>("Promo", promoSchema);

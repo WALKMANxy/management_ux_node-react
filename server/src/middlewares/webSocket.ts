@@ -1,3 +1,4 @@
+//src/middlewares/webSocket.ts
 import { Socket, Server as SocketIOServer } from "socket.io";
 import { config } from "../config/config";
 import { IChat, IMessage } from "../models/Chat";
@@ -14,10 +15,8 @@ interface AuthenticatedSocket extends Socket {
 }
 
 export const setupWebSocket = (io: SocketIOServer) => {
-  // Middleware to authenticate the WebSocket connection
   io.use(async (socket: AuthenticatedSocket, next) => {
     try {
-      // Extract access token from socket handshake headers (e.g., Authorization: Bearer <token>)
       const accessToken = socket.handshake.auth.authorization?.replace(
         "Bearer ",
         ""
@@ -44,7 +43,7 @@ export const setupWebSocket = (io: SocketIOServer) => {
         logger.warn("Invalid or expired session for WebSocket connection", {
           socketId: socket.id,
         });
-        socket.emit("reconnect:unauthorized"); // Notify client of unauthorized connection due to expired token
+        socket.emit("reconnect:unauthorized");
         return next(
           new Error("Authentication error: Invalid or expired session")
         );
@@ -70,7 +69,7 @@ export const setupWebSocket = (io: SocketIOServer) => {
         userId: socket.userId,
         socketId: socket.id,
       }); */
-      next(); // Proceed with the connection
+      next();
     } catch (error) {
       logger.error("WebSocket authentication error", {
         error,
@@ -95,7 +94,8 @@ export const setupWebSocket = (io: SocketIOServer) => {
       await joinUserToChats(io, socket);
 
       // We're gonna handle this once the project starts, since there are no users currently.
-     /*  // Join all existing chat rooms the user is part of
+
+      /*
       // Check if user is employee or admin and update the broadcast chat accordingly
       const broadcastChatId = "6701f7dbc1a80a3d029808ab";
 
@@ -110,13 +110,13 @@ export const setupWebSocket = (io: SocketIOServer) => {
       } */
     }
 
-    socket.on("disconnect", () => {
+    /*  socket.on("disconnect", () => {
       /* logger.info("Client disconnected", {
         userId: socket.userId,
         socketId: socket.id,
-      }); */
+      });
       // Socket.IO automatically handles leaving all rooms upon disconnection
-    });
+    }); */
 
     // Handle incoming message
     socket.on(
@@ -149,39 +149,38 @@ export const setupWebSocket = (io: SocketIOServer) => {
       }
     );
 
-   // Handle chat creation
-socket.on("chat:create", async ({ chat }: { chat: Partial<IChat> }) => {
-  try {
-    const createdChat = await ChatService.createChat(chat);
+    // Handle chat creation
+    socket.on("chat:create", async ({ chat }: { chat: Partial<IChat> }) => {
+      try {
+        const createdChat = await ChatService.createChat(chat);
 
-    // Automatically join all participants to the correct chat room
-    createdChat.participants.forEach((participantId) => {
-      const roomId = `chat:${createdChat._id}`;
-      const participantRoomId = `user:${participantId.toString()}`;
+        // Automatically join all participants to the correct chat room
+        createdChat.participants.forEach((participantId) => {
+          const roomId = `chat:${createdChat._id}`;
+          const participantRoomId = `user:${participantId.toString()}`;
 
-      // Make all sockets in participant's user room join the new chat room
-      io.in(participantRoomId).socketsJoin(roomId);
-     /*  logger.info("User sockets joined chat room", {
-        userId: participantId.toString(),
-        chatId: createdChat._id,
-        roomId,
-      }); */
+          // Make all sockets in participant's user room join the new chat room
+          io.in(participantRoomId).socketsJoin(roomId);
+          /*  logger.info("User sockets joined chat room", {
+              userId: participantId.toString(),
+              chatId: createdChat._id,
+              roomId,
+            }); */
 
-      // Emit 'chat:newChat' to inform the client about the new chat
-      io.to(participantRoomId).emit("chat:newChat", {
-        chat: createdChat,
-      });
+          // Emit 'chat:newChat' to inform the client about the new chat
+          io.to(participantRoomId).emit("chat:newChat", {
+            chat: createdChat,
+          });
+        });
+
+        /*  logger.info("New chat created and users joined successfully.", {
+                chatId: createdChat._id,
+                participants: createdChat.participants,
+            }); */
+      } catch (error) {
+        logger.error("Error handling new chat creation", { error });
+      }
     });
-
-   /*  logger.info("New chat created and users joined successfully.", {
-      chatId: createdChat._id,
-      participants: createdChat.participants,
-    }); */
-  } catch (error) {
-    logger.error("Error handling new chat creation", { error });
-  }
-});
-
 
     // **Handle chat editing**
     socket.on("chat:edit", async ({ chatId, updatedData }) => {
@@ -200,13 +199,12 @@ socket.on("chat:create", async ({ chat }: { chat: Partial<IChat> }) => {
           });
         });
 
-       /*  logger.info("Chat updated successfully.", {
+        /*  logger.info("Chat updated successfully.", {
           chatId: updatedChat._id,
           updatedData: updatedData,
         }); */
       } catch (error) {
         logger.error("Error handling chat editing", { error });
-        // Emit an error back to the client
       }
     });
 
@@ -289,11 +287,11 @@ socket.on("chat:create", async ({ chat }: { chat: Partial<IChat> }) => {
             }
           });
 
-          logger.info("Automated messages emitted successfully.", {
+          /* logger.info("Automated messages emitted successfully.", {
             chatIds,
             targetIds,
             totalChats: chats.length,
-          });
+          }); */
         } catch (error) {
           logger.error("Error handling automated message", { error });
         }
@@ -302,7 +300,7 @@ socket.on("chat:create", async ({ chat }: { chat: Partial<IChat> }) => {
 
     // Handle logout
     socket.on("logout", () => {
-     /*  logger.info("Client logout requested", {
+      /*  logger.info("Client logout requested", {
         userId: socket.userId,
         socketId: socket.id,
       }); */

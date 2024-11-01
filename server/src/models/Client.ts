@@ -1,3 +1,4 @@
+//src/models/Client.ts
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IClient extends Document {
@@ -15,7 +16,7 @@ export interface IClient extends Document {
   "Descizione metodo pagamento": string;
   CS: string;
   AG: string;
-  createdAt?: Date; // Optional timestamp fields
+  createdAt?: Date;
   updatedAt?: Date;
 }
 
@@ -37,7 +38,7 @@ const ClientSchema: Schema = new Schema(
     AG: { type: String },
   },
   {
-    timestamps: true, // Automatically create `createdAt` and `updatedAt` fields
+    timestamps: true,
   }
 );
 
