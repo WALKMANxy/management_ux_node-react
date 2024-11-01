@@ -82,7 +82,7 @@ const Dashboard: React.FC = () => {
       <Grid container spacing={6} mt={-4}>
         {/* Left Side Components */}
         <Grid item xs={!isTablet ? 12 : 12} md={!isTablet ? 9 : 12}>
-          <Grid container spacing={3}>
+          <Grid container spacing={4}>
             {/* Top Left: Clock Component */}
             <Grid item xs={6}>
               {loading ? (

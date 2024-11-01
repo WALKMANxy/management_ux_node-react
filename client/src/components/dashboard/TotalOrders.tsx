@@ -308,6 +308,8 @@ const TotalOrder: React.FC<TotalOrderProps> = ({
                   series={series}
                   type="area"
                   height={isMobile ? 150 : 150}
+                  key={timeValue ? 'monthly' : 'yearly'} // Add this line
+
                 />
               </Grid>
             </Grid>
