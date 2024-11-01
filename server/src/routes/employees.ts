@@ -1,24 +1,23 @@
 // src/routes/employeeRoutes.ts
 import express from "express";
 import {
-  fetchEmployeeById,
-  fetchAllEmployees,
   createEmployee,
-  updateEmployee,
   deleteEmployee,
+  fetchAllEmployees,
+  fetchEmployeeById,
+  updateEmployee,
 } from "../controllers/employeeController";
 import { authenticateUser } from "../middlewares/authentication";
 import { checkAdminRole } from "../middlewares/roleChecker";
 import {
-  validateCreateEmployee,
-  validateUpdateEmployee,
-  validateDeleteEmployee,
   handleValidation,
+  validateCreateEmployee,
+  validateDeleteEmployee,
+  validateUpdateEmployee,
 } from "../middlewares/validateEmployee";
 
 const router = express.Router();
 
-// Middleware to authenticate user
 router.use(authenticateUser);
 
 /**

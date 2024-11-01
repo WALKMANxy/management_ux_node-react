@@ -1,4 +1,4 @@
-// middleware/rateLimiter.ts
+//src/middlewares/rateLimiter.ts
 
 import rateLimit from "express-rate-limit";
 

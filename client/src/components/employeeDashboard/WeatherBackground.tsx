@@ -1,12 +1,10 @@
 import { Box } from "@mui/material";
 
-// Define a type for the background styles
 interface BackgroundStyles {
   backgroundColor: string;
   shapes: JSX.Element[];
 }
 
-// Function to get background styles based on weather code and time of day
 export const getBackgroundStyles = (
   weatherCode: number,
   isDay: boolean
@@ -14,7 +12,6 @@ export const getBackgroundStyles = (
   let backgroundColor = "#87CEEB"; // Default sky blue
   let shapes: JSX.Element[] = [];
 
-  // Define color mappings based on weather types
   const weatherType = getWeatherType(weatherCode);
 
   switch (weatherType) {
@@ -37,7 +34,6 @@ export const getBackgroundStyles = (
             zIndex: -1,
           }}
         />,
-        // Add more shapes as needed
       ];
       break;
 
@@ -58,7 +54,6 @@ export const getBackgroundStyles = (
             zIndex: -1,
           }}
         />,
-        // Add more shapes as needed
       ];
       break;
 
@@ -79,7 +74,6 @@ export const getBackgroundStyles = (
             zIndex: -1,
           }}
         />,
-        // Add more shapes as needed
       ];
       break;
 
@@ -100,7 +94,6 @@ export const getBackgroundStyles = (
             zIndex: -1,
           }}
         />,
-        // Add more shapes as needed
       ];
       break;
 
@@ -121,7 +114,6 @@ export const getBackgroundStyles = (
             zIndex: -1,
           }}
         />,
-        // Add more shapes as needed
       ];
       break;
 
@@ -142,7 +134,6 @@ export const getBackgroundStyles = (
             zIndex: -1,
           }}
         />,
-        // Add more shapes as needed
       ];
       break;
 
@@ -154,7 +145,6 @@ export const getBackgroundStyles = (
   return { backgroundColor, shapes };
 };
 
-// Helper function to determine weather type based on code
 const getWeatherType = (weatherCode: number): string => {
   const clearCodes = [0, 1];
   const partlyCloudyCodes = [2];
@@ -176,5 +166,5 @@ const getWeatherType = (weatherCode: number): string => {
   if (snowCodes.includes(weatherCode)) return "Snow";
   if (thunderstormsCodes.includes(weatherCode)) return "Thunderstorm";
 
-  return "Clear"; // Default type
+  return "Clear";
 };

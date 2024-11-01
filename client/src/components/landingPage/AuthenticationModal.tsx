@@ -75,11 +75,11 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
   }, [originalToggleMode]);
 
   const handleForgotPassword = () => {
-    setIsPasswordReset(true); // Trigger the password reset flow
+    setIsPasswordReset(true);
   };
 
   const handleBackToSignIn = () => {
-    setIsPasswordReset(false); // Return to the sign-in flow
+    setIsPasswordReset(false);
   };
 
   return (
@@ -91,8 +91,8 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
       PaperProps={{
         sx: {
           borderRadius: "30px",
-          backdropFilter: "blur(120px)", // Frosted glass effect
-          backgroundColor: "rgba(255, 255, 255, 1)", // Semi-transparent background
+          backdropFilter: "blur(120px)",
+          backgroundColor: "rgba(255, 255, 255, 1)",
         },
       }}
     >
@@ -121,7 +121,7 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
               variant="body2"
               sx={{ marginBottom: "24px", color: "text.secondary" }}
             >
-              {t("auth.continueToApp", { appName: "RCS Next" })}
+              {t("auth.continueToApp", { appName: "NEXT_" })}
             </Typography>
 
             <Collapse in={alertOpen}>
@@ -344,10 +344,10 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
                   boxShadow: "0 2px 8px 0 rgba(0,0,0,.25)",
                 },
                 "& .MuiButton-startIcon": {
-                  marginRight: "24px", // Increase space between icon and text
+                  marginRight: "24px",
                 },
                 "& .MuiSvgIcon-root": {
-                  color: "#ffffff", // Ensure the Google icon is white
+                  color: "#ffffff",
                 },
               }}
               onClick={handleLoginWithGoogleClick}
@@ -373,7 +373,7 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
             >
               {isLoginMode ? (
                 <>
-                  {t("auth.newToApp", { appName: "RCS Next" })}{" "}
+                  {t("auth.newToApp", { appName: "NEXT_" })}{" "}
                   <Typography
                     component="span"
                     sx={{

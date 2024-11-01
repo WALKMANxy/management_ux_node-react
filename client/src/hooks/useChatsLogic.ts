@@ -1,10 +1,8 @@
+//src/hooks/useChatsLogic.ts
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import {
-  useAppDispatch /* useAppSelector */,
-  useAppSelector,
-} from "../app/hooks";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { selectUserId, selectUserRole } from "../features/auth/authSlice";
 import {
   addAttachmentMessageReducer,
@@ -18,7 +16,7 @@ import {
   setCurrentChatReducer,
   updateChatReducer,
   updateReadStatusReducer,
-} from "../features/chat/chatSlice"; // Ensure correct selectors are imported
+} from "../features/chat/chatSlice";
 import {
   fetchAllChatsThunk,
   uploadAttachmentsThunk,
@@ -39,9 +37,9 @@ const useChatLogic = () => {
   const currentUserId = useAppSelector(selectUserId);
   const userRole = useAppSelector(selectUserRole);
   const users = useAppSelector(selectAllUsers);
-  const chats: IChat[] = useAppSelector(selectAllChats); // Use selector to get all chats
-  const currentChat: IChat | null = useSelector(selectCurrentChat); // Allow null values
-  const messages = useAppSelector(selectMessagesFromCurrentChat); // Use selector to get messages of the current chat
+  const chats: IChat[] = useAppSelector(selectAllChats);
+  const currentChat: IChat | null = useSelector(selectCurrentChat);
+  const messages = useAppSelector(selectMessagesFromCurrentChat);
   const [contactsFetched, setContactsFetched] = useState(false);
   const { t } = useTranslation();
   const fetchChatsStatus = useAppSelector(selectFetchChatsStatus);
@@ -59,7 +57,7 @@ const useChatLogic = () => {
       setLoadingChats(true);
       await dispatch(fetchAllChatsThunk()).unwrap();
       setChatError(null);
-      chatRetryCountRef.current = 0; // Reset retry count on success
+      chatRetryCountRef.current = 0;
     } catch (err: unknown) {
       console.error("Error fetching chats:", err);
       if (err instanceof Error) {
@@ -80,7 +78,6 @@ const useChatLogic = () => {
   useEffect(() => {
     if (shouldFetchChats) {
       const timeoutId = setTimeout(() => {
-        // Call fetchChats after a 500ms delay
         fetchChats();
       }, 500);
 
@@ -99,7 +96,7 @@ const useChatLogic = () => {
       const retryDelay = Math.min(32000, 1000 * 2 ** chatRetryCountRef.current); // Exponential backoff
 
       const retryTimeout = setTimeout(() => {
-        console.log(`Retry attempt #${chatRetryCountRef.current}`);
+        // console.log(`Retry attempt #${chatRetryCountRef.current}`);
         fetchChats();
       }, retryDelay);
 
@@ -242,9 +239,9 @@ const useChatLogic = () => {
           }));
           messageData.attachments = updatedAttachments;
 
-          console.log(
+          /*  console.log(
             `Dispatching addAttachmentMessageReducer for message with attachments: ${messageData._id}`
-          );
+          ); */
 
           // Dispatch message with attachments
           dispatch(
@@ -260,7 +257,7 @@ const useChatLogic = () => {
               chatId: currentChatId,
               message: messageData,
             })
-          ).unwrap(); // unwrap() to handle fulfilled/rejected state
+          ).unwrap();
         } else {
           // Dispatch message without attachments
           dispatch(
@@ -280,7 +277,7 @@ const useChatLogic = () => {
       chatType: "simple" | "group" | "broadcast",
       name?: string,
       description?: string,
-      admins?: string[] // New optional admins parameter
+      admins?: string[]
     ) => {
       if (!participants.length) return;
 
@@ -303,12 +300,12 @@ const useChatLogic = () => {
         messages: [],
         createdAt: new Date(),
         updatedAt: new Date(),
-        status: "pending", // Indicate that the chat is pending confirmation
-        admins: admins || [], // Assign the admins array directly
+        status: "pending",
+        admins: admins || [],
       };
 
-      /*       console.log("Dispatching to addChatReducer:", chatData);
-       */
+      // console.log("Dispatching to addChatReducer:", chatData);
+
       try {
         dispatch(addChatReducer({ chat: chatData }));
       } catch (error) {
@@ -348,10 +345,10 @@ const useChatLogic = () => {
             chatId: updatedChat._id!,
             updatedData: updatedChat,
           })
-        ); // Ensure you have an updateChatReducer
+        );
       } catch (error) {
         console.error("Failed to edit chat:", error);
-        throw error; // Re-throw to handle in the form
+        throw error;
       }
     },
     [dispatch, chats]
@@ -385,7 +382,7 @@ const useChatLogic = () => {
             messages: [],
             createdAt: new Date(),
             updatedAt: new Date(),
-            status: "pending", // Indicate that the chat is pending confirmation
+            status: "pending",
           };
 
           // Optimistically add the new chat to the state
@@ -396,7 +393,6 @@ const useChatLogic = () => {
         }
       } catch (error) {
         console.error("handleContactSelect encountered an error:", error);
-        // Handle error appropriately (e.g., show a notification to the user)
       } finally {
         if (chatToSelect) {
           selectChat(chatToSelect);
@@ -446,7 +442,7 @@ const useChatLogic = () => {
 
     // Default return if no contacts are found
     return [];
-  }, [users, userRole, agentClientIds, currentUserId]); // Dependencies array
+  }, [users, userRole, agentClientIds, currentUserId]);
 
   // Filter and sort chats based on search term and message timestamp
   const getFilteredAndSortedChats = useCallback(
@@ -536,7 +532,8 @@ const useChatLogic = () => {
     }
   };
 
-  const broadcastChatId = "6701f7dbc1a80a3d029808ab"; // Your broadcast chat ID
+  // Have to implement a system to pick a broadCast chat to show to all users, maybe a setting inside the super admin's page
+  const broadcastChatId = "6701f7dbc1a80a3d029808ab";
 
   // Selector to get the broadcast chat
   const broadcastChat = useMemo(() => {
@@ -564,10 +561,10 @@ const useChatLogic = () => {
     handleSendMessage,
     handleCreateChat,
     handleContactSelect,
-    fetchContacts, // Add fetchContacts to be used when toggling to contacts view
+    fetchContacts,
     contactsFetched,
-    loadingContacts, // Provide loading state
-    filteredContacts, // Function to filter contacts based on the role
+    loadingContacts,
+    filteredContacts, 
     getFilteredAndSortedChats,
     getChatTitle,
     getUnreadCount,

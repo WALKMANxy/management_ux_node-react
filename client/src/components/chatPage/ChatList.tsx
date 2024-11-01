@@ -1,5 +1,4 @@
 // src/components/chatPage/ChatList.tsx
-
 import {
   Avatar,
   Badge,
@@ -14,27 +13,19 @@ import {
 import React from "react";
 import { useTranslation } from "react-i18next";
 import useChatLogic from "../../hooks/useChatsLogic";
-import { formatDate } from "../../utils/chatUtils";
+import { formatDateChats } from "../../utils/chatUtils";
 
 interface ChatListProps {
-  searchTerm?: string; // Make searchTerm optional
-  loading?: boolean; // Make loading optional
+  searchTerm?: string;
+  loading?: boolean;
 }
 
-/**
- * ChatList Component
- * Displays a list of chats with avatars, unread message counts, and message previews.
- *
- * @param {ChatListProps} props - Component props.
- * @returns {JSX.Element} The rendered component.
- */
 const ChatList: React.FC<ChatListProps> = ({
   searchTerm = "",
   loading = false,
 }) => {
-
-/*   console.log("ChatView rendering now");
- */
+  /*   console.log("ChatView rendering now");
+   */
 
   const { t } = useTranslation();
   const {
@@ -42,13 +33,10 @@ const ChatList: React.FC<ChatListProps> = ({
     getChatTitle,
     getUnreadCount,
     selectChat,
-  } = useChatLogic(); // Destructure the required functions from the hook
-
-  // Combine external loading prop with internal loadingChats state
+  } = useChatLogic();
 
   // Retrieve sorted and filtered chats based on the search term
   const sortedChats = getFilteredAndSortedChats(searchTerm);
-
 
   return (
     <List>
@@ -70,7 +58,7 @@ const ChatList: React.FC<ChatListProps> = ({
 
           const title = getChatTitle(chat);
           const avatarLetter = title.charAt(0).toUpperCase();
-          const avatar = <Avatar>{avatarLetter}</Avatar>; // You can customize the avatar as needed
+          const avatar = <Avatar>{avatarLetter}</Avatar>;
           const unreadCount = getUnreadCount(chat);
           const isNew = unreadCount > 0;
 
@@ -79,8 +67,7 @@ const ChatList: React.FC<ChatListProps> = ({
               key={chat._id || chat.local_id}
               button
               onClick={() => {
-                selectChat(chat); // Call selectChat to update the current chat state
-                // Optionally, mark messages as read here if not handled within selectChat
+                selectChat(chat);
               }}
               sx={{ borderBottom: "1px solid #e0e0e0" }}
             >
@@ -106,7 +93,7 @@ const ChatList: React.FC<ChatListProps> = ({
                 <Box sx={{ ml: 2, textAlign: "right" }}>
                   <Typography variant="caption" color="textSecondary">
                     {lastMessage.timestamp
-                      ? formatDate(lastMessage.timestamp)
+                      ? formatDateChats(lastMessage.timestamp)
                       : t("chatList.na")}
                   </Typography>
                 </Box>

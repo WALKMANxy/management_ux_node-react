@@ -1,7 +1,6 @@
 // src/components/chatPage/MessageTypeMenu.tsx
-
+import { IconButton, Menu, Typography } from "@mui/material";
 import React from "react";
-import {  IconButton, Menu, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 interface MessageTypeModal {
@@ -35,7 +34,7 @@ const MessageTypeModal: React.FC<MessageTypeModal> = ({
         horizontal: "center",
       }}
       sx={{
-        mt:-2,
+        mt: -2,
       }}
       PaperProps={{
         sx: {
@@ -52,10 +51,14 @@ const MessageTypeModal: React.FC<MessageTypeModal> = ({
       {["message", "alert", "promo", "visit"].map((type) => (
         <IconButton
           key={type}
-          onClick={() => onSelect(type as "message" | "alert" | "promo" | "visit")}
+          onClick={() =>
+            onSelect(type as "message" | "alert" | "promo" | "visit")
+          }
           color={messageType === type ? "primary" : "default"}
         >
-          <Typography variant="button">{t(`inputBox.labels.${type}`)}</Typography>
+          <Typography variant="button">
+            {t(`inputBox.labels.${type}`)}
+          </Typography>
         </IconButton>
       ))}
     </Menu>

@@ -1,11 +1,7 @@
 // src/services/adminService.ts
-
 import Admin, { IAdmin } from "../models/Admin";
 
-/**
- * Fetch all admins from the database.
- * @returns Promise resolving to an array of Admin documents.
- */
+
 export const getAllAdmins = async (): Promise<IAdmin[]> => {
   try {
     const admins = await Admin.find().exec();
@@ -16,11 +12,7 @@ export const getAllAdmins = async (): Promise<IAdmin[]> => {
   }
 };
 
-/**
- * Fetch a single admin by ID from the database.
- * @param id - The ID of the admin to fetch.
- * @returns Promise resolving to an Admin document or null if not found.
- */
+
 export const getAdminById = async (id: string): Promise<IAdmin | null> => {
   try {
     const admin = await Admin.findOne({ id }).exec();
@@ -31,11 +23,7 @@ export const getAdminById = async (id: string): Promise<IAdmin | null> => {
   }
 };
 
-/**
- * Create a new admin in the database.
- * @param adminData - The data for the new admin.
- * @returns Promise resolving to the created Admin document.
- */
+
 export const createAdminService = async (adminData: { id: string; name: string; email: string }): Promise<IAdmin> => {
   try {
     const newAdmin = new Admin(adminData);
@@ -43,37 +31,28 @@ export const createAdminService = async (adminData: { id: string; name: string; 
     return newAdmin;
   } catch (error: any) {
     console.error("Error creating admin:", error);
-    throw error; // Let the controller handle specific error responses
+    throw error;
   }
 };
 
-/**
- * Update an existing admin by ID.
- * @param id - The ID of the admin to update.
- * @param updateData - The data to update.
- * @returns Promise resolving to the updated Admin document or null if not found.
- */
+
 export const updateAdminService = async (
   id: string,
   updateData: { name?: string; email?: string }
 ): Promise<IAdmin | null> => {
   try {
     const updatedAdmin = await Admin.findOneAndUpdate({ id }, updateData, {
-      new: true, // Return the updated document
-      runValidators: true, // Ensure the update respects schema validations
+      new: true,
+      runValidators: true,
     }).exec();
     return updatedAdmin;
   } catch (error: any) {
     console.error(`Error updating admin with id ${id}:`, error);
-    throw error; // Let the controller handle specific error responses
+    throw error;
   }
 };
 
-/**
- * Delete an admin by ID.
- * @param id - The ID of the admin to delete.
- * @returns Promise resolving to true if deleted, false if not found.
- */
+
 export const deleteAdminService = async (id: string): Promise<boolean> => {
   try {
     const result = await Admin.deleteOne({ id }).exec();

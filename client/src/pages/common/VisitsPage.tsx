@@ -3,7 +3,6 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PeopleIcon from "@mui/icons-material/People";
 import RefreshIcon from "@mui/icons-material/Refresh";
-
 import {
   Box,
   CircularProgress,
@@ -39,7 +38,6 @@ import useLoadingData from "../../hooks/useLoadingData";
 import useResizeObserver from "../../hooks/useResizeObserver";
 import { useVisitSidebar } from "../../hooks/useVisitSidebar";
 
-// Lazy load the non-immediate components
 const ClientDetailsCard = React.lazy(
   () => import("../../components/visitPage/ClientDetailsCard")
 );
@@ -53,7 +51,7 @@ const VisitView = React.lazy(
   () => import("../../components/visitPage/VisitView")
 );
 const UpcomingVisits = React.lazy(
-  () => import("../../components/dashboard/UpcomingVisits") // Adjust the import path if necessary
+  () => import("../../components/dashboard/UpcomingVisits")
 );
 
 const VisitsPage: React.FC = () => {
@@ -64,26 +62,18 @@ const VisitsPage: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const { t } = useTranslation();
-
   const { loading } = useLoadingData();
-
   const selectedVisitId = useAppSelector(
     (state: RootState) => state.data.selectedVisitId
   );
-
   const [isCreatingVisit, setIsCreatingVisit] = useState(false);
-
   const [isCreateVisitFormLoaded, setIsCreateVisitFormLoaded] = useState(false);
-
   const { handleVisitsRefresh } = useVisitSidebar();
-
-  // Get currentUser from Redux state
   const currentUser = useAppSelector(
     (state: RootState) => state.data.currentUserDetails
   );
   const userRole = currentUser?.role;
 
-  // Get selectedClientId from Redux state
   const selectedClientId = useAppSelector(
     (state: RootState) => state.data.selectedClientId
   );
@@ -247,8 +237,8 @@ const VisitsPage: React.FC = () => {
                   PaperProps={{
                     sx: {
                       width: 300,
-                      top: appBarHeight, // Push the drawer below the AppBar
-                      height: `calc(100% - ${appBarHeight}px)`, // Adjust the height
+                      top: appBarHeight,
+                      height: `calc(100% - ${appBarHeight}px)`,
                       borderTopRightRadius: 16,
                       borderBottomRightRadius: 16,
                       boxShadow: 3,
@@ -319,7 +309,7 @@ const VisitsPage: React.FC = () => {
                   sx={{
                     mb: 4,
                     px: 2,
-                    mt: isTablet && userRole !== "client" ? 6 : 0, // Adjust margin-top when toggle button is present
+                    mt: isTablet && userRole !== "client" ? 6 : 0,
                   }}
                 >
                   <Suspense fallback={<SkeletonCard />}>
@@ -386,7 +376,7 @@ const VisitsPage: React.FC = () => {
                       flexDirection: "column",
                       flexShrink: 0,
                       mb: 2,
-                      mt: isTablet ? 6 : 0, // Adjust margin-top when toggle button is present
+                      mt: isTablet ? 6 : 0,
                     }}
                     ref={clientDetailsRef}
                   >

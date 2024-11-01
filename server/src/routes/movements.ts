@@ -1,3 +1,4 @@
+//src/routes/movements.ts
 import express from "express";
 import { movementValidationRules } from "../constants/validationRules";
 import { MovementController } from "../controllers/movementController";
@@ -10,7 +11,6 @@ import { checkValidation } from "../middlewares/validate";
 
 const router = express.Router();
 
-// Middleware to authenticate and authorize user
 router.use(authenticateUser);
 
 // GET method to retrieve all movements

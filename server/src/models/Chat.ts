@@ -1,6 +1,6 @@
+//src/models/Chat.ts
 import { Document, Schema, Types, model } from "mongoose";
 
-// Updated IMessage interface
 export interface IMessage {
   _id: Types.ObjectId; // Server-generated unique identifier
   local_id?: string; // Optional client-generated identifier for matching
@@ -14,20 +14,17 @@ export interface IMessage {
   isUploading?: boolean; // Tracks if the message is still uploading
 }
 
-// New Attachment interface
 export interface Attachment {
   url: string;
-  type: "image" | "video" | "pdf" | "word" | "spreadsheet" |  "other";
+  type: "image" | "video" | "pdf" | "word" | "spreadsheet" | "other";
   fileName: string;
   size: number;
   chatId?: Types.ObjectId;
   messageId?: string; // Store `local_id` or `_id`
-  uploadProgress? : number;
-  status: 'pending' | 'uploading' | 'uploaded' | 'failed';
-
+  uploadProgress?: number;
+  status: "pending" | "uploading" | "uploaded" | "failed";
 }
 
-// Rest of the IChat interface remains the same
 export interface IChat extends Document {
   _id: Types.ObjectId;
   local_id?: string;
@@ -42,7 +39,6 @@ export interface IChat extends Document {
   status: "pending" | "created" | "failed";
 }
 
-// Updated messageSchema
 const messageSchema = new Schema<IMessage>(
   {
     _id: { type: Schema.Types.ObjectId, auto: true },
@@ -71,7 +67,11 @@ const messageSchema = new Schema<IMessage>(
     attachments: [
       {
         url: { type: String, required: true },
-        type: { type: String, enum: ["image", "video", "pdf", "word", "spreadsheet",  "other"], required: true },
+        type: {
+          type: String,
+          enum: ["image", "video", "pdf", "word", "spreadsheet", "other"],
+          required: true,
+        },
         fileName: { type: String, required: true },
         size: { type: Number, required: true },
         chatId: { type: Schema.Types.ObjectId, ref: "Chat" },
@@ -94,7 +94,6 @@ const messageSchema = new Schema<IMessage>(
   { _id: false }
 );
 
-// The rest of the chatSchema and indexes remain the same
 const chatSchema = new Schema<IChat>(
   {
     _id: { type: Schema.Types.ObjectId, auto: true },
@@ -122,7 +121,6 @@ const chatSchema = new Schema<IChat>(
   { timestamps: true }
 );
 
-// Indexes remain the same
 chatSchema.index(
   { type: 1, participants: 1 },
   { unique: true, partialFilterExpression: { type: "simple" } }

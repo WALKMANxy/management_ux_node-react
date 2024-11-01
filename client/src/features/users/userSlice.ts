@@ -1,4 +1,4 @@
-// src/store/slices/userSlice.ts
+// src/features/users/userSlice.ts
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WritableDraft } from "immer";
 import { createSelector } from "reselect";
@@ -9,8 +9,8 @@ import { userApi } from "./userQueries";
 
 // Define the initial state
 export interface UserState {
-  users: Record<string, Partial<User>>; // Mapping of userId to user data
-  currentUser: Partial<User> | null; // For logged-in user data
+  users: Record<string, Partial<User>>;
+  currentUser: Partial<User> | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
@@ -30,7 +30,7 @@ export const fetchUsersByIds = createAsyncThunk(
       const result = await getUsersByBatchIds(ids);
       return result;
     } catch (error) {
-      console.error("fetchUsersByIds error:", error); // Debugging: Log any errors
+      console.error("fetchUsersByIds error:", error);
       return rejectWithValue(
         error instanceof Error ? error.message : "Failed to fetch users"
       );
@@ -80,9 +80,8 @@ export const getAllUsersThunk = createAsyncThunk<User[], void>(
   "users/getAllUsersThunk",
   async (_, { rejectWithValue }) => {
     try {
-      // Call the getAllUsers function directly
       const result = await getAllUsers();
-      return result; // Return the array of users directly
+      return result;
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : "Failed to fetch users"
@@ -96,8 +95,8 @@ export const deleteUserByIdThunk = createAsyncThunk(
   "users/deleteUserById",
   async (id: string, { rejectWithValue }) => {
     try {
-      await deleteUserById(id); // Call the API to delete the user
-      return id; // Return the user ID to be removed from the state
+      await deleteUserById(id);
+      return id;
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : "Failed to delete user"
@@ -133,7 +132,7 @@ const userSlice = createSlice({
         state.status = "loading";
         state.error = null;
       })
-      // Updated fulfilled case for getAllUsersThunk
+
       .addCase(
         getAllUsersThunk.fulfilled,
         (state, action: PayloadAction<User[]>) => {
@@ -169,7 +168,6 @@ const userSlice = createSlice({
         state.status = "failed";
         state.error = action.payload as string;
       })
-      // Handle fetchUsersByIds
       .addCase(fetchUsersByIds.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -186,8 +184,6 @@ const userSlice = createSlice({
         state.status = "failed";
         state.error = action.payload as string;
       })
-
-      // Handle fetchUserById
       .addCase(fetchUserById.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -197,15 +193,13 @@ const userSlice = createSlice({
         const user = action.payload;
         if (user._id) {
           state.users[user._id] = user;
-          state.currentUser = user; // Optionally set the fetched user as current
+          state.currentUser = user;
         }
       })
       .addCase(fetchUserById.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
       })
-
-      // Handle updateUserById
       .addCase(updateUserById.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -216,7 +210,7 @@ const userSlice = createSlice({
         if (updatedUser._id) {
           state.users[updatedUser._id] = updatedUser;
           if (state.currentUser?._id === updatedUser._id) {
-            state.currentUser = updatedUser; // Update currentUser if applicable
+            state.currentUser = updatedUser;
           }
         }
       })
@@ -231,7 +225,7 @@ const userSlice = createSlice({
       .addCase(deleteUserByIdThunk.fulfilled, (state, action) => {
         state.status = "succeeded";
         const userId = action.payload;
-        delete state.users[userId]; // Remove the deleted user from the state
+        delete state.users[userId];
       })
       .addCase(deleteUserByIdThunk.rejected, (state, action) => {
         state.status = "failed";
@@ -247,7 +241,7 @@ export default userSlice.reducer;
 // Memoized selector to select a user by ID
 export const selectUserById = createSelector(
   [
-    (state: RootState) => state.users.users, // Adjust based on your state structure
+    (state: RootState) => state.users.users,
     (_: RootState, userId: string) => userId,
   ],
   (users, userId) => users[userId] as User | undefined
@@ -261,12 +255,8 @@ export const selectAllUsers = createSelector(
 
 export const selectUsersLoading = (state: RootState) =>
   state.users.status === "loading";
-
-// Replace with a simple selector
 export const selectUsersStatus = (state: RootState) => state.users.status;
 
-// Replace with a simple selector
 export const selectUsersError = (state: RootState) => state.users.error;
 
-// Selector to select the current user
 export const selectCurrentUser = (state: RootState) => state.users.currentUser;

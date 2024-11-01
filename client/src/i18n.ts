@@ -4,7 +4,6 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import resourcesToBackend from "i18next-resources-to-backend";
 import { initReactI18next } from "react-i18next";
 
-// Use import.meta.glob to load all translation files
 const translationFiles = import.meta.glob("./locales/**/**.json");
 
 i18n
@@ -32,10 +31,10 @@ i18n
   .init({
     fallbackLng: "en",
     debug: false,
-    ns: ["translation"], // Adjust this if you have different namespaces
+    ns: ["translation"],
     defaultNS: "translation",
     interpolation: {
-      escapeValue: false, // React already escapes by default
+      escapeValue: false, 
     },
     detection: {
       order: [

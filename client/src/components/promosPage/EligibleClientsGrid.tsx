@@ -8,7 +8,6 @@ import {
 } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Ensure this is imported
-
 import { AgGridReact } from "ag-grid-react";
 import React, { useCallback, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
@@ -179,8 +178,8 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
 
             boxShadow: `0px 4px 8px ${
               global ? "rgba(255, 165, 0, 0.4)" : "rgba(0, 128, 0, 0.4)"
-            }`, // Faint shadow color based on global state
-            borderRadius: "24px", // Optional: Add border-radius for smoother edges
+            }`,
+            borderRadius: "24px",
           }}
         >
           {global
@@ -254,15 +253,15 @@ const EligibleClientsGrid: React.FC<EligibleClientsGridProps> = ({
           </div>`}
           defaultColDef={{
             flex: 1,
-            floatingFilter: true, // Enable floating filters
+            floatingFilter: true,
             suppressHeaderMenuButton: true,
           }}
           suppressColumnVirtualisation={false}
           suppressAggFuncInHeader={true}
-          suppressPaginationPanel={true} // Add this line to hide the pagination panel
+          suppressPaginationPanel={true}
           animateRows={true}
           suppressMovableColumns={true}
-          selection={!isViewing ? selection : undefined} // Disable selection when in view mode
+          selection={!isViewing ? selection : undefined} 
         />
       </div>
     </Box>

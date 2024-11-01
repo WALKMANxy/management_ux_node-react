@@ -1,16 +1,14 @@
 // src/utils/activityUtils.ts
-
 import { VisitWithAgent } from "../features/promoVisits/promoVisitsSelectors";
 import { Client } from "../models/entityModels";
 import { calculateRevenue, currencyFormatter } from "./dataUtils";
-import { t } from "i18next"; // Make sure you import the i18next correctly.
+import { t } from "i18next";
 
-// Define the structure of an activity item
 export interface ActivityItem {
   id: string;
   type: "visits" | "sales" | "alerts";
   title: string;
-  time: number; // Use timestamp for efficient sorting
+  time: number; 
   details: string;
   subDetails?: string;
 }

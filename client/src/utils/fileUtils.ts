@@ -2,12 +2,6 @@
 
 export type AttachmentType = "image" | "pdf" | "word" | "excel" | "csv" | "other";
 
-/**
- * Maps a file extension to the corresponding AttachmentType.
- *
- * @param {string} extension - The file extension (e.g., "jpg", "pdf").
- * @returns {AttachmentType} The corresponding AttachmentType.
- */
 export const mapExtensionToAttachmentType = (extension: string): AttachmentType => {
   const ext = extension.toLowerCase();
   if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) return "image";

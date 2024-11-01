@@ -1,3 +1,4 @@
+//src/hooks/useLoadingData.ts
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { shallowEqual } from "react-redux";
@@ -14,8 +15,7 @@ import { selectCurrentUser } from "../features/users/userSlice";
 import { updateUserEntityNameIfMissing } from "../services/checkUserName";
 import { ensureEncryptionInitialized } from "../utils/cacheUtils";
 
-const timeMS = getTimeMs(); // Ensure this is set in your .env file
-
+const timeMS = getTimeMs();
 
 const useLoadingData = () => {
   const dispatch = useAppDispatch();
@@ -23,15 +23,13 @@ const useLoadingData = () => {
 
   const [localError, setLocalError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [retryCount, setRetryCount] = useState<number>(0); // Track retry attempts
+  const [retryCount, setRetryCount] = useState<number>(0);
   const [fakeLoading, setFakeLoading] = useState(true);
 
   const retryCountRef = useRef(retryCount);
   retryCountRef.current = retryCount;
 
   const toastId = "loadingDataToast";
-
-  // After Optimization
 
   const {
     clients,
@@ -66,7 +64,7 @@ const useLoadingData = () => {
         !currentUserDetails) &&
       retryCountRef.current < 5
     );
-  }, [status, clients, agents, currentUserData, currentUserDetails, role])
+  }, [status, clients, agents, currentUserData, currentUserDetails, role]);
 
   const fetchData = useCallback(async () => {
     try {
@@ -105,13 +103,13 @@ const useLoadingData = () => {
 
       if (retryCountRef.current < 5) {
         setRetryCount((prevCount) => prevCount + 1);
-        console.log(`Retry count incremented: ${retryCountRef.current + 1}`);
+        // console.log(`Retry count incremented: ${retryCountRef.current + 1}`);
       }
     } finally {
       setLoading(false);
       toast.dismiss(toastId);
     }
-  }, [dispatch,  currentUser, currentUserDetails, t]);
+  }, [dispatch, currentUser, currentUserDetails, t]);
 
   useEffect(() => {
     if (role !== "employee" && shouldFetchData) {
@@ -126,7 +124,7 @@ const useLoadingData = () => {
       }, 500);
 
       return () => {
-        console.log("Clearing retry timeout");
+        // console.log("Clearing retry timeout");
         clearTimeout(retryTimeout);
       };
     }

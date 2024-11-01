@@ -11,7 +11,6 @@ import {
 import React, { useMemo } from "react";
 
 const SkeletonDetails: React.FC = () => {
-
   const theme = useTheme();
   const isMobile = useMediaQuery("(max-width:600px)");
 
@@ -34,7 +33,7 @@ const SkeletonDetails: React.FC = () => {
       position: "relative" as const,
       overflowX: "hidden",
       "&::-webkit-scrollbar": {
-        display: "none", // Hide scrollbar
+        display: "none",
       },
       "&:after": {
         content: '""',

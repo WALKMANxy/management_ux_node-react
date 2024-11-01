@@ -32,7 +32,6 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
     const theme = useTheme();
     const isMobile = useMediaQuery("(max-width:600px)");
 
-    // Memoize the toggle function to avoid recreating it on every render
     const toggleCollapse = useMemo(
       () => () => {
         setMovementDetailsCollapsed(!isMovementDetailsCollapsed);
@@ -40,15 +39,13 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
       [isMovementDetailsCollapsed, setMovementDetailsCollapsed]
     );
 
-    // Calculate height based on expansion state and mobile view
     const height = useMemo(() => {
       if (isMobile) {
-        return isMovementDetailsCollapsed ? "100%" : 640 * 1.33; // Reduced by 25% when expanded
+        return isMovementDetailsCollapsed ? "100%" : 640 * 1.33;
       }
       return "100%";
     }, [isMobile, isMovementDetailsCollapsed]);
 
-    // Memoize styles to avoid recreating them on every render
     const paperStyles = useMemo(
       () => ({
         p: isMobile ? 0 : 3,
@@ -59,9 +56,9 @@ const MovementDetails = React.forwardRef<HTMLDivElement, MovementDetailsProps>(
         height,
         maxHeight: height,
         position: "relative" as const,
-        overflowX: "hidden", // Ensure no horizontal overflow
+        overflowX: "hidden",
         "&::-webkit-scrollbar": {
-          display: "none", // Hide scrollbar
+          display: "none",
         },
         "&:after": {
           content: '""',

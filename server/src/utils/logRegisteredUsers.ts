@@ -1,3 +1,4 @@
+//src/utils/logRegisteredUsers.ts
 import fs from "fs";
 import path from "path";
 import { IUser } from "../models/User";
@@ -42,7 +43,7 @@ export const logRegisteredUser = (user: IUser) => {
     logs.push(logEntry);
 
     writeFile(LOG_FILE_PATH, logs);
-    logger.info(`Log entry added to ${LOG_FILE_PATH}`);
+    logger.info(`Registered user entry added to ${LOG_FILE_PATH}`);
   } catch (err) {
     logger.error("Error reading or writing log file:", { error: err });
   }

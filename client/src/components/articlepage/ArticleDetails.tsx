@@ -1,3 +1,4 @@
+//src/components/articlepage/ArticleDetails.tsx
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
@@ -51,7 +52,7 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
     // Calculate height based on expansion state and mobile view
     const height = useMemo(() => {
       if (isMobile) {
-        return isArticleDetailsCollapsed ? "100%" : 740 * 1.33; // Adjust height when expanded
+        return isArticleDetailsCollapsed ? "100%" : 740 * 1.33;
       }
       return "100%";
     }, [isMobile, isArticleDetailsCollapsed]);
@@ -69,7 +70,7 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
         position: "relative" as const,
         overflowX: "hidden",
         "&::-webkit-scrollbar": {
-          display: "none", // Hide scrollbar
+          display: "none",
         },
         "&:after": {
           content: '""',
@@ -192,7 +193,7 @@ const ArticleDetails = React.forwardRef<HTMLDivElement, ArticleDetailsProps>(
             </Box>
           ) : (
             <Box sx={{ p: 2 }}>
-              {/* Placeholder or Empty State */}
+              {/* Placeholder */}
               <Typography
                 variant="body1"
                 color="textSecondary"

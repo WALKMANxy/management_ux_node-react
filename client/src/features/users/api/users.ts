@@ -1,3 +1,4 @@
+//src/features/users/api/users.ts
 import { User } from "../../../models/entityModels";
 import { apiCall } from "../../../utils/apiUtils";
 
@@ -16,7 +17,7 @@ export const updateUserById = async (
   return apiCall<User>(`users/${id}`, "PATCH", updatedData);
 };
 
-// New API call to fetch users by a batch of IDs
+// API call to fetch users by a batch of IDs
 export const getUsersByBatchIds = async (
   ids: string[]
 ): Promise<Partial<User>[]> => {
@@ -25,8 +26,8 @@ export const getUsersByBatchIds = async (
     const response = await apiCall<Partial<User>[]>(`users/batch`, "POST", { ids });
     return response;
   } catch (error) {
-    console.error("getUsersByBatchIds error:", error); // Debugging: Log any errors
-    throw error; // Re-throw the error to ensure it propagates correctly
+    console.error("getUsersByBatchIds error:", error);
+    throw error; 
   }
 };
 

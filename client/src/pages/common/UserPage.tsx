@@ -1,5 +1,4 @@
 // src/components/UserPage/UserPage.tsx
-
 import { Box, Divider, useMediaQuery } from "@mui/material";
 import React, { memo, Suspense, useState } from "react";
 import { Navigate } from "react-router-dom";
@@ -35,13 +34,11 @@ const UserPage: React.FC = () => {
   const [selectedSection, setSelectedSection] =
     useState<SelectedSection>("modify-account");
 
-  // If no user is logged in, redirect to login or another appropriate page
+  // If no user is logged in, redirect to login
   if (!currentUser || !currentUser._id) {
     return <Navigate to="/" replace />;
   }
 
-  // Render the appropriate component based on the selected section
-  // Render the appropriate component based on the selected section
   const renderSelectedSection = () => {
     switch (selectedSection) {
       case "modify-account":
@@ -85,15 +82,12 @@ const UserPage: React.FC = () => {
       <Box
         sx={{
           height: "100%",
-          position: "fixed", // Sidebar stays fixed in place
-          overflowY: "auto", // Scroll independently if needed
-          // Hide scrollbar for WebKit-based browsers (Chrome, Safari)
+          position: "fixed",
+          overflowY: "auto",
           "&::-webkit-scrollbar": {
             display: "none",
           },
-          // Hide scrollbar for Firefox
           scrollbarWidth: "none",
-          // Hide scrollbar for IE/Edge
           msOverflowStyle: "none",
           flexGrow: 1,
         }}
@@ -112,15 +106,15 @@ const UserPage: React.FC = () => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          minHeight: 0, // Allows to shrink properly
+          minHeight: 0,
 
           flexGrow: 1,
           bgcolor: "#f5f5f5",
           px: isMobile ? 1 : 3,
           pt: isMobile ? 3 : 3,
           pb: isMobile ? 4 : 0,
-          overflowY: "auto", // Always enable scrolling within main content area
-          overflowX: "hidden", // Prevent horizontal scrolling
+          overflowY: "auto",
+          overflowX: "hidden",
           scrollbarWidth: "none",
           msOverflowStyle: "none",
           ml: isMobile ? 0 : "240px",

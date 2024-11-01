@@ -1,5 +1,4 @@
 // src/utils/iconUtils.ts
-
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ArticleIcon from "@mui/icons-material/Article";
 import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';import Box from "@mui/material/Box";
@@ -46,8 +45,8 @@ export const getIconForFileType = (
       sx={{
         position: 'relative',
         display: 'inline-flex',
-        borderRadius: '8px', // Optional, to style the icon container
-        padding: '8px', // Optional, to add some padding around the icon
+        borderRadius: '8px',
+        padding: '8px', 
       }}
     >
       {IconComponent}

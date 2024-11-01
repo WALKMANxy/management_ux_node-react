@@ -1,4 +1,4 @@
-// VisitsSidebar.tsx
+//src/components/visitPage/VisitsSidebar.tsx
 import { Box, List, useTheme } from "@mui/material";
 import React, { useCallback } from "react";
 import { useVisitSidebar } from "../../hooks/useVisitSidebar";
@@ -7,7 +7,6 @@ import HeaderSidebar from "./HeaderSidebar";
 import SearchBarSidebar from "./SearchBarSidebar";
 import SidebarList from "./SidebarList";
 
-// types.ts
 export interface AgentCounts {
   hasPending: boolean;
   hasIncomplete: boolean;
@@ -82,12 +81,11 @@ const VisitsSidebar: React.FC = () => {
       <List
         sx={{
           height: isMobile ? "79vh" : "100dvh",
-          overflowY: "auto", // Enable vertical scrolling
-          // Hide scrollbar but allow scrolling
-          scrollbarWidth: "none", // Firefox
-          msOverflowStyle: "none", // IE 10+
+          overflowY: "auto",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
           "&::-webkit-scrollbar": {
-            display: "none", // Chrome, Safari, Opera
+            display: "none", 
           },
         }}
       >

@@ -1,5 +1,4 @@
-// hooks/useCalendar.ts
-
+// src/hooks/useCalendar.ts
 import dayjs from "dayjs";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { SlotInfo } from "react-big-calendar";
@@ -22,28 +21,29 @@ import { CalendarEvent, Visit } from "../models/dataModels";
 import { CreateEventPayload } from "../models/propsModels";
 import { showToast } from "../services/toastMessage";
 
+interface ApiError {
+  data?: {
+    message?: string;
+  };
+  message?: string;
+}
+
 export const useCalendar = () => {
   const [selectedDays, setSelectedDays] = useState<Date[]>([]);
   const [viewMode, setViewMode] = useState<"calendar" | "history">("calendar");
   const [openForm, setOpenForm] = useState(false);
-  const [currentDate, setCurrentDate] = useState<Date>(new Date()); // Centralized currentDate
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [allServerEvents, setAllServerEvents] = useState<CalendarEvent[]>([]);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedEvent, setSelectedEvent] =
     React.useState<CalendarEvent | null>(null);
-
   const currentMonth = currentDate.getMonth() + 1;
   const currentYear = currentDate.getFullYear();
-
   const userRole = useSelector(selectUserRole);
   const user = useAppSelector(selectCurrentUser);
-
-  // Get visits from the state
   const visits = useSelector(selectVisits);
-
-  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null); // State for editing
-
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const { t } = useTranslation();
 
   // RTK Query Mutations
@@ -60,13 +60,6 @@ export const useCalendar = () => {
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
-  interface ApiError {
-    data?: {
-      message?: string;
-    };
-    message?: string;
-  }
 
   const {
     data: adminEventsData,
@@ -95,7 +88,7 @@ export const useCalendar = () => {
           const idKey = event._id
             ? event._id
             : `${event.startDate}-${event.reason}`;
-          eventMap.set(idKey, event); // Use _id if available, else fallback to key
+          eventMap.set(idKey, event);
         });
 
         // Update the map with server events
@@ -103,7 +96,7 @@ export const useCalendar = () => {
           const idKey = newEvent._id
             ? newEvent._id
             : `${newEvent.startDate}-${newEvent.reason}`;
-          eventMap.set(idKey, newEvent); // Update or add the new event based on idKey
+          eventMap.set(idKey, newEvent);
         });
 
         // Convert the map back to an array
@@ -154,7 +147,7 @@ export const useCalendar = () => {
 
       // Check if the selected slot is in the past
       if (dayjs(slotInfo.start).isBefore(now, "day")) {
-        showToast.error(t("calendarHook.pastDateError")); // Toast message for past dates
+        showToast.error(t("calendarHook.pastDateError"));
         return;
       }
 
@@ -165,7 +158,7 @@ export const useCalendar = () => {
       }
 
       setSelectedDays([slotInfo.start, slotInfo.end]);
-      setEditingEvent(null); // Reset editingEvent
+      setEditingEvent(null);
       setOpenForm(true);
     },
     [userRole, t]
@@ -186,7 +179,7 @@ export const useCalendar = () => {
   };
 
   const handleEventPopoverClose = (event: React.MouseEvent | Event) => {
-    event.stopPropagation(); // Prevent the click from propagating to other elements
+    event.stopPropagation();
     setAnchorEl(null);
     setSelectedEvent(null);
   };
@@ -198,9 +191,9 @@ export const useCalendar = () => {
     }
 
     // Debugging: Log the start and end dates before submission
-    console.log("Submitting Event:");
+    /* console.log("Submitting Event:");
     console.log("Start Date (before submission):", data.startDate);
-    console.log("End Date (before submission):", data.endDate);
+    console.log("End Date (before submission):", data.endDate); */
 
     try {
       if (editingEvent && editingEvent._id) {
@@ -211,8 +204,8 @@ export const useCalendar = () => {
             eventType: data.eventType,
             reason: data.reason as CalendarEvent["reason"],
             note: data.note?.trim() || undefined,
-            startDate: data.startDate, // Include startDate
-            endDate: data.endDate,     // Include endDate
+            startDate: data.startDate,
+            endDate: data.endDate,
           },
         };
 
@@ -279,21 +272,18 @@ export const useCalendar = () => {
   );
 
   // Handle editing an event
-  const handleEditEvent = useCallback(
-    (event: CalendarEvent) => {
-      handlePopoverClose();
-      setEditingEvent(event);
-      setSelectedDays([new Date(event.startDate), new Date(event.endDate)]);
-      setOpenForm(true);
-      console.log("Opening form for editing event", event);
-    },
-    []
-  );
+  const handleEditEvent = useCallback((event: CalendarEvent) => {
+    handlePopoverClose();
+    setEditingEvent(event);
+    setSelectedDays([new Date(event.startDate), new Date(event.endDate)]);
+    setOpenForm(true);
+    console.log("Opening form for editing event", event);
+  }, []);
 
   const handleFormCancel = () => {
     setOpenForm(false);
     setSelectedDays([]);
-    setEditingEvent(null); // Clear any currently editing event to reset the form
+    setEditingEvent(null);
   };
 
   const toggleViewMode = () => {
@@ -308,7 +298,6 @@ export const useCalendar = () => {
 
   // Combine serverEvents and visitEvents
   const combinedEvents: CalendarEvent[] = useMemo(() => {
-    // Combine and eliminate duplicates if necessary
     return [...allServerEvents, ...visitEvents];
   }, [allServerEvents, visitEvents]);
 
@@ -360,9 +349,9 @@ export const useCalendar = () => {
 
   const handleGoToVisit = (event: CalendarEvent) => {
     if (event.eventType === "visit") {
-      dispatch(selectClient(event.visitClientId!)); // Select client
-      dispatch(selectVisit(event._id!)); // Select visit
-      navigate("/visits"); // Navigate to /visits
+      dispatch(selectClient(event.visitClientId!));
+      dispatch(selectVisit(event._id!));
+      navigate("/visits");
     }
   };
 
@@ -386,8 +375,8 @@ export const useCalendar = () => {
     toggleViewMode,
     scrollToTime,
     isCreating,
-    isEditing, // Loading state for editing
-    isDeleting, // Loading state for deleting
+    isEditing,
+    isDeleting,
     currentDate,
     setCurrentDate,
     anchorEl,
@@ -396,8 +385,8 @@ export const useCalendar = () => {
     deletingError,
     selectedEvent,
     handlePopoverClose,
-    handleEditEvent, // Expose edit handler
-    handleDeleteEvent, // Expose delete handler
+    handleEditEvent,
+    handleDeleteEvent,
     editingEvent,
   };
 };

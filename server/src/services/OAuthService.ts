@@ -1,3 +1,4 @@
+//src/services/OAuthService.ts
 import axios from "axios";
 import { Credentials, OAuth2Client } from "google-auth-library";
 import { config } from "../config/config";
@@ -7,13 +8,17 @@ import { GoogleUserInfo } from "../models/types";
 export class OAuthService {
   private static oauth2Client = new OAuth2Client(
     config.googleClientId,
-    config.googleClientSecret,
-    config.redirectUri
+    config.googleClientSecret
   );
+
+  private static redirectUri = `${config.appUrl}/auth/google/callback`;
 
   static async getToken(code: string): Promise<Credentials> {
     try {
-      const { tokens } = await this.oauth2Client.getToken(code);
+      const { tokens } = await this.oauth2Client.getToken({
+        code,
+        redirect_uri: this.redirectUri,
+      });
       if (!tokens || !tokens.access_token) {
         throw new Error("Failed to obtain access token");
       }

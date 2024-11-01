@@ -3,17 +3,17 @@ import { MonthlyData, Movement } from "./dataModels";
 export type UserRole = "admin" | "agent" | "client" | "employee" | "guest";
 
 export type User = {
-  _id: string; // Corresponds to MongoDB's _id
+  _id: string;
   email: string;
   googleId?: string;
-  password?: string; // Optional for OAuth users
-  passwordResetToken?: string; // Optional for password reset
-  passwordResetExpires?: Date; // Optional for password reset
+  password?: string;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
   role: UserRole;
-  entityCode: string; // Code linking to admin, agent, or client
+  entityCode: string;
   entityName?: string;
   avatar?: string;
-  authType: "email" | "google"; // New field to distinguish authentication type
+  authType: "email" | "google";
   isEmailVerified?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -36,7 +36,7 @@ export interface Employee {
 export type Client = {
   id: string;
   name: string;
-  extendedName?: string; // New property
+  extendedName?: string;
   province?: string;
   phone?: string;
   totalOrders: number;
@@ -45,15 +45,15 @@ export type Client = {
   unpaidRevenue: string;
   address?: string;
   email?: string;
-  pec?: string; // New property
-  taxCode?: string; // New property
-  extendedTaxCode?: string; // New property
-  paymentMethodID?: string; // New property
-  paymentMethod?: string; // New property
+  pec?: string;
+  taxCode?: string;
+  extendedTaxCode?: string;
+  paymentMethodID?: string;
+  paymentMethod?: string;
   agent: string;
   agentName?: string;
   movements: Movement[];
-  monthlyData: { [monthYear: string]: MonthlyData }; // Added
+  monthlyData: { [monthYear: string]: MonthlyData };
   colour?: string;
   agentData?: Agent[];
 };

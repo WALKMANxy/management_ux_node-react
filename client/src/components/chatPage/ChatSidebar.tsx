@@ -1,5 +1,4 @@
 // src/components/chatPage/ChatSidebar.tsx
-
 import AddIcon from "@mui/icons-material/Add";
 import ChatIcon from "@mui/icons-material/Chat";
 import ContactsIcon from "@mui/icons-material/Contacts";
@@ -34,9 +33,8 @@ import ContactsList from "./ContactsList";
 const CreateChatForm = lazy(() => import("./CreateChatForm"));
 
 const ChatSidebar: React.FC = () => {
+  //  console.log("ChatList rendering now");
 
-/*   console.log("ChatList rendering now");
- */
 
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
@@ -69,27 +67,26 @@ const ChatSidebar: React.FC = () => {
     ? "animate__fadeInLeft animate_faster"
     : animationClass;
 
-// Inside ChatSidebar component
-const toggleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const toggleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-const handleToggleContacts = useCallback(() => {
-  // Apply fadeOut animation
-  setAnimationClass("animate__fadeOut");
-  // After fadeOut, toggle the view and apply fadeIn
-  toggleTimeoutRef.current = setTimeout(() => {
-    setShowContacts((prev) => !prev);
-    setAnimationClass("animate__fadeIn");
-    toggleTimeoutRef.current = null;
-  }, 50); // Duration should match the animation duration
-}, []);
+  const handleToggleContacts = useCallback(() => {
+    // Apply fadeOut animation
+    setAnimationClass("animate__fadeOut");
+    // After fadeOut, toggle the view and apply fadeIn
+    toggleTimeoutRef.current = setTimeout(() => {
+      setShowContacts((prev) => !prev);
+      setAnimationClass("animate__fadeIn");
+      toggleTimeoutRef.current = null;
+    }, 50);
+  }, []);
 
-useEffect(() => {
-  return () => {
-    if (toggleTimeoutRef.current) {
-      clearTimeout(toggleTimeoutRef.current);
-    }
-  };
-}, []);
+  useEffect(() => {
+    return () => {
+      if (toggleTimeoutRef.current) {
+        clearTimeout(toggleTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!contactsFetched) {
@@ -249,13 +246,10 @@ useEffect(() => {
         sx={{
           flex: 1,
           overflowY: "auto",
-          // Hide the scrollbar
           "&::-webkitScrollbar": {
             display: "none",
           },
-          // For Firefox
           scrollbarWidth: "none",
-          // For IE and Edge
           MsOverflowStyle: "none",
         }}
       >

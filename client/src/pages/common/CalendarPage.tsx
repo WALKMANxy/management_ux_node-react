@@ -1,5 +1,4 @@
 // src/pages/CalendarPage.tsx
-
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import {
@@ -10,7 +9,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import "animate.css"; // Add animate.css
+import "animate.css";
 import React, { Fragment, memo, Suspense, useEffect, useState } from "react";
 import { Calendar } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -28,7 +27,7 @@ import { useCalendarWithHolidays } from "../../hooks/useCalendarWithHolidays";
 import { CalendarEvent } from "../../models/dataModels";
 import { localizer } from "../../services/localizer";
 import { showToast } from "../../services/toastMessage";
-import "./CalendarPage.css"; // Import the CSS file
+import "./CalendarPage.css";
 
 const EventHistory = React.lazy(
   () => import("../../components/calendarPage/EventHistory")
@@ -40,7 +39,7 @@ const CalendarPage: React.FC = () => {
   const {
     viewMode,
     openForm,
-    serverEvents, // Now directly reflects combined events
+    serverEvents,
     isServerLoading,
     serverError,
     handleSelectSlot,
@@ -55,8 +54,8 @@ const CalendarPage: React.FC = () => {
     anchorEl,
     selectedEvent,
     handlePopoverClose,
-    handleEditEvent, // Exposed edit handler
-    handleDeleteEvent, // Exposed delete handler
+    handleEditEvent,
+    handleDeleteEvent,
     isEditing,
     editingEvent,
     handleEventPopoverClose,
@@ -67,13 +66,9 @@ const CalendarPage: React.FC = () => {
 
   const { holidayEvents, isHolidaysLoading, holidaysError } =
     useCalendarWithHolidays(currentDate);
-
   const userRole = useSelector(selectCurrentUser)?.role;
-
   const theme = useTheme();
-
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
   const [confirmDelete, setConfirmDelete] = useState<CalendarEvent | null>(
     null
   );
@@ -86,8 +81,7 @@ const CalendarPage: React.FC = () => {
     if (!serverError && !holidaysError && serverEvents && holidayEvents) {
       // Both fetches succeeded, merge the events
       setDisplayEvents([...serverEvents, ...holidayEvents]);
-      /*       console.log("Merged Events:", [...serverEvents, ...holidayEvents]);
-       */
+      // console.log("Merged Events:", [...serverEvents, ...holidayEvents]);
     } else if (serverError && !holidaysError && holidayEvents) {
       // Server events failed, show only holiday events
       setDisplayEvents(holidayEvents);
@@ -126,7 +120,6 @@ const CalendarPage: React.FC = () => {
     setConfirmDelete(event);
   };
 
-  // Optional: Show a loading spinner
   if (isLoading) {
     return <Loader fadeout />;
   }
@@ -189,7 +182,7 @@ const CalendarPage: React.FC = () => {
         </Typography>
         <IconButton
           onClick={toggleViewMode}
-          sx={{ color: "black" }} // Override color to black
+          sx={{ color: "black" }}
           aria-label="toggle view"
         >
           {viewMode === "calendar" ? <ViewListIcon /> : <CalendarTodayIcon />}
@@ -221,7 +214,7 @@ const CalendarPage: React.FC = () => {
               step={60}
               showMultiDayTimes
               defaultView="month"
-              dayPropGetter={dayPropGetter} // Apply the dayPropGetter
+              dayPropGetter={dayPropGetter}
               eventPropGetter={() => ({
                 style: {
                   backgroundColor: "transparent",
@@ -235,7 +228,7 @@ const CalendarPage: React.FC = () => {
                     setCurrentDate={setCurrentDate}
                   />
                 ),
-                event: CalendarEventComponent, // Use the custom event component
+                event: CalendarEventComponent,
               }}
             />
           </Paper>
@@ -252,20 +245,19 @@ const CalendarPage: React.FC = () => {
               events={displayEvents}
               userRole={userRole!}
               handleDeleteEvent={handleDeleteEventWithConfirmation}
-              handleApproveEvent={handleApprove} // Passed as prop
-              handleRejectEvent={handleReject} // Passed as prop
-              handleEditEvent={handleEditEvent} // Passed as prop
-              openForm={openForm} // Passed as prop
-              handleFormSubmit={handleFormSubmit} // Passed as prop
-              handleFormCancel={handleFormCancel} // Passed as prop
-              isCreating={isCreating} // Passed as prop
-              selectedDays={selectedDays} // Passed as prop
-              isLoading={isLoading} // Passed as prop
+              handleApproveEvent={handleApprove}
+              handleRejectEvent={handleReject}
+              handleEditEvent={handleEditEvent}
+              openForm={openForm}
+              handleFormSubmit={handleFormSubmit}
+              handleFormCancel={handleFormCancel}
+              isCreating={isCreating}
+              selectedDays={selectedDays}
+              isLoading={isLoading}
             />
           </Suspense>
         </Box>
       )}
-
       {/* EventForm is now controlled by CalendarPage */}
       <EventForm
         key={editingEvent ? editingEvent._id : "new-event"}
@@ -276,7 +268,6 @@ const CalendarPage: React.FC = () => {
         isSubmitting={isCreating || isEditing}
         initialData={editingEvent}
       />
-
       {/* PopOverEvent Component */}
       {selectedEvent && (
         <PopOverEvent
@@ -285,10 +276,10 @@ const CalendarPage: React.FC = () => {
           handleClose={handleEventPopoverClose}
           event={selectedEvent}
           userRole={userRole!}
-          onEdit={handleEditEvent} // Connect to edit handler
-          onDelete={handleDeleteEventWithConfirmation} // Connect to delete handler with confirmation
-          onApprove={handleApprove} // Connect to approve handler
-          onReject={handleReject} // Connect to reject handler
+          onEdit={handleEditEvent}
+          onDelete={handleDeleteEventWithConfirmation}
+          onApprove={handleApprove}
+          onReject={handleReject}
         />
       )}
       {/* Confirm Delete Dialog */}

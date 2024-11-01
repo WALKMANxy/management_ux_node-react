@@ -12,17 +12,12 @@ export const useVisitsPage = () => {
   const dispatch = useAppDispatch();
 
   const [isCreatingVisit, setIsCreatingVisit] = useState(false);
-  const [isEditing, setIsEditing] = useState(false); // Centralize isEditing
-
-  // Get currentUser from Redux state
+  const [isEditing, setIsEditing] = useState(false);
   const currentUser = useAppSelector(
     (state: RootState) => state.data.currentUserDetails
   );
   const userRole = currentUser?.role;
-
   const currentUserId = currentUser?.id;
-
-  // Get selectedClientId from Redux state
   const selectedClientId = useAppSelector(
     (state: RootState) => state.data.selectedClientId
   );
@@ -30,13 +25,9 @@ export const useVisitsPage = () => {
   const selectedVisitId = useAppSelector(
     (state: RootState) => state.data.selectedVisitId
   );
-
-  // State variables for collapsible containers
   const [isClientDetailsCollapsed, setIsClientDetailsCollapsed] =
     useState(false);
   const [isVisitsTableCollapsed, setIsVisitsTableCollapsed] = useState(false); // Open by default
-
-  // Refs for scrolling
   const createVisitFormRef = useRef<HTMLDivElement>(null);
   const editVisitFormRef = useRef<HTMLDivElement>(null);
 
@@ -57,7 +48,7 @@ export const useVisitsPage = () => {
       // If a visit was selected, clear it
       if (selectedVisitId) {
         dispatch(clearSelectedVisit());
-        setIsEditing(false); // Ensure we're not in editing mode
+        setIsEditing(false);
       }
     }
   }, [isCreatingVisit, dispatch, selectedVisitId]);

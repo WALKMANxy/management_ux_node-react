@@ -24,13 +24,13 @@ const DailyForecastItem: React.FC<DailyForecastItemProps> = ({
         flexDirection: "column",
         alignItems: "center",
         padding: isMobile ? "4px" : "20px",
-        border: "0.5px solid #ddd", // Light gray border
-        borderRadius: "8px", // Rounded corners
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow
-        backgroundColor: "rgba(255,255,255,0.05)", // Background color
+        border: "0.5px solid #ddd",
+        borderRadius: "8px",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        backgroundColor: "rgba(255,255,255,0.05)",
         "&:hover": {
           transform: "scale(1.05)",
-          transition: "transform 0.2s ease-in", // Slight zoom on hover with ease-in
+          transition: "transform 0.2s ease-in",
         },
       }}
     >

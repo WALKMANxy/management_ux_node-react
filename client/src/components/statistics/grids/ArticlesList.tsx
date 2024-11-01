@@ -29,7 +29,7 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
   isArticleListCollapsed,
   setArticleListCollapsed,
   isMobile,
-  articleDetailsRef, // Add the articleDetailsRef prop
+  articleDetailsRef,
 }) => {
   const { t } = useTranslation();
 
@@ -59,7 +59,7 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
       >
         <Typography
           variant="h4"
-          sx={{ pl: 2, pt: isMobile ? 0 : 2, mb: isMobile ? -2 : -6, }}
+          sx={{ pl: 2, pt: isMobile ? 0 : 2, mb: isMobile ? -2 : -6 }}
         >
           {t("articleList.title")}
         </Typography>
@@ -87,7 +87,7 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
         sx={{ pt: isMobile ? 0 : 0, pb: 4 }}
       >
         <Box sx={{ p: 2, pt: 0 }}>
-        <Box
+          <Box
             sx={{
               display: "flex",
               flexDirection: isMobile ? "column" : "row",
@@ -135,7 +135,7 @@ const ArticlesList: React.FC<ArticlesListProps> = ({
             ref={gridRef}
             columnDefs={memoizedColumnDefs}
             rowData={filteredArticles}
-            paginationPageSize={100} // Adjusted to a more manageable number
+            paginationPageSize={100} 
             quickFilterText={quickFilterText}
           />
         </Box>

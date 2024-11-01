@@ -1,3 +1,4 @@
+// src/components/landingPage/PasswordReset.tsx
 import {
   Alert,
   Box,
@@ -8,7 +9,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   requestPasswordReset,
@@ -24,16 +25,19 @@ interface PasswordResetProps {
 const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState<string>("".padStart(6, ""));
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [step, setStep] = useState(1); // Track the current step of the flow
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
     "success"
   );
-  const [passwordErrors, setPasswordErrors] = useState<string[]>([]); // State for password validation errors
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+
+  // Create refs for each of the 6 input fields
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const validatePassword = (password: string) => {
     const errors: string[] = [];
@@ -60,7 +64,11 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
       await requestPasswordReset(email);
       setAlertMessage(t("auth.resetCodeSent"));
       setAlertSeverity("success");
-      setStep(2); // Move to the code verification step
+      setStep(2);
+      // Focus the first input of the code
+      setTimeout(() => {
+        inputRefs.current[0]?.focus();
+      }, 100);
     } catch {
       setAlertMessage(t("auth.requestResetFailed"));
       setAlertSeverity("error");
@@ -75,7 +83,7 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
       await verifyResetCode(email, code);
       setAlertMessage(t("auth.codeVerified"));
       setAlertSeverity("success");
-      setStep(3); // Move to the password update step
+      setStep(3);
     } catch {
       setAlertMessage(t("auth.invalidCode"));
       setAlertSeverity("error");
@@ -100,12 +108,71 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
       setAlertMessage(t("auth.passwordUpdated"));
       setAlertSeverity("success");
       showToast.info(t("auth.passwordUpdatedToast"));
-      setTimeout(onClose, 3000); // Close modal after success message
+      setTimeout(onClose, 3000);
     } catch {
       setAlertMessage(t("auth.updatePasswordFailed"));
       setAlertSeverity("error");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCodeChange = (value: string, index: number) => {
+    // Allow only alphanumeric characters
+    const sanitizedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+
+    const newCode = code.split("");
+    newCode[index] = sanitizedValue.charAt(0) || "";
+    setCode(newCode.join(""));
+
+    if (sanitizedValue && index < 5) {
+      // Move focus to next input
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  // Handle key down events for backspace navigation
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    index: number
+  ) => {
+    if (e.key === "Backspace") {
+      if (code[index]) {
+        // If current input has a value, clear it
+        const newCode = code.split("");
+        newCode[index] = "";
+        setCode(newCode.join(""));
+      } else if (index > 0) {
+        // Move to previous input if empty
+        inputRefs.current[index - 1]?.focus();
+        const newCode = code.split("");
+        newCode[index - 1] = "";
+        setCode(newCode.join(""));
+      }
+      e.preventDefault();
+    } else if (e.key === "ArrowLeft" && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+      e.preventDefault();
+    } else if (e.key === "ArrowRight" && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+      e.preventDefault();
+    }
+  };
+
+  // Handle paste event to allow pasting the entire code
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pasteData = e.clipboardData.getData("Text").trim().toUpperCase();
+    if (/^[A-Z0-9]{6}$/.test(pasteData)) {
+      setCode(pasteData);
+      // Populate all input fields
+      pasteData.split("").forEach((char, idx) => {
+        if (inputRefs.current[idx]) {
+          inputRefs.current[idx]!.value = char;
+        }
+      });
+      // Focus the last input
+      inputRefs.current[5]?.focus();
+      e.preventDefault();
     }
   };
 
@@ -205,10 +272,13 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
             {[...Array(6)].map((_, index) => (
               <TextField
                 key={index}
+                inputRef={(el) => (inputRefs.current[index] = el)}
                 inputProps={{
                   maxLength: 1,
                   sx: {
                     textAlign: "center",
+                    fontSize: "1.5rem",
+                    textTransform: "uppercase",
                   },
                 }}
                 variant="outlined"
@@ -217,14 +287,13 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ onClose }) => {
                   textAlign: "center",
                   borderRadius: "12px",
                 }}
-                onChange={(e) =>
-                  setCode(
-                    (prev) =>
-                      prev.slice(0, index) +
-                      e.target.value +
-                      prev.slice(index + 1)
-                  )
-                }
+                value={code[index] || ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  handleCodeChange(value, index);
+                }}
+                onKeyDown={(e) => handleKeyDown(e, index)}
+                onPaste={handlePaste}
               />
             ))}
           </Box>

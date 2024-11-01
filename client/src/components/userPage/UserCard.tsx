@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import DeleteIcon from "@mui/icons-material/Delete"; // Icon for delete button
+//src/components/userPage/UserCard.tsx
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   Avatar,
   Box,
@@ -19,7 +20,6 @@ import { styled } from "@mui/material/styles";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-// Define styled components for better maintainability
 const CardContainer = styled(Box)(
   ({ theme, isnew }: { theme: any; isnew: string }) => ({
     display: "flex",
@@ -33,7 +33,7 @@ const CardContainer = styled(Box)(
     width: "100%",
     maxWidth: 400,
     transition: "box-shadow 0.3s, background-color 0.3s",
-    position: "relative", // For positioning the delete button
+    position: "relative",
   })
 );
 
@@ -59,7 +59,6 @@ const Value = styled(Typography)(({ theme }) => ({
   marginBottom: theme.spacing(0.5),
 }));
 
-// Define the interface for props
 interface UserCardProps {
   email: string;
   avatar?: string;
@@ -68,19 +67,18 @@ interface UserCardProps {
     code?: string;
     name?: string;
   };
-  userId?: string; // New prop for user._id
-  isnew?: string; // Indicates if this is a new entity
-  onDeleteUser: (id: string) => void; // Function to call when deleting user
+  userId?: string;
+  isnew?: string;
+  onDeleteUser: (id: string) => void;
 }
 
-// Functional Component with React.memo for performance optimization
 const UserCard: React.FC<UserCardProps> = React.memo(
   ({ email, avatar, details, userId, isnew = "false", onDeleteUser }) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const { t } = useTranslation();
 
-    const [open, setOpen] = useState(false); // State to manage dialog open/close
+    const [open, setOpen] = useState(false);
 
     const handleDeleteClick = () => {
       setOpen(true);
@@ -92,7 +90,7 @@ const UserCard: React.FC<UserCardProps> = React.memo(
 
     const handleConfirmDelete = () => {
       if (userId) {
-        onDeleteUser(userId); // Call the delete function with userId
+        onDeleteUser(userId);
         setOpen(false);
       } else {
         return;
@@ -106,14 +104,14 @@ const UserCard: React.FC<UserCardProps> = React.memo(
           theme={theme}
           sx={{
             borderRadius: 6,
-            transform: isMobile ? "scale(0.75)" : "none", // Apply scale for mobile
-            transformOrigin: "top left", // Anchor the scale to the top-left corner
+            transform: isMobile ? "scale(0.75)" : "none",
+            transformOrigin: "top left",
             width: isMobile ? "133.33%" : "100%",
           }}
         >
           {/* User Avatar */}
           <Avatar
-            src={avatar || "/default-avatar.png"} // Use user's avatar or fallback to default
+            src={avatar || "/default-avatar.png"}
             alt={t("userCard.avatarAlt", "Avatar for") + ` ${email}`}
             sx={{ borderRadius: 2, width: 56, height: 56 }}
           />
@@ -155,7 +153,7 @@ const UserCard: React.FC<UserCardProps> = React.memo(
                 position: "absolute",
                 bottom: 10,
                 right: 10,
-                backgroundColor: "rgba(255, 0, 0, 0.1)", // Faint red background
+                backgroundColor: "rgba(255, 0, 0, 0.1)",
                 "&:hover": {
                   backgroundColor: "rgba(255, 0, 0, 0.2)",
                 },
@@ -188,7 +186,7 @@ const UserCard: React.FC<UserCardProps> = React.memo(
               onClick={handleConfirmDelete}
               sx={{
                 color: "black",
-                backgroundColor: "rgba(255, 0, 0, 0.1)", // Faint red background
+                backgroundColor: "rgba(255, 0, 0, 0.1)",
                 "&:hover": {
                   backgroundColor: "rgba(255, 0, 0, 0.2)",
                 },
@@ -201,7 +199,7 @@ const UserCard: React.FC<UserCardProps> = React.memo(
               sx={{
                 color: "black",
 
-                backgroundColor: "rgba(128, 128, 128, 0.1)", // Faint gray background
+                backgroundColor: "rgba(128, 128, 128, 0.1)",
                 "&:hover": {
                   backgroundColor: "rgba(128, 128, 128, 0.2)",
                 },

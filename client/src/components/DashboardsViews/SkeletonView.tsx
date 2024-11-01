@@ -36,10 +36,9 @@ const ClientViewSkeleton: React.FC = () => {
               zIndex: 1000,
             }}
             aria-label="Skeleton"
-            />
+          />
         )}
       </Box>
-
       <Grid container spacing={2}>
         <Grid item xs={12} md={4}>
           <Skeleton
@@ -49,7 +48,7 @@ const ClientViewSkeleton: React.FC = () => {
             height={300}
             sx={{ borderRadius: "12px" }}
             aria-label="Skeleton"
-            />
+          />
         </Grid>
         <Grid item xs={12} md={4}>
           <Skeleton
@@ -59,7 +58,7 @@ const ClientViewSkeleton: React.FC = () => {
             height={300}
             sx={{ borderRadius: "12px" }}
             aria-label="Skeleton"
-            />
+          />
         </Grid>
         <Grid item xs={12} md={4}>
           <Skeleton
@@ -69,7 +68,7 @@ const ClientViewSkeleton: React.FC = () => {
             height={300}
             sx={{ borderRadius: "12px" }}
             aria-label="Skeleton"
-            />
+          />
         </Grid>
         <Grid item xs={12} md={6}>
           <Skeleton
@@ -79,7 +78,7 @@ const ClientViewSkeleton: React.FC = () => {
             height={300}
             sx={{ borderRadius: "12px" }}
             aria-label="Skeleton"
-            />
+          />
         </Grid>
         <Grid item xs={12} md={6}>
           <Skeleton
@@ -89,7 +88,7 @@ const ClientViewSkeleton: React.FC = () => {
             height={300}
             sx={{ borderRadius: "12px" }}
             aria-label="Skeleton"
-            />
+          />
         </Grid>
       </Grid>
       <Box pt={2.5}>
@@ -102,7 +101,6 @@ const ClientViewSkeleton: React.FC = () => {
           aria-label="Skeleton"
         />
       </Box>
-
       {/* Skeleton FAB */}
       <Skeleton
         animation="wave"
@@ -117,7 +115,7 @@ const ClientViewSkeleton: React.FC = () => {
           zIndex: 1300,
         }}
         aria-label="Skeleton"
-        />
+      />
     </Box>
   );
 };

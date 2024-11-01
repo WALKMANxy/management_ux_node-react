@@ -1,3 +1,4 @@
+//src/components/chatPage/UserList.tsx
 import {
   Checkbox,
   Table,
@@ -27,7 +28,7 @@ const UserList: React.FC<UserListProps> = ({
   const { t } = useTranslation();
   const theme = useTheme();
 
-  // Convert users object to array and filter out current user if necessary
+  // Convert users object to array and filter out current user
   const userArray = useMemo(
     () => Object.values(users).filter((user) => user._id !== currentUserId),
     [users, currentUserId]
@@ -44,7 +45,7 @@ const UserList: React.FC<UserListProps> = ({
       case "client":
         return "rgba(255, 255, 0, 0.2)"; // Faint yellow
       default:
-        return ""; // No color
+        return "";
     }
   };
 
@@ -52,10 +53,10 @@ const UserList: React.FC<UserListProps> = ({
     <TableContainer
       sx={{
         maxHeight: 300,
-        overflowY: "auto", // Enable vertical scrolling
-        scrollbarWidth: "none", // Hide scrollbar in Firefox
+        overflowY: "auto",
+        scrollbarWidth: "none",
         "&::-webkit-scrollbar": {
-          display: "none", // Hide scrollbar in WebKit-based browsers
+          display: "none",
         },
       }}
     >
@@ -66,7 +67,7 @@ const UserList: React.FC<UserListProps> = ({
       >
         <TableBody>
           {userArray.map((user) => {
-            if (!user._id) return null; // Skip users without an ID
+            if (!user._id) return null;
 
             return (
               <TableRow
@@ -82,7 +83,7 @@ const UserList: React.FC<UserListProps> = ({
                 selected={user._id ? selectedUserIds.includes(user._id) : false}
                 sx={{
                   cursor: "pointer",
-                  backgroundColor: getRowColor(user.role), // Apply color based on role
+                  backgroundColor: getRowColor(user.role),
                   "&.Mui-selected": {
                     backgroundColor: theme.palette.action.selected,
                   },

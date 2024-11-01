@@ -1,12 +1,14 @@
 // src/hooks/useUserDetails.ts
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useInView } from "react-intersection-observer";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { loadAdminDetailsData } from "../features/data/api/admins";
 import { getAllEmployees } from "../features/data/api/employees";
-import { deleteUserByIdThunk, updateUserById } from "../features/users/userSlice";
+import {
+  deleteUserByIdThunk,
+  updateUserById,
+} from "../features/users/userSlice";
 import {
   Admin,
   Agent,
@@ -21,14 +23,10 @@ const useUserDetails = (user: Partial<User>) => {
   const clients = useAppSelector((state) => state.data.clients);
   const agents = useAppSelector((state) => state.data.agents);
   const { t } = useTranslation();
-
   const dispatch = useAppDispatch();
-
   const [admins, setAdmins] = useState<Admin[]>([]);
-  const [employees, setEmployees] = useState<Employee[]>([]); // New state for employees
-
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [role, setRole] = useState<UserRole>(user.role || "guest");
-
   const [entitySearchText, setEntitySearchText] = useState("");
   const [selectedEntity, setSelectedEntity] = useState<
     Client | Agent | Admin | Employee | null
@@ -37,8 +35,8 @@ const useUserDetails = (user: Partial<User>) => {
   const [loading, setLoading] = useState(false);
   const { ref, inView } = useInView({ triggerOnce: false, threshold: 0.1 });
   const [visibleRows, setVisibleRows] = useState(20);
-  const [alertMessage, setAlertMessage] = useState<string | null>(null); // New state for alert messages
-  const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(); // New state for alert severity
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertSeverity, setAlertSeverity] = useState<"success" | "error">();
 
   // Fetch admins only once when the component mounts
   useEffect(() => {
@@ -47,8 +45,8 @@ const useUserDetails = (user: Partial<User>) => {
     // Load both admins and employees in parallel
     Promise.all([loadAdminDetailsData(), getAllEmployees()])
       .then(([adminData, employeeData]) => {
-        setAdmins(adminData); // Store fetched admins
-        setEmployees(employeeData); // Store fetched employees
+        setAdmins(adminData);
+        setEmployees(employeeData);
         setLoadingEntities(false);
       })
       .catch((error: Error) => {
@@ -84,7 +82,7 @@ const useUserDetails = (user: Partial<User>) => {
         return sortedClients;
       case "agent":
         return sortedAgents;
-      case "employee": // New role check for employees
+      case "employee":
         return sortedEmployees;
       default:
         return [];
@@ -129,7 +127,7 @@ const useUserDetails = (user: Partial<User>) => {
 
   const handleEntitySearch = useCallback((searchText: string) => {
     setEntitySearchText(searchText);
-    setVisibleRows(20); // Reset visible rows when a new search is initiated
+    setVisibleRows(20);
   }, []);
 
   const handleSaveChanges = useCallback(() => {
@@ -175,8 +173,8 @@ const useUserDetails = (user: Partial<User>) => {
     }
   }, [selectedEntity, role, user._id, dispatch, t]);
 
-   // New handleDeleteUser function
-   const handleDeleteUser = useCallback(
+  // New handleDeleteUser function
+  const handleDeleteUser = useCallback(
     (userId: string) => {
       setLoading(true);
       dispatch(deleteUserByIdThunk(userId))
@@ -185,7 +183,6 @@ const useUserDetails = (user: Partial<User>) => {
         })
         .catch((error: unknown) => {
           if (error instanceof Error) {
-
             showToast.error(
               t("userDetails.deleteFailedToast", { message: error.message })
             );

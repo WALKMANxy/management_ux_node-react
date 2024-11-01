@@ -1,3 +1,4 @@
+//src/features/auth/authThunks.ts
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AuthState } from "../../models/stateModels";
 import { setAccessToken } from "../../services/tokenService";
@@ -29,14 +30,12 @@ export const handleLogin = createAsyncThunk(
         refreshToken,
       }); */
 
-      // Perform side effects needed on login
       sessionStorage.setItem(
         "auth",
         JSON.stringify({ isLoggedIn: true, role, id, userId, refreshToken })
       );
-      //   console.log("Auth state saved in sessionStorage");
+      //console.log("Auth state saved in sessionStorage");
 
-      // Connect to WebSocket service
       webSocketService.connect();
       console.log("WebSocket service connected");
 
@@ -51,17 +50,18 @@ export const handleLogin = createAsyncThunk(
 );
 
 // Thunk to handle logout with side effects
-// Thunk to handle logout with side effects
 export const handleLogout = createAsyncThunk(
   "auth/handleLogout",
   async (_, { rejectWithValue }) => {
     try {
-      // Attempt to call the logout API endpoint and disconnect WebSocket
       try {
         await logoutUser();
         webSocketService.disconnect();
       } catch (apiError) {
-        console.error("Logout API call or WebSocket disconnect failed:", apiError);
+        console.error(
+          "Logout API call or WebSocket disconnect failed:",
+          apiError
+        );
       }
 
       // Clear tokens and auth state regardless of API outcome
@@ -69,7 +69,7 @@ export const handleLogout = createAsyncThunk(
       localStorage.removeItem("authState");
       setAccessToken(null);
 
-      return; // No payload needed
+      return;
     } catch (error: unknown) {
       const typedError = error as { message: string };
       return rejectWithValue(typedError.message);

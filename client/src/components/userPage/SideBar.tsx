@@ -1,5 +1,4 @@
 // src/components/UserPage/Sidebar.tsx
-
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PeopleIcon from "@mui/icons-material/People";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -75,14 +74,14 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({ onSelectSection }) => {
       component="nav"
       sx={{
         maxHeight: "100dvh",
-        width: isMobile ? 55 : 240, // Narrower width on mobile
-        bgcolor: "transparent", // Transparent background
+        width: isMobile ? 55 : 240,
+        bgcolor: "transparent",
         display: "flex",
         flexDirection: "column",
         alignItems: isMobile ? "center" : "flex-start",
-        borderRight: isMobile ? "none" : "1px solid rgba(0, 0, 0, 0.12)", // Optional border for non-mobile
+        borderRight: isMobile ? "none" : "1px solid rgba(0, 0, 0, 0.12)",
         overflowX: "hidden",
-        transition: "width 0.3s", // Smooth transition for width change
+        transition: "width 0.3s",
         borderTopRightRadius: isMobile ? 0 : 30,
       }}
     >
@@ -110,14 +109,14 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({ onSelectSection }) => {
               sx={{
                 justifyContent: isMobile ? "center" : "flex-start",
                 minHeight: 48,
-                boxShadow: theme.shadows[1], // Apply boxShadow from theme
+                boxShadow: theme.shadows[1],
                 borderRadius: "8px",
-                mb: 1, // Margin bottom for spacing between items
-                paddingX: isMobile ? 0 : 2, // Reduced padding on mobile
+                mb: 1,
+                paddingX: isMobile ? 0 : 2,
 
                 transition: "box-shadow 0.3s, border 0.3s",
                 "&:hover": {
-                  boxShadow: theme.shadows[4], // Enhance boxShadow on hover
+                  boxShadow: theme.shadows[4], 
                 },
                 "&.Mui-selected": {
                   boxShadow: theme.shadows[4],

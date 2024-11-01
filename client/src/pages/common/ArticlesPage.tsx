@@ -1,3 +1,4 @@
+//src/pages/common/ArticlesPage.tsx
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import React, { memo, useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -33,7 +34,7 @@ const ArticlesPage: React.FC = () => {
     anchorEl,
     articleDetailsRef,
     exportDataAsCsv,
-    clientMovements, // Add clientMovements
+    clientMovements,
   } = useArticlesGrid();
 
   const theme = useTheme();
@@ -46,7 +47,7 @@ const ArticlesPage: React.FC = () => {
     if (selectedItem) {
       const item = JSON.parse(selectedItem);
       handleArticleSelect(item.articleId);
-      sessionStorage.removeItem("searchedItem"); // Clear the item from storage
+      sessionStorage.removeItem("searchedItem");
     }
   }, [handleArticleSelect]);
 
@@ -117,7 +118,6 @@ const ArticlesPage: React.FC = () => {
     return baseColumns;
   }, [t, userRole, totalQuantitySold, renderClickableCell]);
 
-  // Handle loading state
   if (loading) {
     return (
       <Box

@@ -15,7 +15,6 @@ interface VisitViewProps {
   onDeselectVisit: () => void;
 }
 
-// Styled IconButton for Actions
 const StyledActionButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
   color: theme.palette.common.white,
@@ -27,7 +26,6 @@ const StyledActionButton = styled(IconButton)(({ theme }) => ({
   height: 48,
 }));
 
-// Styled Close Button
 const StyledCloseButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.error.main,
   color: theme.palette.common.white,
@@ -46,9 +44,8 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
 
   const editVisitRef = useRef<HTMLDivElement | null>(null);
 
-  // Retrieve userRole from Redux store
   const userRole = useAppSelector(selectCurrentUser)?.role
-  // Scroll into view when EditVisitForm is rendered
+
   useEffect(() => {
     if (isEditing && editVisitRef.current) {
       editVisitRef.current.scrollIntoView({ behavior: "smooth" });
@@ -67,7 +64,6 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
     onDeselectVisit();
   };
 
-  // Close the edit form when selectedVisitId changes
   useEffect(() => {
     if (isEditing) {
       handleEditClose();
@@ -75,9 +71,7 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedVisitId]);
 
-  // Fetch the visit data from the store
   const visits = useAppSelector(selectVisits);
-
   const visit = visits.find((v) => v._id === visitId);
 
   if (!visit) return null;
@@ -94,7 +88,7 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
         pending={visit.pending}
         completed={visit.completed}
         visitIssuedBy={visit.visitIssuedBy}
-        isNew={false} // Set this based on your logic, e.g., comparing dates
+        isNew={false}
       />
 
       {/* Action Buttons */}
@@ -103,7 +97,7 @@ const VisitView: React.FC<VisitViewProps> = ({ visitId, onDeselectVisit }) => {
           direction={"row"}
           spacing={2}
           justifyContent="flex-end"
-          sx={{ pr: 1.2, pt: 0.5 }} // Adjust padding-right or padding-left to align
+          sx={{ pr: 1.2, pt: 0.5 }} 
         >
           {/* Conditionally render the Edit button if userRole is not "client" */}
           {userRole !== "client" && (

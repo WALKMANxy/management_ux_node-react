@@ -1,3 +1,4 @@
+//src/controllers/OAuthController.ts
 import { Request, Response } from "express";
 import { config } from "../config/config";
 import { AuthenticatedRequest } from "../models/types";
@@ -15,7 +16,11 @@ export class OAuthController {
     const { state } = req.query;
 
     const redirectUri = `${config.appUrl}/auth/google/callback`;
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${config.googleClientId}&redirect_uri=${redirectUri}&response_type=code&scope=email%20profile&state=${state}`;
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${
+      config.googleClientId
+    }&redirect_uri=${encodeURIComponent(
+      redirectUri
+    )}&response_type=code&scope=email%20profile&state=${state}`;
 
     res.redirect(googleAuthUrl);
   }
@@ -51,7 +56,6 @@ export class OAuthController {
         uniqueId
       );
 
-      // Respond with tokens in the response body
       res.status(200).json({
         message: "OAuth login successful.",
         accessToken,
@@ -64,7 +68,6 @@ export class OAuthController {
         },
       });
 
-      // Send a message to the opener window to close the window if needed
       res.send(`
       <script>
           window.opener.postMessage({
@@ -88,9 +91,6 @@ export class OAuthController {
     }
   }
 
-  /**
-   * Refreshes the session by validating the provided Refresh Token and issuing new tokens.
-   */
   static async refreshSession(req: Request, res: Response) {
     const { refreshToken, uniqueId } = req.body;
 

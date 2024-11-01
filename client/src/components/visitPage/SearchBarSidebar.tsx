@@ -1,3 +1,4 @@
+//src/components/visitPage/SearchBarSidebar.tsx
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { TextField, InputAdornment, Tooltip } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -19,23 +20,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Declare the input state to handle the TextField value
   const [input, setInput] = useState(searchTerm);
 
-  // Debounce the input value
   const debouncedInput = useDebounce(input, 300);
 
-  // Handle input changes and set the input state
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
   };
 
-  // Update the searchTerm after debounced input changes
   useEffect(() => {
     setSearchTerm(debouncedInput);
   }, [debouncedInput, setSearchTerm]);
 
-  // Determine placeholder based on role and agent selection
   const placeholder =
     userRole === "admin" && !selectedAgentId
       ? t("visitsSidebar.searchAgents", "Search Agents")
@@ -47,8 +43,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
         variant="outlined"
         placeholder={placeholder}
         fullWidth
-        value={input} // Use input state for value
-        onChange={handleChange} // Update input state on change
+        value={input}
+        onChange={handleChange} 
         type="search"
         autoComplete="off"
         InputProps={{

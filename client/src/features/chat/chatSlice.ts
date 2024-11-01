@@ -1,4 +1,4 @@
-// src/store/slices/chatSlice.ts
+// src/features/chat/chatSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WritableDraft } from "immer";
 import { createSelector } from "reselect";
@@ -13,24 +13,22 @@ import {
   fetchOlderMessagesThunk,
 } from "./chatThunks";
 
-// Define the simplified ChatState without the messages field
 interface ChatState {
-  chats: Record<string, IChat>; // Store chats by their IDs
-  currentChat: IChat | null; // Currently selected chat
-  status: "idle" | "loading" | "succeeded" | "failed"; // Status of the chat fetching/operations
+  chats: Record<string, IChat>;
+  currentChat: IChat | null;
+  status: "idle" | "loading" | "succeeded" | "failed";
   fetchChatsStatus: "idle" | "loading" | "succeeded" | "failed";
-
-  error: string | null; // To store any errors
+  error: string | null;
 }
 
 // Define the initial state without the messages field
 const initialState: ChatState = {
-  chats: {}, // Chats stored by chat ID
-  currentChat: null, // No chat selected initially
-  status: "idle", // Initial status
+  chats: {},
+  currentChat: null,
+  status: "idle",
   fetchChatsStatus: "idle",
 
-  error: null, // No errors initially
+  error: null,
 };
 
 // Define the chat slice
@@ -67,7 +65,7 @@ const chatSlice = createSlice({
       action: PayloadAction<{
         chatId: string;
         message: IMessage;
-        fromServer?: boolean; // Flag to distinguish server-originated actions
+        fromServer?: boolean;
       }>
     ) => {
       const { chatId, message } = action.payload;
@@ -76,7 +74,6 @@ const chatSlice = createSlice({
       const chat = state.chats[chatId];
 
       // Check if the chat exists
-
       if (!chat) {
         console.error("Chat does not exist in the state.");
         return;
@@ -112,13 +109,13 @@ const chatSlice = createSlice({
         return;
       }
 
-      // Initialize uploadProgress and status without removing 'file' property
+      // Initialize uploadProgress and status
       const initializedMessage: IMessage = {
         ...message,
         attachments: message.attachments.map((attachment) => ({
-          ...attachment, // Retain 'file' property
-          uploadProgress: 0, // Initialize upload progress
-          status: "pending", // Initialize status
+          ...attachment,
+          uploadProgress: 0,
+          status: "pending",
         })),
         isUploading: true,
       };
@@ -159,7 +156,6 @@ const chatSlice = createSlice({
           // Update the progress
           attachment.uploadProgress = progress;
 
-          // Set status to "uploaded" when progress reaches 100
           if (progress === 100) {
             attachment.status = "uploaded";
           }
@@ -221,14 +217,15 @@ const chatSlice = createSlice({
       if (existingMessage) {
         console.log("Marking message as uploaded");
         existingMessage.isUploading = false;
-        // Do not alter status here; status remains "pending" until server confirmation
         // Strip the 'file' property from each attachment
-        existingMessage.attachments = existingMessage.attachments.map((attachment) => {
-          const { file, ...rest } = attachment;
-          return {
-            ...rest,
-          };
-        });
+        existingMessage.attachments = existingMessage.attachments.map(
+          (attachment) => {
+            const { file, ...rest } = attachment;
+            return {
+              ...rest,
+            };
+          }
+        );
       } else {
         console.error("Message does not exist in the state.");
         return;
@@ -246,10 +243,10 @@ const chatSlice = createSlice({
     updateReadStatusReducer: (
       state,
       action: PayloadAction<{
-        chatId: string; // Required for other components
+        chatId: string;
         userId: string;
         messageIds: string[];
-        fromServer?: boolean; // Flag to distinguish server-originated actions
+        fromServer?: boolean;
       }>
     ) => {
       const { chatId, userId, messageIds } = action.payload;
@@ -260,7 +257,7 @@ const chatSlice = createSlice({
       // Check if the chat exists
       if (!chat) {
         console.error(`Chat with ID ${chatId} does not exist in the state.`);
-        return state; // Return the existing state if chat doesn't exist
+        return state;
       }
 
       chat.messages.forEach((message) => {
@@ -278,7 +275,7 @@ const chatSlice = createSlice({
       state,
       action: PayloadAction<{
         chat: IChat;
-        fromServer?: boolean; // Flag to distinguish server-originated actions
+        fromServer?: boolean;
       }>
     ) => {
       const { chat, fromServer } = action.payload;
@@ -292,17 +289,17 @@ const chatSlice = createSlice({
             state.currentChat = {
               ...state.currentChat,
               ...chat,
-              _id: chat._id, // Ensure _id is set
-              status: chat.status, // Update status
+              _id: chat._id,
+              status: chat.status,
             };
           }
 
           // Replace the chat keyed by local_id with the chat keyed by _id
           state.chats[chat._id] = {
-            ...state.chats[localId], // Retain existing data
-            ...chat, // Overwrite with server data
-            _id: chat._id, // Ensure _id is set
-            status: chat.status, // Update status
+            ...state.chats[localId],
+            ...chat,
+            _id: chat._id,
+            status: chat.status,
           };
           // Remove the old chat entry keyed by local_id
           delete state.chats[localId];
@@ -525,13 +522,13 @@ export const {
   updateReadStatusReducer,
   addChatReducer,
   updateChatReducer,
-  setCurrentChatById
+  setCurrentChatById,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
 
-export const selectFetchChatsStatus = (state: RootState) => state.chats.fetchChatsStatus;
-
+export const selectFetchChatsStatus = (state: RootState) =>
+  state.chats.fetchChatsStatus;
 
 // Memoized selector for all chats
 export const selectAllChats = createSelector(
@@ -548,10 +545,12 @@ export const selectChatById = createSelector(
   (chats, chatId) => chats[chatId]
 );
 
-// Replace with a simple selector
+// Selector to get the current chat
 export const selectCurrentChat = (state: RootState) => {
   const currentChatId = state.chats.currentChat?._id;
-  return currentChatId ? state.chats.chats[currentChatId] : state.chats.currentChat;
+  return currentChatId
+    ? state.chats.chats[currentChatId]
+    : state.chats.currentChat;
 };
 
 // Memoized selector for messages from the current chat
@@ -560,10 +559,10 @@ export const selectMessagesFromCurrentChat = createSelector(
   (currentChat) => currentChat?.messages || []
 );
 
-// Replace with a simple selector
+// Selector to get the current chat status
 export const selectChatsStatus = (state: RootState) => state.chats.status;
 
-// Replace with a simple selector
+// Selector to get the current chat error
 export const selectChatsError = (state: RootState) => state.chats.error;
 
 // Memoized selector for messages by chat ID
@@ -585,12 +584,14 @@ export const selectUnreadMessages = createSelector(
     ) || []
 );
 
-// src/store/slices/chatSlice.ts
-
-// Add this selector at the bottom of your chatSlice.ts file
+// Selector to get an attachment
 export const selectAttachment = (
   state: RootState,
-  payload: { chatId: string; messageLocalId: string; attachmentFileName: string }
+  payload: {
+    chatId: string;
+    messageLocalId: string;
+    attachmentFileName: string;
+  }
 ): Attachment | undefined => {
   const { chatId, messageLocalId, attachmentFileName } = payload;
   const chat = state.chats.chats[chatId];
@@ -598,14 +599,20 @@ export const selectAttachment = (
     console.error(`Chat with ID ${chatId} does not exist in the state.`);
     return undefined;
   }
-  const message = chat.messages.find(msg => msg.local_id === messageLocalId);
+  const message = chat.messages.find((msg) => msg.local_id === messageLocalId);
   if (!message) {
-    console.error(`Message with local_id ${messageLocalId} does not exist in chat ${chatId}.`);
+    console.error(
+      `Message with local_id ${messageLocalId} does not exist in chat ${chatId}.`
+    );
     return undefined;
   }
-  const attachment = message.attachments.find(att => att.fileName === attachmentFileName);
+  const attachment = message.attachments.find(
+    (att) => att.fileName === attachmentFileName
+  );
   if (!attachment) {
-    console.error(`Attachment with fileName ${attachmentFileName} does not exist in message ${messageLocalId}.`);
+    console.error(
+      `Attachment with fileName ${attachmentFileName} does not exist in message ${messageLocalId}.`
+    );
   }
   return attachment;
 };

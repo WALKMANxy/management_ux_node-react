@@ -1,4 +1,4 @@
-// utils/errorHandling.ts
+//src/services/errorHandling.ts
 
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
@@ -22,7 +22,7 @@ class AppError extends Error {
   constructor(message: string, name: string) {
     super(message);
     this.name = name;
-    Object.setPrototypeOf(this, new.target.prototype); // Restore prototype chain
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
@@ -61,7 +61,9 @@ class FetchUserRoleError extends AppError {
 
 // Logger utility function
 const logError = (error: Error): void => {
-  console.error(`[${new Date().toISOString()}] ${error.name}: ${error.message}`);
+  console.error(
+    `[${new Date().toISOString()}] ${error.name}: ${error.message}`
+  );
 };
 
 const handleApiError = (error: unknown, operation: string): void => {
@@ -77,7 +79,10 @@ const handleApiError = (error: unknown, operation: string): void => {
     );
     logError(networkError);
   } else {
-    const unknownError = new AppError(`Unknown error during ${operation}`, "UnknownError");
+    const unknownError = new AppError(
+      `Unknown error during ${operation}`,
+      "UnknownError"
+    );
     logError(unknownError);
   }
 };

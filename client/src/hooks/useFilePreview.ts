@@ -1,6 +1,7 @@
+//src/hooks/useFilePreview.ts
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { v4 as uuidv4 } from "uuid"; // Import UUID function
+import { v4 as uuidv4 } from "uuid";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { downloadFileFromS3 } from "../features/data/api/media";
 import {
@@ -10,9 +11,9 @@ import {
 } from "../features/downloads/downloadedFilesSlice";
 import { Attachment } from "../models/dataModels";
 
-const MAX_FILES = 5; // Maximum number of files allowed
-const MAX_FILE_SIZE_MB = 15; // Max size per file in MB
-const MAX_TOTAL_SIZE_MB = 75; // Max total size of all files in MB
+const MAX_FILES = 5;
+const MAX_FILE_SIZE_MB = 15;
+const MAX_TOTAL_SIZE_MB = 75;
 
 // Hook to manage file preview and download logic
 export const useFilePreview = () => {
@@ -39,9 +40,9 @@ export const useFilePreview = () => {
         return;
       }
 
-      console.groupCollapsed(`Downloading file: ${attachment.fileName}`);
+      // console.groupCollapsed(`Downloading file: ${attachment.fileName}`);
       try {
-        console.log(`Download request:`, attachment);
+        // console.log(`Download request:`, attachment);
 
         const blobUrl = await downloadFileFromS3(attachment, (progress) => {
           if (onProgress) {
@@ -58,15 +59,15 @@ export const useFilePreview = () => {
           return;
         }
 
-        console.log(`Download complete:`, blobUrl);
+        // console.log(`Download complete:`, blobUrl);
 
         dispatch(
           addDownloadedFile({
             ...attachment,
             url: blobUrl ?? "",
-            file: undefined, // Ensure file is not stored
-            uploadProgress: 100, // Set download progress to 100%
-            status: "uploaded", // Set status to uploaded
+            file: undefined,
+            uploadProgress: 100,
+            status: "uploaded",
           })
         );
       } catch (error) {
@@ -105,7 +106,7 @@ export const useFilePreview = () => {
         link.download = fileToDownload.fileName;
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link); // Clean up the link element
+        document.body.removeChild(link);
       } catch (error) {
         toast.error("Failed to download the file.");
         console.error("Error downloading the file:", error);
@@ -116,12 +117,12 @@ export const useFilePreview = () => {
 
   const openFileViewer = useCallback(
     (isPreview: boolean, fileName?: string) => {
-      console.groupCollapsed("openFileViewer");
+      /*  console.groupCollapsed("openFileViewer");
       console.log("isPreview:", isPreview);
       console.log("fileName:", fileName);
       console.log("selectedAttachments:", selectedAttachments);
       console.log("downloadedFiles:", downloadedFilesRef.current);
-      console.groupEnd();
+      console.groupEnd(); */
 
       setIsPreview(isPreview);
 
@@ -161,7 +162,7 @@ export const useFilePreview = () => {
       setCurrentFile(fileToView);
       setIsViewerOpen(true);
     },
-    [selectedAttachments] // Remove downloadedFilesRef from dependencies
+    [selectedAttachments]
   );
 
   const addAttachments = useCallback(
@@ -212,7 +213,7 @@ export const useFilePreview = () => {
 
   const clearAttachments = useCallback(() => {
     setSelectedAttachments((prev) => {
-      if (prev.length === 0) return prev; // Early return if no attachments
+      if (prev.length === 0) return prev;
 
       // Revoke all object URLs before clearing
       prev.forEach((attachment) => {
@@ -228,7 +229,7 @@ export const useFilePreview = () => {
   const closeFileViewer = useCallback(
     (isPreview: boolean) => {
       setIsViewerOpen(false);
-      setIsPreview(false); // Always reset to false when closing
+      setIsPreview(false);
       setCurrentFile(null);
 
       // If in preview mode, clear the attachments
@@ -308,9 +309,9 @@ export const useFilePreview = () => {
               ) {
                 return "word";
               } else if (["xls", "xlsx", "xlsm", "ods"].includes(extension)) {
-                return "spreadsheet"; // Use "spreadsheet" here
+                return "spreadsheet";
               } else {
-                return "other"; // Return "other" for unsupported types
+                return "other";
               }
             })();
 
@@ -327,9 +328,7 @@ export const useFilePreview = () => {
               fileName = `${fileId}.${extension}`;
             } else {
               // For other files, sanitize the name and keep the extension
-              const sanitizedBaseName = file.name
-                .replace(/\s+/g, "_") // Replace spaces with underscores
-                .trim(); // Remove any leading/trailing whitespace
+              const sanitizedBaseName = file.name.replace(/\s+/g, "_").trim();
               fileName = sanitizedBaseName;
             }
 
@@ -341,15 +340,15 @@ export const useFilePreview = () => {
 
             return {
               file: newFile,
-              url: blobUrl, // Temporary URL for preview
+              url: blobUrl,
               type: fileType,
-              fileName, // Use the new fileName
+              fileName,
               size: newFile.size,
-              uploadProgress: 0, // Initialize uploadProgress to 0
-              status: "pending" as Attachment["status"], // Use the status type from Attachment
+              uploadProgress: 0,
+              status: "pending" as Attachment["status"],
             };
           })
-          .filter((item) => item !== undefined && item !== null); // Filter out null and undefined entries from unsupported extensions
+          .filter((item) => item !== undefined && item !== null);
 
         addAttachments(fileArray);
       }
@@ -359,7 +358,7 @@ export const useFilePreview = () => {
 
   useEffect(() => {
     if (selectedAttachments.length > 0) {
-      console.log("Opening File Viewer with Attachments:", selectedAttachments);
+      // console.log("Opening File Viewer with Attachments:", selectedAttachments);
       openFileViewer(true);
     } else {
       closeFileViewer(true);

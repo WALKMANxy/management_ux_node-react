@@ -1,6 +1,14 @@
+//src/Styles/theme.ts
 import { createTheme } from "@mui/material";
 
 export const theme = createTheme({
+  components: {
+    MuiUseMediaQuery: {
+      defaultProps: {
+        noSsr: true,
+      },
+    },
+  },
     typography: {
       fontFamily: [
         "SF Pro Display",

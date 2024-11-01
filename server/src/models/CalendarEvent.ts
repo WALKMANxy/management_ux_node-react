@@ -1,7 +1,8 @@
-import { Schema, model, Document } from "mongoose";
+//src/models/CalendarEvent.ts
+import { Document, Schema, model } from "mongoose";
 
 export interface ICalendarEvent extends Document {
-  userId: Schema.Types.ObjectId; // Optional for company-wide events or holidays
+  userId: Schema.Types.ObjectId;
   startDate: Date;
   endDate: Date;
   eventType: "holiday" | "event" | "absence";
@@ -70,9 +71,9 @@ calendarEventSchema.index({ startDate: 1 });
 calendarEventSchema.index({ endDate: 1 });
 calendarEventSchema.index({ status: 1 });
 calendarEventSchema.index({ eventType: 1 });
-calendarEventSchema.index({ userId: 1, startDate: 1 }); // Compound index for userId and startDate
-calendarEventSchema.index({ userId: 1, status: 1 }); // Compound index for userId and status
-calendarEventSchema.index({ eventType: 1, startDate: 1 }); // Compound index for eventType and startDate
+calendarEventSchema.index({ userId: 1, startDate: 1 });
+calendarEventSchema.index({ userId: 1, status: 1 });
+calendarEventSchema.index({ eventType: 1, startDate: 1 });
 
 export const CalendarEvent = model<ICalendarEvent>(
   "CalendarEvent",

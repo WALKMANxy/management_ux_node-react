@@ -1,3 +1,4 @@
+//src/components/calendarPage/CustomToolbar.tsx
 import CalendarViewMonthIcon from "@mui/icons-material/CalendarViewMonth";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -110,10 +111,10 @@ export const CustomToolbar: React.FC<CustomToolbarProps> = ({
                 fontWeight: "bold",
                 flex: 1,
                 textAlign: "center",
-                backgroundColor: "rgba(255, 255, 255, 0.8)", // subtle background
-                borderRadius: "10px", // rounded corners
-                padding: "5px 10px", // padding around the text
-                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)", // soft shadow
+                backgroundColor: "rgba(255, 255, 255, 0.8)",
+                borderRadius: "10px",
+                padding: "5px 10px",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
               }}
             >
               {toolbar.label}
@@ -158,7 +159,7 @@ export const CustomToolbar: React.FC<CustomToolbarProps> = ({
             flexGrow: 1,
           }}
         >
-          {/* Refresh Icon anchored to flex start */}
+          {/* Refresh Icon  */}
           <Tooltip title={t("customToolbar.today")}>
             <IconButton
               onClick={goToToday}
@@ -173,7 +174,7 @@ export const CustomToolbar: React.FC<CustomToolbarProps> = ({
             </IconButton>
           </Tooltip>
 
-          {/* Navigation Buttons and Title anchored at center */}
+          {/* Navigation Buttons and Title  */}
           <div
             style={{
               display: "flex",
@@ -217,7 +218,7 @@ export const CustomToolbar: React.FC<CustomToolbarProps> = ({
             </Tooltip>
           </div>
 
-          {/* View Buttons anchored at flex-end */}
+          {/* View Buttons */}
           <div
             style={{
               display: "flex",

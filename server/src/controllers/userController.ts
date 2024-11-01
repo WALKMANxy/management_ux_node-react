@@ -1,3 +1,4 @@
+//src/controllers/userController.ts
 import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../models/types";
 import { UserService } from "../services/userService";
@@ -55,7 +56,7 @@ export class UserController {
 
   static async getUsersByBatchIds(req: Request, res: Response): Promise<void> {
     try {
-      const { ids } = req.body; // Get user IDs from the request body
+      const { ids } = req.body;
       if (!Array.isArray(ids) || !ids.length) {
         res.status(400).json({ message: "Invalid or missing IDs array" });
         return;
@@ -77,12 +78,20 @@ export class UserController {
       }
     }
   }
-  // Controller action to update the user's email
   static async updateUserEmail(
     req: AuthenticatedRequest,
     res: Response
   ): Promise<void> {
     try {
+      const ipInfo = req.ipInfo || {
+        ip: req.ip ? req.ip.replace("::ffff:", "") : "",
+        country: "",
+        region: "",
+        city: "",
+        latitude: 0,
+        longitude: 0,
+      };
+
       const { currentEmail, currentPassword, newEmail } = req.body;
 
       if (!currentEmail || !currentPassword || !newEmail) {
@@ -94,7 +103,8 @@ export class UserController {
         req.params.id,
         currentEmail,
         currentPassword,
-        newEmail
+        newEmail,
+        ipInfo
       );
 
       if (!user) {
@@ -115,12 +125,20 @@ export class UserController {
     }
   }
 
-  // Controller action to update the user's password
   static async updateUserPassword(
     req: AuthenticatedRequest,
     res: Response
   ): Promise<void> {
     try {
+      const ipInfo = req.ipInfo || {
+        ip: req.ip ? req.ip.replace("::ffff:", "") : "",
+        country: "",
+        region: "",
+        city: "",
+        latitude: 0,
+        longitude: 0,
+      };
+
       const { currentEmail, currentPassword, newPassword } = req.body;
 
       if (!currentEmail || !currentPassword || !newPassword) {
@@ -132,7 +150,8 @@ export class UserController {
         req.params.id,
         currentEmail,
         currentPassword,
-        newPassword
+        newPassword,
+        ipInfo
       );
 
       if (!user) {
@@ -153,7 +172,10 @@ export class UserController {
     }
   }
 
-  static async deleteUser(req: AuthenticatedRequest, res: Response): Promise<void> {
+  static async deleteUser(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
     try {
       const user = await UserService.deleteUser(req.params.id);
       if (!user) {

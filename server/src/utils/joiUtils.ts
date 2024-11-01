@@ -1,3 +1,4 @@
+//src/utils/joiUtils.ts
 import Joi from "joi";
 import mongoose from "mongoose";
 
@@ -47,7 +48,7 @@ export const createEventSchema = Joi.object({
           .required(),
       },
     ],
-    otherwise: Joi.forbidden(), // Forbid reason if eventType doesn't match any known value
+    otherwise: Joi.forbidden(),
   }),
   note: Joi.string().optional(),
 });
@@ -55,12 +56,11 @@ export const createEventSchema = Joi.object({
 export const editEventSchema = Joi.object({
   startDate: Joi.date().optional(),
   endDate: Joi.date().optional(),
-  eventType: Joi.string().valid('absence', 'holiday', 'event').optional(),
+  eventType: Joi.string().valid("absence", "holiday", "event").optional(),
   reason: Joi.string().optional(),
-  note: Joi.string().allow('', null).optional(),
+  note: Joi.string().allow("", null).optional(),
 });
 
-// Schema for updating the status of a CalendarEvent
 export const updateEventStatusSchema = Joi.object({
   status: Joi.string()
     .valid("pending", "approved", "rejected", "cancelled")

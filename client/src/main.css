@@ -1,16 +1,6 @@
-/* src/styles/global.css */
+/* src/main.css */
 
-/*  Import and Define SF Pro Display font
-@font-face {
-  font-family: "SF Pro Display";
-  src: url("/src/assets/fonts/SF-Pro-Display-Regular.otf") format("opentype"),
-    url("/src/assets/fonts/SF-Pro-Display-Medium.otf") format("opentype"),
-    url("/src/assets/fonts/SF-Pro-Display-Bold.otf") format("opentype");
-  font-weight: 400;
-  font-style: normal;
-} */
 
-/* Apply SF Pro Display font to the body */
 body {
   margin: 0;
   font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont,
@@ -33,32 +23,32 @@ code {
 
 input[class^="ag-"][type="number"]:not(.ag-number-field-input-stepper) {
   -moz-appearance: textfield;
-  appearance: textfield; /* Added line */
+  appearance: textfield;
 }
 
 
 
 th {
-  text-align: inherit; /* Inherits the text-align value from its parent */
+  text-align: inherit;
 }
 
 .ag-body-viewport,
 .ag-center-cols-viewport {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .ag-body-viewport::-webkit-scrollbar,
 .ag-center-cols-viewport::-webkit-scrollbar {
-  display: none; /* Safari and Chrome */
+  display: none;
 }
 
 @keyframes ag-shake-left-to-right {
   from {
-    transform: translateX(-2px); /* Replaces padding-left */
+    transform: translateX(-2px);
   }
   to {
-    transform: translateX(2px); /* Replaces padding-right */
+    transform: translateX(2px);
   }
 }
 
@@ -98,8 +88,5 @@ html,
 body {
   width: 100vw;
   overflow-x: hidden;
-
   scrollbar-width: none;
-
-  /* Hide scrollbar for IE/Edge */
 }

@@ -1,3 +1,4 @@
+//src/controllers/authController.ts
 import { Request, Response } from "express";
 import { config } from "../config/config";
 import { AuthenticatedRequest } from "../models/types";
@@ -9,6 +10,7 @@ import {
   verifyResetCodeService,
   verifyUserEmailService,
 } from "../services/authService";
+import { verifyRefreshTokenJWT } from "../utils/jwtUtils";
 import { logger } from "../utils/logger";
 import {
   createSession,
@@ -17,7 +19,6 @@ import {
   invalidateSession,
   renewSession,
 } from "../utils/sessionUtils";
-import { verifyRefreshTokenJWT } from "../utils/jwtUtils";
 
 export const register = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -44,9 +45,8 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
-// Login endpoint to handle authentication and session creation
 export const login = async (req: Request, res: Response) => {
-  const { email, password, uniqueId } = req.body; // Ensure uniqueId is sent from client
+  const { email, password, uniqueId } = req.body;
 
   if (!uniqueId) {
     return res.status(400).json({ message: "uniqueId is required for login." });
@@ -65,7 +65,6 @@ export const login = async (req: Request, res: Response) => {
         .json({ message: "Please verify your email before logging in." });
     }
 
-    // Create a new session; existing sessions with the same uniqueId will be invalidated
     const { accessToken, refreshToken } = await createSession(
       user,
       req,
@@ -74,8 +73,8 @@ export const login = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       message: "Login successful",
-      accessToken, // Access Token for authenticating requests
-      refreshToken, // Refresh Token for renewing Access Tokens
+      accessToken,
+      refreshToken,
       id: user.id,
     });
   } catch (error: unknown) {
@@ -94,7 +93,6 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-// Logout endpoint to invalidate a single session
 export const logout = async (req: Request, res: Response) => {
   const refreshToken = req.header("Authorization")?.replace("Bearer ", "");
   const uniqueId = req.header("uniqueId");
@@ -105,23 +103,24 @@ export const logout = async (req: Request, res: Response) => {
       .json({ message: "Refresh token is required for logout." });
   }
 
-   // Step 1: Verify and decode the refresh token to extract userId
-   let decodedToken;
-   try {
-     decodedToken = verifyRefreshTokenJWT(refreshToken);
-   } catch (err) {
-     logger.warn("Invalid or expired refresh token", { refreshToken, error: err });
-     return null;
-   }
+  let decodedToken;
+  try {
+    decodedToken = verifyRefreshTokenJWT(refreshToken);
+  } catch (err) {
+    logger.warn("Invalid or expired refresh token", {
+      refreshToken,
+      error: err,
+    });
+    return null;
+  }
 
-   const userId = decodedToken.userId;
-   if (!userId) {
-     logger.warn("Refresh token does not contain userId", { refreshToken });
-     return null;
-   }
+  const userId = decodedToken.userId;
+  if (!userId) {
+    logger.warn("Refresh token does not contain userId", { refreshToken });
+    return null;
+  }
 
-   // Step 2: Retrieve userAgent from the request
-   const userAgent = req.get("User-Agent") || "Unknown";
+  const userAgent = req.get("User-Agent") || "Unknown";
 
   try {
     const invalidated = await invalidateSession(userId, uniqueId!, userAgent!);
@@ -140,7 +139,6 @@ export const logout = async (req: Request, res: Response) => {
   }
 };
 
-// Logout from all devices by invalidating all sessions for the user
 export const logoutAllDevices = async (
   req: AuthenticatedRequest,
   res: Response
@@ -165,7 +163,6 @@ export const logoutAllDevices = async (
   }
 };
 
-// Retrieve all active sessions for a user
 export const getUserActiveSessions = async (
   req: AuthenticatedRequest,
   res: Response
@@ -200,29 +197,28 @@ export const verifyEmail = async (req: Request, res: Response) => {
   }
 };
 
-// Refresh Access Token using Refresh Token
 export const refreshSession = async (req: Request, res: Response) => {
-  const { refreshToken, uniqueId } = req.body; // Ensure uniqueId is sent from client
+  const { refreshToken, uniqueId } = req.body;
 
-  console.log("refreshSession called with:", { refreshToken, uniqueId });
+  // console.log("refreshSession called with:", { refreshToken, uniqueId });
 
   if (!refreshToken || !uniqueId) {
-    console.log("Missing required parameters");
+    // console.log("Missing required parameters");
     return res
       .status(400)
       .json({ message: "Refresh token and uniqueId are required." });
   }
 
   try {
-    console.log("Attempting to renew session");
+    // console.log("Attempting to renew session");
     const renewedTokens = await renewSession(refreshToken, req, uniqueId);
 
     if (!renewedTokens) {
-      console.log("Renewal failed");
+      // console.log("Renewal failed");
       return res.status(401).json({ message: "Invalid or expired session." });
     }
 
-    console.log("Renewed session successfully");
+    // console.log("Renewed session successfully");
     return res.status(200).json({
       message: "Session renewed successfully.",
       accessToken: renewedTokens.accessToken,
@@ -237,7 +233,6 @@ export const refreshSession = async (req: Request, res: Response) => {
   }
 };
 
-// Request password reset
 export const requestPasswordReset = async (
   req: AuthenticatedRequest,
   res: Response
@@ -254,10 +249,10 @@ export const requestPasswordReset = async (
       longitude: 0,
     };
 
-    console.log("Requesting password reset for:", email);
-    console.log("IP Info:", ipInfo);
+    // console.log("Requesting password reset for:", email);
+    // console.log("IP Info:", ipInfo);
     await generateResetCodeService(email, ipInfo);
-    console.log("Password reset code sent successfully.");
+    // console.log("Password reset code sent successfully.");
     res.status(200).json({
       message:
         "If an account with that email exists, a reset code will be sent.",
@@ -268,7 +263,6 @@ export const requestPasswordReset = async (
   }
 };
 
-// Verify reset code
 export const verifyResetCode = async (
   req: Request,
   res: Response
@@ -286,7 +280,6 @@ export const verifyResetCode = async (
   }
 };
 
-// Update password
 export const updatePassword = async (
   req: Request,
   res: Response

@@ -29,7 +29,6 @@ const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
     );
   }
 
-  // Split name on space and take the first word
   const displayName = name
     ? name.split(" ")[0]
     : t(`${role}Dashboard.defaultName`);
@@ -39,8 +38,7 @@ const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
       variant="h4"
       sx={{
         fontFamily: "Inter, sans-serif",
-        fontWeight: 100, // Now using the lighter custom font weight
-
+        fontWeight: 100,
       }}
     >
       {t(`dashboard.welcomeBack`, {

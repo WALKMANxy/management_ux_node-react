@@ -1,10 +1,8 @@
 // src/hooks/usePromoForm.ts
-
 import { deDE, enUS, frFR, itIT, ruRU } from "@mui/x-date-pickers/locales";
-import { SubmitHandler, useForm } from "react-hook-form";
-
 import dayjs, { Dayjs } from "dayjs";
 import { useCallback, useMemo } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Promo } from "../models/dataModels";
 import { showToast } from "../services/toastMessage";
@@ -104,8 +102,8 @@ const usePromoForm = ({
         return;
       }
 
-      /*       console.log("Form data before processing:", data);
-       */
+      //  console.log("Form data before processing:", data);
+
       // Prepare promo data
       const preparedPromoData: Promo = {
         _id: promoData?._id,
@@ -121,11 +119,10 @@ const usePromoForm = ({
         promoIssuedBy: userId || "unknown",
       };
 
-      console.log("Prepared promo data being sent:", preparedPromoData);
+      // console.log("Prepared promo data being sent:", preparedPromoData);
 
       try {
         await onSubmit(preparedPromoData);
-        // Optionally reset the form
         if (isCreating) {
           reset();
         }
@@ -147,9 +144,8 @@ const usePromoForm = ({
     setValue,
     handleSubmit: handleSubmit(onSubmitHandler),
     selectedLocale,
-    clients, // Expose clients if needed
-    t, // Expose translation function if needed
-    errors, // Expose form errors if needed
+    clients,
+    errors,
   };
 };
 

@@ -1,20 +1,18 @@
 import { Response } from "express";
-/* import { emitToAdmins, emitToUser } from "../middlewares/webSocket";
- */import { AuthenticatedRequest } from "../models/types";
+import { AuthenticatedRequest } from "../models/types";
 import { CalendarEventService } from "../services/calendarEventsService";
 import { logger } from "../utils/logger";
 
 export class CalendarEventController {
-  // Create a new calendar event
   static async createEvent(req: AuthenticatedRequest, res: Response) {
     try {
       const { startDate, endDate, eventType, reason, note } = req.body;
       const userId = req.user?.id;
       const userRole = req.user?.role;
 
-       // Debugging: Log incoming dates
-    console.log("Incoming Start Date:", startDate);
-    console.log("Incoming End Date:", endDate);
+      // Debugging: Log incoming dates
+      // console.log("Incoming Start Date:", startDate);
+      // console.log("Incoming End Date:", endDate);
 
       if (!startDate || !endDate || !eventType || !reason) {
         logger.warn(`Missing required fields in calendar event creation`);
@@ -23,7 +21,6 @@ export class CalendarEventController {
         });
       }
 
-      // Event creation based on user role and event type
       const event = await CalendarEventService.createEvent(
         {
           userId: userId!,
@@ -36,9 +33,9 @@ export class CalendarEventController {
         userRole!
       );
 
-      logger.info(`Calendar event created successfully for user ${userId}`);
+      // logger.info(`Calendar event created successfully for user ${userId}`);
 
-     /*  // Emit WebSocket event based on event type
+      /*  // Emit WebSocket event based on event type
       if (event.eventType === "absence") {
         emitToAdmins("calendarEvents:newEvent", event);
       } */
@@ -56,7 +53,6 @@ export class CalendarEventController {
     }
   }
 
-  // Get all events for a specific month (Admin)
   static async getEventsByMonthForAdmin(
     req: AuthenticatedRequest,
     res: Response
@@ -65,9 +61,9 @@ export class CalendarEventController {
 
     try {
       // Log the incoming request details
-      logger.debug(
+      /* logger.debug(
         `Request received with query parameters: ${JSON.stringify(req.query)}`
-      );
+      ); */
 
       const { year, month } = req.query;
 
@@ -81,9 +77,9 @@ export class CalendarEventController {
         });
       }
 
-      logger.debug(
+     /*  logger.debug(
         `Attempting to fetch events for year: ${year}, month: ${month}`
-      );
+      ); */
 
       // Fetch events
       const events = await CalendarEventService.getEventsByMonthForAdmin(
@@ -91,7 +87,7 @@ export class CalendarEventController {
         Number(month)
       );
 
-     /*  if (events && events.length > 0) {
+      /*  if (events && events.length > 0) {
         logger.info(
           `Fetched ${events.length} events for the admin in ${month}/${year}`
         );
@@ -155,7 +151,7 @@ export class CalendarEventController {
         return res.status(200);
       }
 
-    /*   logger.info(
+      /*   logger.info(
         `Fetched calendar events by status and user for user ${userId} in ${month}/${year}`
       ); */
       return res.status(200).json(events);
@@ -198,7 +194,7 @@ export class CalendarEventController {
         return res.status(200).json({ message: "Calendar event not found." });
       }
 
-      logger.info(`Calendar event with ID ${eventId} updated to ${status}`);
+      // logger.info(`Calendar event with ID ${eventId} updated to ${status}`);
 
       /* // Emit WebSocket event for status update to the event's user
       emitToUser(
@@ -245,13 +241,13 @@ export class CalendarEventController {
       });
 
       if (!updatedEvent) {
-         logger.error(`Calendar event with ID ${eventId} not found for editing`);
+        logger.error(`Calendar event with ID ${eventId} not found for editing`);
         return res.status(404).json({ message: "Calendar event not found." });
       }
 
-      logger.info(`Calendar event with ID ${eventId} updated successfully`);
+      // logger.info(`Calendar event with ID ${eventId} updated successfully`);
 
-     /*  // Emit WebSocket event for update
+      /*  // Emit WebSocket event for update
       emitToAdmins("calendarEvents:eventUpdated", updatedEvent);
       emitToUser(
         updatedEvent.userId.toString(),
@@ -278,13 +274,15 @@ export class CalendarEventController {
       const deletedEvent = await CalendarEventService.deleteEvent(eventId);
 
       if (!deletedEvent) {
-        logger.error(`Calendar event with ID ${eventId} not found for deletion`);
+        logger.error(
+          `Calendar event with ID ${eventId} not found for deletion`
+        );
         return res.status(404).json({ message: "Calendar event not found." });
       }
 
-      logger.info(`Calendar event with ID ${eventId} deleted successfully`);
+      // logger.info(`Calendar event with ID ${eventId} deleted successfully`);
 
-     /*  // Emit WebSocket event for deletion
+      /*  // Emit WebSocket event for deletion
       emitToAdmins("calendarEvents:eventDeleted", deletedEvent);
       emitToUser(
         deletedEvent.userId.toString(),

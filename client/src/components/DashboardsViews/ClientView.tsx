@@ -25,18 +25,18 @@ import MonthOverMonthSpendingTrend from "../statistics/charts/MonthOverMonthSpen
 import TopBrandsSold from "../statistics/charts/TopBrandSold";
 
 interface ClientViewProps {
-  selectedClient: any; // Replace `any` with appropriate type
+  selectedClient: any;
   handleToggleDrawer: () => void;
   clearSelection?: () => void;
-  calculateTotalSpentThisMonth: Function; // Replace `Function` with specific type
+  calculateTotalSpentThisMonth: Function;
   calculateTotalSpentThisYear: Function;
   calculateTopArticleType: Function;
   calculateMonthlyData: Function;
-  clientComparativeStatisticsMonthly?: any; // Replace `any` with appropriate type
+  clientComparativeStatisticsMonthly?: any;
   clientComparativeStatistics?: any;
   topBrandsData: any;
   userRole: any;
-  loadingState: boolean; // New prop to handle loading
+  loadingState: boolean;
 }
 
 const ClientView: React.FC<ClientViewProps> = ({
@@ -89,7 +89,7 @@ const ClientView: React.FC<ClientViewProps> = ({
             gutterBottom
             sx={{
               fontFamily: "Inter, sans-serif",
-              fontWeight: 100, // Now using the lighter custom font weight
+              fontWeight: 100,
             }}
           >
             {" "}
@@ -130,7 +130,7 @@ const ClientView: React.FC<ClientViewProps> = ({
         )}
       </Box>
 
-      <Grid container spacing={2}>
+      <Grid container spacing={4}>
         <Grid item xs={12} md={4}>
           {loadingState ? (
             <Skeleton
@@ -259,7 +259,6 @@ const ClientView: React.FC<ClientViewProps> = ({
       {/* Conditionally render the Close Selection FAB */}
       {userRole !== "client" &&
         (loadingState ? (
-          // Show Skeleton when loadingState is true
           <Skeleton
             animation="wave"
             variant="circular"

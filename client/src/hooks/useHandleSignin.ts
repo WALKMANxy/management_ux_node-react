@@ -1,16 +1,18 @@
+//src/hooks/useHandleSignin.ts
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { showToast } from "../services/toastMessage";
 import { useAuth } from "./useAuth";
+import { isRegistered } from "../utils/landingUtils";
 
 export const useHandleSignin = (onClose: () => void) => {
-  const { t } = useTranslation(); // Initialize translation
+  const { t } = useTranslation();
 
-  const [isLoginMode, setIsLoginMode] = useState(true);
+  const [isLoginMode, setIsLoginMode] = useState<boolean>(() => isRegistered());
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [keepMeSignedIn, setKeepMeSignedIn] = useState(false); // Track "Keep me signed in" state
+  const [keepMeSignedIn, setKeepMeSignedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertOpen, setAlertOpen] = useState(false);
@@ -19,7 +21,7 @@ export const useHandleSignin = (onClose: () => void) => {
   >("error");
   const [shakeEmail, setShakeEmail] = useState(false);
   const [shakePassword, setShakePassword] = useState(false);
-  const [shakeConfirmPassword, setShakeConfirmPassword] = useState(false); // For confirming password shake effect
+  const [shakeConfirmPassword, setShakeConfirmPassword] = useState(false);
 
   const { initiateLogin, initiateRegister, handleLoginWithGoogle } = useAuth();
 
@@ -53,7 +55,7 @@ export const useHandleSignin = (onClose: () => void) => {
     }, 2000);
 
     return () => clearTimeout(resetShake);
-  }, [alertMessage]); // Dependency array includes alertMessage to trigger effect when it changes
+  }, [alertMessage]);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -101,10 +103,9 @@ export const useHandleSignin = (onClose: () => void) => {
     } catch (error: unknown) {
       // Handling the error with proper type checking
       if (error instanceof Error) {
-        console.log("Error:", error.message);
+        console.error("Error:", error.message);
       } else {
-        // Fallback in case error is not an instance of Error
-        console.log("Error:", error);
+        console.error("Error:", error);
       }
     } finally {
       setLoading(false);
@@ -134,7 +135,7 @@ export const useHandleSignin = (onClose: () => void) => {
     confirmPassword,
     setConfirmPassword,
     keepMeSignedIn,
-    setKeepMeSignedIn, // Include setter for the checkbox
+    setKeepMeSignedIn,
     loading,
     alertOpen,
     setAlertOpen,

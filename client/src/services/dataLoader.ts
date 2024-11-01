@@ -1,3 +1,4 @@
+// client/src/services/dataLoader.ts
 import dayjs from "dayjs";
 import {
   CalendarEvent,
@@ -32,28 +33,28 @@ export const mapDataToModels = async (
 
   // Create workers and assign them relevant chunks of data with filtered client details
   const workers = chunks.map((chunk, index) => {
-    // Use Set for faster lookups
     const relevantClientIds = new Set(
       chunk.map((item) => item["Codice Cliente"].toString())
     );
 
     const relevantClientDetailsMap = new Map(
-      [...clientDetailsMap].filter(([clientId]) => relevantClientIds.has(clientId))
+      [...clientDetailsMap].filter(([clientId]) =>
+        relevantClientIds.has(clientId)
+      )
     );
-
 
     return new Promise<Client[]>((resolve, reject) => {
       const worker = new Worker(workerScriptPath);
 
       worker.onmessage = (event: MessageEvent<Client[]>) => {
         resolve(event.data);
-        worker.terminate(); // Terminate the worker after it finishes
+        worker.terminate();
       };
 
       worker.onerror = (error) => {
         console.error(`Worker ${index} error:`, error);
         reject(error);
-        worker.terminate(); // Terminate the worker on error
+        worker.terminate();
       };
 
       // Send the chunk of data and the relevant client details map
@@ -124,8 +125,6 @@ export const mapDataToMovementDetails = (
     priceBought: item["Costo"].toFixed(2),
   }));
 };
-
-// utils/dataLoader.ts
 
 export const mapVisitsToEntity = (
   visits: Visit[],
@@ -217,6 +216,6 @@ export const mapVisitToCalendarEvent = (visit: Visit): CalendarEvent => {
       ? "approved"
       : "pending",
     createdAt,
-    updatedAt: new Date(), // Consider using visit.updatedAt if available
+    updatedAt: new Date(),
   };
 };

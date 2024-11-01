@@ -1,4 +1,4 @@
-//src/features/utility/utilitySlice.ts
+//src/features/promoVisits/promoVisitsSelectors.ts
 import { createSelector } from "reselect";
 import { RootState } from "../../app/store";
 import { GlobalVisits, Promo, Visit } from "../../models/dataModels";
@@ -61,7 +61,7 @@ export const selectPromos = createSelector(
       // Client or Agent case
       return currentUserPromos;
     } else {
-      return []; // Fallback
+      return []; 
     }
   }
 );

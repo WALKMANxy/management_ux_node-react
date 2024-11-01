@@ -1,9 +1,7 @@
 // src/components/SpentThisYear.tsx
-
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
-
 import { Avatar, Box, Grid, Paper, Tooltip, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
@@ -24,12 +22,6 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
 
   const formattedAmount = currencyFormatter(parseFloat(amount));
 
-  /**
-   * Determines the comparison result based on the value and user role.
-   *
-   * @param {number} value - The comparison value.
-   * @returns {ComparisonResult} The comparison result object.
-   */
   const getComparisonResult = (value: number): ComparisonResult => {
     const isAgentComparison = userRole === "admin" && isAgentSelected;
     const isClientComparison =
@@ -109,7 +101,7 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
         position: "absolute",
         width: 210,
         height: 210,
-        background: "#43a047", // Dark Green
+        background: "#43a047",
         borderRadius: "50%",
         top: -85,
         right: -95,
@@ -119,7 +111,7 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
         position: "absolute",
         width: 210,
         height: 210,
-        background: "#a5d6a7", // Light Green
+        background: "#a5d6a7",
         borderRadius: "50%",
         top: -125,
         right: -15,
@@ -132,21 +124,21 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
       mr: 1,
       mt: 1.75,
       mb: 0.75,
-      wordBreak: "break-word", // Ensure long amounts wrap
+      wordBreak: "break-word",
     },
     title: {
       fontSize: "1.5rem",
       fontWeight: 500,
       color: "#000",
-      whiteSpace: "normal", // Allow text to wrap
-      wordBreak: "break-word", // Ensure long titles wrap
+      whiteSpace: "normal",
+      wordBreak: "break-word",
     },
     comparison: {
       fontSize: "1.65rem",
       fontWeight: 500,
-      color: "", // Will be set dynamically
+      color: "",
       paddingTop: 1,
-      wordBreak: "break-word", // Ensure long comparison texts wrap
+      wordBreak: "break-word",
     },
   };
 
@@ -160,7 +152,7 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
                 <Avatar
                   variant="rounded"
                   sx={{
-                    bgcolor: "#43a047", // Dark Green
+                    bgcolor: "#43a047",
                     color: "#000",
                     mt: 1,
                   }}
@@ -242,6 +234,4 @@ const SpentThisYear: React.FC<SpentThisYearProps> = ({
     </Paper>
   );
 };
-
-// Correct usage of React.memo with export
 export default React.memo(SpentThisYear);

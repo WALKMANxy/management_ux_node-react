@@ -1,5 +1,4 @@
-// src/components/CalendarComponent.tsx
-
+// src/components/dashboard/CalendarComponent.tsx
 import {
   Button,
   Dialog,
@@ -18,7 +17,7 @@ import { DayCalendarSkeleton } from "@mui/x-date-pickers/DayCalendarSkeleton";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
@@ -33,6 +32,7 @@ import {
 import { ServerDayProps } from "../../models/propsModels";
 import { locale } from "../../services/localizer";
 import { agentColorMap } from "../../utils/constants";
+import { now } from "../../utils/dataUtils";
 import ServerDay from "./ServerDay";
 
 const CalendarComponent: React.FC = () => {
@@ -43,9 +43,9 @@ const CalendarComponent: React.FC = () => {
   const clients = useAppSelector((state) => state.data.clients);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { t } = useTranslation(); // Initialize translation
+  const { t } = useTranslation();
 
-  const userRole = currentUserDetails?.role; // Extract userRole
+  const userRole = currentUserDetails?.role;
 
   const [isLoading, setIsLoading] = useState(false);
   const [highlightedDays, setHighlightedDays] = useState<
@@ -58,71 +58,67 @@ const CalendarComponent: React.FC = () => {
     VisitWithAgent[]
   >([]);
 
-
   const updateHighlightedDays = useCallback(
     (month: Dayjs) => {
-      const now = dayjs(); // Current date and time
-
-      const days = visits.reduce<{ date: number; color: string }[]>((acc, visit) => {
-        if (
-          visit.pending !== true ||
-          visit.completed !== false ||
-          !visit.date ||
-          !dayjs(visit.date).isSame(month, "month")
-        ) {
-          return acc;
-        }
-
-        const visitDay = dayjs(visit.date);
-        const date = visitDay.date();
-        const isPast = visitDay.isBefore(now, "day");
-
-        // Check if the date is already processed
-        const existing = acc.find((d) => d.date === date);
-        if (existing && existing.color === "#FFA8B8") {
-          return acc; // Already has highest priority color
-        }
-
-        let color = "#ADD8E6"; // Default pastel blue
-
-        if (currentUserDetails) {
-          if (currentUserDetails.role === "admin") {
-            // Admin view: color by agent
-            color = visit.agentId
-              ? agentColorMap[String(visit.agentId)] ?? color
-              : color;
-          } else if (currentUserDetails.role === "agent") {
-            // Agent view: color by client
-            const client = clients[visit.clientId];
-            color = client?.colour ?? color;
+      const days = visits.reduce<{ date: number; color: string }[]>(
+        (acc, visit) => {
+          if (
+            visit.pending !== true ||
+            visit.completed !== false ||
+            !visit.date ||
+            !dayjs(visit.date).isSame(month, "month")
+          ) {
+            return acc;
           }
-          // Clients have a single default color; no change needed
-        }
 
-        if (isPast) {
-          color = "#FFA8B8"; // Override with fainter red for past pending visits
-        }
+          const visitDay = dayjs(visit.date);
+          const date = visitDay.date();
+          const isPast = visitDay.isBefore(now, "day");
 
-        if (!existing) {
-          acc.push({ date, color });
-        } else if (!isPast) {
-          acc = acc.map((d) =>
-            d.date === date && d.color !== "#FFA8B8" ? { ...d, color } : d
-          );
-        }
+          // Check if the date is already processed
+          const existing = acc.find((d) => d.date === date);
+          if (existing && existing.color === "#FFA8B8") {
+            return acc;
+          }
 
-        return acc;
-      }, []);
+          let color = "#ADD8E6";
+
+          if (currentUserDetails) {
+            if (currentUserDetails.role === "admin") {
+              // Admin view: color by agent
+              color = visit.agentId
+                ? agentColorMap[String(visit.agentId)] ?? color
+                : color;
+            } else if (currentUserDetails.role === "agent") {
+              // Agent view: color by client
+              const client = clients[visit.clientId];
+              color = client?.colour ?? color;
+            }
+            // Clients have a single default color; no change needed
+          }
+
+          if (isPast) {
+            color = "#FFA8B8"; // Override with fainter red for past pending visits
+          }
+
+          if (!existing) {
+            acc.push({ date, color });
+          } else if (!isPast) {
+            acc = acc.map((d) =>
+              d.date === date && d.color !== "#FFA8B8" ? { ...d, color } : d
+            );
+          }
+
+          return acc;
+        },
+        []
+      );
 
       setHighlightedDays(days);
     },
     [visits, currentUserDetails, clients]
   );
 
-
-  /**
-   * Updates highlighted days whenever the current month changes.
-   */
   useEffect(() => {
     updateHighlightedDays(currentMonth);
   }, [currentMonth, updateHighlightedDays]);
@@ -158,10 +154,7 @@ const CalendarComponent: React.FC = () => {
       }
     };
   }, []);
-  /**
-   * Handles clicks on a specific day in the calendar.
-   * Navigates to the visit details or opens a dialog if multiple visits exist.
-   */
+
   const handleDayClick = (day: Dayjs) => {
     // Find all visits on the clicked day
     const visitsForDay = visits.filter(
@@ -173,7 +166,7 @@ const CalendarComponent: React.FC = () => {
     );
 
     if (visitsForDay.length === 0) {
-      // No visits on this day; do nothing or optionally show a message
+      // No visits on this day; do nothing
       return;
     } else if (visitsForDay.length === 1) {
       // Only one visit; navigate directly to /visits and select the visit
@@ -188,9 +181,6 @@ const CalendarComponent: React.FC = () => {
     }
   };
 
-  /**
-   * Handles the selection of a specific visit from the dialog.
-   */
   const handleVisitSelect = (visit: VisitWithAgent) => {
     if (userRole === "admin") {
       if (visit.agentId) {
@@ -207,9 +197,6 @@ const CalendarComponent: React.FC = () => {
     navigate("/visits");
   };
 
-  /**
-   * Closes the dialog without selecting a visit.
-   */
   const handleDialogClose = () => {
     setOpenDialog(false);
   };
@@ -223,10 +210,10 @@ const CalendarComponent: React.FC = () => {
         position: "relative",
         overflow: "hidden",
         background: "white",
-        flexGrow: 1, // Allow the component to grow and shrink based on available space
+        flexGrow: 1,
         display: "flex",
         flexDirection: "column",
-        minHeight: 0, // Allow the component to shrink without constraints
+        minHeight: 0,
         "&::before": {
           content: '""',
           position: "absolute",
@@ -262,8 +249,8 @@ const CalendarComponent: React.FC = () => {
           }}
           sx={{
             width: "auto",
-            flexGrow: 1, // Allow the calendar to grow and shrink based on available space
-            minHeight: 0, // Allow the calendar to shrink without constraints
+            flexGrow: 1,
+            minHeight: 0,
           }}
         />
       </LocalizationProvider>
