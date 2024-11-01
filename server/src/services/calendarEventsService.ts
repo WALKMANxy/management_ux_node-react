@@ -1,3 +1,4 @@
+//src/services/calendarEventsService.ts
 import { Types } from "mongoose";
 import { CalendarEvent, ICalendarEvent } from "../models/CalendarEvent";
 import { logger } from "../utils/logger";
@@ -16,16 +17,15 @@ export class CalendarEventService {
         status = "approved";
       }
 
-
-    // Debugging: Log the start and end dates
-    console.log("Service Start Date:", data.startDate);
-    console.log("Service End Date:", data.endDate);
+      // Debugging: Log the start and end dates
+      /* console.log("Service Start Date:", data.startDate);
+    console.log("Service End Date:", data.endDate); */
 
       const newEvent = new CalendarEvent({
         ...data,
-        status, // Set the status based on the event type and user role
-        createdAt: new Date(), // Set the current date for createdAt
-        updatedAt: new Date(), // Set the current date for updatedAt
+        status,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       });
       return await newEvent.save();
     } catch (error) {
@@ -88,9 +88,9 @@ export class CalendarEventService {
 
       return await CalendarEvent.find({
         $or: [
-          { userId: new Types.ObjectId(userId) }, // Get events for the logged-in user
+          { userId: new Types.ObjectId(userId) },
           { status: "approved" },
-          { status: "pending" }, // Get all approved and pending events for the current month
+          { status: "pending" },
         ],
         startDate: { $gte: startOfMonth, $lte: endOfMonth },
       }).exec();
@@ -114,7 +114,7 @@ export class CalendarEventService {
     try {
       return await CalendarEvent.findByIdAndUpdate(
         eventId,
-        { status, updatedAt: new Date() }, // Update the status and updatedAt timestamp
+        { status, updatedAt: new Date() },
         { new: true }
       ).exec();
     } catch (error) {

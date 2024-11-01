@@ -1,7 +1,8 @@
+//src/models/Passcode.ts
 import { Document, Schema, Types, model } from "mongoose";
 
 export interface IPasscode extends Document {
-  userId: Types.ObjectId; // Use Types.ObjectId instead of string
+  userId: Types.ObjectId;
   passcode: string;
   createdAt: Date;
   expiresAt: Date;
@@ -19,6 +20,6 @@ const passcodeSchema = new Schema<IPasscode>(
   { timestamps: true }
 );
 
-passcodeSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 }); // Automatically delete expired documents
+passcodeSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export const Passcode = model<IPasscode>("Passcode", passcodeSchema);

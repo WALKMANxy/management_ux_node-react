@@ -1,3 +1,4 @@
+//src/config/config.ts
 import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
@@ -5,7 +6,6 @@ import { logger } from "../utils/logger";
 
 const nodeEnv = process.env.NODE_ENV;
 
-// Function to load environment-specific .env file
 const loadEnvFile = () => {
   const envFile = path.resolve(process.cwd(), `.env.${nodeEnv}`);
 
@@ -16,7 +16,7 @@ const loadEnvFile = () => {
     logger.warn(
       `No .env.${nodeEnv} file found. Using default environment variables.`
     );
-    dotenv.config(); // This will load the default .env file if it exists
+    dotenv.config();
   }
 };
 
@@ -58,7 +58,10 @@ export const config = {
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
   region: process.env.AWS_REGION || "",
   bucketName: process.env.AWS_BUCKET_NAME || "",
+  postmarkApiToken: process.env.POSTMARK_API_TOKEN || "",
 };
+
+console.log(config.postmarkApiToken);
 
 // Validate required environment variables
 const requiredEnvVars = [

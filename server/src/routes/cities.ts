@@ -1,3 +1,4 @@
+//src/routes/cities.ts
 import { Router } from "express";
 import { authenticateUser } from "../middlewares/authentication";
 import { CityController } from "../controllers/cityQueryController";
@@ -6,7 +7,6 @@ const cityController = new CityController();
 const router = Router();
 
 router.use(authenticateUser);
-
 
 // Route to find a nearby city
 router.get("/find", (req, res) => cityController.findCity(req, res));

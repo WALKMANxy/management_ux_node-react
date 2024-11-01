@@ -1,3 +1,4 @@
+//src/utils/sessionUtils.ts
 import { Request } from "express";
 import ms from "ms";
 import { config } from "../config/config";
@@ -13,7 +14,7 @@ import {
 } from "./jwtUtils";
 import { logger } from "./logger";
 
-const refreshTokenDurationMs = ms(config.jwt.refreshTokenExpiry); // e.g., "7d"
+const refreshTokenDurationMs = ms(config.jwt.refreshTokenExpiry);
 
 export const createSession = async (
   user: Partial<IUser>,
@@ -35,11 +36,11 @@ export const createSession = async (
     logger.info("Attempting to create session", { userId, uniqueId });
 
     const userAgent = req.get("User-Agent") || "Unknown";
-    logger.info("Retrieved User-Agent from request", { userAgent });
+    // logger.info("Retrieved User-Agent from request", { userAgent });
 
-    console.log(
+    /*  console.log(
       "Checking if a session with the same userId, uniqueId, and userAgent exists"
-    );
+    ); */
     const existingSession = await Session.findOne({
       userId,
       uniqueId,
@@ -47,16 +48,16 @@ export const createSession = async (
     });
 
     if (existingSession) {
-      console.log("Found existing session. Invalidating session...");
+      // console.log("Found existing session. Invalidating session...");
       const invalidated = await invalidateSession(userId!, uniqueId, userAgent);
       if (!invalidated) {
-        console.log("Failed to invalidate existing session.");
+        console.error("Failed to invalidate existing session.");
         throw new Error("Failed to invalidate existing session.");
       }
     }
 
     // Generate tokens
-    logger.info("Generating new tokens for user", { userId });
+    // logger.info("Generating new tokens for user", { userId });
     const newAccessToken = generateAccessToken(user as IUser, uniqueId);
     const newRefreshToken = generateRefreshToken(user as IUser);
 
@@ -71,7 +72,7 @@ export const createSession = async (
       uniqueId,
     });
 
-    console.log("Saved session:", session.toObject());
+    // console.log("Saved session:", session.toObject());
 
     await session.save();
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
@@ -106,12 +107,6 @@ export const createSession = async (
   }
 };
 
-/**
- * Validates the Access Token and retrieves the corresponding session.
- * @param accessToken - The Access Token provided by the client.
- * @param req - The request object containing userAgent and uniqueId.
- * @returns The session if valid, otherwise null.
- */
 export const getSessionByAccessToken = async (
   accessToken: string,
   req: Request
@@ -179,7 +174,7 @@ export const getSessionByAccessToken = async (
 export const renewSession = async (
   refreshToken: string,
   req: Request,
-  uniqueId: string // Now mandatory to ensure consistent session binding
+  uniqueId: string
 ): Promise<{ accessToken: string; refreshToken: string } | null> => {
   try {
     if (!refreshToken) {
@@ -303,10 +298,6 @@ export const invalidateSession = async (
   }
 };
 
-/**
- * Invalidates all sessions for a specific user.
- * @param userId - The ID of the user whose sessions are to be invalidated.
- */
 export const invalidateAllUserSessions = async (
   userId: string
 ): Promise<void> => {
@@ -326,11 +317,6 @@ export const invalidateAllUserSessions = async (
   }
 };
 
-/**
- * Fetches all active sessions for a user.
- * @param userId - The ID of the user whose sessions are to be fetched.
- * @returns An array of active sessions.
- */
 export const getUserSessions = async (userId: string): Promise<ISession[]> => {
   try {
     const sessions = await Session.find({

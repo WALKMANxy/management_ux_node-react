@@ -1,6 +1,6 @@
+//src/models/City.ts
 import mongoose, { Document } from "mongoose";
 
-// Define the interface for the City model
 interface ICity extends Document {
   name: string;
   location: {
@@ -30,9 +30,6 @@ const citySchema = new mongoose.Schema({
 
 // Create a 2dsphere index for geospatial queries
 citySchema.index({ location: "2dsphere" });
-
-// Add an index for the name field
 citySchema.index({ name: 1 });
 
-// Create and export the City model
 export const City = mongoose.model<ICity>("City", citySchema);

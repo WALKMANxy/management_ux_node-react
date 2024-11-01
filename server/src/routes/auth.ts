@@ -1,3 +1,4 @@
+//src/routes/auth.ts
 import { Router } from "express";
 import {
   loginValidationRules,
@@ -28,6 +29,7 @@ router.post(
   checkValidation,
   register
 );
+
 router.get("/verify-email", verifyEmail);
 
 router.post(
@@ -37,6 +39,7 @@ router.post(
   checkValidation,
   login
 );
+
 router.post("/logout", authRateLimiter, logout);
 
 router.post("/logout-all", authenticateUser, authRateLimiter, logoutAllDevices);
@@ -49,7 +52,6 @@ router.get(
 );
 router.post("/refresh-session", authRateLimiter, refreshSession);
 
-// Password reset routes
 router.post("/request-password-reset", authRateLimiter, requestPasswordReset);
 
 router.post("/verify-reset-code", authRateLimiter, verifyResetCode);

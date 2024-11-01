@@ -1,12 +1,11 @@
 // src/middleware/errorHandler.ts
-
 import { NextFunction, Response } from "express";
 import { logger } from "./logger";
 import { AuthenticatedRequest } from "../models/types";
 
 interface CustomError extends Error {
   statusCode?: number;
-  isOperational?: boolean; // Flag for operational (expected) errors
+  isOperational?: boolean;
 }
 
 // Improved error handler middleware
@@ -16,7 +15,6 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  // Determine the status code: use provided statusCode or default to 500
   const statusCode = err.statusCode || 500;
 
   // Log the error with additional context
@@ -34,11 +32,11 @@ export const errorHandler = (
   const responseMessage =
     process.env.NODE_ENV === "production"
       ? "An unexpected error occurred. Please try again later."
-      : err.message; // More detailed error message in development
+      : err.message; 
 
   // Send JSON response with error message
   res.status(statusCode).json({
     message: responseMessage,
-    ...(process.env.NODE_ENV !== "production" && { error: err.message }), // Include error details in non-production environments
+    ...(process.env.NODE_ENV !== "production" && { error: err.message }),
   });
 };

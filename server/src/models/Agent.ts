@@ -1,3 +1,4 @@
+//src/models/Agent.ts
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IAgent extends Document {
@@ -6,10 +7,10 @@ export interface IAgent extends Document {
   email?: string;
   phone?: string;
   clients: {
-    CODICE: string; // Reference to Client
-    colour?: string; // Optional colour property
+    CODICE: string;
+    colour?: string;
   }[];
-  createdAt?: Date; // Optional timestamp fields
+  createdAt?: Date;
   updatedAt?: Date;
 }
 
@@ -27,7 +28,7 @@ const AgentSchema: Schema = new Schema(
     clients: { type: [ClientReferenceSchema], default: [] },
   },
   {
-    timestamps: true, // Automatically create `createdAt` and `updatedAt` fields
+    timestamps: true, 
   }
 );
 

@@ -1,3 +1,4 @@
+//src/index.ts
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -26,7 +27,7 @@ import oauthRoutes from "./routes/OAuth";
 import promosRoutes from "./routes/promos";
 import usersRoutes from "./routes/users";
 import visitsRoutes from "./routes/visits";
-import utilsRoutes from "./routes/utils";
+// import utilsRoutes from "./routes/utils";
 import { errorHandler } from "./utils/errorHandler";
 import { logger, logRequestsIp } from "./utils/logger";
 
@@ -41,7 +42,7 @@ mongoose
   .catch((err) => logger.error("MongoDB connection error:", { error: err }));
 
 const corsOptions: cors.CorsOptions = {
-  origin: [config.appUrl, "https://rcsnext.com"],
+  origin: [config.appUrl, "https://dev.rcsnext.com"],
   credentials: true,
   optionsSuccessStatus: 200,
 };
@@ -63,12 +64,8 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-
 // Data Scrambling utility routes.
-
- app.use("/utils", utilsRoutes);
-
-
+// app.use("/utils", utilsRoutes);
 
 // Public routes
 app.use("/auth", authRoutes);
