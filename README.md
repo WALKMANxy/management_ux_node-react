@@ -12,8 +12,7 @@ A cutting-edge management software solution built for modern businesses, featuri
 
 [Demo](https://rcsnext.com) • [Report Bug](https://github.com/yourusername/next-m/issues) • [Request Feature](https://github.com/yourusername/next-m/issues)
 
-[test.jpg](https://postimg.cc/Js30Wc3S)
-</div>
+[![test.jpg](https://i.postimg.cc/3xVvmtkr/test.jpg)](https://postimg.cc/Js30Wc3S)</div>
 
 ## 🌟 Features
 
