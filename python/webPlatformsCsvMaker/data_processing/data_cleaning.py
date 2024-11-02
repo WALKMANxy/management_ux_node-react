@@ -196,7 +196,6 @@ def merge_files(articles_file_path, warehouse_file_path):
         how="inner",  # Use 'inner' to get only successful matches
     )
 
-    # Additional filtering step based on your requirements
     # Filter out all rows where UBICAZIONE starts with 'c.00' or 'C.00' and DESCRIZIONE does not contain 'FILTRO', 'FILTRI', 'filtro', 'filtri'
     pattern = r"^[cC]\.00"
     keywords = ["FILTRO", "FILTRI", "filtro", "filtri"]
