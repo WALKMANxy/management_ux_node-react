@@ -95,13 +95,13 @@ def optimized_cross_code_generation(cleaned_df, ignored_brands):
     return cross_codes_series.fillna("")
 
 
-def process_tulero(
+def process_company1(
     merged_df, brands_file_path, old_oems_folder, ignored_brands, markup, shipping_cost
 ):
     import numpy as np
     import pandas as pd
 
-    # print("process_tulero function started")
+    # print("process_company1 function started")
     # Proceed with the rest of the processing
     merged_df["CODICE OE"] = pd.NA
     merged_df["CODICI CROSS"] = pd.NA
@@ -310,8 +310,8 @@ def process_tulero(
 
     # print("Applied the custom rounding to 'PREZZO'")
 
-    tulero_df = merged_df
+    company1_df = merged_df
 
     # print("TULERO READY")
 
-    return tulero_df
+    return company1_df

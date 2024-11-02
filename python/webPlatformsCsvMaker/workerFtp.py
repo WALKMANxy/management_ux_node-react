@@ -16,11 +16,11 @@ from utility.ftp_utils import upload_to_ftp
 
 
 class UploadDialog(QDialog):
-    def __init__(self, parent, output_folder, tulero_ftp_info, tyre24_ftp_info):
+    def __init__(self, parent, output_folder, company1_ftp_info, company2_ftp_info):
         super().__init__(parent)
         self.output_folder = output_folder
-        self.tulero_ftp_info = tulero_ftp_info
-        self.tyre24_ftp_info = tyre24_ftp_info
+        self.company1_ftp_info = company1_ftp_info
+        self.company2_ftp_info = company2_ftp_info
 
         self.setWindowTitle(_("Upload Files"))
         self.setModal(True)
@@ -34,13 +34,13 @@ class UploadDialog(QDialog):
 
         button_layout = QHBoxLayout()
 
-        self.tulero_button = QPushButton("Tulero")
-        self.tulero_button.clicked.connect(self.upload_tulero)
-        button_layout.addWidget(self.tulero_button)
+        self.company1_button = QPushButton("Tulero")
+        self.company1_button.clicked.connect(self.upload_company1)
+        button_layout.addWidget(self.company1_button)
 
-        self.tyre24_button = QPushButton("Tyre24")
-        self.tyre24_button.clicked.connect(self.upload_tyre24)
-        button_layout.addWidget(self.tyre24_button)
+        self.company2_button = QPushButton("Tyre24")
+        self.company2_button.clicked.connect(self.upload_company2)
+        button_layout.addWidget(self.company2_button)
 
         self.both_button = QPushButton(_("Both"))
         self.both_button.clicked.connect(self.upload_both)
@@ -63,26 +63,26 @@ class UploadDialog(QDialog):
         self.setLayout(layout)
         self.worker = None
 
-    def upload_tulero(self):
-        self.upload_files(upload_tulero=True, upload_tyre24=False)
+    def upload_company1(self):
+        self.upload_files(upload_company1=True, upload_company2=False)
 
-    def upload_tyre24(self):
-        self.upload_files(upload_tulero=False, upload_tyre24=True)
+    def upload_company2(self):
+        self.upload_files(upload_company1=False, upload_company2=True)
 
     def upload_both(self):
-        self.upload_files(upload_tulero=True, upload_tyre24=True)
+        self.upload_files(upload_company1=True, upload_company2=True)
 
-    def upload_files(self, upload_tulero, upload_tyre24):
-        if upload_tulero and not self.validate_ftp_info(self.tulero_ftp_info):
+    def upload_files(self, upload_company1, upload_company2):
+        if upload_company1 and not self.validate_ftp_info(self.company1_ftp_info):
             self.message_label.setText(_("Tulero FTP info is incomplete."))
             return
-        if upload_tyre24 and not self.validate_ftp_info(self.tyre24_ftp_info):
+        if upload_company2 and not self.validate_ftp_info(self.company2_ftp_info):
             self.message_label.setText(_("Tyre24 FTP info is incomplete."))
             return
 
         # Disable buttons
-        self.tulero_button.setEnabled(False)
-        self.tyre24_button.setEnabled(False)
+        self.company1_button.setEnabled(False)
+        self.company2_button.setEnabled(False)
         self.both_button.setEnabled(False)
         self.none_button.setEnabled(False)
 
@@ -93,10 +93,10 @@ class UploadDialog(QDialog):
         # Start upload worker
         self.worker = UploadWorker(
             self.output_folder,
-            self.tulero_ftp_info,
-            self.tyre24_ftp_info,
-            upload_tulero,
-            upload_tyre24,
+            self.company1_ftp_info,
+            self.company2_ftp_info,
+            upload_company1,
+            upload_company2,
         )
         self.worker.progress.connect(self.update_progress)
         self.worker.finished.connect(self.upload_finished)
@@ -110,8 +110,8 @@ class UploadDialog(QDialog):
         self.progress_bar.setVisible(False)
 
         # Enable buttons
-        self.tulero_button.setEnabled(True)
-        self.tyre24_button.setEnabled(True)
+        self.company1_button.setEnabled(True)
+        self.company2_button.setEnabled(True)
         self.both_button.setEnabled(True)
         self.none_button.setEnabled(True)
 
@@ -135,44 +135,44 @@ class UploadWorker(QThread):
     def __init__(
         self,
         output_folder,
-        tulero_ftp_info,
-        tyre24_ftp_info,
-        upload_tulero=True,
-        upload_tyre24=True,
+        company1_ftp_info,
+        company2_ftp_info,
+        upload_company1=True,
+        upload_company2=True,
     ):
         super().__init__()
         self.output_folder = output_folder
-        self.tulero_ftp_info = tulero_ftp_info
-        self.tyre24_ftp_info = tyre24_ftp_info
-        self.upload_tulero = upload_tulero
-        self.upload_tyre24 = upload_tyre24
+        self.company1_ftp_info = company1_ftp_info
+        self.company2_ftp_info = company2_ftp_info
+        self.upload_company1 = upload_company1
+        self.upload_company2 = upload_company2
 
     def run(self):
         messages = []
 
         # Upload Tulero file if requested
-        if self.upload_tulero:
-            tulero_output_file = os.path.join(self.output_folder, "tulero_output.csv")
+        if self.upload_company1:
+            company1_output_file = os.path.join(self.output_folder, "company1_output.csv")
             self.progress.emit(_("Uploading Tulero file..."))
-            tulero_success, tulero_error = upload_to_ftp(
-                tulero_output_file, self.tulero_ftp_info
+            company1_success, company1_error = upload_to_ftp(
+                company1_output_file, self.company1_ftp_info
             )
-            if tulero_success:
+            if company1_success:
                 messages.append(_("Tulero upload successful."))
             else:
-                messages.append(_("Tulero upload failed: ") + tulero_error)
+                messages.append(_("Tulero upload failed: ") + company1_error)
 
         # Upload Tyre24 file if requested
-        if self.upload_tyre24:
-            tyre24_output_file = os.path.join(self.output_folder, "tyre24_output.csv")
+        if self.upload_company2:
+            company2_output_file = os.path.join(self.output_folder, "company2_output.csv")
             self.progress.emit(_("Uploading Tyre24 file..."))
-            tyre24_success, tyre24_error = upload_to_ftp(
-                tyre24_output_file, self.tyre24_ftp_info
+            company2_success, company2_error = upload_to_ftp(
+                company2_output_file, self.company2_ftp_info
             )
-            if tyre24_success:
+            if company2_success:
                 messages.append(_("Tyre24 upload successful."))
             else:
-                messages.append(_("Tyre24 upload failed: ") + tyre24_error)
+                messages.append(_("Tyre24 upload failed: ") + company2_error)
 
         # Combine all messages and emit the result
         final_message = (
