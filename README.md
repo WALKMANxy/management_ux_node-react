@@ -1,6 +1,6 @@
 <div align="center">
 
-# NEXT_M Management Software
+# NEXT_ Management Software
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/WALKMANxy/management_ux_node-react/issues)
