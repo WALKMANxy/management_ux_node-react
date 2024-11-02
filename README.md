@@ -13,9 +13,9 @@ A cutting-edge management software solution built for modern businesses, featuri
 
 [Demo](https://rcsnext.com) • [Report Bug](https://github.com/WALKMANxy/management_ux_node-react/issues) • [Request Feature](https://github.com/WALKMANxy/management_ux_node-react/issues)
 
-![NEXT_M Dashboard](link-to-your-dashboard-screenshot.png)
-
+[![test.jpg](https://i.postimg.cc/3xVvmtkr/test.jpg)](https://postimg.cc/Js30Wc3S)
 </div>
+
 
 ## 🌟 Features
 
