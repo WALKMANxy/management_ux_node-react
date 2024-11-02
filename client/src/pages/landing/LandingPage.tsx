@@ -103,6 +103,7 @@ const LandingPage: React.FC = () => {
           >
             <Box
               sx={{
+                padding: "1rem",
                 flex: {
                   xs: isLandscape ? "0 1 40%" : "0 1 70%",
                   sm: isLandscape ? "0 1 40%" : "0 1 70%",
@@ -144,8 +145,7 @@ const LandingPage: React.FC = () => {
                 flexItem={isLandscape}
                 sx={{
                   my: isSuperMobile ? 0.5 : 2,
-                  mr: isLandscape ? 2 : 0, // Add horizontal margin in landscape
-                  
+                  mx: isLandscape ? 2 : 0, // Add horizontal margin in landscape
                   height: isLandscape ? "auto" : "1px", // Ensure height is auto for vertical
                   minWidth: isLandscape ? null : "300px",
                 }}
@@ -168,6 +168,8 @@ const LandingPage: React.FC = () => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
+                  flex: isLandscape ? "1" : "none", // Allows button to take up available space in landscape
+                  flexShrink: 1,
                 }}
               >
                 <Button
@@ -176,7 +178,7 @@ const LandingPage: React.FC = () => {
                   onClick={() => setShowLogin(true)}
                   onMouseEnter={preloadDashboard}
                   sx={{
-                    mt: isSuperMobile || isMobile || isLandscape ? 2 : 4,
+                    mt: isSuperMobile || isMobile ? 2 : 4,
 
                     paddingX: 4,
                     paddingY: 1.5,
