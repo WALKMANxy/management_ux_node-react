@@ -19,11 +19,11 @@ class Worker(QThread):
         oem_folder,
         brands_file,
         tecdoc_file,  # New
-        tulero_ftp_info,  # New
-        tyre24_ftp_info,  # New
+        company1_ftp_info,  # New
+        company2_ftp_info,  # New
         validated_data,  # Add the inputs (markup and shipping costs)
-        upload_tulero=True,  # New parameter
-        upload_tyre24=True,   # New parameter
+        upload_company1=True,  # New parameter
+        upload_company2=True,   # New parameter
     ):
         super().__init__()
         self.articles_file = articles_file
@@ -32,18 +32,18 @@ class Worker(QThread):
         self.oem_folder = oem_folder
         self.brands_file = brands_file
         self.tecdoc_file = tecdoc_file  # New
-        self.tulero_ftp_info = tulero_ftp_info  # New
-        self.tyre24_ftp_info = tyre24_ftp_info  # New
+        self.company1_ftp_info = company1_ftp_info  # New
+        self.company2_ftp_info = company2_ftp_info  # New
         self.inputs = validated_data  # Store the inputs
-        self.upload_tulero = upload_tulero  # New
-        self.upload_tyre24 = upload_tyre24    # New
+        self.upload_company1 = upload_company1  # New
+        self.upload_company2 = upload_company2    # New
         self.timer = None
 
     def run(self):
         try:
             # Call the main data processing function
-            tulero_output_file = os.path.join(self.output_folder, "tulero_output.csv")
-            tyre24_output_file = os.path.join(self.output_folder, "tyre24_output.csv")
+            company1_output_file = os.path.join(self.output_folder, "company1_output.csv")
+            company2_output_file = os.path.join(self.output_folder, "company2_output.csv")
 
             try:
                 # Run data processing
@@ -51,8 +51,8 @@ class Worker(QThread):
                     self.articles_file,
                     self.warehouse_file,
                     self.tecdoc_file,
-                    tulero_output_file,
-                    tyre24_output_file,
+                    company1_output_file,
+                    company2_output_file,
                     self.brands_file,
                     self.oem_folder,
                     IGNORED_BRANDS,
@@ -73,17 +73,17 @@ class Worker(QThread):
     def upload_files(self):
         """Handles file upload and catches more detailed errors."""
         try:
-            if not self.upload_tulero and not self.upload_tyre24:
+            if not self.upload_company1 and not self.upload_company2:
                 # No uploads to perform
                 self.finished_processing.emit("Processing completed successfully without uploads.")
                 return
 
             upload_worker = UploadWorker(
                 self.output_folder,
-                self.tulero_ftp_info,
-                self.tyre24_ftp_info,
-                upload_tulero=self.upload_tulero,  # Pass the flag
-                upload_tyre24=self.upload_tyre24,  # Pass the flag
+                self.company1_ftp_info,
+                self.company2_ftp_info,
+                upload_company1=self.upload_company1,  # Pass the flag
+                upload_company2=self.upload_company2,  # Pass the flag
             )
             upload_worker.progress.connect(lambda message: self.progress.emit(message))
             upload_worker.finished.connect(self.on_upload_finished)
