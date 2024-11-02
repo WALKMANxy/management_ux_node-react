@@ -3,16 +3,19 @@
 # NEXT_M Management Software
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/yourusername/next-m/issues)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen.svg)](https://nodejs.org/)
+[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/WALKMANxy/management_ux_node-react/issues)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev/)
 
 A cutting-edge management software solution built for modern businesses, featuring real-time communication, advanced analytics, and comprehensive business tools.
 
-[Demo](https://rcsnext.com) • [Report Bug](https://github.com/yourusername/next-m/issues) • [Request Feature](https://github.com/yourusername/next-m/issues)
+[Demo](https://rcsnext.com) • [Report Bug](https://github.com/WALKMANxy/management_ux_node-react/issues) • [Request Feature](https://github.com/WALKMANxy/management_ux_node-react/issues)
 
-[![test.jpg](https://i.postimg.cc/3xVvmtkr/test.jpg)](https://postimg.cc/Js30Wc3S)</div>
+![NEXT_M Dashboard](link-to-your-dashboard-screenshot.png)
+
+</div>
 
 ## 🌟 Features
 
@@ -23,10 +26,11 @@ A cutting-edge management software solution built for modern businesses, featuri
 - **Admin Controls**
   - Full CRUD operations for entities (clients, admins, agents, employees)
   - User deletion capabilities
-  - Entity assignment system
+  - Entity assignment system, only registered and verified users that have been assigned an entity by an admin can enter the app
 
 - **Authentication**
   - Secure login & registration
+  - Account verification via email after registration
   - Password reset functionality
   - Session persistence
   - Auto-renewal system
@@ -34,7 +38,7 @@ A cutting-edge management software solution built for modern businesses, featuri
 ### 📊 Analytics & Dashboards
 - **Role-Specific Dashboards**
   - Custom views per user type
-  - Real-time data updates
+  - Possibility of real-time data updates upon necessity and data source
   
 - **Advanced Analytics**
   - Revenue tracking (net/gross)
@@ -48,7 +52,8 @@ A cutting-edge management software solution built for modern businesses, featuri
   - Broadcast messaging
   - AWS S3 file sharing
   - Message search
-  - Last seen indicators
+  - Server reception and "seen" status indicators
+  - Supports automated messages via NEXT_ Bot (Scheduled visits, events, reminders)
   
 - **Performance Features**
   - Web Worker optimization
@@ -58,7 +63,7 @@ A cutting-edge management software solution built for modern businesses, featuri
 ### 🗓️ Business Tools
 - **Visit Management**
   - Scheduling system
-  - Privacy controls
+  - Private and public notes inside the visits, the former only visible to the agent linked to the visit and the admins
   
 - **Promotion System**
   - Custom promotion creation
@@ -67,11 +72,11 @@ A cutting-edge management software solution built for modern businesses, featuri
 - **Calendar Integration**
   - Absence tracking
   - Event management
-  - National holiday support
+  - Supports locale's Nation Holiday via nager.date
 
 ### 💻 Technical Excellence
 - **Responsive Design**
-  - Mobile-first approach
+  - Full support for mobile, tablets and desktops
   - Custom component library (95%)
   - Touch-optimized interfaces
 
@@ -97,17 +102,19 @@ A cutting-edge management software solution built for modern businesses, featuri
 
 ### Prerequisites
 
-- Node.js ≥ 14.0.0
+- Node.js ≥ 22.0.0
 - npm ≥ 6.0.0
 - MongoDB Atlas account
 - AWS S3 account
+- Postmark API key (for automated email system)
+- LocationIQ API Key (for reverse geocoding)
 
 ### Installation
 
 1. **Clone the repository**
 ```
-git clone https://github.com/yourusername/next-m.git
-cd next-m
+git clone https://github.com/WALKMANxy/management_ux_node-react.git
+cd management_ux_node-react
 ```
 
 2. **Set up environment variables**
@@ -117,22 +124,51 @@ Create `.env` files in both server and client directories using the provided tem
 <details>
 <summary>Server Environment Variables</summary>
 
-Required variables for server setup:
-- `NODE_ENV`
-- `PORT`
-- `BASE_URL`
-- `MONGO_URI`
-- [View full list](#server-environment-variables)
+```env
+NODE_ENV=
+PORT=
+BASE_URL=
+APP_URL=
+REFRESH_TOKEN_DURATION=
+SESSION_DURATION=
+IPINFO_TOKEN=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+BOT_TOKEN=
+REDIRECT_URI=
+SSL_KEY_PATH_OLD=
+SSL_CERT_PATH_OLD=
+SSL_KEY_PATH=
+SSL_CERT_PATH=
+JWT_SECRET=
+ACCESS_TOKEN_SECRET=
+REFRESH_TOKEN_SECRET=
+REVERSE_GEO_TOKEN=
+ACCESS_TOKEN_EXPIRY=
+REFRESH_TOKEN_EXPIRY=
+SESSION_DURATION=
+POSTMARK_API_TOKEN=
+JWT_EXPIRES_IN=
+PASSWORD_RESET_EXPIRES_IN=
+MONGO_URI=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=
+AWS_BUCKET_NAME=
+```
 </details>
 
 <details>
 <summary>Client Environment Variables</summary>
 
-Required variables for client setup:
-- `VITE_APP_NAME`
-- `VITE_API_BASE_URL`
-- `VITE_APP_URL`
-- [View full list](#client-environment-variables)
+```env
+VITE_APP_NAME=
+VITE_API_BASE_URL=
+VITE_APP_URL=
+VITE_DEV_CRT=
+VITE_DEV_KEY=
+VITE_UPDATE_TIME_MS=
+```
 </details>
 
 3. **Install dependencies and start development servers**
@@ -159,6 +195,13 @@ npm run dev
 - Custom Components
 - Web Workers
 - dexie.js
+- @fortawesome
+- ag-grid-react
+- apexcharts
+- i18next
+- react-hook-form
+- List virtualization
+- Sonner
 
 ### Backend
 - Node.js + Express
@@ -167,6 +210,8 @@ npm run dev
 - Socket.IO
 - AWS S3
 - Winston Logger
+- OAuth 2
+- Postmark
 
 ## 🔒 Security Measures
 
@@ -181,15 +226,7 @@ npm run dev
 
 ## 🤝 Contributing
 
-We love your input! Check out our [Contributing Guide](CONTRIBUTING.md) to get started.
-
-### Development Process
-
-1. Fork the repo
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+This is a pet project, and we welcome any contributions! Feel free to open Issues or Pull Requests if you'd like to help improve the project or report any issues you find.
 
 ## 📜 License
 
@@ -197,15 +234,15 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 📞 Contact
 
-Project Lead - [@yourusername](https://twitter.com/yourusername)
+Project Lead - [@WALKMANxy](https://github.com/WALKMANxy)
 
-Project Link: [https://github.com/yourusername/next-m](https://github.com/yourusername/next-m)
+Project Link: [https://github.com/WALKMANxy/management_ux_node-react](https://github.com/WALKMANxy/management_ux_node-react)
 
 ---
 
 <div align="center">
 
-Made with ❤️ by [Your Name](https://github.com/yourusername)
+Made with ❤️ by WALKMAN
 
 ⭐️ Star us on GitHub — it helps!
 
