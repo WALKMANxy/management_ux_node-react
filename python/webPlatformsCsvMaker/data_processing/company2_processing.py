@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def process_tyre24(
+def process_company2(
     merged_df, tecdoc_file_path, markup_it, shipping_it, markup_de, shipping_de
 ):
     # Rename the columns
@@ -198,6 +198,6 @@ def process_tyre24(
     # Filter out rows with TecDoc Brand 'RCS' and 'CC'
     merged_df = merged_df[~merged_df["TecDoc Brand"].isin(["RCS", "CC"])]
 
-    tyre24_df = merged_df
+    company2_df = merged_df
 
-    return tyre24_df
+    return company2_df
