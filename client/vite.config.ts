@@ -35,7 +35,7 @@ export default defineConfig(({ mode }) => {
           "locales/**/*.json", // Include all JSON files inside locales
           "logo-appbar.png",
           "logobig.png",
-          "assets/weather/*.svg",
+          "images/weather/*.svg",
         ],
         manifest: {
           name: "NEXT_",
