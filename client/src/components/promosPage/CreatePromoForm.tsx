@@ -86,6 +86,7 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
           display: "flex",
           flexDirection: "column",
           height: "auto",
+          mx: 1,
         }}
       >
         {isCreating && (
@@ -327,7 +328,7 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
         {/* Action Buttons */}
         <Box
           sx={{
-            mt: 4,
+            mt: 2,
             display: "flex",
             justifyContent: "flex-end",
             gap: 2,
@@ -336,7 +337,8 @@ const CreatePromoForm: React.FC<CreatePromoFormProps> = ({
           <Box
             sx={{
               display: "flex",
-              gap: 4,
+              gap: 2.5,
+              pb: 2,
             }}
           >
             <Tooltip
