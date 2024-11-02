@@ -34,6 +34,7 @@ A cutting-edge management software solution built for modern businesses, featuri
   - Password reset functionality
   - Session persistence
   - Auto-renewal system
+  - OAuth2 login with Google (still needs to be tested)
 
 ### 📊 Analytics & Dashboards
 - **Role-Specific Dashboards**
@@ -103,10 +104,12 @@ A cutting-edge management software solution built for modern businesses, featuri
 
 - Node.js ≥ 22.0.0
 - npm ≥ 6.0.0
-- MongoDB Cluster 
+- MongoDB Cluster
+- Google Cloud OAuth2 tokens (for google login support)
 - AWS S3 account (for file sharing support)
 - Postmark API key (for automated email system)
 - LocationIQ API Key (for reverse geocoding)
+- IPInfo API key (for ip logging and tracking)
 
 ### Installation
 
