@@ -125,36 +125,34 @@ Create `.env` files in both server and client directories using the provided tem
 <summary>Server Environment Variables</summary>
 
 ```env
-NODE_ENV=
-PORT=
-BASE_URL=
-APP_URL=
-REFRESH_TOKEN_DURATION=
-SESSION_DURATION=
-IPINFO_TOKEN=
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-BOT_TOKEN=
-REDIRECT_URI=
-SSL_KEY_PATH_OLD=
-SSL_CERT_PATH_OLD=
-SSL_KEY_PATH=
-SSL_CERT_PATH=
-JWT_SECRET=
-ACCESS_TOKEN_SECRET=
-REFRESH_TOKEN_SECRET=
-REVERSE_GEO_TOKEN=
-ACCESS_TOKEN_EXPIRY=
-REFRESH_TOKEN_EXPIRY=
-SESSION_DURATION=
-POSTMARK_API_TOKEN=
-JWT_EXPIRES_IN=
-PASSWORD_RESET_EXPIRES_IN=
-MONGO_URI=
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_REGION=
-AWS_BUCKET_NAME=
+NODE_ENV=development
+PORT=3000
+BASE_URL=http://localhost:3000
+APP_URL=http://localhost:3000
+REFRESH_TOKEN_DURATION=30d
+SESSION_DURATION=30d
+IPINFO_TOKEN=your_ipinfo_token
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+BOT_TOKEN=your_bot_token
+REDIRECT_URI=http://localhost:3000/oauth2callback
+SSL_KEY_PATH=path_to_ssl_key
+SSL_CERT_PATH=path_to_ssl_cert
+JWT_SECRET=your_jwt_secret
+ACCESS_TOKEN_SECRET=your_access_token_secret
+REFRESH_TOKEN_SECRET=your_refresh_token_secret
+REVERSE_GEO_TOKEN=your_reverse_geo_token
+ACCESS_TOKEN_EXPIRY=15m
+REFRESH_TOKEN_EXPIRY=30d
+SESSION_DURATION=30d
+POSTMARK_API_TOKEN=your_postmark_api_token
+JWT_EXPIRES_IN=15m
+PASSWORD_RESET_EXPIRES_IN=1h
+MONGO_URI=your_mongodb_connection_string
+AWS_ACCESS_KEY_ID=your_aws_access_key_id
+AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
+AWS_REGION=your_aws_region
+AWS_BUCKET_NAME=your_s3_bucket_name
 ```
 </details>
 
@@ -162,12 +160,12 @@ AWS_BUCKET_NAME=
 <summary>Client Environment Variables</summary>
 
 ```env
-VITE_APP_NAME=
-VITE_API_BASE_URL=
-VITE_APP_URL=
-VITE_DEV_CRT=
-VITE_DEV_KEY=
-VITE_UPDATE_TIME_MS=
+VITE_APP_NAME=NEXT_M
+VITE_API_BASE_URL=http://localhost:3000
+VITE_APP_URL=http://localhost:3000
+VITE_DEV_CRT=path_to_dev_cert
+VITE_DEV_KEY=path_to_dev_key
+VITE_UPDATE_TIME_MS=60000
 ```
 </details>
 
