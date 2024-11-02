@@ -21,17 +21,14 @@ interface ChatState {
   error: string | null;
 }
 
-// Define the initial state without the messages field
 const initialState: ChatState = {
   chats: {},
   currentChat: null,
   status: "idle",
   fetchChatsStatus: "idle",
-
   error: null,
 };
 
-// Define the chat slice
 const chatSlice = createSlice({
   name: "chats",
   initialState,
@@ -56,7 +53,6 @@ const chatSlice = createSlice({
         state.currentChat = null;
       }
     },
-    // New reducer to clear currentChat
     clearCurrentChatReducer: (state) => {
       state.currentChat = null;
     },
@@ -70,10 +66,8 @@ const chatSlice = createSlice({
     ) => {
       const { chatId, message } = action.payload;
 
-      // Retrieve the chat from the state
       const chat = state.chats[chatId];
 
-      // Check if the chat exists
       if (!chat) {
         console.error("Chat does not exist in the state.");
         return;
@@ -119,7 +113,6 @@ const chatSlice = createSlice({
         })),
         isUploading: true,
       };
-      // Push the modified message to the chat
       chat.messages.push(initializedMessage);
       chat.updatedAt = new Date();
     },
@@ -148,22 +141,17 @@ const chatSlice = createSlice({
           (att) => att.fileName === attachmentFileName
         );
         if (attachment) {
-          // Set the status to "uploading" as soon as progress starts
           if (progress > 0 && progress < 100) {
             attachment.status = "uploading";
           }
 
-          // Update the progress
           attachment.uploadProgress = progress;
-
           if (progress === 100) {
             attachment.status = "uploaded";
           }
         }
       }
     },
-
-    // Marks the upload as failed for a specific attachment
     uploadAttachmentFailed: (
       state,
       action: PayloadAction<{
@@ -189,13 +177,10 @@ const chatSlice = createSlice({
           attachment.uploadProgress = 0;
           attachment.status = "failed";
         }
-        // Mark message as failed if any attachment has failed
         message.status = "failed";
         message.isUploading = false;
       }
     },
-
-    // Marks the entire upload as complete for a message
     uploadComplete: (
       state,
       action: PayloadAction<{
@@ -230,7 +215,6 @@ const chatSlice = createSlice({
         console.error("Message does not exist in the state.");
         return;
       }
-      // Sort messages by timestamp
       console.log("Sorting messages by timestamp");
       chat.messages.sort(
         (a, b) =>
@@ -251,10 +235,8 @@ const chatSlice = createSlice({
     ) => {
       const { chatId, userId, messageIds } = action.payload;
 
-      // Retrieve the chat from the state
       const chat = state.chats[chatId];
 
-      // Check if the chat exists
       if (!chat) {
         console.error(`Chat with ID ${chatId} does not exist in the state.`);
         return state;
@@ -283,9 +265,7 @@ const chatSlice = createSlice({
       if (fromServer && chat._id) {
         const localId = chat.local_id;
         if (localId && state.chats[localId]) {
-          // Check if the current chat is the same as the one being updated
           if (state.currentChat?.local_id === localId) {
-            // Update the currentChat with the server data
             state.currentChat = {
               ...state.currentChat,
               ...chat,
@@ -294,28 +274,23 @@ const chatSlice = createSlice({
             };
           }
 
-          // Replace the chat keyed by local_id with the chat keyed by _id
           state.chats[chat._id] = {
             ...state.chats[localId],
             ...chat,
             _id: chat._id,
             status: chat.status,
           };
-          // Remove the old chat entry keyed by local_id
           delete state.chats[localId];
         } else {
-          // If no matching local_id, add the chat as a new entry keyed by _id
           state.chats[chat._id] = chat;
         }
       } else {
-        // Client-originated chat, add to state keyed by local_id
         const localId = chat.local_id;
         if (localId) {
           state.chats[localId] = chat;
         }
       }
     },
-
     updateChatReducer: (
       state,
       action: PayloadAction<{
@@ -530,13 +505,11 @@ export default chatSlice.reducer;
 export const selectFetchChatsStatus = (state: RootState) =>
   state.chats.fetchChatsStatus;
 
-// Memoized selector for all chats
 export const selectAllChats = createSelector(
   (state: RootState) => state.chats.chats,
   (chats) => Object.values(chats)
 );
 
-// Memoized selector for a specific chat by ID
 export const selectChatById = createSelector(
   [
     (state: RootState) => state.chats.chats,
@@ -545,7 +518,6 @@ export const selectChatById = createSelector(
   (chats, chatId) => chats[chatId]
 );
 
-// Selector to get the current chat
 export const selectCurrentChat = (state: RootState) => {
   const currentChatId = state.chats.currentChat?._id;
   return currentChatId
@@ -553,19 +525,15 @@ export const selectCurrentChat = (state: RootState) => {
     : state.chats.currentChat;
 };
 
-// Memoized selector for messages from the current chat
 export const selectMessagesFromCurrentChat = createSelector(
   selectCurrentChat,
   (currentChat) => currentChat?.messages || []
 );
 
-// Selector to get the current chat status
 export const selectChatsStatus = (state: RootState) => state.chats.status;
 
-// Selector to get the current chat error
 export const selectChatsError = (state: RootState) => state.chats.error;
 
-// Memoized selector for messages by chat ID
 export const selectMessagesByChatId = createSelector(
   [
     (state: RootState) => state.chats.chats,
@@ -574,7 +542,6 @@ export const selectMessagesByChatId = createSelector(
   (chats, chatId) => chats[chatId]?.messages || []
 );
 
-// Memoized selector for unread messages for a specific user in the current chat
 export const selectUnreadMessages = createSelector(
   [selectCurrentChat, (_: RootState, userId: string) => userId],
   (currentChat, userId) =>
@@ -584,7 +551,6 @@ export const selectUnreadMessages = createSelector(
     ) || []
 );
 
-// Selector to get an attachment
 export const selectAttachment = (
   state: RootState,
   payload: {

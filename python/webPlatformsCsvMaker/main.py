@@ -55,16 +55,16 @@ class MainWindow(QMainWindow):
             "output_entry",
             "warehouse_entry",
             "tecdoc_entry",
-            "tulero_ftp_host_entry",
-            "tulero_ftp_user_entry",
-            "tulero_ftp_pass_entry",
-            "tulero_ftp_dir_combo",
-            "tyre24_ftp_host_entry",
-            "tyre24_ftp_user_entry",
-            "tyre24_ftp_pass_entry",
-            "tyre24_ftp_dir_combo",
-            "upload_tulero_checkbox",    # Corrected Naming
-            "upload_tyre24_checkbox",    # Corrected Naming
+            "company1_ftp_host_entry",
+            "company1_ftp_user_entry",
+            "company1_ftp_pass_entry",
+            "company1_ftp_dir_combo",
+            "company2_ftp_host_entry",
+            "company2_ftp_user_entry",
+            "company2_ftp_pass_entry",
+            "company2_ftp_dir_combo",
+            "upload_company1_checkbox",    # Corrected Naming
+            "upload_company2_checkbox",    # Corrected Naming
             "progress_bar",
             "process_button",
             "upload_button",
@@ -97,44 +97,44 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.update_fake_progress)
 
         # Set validators for percentage fields
-        self.tulero_markup_entry = widgets.get("tulero_markup_entry")
-        self.tyre24_markup_it_entry = widgets.get("tyre24_markup_it_entry")
-        self.tyre24_markup_de_entry = widgets.get("tyre24_markup_de_entry")
+        self.company1_markup_entry = widgets.get("company1_markup_entry")
+        self.company2_markup_it_entry = widgets.get("company2_markup_it_entry")
+        self.company2_markup_de_entry = widgets.get("company2_markup_de_entry")
 
-        self.tulero_shipping_entry = widgets.get("tulero_shipping_entry")
-        self.tyre24_shipping_it_entry = widgets.get("tyre24_shipping_it_entry")
-        self.tyre24_shipping_de_entry = widgets.get("tyre24_shipping_de_entry")
+        self.company1_shipping_entry = widgets.get("company1_shipping_entry")
+        self.company2_shipping_it_entry = widgets.get("company2_shipping_it_entry")
+        self.company2_shipping_de_entry = widgets.get("company2_shipping_de_entry")
 
-        self.tulero_markup_entry.setValidator(QIntValidator(10, 35, self))
-        self.tyre24_markup_it_entry.setValidator(QIntValidator(10, 35, self))
-        self.tyre24_markup_de_entry.setValidator(QIntValidator(10, 35, self))
+        self.company1_markup_entry.setValidator(QIntValidator(10, 35, self))
+        self.company2_markup_it_entry.setValidator(QIntValidator(10, 35, self))
+        self.company2_markup_de_entry.setValidator(QIntValidator(10, 35, self))
 
         # Set validators for shipping cost fields
         shipping_validator = QDoubleValidator(7.0, 20.0, 1, self)
         shipping_validator.setNotation(QDoubleValidator.Notation.StandardNotation)
-        self.tulero_shipping_entry.setValidator(shipping_validator)
-        self.tyre24_shipping_it_entry.setValidator(shipping_validator)
-        self.tyre24_shipping_de_entry.setValidator(shipping_validator)
+        self.company1_shipping_entry.setValidator(shipping_validator)
+        self.company2_shipping_it_entry.setValidator(shipping_validator)
+        self.company2_shipping_de_entry.setValidator(shipping_validator)
 
         # Connect textChanged signals to validation methods
-        self.tulero_markup_entry.textChanged.connect(
-            lambda: self.validate_percentage(self.tulero_markup_entry, "markup")
+        self.company1_markup_entry.textChanged.connect(
+            lambda: self.validate_percentage(self.company1_markup_entry, "markup")
         )
-        self.tyre24_markup_it_entry.textChanged.connect(
-            lambda: self.validate_percentage(self.tyre24_markup_it_entry, "markup_it")
+        self.company2_markup_it_entry.textChanged.connect(
+            lambda: self.validate_percentage(self.company2_markup_it_entry, "markup_it")
         )
-        self.tyre24_markup_de_entry.textChanged.connect(
-            lambda: self.validate_percentage(self.tyre24_markup_de_entry, "markup_de")
+        self.company2_markup_de_entry.textChanged.connect(
+            lambda: self.validate_percentage(self.company2_markup_de_entry, "markup_de")
         )
 
-        self.tulero_shipping_entry.textChanged.connect(
-            lambda: self.validate_shipping(self.tulero_shipping_entry, "shipping")
+        self.company1_shipping_entry.textChanged.connect(
+            lambda: self.validate_shipping(self.company1_shipping_entry, "shipping")
         )
-        self.tyre24_shipping_it_entry.textChanged.connect(
-            lambda: self.validate_shipping(self.tyre24_shipping_it_entry, "shipping_it")
+        self.company2_shipping_it_entry.textChanged.connect(
+            lambda: self.validate_shipping(self.company2_shipping_it_entry, "shipping_it")
         )
-        self.tyre24_shipping_de_entry.textChanged.connect(
-            lambda: self.validate_shipping(self.tyre24_shipping_de_entry, "shipping_de")
+        self.company2_shipping_de_entry.textChanged.connect(
+            lambda: self.validate_shipping(self.company2_shipping_de_entry, "shipping_de")
         )
 
         # Initialize symbol appending (no longer needed)
@@ -143,13 +143,13 @@ class MainWindow(QMainWindow):
         self.check_and_load_files()
 
         # Trigger validation for pre-filled fields
-        self.validate_percentage(self.tulero_markup_entry, "markup")
-        self.validate_percentage(self.tyre24_markup_it_entry, "markup_it")
-        self.validate_percentage(self.tyre24_markup_de_entry, "markup_de")
+        self.validate_percentage(self.company1_markup_entry, "markup")
+        self.validate_percentage(self.company2_markup_it_entry, "markup_it")
+        self.validate_percentage(self.company2_markup_de_entry, "markup_de")
 
-        self.validate_shipping(self.tulero_shipping_entry, "shipping")
-        self.validate_shipping(self.tyre24_shipping_it_entry, "shipping_it")
-        self.validate_shipping(self.tyre24_shipping_de_entry, "shipping_de")
+        self.validate_shipping(self.company1_shipping_entry, "shipping")
+        self.validate_shipping(self.company2_shipping_it_entry, "shipping_it")
+        self.validate_shipping(self.company2_shipping_de_entry, "shipping_de")
 
 
 
@@ -173,56 +173,56 @@ class MainWindow(QMainWindow):
         )
 
         # Load Tulero FTP credentials
-        self.tulero_ftp_host = config.get("tulero_ftp_host", "")
-        self.tulero_ftp_user = config.get("tulero_ftp_user", "")
-        self.tulero_ftp_pass = config.get("tulero_ftp_pass", "")
-        self.tulero_ftp_dir = config.get("tulero_ftp_dir", "/")
+        self.company1_ftp_host = config.get("company1_ftp_host", "")
+        self.company1_ftp_user = config.get("company1_ftp_user", "")
+        self.company1_ftp_pass = config.get("company1_ftp_pass", "")
+        self.company1_ftp_dir = config.get("company1_ftp_dir", "/")
 
         # Load Tyre24 FTP credentials
-        self.tyre24_ftp_host = config.get("tyre24_ftp_host", "")
-        self.tyre24_ftp_user = config.get("tyre24_ftp_user", "")
-        self.tyre24_ftp_pass = config.get("tyre24_ftp_pass", "")
-        self.tyre24_ftp_dir = config.get("tyre24_ftp_dir", "/")
+        self.company2_ftp_host = config.get("company2_ftp_host", "")
+        self.company2_ftp_user = config.get("company2_ftp_user", "")
+        self.company2_ftp_pass = config.get("company2_ftp_pass", "")
+        self.company2_ftp_dir = config.get("company2_ftp_dir", "/")
 
         # Set the UI elements
-        self.tulero_ftp_host_entry.setText(self.tulero_ftp_host)
-        self.tulero_ftp_user_entry.setText(self.tulero_ftp_user)
-        self.tulero_ftp_pass_entry.setText(self.tulero_ftp_pass)
-        self.tulero_ftp_dir_combo.setCurrentText(self.tulero_ftp_dir)
+        self.company1_ftp_host_entry.setText(self.company1_ftp_host)
+        self.company1_ftp_user_entry.setText(self.company1_ftp_user)
+        self.company1_ftp_pass_entry.setText(self.company1_ftp_pass)
+        self.company1_ftp_dir_combo.setCurrentText(self.company1_ftp_dir)
 
-        self.tyre24_ftp_host_entry.setText(self.tyre24_ftp_host)
-        self.tyre24_ftp_user_entry.setText(self.tyre24_ftp_user)
-        self.tyre24_ftp_pass_entry.setText(self.tyre24_ftp_pass)
-        self.tyre24_ftp_dir_combo.setCurrentText(self.tyre24_ftp_dir)
+        self.company2_ftp_host_entry.setText(self.company2_ftp_host)
+        self.company2_ftp_user_entry.setText(self.company2_ftp_user)
+        self.company2_ftp_pass_entry.setText(self.company2_ftp_pass)
+        self.company2_ftp_dir_combo.setCurrentText(self.company2_ftp_dir)
 
         if "ftp_dir" in config:  # Ensure the ftp_dir is in the configuration
             self.ftp_dir_combo.setCurrentText(config["ftp_dir"])
 
         # Load and set Markup and Shipping Costs
         # Markup Fields
-        tulero_markup = config.get("tulero_markup", 1.25)  # Default: 1.25 (25%)
-        tyre24_markup_it = config.get("tyre24_markup_it", 1.25)  # Default: 1.25 (25%)
-        tyre24_markup_de = config.get("tyre24_markup_de", 1.25)  # Default: 1.25 (25%)
+        company1_markup = config.get("company1_markup", 1.25)  # Default: 1.25 (25%)
+        company2_markup_it = config.get("company2_markup_it", 1.25)  # Default: 1.25 (25%)
+        company2_markup_de = config.get("company2_markup_de", 1.25)  # Default: 1.25 (25%)
 
         # Convert internal value to display value (e.g., 1.25 -> 25)
-        tulero_markup_display = int((tulero_markup - 1) * 100)
-        tyre24_markup_it_display = int((tyre24_markup_it - 1) * 100)
-        tyre24_markup_de_display = int((tyre24_markup_de - 1) * 100)
+        company1_markup_display = int((company1_markup - 1) * 100)
+        company2_markup_it_display = int((company2_markup_it - 1) * 100)
+        company2_markup_de_display = int((company2_markup_de - 1) * 100)
 
         # Set the text with '%' symbol
-        self.tulero_markup_entry.setText(f"{tulero_markup_display}%")
-        self.tyre24_markup_it_entry.setText(f"{tyre24_markup_it_display}%")
-        self.tyre24_markup_de_entry.setText(f"{tyre24_markup_de_display}%")
+        self.company1_markup_entry.setText(f"{company1_markup_display}%")
+        self.company2_markup_it_entry.setText(f"{company2_markup_it_display}%")
+        self.company2_markup_de_entry.setText(f"{company2_markup_de_display}%")
 
         # Shipping Cost Fields
-        tulero_shipping = config.get("tulero_shipping", 7.5)  # Default: 7.5€
-        tyre24_shipping_it = config.get("tyre24_shipping_it", 7.5)  # Default: 7.5€
-        tyre24_shipping_de = config.get("tyre24_shipping_de", 10.5)  # Default: 10.5€
+        company1_shipping = config.get("company1_shipping", 7.5)  # Default: 7.5€
+        company2_shipping_it = config.get("company2_shipping_it", 7.5)  # Default: 7.5€
+        company2_shipping_de = config.get("company2_shipping_de", 10.5)  # Default: 10.5€
 
         # Set the text with '€' symbol
-        self.tulero_shipping_entry.setText(f"{tulero_shipping}€")
-        self.tyre24_shipping_it_entry.setText(f"{tyre24_shipping_it}€")
-        self.tyre24_shipping_de_entry.setText(f"{tyre24_shipping_de}€")
+        self.company1_shipping_entry.setText(f"{company1_shipping}€")
+        self.company2_shipping_it_entry.setText(f"{company2_shipping_it}€")
+        self.company2_shipping_de_entry.setText(f"{company2_shipping_de}€")
 
         # Existing file and folder loading logic
         if os.path.exists(articles_file):
@@ -256,8 +256,8 @@ class MainWindow(QMainWindow):
         self.output_button.setStyleSheet("background-color: green; color: white;")
 
         # Load checkbox states
-        self.upload_tulero_checkbox.setChecked(config.get("upload_tulero", True))
-        self.upload_tyre24_checkbox.setChecked(config.get("upload_tyre24", True))
+        self.upload_company1_checkbox.setChecked(config.get("upload_company1", True))
+        self.upload_company2_checkbox.setChecked(config.get("upload_company2", True))
 
         self.check_ready_to_process()
         self.update_upload_button_state()
@@ -275,9 +275,9 @@ class MainWindow(QMainWindow):
 
     def update_upload_button_state(self):
         try:
-            tulero_csv = os.path.join(self.output_folder, "tulero_output.csv")
-            tyre24_csv = os.path.join(self.output_folder, "tyre24_output.csv")
-            if os.path.exists(tulero_csv) and os.path.exists(tyre24_csv):
+            company1_csv = os.path.join(self.output_folder, "company1_output.csv")
+            company2_csv = os.path.join(self.output_folder, "company2_output.csv")
+            if os.path.exists(company1_csv) and os.path.exists(company2_csv):
                 self.upload_button.setEnabled(True)
             else:
                 self.upload_button.setEnabled(False)
@@ -334,12 +334,12 @@ class MainWindow(QMainWindow):
         try:
             # Use the internally stored values
             config_values = {
-                "tulero_markup": getattr(self, "markup_value", None),
-                "tulero_shipping": getattr(self, "shipping_value", None),
-                "tyre24_markup_it": getattr(self, "markup_it_value", None),
-                "tyre24_shipping_it": getattr(self, "shipping_it_value", None),
-                "tyre24_markup_de": getattr(self, "markup_de_value", None),
-                "tyre24_shipping_de": getattr(self, "shipping_de_value", None),
+                "company1_markup": getattr(self, "markup_value", None),
+                "company1_shipping": getattr(self, "shipping_value", None),
+                "company2_markup_it": getattr(self, "markup_it_value", None),
+                "company2_shipping_it": getattr(self, "shipping_it_value", None),
+                "company2_markup_de": getattr(self, "markup_de_value", None),
+                "company2_shipping_de": getattr(self, "shipping_de_value", None),
             }
 
             # Check if any value is None (invalid or not set)
@@ -363,11 +363,11 @@ class MainWindow(QMainWindow):
             return  # Stop processing if inputs are invalid
 
         # Determine which FTPs to upload to based on checkboxes
-        upload_tulero = self.upload_tulero_checkbox.isChecked()
-        upload_tyre24 = self.upload_tyre24_checkbox.isChecked()
+        upload_company1 = self.upload_company1_checkbox.isChecked()
+        upload_company2 = self.upload_company2_checkbox.isChecked()
 
         # Optional: Inform user if no uploads are selected
-        if not upload_tulero and not upload_tyre24:
+        if not upload_company1 and not upload_company2:
             reply = QMessageBox.question(
                 self,
                 _("Confirm Processing"),
@@ -389,19 +389,19 @@ class MainWindow(QMainWindow):
         self.fake_progress = 0  # Reset fake progress
 
         # Collect Tulero FTP info
-        tulero_ftp_info = {
-            "host": self.tulero_ftp_host_entry.text().strip(),
-            "user": self.tulero_ftp_user_entry.text().strip(),
-            "pass": self.tulero_ftp_pass_entry.text().strip(),
-            "dir": self.tulero_ftp_dir_combo.currentText().strip(),
+        company1_ftp_info = {
+            "host": self.company1_ftp_host_entry.text().strip(),
+            "user": self.company1_ftp_user_entry.text().strip(),
+            "pass": self.company1_ftp_pass_entry.text().strip(),
+            "dir": self.company1_ftp_dir_combo.currentText().strip(),
         }
 
         # Collect Tyre24 FTP info
-        tyre24_ftp_info = {
-            "host": self.tyre24_ftp_host_entry.text().strip(),
-            "user": self.tyre24_ftp_user_entry.text().strip(),
-            "pass": self.tyre24_ftp_pass_entry.text().strip(),
-            "dir": self.tyre24_ftp_dir_combo.currentText().strip(),
+        company2_ftp_info = {
+            "host": self.company2_ftp_host_entry.text().strip(),
+            "user": self.company2_ftp_user_entry.text().strip(),
+            "pass": self.company2_ftp_pass_entry.text().strip(),
+            "dir": self.company2_ftp_dir_combo.currentText().strip(),
         }
 
         # Initialize and start the Worker thread
@@ -412,11 +412,11 @@ class MainWindow(QMainWindow):
             self.oem_folder,
             self.brands_file,
             self.tecdoc_file,  # New
-            tulero_ftp_info,  # New
-            tyre24_ftp_info,  # New
+            company1_ftp_info,  # New
+            company2_ftp_info,  # New
             validated_data,  # Pass the validated data
-            upload_tulero=upload_tulero,  # Pass upload preference
-            upload_tyre24=upload_tyre24,  # Pass upload preference
+            upload_company1=upload_company1,  # Pass upload preference
+            upload_company2=upload_company2,  # Pass upload preference
         )
         self.worker.progress.connect(self.on_worker_progress)
         self.worker.finished_processing.connect(self.processing_complete)
@@ -494,24 +494,24 @@ class MainWindow(QMainWindow):
             "output_folder": self.output_folder,
             "warehouse_file": self.warehouse_file,  # New
             "tecdoc_file": self.tecdoc_file,
-            "tulero_ftp_host": self.tulero_ftp_host_entry.text().strip(),
-            "tulero_ftp_user": self.tulero_ftp_user_entry.text().strip(),
-            "tulero_ftp_pass": self.tulero_ftp_pass_entry.text().strip(),
-            "tulero_ftp_dir": self.tulero_ftp_dir_combo.currentText().strip(),
-            "tyre24_ftp_host": self.tyre24_ftp_host_entry.text().strip(),
-            "tyre24_ftp_user": self.tyre24_ftp_user_entry.text().strip(),
-            "tyre24_ftp_pass": self.tyre24_ftp_pass_entry.text().strip(),
-            "tyre24_ftp_dir": self.tyre24_ftp_dir_combo.currentText().strip(),
-            "upload_tulero": self.upload_tulero_checkbox.isChecked(),
-            "upload_tyre24": self.upload_tyre24_checkbox.isChecked(),
-            "tulero_markup": round(getattr(self, "markup_value", 1.25), 2),  # Store with 2 decimal places
-            "tulero_shipping": getattr(self, "shipping_value", 7.5),  # Default: 7.5€
-            "tyre24_markup_it": round(getattr(self, "markup_it_value", 1.25), 2),
-            "tyre24_shipping_it": getattr(
+            "company1_ftp_host": self.company1_ftp_host_entry.text().strip(),
+            "company1_ftp_user": self.company1_ftp_user_entry.text().strip(),
+            "company1_ftp_pass": self.company1_ftp_pass_entry.text().strip(),
+            "company1_ftp_dir": self.company1_ftp_dir_combo.currentText().strip(),
+            "company2_ftp_host": self.company2_ftp_host_entry.text().strip(),
+            "company2_ftp_user": self.company2_ftp_user_entry.text().strip(),
+            "company2_ftp_pass": self.company2_ftp_pass_entry.text().strip(),
+            "company2_ftp_dir": self.company2_ftp_dir_combo.currentText().strip(),
+            "upload_company1": self.upload_company1_checkbox.isChecked(),
+            "upload_company2": self.upload_company2_checkbox.isChecked(),
+            "company1_markup": round(getattr(self, "markup_value", 1.25), 2),  # Store with 2 decimal places
+            "company1_shipping": getattr(self, "shipping_value", 7.5),  # Default: 7.5€
+            "company2_markup_it": round(getattr(self, "markup_it_value", 1.25), 2),
+            "company2_shipping_it": getattr(
                 self, "shipping_it_value", 7.5
             ),  # Default: 7.5€
-            "tyre24_markup_de": round(getattr(self, "markup_de_value", 1.25), 2),
-            "tyre24_shipping_de": getattr(
+            "company2_markup_de": round(getattr(self, "markup_de_value", 1.25), 2),
+            "company2_shipping_de": getattr(
                 self, "shipping_de_value", 10.5
             ),  # Default: 10.5€
 
@@ -520,22 +520,22 @@ class MainWindow(QMainWindow):
 
     def start_upload(self):
         # Collect FTP info
-        tulero_ftp_info = {
-            "host": self.tulero_ftp_host_entry.text().strip(),
-            "user": self.tulero_ftp_user_entry.text().strip(),
-            "pass": self.tulero_ftp_pass_entry.text().strip(),
-            "dir": self.tulero_ftp_dir_combo.currentText().strip(),
+        company1_ftp_info = {
+            "host": self.company1_ftp_host_entry.text().strip(),
+            "user": self.company1_ftp_user_entry.text().strip(),
+            "pass": self.company1_ftp_pass_entry.text().strip(),
+            "dir": self.company1_ftp_dir_combo.currentText().strip(),
         }
 
-        tyre24_ftp_info = {
-            "host": self.tyre24_ftp_host_entry.text().strip(),
-            "user": self.tyre24_ftp_user_entry.text().strip(),
-            "pass": self.tyre24_ftp_pass_entry.text().strip(),
-            "dir": self.tyre24_ftp_dir_combo.currentText().strip(),
+        company2_ftp_info = {
+            "host": self.company2_ftp_host_entry.text().strip(),
+            "user": self.company2_ftp_user_entry.text().strip(),
+            "pass": self.company2_ftp_pass_entry.text().strip(),
+            "dir": self.company2_ftp_dir_combo.currentText().strip(),
         }
 
         dialog = UploadDialog(
-            self, self.output_folder, tulero_ftp_info, tyre24_ftp_info
+            self, self.output_folder, company1_ftp_info, company2_ftp_info
         )
         dialog.exec()
 
