@@ -58,12 +58,11 @@ A cutting-edge management software solution built for modern businesses, featuri
 - **Performance Features**
   - Web Worker optimization
   - AES256 encrypted caching
-  - Attachment preview system
 
 ### 🗓️ Business Tools
 - **Visit Management**
   - Scheduling system
-  - Private and public notes inside the visits, the former only visible to the agent linked to the visit and the admins
+  - Private and public notes inside the visits, the former only visible to the agent linked to the visit, and the admins.
   
 - **Promotion System**
   - Custom promotion creation
@@ -104,8 +103,8 @@ A cutting-edge management software solution built for modern businesses, featuri
 
 - Node.js ≥ 22.0.0
 - npm ≥ 6.0.0
-- MongoDB Atlas account
-- AWS S3 account
+- MongoDB Cluster 
+- AWS S3 account (for file sharing support)
 - Postmark API key (for automated email system)
 - LocationIQ API Key (for reverse geocoding)
 
@@ -119,7 +118,7 @@ cd management_ux_node-react
 
 2. **Set up environment variables**
 
-Create `.env` files in both server and client directories using the provided templates below.
+Create `.env` files in both server and client directories using the provided templates below as a start.
 
 <details>
 <summary>Server Environment Variables</summary>
@@ -220,11 +219,11 @@ npm run dev
 - IP logging
 - Location tracking
 - Token-based auth
-- No cookies policy
+- No cookies policy (future proofing for possible Android / iOS companion app.)
 
 ## 🤝 Contributing
 
-This is a pet project, and we welcome any contributions! Feel free to open Issues or Pull Requests if you'd like to help improve the project or report any issues you find.
+This is a pet project, and we welcome any contributions! Feel free to open any issues or pull requests if you'd like to help improve the project, or find any glaring issues (which you very well might!).
 
 ## 📜 License
 
@@ -240,8 +239,7 @@ Project Link: [https://github.com/WALKMANxy/management_ux_node-react](https://gi
 
 <div align="center">
 
-Made with ❤️ by WALKMAN
+Made with ❤️, sweat and tears by WALKMAN
 
-⭐️ Star us on GitHub — it helps!
 
 </div>
