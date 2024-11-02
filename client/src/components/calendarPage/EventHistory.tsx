@@ -187,7 +187,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
       sx={{ borderRadius: 2, padding: isMobile ? 1 : 2 }}
     >
       {/* Filter ButtonGroup */}
-      <Box display="flex" justifyContent="flex-end" alignItems="center" mb={2}>
+      <Box display="flex" justifyContent="flex-start" alignItems="center" mb={0}>
         <ButtonGroup
           variant="contained"
           aria-label={t("eventHistory.filterSelection", "Filter selection")}
@@ -261,6 +261,7 @@ export const EventHistory: React.FC<EventHistoryProps> = ({
         component={Paper}
         sx={{
           maxHeight: "70vh",
+          minHeight: "65vh",
           overflowY: "auto",
           overflowX: "auto",
           "&::-webkitScrollbar": {

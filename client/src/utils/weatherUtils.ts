@@ -1,30 +1,5 @@
-import {
-  default as clearDay,
-  default as defaultClearDay,
-} from "../assets/weather/clear-day.svg";
-import {
-  default as clearNight,
-  default as defaultClearNight,
-} from "../assets/weather/clear-night.svg";
-import drizzle from "../assets/weather/drizzle.svg";
-import fogDay from "../assets/weather/fog-day.svg";
-import fogNight from "../assets/weather/fog-night.svg";
-import overcastDay from "../assets/weather/overcast-day.svg";
-import overcastNight from "../assets/weather/overcast-night.svg";
-import partlyCloudyDayRain from "../assets/weather/partly-cloudy-day-rain.svg";
-import partlyCloudyDaySleet from "../assets/weather/partly-cloudy-day-sleet.svg";
-import partlyCloudyDaySnow from "../assets/weather/partly-cloudy-day-snow.svg";
-import partlyCloudyDay from "../assets/weather/partly-cloudy-day.svg";
-import partlyCloudyNightRain from "../assets/weather/partly-cloudy-night-rain.svg";
-import partlyCloudyNightSleet from "../assets/weather/partly-cloudy-night-sleet.svg";
-import partlyCloudyNightSnow from "../assets/weather/partly-cloudy-night-snow.svg";
-import partlyCloudyNight from "../assets/weather/partly-cloudy-night.svg";
-import thunderstormsDayRain from "../assets/weather/thunderstorms-day-rain.svg";
-import thunderstormsDaySnow from "../assets/weather/thunderstorms-day-snow.svg";
-import thunderstormsDay from "../assets/weather/thunderstorms-day.svg";
-import thunderstormsNightRain from "../assets/weather/thunderstorms-night-rain.svg";
-import thunderstormsNightSnow from "../assets/weather/thunderstorms-night-snow.svg";
-import thunderstormsNight from "../assets/weather/thunderstorms-night.svg";
+// Define a base path for weather icons in the public folder
+const WEATHER_ICON_PATH = "/images/weather/";
 
 interface WeatherIcon {
   day: string;
@@ -36,34 +11,39 @@ interface WeatherIcons {
 }
 
 const weatherIcons: WeatherIcons = {
-  0: { day: clearDay, night: clearNight },
-  1: { day: clearDay, night: clearNight },
-  2: { day: partlyCloudyDay, night: partlyCloudyNight },
-  3: { day: overcastDay, night: overcastNight },
-  45: { day: fogDay, night: fogNight },
-  48: { day: fogDay, night: fogNight },
-  51: { day: drizzle, night: drizzle },
-  53: { day: drizzle, night: drizzle },
-  55: { day: drizzle, night: drizzle },
-  61: { day: partlyCloudyDayRain, night: partlyCloudyNightRain },
-  63: { day: partlyCloudyDayRain, night: partlyCloudyNightRain },
-  65: { day: partlyCloudyDayRain, night: partlyCloudyNightRain },
-  66: { day: partlyCloudyDaySleet, night: partlyCloudyNightSleet },
-  67: { day: partlyCloudyDaySleet, night: partlyCloudyNightSleet },
-  71: { day: partlyCloudyDaySnow, night: partlyCloudyNightSnow },
-  73: { day: partlyCloudyDaySnow, night: partlyCloudyNightSnow },
-  75: { day: partlyCloudyDaySnow, night: partlyCloudyNightSnow },
-  77: { day: partlyCloudyDaySnow, night: partlyCloudyNightSnow },
-  80: { day: partlyCloudyDayRain, night: partlyCloudyNightRain },
-  81: { day: partlyCloudyDayRain, night: partlyCloudyNightRain },
-  82: { day: partlyCloudyDayRain, night: partlyCloudyNightRain },
-  85: { day: partlyCloudyDaySnow, night: partlyCloudyNightSnow },
-  86: { day: partlyCloudyDaySnow, night: partlyCloudyNightSnow },
-  95: { day: thunderstormsDay, night: thunderstormsNight },
-  96: { day: thunderstormsDayRain, night: thunderstormsNightRain },
-  99: { day: thunderstormsDaySnow, night: thunderstormsNightSnow },
+  0: { day: `${WEATHER_ICON_PATH}clear-day.svg`, night: `${WEATHER_ICON_PATH}clear-night.svg` },
+  1: { day: `${WEATHER_ICON_PATH}clear-day.svg`, night: `${WEATHER_ICON_PATH}clear-night.svg` },
+  2: { day: `${WEATHER_ICON_PATH}partly-cloudy-day.svg`, night: `${WEATHER_ICON_PATH}partly-cloudy-night.svg` },
+  3: { day: `${WEATHER_ICON_PATH}overcast-day.svg`, night: `${WEATHER_ICON_PATH}overcast-night.svg` },
+  45: { day: `${WEATHER_ICON_PATH}fog-day.svg`, night: `${WEATHER_ICON_PATH}fog-night.svg` },
+  48: { day: `${WEATHER_ICON_PATH}fog-day.svg`, night: `${WEATHER_ICON_PATH}fog-night.svg` },
+  51: { day: `${WEATHER_ICON_PATH}drizzle.svg`, night: `${WEATHER_ICON_PATH}drizzle.svg` },
+  53: { day: `${WEATHER_ICON_PATH}drizzle.svg`, night: `${WEATHER_ICON_PATH}drizzle.svg` },
+  55: { day: `${WEATHER_ICON_PATH}drizzle.svg`, night: `${WEATHER_ICON_PATH}drizzle.svg` },
+  61: { day: `${WEATHER_ICON_PATH}partly-cloudy-day-rain.svg`, night: `${WEATHER_ICON_PATH}partly-cloudy-night-rain.svg` },
+  63: { day: `${WEATHER_ICON_PATH}partly-cloudy-day-rain.svg`, night: `${WEATHER_ICON_PATH}partly-cloudy-night-rain.svg` },
+  65: { day: `${WEATHER_ICON_PATH}partly-cloudy-day-rain.svg`, night: `${WEATHER_ICON_PATH}partly-cloudy-night-rain.svg` },
+  66: { day: `${WEATHER_ICON_PATH}partly-cloudy-day-sleet.svg`, night: `${WEATHER_ICON_PATH}partly-cloudy-night-sleet.svg` },
+  67: { day: `${WEATHER_ICON_PATH}partly-cloudy-day-sleet.svg`, night: `${WEATHER_ICON_PATH}partly-cloudy-night-sleet.svg` },
+  71: { day: `${WEATHER_ICON_PATH}partly-cloudy-day-snow.svg`, night: `${WEATHER_ICON_PATH}partly-cloudy-night-snow.svg` },
+  73: { day: `${WEATHER_ICON_PATH}partly-cloudy-day-snow.svg`, night: `${WEATHER_ICON_PATH}partly-cloudy-night-snow.svg` },
+  75: { day: `${WEATHER_ICON_PATH}partly-cloudy-day-snow.svg`, night: `${WEATHER_ICON_PATH}partly-cloudy-night-snow.svg` },
+  77: { day: `${WEATHER_ICON_PATH}partly-cloudy-day-snow.svg`, night: `${WEATHER_ICON_PATH}partly-cloudy-night-snow.svg` },
+  80: { day: `${WEATHER_ICON_PATH}partly-cloudy-day-rain.svg`, night: `${WEATHER_ICON_PATH}partly-cloudy-night-rain.svg` },
+  81: { day: `${WEATHER_ICON_PATH}partly-cloudy-day-rain.svg`, night: `${WEATHER_ICON_PATH}partly-cloudy-night-rain.svg` },
+  82: { day: `${WEATHER_ICON_PATH}partly-cloudy-day-rain.svg`, night: `${WEATHER_ICON_PATH}partly-cloudy-night-rain.svg` },
+  85: { day: `${WEATHER_ICON_PATH}partly-cloudy-day-snow.svg`, night: `${WEATHER_ICON_PATH}partly-cloudy-night-snow.svg` },
+  86: { day: `${WEATHER_ICON_PATH}partly-cloudy-day-snow.svg`, night: `${WEATHER_ICON_PATH}partly-cloudy-night-snow.svg` },
+  95: { day: `${WEATHER_ICON_PATH}thunderstorms-day.svg`, night: `${WEATHER_ICON_PATH}thunderstorms-night.svg` },
+  96: { day: `${WEATHER_ICON_PATH}thunderstorms-day-rain.svg`, night: `${WEATHER_ICON_PATH}thunderstorms-night-rain.svg` },
+  99: { day: `${WEATHER_ICON_PATH}thunderstorms-day-snow.svg`, night: `${WEATHER_ICON_PATH}thunderstorms-night-snow.svg` },
 };
 
+// Define default icons for fallback
+const defaultClearDay = `${WEATHER_ICON_PATH}clear-day.svg`;
+const defaultClearNight = `${WEATHER_ICON_PATH}clear-night.svg`;
+
+// Function to determine if it's currently day time
 export const isDayTime = (): boolean => {
   const hour = new Date().getHours();
   return hour >= 6 && hour < 18; // Consider 6 AM to 6 PM as day
@@ -85,6 +65,15 @@ export const getWeatherIcon = (weatherCode: number): string => {
   return isDay ? defaultClearDay : defaultClearNight;
 };
 
+/**
+ * Function to check if the location has changed based on latitude and longitude.
+ * @param lat1 - Previous latitude
+ * @param lon1 - Previous longitude
+ * @param lat2 - Current latitude
+ * @param lon2 - Current longitude
+ * @param threshold - The minimum change required to consider the location as changed (default is 0.01)
+ * @returns boolean indicating whether the location has changed
+ */
 export const hasLocationChanged = (
   lat1: number,
   lon1: number,
@@ -92,11 +81,10 @@ export const hasLocationChanged = (
   lon2: number,
   threshold: number = 0.01
 ): boolean => {
-
   // Calculate the absolute difference between latitudes and longitudes
   const latDiff = Math.abs(lat1 - lat2);
   const lonDiff = Math.abs(lon1 - lon2);
-  
+
   // Check if the difference is greater than the threshold
   return latDiff > threshold || lonDiff > threshold;
 };

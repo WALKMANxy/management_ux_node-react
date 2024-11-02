@@ -152,7 +152,6 @@
     "VisitsContainer": "Visits",
     "ClientDetailsContainer": "Client Details",
     "visitsHistory": "Visits History"
-
   },
   "topBrandsSold": {
     "titleAgent": "Top Brands Sold",
@@ -364,6 +363,7 @@
       "durationTooLong": "Event duration cannot exceed two weeks."
     },
     "eventHistory": {
+      "system": "System",
       "title": "Event History",
       "headers": {
         "user": "User",
@@ -387,7 +387,6 @@
       "filterSelection": "Filter selection",
       "filterAll": "All",
       "na": "N/A",
-      "system": "System",
       "unknown": "Unknown"
     },
     "eventHistoryTooltips": {
