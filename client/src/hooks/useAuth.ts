@@ -292,14 +292,24 @@ export const useAuth = () => {
   };
 
   const handleLoginWithGoogle = () => {
-    const state = Math.random().toString(36).substring(2, 15);
-    sessionStorage.setItem("oauth_state", state);
+    // Create a state object with random state and uniqueId
+    const stateObj = {
+      randomState: Math.random().toString(36).substring(2, 15),
+      uniqueId: getUniqueIdentifier(),
+    };
 
-    const uniqueId = getUniqueIdentifier();
+    // Save the randomState for later verification
+    sessionStorage.setItem("oauth_state", stateObj.randomState);
 
+    // Base64 encode the state object
+    const stateParam = encodeURIComponent(btoa(JSON.stringify(stateObj)));
+
+    // Update the Google OAuth URL
     const googleAuthUrl = `${
       import.meta.env.VITE_API_BASE_URL
-    }/oauth2/google?state=${state}&uniqueId=${uniqueId}`;
+    }/oauth2/google?state=${stateParam}`;
+
+    // Open the OAuth popup window
     const width = 500;
     const height = 600;
     const left = window.screenX + (window.outerWidth - width) / 2;
@@ -311,9 +321,9 @@ export const useAuth = () => {
       `width=${width},height=${height},left=${left},top=${top}`
     );
   };
-
   useEffect(() => {
     const messageListener = async (event: MessageEvent) => {
+      // Verify the origin (should be your API's base URL)
       if (event.origin !== import.meta.env.VITE_API_BASE_URL) {
         return;
       }
@@ -341,7 +351,7 @@ export const useAuth = () => {
         await dispatch(
           handleLogin({
             role: user.role,
-            id: user.entityCode,
+            id: user.id, // Use the correct property
             userId: user._id,
             refreshToken,
           })
