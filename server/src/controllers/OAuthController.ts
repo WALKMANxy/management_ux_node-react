@@ -13,14 +13,20 @@ import {
 
 export class OAuthController {
   static initiateGoogleOAuth(req: Request, res: Response) {
-    const { state } = req.query;
+    console.log("Initiating Google OAuth process");
 
-    const redirectUri = `${config.appUrl}/auth/google/callback`;
+    const { state } = req.query;
+    console.log("Received state:", state);
+
+    const redirectUri = `${config.baseUrl}/auth/google/callback`;
+    console.log("Redirect URI set to:", redirectUri);
+
     const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${
       config.googleClientId
     }&redirect_uri=${encodeURIComponent(
       redirectUri
     )}&response_type=code&scope=email%20profile&state=${state}`;
+    console.log("Constructed Google Auth URL:", googleAuthUrl);
 
     res.redirect(googleAuthUrl);
   }
@@ -28,7 +34,24 @@ export class OAuthController {
   static async handleOAuthCallback(req: Request, res: Response) {
     const { code, state } = req.query;
 
-    const uniqueId = req.query.uniqueId;
+    console.log("Handling OAuth callback:", req.query);
+
+    if (typeof state !== "string") {
+      return res.status(400).json({ message: "Invalid state parameter" });
+    }
+
+    // Decode state parameter
+    let stateObj;
+    try {
+      const decodedState = Buffer.from(state, "base64").toString("utf-8");
+      stateObj = JSON.parse(decodedState);
+      console.log("State object:", stateObj);
+    } catch (error) {
+      console.error("Error decoding state:", error);
+      return res.status(400).json({ message: "Invalid state parameter" });
+    }
+
+    const { randomState, uniqueId } = stateObj;
 
     if (typeof uniqueId !== "string") {
       return res.status(400).json({ message: "Invalid or missing uniqueId" });
@@ -39,16 +62,22 @@ export class OAuthController {
     }
 
     try {
+      // Proceed with token exchange and user creation
       const tokens = await OAuthService.getToken(code);
+      console.log("Tokens:", tokens);
+
       const { id, email, name, picture } = await OAuthService.getUserInfo(
         tokens.access_token!
       );
+      console.log("User info:", { id, email, name, picture });
+
       const user = await OAuthService.findOrCreateUser(
         id,
         email,
         name,
         picture
       );
+      console.log("Created user:", user);
 
       const { accessToken, refreshToken } = await createSession(
         user,
@@ -56,38 +85,35 @@ export class OAuthController {
         uniqueId
       );
 
-      res.status(200).json({
-        message: "OAuth login successful.",
-        accessToken,
-        refreshToken,
-        user: {
-          id: user._id,
-          email: user.email,
-          name: user.entityName,
-          picture: user.avatar,
-        },
-      });
+      console.log("Created session:", { accessToken, refreshToken });
 
+      // Send the script to the client
       res.send(`
-      <script>
+        <script>
           window.opener.postMessage({
-              status: "success",
-              state: "${state}",
-              user: ${JSON.stringify(user)},
-              accessToken: "${accessToken}",
-              refreshToken: "${refreshToken}"
+            status: "success",
+            state: "${randomState}",
+            user: ${JSON.stringify({
+              _id: user._id,
+              email: user.email,
+              name: user.entityName,
+              role: user.role,
+              avatar: user.avatar,
+            })},
+            accessToken: "${accessToken}",
+            refreshToken: "${refreshToken}"
           }, "${process.env.CLIENT_URL}");
           window.close();
-      </script>
-  `);
+        </script>
+      `);
     } catch (error) {
       console.error("Error during OAuth callback", error);
       res.send(`
-      <script>
-          window.opener.postMessage({ status: "error", state: "${state}" }, "${process.env.CLIENT_URL}");
+        <script>
+          window.opener.postMessage({ status: "error", state: "${randomState}" }, "${process.env.CLIENT_URL}");
           window.close();
-      </script>
-  `);
+        </script>
+      `);
     }
   }
 
