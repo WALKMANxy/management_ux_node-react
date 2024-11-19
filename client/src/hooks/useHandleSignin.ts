@@ -116,7 +116,6 @@ export const useHandleSignin = (onClose: () => void) => {
     try {
       handleLoginWithGoogle();
       onClose();
-      showToast.success(t("signin.loginWithGoogleSuccess"));
     } catch (error: unknown) {
       if (error instanceof Error) {
         showToast.error(error.message);
