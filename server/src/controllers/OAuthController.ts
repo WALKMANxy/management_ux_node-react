@@ -18,7 +18,7 @@ export class OAuthController {
     const { state } = req.query;
     console.log("Received state:", state);
 
-    const redirectUri = `${config.baseUrl}/auth/google/callback`;
+    const redirectUri = `${config.baseUrl}/oauth2/google/callback`;
     console.log("Redirect URI set to:", redirectUri);
 
     const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${
@@ -40,26 +40,23 @@ export class OAuthController {
       return res.status(400).json({ message: "Invalid state parameter" });
     }
 
-    // Decode state parameter
-    let stateObj;
-    try {
-      const decodedState = Buffer.from(state, "base64").toString("utf-8");
-      stateObj = JSON.parse(decodedState);
-      console.log("State object:", stateObj);
-    } catch (error) {
-      console.error("Error decoding state:", error);
+    // Decode the state parameter
+    const decodedState = decodeURIComponent(state);
+    console.log("Decoded state:", decodedState);
+
+    // Split the state parameter using the delimiter
+    const [randomState, uniqueId] = decodedState.split(":");
+
+    console.log("Parsed state parameters:", { randomState, uniqueId });
+
+    if (!randomState || !uniqueId) {
       return res.status(400).json({ message: "Invalid state parameter" });
-    }
-
-    const { randomState, uniqueId } = stateObj;
-
-    if (typeof uniqueId !== "string") {
-      return res.status(400).json({ message: "Invalid or missing uniqueId" });
     }
 
     if (typeof code !== "string") {
       return res.status(400).json({ message: "Invalid authorization code" });
     }
+
 
     try {
       // Proceed with token exchange and user creation
