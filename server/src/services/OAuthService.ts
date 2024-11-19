@@ -11,7 +11,7 @@ export class OAuthService {
     config.googleClientSecret
   );
 
-  private static redirectUri = `${config.appUrl}/auth/google/callback`;
+  private static redirectUri = `${config.baseUrl}/oauth2/google/callback`;
 
   static async getToken(code: string): Promise<Credentials> {
     try {
@@ -60,6 +60,7 @@ export class OAuthService {
           avatar: picture,
           role: "guest",
           isEmailVerified: true,
+          authType: "google",
         });
       } else {
         user.email = email;
