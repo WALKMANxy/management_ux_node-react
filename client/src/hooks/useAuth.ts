@@ -292,22 +292,27 @@ export const useAuth = () => {
   };
 
   const handleLoginWithGoogle = () => {
-    // Create a state object with random state and uniqueId
-    const stateObj = {
-      randomState: Math.random().toString(36).substring(2, 15),
-      uniqueId: getUniqueIdentifier(),
-    };
+    // Generate randomState and get uniqueId
+    const randomState = Math.random().toString(36).substring(2, 15);
+    const uniqueId = getUniqueIdentifier();
 
     // Save the randomState for later verification
-    sessionStorage.setItem("oauth_state", stateObj.randomState);
+    sessionStorage.setItem("oauth_random_state", randomState);
 
-    // Base64 encode the state object
-    const stateParam = encodeURIComponent(btoa(JSON.stringify(stateObj)));
+    // Concatenate the state parameters with a delimiter
+    const stateParam = `${randomState}:${uniqueId}`;
 
-    // Update the Google OAuth URL
+    console.log("State parameter:", stateParam);
+
+    // URL-encode the state parameter if necessary
+    const encodedStateParam = encodeURIComponent(stateParam);
+
+    console.log("Encoded state parameter:", encodedStateParam);
+
+    // Update the OAuth initiation URL
     const googleAuthUrl = `${
       import.meta.env.VITE_API_BASE_URL
-    }/oauth2/google?state=${stateParam}`;
+    }/oauth2/google?state=${encodedStateParam}`;
 
     // Open the OAuth popup window
     const width = 500;
@@ -321,16 +326,18 @@ export const useAuth = () => {
       `width=${width},height=${height},left=${left},top=${top}`
     );
   };
+
   useEffect(() => {
     const messageListener = async (event: MessageEvent) => {
-      // Verify the origin (should be your API's base URL)
+      // Verify the origin
       if (event.origin !== import.meta.env.VITE_API_BASE_URL) {
         return;
       }
 
       const { status, state, user, refreshToken, accessToken } = event.data;
-      const expectedState = sessionStorage.getItem("oauth_state");
-      sessionStorage.removeItem("oauth_state");
+
+      const expectedState = sessionStorage.getItem("oauth_random_state");
+      sessionStorage.removeItem("oauth_random_state");
 
       if (state !== expectedState) {
         showToast.error(t("auth.invalidStateParameter"));
@@ -338,7 +345,7 @@ export const useAuth = () => {
       }
 
       if (status === "success" && user) {
-        showToast.success(t("auth.googleLoginSuccess")); // Toast for Google OAuth success
+        showToast.success(t("auth.googleLoginSuccess"));
         const userId = user._id;
 
         await initializeUserEncryption({
@@ -351,7 +358,7 @@ export const useAuth = () => {
         await dispatch(
           handleLogin({
             role: user.role,
-            id: user.id, // Use the correct property
+            id: user.id, // Ensure this matches your user object
             userId: user._id,
             refreshToken,
           })
