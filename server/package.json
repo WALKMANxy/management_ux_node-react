@@ -18,7 +18,7 @@
     "@aws-sdk/s3-request-presigner": "^3.670.0",
     "@faker-js/faker": "^9.1.0",
     "@types/bcryptjs": "^2.4.6",
-    "axios": "^1.7.7",
+    "axios": "^1.13.2",
     "bcryptjs": "^2.4.3",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
